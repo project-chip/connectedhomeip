@@ -144,15 +144,12 @@ public:
      * @retval #CHIP_NO_ERROR        Successfully reserved required buffer size.
      * @retval #CHIP_ERROR_INCORRECT_STATE  If the TLVWriter was not initialized.
      * @retval #CHIP_ERROR_NO_MEMORY The reserved buffer size cannot fits into the remaining buffer size.
+     * @retval #CHIP_ERROR_INCORRECT_STATE
+     *                               Uses TLVBackingStore and is in a state where it might allocate
+     *                               additional non-contigious memory, thus making it difficult/impossible
+     *                               to properly reserve space.
      */
-    CHIP_ERROR ReserveBuffer(uint32_t aBufferSize)
-    {
-        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(mRemainingLen >= aBufferSize, CHIP_ERROR_NO_MEMORY);
-        mReservedSize += aBufferSize;
-        mRemainingLen -= aBufferSize;
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR ReserveBuffer(uint32_t aBufferSize);
 
     /**
      * Release previously reserved buffer.

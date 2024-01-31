@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 39.2.4. [TC-WNCV-2.4] Type Attribute with server as DUT
+name: 39.2.4. [TC-WNCV-2.4] Type attribute [DUT as Server]
 
 PICS:
     - WNCV.S
@@ -32,7 +32,7 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 1a: Reads Type attribute from DUT, If (WNCV.S.F00(LF) &
+          "Step 1a: TH reads Type attribute from DUT, If (WNCV.S.F00(LF) &
           !WNCV.S.F01(TL)) value must be between [min=0, max=5] or equals to 9"
       command: "readAttribute"
       attribute: "Type"
@@ -44,7 +44,7 @@ tests:
               maxValue: 9
 
     - label:
-          "Step 1b: Reads Type attribute from DUT, If (!WNCV.S.F00(LF) &
+          "Step 1b: TH reads Type attribute from DUT, If (!WNCV.S.F00(LF) &
           WNCV.S.F01(TL)) value must be only equal to 7"
       command: "readAttribute"
       attribute: "Type"
@@ -55,7 +55,7 @@ tests:
               type: enum8
 
     - label:
-          "Step 1c: Reads Type attribute from DUT, If (WNCV.S.F00(LF) &
+          "Step 1c: TH reads Type attribute from DUT, If (WNCV.S.F00(LF) &
           WNCV.S.F01(TL)) value is either 6 or 8"
       command: "readAttribute"
       attribute: "Type"

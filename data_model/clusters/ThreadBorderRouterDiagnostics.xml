@@ -68,7 +68,7 @@ Davis, CA 95616, USA
     <command id="0x01" name="OpDatasetResponse" direction="responseFromServer">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="OperationalDataset" type="octets">
+      <field id="0" name="OperationalDataset" type="octstr">
         <mandatoryConform>
           <feature name="TH"/>
         </mandatoryConform>

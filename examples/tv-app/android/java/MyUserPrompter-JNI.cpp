@@ -116,7 +116,8 @@ exit:
  * If user responds with Cancel then implementor calls UserPrompterResolver.OnPinCodeDeclined();
  *
  */
-void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
+void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                                    uint16_t pairingHint, const char * pairingInstruction)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -146,6 +147,50 @@ exit:
     {
         ChipLogError(Zcl, "PromptForCommissionPincode error: %s", err.AsString());
     }
+}
+
+/**
+ *   Called to when CancelCommissioning is received via UDC.
+ * Indicates that commissioner can stop showing the passcode entry or display dialog.
+ * For example, can show text such as "Commissioning cancelled by client" before hiding dialog.
+ */
+void JNIMyUserPrompter::HidePromptsOnCancel(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
+{
+    // TODO
+    ChipLogError(Zcl, "JNIMyUserPrompter::HidePromptsOnCancel Needs Implementation");
+}
+
+/**
+ *   Return true if this UserPrompter displays QR code along with passcode
+ * When PromptWithCommissionerPasscode is called during Commissioner Passcode functionality.
+ */
+bool JNIMyUserPrompter::DisplaysPasscodeAndQRCode()
+{
+    // TODO
+    ChipLogError(Zcl, "JNIMyUserPrompter::DisplaysPasscodeAndQRCode Needs Implementation");
+    return false;
+}
+
+/**
+ *   Called to display the given setup passcode to the user,
+ * for commissioning the given commissioneeName with the given vendorId and productId,
+ * and provide instructions for where to enter it in the commissionee (when pairingHint and pairingInstruction are provided).
+ * For example "Casting Passcode: [passcode]. For more instructions, click here."
+ */
+void JNIMyUserPrompter::PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                                       uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction)
+{
+    // TODO
+    ChipLogError(Zcl, "JNIMyUserPrompter::PromptWithCommissionerPasscode Needs Implementation");
+}
+
+/**
+ *   Called to alert the user that commissioning has begun."
+ */
+void JNIMyUserPrompter::PromptCommissioningStarted(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
+{
+    // TODO
+    ChipLogError(Zcl, "JNIMyUserPrompter::PromptCommissioningStarted Needs Implementation");
 }
 
 /*

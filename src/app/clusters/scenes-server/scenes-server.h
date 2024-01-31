@@ -29,7 +29,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Scenes {
+namespace ScenesManagement {
 
 class ScenesServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
@@ -114,8 +114,6 @@ private:
     void HandleStoreScene(HandlerContext & ctx, const Commands::StoreScene::DecodableType & req);
     void HandleRecallScene(HandlerContext & ctx, const Commands::RecallScene::DecodableType & req);
     void HandleGetSceneMembership(HandlerContext & ctx, const Commands::GetSceneMembership::DecodableType & req);
-    void HandleEnhancedAddScene(HandlerContext & ctx, const Commands::EnhancedAddScene::DecodableType & req);
-    void HandleEnhancedViewScene(HandlerContext & ctx, const Commands::EnhancedViewScene::DecodableType & req);
     void HandleCopyScene(HandlerContext & ctx, const Commands::CopyScene::DecodableType & req);
 
     // Group Data Provider
@@ -128,7 +126,7 @@ private:
     static ScenesServer mInstance;
 };
 
-} // namespace Scenes
+} // namespace ScenesManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

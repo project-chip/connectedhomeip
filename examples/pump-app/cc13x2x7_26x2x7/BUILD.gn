@@ -91,6 +91,10 @@ ti_simplelink_executable("pump_app") {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
   }
 
+  if (custom_factory_data) {
+    defines = [ "CC13XX_26XX_FACTORY_DATA" ]
+  }
+
   include_dirs = [
     "${project_dir}",
     "${project_dir}/main",

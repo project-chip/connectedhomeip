@@ -41,7 +41,7 @@
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
 #include <tracing/esp32_trace/insights_sys_stats.h>
-#define START_TIMEOUT_MS 600000
+#define START_TIMEOUT_MS 60000
 #endif
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -100,13 +100,25 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 DeviceLayer::ESP32SecureCertDACProvider gSecureCertDACProvider;
 #endif // CONFIG_SEC_CERT_DAC_PROVIDER
 
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+extern const uint8_t cd_start[] asm("_binary_certification_declaration_der_start");
+extern const uint8_t cd_end[] asm("_binary_certification_declaration_der_end");
+ByteSpan cdSpan(cd_start, static_cast<size_t>(cd_end - cd_start));
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
+
 chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 {
 #if CONFIG_SEC_CERT_DAC_PROVIDER
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+    gSecureCertDACProvider.SetCertificationDeclaration(cdSpan);
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
     return &gSecureCertDACProvider;
 #elif CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+    sFactoryDataProvider.SetCertificationDeclaration(cdSpan);
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
     return &sFactoryDataProvider;
-#else // EXAMPLE_DAC_PROVIDER
+#else  // EXAMPLE_DAC_PROVIDER
     return chip::Credentials::Examples::GetExampleDACProvider();
 #endif
 }

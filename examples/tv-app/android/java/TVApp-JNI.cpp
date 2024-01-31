@@ -189,11 +189,23 @@ JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider
 }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-class MyPincodeService : public PincodeService
+class MyPincodeService : public PasscodeService
 {
-    uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode) override
     {
-        return ContentAppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
+        return ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
+    }
+
+    uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
+    {
+        // TODO: randomly generate this value
+        return 12345678;
+    }
+
+    uint32_t FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    {
+        return ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
     }
 };
 MyPincodeService gMyPincodeService;
@@ -329,7 +341,7 @@ void TvAppJNI::InitializeCommissioner(JNIMyUserPrompter * userPrompter)
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
     if (cdc != nullptr && userPrompter != nullptr)
     {
-        cdc->SetPincodeService(&gMyPincodeService);
+        cdc->SetPasscodeService(&gMyPincodeService);
         cdc->SetUserPrompter(userPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

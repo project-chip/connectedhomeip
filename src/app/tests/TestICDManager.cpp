@@ -16,11 +16,14 @@
  *    limitations under the License.
  */
 #include <app/EventManagement.h>
-#include <app/icd/ICDConfigurationData.h>
-#include <app/icd/ICDManager.h>
-#include <app/icd/ICDNotifier.h>
-#include <app/icd/ICDStateObserver.h>
+#include <app/SubscriptionManager.h>
+#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDManager.h>
+#include <app/icd/server/ICDNotifier.h>
+#include <app/icd/server/ICDStateObserver.h>
 #include <app/tests/AppTestContext.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/NodeId.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestContext.h>
@@ -68,6 +71,21 @@ public:
     void OnICDModeChange() {}
 };
 
+class TestSubscriptionManager : public SubscriptionManager
+{
+public:
+    TestSubscriptionManager() = default;
+    ~TestSubscriptionManager(){};
+
+    void SetReturnValue(bool value) { mReturnValue = value; };
+
+    bool SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) { return mReturnValue; };
+    bool SubjectHasPersistedSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) { return mReturnValue; };
+
+private:
+    bool mReturnValue = false;
+};
+
 class TestContext : public chip::Test::AppContext
 {
 public:
@@ -93,7 +111,7 @@ public:
     CHIP_ERROR SetUp() override
     {
         ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
-        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager());
+        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubManager);
         mICDManager.RegisterObserver(&mICDStateObserver);
         return CHIP_NO_ERROR;
     }
@@ -108,6 +126,7 @@ public:
     System::Clock::Internal::MockClock mMockClock;
     TestSessionKeystoreImpl mKeystore;
     app::ICDManager mICDManager;
+    TestSubscriptionManager mSubManager;
     TestPersistentStorageDelegate testStorage;
 
 private:
@@ -129,7 +148,7 @@ public:
      *
      * @param time_ms: Value in milliseconds.
      */
-    static void AdvanceClockAndRunEventLoop(TestContext * ctx, uint32_t time_ms)
+    static void AdvanceClockAndRunEventLoop(TestContext * ctx, uint64_t time_ms)
     {
         ctx->mMockClock.AdvanceMonotonic(System::Clock::Timeout(time_ms));
         ctx->GetIOContext().DriveIO();
@@ -141,24 +160,193 @@ public:
 
         // After the init we should be in Idle mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-        AdvanceClockAndRunEventLoop(ctx, secondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
-        // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
+        // Idle mode Duration expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() + 1);
-        // Active mode interval expired, ICDManager transitioned to the IdleMode.
+        // Active mode Duration expired, ICDManager transitioned to the IdleMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-        AdvanceClockAndRunEventLoop(ctx, secondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
-        // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
+        // Idle mode Duration expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Events updating the Operation to Active mode can extend the current active mode time by 1 Active mode threshold.
-        // Kick an active Threshold just before the end of the Active interval and validate that the active mode is extended.
+        // Kick an active Threshold just before the end of the ActiveMode duration and validate that the active mode is extended.
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() - 1);
-        ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+        ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeThresholdMs() / 2);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+    }
+
+    /**
+     * @brief Test verifies that the ICDManager starts its timers correctly based on if it will have any messages to send
+     *        when the IdleModeDuration expires
+     */
+    static void TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+        typedef ICDListener::ICDManagementEvents ICDMEvent;
+        ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
+
+        // Set FeatureMap - Configures CIP, UAT and LITS to 1
+        ctx->mICDManager.SetTestFeatureMapValue(0x07);
+
+        // Set that there are no matching subscriptions
+        ctx->mSubManager.SetReturnValue(false);
+
+        // Set New durations for test case
+        uint32_t oldActiveModeDuration_ms = icdConfigData.GetActiveModeDurationMs();
+        icdConfigData.SetModeDurations(0, icdConfigData.GetIdleModeDurationSec());
+
+        // Verify That ICDManager starts in Idle
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Reset IdleModeInterval since it was started before the ActiveModeDuration change
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(icdConfigData.GetIdleModeDurationSec()) + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Force the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is now 0
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThresholdMs() + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Expire Idle mode duration; ICDManager should remain in IdleMode since it has no message to send
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(icdConfigData.GetIdleModeDurationSec()) + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Add an entry to the ICDMonitoringTable
+        ICDMonitoringTable table(ctx->testStorage, kTestFabricIndex1, kMaxTestClients, &(ctx->mKeystore));
+
+        ICDMonitoringEntry entry(&(ctx->mKeystore));
+        entry.checkInNodeID    = kClientNodeId11;
+        entry.monitoredSubject = kClientNodeId11;
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table.Set(0, entry));
+
+        // Trigger register event after first entry was added
+        ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
+
+        // Check ICDManager is now in the LIT operating mode
+        NL_TEST_ASSERT(aSuite, icdConfigData.GetICDMode() == ICDConfigurationData::ICDMode::LIT);
+
+        // Kick an ActiveModeThreshold since a Registration can only happen from an incoming message that would transition the ICD
+        // to ActiveMode
+        ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Return the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is 0
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThresholdMs() + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Expire IdleModeDuration - Device should be in ActiveMode since it has an ICDM registration
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(icdConfigData.GetIdleModeDurationSec()) + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Remove entry from the fabric - ICDManager won't have any messages to send
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table.Remove(0));
+        NL_TEST_ASSERT(aSuite, table.IsEmpty());
+
+        // Return the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is 0
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThresholdMs() + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Expire Idle mode duration; ICDManager should remain in IdleMode since it has no message to send
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(icdConfigData.GetIdleModeDurationSec()) + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Reset Old durations
+        icdConfigData.SetModeDurations(oldActiveModeDuration_ms, icdConfigData.GetIdleModeDurationSec());
+    }
+
+    /**
+     * @brief Test verifies that the ICDManager remains in IdleMode since it will not have any messages to send
+     *        when the IdleModeDuration expires
+     */
+    static void TestICDModeDurationsWith0ActiveModeDurationWithActiveSub(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+        typedef ICDListener::ICDManagementEvents ICDMEvent;
+        ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
+
+        // Set FeatureMap - Configures CIP, UAT and LITS to 1
+        ctx->mICDManager.SetTestFeatureMapValue(0x07);
+
+        // Set that there are not matching subscriptions
+        ctx->mSubManager.SetReturnValue(true);
+
+        // Set New durations for test case
+        uint32_t oldActiveModeDuration_ms = icdConfigData.GetActiveModeDurationMs();
+        icdConfigData.SetModeDurations(0, icdConfigData.GetIdleModeDurationSec());
+
+        // Verify That ICDManager starts in Idle
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Reset IdleModeInterval since it was started before the ActiveModeDuration change
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(icdConfigData.GetIdleModeDurationSec()) + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Force the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is now 0
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThresholdMs() + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Expire Idle mode duration; ICDManager should remain in IdleMode since it has no message to send
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(icdConfigData.GetIdleModeDurationSec()) + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Add an entry to the ICDMonitoringTable
+        ICDMonitoringTable table(ctx->testStorage, kTestFabricIndex1, kMaxTestClients, &(ctx->mKeystore));
+
+        ICDMonitoringEntry entry(&(ctx->mKeystore));
+        entry.checkInNodeID    = kClientNodeId11;
+        entry.monitoredSubject = kClientNodeId11;
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table.Set(0, entry));
+
+        // Trigger register event after first entry was added
+        ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
+
+        // Check ICDManager is now in the LIT operating mode
+        NL_TEST_ASSERT(aSuite, icdConfigData.GetICDMode() == ICDConfigurationData::ICDMode::LIT);
+
+        // Kick an ActiveModeThreshold since a Registration can only happen from an incoming message that would transition the ICD
+        // to ActiveMode
+        ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Return the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is 0
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThresholdMs() + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Expire IdleModeDuration - Device stay in IdleMode since it has an active subscription for the ICDM entry
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(icdConfigData.GetIdleModeDurationSec()) + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Remove entry from the fabric
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table.Remove(0));
+        NL_TEST_ASSERT(aSuite, table.IsEmpty());
+
+        // Trigger unregister event after last entry was removed
+        ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
+
+        // Check ICDManager is now in the LIT operating mode
+        NL_TEST_ASSERT(aSuite, icdConfigData.GetICDMode() == ICDConfigurationData::ICDMode::SIT);
+
+        // Kick an ActiveModeThreshold since a Unregistration can only happen from an incoming message that would transition the ICD
+        // to ActiveMode
+        ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Return the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is 0
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThresholdMs() + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Expire Idle mode duration; ICDManager should remain in IdleMode since it has no message to send
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(icdConfigData.GetIdleModeDurationSec()) + 1);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Reset Old durations
+        icdConfigData.SetModeDurations(oldActiveModeDuration_ms, icdConfigData.GetIdleModeDurationSec());
     }
 
     static void TestKeepActivemodeRequests(nlTestSuite * aSuite, void * aContext)
@@ -168,45 +356,45 @@ public:
         ICDNotifier notifier = ICDNotifier::GetInstance();
 
         // Setting a requirement will transition the ICD to active mode.
-        notifier.BroadcastActiveRequestNotification(ActiveFlag::kCommissioningWindowOpen);
+        notifier.NotifyActiveRequestNotification(ActiveFlag::kCommissioningWindowOpen);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
-        // Advance time so active mode interval expires.
+        // Advance time so active mode duration expires.
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() + 1);
         // Requirement flag still set. We stay in active mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Remove requirement. we should directly transition to idle mode.
-        notifier.BroadcastActiveRequestWithdrawal(ActiveFlag::kCommissioningWindowOpen);
+        notifier.NotifyActiveRequestWithdrawal(ActiveFlag::kCommissioningWindowOpen);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
-        notifier.BroadcastActiveRequestNotification(ActiveFlag::kFailSafeArmed);
+        notifier.NotifyActiveRequestNotification(ActiveFlag::kFailSafeArmed);
         // Requirement will transition us to active mode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
-        // Advance time, but by less than the active mode interval and remove the requirement.
+        // Advance time, but by less than the active mode duration and remove the requirement.
         // We should stay in active mode.
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() / 2);
-        notifier.BroadcastActiveRequestWithdrawal(ActiveFlag::kFailSafeArmed);
+        notifier.NotifyActiveRequestWithdrawal(ActiveFlag::kFailSafeArmed);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
-        // Advance time again, The activemode interval is completed.
+        // Advance time again, The activemode duration is completed.
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() + 1);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Set two requirements
-        notifier.BroadcastActiveRequestNotification(ActiveFlag::kFailSafeArmed);
-        notifier.BroadcastActiveRequestNotification(ActiveFlag::kExchangeContextOpen);
+        notifier.NotifyActiveRequestNotification(ActiveFlag::kFailSafeArmed);
+        notifier.NotifyActiveRequestNotification(ActiveFlag::kExchangeContextOpen);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
-        // advance time so the active mode interval expires.
+        // advance time so the active mode duration expires.
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() + 1);
         // A requirement flag is still set. We stay in active mode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // remove 1 requirement. Active mode is maintained
-        notifier.BroadcastActiveRequestWithdrawal(ActiveFlag::kFailSafeArmed);
+        notifier.NotifyActiveRequestWithdrawal(ActiveFlag::kFailSafeArmed);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         // remove the last requirement
-        notifier.BroadcastActiveRequestWithdrawal(ActiveFlag::kExchangeContextOpen);
+        notifier.NotifyActiveRequestWithdrawal(ActiveFlag::kExchangeContextOpen);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
     }
 
@@ -228,7 +416,7 @@ public:
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT);
 
         // Trigger a "fake" register, ICDManager shoudl remain in SIT mode
-        notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
+        notifier.NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager stayed in SIT mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT);
@@ -245,7 +433,7 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table1.Set(0, entry1));
 
         // Trigger register event after first entry was added
-        notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
+        notifier.NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is now in the LIT operating mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::LIT);
@@ -258,7 +446,7 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table1.Set(1, entry2));
 
         // Trigger register event after first entry was added
-        notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
+        notifier.NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is now in the LIT operating mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::LIT);
@@ -271,7 +459,7 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table2.Set(0, entry3));
 
         // Trigger register event after first entry was added
-        notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
+        notifier.NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is now in the LIT operating mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::LIT);
@@ -287,7 +475,7 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table2.RemoveAll());
 
         // Trigger register event after fabric was cleared
-        notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
+        notifier.NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is still in the LIT operating mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::LIT);
@@ -296,7 +484,7 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table1.Remove(1));
 
         // Trigger register event after fabric was cleared
-        notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
+        notifier.NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is still in the LIT operating mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::LIT);
@@ -307,7 +495,7 @@ public:
         NL_TEST_ASSERT(aSuite, table2.IsEmpty());
 
         // Trigger register event after fabric was cleared
-        notifier.BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
+        notifier.NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is still in the LIT operating mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT);
@@ -321,6 +509,28 @@ public:
         uint32_t counter2 = ICDConfigurationData::GetInstance().GetICDCounter();
         NL_TEST_ASSERT(aSuite, (counter + 1) == counter2);
     }
+
+    static void TestOnSubscriptionReport(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx    = static_cast<TestContext *>(aContext);
+        ICDNotifier notifier = ICDNotifier::GetInstance();
+
+        // After the init we should be in Idle mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Trigger a subscription report
+        notifier.NotifySubscriptionReport();
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Trigger another subscription report - active time should not be increased
+        notifier.NotifySubscriptionReport();
+
+        // Advance time so active mode interval expires.
+        AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() + 1);
+
+        // After the init we should be in Idle mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+    }
 };
 
 } // namespace app
@@ -329,6 +539,11 @@ public:
 namespace {
 static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDModeDurations", TestICDManager::TestICDModeDurations),
+    NL_TEST_DEF("TestOnSubscriptionReport", TestICDManager::TestOnSubscriptionReport),
+    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub",
+                TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub),
+    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithActiveSub",
+                TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithActiveSub),
     NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
     NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
     NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),

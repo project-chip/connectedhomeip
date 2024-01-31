@@ -399,7 +399,7 @@ int TestBytesCircularBuffer()
     unsigned seed = static_cast<unsigned>(std::time(nullptr));
     printf("Running " __FILE__ " using seed %d", seed);
     std::srand(seed);
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

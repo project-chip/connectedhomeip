@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 145.1.2. [TC-FLDCONC-2.1] Attributes with server as DUT
+name: 145.1.2. [TC-FLDCONC-2.1] Attributes with DUT as Server
 
 PICS:
     - FLDCONC.S
@@ -133,3 +133,12 @@ tests:
               type: enum8
               minValue: 0
               maxValue: 4
+
+    - label: "Step 12: TH reads from the DUT the Uncertainty attribute."
+      PICS: FLDCONC.S.A0007
+      command: "readAttribute"
+      attribute: "Uncertainty"
+      response:
+          constraints:
+              type: single
+              minValue: 0

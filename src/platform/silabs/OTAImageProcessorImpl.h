@@ -75,6 +75,7 @@ private:
     static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4)));
     // Offset indicates how far the write buffer has been filled
     static uint16_t writeBufOffset;
+    static bool mReset;
 };
 
 } // namespace chip

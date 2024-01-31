@@ -31,6 +31,13 @@ arm_toolchain("qpg_lighting_app") {
   }
 }
 
+arm_toolchain("qpg_light_switch_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/light-switch-app/qpg/args.gni")
+  }
+}
+
 arm_toolchain("qpg_shell_app") {
   toolchain_args = {
     current_os = "freertos"

@@ -21,27 +21,20 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <LinearLayout
-                    android:id="@+id/door_lock_function_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                <include
+                    android:id="@+id/door_lock_lock_state_layout"
+                    layout="@layout/layout_item_title_value_simple_button" />
 
-                    <include
-                        android:id="@+id/door_lock_lock_state_layout"
-                        layout="@layout/layout_item_title_value_simple_button" />
+                <include
+                    android:id="@+id/door_lock_send_alarm_layout"
+                    layout="@layout/layout_item_title_value_simple_button" />
 
-                    <include
-                        android:id="@+id/door_lock_send_alarm_layout"
-                        layout="@layout/layout_item_title_value_simple_button" />
-
-                    <include
-                        android:id="@+id/door_lock_battery_layout"
-                        layout="@layout/layout_item_title_value_seekbar" />
-                </LinearLayout>
+                <include
+                    android:id="@+id/door_lock_battery_layout"
+                    layout="@layout/layout_item_title_value_seekbar" />
 
                 <!-- Bottom Space -->
-                <include layout="@layout/layout_space_bottom" />
+                <include layout="@layout/layout_bottom_space" />
                 <!-- Bottom Space -->
             </LinearLayout>
         </ScrollView>

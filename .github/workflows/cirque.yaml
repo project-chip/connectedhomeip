@@ -40,7 +40,7 @@ jobs:
         # need to run with privilege, which isn't supported by job.XXX.contaner
         #  https://github.com/actions/container-action/issues/2
         #         container:
-        #             image: ghcr.io/project-chip/chip-build-cirque:26
+        #             image: ghcr.io/project-chip/chip-build-cirque:32
         #             volumes:
         #                 - "/tmp:/tmp"
         #                 - "/dev/pts:/dev/pts"
@@ -90,7 +90,10 @@ jobs:
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
-                    -- scripts/tests/cirque_tests.sh bootstrap
+                    -- sh -c " \
+                       git config --global --add safe.directory '*' \
+                       && scripts/tests/cirque_tests.sh bootstrap \
+                      "
 
             - name: Artifact suffix
               id: outsuffix
@@ -123,7 +126,7 @@ jobs:
                    
 
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ always() && !env.ACT }}
               with:
                   name: cirque_log-${{steps.outsuffix.outputs.value}}-logs

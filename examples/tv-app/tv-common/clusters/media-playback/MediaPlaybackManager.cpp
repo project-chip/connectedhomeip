@@ -277,42 +277,32 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
 
 bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)
 {
-    bool foundMatch = false;
+    std::string idString(trackId.data(), trackId.size());
     for (auto const & availableAudioTrack : mAvailableAudioTracks)
     {
-        if (strcmp(availableAudioTrack.id.data(), trackId.data()) == 0)
+        std::string nextIdString(availableAudioTrack.id.data(), availableAudioTrack.id.size());
+        if (nextIdString == idString)
         {
             mActiveAudioTrack = availableAudioTrack;
-            foundMatch        = true;
+            return true;
         }
     }
-
-    if (!foundMatch)
-    {
-        // return an error
-    }
-
-    return true;
+    return false;
 }
 
 bool MediaPlaybackManager::HandleActivateTextTrack(const chip::CharSpan & trackId)
 {
-    bool foundMatch = false;
+    std::string idString(trackId.data(), trackId.size());
     for (auto const & availableTextTrack : mAvailableTextTracks)
     {
-        if (strcmp(availableTextTrack.id.data(), trackId.data()) == 0)
+        std::string nextIdString(availableTextTrack.id.data(), availableTextTrack.id.size());
+        if (nextIdString == idString)
         {
-            mActiveAudioTrack = availableTextTrack;
-            foundMatch        = true;
+            mActiveTextTrack = availableTextTrack;
+            return true;
         }
     }
-
-    if (!foundMatch)
-    {
-        // return an error
-    }
-
-    return true;
+    return false;
 }
 
 bool MediaPlaybackManager::HandleDeactivateTextTrack()

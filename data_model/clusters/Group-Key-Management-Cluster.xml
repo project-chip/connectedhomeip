@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003f" name="GroupKeyManagement" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003F" name="GroupKeyManagement" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Clarify KeySetWrite validation and behavior on invalid epoch key lengths"/>
@@ -86,29 +86,31 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="GroupInfoMapStruct">
-      <field id="1" name="GroupId" type="&lt;&lt;ref_DataTypeGroupId&gt;&gt;">
+      <field id="1" name="GroupId" type="ref_DataTypeGroupId">
         <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="Endpoints" type="&lt;&lt;ref_DataTypeList&gt;&gt;[&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt;]">
+      <field id="2" name="Endpoints" type="ref_DataTypeList[ref_DataTypeEndpointNumber]">
         <access read="true"/>
         <mandatoryConform/>
         <constraint type="min" value="1"/>
       </field>
-      <field id="3" name="GroupName" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="3" name="GroupName" type="ref_DataTypeString">
         <access read="true"/>
         <optionalConform/>
         <constraint type="max" value="16"/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
     <struct name="GroupKeyMapStruct">
-      <field id="1" name="GroupId" type="&lt;&lt;ref_DataTypeGroupId&gt;&gt;">
+      <field id="1" name="GroupId" type="ref_DataTypeGroupId">
         <mandatoryConform/>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="65535"/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
     <struct name="GroupKeySetStruct">
       <field id="0" name="GroupKeySetID" type="uint16">
@@ -118,35 +120,35 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="EpochKey0" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="2" name="EpochKey0" type="ref_DataTypeOctstr">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint type="allowed" value="16"/>
       </field>
-      <field id="3" name="EpochStartTime0" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
+      <field id="3" name="EpochStartTime0" type="ref_DataTypeEpochUs">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="4" name="EpochKey1" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
-        <access fabricSensitive="true"/>
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
-      </field>
-      <field id="5" name="EpochStartTime1" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
-        <access fabricSensitive="true"/>
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="6" name="EpochKey2" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="4" name="EpochKey1" type="ref_DataTypeOctstr">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint type="allowed" value="16"/>
       </field>
-      <field id="7" name="EpochStartTime2" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
+      <field id="5" name="EpochStartTime1" type="ref_DataTypeEpochUs">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="EpochKey2" type="ref_DataTypeOctstr">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="allowed" value="16"/>
+      </field>
+      <field id="7" name="EpochStartTime2" type="ref_DataTypeEpochUs">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -161,14 +163,14 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="GroupKeyMap" type="&lt;&lt;ref_DataTypeList&gt;&gt;[GroupKeyMapStruct Type]" default="empty">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+    <attribute id="0x0000" name="GroupKeyMap" type="ref_DataTypeList[GroupKeyMapStruct Type]" default="empty">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage" fabricScoped="true"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0001" name="GroupTable" type="&lt;&lt;ref_DataTypeList&gt;&gt;[GroupInfoMapStruct Type]" default="empty">
-      <access read="true" readPrivilege="view"/>
+    <attribute id="0x0001" name="GroupTable" type="ref_DataTypeList[GroupInfoMapStruct Type]" default="empty">
+      <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>

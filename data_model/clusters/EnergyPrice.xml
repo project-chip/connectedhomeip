@@ -81,19 +81,19 @@ Davis, CA 95616, USA
       <item value="0" name="kWh" summary="Kilowatt Hours">
         <mandatoryConform/>
       </item>
-      <item value="1" name="m³" summary="Cubic meters">
+      <item value="1" name="m" summary="Cubic meters">
         <mandatoryConform/>
       </item>
-      <item value="2" name="ft³" summary="Cubic feet">
+      <item value="2" name="ft" summary="Cubic feet">
         <mandatoryConform/>
       </item>
       <item value="3" name="CCF" summary="Centum Cubic feet">
         <mandatoryConform/>
       </item>
-      <item value="4" name="US gl" summary="US Gallons">
+      <item value="4" name="US" summary="US Gallons">
         <mandatoryConform/>
       </item>
-      <item value="5" name="IMP gl" summary="Imperial Gallons">
+      <item value="5" name="IMP" summary="Imperial Gallons">
         <mandatoryConform/>
       </item>
       <item value="6" name="L" summary="Liters">
@@ -123,8 +123,9 @@ Davis, CA 95616, USA
       <field id="2" name="Description" type="string">
         <access read="true"/>
         <optionalConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint type="maxLength" value="32 chars"/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
     <struct name="PriceStruct">
       <field id="0" name="PeriodStart" type="epoch-s">
@@ -160,6 +161,7 @@ Davis, CA 95616, USA
         <optionalConform/>
         <constraint type="maxCount" value="10"/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>

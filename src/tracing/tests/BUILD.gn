@@ -27,7 +27,7 @@ if (matter_enable_tracing_support && matter_trace_config == "multiplexed") {
     sources = []
 
     public_deps = [
-      "${chip_root}/src/lib/support:testing",
+      "${chip_root}/src/lib/support:testing_nlunit",
       "${chip_root}/src/platform",
       "${chip_root}/src/tracing",
       "${nlunit_test_root}:nlunit-test",

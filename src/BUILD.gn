@@ -19,7 +19,6 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
-import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
@@ -39,6 +38,11 @@ config("includes") {
     "${root_gen_dir}/include",
   ]
 
+  if (chip_device_platform == "external" &&
+      chip_external_platform_include_dir != "") {
+    include_dirs += [ "${chip_external_platform_include_dir}" ]
+  }
+
   # TODO: generated file dependency should be a lib NOT an include
   include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
 
@@ -52,7 +56,8 @@ if (chip_build_tests) {
   import("${chip_root}/build/chip/chip_test_group.gni")
 
   chip_test_group("tests") {
-    deps = [
+    deps = []
+    tests = [
       "${chip_root}/src/access/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
@@ -61,13 +66,14 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/core/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/protocols/interaction_model/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
     if (current_os != "mbed") {
-      deps += [
+      tests += [
         "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
         "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
@@ -76,19 +82,19 @@ if (chip_build_tests) {
     }
 
     if (current_os != "zephyr" && current_os != "mbed") {
-      deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
+      tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
 
     if (current_os != "zephyr" && current_os != "mbed" &&
         chip_device_platform != "efr32") {
-      deps += [
+      tests += [
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]
     }
 
     if (chip_device_platform != "efr32") {
-      deps += [
+      tests += [
         # TODO(#10447): App test has HF on EFR32.
         "${chip_root}/src/app/tests",
         "${chip_root}/src/credentials/tests",
@@ -101,21 +107,21 @@ if (chip_build_tests) {
 
       if (matter_enable_tracing_support &&
           matter_trace_config == "multiplexed") {
-        deps += [ "${chip_root}/src/tracing/tests" ]
+        tests += [ "${chip_root}/src/tracing/tests" ]
       }
     }
 
     if (chip_device_platform != "none") {
-      deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
+      tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
     if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
         chip_device_platform != "ameba") {
-      deps += [ "${chip_root}/src/platform/tests" ]
+      tests += [ "${chip_root}/src/platform/tests" ]
     }
 
     if (chip_config_network_layer_ble) {
-      deps += [ "${chip_root}/src/ble/tests" ]
+      tests += [ "${chip_root}/src/ble/tests" ]
     }
 
     # On nrfconnect, the controller tests run into
@@ -123,21 +129,26 @@ if (chip_build_tests) {
     if (chip_device_platform != "nrfconnect" &&
         chip_device_platform != "efr32") {
       # TODO(#10447): Controller test has HF on EFR32.
-      deps += [ "${chip_root}/src/controller/tests/data_model" ]
+      tests += [ "${chip_root}/src/controller/tests/data_model" ]
 
       # Skip controller test for Open IoT SDK
       # https://github.com/project-chip/connectedhomeip/issues/23747
       if (chip_device_platform != "openiotsdk") {
-        deps += [ "${chip_root}/src/controller/tests" ]
+        tests += [ "${chip_root}/src/controller/tests" ]
       }
     }
 
     if (current_os != "zephyr" && current_os != "mbed" &&
         chip_device_platform != "esp32" && chip_device_platform != "ameba") {
-      deps += [ "${chip_root}/src/lib/shell/tests" ]
+      tests += [ "${chip_root}/src/lib/shell/tests" ]
     }
 
     if (chip_monolithic_tests) {
+      # TODO [PW_MIGRATION] Remove this if after migartion to PW_TEST is completed for all platforms
+      # TODO [PW_MIGRATION] There will be a list of already migrated platforms
+      if (false) {
+        deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
+      }
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
@@ -145,12 +156,12 @@ if (chip_build_tests) {
   }
 
   chip_test_group("fake_platform_tests") {
-    deps = [ "${chip_root}/src/lib/dnssd/platform/tests" ]
+    tests = [ "${chip_root}/src/lib/dnssd/platform/tests" ]
   }
 
   # Tests to run with each Crypto PAL
   chip_test_group("crypto_tests") {
-    deps = [
+    tests = [
       "${chip_root}/src/credentials/tests",
       "${chip_root}/src/crypto/tests",
     ]

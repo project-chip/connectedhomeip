@@ -135,7 +135,7 @@ int TestFailSafeContext()
 {
     nlTestSuite theSuite = { "FailSafeContext tests", &sTests[0], TestFailSafeContext_Setup, TestFailSafeContext_Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

@@ -17,7 +17,7 @@
 #
 
 function _get_fullpath() {
-    cd "$(dirname "$1")" && echo "$PWD/$(basename "$1")"
+    cd "$(dirname "$1")" >/dev/null && echo "$PWD/$(basename "$1")"
 }
 
 set -e
@@ -35,14 +35,14 @@ if [[ -z "$ZAP_INSTALL_PATH" && -n "$PW_ZAP_CIPD_INSTALL_DIR" ]]; then
     ZAP_INSTALL_PATH="$PW_ZAP_CIPD_INSTALL_DIR"
 fi
 
-if [ ! -z "$ZAP_DEVELOPMENT_PATH" ]; then
+if [ -n "$ZAP_DEVELOPMENT_PATH" ]; then
     WORKING_DIR=$ZAP_DEVELOPMENT_PATH
     ZAP_CMD="node src-script/zap-start.js"
     # Make sure we don't try to munge the package.json in the ZAP repo.
     export ZAP_SKIP_REAL_VERSION=1
 
     "$CHIP_ROOT"/scripts/tools/zap/zap_bootstrap.sh
-elif [ ! -z "$ZAP_INSTALL_PATH" ]; then
+elif [ -n "$ZAP_INSTALL_PATH" ]; then
     if [[ "$OSTYPE" == "darwin"* ]]; then
         ZAP_CMD="$ZAP_INSTALL_PATH/zap.app/Contents/MacOS/zap"
     else
@@ -59,7 +59,7 @@ fi
 
     echo "ARGS: $ZAP_ARGS"
 
-    if [[ "${ZAP_ARGS[@]}" == *"/all-clusters-app.zap"* ]]; then
+    if [[ "${ZAP_ARGS[*]}" == *"/all-clusters-app.zap"* ]]; then
         ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl-with-test-extensions.json"
     else
         ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl.json"

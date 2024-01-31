@@ -679,25 +679,40 @@ struct GeneralCommissioningInfo
     ;
 };
 
+// ICDManagementClusterInfo is populated when the controller reads information from
+// the ICD Management cluster, and is used to communicate that information.
+struct ICDManagementClusterInfo
+{
+    // Whether the ICD is capable of functioning as a LIT device.  If false, the ICD can only be a SIT device.
+    bool isLIT;
+    // Whether the ICD supports the check-in protocol.  LIT devices have to support it, but SIT devices
+    // might or might not.
+    bool checkInProtocolSupport;
+
+    // userActiveModeTriggerHint indicates which user action(s) will trigger the ICD to switch to Active mode.
+    // For a LIT: The device is required to provide a value for the bitmap.
+    // For a SIT: The device may not provide a value.  In that case, none of the bits will be set.
+    //
+    // userActiveModeTriggerInstruction may provide additional information for users for some specific
+    // userActiveModeTriggerHint values.
+    BitMask<app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint;
+    CharSpan userActiveModeTriggerInstruction;
+};
+
 struct ReadCommissioningInfo
 {
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
-    bool requiresUTC               = false;
-    bool requiresTimeZone          = false;
-    bool requiresDefaultNTP        = false;
-    bool requiresTrustedTimeSource = false;
-    uint8_t maxTimeZoneSize        = 1;
-    uint8_t maxDSTSize             = 1;
-};
-
-struct ReadCommissioningInfo2
-{
-    NodeId nodeId                     = kUndefinedNodeId;
-    bool isIcd                        = false;
-    bool checkInProtocolSupport       = false;
+    bool requiresUTC                  = false;
+    bool requiresTimeZone             = false;
+    bool requiresDefaultNTP           = false;
+    bool requiresTrustedTimeSource    = false;
+    uint8_t maxTimeZoneSize           = 1;
+    uint8_t maxDSTSize                = 1;
+    NodeId remoteNodeId               = kUndefinedNodeId;
     bool supportsConcurrentConnection = true;
+    ICDManagementClusterInfo icd;
 };
 
 struct TimeZoneResponseInfo
@@ -730,8 +745,8 @@ class CommissioningDelegate
 public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
-     * kReadCommissioningInfo: ReadCommissioningInfo
-     * kReadCommissioningInfo2: ReadCommissioningInfo2
+     * kReadCommissioningInfo: Reported together with ReadCommissioningInfo2
+     * kReadCommissioningInfo2: ReadCommissioningInfo
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None
@@ -755,9 +770,9 @@ public:
      * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: none
      */
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, ReadCommissioningInfo2, AttestationErrorInfo,
-                                         CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

@@ -263,6 +263,13 @@ public:
     }
     CommssionAdvertiseMode GetCommissionAdvertiseMode() const { return mMode; }
 
+    CommissionAdvertisingParameters & SetCommissionerPasscodeSupported(Optional<bool> commissionerPasscodeSupported)
+    {
+        mCommissionerPasscodeSupported = commissionerPasscodeSupported;
+        return *this;
+    }
+    Optional<bool> GetCommissionerPasscodeSupported() const { return mCommissionerPasscodeSupported; }
+
 private:
     uint8_t mShortDiscriminator          = 0;
     uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
@@ -281,6 +288,8 @@ private:
 
     char mPairingInstr[kKeyPairingInstructionMaxLength + 1];
     bool mPairingInstrHasValue = false;
+
+    Optional<bool> mCommissionerPasscodeSupported;
 };
 
 /**

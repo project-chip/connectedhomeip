@@ -17,23 +17,30 @@
 
 package matter.onboardingpayload
 
+import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Element
+import matter.tlv.IntValue
+import matter.tlv.TlvReader
+import matter.tlv.Utf8StringValue
 
 /**
  * @class QRCodeOnboardingPayloadParser A class that can be used to convert a base38 encoded payload
  *   to a OnboardingPayload object
  */
 class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
+
   fun populatePayload(): OnboardingPayload {
-    var indexToReadFrom: AtomicInteger = AtomicInteger(0)
-    var outPayload: OnboardingPayload = OnboardingPayload()
+    val indexToReadFrom = AtomicInteger(0)
+    val outPayload = OnboardingPayload()
 
     val payload = extractPayload(mBase38Representation)
-    if (payload.length == 0) {
+    if (payload.isEmpty()) {
       throw UnrecognizedQrCodeException("Invalid argument")
     }
 
-    var buf = base38Decode(payload)
+    val buf = base38Decode(payload)
     var dest = readBits(buf, indexToReadFrom, kVersionFieldLengthInBits)
     outPayload.version = dest.toInt()
 
@@ -60,9 +67,65 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
       throw UnrecognizedQrCodeException("Invalid argument")
     }
 
-    // TODO: populate TLV optional fields
+    populateTLV(outPayload, buf, indexToReadFrom)
 
     return outPayload
+  }
+
+  private fun populateTLV(
+    payload: OnboardingPayload,
+    payloadData: ArrayList<Byte>,
+    index: AtomicInteger
+  ) {
+    val bitsLeftToRead = (payloadData.count() * 8) - index.get()
+    val tlvBytesLength = (bitsLeftToRead + 7) / 8
+
+    if (tlvBytesLength == 0) {
+      return
+    }
+    val byteBuffer = ByteBuffer.allocate(tlvBytesLength)
+    repeat(tlvBytesLength) {
+      val value = readBits(payloadData, index, 8)
+      byteBuffer.put(value.toByte())
+    }
+
+    val reader = TlvReader(byteBuffer.array())
+    while (true) {
+      val element = reader.nextElement()
+      if (reader.isEndOfTlv()) {
+        break
+      }
+      parseTLVFields(element, payload)
+    }
+  }
+
+  private fun parseTLVFields(element: Element, payload: OnboardingPayload) {
+    // update tag
+    val tag = element.tag
+    if (tag !is ContextSpecificTag) {
+      return
+    }
+
+    if (tag.tagNumber < 0x80) {
+      // add serial number
+      if (tag.tagNumber == kSerialNumberTag) {
+        val value = element.value
+        if (value is IntValue) {
+          payload.addSerialNumber(value.value.toInt())
+        }
+        if (value is Utf8StringValue) {
+          payload.addSerialNumber(value.value)
+        }
+      }
+    } else {
+      // add extension values
+      val value = element.value
+      if (value is IntValue) {
+        payload.addOptionalVendorData(tag.tagNumber, value.value.toInt())
+      } else if (value is Utf8StringValue) {
+        payload.addOptionalVendorData(tag.tagNumber, value.value)
+      }
+    }
   }
 
   companion object {

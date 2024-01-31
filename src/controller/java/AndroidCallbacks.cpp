@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "AndroidCallbacks.h"
+#include <controller/java/AndroidConnectionFailureExceptions.h>
 #include <controller/java/AndroidControllerExceptions.h>
 #ifdef USE_JAVA_TLV_ENCODE_DECODE
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
@@ -114,7 +115,8 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context,
+                                                             const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -135,15 +137,15 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
     VerifyOrReturn(failureMethod != nullptr, ChipLogError(Controller, "Could not find onConnectionFailure method"));
 
     jthrowable exception;
-    CHIP_ERROR err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, ErrorStr(error),
-                                                                                                 error.AsInteger(), exception);
+    CHIP_ERROR err = AndroidConnectionFailureExceptions::GetInstance().CreateAndroidConnectionFailureException(
+        env, failureInfo.error.Format(), failureInfo.error.AsInteger(), failureInfo.sessionStage, exception);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         ChipLogError(Controller,
                      "Unable to create AndroidControllerException on GetConnectedDeviceCallback::OnDeviceConnectionFailureFn: %s",
                      ErrorStr(err)));
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);
+    env->CallVoidMethod(javaCallback, failureMethod, failureInfo.peerId.GetNodeId(), exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -318,7 +320,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to copy tlv element with error %s", ErrorStr(err));
                    aPath.LogPath());
     size = writer.GetLengthWritten();
-    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
+    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), static_cast<jint>(size));
 
     // Convert TLV to JSON
     std::string json;
@@ -457,7 +459,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to copy element with error %s", ErrorStr(err));
                    aEventHeader.LogPath());
     size = writer.GetLengthWritten();
-    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
+    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), static_cast<jint>(size));
 
     // Convert TLV to JSON
     std::string json;
@@ -524,7 +526,7 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(JNIEnv * env, const app::Concrete
         err = writer.CopyElement(TLV::AnonymousTag(), readerForJavaTLV);
         ReturnErrorOnFailure(err);
         size = writer.GetLengthWritten();
-        chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
+        chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), static_cast<jint>(size));
 
         // Convert TLV to JSON
         std::string json;

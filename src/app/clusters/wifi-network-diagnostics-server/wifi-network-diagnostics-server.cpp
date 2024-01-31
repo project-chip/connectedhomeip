@@ -27,6 +27,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -242,6 +243,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
     // Gets called when the Node detects Node’s Wi-Fi connection has been disconnected.
     void OnDisconnectionDetected(uint16_t reasonCode) override
     {
+        MATTER_TRACE_SCOPE("OnDisconnectionDetected", "WiFiDiagnosticsDelegate");
         ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
 
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
@@ -260,6 +262,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
     // Gets called when the Node fails to associate or authenticate an access point.
     void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) override
     {
+        MATTER_TRACE_SCOPE("OnAssociationFailureDetected", "WiFiDiagnosticsDelegate");
         ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected");
 
         Events::AssociationFailure::Type event{ static_cast<AssociationFailureCauseEnum>(associationFailureCause), status };
@@ -279,6 +282,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
     // Gets when the Node’s connection status to a Wi-Fi network has changed.
     void OnConnectionStatusChanged(uint8_t connectionStatus) override
     {
+        MATTER_TRACE_SCOPE("OnConnectionStatusChanged", "WiFiDiagnosticsDelegate");
         ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
 
         Events::ConnectionStatus::Type event{ static_cast<ConnectionStatusEnum>(connectionStatus) };

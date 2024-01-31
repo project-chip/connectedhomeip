@@ -27,11 +27,12 @@ import enum
 from chip.exceptions import ChipStackException
 
 from .delegate import (AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct,
-                       SessionParameters, SessionParametersStruct)
+                       PyInvokeRequestData, PyWriteAttributeData, SessionParameters, SessionParametersStruct,
+                       TestOnlyPyBatchCommandsOverrides)
 
 __all__ = ["AttributePath", "AttributePathIBstruct", "DataVersionFilterIBstruct",
-           "EventPath", "EventPathIBstruct", "InteractionModelError",
-           "SessionParameters", "SessionParametersStruct", "Status"]
+           "EventPath", "EventPathIBstruct", "InteractionModelError", "PyInvokeRequestData",
+           "PyWriteAttributeData", "SessionParameters", "SessionParametersStruct", "Status", "TestOnlyPyBatchCommandsOverrides"]
 
 
 # defined src/controller/python/chip/interaction_model/Delegate.h

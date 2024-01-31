@@ -151,7 +151,7 @@ tests:
                 value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
               - name: "Credentials"
                 value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS
-              - name: "breadcrumb"
+              - name: "Breadcrumb"
                 value: 1
       response:
           values:
@@ -332,7 +332,7 @@ tests:
                 value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
               - name: "Credentials"
                 value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS
-              - name: "breadcrumb"
+              - name: "Breadcrumb"
                 value: 1
       response:
           values:

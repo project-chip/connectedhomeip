@@ -207,57 +207,47 @@ Davis, CA 95616, USA
     </bitmap>
     <struct name="AverageLoadControlStruct">
       <field id="1" name="LoadAdjustment" type="int8">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="between" from="0" to="100"/>
       </field>
     </struct>
     <struct name="DutyCycleControlStruct">
       <field id="1" name="DutyCycle" type="uint8">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="between" from="0" to="100"/>
       </field>
     </struct>
     <struct name="HeatingSourceControlStruct">
       <field id="1" name="HeatingSource" type="HeatingSourceEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="LoadControlEventTransitionStruct">
       <field id="1" name="Duration" type="uint16" default="0">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="max" value="1440"/>
       </field>
       <field id="2" name="Control" type="EventTransitionControlBitmap" default="0">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="TemperatureControl" type="TemperatureControlStruct" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
       </field>
       <field id="4" name="AverageLoadControl" type="AverageLoadControlStruct" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
       </field>
       <field id="5" name="DutyCycleControl" type="DutyCycleControlStruct" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
       </field>
       <field id="6" name="PowerSavingsControl" type="PowerSavingsControlStruct" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
       </field>
       <field id="7" name="HeatingSourceControl" type="HeatingSourceControlStruct" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
       </field>
     </struct>
     <struct name="LoadControlProgramStruct">
-      <field id="0" name="ProgramID" type="octets" default="0">
+      <field id="0" name="ProgramID" type="octstr" default="0">
         <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
@@ -287,15 +277,15 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="between" from="0x00" to="0x3C"/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
     <struct name="PowerSavingsControlStruct">
       <field id="1" name="PowerSavings" type="PowerSavingsEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="TemperatureControlStruct">
-      <field id="0" name="CoolingTempOffset" type="&lt;&lt;ref_TempDiff&gt;&gt;" default="null">
+      <field id="0" name="CoolingTempOffset" type="ref_TempDiff" default="null">
         <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform>
@@ -303,7 +293,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <constraint type="between" from="0x00" to="0x0FE"/>
       </field>
-      <field id="1" name="HeatingTempOffset" type="&lt;&lt;ref_TempDiff&gt;&gt;" default="null">
+      <field id="1" name="HeatingTempOffset" type="ref_TempDiff" default="null">
         <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform>
@@ -327,6 +317,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <constraint type="between" from="0x954D" to="0x7FFF"/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
@@ -335,7 +326,8 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="LoadControlPrograms" type="list[LoadControlProgramStruct Type]" default="empty">
+    <attribute id="0x0001" name="LoadControlPrograms" type="list" default="empty">
+      <entry type="LoadControlProgramStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
@@ -346,7 +338,8 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="min" value="5"/>
     </attribute>
-    <attribute id="0x0003" name="Events" type="list[LoadControlEventStruct Type]" default="empty">
+    <attribute id="0x0003" name="Events" type="list" default="empty">
+      <entry type="LoadControlEventStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
@@ -387,7 +380,7 @@ Davis, CA 95616, USA
     <command id="0x01" name="UnregisterLoadControlProgramRequest" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="LoadControlProgramID" type="octets">
+      <field id="0" name="LoadControlProgramID" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
@@ -402,7 +395,7 @@ Davis, CA 95616, USA
     <command id="0x03" name="RemoveLoadControlEventRequest" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="EventID" type="octets">
+      <field id="0" name="EventID" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
@@ -419,7 +412,7 @@ Davis, CA 95616, USA
     <event id="0x00" name="LoadControlEventStatusChange" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform/>
-      <field id="0" name="EventID" type="octets">
+      <field id="0" name="EventID" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
@@ -469,7 +462,7 @@ Davis, CA 95616, USA
           <feature name="HEATS"/>
         </mandatoryConform>
       </field>
-      <field id="255" name="Signature" type="octets" default="null">
+      <field id="255" name="Signature" type="octstr" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="48"/>

@@ -23,6 +23,7 @@ limitations under the License.
     <define>MEDIA_PLAYBACK_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="2"/> <!-- Revision   -->
     <description>This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.</description>
 
     <globalAttribute side="server" code="0xFFFC" value="0" />
@@ -34,9 +35,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END"   type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeEnd</attribute>
     <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeStart</attribute>
     <attribute side="server" code="0x0007" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_AUDIO_TRACK" optional="true"      type="TrackStruct"     writable="false" isNullable="true">ActiveAudioTrack</attribute>
-    <attribute side="server" code="0x0008" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_AUDIO_TRACKS" optional="true"  type="ARRAY" entryType="TrackStruct"     writable="false" isNullable="true">AvailableAudioTracks</attribute>
+    <attribute side="server" code="0x0008" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_AUDIO_TRACKS" optional="true"  type="array" entryType="TrackStruct"     writable="false" isNullable="true">AvailableAudioTracks</attribute>
     <attribute side="server" code="0x0009" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_TEXT_TRACK" optional="true"      type="TrackStruct"     writable="false" isNullable="true">ActiveTextTrack</attribute>
-    <attribute side="server" code="0x000A" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_TEXT_TRACKS" optional="true"  type="ARRAY" entryType="TrackStruct"     writable="false" isNullable="true">AvailableTextTracks</attribute>
+    <attribute side="server" code="0x000A" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_TEXT_TRACKS" optional="true"  type="array" entryType="TrackStruct"     writable="false" isNullable="true">AvailableTextTracks</attribute>
 
 
     <command source="client" code="0x00" name="Play" response="PlaybackResponse" optional="false">
@@ -164,9 +165,9 @@ limitations under the License.
     <cluster code="0x0506"/>
     <field name="AdvancedSeek" mask="0x1"/>
     <field name="VariableSpeed" mask="0x2"/>
-    <field name="TextTracks" mask="0x3"/>
-    <field name="AudioTracks" mask="0x4"/>
-    <field name="AudioAdvance" mask="0x5"/>
+    <field name="TextTracks" mask="0x4"/>
+    <field name="AudioTracks" mask="0x8"/>
+    <field name="AudioAdvance" mask="0x10"/>
   </bitmap>
 
   <enum name="CharacteristicEnum" type="enum8">

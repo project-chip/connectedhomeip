@@ -57,7 +57,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0036" name="Wi-Fi Network Diagnostics" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0036" name="Wi" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -138,7 +138,7 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="BSSID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;" default="null">
+    <attribute id="0x0000" name="BSSID" type="ref_DataTypeOctstr" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
@@ -200,19 +200,19 @@ Davis, CA 95616, USA
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000a" name="PacketUnicastTxCount" type="uint32" default="0">
+    <attribute id="0x000A" name="PacketUnicastTxCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000b" name="CurrentMaxRate" type="uint64" default="0">
+    <attribute id="0x000B" name="CurrentMaxRate" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x000c" name="OverrunCount" type="uint64" default="0">
+    <attribute id="0x000C" name="OverrunCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>

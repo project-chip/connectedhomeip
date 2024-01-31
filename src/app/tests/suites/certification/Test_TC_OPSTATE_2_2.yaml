@@ -33,7 +33,7 @@ tests:
           "Step 1: Commission DUT to TH (can be skipped if done in a preceding
           test)"
       verification: |
-          OPSTATE.S.C01 && OPSTATE.S.C02
+
       disabled: true
 
     - label:

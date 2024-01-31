@@ -160,7 +160,7 @@ Davis, CA 95616, USA
         <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="1" name="Name" type="ref_DataTypeString">
         <access read="true"/>
         <mandatoryConform/>
       </field>
@@ -187,7 +187,7 @@ Davis, CA 95616, USA
         <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="1" name="Name" type="ref_DataTypeString">
         <access read="true"/>
         <mandatoryConform/>
       </field>
@@ -195,7 +195,7 @@ Davis, CA 95616, USA
         <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="3" name="Endpoints" type="&lt;&lt;ref_DataTypeList&gt;&gt;[&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt;]">
+      <field id="3" name="Endpoints" type="ref_DataTypeList[ref_DataTypeEndpointNumber]">
         <access read="true"/>
         <mandatoryConform/>
         <constraint type="max" value="256"/>
@@ -203,17 +203,17 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="ActionList" type="&lt;&lt;ref_DataTypeList&gt;&gt;[ActionStruct Type]" default="empty">
+    <attribute id="0x0000" name="ActionList" type="ref_DataTypeList[ActionStruct Type]" default="empty">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint type="max" value="256"/>
     </attribute>
-    <attribute id="0x0001" name="EndpointLists" type="&lt;&lt;ref_DataTypeList&gt;&gt;[EndpointListStruct Type]" default="empty">
+    <attribute id="0x0001" name="EndpointLists" type="ref_DataTypeList[EndpointListStruct Type]" default="empty">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint type="max" value="256"/>
     </attribute>
-    <attribute id="0x0002" name="SetupURL" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="empty">
+    <attribute id="0x0002" name="SetupURL" type="ref_DataTypeString" default="empty">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint type="max" value="512"/>
@@ -322,7 +322,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0a" name="DisableAction" response="Y">
+    <command id="0x0A" name="DisableAction" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -331,7 +331,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x0b" name="DisableActionWithDuration" response="Y">
+    <command id="0x0B" name="DisableActionWithDuration" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>

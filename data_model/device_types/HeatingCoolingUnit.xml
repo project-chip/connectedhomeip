@@ -70,16 +70,13 @@ Davis, CA 95616, USA
     <cluster id="0x0004" name="Groups" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0005" name="Scenes" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0008" name="Level Control" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0062" name="Scenes Management" side="server">
       <optionalConform/>
     </cluster>
     <cluster id="0x0201" name="Thermostat" side="client">

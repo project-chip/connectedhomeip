@@ -451,7 +451,64 @@ void ContentAppPlatform::UnsetIfCurrentApp(ContentApp * app)
     }
 }
 
-uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId)
+bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId,
+                                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode)
+{
+    // TODO: perform more complex search for matching apps
+    ContentApp * app = LoadContentAppByClient(info.vendorId, info.productId);
+    if (app == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "no app found for vendor id=%d \r\n", info.vendorId);
+        return false;
+    }
+
+    if (app->GetApplicationBasicDelegate() == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "no ApplicationBasic cluster for app with vendor id=%d \r\n", info.vendorId);
+        return false;
+    }
+
+    // first check if the vendor id matches the client
+    bool allow = app->GetApplicationBasicDelegate()->HandleGetVendorId() == vendorId;
+    if (!allow)
+    {
+        // if no match, then check allowed vendor list
+        for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
+        {
+            if (allowedVendor == vendorId)
+            {
+                allow = true;
+                break;
+            }
+        }
+        if (!allow)
+        {
+            ChipLogProgress(
+                DeviceLayer,
+                "no permission given by ApplicationBasic cluster on app with vendor id=%d to client with vendor id=%d\r\n",
+                info.vendorId, vendorId);
+            return false;
+        }
+    }
+
+    if (app->GetAccountLoginDelegate() == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with vendor id=%d \r\n", info.vendorId);
+        return true;
+    }
+
+    static const size_t kSetupPasscodeSize = 12;
+    char mSetupPasscode[kSetupPasscodeSize];
+
+    app->GetAccountLoginDelegate()->GetSetupPin(mSetupPasscode, kSetupPasscodeSize, rotatingId);
+    std::string passcodeString(mSetupPasscode);
+
+    char * eptr;
+    passcode = (uint32_t) strtol(passcodeString.c_str(), &eptr, 10);
+    return true;
+}
+
+uint32_t ContentAppPlatform::GetPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId)
 {
     ContentApp * app = LoadContentAppByClient(vendorId, productId);
     if (app == nullptr)
@@ -466,14 +523,14 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
         return 0;
     }
 
-    static const size_t kSetupPINSize = 12;
-    char mSetupPIN[kSetupPINSize];
+    static const size_t kSetupPasscodeSize = 12;
+    char mSetupPasscode[kSetupPasscodeSize];
 
-    app->GetAccountLoginDelegate()->GetSetupPin(mSetupPIN, kSetupPINSize, rotatingId);
-    std::string pinString(mSetupPIN);
+    app->GetAccountLoginDelegate()->GetSetupPin(mSetupPasscode, kSetupPasscodeSize, rotatingId);
+    std::string passcodeString(mSetupPasscode);
 
     char * eptr;
-    return (uint32_t) strtol(pinString.c_str(), &eptr, 10);
+    return (uint32_t) strtol(passcodeString.c_str(), &eptr, 10);
 }
 
 // Returns ACL entry with match subject or CHIP_ERROR_NOT_FOUND if no match is found

@@ -31,7 +31,7 @@ lwip_platform = "mt793x"
 
 # Use our porting instad of //third_party/lwip
 
-lwip_root = "${chip_root}/third_party/mt793x_sdk/lwip"
+lwip_root = "${mt793x_sdk_build_root}/mt793x_lwip"
 
 chip_mdns = "platform"
 chip_inet_config_enable_ipv4 = true

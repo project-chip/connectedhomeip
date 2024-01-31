@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.R;
 import com.chip.casting.TvCastingApp;
 
 /** An interstitial {@link Fragment} to select one of the supported media actions to perform */

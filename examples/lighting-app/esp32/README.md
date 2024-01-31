@@ -16,8 +16,8 @@ guides to get started.
 -   Create a file named insights_auth_key.txt in the main directory of the
     example.
 
--   Follow the steps
-    present[here](https://github.com/espressif/esp-insights/blob/main/examples/README.md#set-up-esp-insights-account)
+-   Follow the steps present
+    [here](https://github.com/espressif/esp-insights/blob/main/examples/README.md#set-up-esp-insights-account)
     to set up an insights_account and the auth key created while setting it up
     will be used in the example.
 
@@ -26,13 +26,6 @@ guides to get started.
 ```
 cp /path/to/auth/key.txt path/to/connectedhomeip/examples/lighting-app/esp32/main/insights_auth_key.txt
 ```
-
----
-
--   [Cluster Control](#cluster-control)
--   [Matter OTA guide](../../../docs/guides/esp32/ota.md)
-
----
 
 ### Cluster Control
 
@@ -50,3 +43,8 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/lighting-app/esp32/mai
     control the color attributes:
 
         $ ./out/debug/chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 <NODE ID> 1
+
+### Matter OTA
+
+For Matter OTA please take a look at
+[Matter OTA guide](../../../docs/guides/esp32/ota.md).

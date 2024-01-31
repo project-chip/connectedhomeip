@@ -285,8 +285,12 @@ void SecureSessionTable::DefaultEvictionPolicy(EvictionPolicyContext & evictionC
         // peer" state allows us to prioritize evicting defuct sessions that
         // match the hint against other defunct sessions.
         auto sessionMatchesEvictionHint = [&evictionContext](const SortableSession & session) -> int {
-            return session.mSession->GetPeer() == evictionContext.GetSessionEvictionHint() &&
-                (!session.mSession->IsActiveSession() || session.mNumMatchingOnPeer > 0);
+            if (session.mSession->GetPeer() != evictionContext.GetSessionEvictionHint())
+            {
+                return false;
+            }
+            bool isOnlyActiveSessionToPeer = session.mSession->IsActiveSession() && session.mNumMatchingOnPeer == 0;
+            return !isOnlyActiveSessionToPeer;
         };
         int doesAMatchSessionHint = sessionMatchesEvictionHint(a);
         int doesBMatchSessionHint = sessionMatchesEvictionHint(b);

@@ -22,14 +22,15 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-declare_args() {
-  if (silabs_board == "BRD4338A") {
-    sdk_support_board = "BRD4338A"
-  } else {
-    sdk_support_board = "BRD4325x"
-  }
-}
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+
+declare_args() {
+  # Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled
+  si91x_alarm_based_wakeup = false
+
+  # Periodic time at which the 917 SoC should wakeup
+  si91x_alarm_periodic_time = 30
+}
 
 # Defines an siwx917 SDK build target.
 #
@@ -54,44 +55,46 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/service/device_init/inc",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
-      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/autogen",
-      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/config",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/config",
       "${chip_root}/third_party/mbedtls/repo/include",
       "${chip_root}/third_party/mbedtls/repo/library",
 
       "${chip_root}/src/platform/silabs/rs911x",
 
       # ble component
-      "${wifi_sdk_root}/components/si91x/ble/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+
+      # trng component
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/inc",
 
       # si91x component
-      "${wifi_sdk_root}/components/si91x/inc",
-      "${wifi_sdk_root}/components/si91x/memory",
-      "${wifi_sdk_root}/components/si91x/sl_net/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/inc",
 
       # siwx917_soc component
-      "${wifi_sdk_root}/components/siwx917_soc/boards/config/${silabs_board_lower}",
-      "${wifi_sdk_root}/components/siwx917_soc/boards/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/core/chip/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/core/config",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/config",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/CMSIS/Driver/Include",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/service/nvm3/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/systemlevel/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/rom_driver/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/unified_api/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/unified_api/config",
-      "${wifi_sdk_root}/components/siwx917_soc/hal/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/platform_connectivity/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/platform_connectivity/wifi_inc",
+      "${wifi_sdk_root}/components/board/silabs/config/brd4338a",
+      "${wifi_sdk_root}/components/board/silabs/inc",
+      "${wifi_sdk_root}/components/common/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/config",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/CMSIS/Driver/Include",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/rom_driver/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/config",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/inc",
 
       # wifi component
       "${wifi_sdk_root}/components/protocol/wifi/inc",
-
-      # si91x_support component
-      "${wifi_sdk_root}/components/si91x_support/inc",
 
       # wifi_resources component
       "${wifi_sdk_root}/resources/certificates",
@@ -102,7 +105,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/service/network_manager/inc",
 
       # nvm3
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/nvm3/inc",
       "${efr32_sdk_root}/platform/common/inc",
       "${efr32_sdk_root}/platform/emlib/inc",
       "${efr32_sdk_root}/platform/service/system/inc",
@@ -118,23 +120,28 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/middleware/glib/config",
       "${efr32_sdk_root}/platform/middleware/glib/glib",
       "${efr32_sdk_root}/platform/middleware/glib/dmd",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/inc/memlcd_917",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/middleware/sleeptimer/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/unified_api/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/inc/memlcd_917",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/inc",
       "${efr32_sdk_root}/hardware/driver/memlcd/src/ls013b7dh03",
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/service/sleeptimer/src",
-      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/inc",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/inc",
 
       "${efr32_sdk_root}/platform/service/iostream/inc",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/inc",
-    ]
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/config",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/config",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
 
-    if (silabs_board == "BRD4338A") {
-      _include_dirs += [ "${wifi_sdk_root}/components/siwx917_soc/core/config" ]
-    }
+      # OTA
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/inc",
+    ]
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
     # define. This means the build system by default does not pick up changes in
@@ -148,15 +155,13 @@ template("siwx917_sdk") {
       "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
-      "CCP_SI917_BRINGUP",
+      "CCP_SI917_BRINGUP=1",
       "SL_COMPONENT_CATALOG_PRESENT",
-      "RS911X_WIFI",
+      "RS911X_WIFI=1",
       "RSI_WLAN_ENABLE",
-      "RSI_WITH_OS",
-      "RSI_M4_INTERFACE",  #Enable CCP bus Interface
+      "SLI_SI91X_ENABLE_OS=1",
+      "SLI_SI91X_MCU_INTERFACE=1",  #Enable CCP bus Interface
       "RSI_WLAN_API_ENABLE",
-      "LITTLE_ENDIAN_ORDER",
-      "_CHIP_9118",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -166,57 +171,47 @@ template("siwx917_sdk") {
       "__HEAP_SIZE=0",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
-      "RSI_ARM_CM4F",
-      "SIWX_917",
-      "CHIP_9117",
-      "BLE_ENABLE=1",
-      "RSI_LITTLE_ENDIAN=1",
+      "SIWX_917=1",
+      "CHIP_9117=1",
+      "SLI_SI91X_ENABLE_BLE=1",
+      "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
       "TINYCRYPT_PRIMITIVES",
       "OPTIMIZE_TINYCRYPT_ASM",
       "__error_t_defined",
       "RSI_SAMPLE_HAL",
-      "ENABLE_IPMU_APIS",
-      "ROM_BYPASS",
-      "DEBUG_UART",
-      "FLASH_BASED_EXECUTION_ENABLE",
-      "TA_DEEP_SLEEP_COMMON_FLASH",
-      "SL_WIFI_COMPONENT_INCLUDED",
-      "CHIP_917=1",
+      "DEBUG_UART=1",
+      "SLI_SI91X_MCU_ENABLE_FLASH_BASED_EXECUTION=1",
+      "SL_WIFI_COMPONENT_INCLUDED=1",
+      "SLI_SI917=1",
+      "SI917=1",
       "ROMDRIVER_PRESENT=1",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
-      "SL_PLATFORM_EXAMPLES_ENABLE",
-      "SI91X_DEVICE=1",
-      "SI917_RADIO_BOARD=1",
-      "FLASH_PAGE_SIZE",
-      "SL_NVM3_PRESENT",
-      "ROM_WIRELESS",
+      "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER=1",
       "BRD4325A",  #TODO: should be removed after SoC macro clean-up
-      "CONNECTIVITY_PLATFORM",
+      "SLI_SI917B0=1",
+      "SLI_SI91X_MCU_COMMON_FLASH_MODE=1",
+      "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_VER2=1",
+      "SL_BOARD_REV=\"A00\"",
+      "SPI_MULTI_SLAVE=1",
+      "SYSCALLS_WRITE=1",
+      "__STATIC_INLINE=static inline",
+      "SL_SI91X_SI917_RAM_MEM_CONFIG=2",
+      "SL_SI91x_DUAL_INTERRUPTS_ERRATA=1",
+      "EXT_IRQ_COUNT=75",
+      "FLASH_PAGE_SIZE=1",
+      "DEBUG_ENABLE=1",
+      "ENABLE_DEBUG_MODULE=1",
+      "SI91X_SYSRTC_PRESENT=1",
+      "TA_DEEP_SLEEP_COMMON_FLASH=1",
+      "SI917_SOC=1",
+      "SI91X_PLATFORM=1",
+      "SL_NET_COMPONENT_INCLUDED=1",
+      "SRAM_BASE=0x0cUL",
+      "SRAM_SIZE=0x4fc00UL",
+      "SLI_SI91X_MCU_ENABLE_IPMU_APIS=1",
+      "RADIO_CONFIG_DMP_SUPPORT=1",
+      "configUSE_POSIX_ERRNO=1",
     ]
-
-    if (silabs_board == "BRD4325B") {
-      defines += [ "DUAL_FLASH_EN" ]
-    }
-    if (wifi_soc_common_flash) {
-      defines += [
-        "CHIP_917B0 = 1",
-        "COMMON_FLASH_EN=1",
-        "EXECUTION_FROM_RAM",
-      ]
-      if (silabs_board == "BRD4338A") {
-        defines += [
-          "SI917_RADIO_BOARD_V2=1",
-          "SL_BOARD_REV=\"A00\"",
-          "SPI_MULTI_SLAVE=1",
-          "SYSCALLS_WRITE=1",
-          "SI91X_PLATFORM=1",
-          "SI91X_SYSRTC_COUNT=1",
-          "SI91X_SYSRTC_PRESENT=1",
-          "SSI_ULP_MASTER=1",
-          "SL_MEMLCD_EXTCOMIN_PORT=0",
-        ]
-      }
-    }
 
     if (chip_build_libshell) {
       defines += [ "ENABLE_CHIP_SHELL" ]
@@ -257,7 +252,6 @@ template("siwx917_sdk") {
     if (!disable_lcd) {
       defines += [
         "CONFIG_ENABLE_UART",
-        "__STATIC_INLINE=static inline",
         "SI91X_SYSRTC_COUNT=1",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
@@ -271,9 +265,21 @@ template("siwx917_sdk") {
 
     if (chip_enable_icd_server) {
       defines += [
-        "SL_CATALOG_POWER_MANAGER_PRESENT",
-        "SL_CATALOG_SLEEPTIMER_PRESENT",
+        "SL_ICD_ENABLED=1",
+        "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
+        "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
+        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_s}",
+        "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
+        "SL_SI91X_MCU_WIRELESS_BASED_WAKEUP=1",
+        "SL_SI91X_MCU_BUTTON_BASED_WAKEUP=1",
       ]
+
+      if (si91x_alarm_based_wakeup) {
+        defines += [
+          "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
+          "ALARM_PERIODIC_TIME=${si91x_alarm_periodic_time}",
+        ]
+      }
     }
 
     if (chip_build_libshell) {  # matter shell
@@ -331,6 +337,7 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/common/src/sl_assert.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
+      "${efr32_sdk_root}/platform/common/src/sli_cmsis_os2_ext_task_register.c",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Source/cmsis_os2.c",
       "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
 
@@ -346,54 +353,55 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
 
       # ble component
-      "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gap_apis.c",
-      "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gatt_apis.c",
-      "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_ble.c",
-      "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_common_apis.c",
-      "${wifi_sdk_root}/components/si91x/ble/src/rsi_common_apis.c",
-      "${wifi_sdk_root}/components/si91x/ble/src/rsi_utils.c",
-      "${wifi_sdk_root}/components/si91x/ble/src/sl_si91x_ble.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c",
 
       # si91x_basic_buffers component
-      "${wifi_sdk_root}/components/si91x/memory/malloc_buffers.c",
-      "${wifi_sdk_root}/components/si91x/platforms/siwx917_soc/siwx917_soc_ncp_host.c",
-      "${wifi_sdk_root}/components/si91x/sl_net/src/sl_net_rsi_utility.c",
-      "${wifi_sdk_root}/components/si91x/sl_net/src/sl_net_si91x.c",
-      "${wifi_sdk_root}/components/si91x/sl_net/src/sl_net_si91x_integration_handler.c",
-      "${wifi_sdk_root}/components/si91x/src/sl_rsi_utility.c",
-      "${wifi_sdk_root}/components/si91x/src/sl_si91x_callback_framework.c",
-      "${wifi_sdk_root}/components/si91x/src/sl_si91x_driver.c",
-      "${wifi_sdk_root}/components/si91x/threading/sli_si91x_multithreaded.c",
-
-      # si91x_support component
-      "${wifi_sdk_root}/components/si91x_support/src/sl_utility.c",
-      "${wifi_sdk_root}/components/siwx917_soc/boards/src/rsi_board.c",
-      "${wifi_sdk_root}/components/siwx917_soc/core/chip/src/rsi_deepsleep_soc.c",
-      "${wifi_sdk_root}/components/siwx917_soc/core/chip/src/rsi_system_config.c",
-      "${wifi_sdk_root}/components/siwx917_soc/core/chip/src/system_si91x.c",
-      "${wifi_sdk_root}/components/siwx917_soc/core/config/src/rsi_nvic_priorities_config.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/UDMA.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/USART.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/clock_update.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/rsi_egpio.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/rsi_udma.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/rsi_udma_wrapper.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/rsi_usart.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/systemlevel/src/rsi_ipmu.c",
-
-      # siwx917_soc component
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/systemlevel/src/rsi_pll.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/systemlevel/src/rsi_power_save.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/systemlevel/src/rsi_temp_sensor.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/systemlevel/src/rsi_ulpss_clk.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/unified_api/src/sl_si91x_usart.c",
-      "${wifi_sdk_root}/components/siwx917_soc/platform_connectivity/rsi_hal_mcu_m4_ram.c",
-      "${wifi_sdk_root}/components/siwx917_soc/platform_connectivity/rsi_hal_mcu_m4_rom.c",
-      "${wifi_sdk_root}/components/siwx917_soc/platform_connectivity/sl_platform.c",
-      "${wifi_sdk_root}/components/siwx917_soc/platform_connectivity/sl_platform_wireless.c",
-      "${wifi_sdk_root}/components/siwx917_soc/platform_connectivity/sl_si91x_bus.c",
-      "${wifi_sdk_root}/components/siwx917_soc/platform_connectivity/sl_si91x_timer.c",
-      "${wifi_sdk_root}/components/siwx917_soc/platform_connectivity/sli_siwx917_soc.c",
+      "${wifi_sdk_root}/components/board/silabs/src/rsi_board.c",
+      "${wifi_sdk_root}/components/common/src/sl_utility.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_system_config.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/rsi_debug.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_driver_gpio.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_usart.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/src/sl_si91x_peripheral_gpio.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/memory/malloc_buffers.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
+      "${wifi_sdk_root}/components/service/network_manager/si91x/sl_net_si91x.c",
 
       # modified hal
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
@@ -409,9 +417,13 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/autogen/sl_event_handler.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/hal/rsi_hal_mcu_m4.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_event_handler.c",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_button_instances.c",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_led_instances.c",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/hal/rsi_hal_mcu_m4.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/src/sl_si91x_led.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
       # mbedtls
       "${chip_root}/third_party/mbedtls/repo/library/aes.c",
@@ -450,24 +462,14 @@ template("siwx917_sdk") {
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/autogen/sl_si91x_button_instances.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/src/sl_si91x_button.c",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/src/startup_common_RS1xxxx.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c",
+
+      # OTA
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/src/sl_si91x_hal_soc_soft_reset.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c",
     ]
-
-    # nvm3 ans startup
-    if (silabs_board == "BRD4325B") {
-      sources += [
-        "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/src/startup_RS1xxxx.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/service/nvm3/src/sl_si91x_dual_flash_intf.c",
-      ]
-    }
-
-    if (wifi_soc_common_flash) {
-      sources += [
-        "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/src/startup_common_RS1xxxx.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c",
-      ]
-    }
 
     if (!disable_lcd) {
       sources += [
@@ -484,16 +486,23 @@ template("siwx917_sdk") {
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
         "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/cmsis_driver/SPI.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/memlcd_917/sl_memlcd_spi.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/sl_memlcd.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/memlcd/src/sl_memlcd_display.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/peripheral_drivers/src/rsi_sysrtc.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
-        "${wifi_sdk_root}/components/siwx917_soc/drivers/unified_api/src/sl_si91x_ulp_timer.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/SPI.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/memlcd_917/sl_memlcd_spi.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/sl_memlcd.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/memlcd/src/sl_memlcd_display.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/src/sl_sleeptimer_hal_si91x_sysrtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_ulp_timer.c",
       ]
     }
 
+    if (chip_enable_icd_server) {
+      sources += [
+        "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/src/sl_si91x_m4_ps.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
+      ]
+    }
     public_deps = [
       ":siwx917_mbedtls_config",
       "${segger_rtt_root}:segger_rtt",
@@ -523,6 +532,9 @@ template("siwx917_sdk") {
       ]
     }
 
-    public_configs = [ ":${sdk_target_name}_config" ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      "${examples_plat_dir}:siwx917-common-config",
+    ]
   }
 }

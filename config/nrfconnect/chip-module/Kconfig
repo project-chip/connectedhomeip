@@ -273,4 +273,11 @@ config CHIP_OPENTHREAD_JOINER_ENABLED
 	  If disabled, it allows to optimize memory usage even if Thread Joiner
 	  support is enabled.
 
+config CHIP_ENABLE_READ_CLIENT
+	bool "Enable Read Client in the Interaction Model"
+	help
+	  Enable support for Read Client in the Interaction Model.
+	  This config can be disabled for device types that do not require Read Client functionality.
+	  Disabling this config can save flash and RAM space.
+
 endif # CHIP

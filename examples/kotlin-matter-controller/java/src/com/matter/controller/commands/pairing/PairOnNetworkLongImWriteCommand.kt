@@ -37,21 +37,13 @@ class PairOnNetworkLongImWriteCommand(
     DiscoveryFilterType.LONG_DISCRIMINATOR
   ) {
   override fun runCommand() {
-    currentCommissioner()
-      .pairDevice(
-        getNodeId(),
-        getRemoteAddr().address.hostAddress,
-        MATTER_PORT,
-        getDiscriminator(),
-        getSetupPINCode(),
-      )
-    currentCommissioner().setCompletionListener(this)
-    waitCompleteMs(getTimeoutMillis())
-
     runBlocking {
       try {
         val basicInformationCluster =
           BasicInformationCluster(controller = currentCommissioner(), endpointId = DEFAULT_ENDPOINT)
+
+        // By running command writeNodeLabelAttribute, we are implicitly requesting CASE to be
+        // established if it's not already present.
         basicInformationCluster.writeNodeLabelAttribute("Test Node Label")
         logger.log(Level.INFO, "Write command succeeded")
 

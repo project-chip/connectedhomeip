@@ -24,26 +24,9 @@
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceLayer.h>
 
-#if !defined(EMBER_SCRIPTED_TEST)
 #include <app/att-storage.h>
-#endif
-
-#if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
-#define ATTRIBUTE_STORAGE_CONFIGURATION "attribute-storage-test.h"
-#endif
-
-// ATTRIBUTE_STORAGE_CONFIGURATION macro
-// contains the file that contains the initial set-up of the
-// attribute data structures. If it is missing
-// we use the provider sample.
-#ifndef ATTRIBUTE_STORAGE_CONFIGURATION
-//  #error "Must define ATTRIBUTE_STORAGE_CONFIGURATION to specify the App. Builder default attributes file."
 #include <zap-generated/endpoint_config.h>
-#else
-#include ATTRIBUTE_STORAGE_CONFIGURATION
-#endif
 
 // If we have fixed number of endpoints, then max is the same.
 #ifdef FIXED_ENDPOINT_COUNT
@@ -57,9 +40,11 @@
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
-#define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)                                       \
+// The role argument should be used to determine whether cluster works as a server or a client.
+// It can be assigned with the ZAP_CLUSTER_MASK(SERVER) or ZAP_CLUSTER_MASK(CLUSTER) values.
+#define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)                                 \
     {                                                                                                                              \
-        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, ZAP_CLUSTER_MASK(SERVER), NULL, incomingCommands, outgoingCommands    \
+        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                        \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
@@ -77,29 +62,15 @@
         ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
     }
 
-#define CLUSTER_TICK_FREQ_ALL (0x00)
-#define CLUSTER_TICK_FREQ_QUARTER_SECOND (0x04)
-#define CLUSTER_TICK_FREQ_HALF_SECOND (0x08)
-#define CLUSTER_TICK_FREQ_SECOND (0x0C)
-
 extern uint8_t attributeData[]; // main storage bucket for all attributes
 
-extern uint8_t attributeDefaults[]; // storage bucked for > 2b default values
-
 void emAfCallInits(void);
-
-#define emberAfClusterIsClient(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_CLIENT) != 0))
-#define emberAfClusterIsServer(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_SERVER) != 0))
 
 // Initial configuration
 void emberAfEndpointConfigure(void);
 
-EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
+EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write);
-
-bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
-bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
-                        EmberAfAttributeSearchRecord * attRecord);
 
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
@@ -124,14 +95,6 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId clusterId
 // otherwise number of client clusters on this endpoint
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server);
 
-// If server == true, returns the number of server clusters,
-// otherwise number of client clusters on the endpoint at the given index.
-uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
-
-// If server == true, returns the number of server clusters,
-// otherwise number of client clusters on the endpoint at the given index.
-uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
-
 // Returns the cluster of Nth server or client cluster,
 // depending on server toggle.
 const EmberAfCluster * emberAfGetNthCluster(chip::EndpointId endpoint, uint8_t n, bool server);
@@ -155,14 +118,8 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::Endpoi
 // cast it.
 EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * cluster, EmberAfClusterMask functionMask);
 
-// Public APIs for loading attributes
+// Loads attribute defaults and any non-volatile attributes stored
 void emberAfInitializeAttributes(chip::EndpointId endpoint);
-void emberAfResetAttributes(chip::EndpointId endpoint);
-
-// Loads the attributes from built-in default and / or storage.  If
-// ignoreStorage is true, only defaults will be read, and the storage for
-// non-volatile attributes will be overwritten with those defaults.
-void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool ignoreStorage, chip::Optional<chip::ClusterId> = chip::NullOptional);
 
 // After the RAM value has changed, code should call this function. If this
 // attribute has been tagged as non-volatile, its value will be stored.
@@ -176,25 +133,12 @@ void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath 
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-// Checks a cluster mask byte against ticks passed bitmask
-// returns true if the mask matches a passed interval
-bool emberAfCheckTick(EmberAfClusterMask mask, uint8_t passedMask);
-
-// Check whether there is an endpoint defined with the given endpoint id that is
-// enabled.
-bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
-
-// Note the difference in implementation from emberAfGetNthCluster().
-// emberAfGetClusterByIndex() retrieves the cluster by index regardless of server/client
-// and those indexes may be DIFFERENT than the indexes returned from
-// emberAfGetNthCluster().  In other words:
-//
+// Note the difference in for server filtering.
+// This method will return the cluster count for BOTH client and server
+// and those do NOT work with NthCluster/NthClusterId
 //  - Use emberAfGetClustersFromEndpoint()  with emberAfGetNthCluster() emberAfGetNthClusterId()
-//  - Use emberAfGetClusterCountForEndpoint() with emberAfGetClusterByIndex()
 //
-// Don't mix them.
 uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
-const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8_t clusterIndex);
 
 //
 // Retrieve the device type list associated with a specific endpoint.

@@ -51,8 +51,6 @@ private:
 
     CHIP_ERROR OnMessageToSend(chip::bdx::TransferSession::OutputEvent & event);
 
-    chip::bdx::StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err);
-
     CHIP_ERROR OnTransferSessionBegin(chip::bdx::TransferSession::OutputEvent & event);
 
     CHIP_ERROR OnTransferSessionEnd(chip::bdx::TransferSession::OutputEvent & event);

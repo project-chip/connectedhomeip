@@ -5,18 +5,24 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import com.R;
 import com.chip.casting.AppParameters;
 import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
 import com.chip.casting.util.GlobalCastingConstants;
 import com.chip.casting.util.PreferencesConfigurationManager;
+import com.matter.casting.ConnectionExampleFragment;
+import com.matter.casting.DiscoveryExampleFragment;
 import com.matter.casting.InitializationExample;
+import com.matter.casting.core.CastingPlayer;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
     implements CommissionerDiscoveryFragment.Callback,
         ConnectionFragment.Callback,
-        SelectClusterFragment.Callback {
+        SelectClusterFragment.Callback,
+        DiscoveryExampleFragment.Callback,
+        ConnectionExampleFragment.Callback {
 
   private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -36,7 +42,12 @@ public class MainActivity extends AppCompatActivity
       return;
     }
 
-    Fragment fragment = CommissionerDiscoveryFragment.newInstance(tvCastingApp);
+    Fragment fragment = null;
+    if (GlobalCastingConstants.ChipCastingSimplified) {
+      fragment = DiscoveryExampleFragment.newInstance();
+    } else {
+      fragment = CommissionerDiscoveryFragment.newInstance(tvCastingApp);
+    }
     getSupportFragmentManager()
         .beginTransaction()
         .add(R.id.main_fragment_container, fragment, fragment.getClass().getSimpleName())
@@ -49,8 +60,22 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override
+  public void handleConnectionButtonClicked(CastingPlayer castingPlayer) {
+    Log.i(TAG, "MainActivity.handleConnectionButtonClicked() called");
+    showFragment(ConnectionExampleFragment.newInstance(castingPlayer));
+  }
+
+  @Override
   public void handleCommissioningComplete() {
     showFragment(SelectClusterFragment.newInstance(tvCastingApp));
+  }
+
+  @Override
+  public void handleConnectionComplete(CastingPlayer castingPlayer) {
+    Log.i(TAG, "MainActivity.handleConnectionComplete() called ");
+
+    // TODO: Implement in following PRs. Select Cluster Fragment.
+    // showFragment(SelectClusterFragment.newInstance(tvCastingApp));
   }
 
   @Override
@@ -99,7 +124,7 @@ public class MainActivity extends AppCompatActivity
   private void showFragment(Fragment fragment, boolean showOnBack) {
     Log.d(
         TAG,
-        "showFragment called with " + fragment.getClass().getSimpleName() + " and " + showOnBack);
+        "showFragment() called with " + fragment.getClass().getSimpleName() + " and " + showOnBack);
     FragmentTransaction fragmentTransaction =
         getSupportFragmentManager()
             .beginTransaction()

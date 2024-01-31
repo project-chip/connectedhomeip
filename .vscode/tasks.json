@@ -605,6 +605,7 @@
                 "efr32-brd4186a-window-covering",
                 "efr32-brd4187a-window-covering",
                 "efr32-brd4304a-window-covering",
+                "efr32-brd4338a-light-wifi-917_soc-skip_rps_generation",
                 "esp32-c3devkit-all-clusters",
                 "esp32-devkitc-all-clusters",
                 "esp32-devkitc-all-clusters-ipv6only",

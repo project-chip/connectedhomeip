@@ -150,7 +150,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                   problem=f'Root node does not contain required cluster {c}', spec_location="Root node device type")
                 self.fail_current_test()
 
-    def test_DT_1_1(self):
+    def test_TC_DT_1_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
         self.print_step(2, "Verify that each endpoint includes a descriptor cluster")
         success = True
@@ -165,7 +165,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
-    def test_IDM_10_1(self):
+    def test_TC_IDM_10_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
 
         @dataclass
@@ -464,7 +464,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test(
                 "At least one cluster has failed the range and support checks for its listed attributes, commands or features")
 
-    def test_IDM_11_1(self):
+    def test_TC_IDM_11_1(self):
         success = True
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
@@ -671,7 +671,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test("power source EndpointList attribute is incorrect")
 
-    def test_DESC_2_2(self):
+    def test_TC_DESC_2_2(self):
         self.print_step(0, "Wildcard read of device - already done")
 
         self.print_step(

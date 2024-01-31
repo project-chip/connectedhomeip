@@ -24,8 +24,9 @@
 #include <app/util/config.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
+#include <tracing/macros.h>
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif
 
@@ -59,7 +60,7 @@ constexpr uint8_t kExecuteIfOff = 1;
 } // namespace app
 } // namespace chip
 
-#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
@@ -99,7 +100,7 @@ public:
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
-        using AttributeValuePair = Scenes::Structs::AttributeValuePair::Type;
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
 
         AttributeValuePair pairs[kColorControlScenableAttributesCount];
 
@@ -194,7 +195,7 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
-        app::DataModel::DecodableList<Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePair::DecodableType> attributeValueList;
 
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
@@ -371,7 +372,7 @@ private:
         }
     }
 
-    void AddAttributeValuePair(Scenes::Structs::AttributeValuePair::Type * pairs, AttributeId id, uint32_t value,
+    void AddAttributeValuePair(ScenesManagement::Structs::AttributeValuePair::Type * pairs, AttributeId id, uint32_t value,
                                size_t & attributeCount)
     {
         pairs[attributeCount].attributeID    = id;
@@ -380,7 +381,7 @@ private:
     }
 };
 static DefaultColorControlSceneHandler sColorControlSceneHandler;
-#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 /**********************************************************
  * Matter timer scheduling glue logic
@@ -434,11 +435,11 @@ ColorControlServer & ColorControlServer::Instance()
 chip::scenes::SceneHandler * ColorControlServer::GetSceneHandler()
 {
 
-#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sColorControlSceneHandler;
 #else
     return nullptr;
-#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 bool ColorControlServer::HasFeature(chip::EndpointId endpoint, Feature feature)
@@ -1354,6 +1355,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
                                         HueMoveMode moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride,
                                         bool isEnhanced)
 {
+    MATTER_TRACE_SCOPE("moveHue", "ColorControl");
     EndpointId endpoint                               = commandPath.mEndpointId;
     Status status                                     = Status::Success;
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
@@ -1459,6 +1461,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
                                           uint16_t hue, HueDirection moveDirection, uint16_t transitionTime, uint8_t optionsMask,
                                           uint8_t optionsOverride, bool isEnhanced)
 {
+    MATTER_TRACE_SCOPE("moveToHue", "ColorControl");
     EndpointId endpoint = commandPath.mEndpointId;
 
     Status status       = Status::Success;
@@ -1593,6 +1596,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
                                                        uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
                                                        uint8_t optionsOverride, bool isEnhanced)
 {
+    MATTER_TRACE_SCOPE("moveToHueAndSaturation", "ColorControl");
     // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
     // this and report a constraint error.
     if ((!isEnhanced && hue > MAX_HUE_VALUE) || saturation > MAX_SATURATION_VALUE)
@@ -1607,9 +1611,9 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
         return true;
     }
     Status status = moveToHueAndSaturation(hue, saturation, transitionTime, isEnhanced, commandPath.mEndpointId);
-#ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
-#endif // EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -1632,6 +1636,7 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
                                         HueStepMode stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
                                         uint8_t optionsOverride, bool isEnhanced)
 {
+    MATTER_TRACE_SCOPE("stepHue", "ColorControl");
     EndpointId endpoint = commandPath.mEndpointId;
 
     Status status = Status::Success;
@@ -1715,6 +1720,7 @@ exit:
 bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::MoveSaturation::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("moveSaturation", "ColorControl");
     auto & moveMode        = commandData.moveMode;
     auto & rate            = commandData.rate;
     auto & optionsMask     = commandData.optionsMask;
@@ -1798,6 +1804,7 @@ exit:
 bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::MoveToSaturation::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("moveToSaturation", "ColorControl");
     // limit checking: saturation is 0..254.  Spec dictates we ignore
     // this and report a malformed packet.
     if (commandData.saturation > MAX_SATURATION_VALUE)
@@ -1812,9 +1819,9 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
         return true;
     }
     Status status = moveToSaturation(commandData.saturation, commandData.transitionTime, commandPath.mEndpointId);
-#ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
-#endif // EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -1822,6 +1829,7 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
 bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::StepSaturation::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("stepSaturation", "ColorControl");
     auto stepMode             = commandData.stepMode;
     uint8_t stepSize          = commandData.stepSize;
     uint8_t transitionTime    = commandData.transitionTime;
@@ -1885,6 +1893,7 @@ exit:
 bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::ColorLoopSet::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("colorLoop", "ColorControl");
     auto updateFlags          = commandData.updateFlags;
     auto action               = commandData.action;
     auto direction            = commandData.direction;
@@ -1996,9 +2005,9 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
     }
 
 exit:
-#ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -2010,6 +2019,7 @@ exit:
  */
 void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
 {
+    MATTER_TRACE_SCOPE("updateHueSat", "ColorControl");
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
@@ -2205,9 +2215,9 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     }
 
     Status status = moveToColor(commandData.colorX, commandData.colorY, commandData.transitionTime, commandPath.mEndpointId);
-#ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
-#endif // EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -2592,6 +2602,24 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
 
     isColorTempTransitionDone = computeNewColor16uValue(colorTempTransitionState);
 
+    if (!isColorTempTransitionDone)
+    {
+        // Check whether our color temperature has actually changed.  If not, do
+        // nothing, and wait for it to change.
+        uint16_t currentColorTemp;
+        if (Attributes::ColorTemperatureMireds::Get(endpoint, &currentColorTemp) != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            // Why can't we read our attribute?
+            return;
+        }
+
+        if (currentColorTemp == colorTempTransitionState->currentValue)
+        {
+            scheduleTimerCallbackMs(configureTempEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
+            return;
+        }
+    }
+
     Attributes::RemainingTime::Set(endpoint, colorTempTransitionState->timeRemaining);
 
     if (isColorTempTransitionDone)
@@ -2732,9 +2760,9 @@ bool ColorControlServer::moveToColorTempCommand(app::CommandHandler * commandObj
     }
 
     Status status = moveToColorTemp(commandPath.mEndpointId, commandData.colorTemperatureMireds, commandData.transitionTime);
-#ifdef EMBER_AF_PLUGIN_SCENES
-    Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
-#endif // EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -3084,11 +3112,11 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     ColorControlServer::Instance().startUpColorTempCommand(endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     // Registers Scene handlers for the color control cluster on the server
-    app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint,
-                                                                         ColorControlServer::Instance().GetSceneHandler());
-#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+    app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(
+        endpoint, ColorControlServer::Instance().GetSceneHandler());
+#endif // defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 void MatterColorControlClusterServerShutdownCallback(EndpointId endpoint)

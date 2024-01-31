@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 42.1.1. [TC-TSTAT-1.1] Global attributes with server as DUT
+name: 42.1.1. [TC-TSTAT-1.1] Global Attributes with DUT as Server
 
 PICS:
     - TSTAT.S
@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the global attribute: ClusterRevision"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +41,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3a: Read the global attribute: FeatureMap"
+    - label: "Step 3a: TH reads from the DUT the FeatureMap attribute."
       PICS:
           "!TSTAT.S.F00 && !TSTAT.S.F01 && !TSTAT.S.F02 && !TSTAT.S.F03 &&
           !TSTAT.S.F04 && !TSTAT.S.F05"
@@ -127,7 +129,7 @@ tests:
               type: bitmap32
               hasMasksSet: [0x40]
 
-    - label: "Step 4a: Read the global attribute: AttributeList"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -136,7 +138,7 @@ tests:
               type: list
               contains: [0, 27, 28, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 4a: Read the global attribute: AttributeList"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -146,8 +148,8 @@ tests:
               contains: [0, 27, 28, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4b: Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in
-          AttributeList"
+          "Step 4b: TH reads the Feature dependent(TSTAT.S.F00(HEAT)) attribute
+          in AttributeList"
       PICS: TSTAT.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
@@ -156,8 +158,8 @@ tests:
               type: list
               contains: [18]
     - label:
-          "Step 4c: Read the Feature dependent(TSTAT.S.F01(COOL)) attribute in
-          AttributeList"
+          "Step 4c: TH reads the Feature dependent(TSTAT.S.F01(COOL)) attribute
+          in AttributeList"
       PICS: TSTAT.S.F01
       command: "readAttribute"
       attribute: "AttributeList"
@@ -167,8 +169,8 @@ tests:
               contains: [17]
 
     - label:
-          "Step 4d: Read the Feature dependent(TSTAT.S.F02(OCC)) attribute in
-          AttributeList"
+          "Step 4d: TH reads the Feature dependent(TSTAT.S.F02(OCC)) attribute
+          in AttributeList"
       PICS: TSTAT.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -178,7 +180,7 @@ tests:
               contains: [2]
 
     - label:
-          "Step 4e: Read the Feature dependent(TSTAT.S.F00(HEAT) &
+          "Step 4e: TH reads the Feature dependent(TSTAT.S.F00(HEAT) &
           TSTAT.S.F02(OCC)) attribute in AttributeList"
       PICS: TSTAT.S.F00 && TSTAT.S.F02
       command: "readAttribute"
@@ -189,7 +191,7 @@ tests:
               contains: [20]
 
     - label:
-          "Step 4f: Read the Feature dependent(TSTAT.S.F01(COOL) &
+          "Step 4f: TH reads the Feature dependent(TSTAT.S.F01(COOL) &
           TSTAT.S.F02(OCC)) attribute in AttributeList"
       PICS: TSTAT.S.F01 && TSTAT.S.F02
       command: "readAttribute"
@@ -200,8 +202,8 @@ tests:
               contains: [19]
 
     - label:
-          "Step 4g: Read the Feature dependent(TSTAT.S.F05(AUTO)) attribute in
-          AttributeList"
+          "Step 4g: TH reads the Feature dependent(TSTAT.S.F05(AUTO)) attribute
+          in AttributeList"
       PICS: TSTAT.S.F05
       command: "readAttribute"
       attribute: "AttributeList"
@@ -211,8 +213,8 @@ tests:
               contains: [17, 18, 25]
 
     - label:
-          "Step 4h: Read the Feature dependent(TSTAT.S.F03(SCH)) attribute in
-          AttributeList"
+          "Step 4h: TH reads the Feature dependent(TSTAT.S.F03(SCH)) attribute
+          in AttributeList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
       attribute: "AttributeList"
@@ -222,7 +224,7 @@ tests:
               contains: [32, 33, 34]
 
     - label:
-          "Step 4i: Read the Feature dependent(TSTAT.S.F04(SB)) attribute in
+          "Step 4i: TH reads the Feature dependent(TSTAT.S.F04(SB)) attribute in
           AttributeList"
       PICS: TSTAT.S.F04
       command: "readAttribute"
@@ -233,7 +235,7 @@ tests:
               contains: [52, 53, 54]
 
     - label:
-          "Step 4j: Read the Feature dependent(TSTAT.S.F04(SB) &
+          "Step 4j: TH reads the Feature dependent(TSTAT.S.F04(SB) &
           TSTAT.S.F02(OCC)) attribute in AttributeList"
       PICS: TSTAT.S.F04 && TSTAT.S.F02
       command: "readAttribute"
@@ -243,7 +245,7 @@ tests:
               type: list
               contains: [55, 56, 57]
 
-    - label: "Step 4k: Read the optional attribute in AttributeList"
+    - label: "Step 4k: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
@@ -252,7 +254,7 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Step 4l: Read the optional attribute in AttributeList"
+    - label: "Step 4l: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0009
       command: "readAttribute"
       attribute: "AttributeList"
@@ -261,7 +263,7 @@ tests:
               type: list
               contains: [9]
 
-    - label: "Step 4m: Read the optional attribute in AttributeList"
+    - label: "Step 4m: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0010
       command: "readAttribute"
       attribute: "AttributeList"
@@ -270,7 +272,7 @@ tests:
               type: list
               contains: [16]
 
-    - label: "Step 4n: Read the optional attribute in AttributeList"
+    - label: "Step 4n: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A001a
       command: "readAttribute"
       attribute: "AttributeList"
@@ -279,7 +281,7 @@ tests:
               type: list
               contains: [26]
 
-    - label: "Step 4o: Read the optional attribute in AttributeList"
+    - label: "Step 4o: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A001d
       command: "readAttribute"
       attribute: "AttributeList"
@@ -288,7 +290,7 @@ tests:
               type: list
               contains: [29]
 
-    - label: "Step 4p: Read the optional attribute in AttributeList"
+    - label: "Step 4p: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0023
       command: "readAttribute"
       attribute: "AttributeList"
@@ -297,7 +299,7 @@ tests:
               type: list
               contains: [35]
 
-    - label: "Step 4q: Read the optional attribute in AttributeList"
+    - label: "Step 4q: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0024
       command: "readAttribute"
       attribute: "AttributeList"
@@ -306,7 +308,7 @@ tests:
               type: list
               contains: [36]
 
-    - label: "Step 4r: Read the optional attribute in AttributeList"
+    - label: "Step 4r: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0025
       command: "readAttribute"
       attribute: "AttributeList"
@@ -315,7 +317,7 @@ tests:
               type: list
               contains: [37]
 
-    - label: "Step 4s: Read the optional attribute in AttributeList"
+    - label: "Step 4s: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0029
       command: "readAttribute"
       attribute: "AttributeList"
@@ -324,7 +326,7 @@ tests:
               type: list
               contains: [41]
 
-    - label: "Step 4t: Read the optional attribute in AttributeList"
+    - label: "Step 4t: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0030
       command: "readAttribute"
       attribute: "AttributeList"
@@ -333,7 +335,7 @@ tests:
               type: list
               contains: [48]
 
-    - label: "Step 4u: Read the optional attribute in AttributeList"
+    - label: "Step 4u: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0031
       command: "readAttribute"
       attribute: "AttributeList"
@@ -342,7 +344,7 @@ tests:
               type: list
               contains: [49]
 
-    - label: "Step 4x: Read the optional attribute in AttributeList"
+    - label: "Step 4x: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0032
       command: "readAttribute"
       attribute: "AttributeList"
@@ -351,7 +353,7 @@ tests:
               type: list
               contains: [50]
 
-    - label: "Step 5y: Read the optional attribute: AttributeList"
+    - label: "Step 4y: TH reads the optional attribute: AttributeList"
       PICS: TSTAT.S.A003a
       command: "readAttribute"
       attribute: "AttributeList"
@@ -360,7 +362,7 @@ tests:
               type: list
               contains: [58]
 
-    - label: "Step 4z: Read the optional attribute in AttributeList"
+    - label: "Step 4z: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0040
       command: "readAttribute"
       attribute: "AttributeList"
@@ -369,7 +371,7 @@ tests:
               type: list
               contains: [64]
 
-    - label: "Step 4A: Read the optional attribute in AttributeList"
+    - label: "Step 4A: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0041
       command: "readAttribute"
       attribute: "AttributeList"
@@ -378,7 +380,7 @@ tests:
               type: list
               contains: [65]
 
-    - label: "Step 4B: Read the optional attribute in AttributeList"
+    - label: "Step 4B: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0042
       command: "readAttribute"
       attribute: "AttributeList"
@@ -387,7 +389,7 @@ tests:
               type: list
               contains: [66]
 
-    - label: "Step 4C: Read the optional attribute in AttributeList"
+    - label: "Step 4C: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0043
       command: "readAttribute"
       attribute: "AttributeList"
@@ -396,7 +398,7 @@ tests:
               type: list
               contains: [67]
 
-    - label: "Step 5D: Read the optional attribute: AttributeList"
+    - label: "Step 4D: TH reads the optional attribute: AttributeList"
       PICS: TSTAT.S.A0044
       command: "readAttribute"
       attribute: "AttributeList"
@@ -405,7 +407,7 @@ tests:
               type: list
               contains: [68]
 
-    - label: "Step 4E: Read the optional attribute in AttributeList"
+    - label: "Step 4E: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0045
       command: "readAttribute"
       attribute: "AttributeList"
@@ -414,7 +416,7 @@ tests:
               type: list
               contains: [69]
 
-    - label: "Step 4F: Read the optional attribute in AttributeList"
+    - label: "Step 4F: TH reads the optional attribute in AttributeList"
       PICS: TSTAT.S.A0046
       command: "readAttribute"
       attribute: "AttributeList"
@@ -423,7 +425,7 @@ tests:
               type: list
               contains: [70]
 
-    - label: "Step 5G: Read the optional attribute: AttributeList"
+    - label: "Step 4g: TH reads the optional attribute: AttributeList"
       PICS: TSTAT.S.A0047
       command: "readAttribute"
       attribute: "AttributeList"
@@ -433,7 +435,7 @@ tests:
               contains: [71]
 
     - label:
-          "Step 4H: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          "Step 4H: TH reads the Feature dependent(TSTAT.S.F00(HEAT)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F00 && TSTAT.S.A0003
       command: "readAttribute"
@@ -444,7 +446,7 @@ tests:
               contains: [3]
 
     - label:
-          "Step 4I: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          "Step 4I: TH reads the Feature dependent(TSTAT.S.F00(HEAT)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F00 && TSTAT.S.A0004
       command: "readAttribute"
@@ -455,7 +457,7 @@ tests:
               contains: [4]
 
     - label:
-          "Step 4J: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          "Step 4J: TH reads the Feature dependent(TSTAT.S.F00(HEAT)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F00 && TSTAT.S.A0008
       command: "readAttribute"
@@ -466,7 +468,7 @@ tests:
               contains: [8]
 
     - label:
-          "Step 4K: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          "Step 4K: TH reads the Feature dependent(TSTAT.S.F00(HEAT)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015
       command: "readAttribute"
@@ -477,7 +479,7 @@ tests:
               contains: [21]
 
     - label:
-          "Step 4L: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          "Step 4L: TH reads the Feature dependent(TSTAT.S.F00(HEAT)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016
       command: "readAttribute"
@@ -488,7 +490,7 @@ tests:
               contains: [22]
 
     - label:
-          "Step 4M: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          "Step 4M: TH reads the Feature dependent(TSTAT.S.F01(COOL)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F01 && TSTAT.S.A0005
       command: "readAttribute"
@@ -499,7 +501,7 @@ tests:
               contains: [5]
 
     - label:
-          "Step 4N: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          "Step 4N: TH reads the Feature dependent(TSTAT.S.F01(COOL)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F01 && TSTAT.S.A0007
       command: "readAttribute"
@@ -510,7 +512,7 @@ tests:
               contains: [6]
 
     - label:
-          "Step 4O: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          "Step 4O: TH reads the Feature dependent(TSTAT.S.F01(COOL)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F01 && TSTAT.S.A0007
       command: "readAttribute"
@@ -521,7 +523,7 @@ tests:
               contains: [7]
 
     - label:
-          "Step 4P: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          "Step 4P: TH reads the Feature dependent(TSTAT.S.F01(COOL)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
       command: "readAttribute"
@@ -532,7 +534,7 @@ tests:
               contains: [23]
 
     - label:
-          "Step 4Q: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          "Step 4Q: TH reads the Feature dependent(TSTAT.S.F01(COOL)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018
       command: "readAttribute"
@@ -543,7 +545,7 @@ tests:
               contains: [24]
 
     - label:
-          "Step 4R: Read the Feature dependent(TSTAT.S.F05(AUTO)) optional
+          "Step 4R: TH reads the Feature dependent(TSTAT.S.F05(AUTO)) optional
           attribute in AttributeList"
       PICS: TSTAT.S.F05 && TSTAT.S.A001e
       command: "readAttribute"
@@ -553,7 +555,16 @@ tests:
               type: list
               contains: [30]
 
-    - label: "Step 5a: Read the mandatory commands in AcceptedCommandList"
+    - label: "Step 5: TH reads EventList attribute from the DUT."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6a: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -562,7 +573,7 @@ tests:
               contains: [0]
 
     - label:
-          "Step 5b: Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          "Step 6b: TH reads Feature dependent(TSTAT.S.F03(SCH)) commands in
           AcceptedCommandList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
@@ -573,7 +584,7 @@ tests:
               contains: [1, 2, 3]
 
     - label:
-          "Step 5c: Read the optional (GetRelayStatusLog) command in
+          "Step 6c: TH reads the optional (GetRelayStatusLog) command in
           AcceptedCommandList"
       PICS: TSTAT.S.C04.Rsp
       command: "readAttribute"
@@ -583,7 +594,8 @@ tests:
               type: list
               contains: [4]
 
-    - label: "Step 6a: Read the global attribute: GeneratedCommandList"
+    - label:
+          "Step 7a: TH reads from the DUT the GeneratedCommandList attribute."
       PICS: " !TSTAT.S.C04.Rsp && !TSTAT.S.C02.Rsp "
       command: "readAttribute"
       attribute: "GeneratedCommandList"
@@ -593,7 +605,7 @@ tests:
               type: list
 
     - label:
-          "Step 6b: Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          "Step 7b: TH reads Feature dependent(TSTAT.S.F03(SCH)) commands in
           GeneratedCommandList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
@@ -604,7 +616,7 @@ tests:
               contains: [0]
 
     - label:
-          "Step 6c: Read optional command (GetRelayStatusLogResponse) in
+          "Step 7c: TH reads optional command (GetRelayStatusLogResponse) in
           GeneratedCommandList"
       PICS: TSTAT.S.C04.Rsp
       command: "readAttribute"
@@ -613,12 +625,3 @@ tests:
           constraints:
               type: list
               contains: [1]
-
-    - label: "Step 7: Read EventList attribute from the DUT."
-      PICS: PICS_EVENT_LIST_ENABLED
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          value: []
-          constraints:
-              type: list

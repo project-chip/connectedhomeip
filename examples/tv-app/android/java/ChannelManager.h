@@ -31,6 +31,8 @@ using ChannelInfoType           = chip::app::Clusters::Channel::Structs::Channel
 using AdditionalInfoType        = chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type;
 using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
 using PageTokenType             = chip::app::Clusters::Channel::Structs::PageTokenStruct::Type;
+using ProgramType               = chip::app::Clusters::Channel::Structs::ProgramStruct::Type;
+using ChannelPagingType         = chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type;
 
 class ChannelManager : public ChannelDelegate
 {
@@ -72,6 +74,10 @@ private:
     jmethodID mChangeChannelMethod         = nullptr;
     jmethodID mChangeChannelByNumberMethod = nullptr;
     jmethodID mSkipChannelMethod           = nullptr;
+
+    jmethodID mGetProgramGuideMethod     = nullptr;
+    jmethodID mRecordProgramMethod       = nullptr;
+    jmethodID mCancelRecordProgramMethod = nullptr;
 
     // TODO: set this based upon meta data from app
     uint32_t mDynamicEndpointFeatureMap = 3;

@@ -84,6 +84,15 @@ public:
         virtual ~Callback() = default;
 
         /**
+         * Used to notify a (maybe empty) report data is received from peer and the subscription and the peer is alive.
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         */
+        virtual void NotifySubscriptionStillActive(const ReadClient & apReadClient) {}
+
+        /**
          * Used to signal the commencement of processing of the first attribute or event report received in a given exchange.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
@@ -155,6 +164,12 @@ public:
          * (see ReadClient::DefaultResubscribePolicy for more details). If the default implementation doesn't suffice, the logic of
          * ReadClient::DefaultResubscribePolicy is broken down into its constituent methods that are publicly available for
          * applications to call and sequence.
+         *
+         * If the peer is LIT ICD, and the timeout is reached, `aTerminationCause` will be
+         * `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT`. In this case, returning `CHIP_NO_ERROR` will still trigger a resubscribe
+         * attempt, while returning `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT` will put the subscription in the
+         * `InactiveICDSubscription` state.  In the latter case, OnResubscriptionNeeded will be called again when
+         * `OnActiveModeNotification` is called.
          *
          * If the method is over-ridden, it's the application's responsibility to take the appropriate steps needed to eventually
          * call-back into the ReadClient object to schedule a re-subscription (by invoking ReadClient::ScheduleResubscription).
@@ -277,6 +292,12 @@ public:
         Subscribe,
     };
 
+    enum class PeerType : uint8_t
+    {
+        kNormal,
+        kLITICD,
+    };
+
     /**
      *
      *  Constructor.
@@ -322,6 +343,18 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
+
+    /**
+     *  Re-activate an inactive subscription.
+     *
+     *  When subscribing to LIT-ICD and liveness timeout reached and OnResubscriptionNeeded returns
+     * CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT, the read client will move to the InactiveICDSubscription state and
+     * resubscription can be triggered via OnActiveModeNotification().
+     *
+     *  If the subscription is not in the `InactiveICDSubscription` state, this function will do nothing. So it is always safe to
+     * call this function when a check-in message is received.
+     */
+    void OnActiveModeNotification();
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
@@ -477,6 +510,7 @@ private:
         AwaitingInitialReport,     ///< The client is waiting for initial report
         AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
         SubscriptionActive,        ///< The client is maintaining subscription
+        InactiveICDSubscription,   ///< The client is waiting to resubscribe for LIT device
     };
 
     enum class ReportType
@@ -497,10 +531,20 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
+     *  Updates the type (LIT ICD or not) of the peer.
+     *
+     *  When the subscription is active, this function will just set the flag. When the subscription is an InactiveICDSubscription,
+     * setting the peer type to SIT or normal devices will also trigger a resubscription attempt.
+     *
+     */
+    void OnPeerTypeChange(PeerType aType);
+
+    /**
      *  Check if current read client is being used
      *
      */
     bool IsIdle() const { return mState == ClientState::Idle; }
+    bool IsInactiveICDSubscription() const { return mState == ClientState::InactiveICDSubscription; }
     bool IsSubscriptionActive() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
@@ -515,6 +559,7 @@ private:
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
                                           const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
+    CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
@@ -524,6 +569,7 @@ private:
     CHIP_ERROR ComputeLivenessCheckTimerTimeout(System::Clock::Timeout * aTimeout);
     void CancelLivenessCheckTimer();
     void CancelResubscribeTimer();
+    void TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason);
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, ReportType aReportType);
@@ -611,6 +657,8 @@ private:
     uint32_t mNumRetries = 0;
 
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
+
+    bool mIsPeerLIT = false;
 
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;

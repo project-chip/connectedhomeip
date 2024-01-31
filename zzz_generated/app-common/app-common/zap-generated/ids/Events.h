@@ -379,7 +379,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace RvcOperationalState
 
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 namespace Events {
 
 namespace AlarmsStateChanged {
@@ -391,7 +391,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace SensorFault
 
 } // namespace Events
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 
 namespace ValveConfigurationAndControl {
 namespace Events {
@@ -430,6 +430,24 @@ static constexpr EventId Id = 0x00000000;
 
 } // namespace Events
 } // namespace DemandResponseLoadControl
+
+namespace Messages {
+namespace Events {
+
+namespace MessageQueued {
+static constexpr EventId Id = 0x00000000;
+} // namespace MessageQueued
+
+namespace MessagePresented {
+static constexpr EventId Id = 0x00000001;
+} // namespace MessagePresented
+
+namespace MessageComplete {
+static constexpr EventId Id = 0x00000002;
+} // namespace MessageComplete
+
+} // namespace Events
+} // namespace Messages
 
 namespace DeviceEnergyManagement {
 namespace Events {
@@ -634,8 +652,22 @@ namespace TestFabricScopedEvent {
 static constexpr EventId Id = 0x00000002;
 } // namespace TestFabricScopedEvent
 
+namespace TestDifferentVendorMeiEvent {
+static constexpr EventId Id = 0xFFF200EE;
+} // namespace TestDifferentVendorMeiEvent
+
 } // namespace Events
 } // namespace UnitTesting
+
+namespace SampleMei {
+namespace Events {
+
+namespace PingCountEvent {
+static constexpr EventId Id = 0x00000000;
+} // namespace PingCountEvent
+
+} // namespace Events
+} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

@@ -190,7 +190,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000a" name="PeriodicEnergyExported" type="uint64" default="null">
+    <attribute id="0x000A" name="PeriodicEnergyExported" type="uint64" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -200,7 +200,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000b" name="EphemeralEnergyImported" type="uint64" default="null">
+    <attribute id="0x000B" name="EphemeralEnergyImported" type="uint64" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -210,7 +210,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000c" name="EphemeralEnergyImported" type="uint64" default="null">
+    <attribute id="0x000C" name="EphemeralEnergyExported" type="uint64" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>

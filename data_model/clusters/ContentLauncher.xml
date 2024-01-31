@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050a" name="Content Launcher" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050A" name="Content Launcher" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -65,15 +65,6 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="1" code="UP" name="URLPlayback" summary="Device supports basic URL-based file playback">
-      <optionalConform/>
-    </feature>
-    <feature bit="2" code="AS" name="AdvancedSeek" summary="Enables clients to implement more advanced media seeking behavior in their user interface, such as for example a &quot;seek bar&quot;.">
-      <optionalConform/>
-    </feature>
-    <feature bit="3" code="TT" name="TextTracks" summary="Device or app supports Text Tracks.">
-      <optionalConform/>
-    </feature>
-    <feature bit="4" code="AT" name="AudioTracks" summary="Device or app supports Audio Tracks.">
       <optionalConform/>
     </feature>
   </features>
@@ -134,15 +125,6 @@ Davis, CA 95616, USA
       <item value="13" name="Video" summary="Video represents the identifying data for a specific piece of video content; for example, &quot;Manchester by the Sea&quot;.">
         <mandatoryConform/>
       </item>
-      <item value="14" name="Season" summary="Season represents the specific season number within a TV series.">
-        <optionalConform/>
-      </item>
-      <item value="15" name="Episode" summary="Episode represents a specific episode number within a Season in a TV series.">
-        <optionalConform/>
-      </item>
-      <item value="16" name="Any" summary="Represents a search text input across many parameter types or even outside of the defined param types.">
-        <optionalConform/>
-      </item>
     </enum>
     <enum name="StatusEnum">
       <item value="0" name="Success" summary="Command succeeded">
@@ -154,25 +136,12 @@ Davis, CA 95616, USA
       <item value="2" name="AuthFailed" summary="Requested URL returned 401 error code.">
         <mandatoryConform/>
       </item>
-      <item value="3" name="TextTrackNotAvailable" summary="Requested Text Track (in PlaybackPreferences) not available">
-        <mandatoryConform>
-          <feature name="TT"/>
-        </mandatoryConform>
-      </item>
-      <item value="4" name="AudioTrackNotAvailable" summary="Requested Audio Track (in PlaybackPreferences) not available">
-        <mandatoryConform>
-          <feature name="AT"/>
-        </mandatoryConform>
-      </item>
     </enum>
     <bitmap name="SupportedProtocolsBitmap">
       <bitfield name="DASH" bit="0" summary="Device supports Dynamic Adaptive Streaming over HTTP (DASH)">
         <mandatoryConform/>
       </bitfield>
       <bitfield name="HLS" bit="1" summary="Device supports HTTP Live Streaming (HLS)">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="WebRTC" bit="2" summary="Device supports WebRTC via HTML5 (Web Real-Time Communication)">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -188,69 +157,28 @@ Davis, CA 95616, USA
     </struct>
     <struct name="BrandingInformationStruct">
       <field id="0" name="ProviderName" type="string">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="256"/>
       </field>
       <field id="1" name="Background" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="2" name="Logo" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="3" name="ProgressBar" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="4" name="Splash" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="5" name="WaterMark" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
-      </field>
-    </struct>
-    <struct name="PlaybackPreferencesStruct">
-      <field id="0" name="PlaybackPosition" type="uint64">
-        <quality nullable="true"/>
-        <mandatoryConform>
-          <feature name="AS"/>
-        </mandatoryConform>
-      </field>
-      <field id="1" name="TextTrack" type="TrackPreferenceStruct">
-        <quality nullable="true"/>
-        <mandatoryConform>
-          <feature name="TT"/>
-        </mandatoryConform>
-      </field>
-      <field id="2" name="AudioTracks" type="list[TrackPreferenceStruct Type]">
-        <quality nullable="true"/>
-        <mandatoryConform>
-          <feature name="AT"/>
-        </mandatoryConform>
-      </field>
-    </struct>
-    <struct name="TrackPreferenceStruct">
-      <field id="0" name="LanguageCode" type="string">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
-      </field>
-      <field id="1" name="Characteristics" type="list[CharacteristicEnum Type]" default="null">
-        <quality nullable="true"/>
-        <optionalConform/>
-      </field>
-      <field id="2" name="AudioOutputIndex" type="uint8">
-        <quality nullable="true"/>
-        <mandatoryConform>
-          <feature name="AT"/>
-        </mandatoryConform>
       </field>
     </struct>
     <struct name="ContentSearchStruct">
-      <field id="0" name="ParameterList" type="list[ParameterStruct Type]" default="0">
+      <field id="0" name="ParameterList" type="list" default="0">
+        <entry type="ParameterStruct"/>
         <mandatoryConform/>
       </field>
     </struct>
@@ -273,7 +201,8 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="maxLength" value="1024"/>
       </field>
-      <field id="2" name="ExternalIDList" type="list[AdditionalInfoStruct Type]" default="empty">
+      <field id="2" name="ExternalIDList" type="list" default="empty">
+        <entry type="AdditionalInfoStruct"/>
         <optionalConform/>
       </field>
     </struct>
@@ -329,12 +258,6 @@ Davis, CA 95616, USA
       <field id="2" name="Data" type="string" default="MS">
         <optionalConform/>
       </field>
-      <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
-        <optionalConform/>
-      </field>
-      <field id="4" name="UseCurrentContext" type="bool" default="true">
-        <optionalConform/>
-      </field>
     </command>
     <command id="0x01" name="LaunchURL" response="LauncherResponse">
       <access invokePrivilege="operate"/>
@@ -348,9 +271,6 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
       <field id="2" name="BrandingInformation" type="BrandingInformationStruct" default="MS">
-        <optionalConform/>
-      </field>
-      <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
         <optionalConform/>
       </field>
     </command>

@@ -33,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: Read the global attribute: ClusterRevision"
+    - label: "Step 1: TH reads the ClusterRevision attribute from the DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -41,7 +41,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 2: Read FeatureMap attribute from the DUT"
+    - label: "Step 2: TH reads the FeatureMap attribute from the DUT"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,7 +49,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 3a: Read the global attribute: AttributeList"
+    - label: "Step 3a: TH reads the AttributeList attribute from the DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -59,7 +59,7 @@ tests:
               contains:
                   [2, 4, 5, 6, 7, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 3a: Read the global attribute: AttributeList"
+    - label: "Step 3a: TH reads the AttributeList attribute from the DUT"
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -68,7 +68,8 @@ tests:
               type: list
               contains: [2, 4, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 3b: Read the optional attribute(VendorName) in AttributeList"
+    - label:
+          "Step 3b: TH reads the optional attribute(VendorName) in AttributeList"
       PICS: APBSC.S.A0000
       command: "readAttribute"
       attribute: "AttributeList"
@@ -77,7 +78,8 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 3c: Read the optional attribute(VendorID) in AttributeList"
+    - label:
+          "Step 3c: TH reads the optional attribute(VendorID) in AttributeList"
       PICS: APBSC.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
@@ -86,7 +88,8 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Step 3d: Read the optional attribute(ProductID) in AttributeList"
+    - label:
+          "Step 3d: TH reads the optional attribute(ProductID) in AttributeList"
       PICS: APBSC.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
@@ -95,7 +98,7 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Step 4: Read the global attribute: AcceptedCommandList"
+    - label: "Step 4: TH reads the AcceptedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -103,7 +106,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 5: Read the global attribute: GeneratedCommandList"
+    - label: "Step 5: TH reads the GeneratedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -111,7 +114,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: Read the global attribute: EventList"
+    - label: "Step 6: TH reads the EventList attribute from the DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"

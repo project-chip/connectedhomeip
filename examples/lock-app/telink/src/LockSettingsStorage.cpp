@@ -33,16 +33,26 @@ namespace Internal {
     (key);                                                                                                                         \
     static_assert(sizeof(key) <= SETTINGS_MAX_NAME_LEN, "Config key too long: " key)
 
+#define CONFIG_KEY_CREDENTIAL(type) (NAMESPACE_CONFIG "credential-" type)
+#define CONFIG_KEY_CREDENTIAL_DATA(type) (NAMESPACE_CONFIG "credential-" type "-data")
+
 #define NAMESPACE_CONFIG CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
 
-const ZephyrConfig::Key LockSettingsStorage::kConfigKey_LockUser         = CONFIG_KEY(NAMESPACE_CONFIG "lock-user");
-const ZephyrConfig::Key LockSettingsStorage::kConfigKey_Credential       = CONFIG_KEY(NAMESPACE_CONFIG "credential");
-const ZephyrConfig::Key LockSettingsStorage::kConfigKey_LockUserName     = CONFIG_KEY(NAMESPACE_CONFIG "lock-user-name");
-const ZephyrConfig::Key LockSettingsStorage::kConfigKey_CredentialData   = CONFIG_KEY(NAMESPACE_CONFIG "credential-data");
-const ZephyrConfig::Key LockSettingsStorage::kConfigKey_UserCredentials  = CONFIG_KEY(NAMESPACE_CONFIG "user-credentials");
-const ZephyrConfig::Key LockSettingsStorage::kConfigKey_WeekDaySchedules = CONFIG_KEY(NAMESPACE_CONFIG "week-day-schedules");
-const ZephyrConfig::Key LockSettingsStorage::kConfigKey_YearDaySchedules = CONFIG_KEY(NAMESPACE_CONFIG "year-day-schedules");
-const ZephyrConfig::Key LockSettingsStorage::kConfigKey_HolidaySchedules = CONFIG_KEY(NAMESPACE_CONFIG "holiday-schedules");
+const ZephyrConfig::Key LockSettingsStorage::kConfigKey_LockUser             = CONFIG_KEY(NAMESPACE_CONFIG "lock-user");
+const ZephyrConfig::Key LockSettingsStorage::kConfigKey_LockUserName         = CONFIG_KEY(NAMESPACE_CONFIG "lock-user-name");
+const ZephyrConfig::Key LockSettingsStorage::kConfigKey_UserCredentials      = CONFIG_KEY(NAMESPACE_CONFIG "user-credentials");
+const ZephyrConfig::Key LockSettingsStorage::kConfigKey_WeekDaySchedules     = CONFIG_KEY(NAMESPACE_CONFIG "week-day-schedules");
+const ZephyrConfig::Key LockSettingsStorage::kConfigKey_YearDaySchedules     = CONFIG_KEY(NAMESPACE_CONFIG "year-day-schedules");
+const ZephyrConfig::Key LockSettingsStorage::kConfigKey_HolidaySchedules     = CONFIG_KEY(NAMESPACE_CONFIG "holiday-schedules");
+const char * LockSettingsStorage::kConfigKey_Credential[kNumCredentialTypes] = {
+    CONFIG_KEY_CREDENTIAL("programming-pin"), CONFIG_KEY_CREDENTIAL("pin"),         CONFIG_KEY_CREDENTIAL("rfid"),
+    CONFIG_KEY_CREDENTIAL("finger-print"),    CONFIG_KEY_CREDENTIAL("finger-vein"), CONFIG_KEY_CREDENTIAL("face")
+};
+const char * LockSettingsStorage::kConfigKey_CredentialData[kNumCredentialTypes] = {
+    CONFIG_KEY_CREDENTIAL_DATA("programming-pin"), CONFIG_KEY_CREDENTIAL_DATA("pin"),         CONFIG_KEY_CREDENTIAL_DATA("rfid"),
+    CONFIG_KEY_CREDENTIAL_DATA("finger-print"),    CONFIG_KEY_CREDENTIAL_DATA("finger-vein"), CONFIG_KEY_CREDENTIAL_DATA("face")
+};
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "ICDClientStorage.h"
+#include <app/icd/client/ICDClientStorage.h>
 #include <lib/core/CHIPCore.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -31,6 +31,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/core/TLV.h>
+#include <lib/support/CommonIterator.h>
 #include <lib/support/Pool.h>
 #include <vector>
 
@@ -50,11 +51,40 @@ namespace app {
 class DefaultICDClientStorage : public ICDClientStorage
 {
 public:
+    using ICDClientInfoIterator = CommonIterator<ICDClientInfo>;
+
+    // ICDClientInfoIterator wrapper to release ICDClientInfoIterator when it is out of scope
+    class ICDClientInfoIteratorWrapper
+    {
+    public:
+        ICDClientInfoIteratorWrapper(ICDClientInfoIterator * apICDClientInfoIterator)
+        {
+            mpICDClientInfoIterator = apICDClientInfoIterator;
+        }
+
+        ~ICDClientInfoIteratorWrapper()
+        {
+            if (mpICDClientInfoIterator != nullptr)
+            {
+                mpICDClientInfoIterator->Release();
+                mpICDClientInfoIterator = nullptr;
+            }
+        }
+
+    private:
+        ICDClientInfoIterator * mpICDClientInfoIterator = nullptr;
+    };
+
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS;
 
     CHIP_ERROR Init(PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore);
 
-    ICDClientInfoIterator * IterateICDClientInfo() override;
+    /**
+     * Iterate through persisted ICD Client Info
+     *
+     * @return A valid iterator on success. Use CommonIterator accessor to retrieve ICDClientInfo
+     */
+    ICDClientInfoIterator * IterateICDClientInfo();
 
     /**
      * When decrypting check-in messages, the system needs to iterate through all keys
@@ -75,13 +105,19 @@ public:
 
     CHIP_ERROR StoreEntry(const ICDClientInfo & clientInfo) override;
 
-    CHIP_ERROR GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo) override;
-
     CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNode) override;
 
-    CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) override;
+    /**
+     * Remove all ICDClient persistent information associated with the specified
+     * fabric index.  If no entries for the fabric index exist, this is a no-op
+     * and is considered successful.
+     * When the whole fabric is removed, all entries from persistent storage in current fabric index are removed.
+     *
+     * @param[in] fabricIndex the index of the fabric for which to remove ICDClient persistent information
+     */
+    CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex);
 
-    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
+    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, CounterType & counter) override;
 
 protected:
     enum class ClientInfoTag : uint8_t
@@ -91,7 +127,8 @@ protected:
         kStartICDCounter  = 3,
         kOffset           = 4,
         kMonitoredSubject = 5,
-        kSharedKey        = 6
+        kAesKeyHandle     = 6,
+        kHmacKeyHandle    = 7,
     };
 
     enum class CounterTag : uint8_t

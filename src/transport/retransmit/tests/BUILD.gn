@@ -30,7 +30,7 @@ chip_test_suite_using_nltest("tests") {
   ]
 
   public_deps = [
-    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/transport/retransmit",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",

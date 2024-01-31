@@ -99,7 +99,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
-    chip::DeviceLayer::SystemLayer().ScheduleWork(UpdateClusterState, nullptr);
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -424,7 +424,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     }
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        chip::DeviceLayer::SystemLayer().ScheduleWork(UpdateClusterState, nullptr);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }
@@ -463,7 +463,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 }
 
 /* if unlocked then it locked it first*/
-void AppTask::UpdateClusterState(chip::System::Layer *, void * context)
+void AppTask::UpdateClusterState(intptr_t context)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 

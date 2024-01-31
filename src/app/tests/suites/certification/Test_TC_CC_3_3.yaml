@@ -150,7 +150,7 @@ tests:
 
     #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 PICS_SKIP_SAMPLE_APP
+      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
 

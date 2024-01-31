@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.R;
 import com.chip.casting.ContentApp;
 import com.chip.casting.ContentLauncherTypes;
 import com.chip.casting.FailureCallback;

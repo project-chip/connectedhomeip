@@ -10,46 +10,6 @@
 #   - input_file is the input IDL
 #   - output_file/golden_path are the expected output file names
 #     and the expected content for those output files.
-java-jni:
-    inputs/simple_attribute.matter:
-        jni/MyClusterClient-ReadImpl.cpp: outputs/simple_attribute/jni/MyClusterClient-ReadImpl.cpp
-        jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/simple_attribute/jni/MyClusterClient-InvokeSubscribeImpl.cpp
-        jni/CHIPCallbackTypes.h: outputs/simple_attribute/jni/CHIPCallbackTypes.h
-        jni/CHIPReadCallbacks.h: outputs/simple_attribute/jni/CHIPReadReadCallbacks.h
-        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
-
-    inputs/global_struct_attribute.matter:
-        jni/DemoClusterClient-ReadImpl.cpp: outputs/global_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp
-        jni/DemoClusterClient-InvokeSubscribeImpl.cpp: outputs/global_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp
-        jni/CHIPCallbackTypes.h: outputs/global_struct_attribute/jni/CHIPCallbackTypes.h
-        jni/CHIPReadCallbacks.h: outputs/global_struct_attribute/jni/CHIPReadReadCallbacks.h
-        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
-
-    inputs/cluster_struct_attribute.matter:
-        jni/DemoClusterClient-ReadImpl.cpp: outputs/cluster_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp
-        jni/DemoClusterClient-InvokeSubscribeImpl.cpp: outputs/cluster_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp
-        jni/CHIPCallbackTypes.h: outputs/cluster_struct_attribute/jni/CHIPCallbackTypes.h
-        jni/CHIPReadCallbacks.h: outputs/cluster_struct_attribute/jni/CHIPReadReadCallbacks.h
-        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
-
-    inputs/several_clusters.matter:
-        jni/FirstClient-ReadImpl.cpp: outputs/several_clusters/jni/FirstClient-ReadImpl.cpp
-        jni/SecondClient-ReadImpl.cpp: outputs/several_clusters/jni/SecondClient-ReadImpl.cpp
-        jni/ThirdClient-ReadImpl.cpp: outputs/several_clusters/jni/ThirdClient-ReadImpl.cpp
-        jni/FirstClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/FirstClient-InvokeSubscribeImpl.cpp
-        jni/SecondClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/SecondClient-InvokeSubscribeImpl.cpp
-        jni/ThirdClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/ThirdClient-InvokeSubscribeImpl.cpp
-        jni/CHIPCallbackTypes.h: outputs/several_clusters/jni/CHIPCallbackTypes.h
-        jni/CHIPReadCallbacks.h: outputs/several_clusters/jni/CHIPReadReadCallbacks.h
-        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
-
-    inputs/optional_argument.matter:
-        jni/MyClusterClient-ReadImpl.cpp: outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp
-        jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp
-        jni/CHIPCallbackTypes.h: outputs/optional_argument/jni/CHIPCallbackTypes.h
-        jni/CHIPReadCallbacks.h: outputs/optional_argument/jni/CHIPReadReadCallbacks.h
-        jni/CHIPGlobalCallbacks.cpp: outputs/shared/jni/CHIPGlobalCallbacks.cpp
-
 java-class:
     inputs/several_clusters.matter:
         java/chip/devicecontroller/cluster/structs/SecondClusterFabricDescriptorStruct.kt: outputs/several_clusters/java/SecondClusterFabricDescriptorStruct.kt
@@ -66,14 +26,17 @@ cpp-app:
     inputs/several_clusters.matter:
         app/PluginApplicationCallbacks.h: outputs/several_clusters/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/several_clusters/cpp-app/callback-stub.cpp
+        app/cluster-init-callback.cpp: outputs/several_clusters/cpp-app/cluster-init-callback.cpp
 
     inputs/large_all_clusters_app.matter:
         app/PluginApplicationCallbacks.h: outputs/large_all_clusters_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_all_clusters_app/cpp-app/callback-stub.cpp
+        app/cluster-init-callback.cpp: outputs/large_all_clusters_app/cpp-app/cluster-init-callback.cpp
 
     inputs/large_lighting_app.matter:
         app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp
+        app/cluster-init-callback.cpp: outputs/large_lighting_app/cpp-app/cluster-init-callback.cpp
 
 cpp-tlvmeta:
     inputs/cluster_with_commands.matter:

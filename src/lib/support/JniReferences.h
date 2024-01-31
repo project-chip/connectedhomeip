@@ -82,6 +82,10 @@ public:
 
     CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature,
                           jmethodID * methodId);
+
+    CHIP_ERROR FindMethod(JNIEnv * env, jclass javaClass, const char * methodName, const char * methodSignature,
+                          jmethodID * methodId);
+
     void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);
 
     CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, jsize inArrayLen, jbyteArray & outArray);

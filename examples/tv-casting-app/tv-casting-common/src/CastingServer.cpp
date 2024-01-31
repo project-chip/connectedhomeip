@@ -191,7 +191,9 @@ void CastingServer::OnCommissioningSessionEstablishmentStarted()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner)
 {
-    return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
+    // TODO: expose options to the higher layer
+    Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+    return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
 }
 
 chip::Inet::IPAddress * CastingServer::getIpAddressForUDCRequest(chip::Inet::IPAddress ipAddresses[], const size_t numIPs)

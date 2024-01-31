@@ -211,27 +211,27 @@ Davis, CA 95616, USA
       <access readPrivilege="view"/>
       <optionalConform/>
     </event>
-    <event id="0x0a" name="SensorFailure" priority="info">
+    <event id="0x0A" name="SensorFailure" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
     </event>
-    <event id="0x0b" name="ElectronicNonFatalFailure" priority="info">
+    <event id="0x0B" name="ElectronicNonFatalFailure" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
     </event>
-    <event id="0x0c" name="ElectronicFatalFailure" priority="critical">
+    <event id="0x0C" name="ElectronicFatalFailure" priority="critical">
       <access readPrivilege="view"/>
       <optionalConform/>
     </event>
-    <event id="0x0d" name="GeneralFault" priority="info">
+    <event id="0x0D" name="GeneralFault" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
     </event>
-    <event id="0x0e" name="Leakage" priority="info">
+    <event id="0x0E" name="Leakage" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
     </event>
-    <event id="0x0f" name="AirDetection" priority="info">
+    <event id="0x0F" name="AirDetection" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
     </event>

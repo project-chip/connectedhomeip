@@ -20,7 +20,6 @@ import com.matter.virtual.device.app.core.ui.SharedViewModel
 import com.matter.virtual.device.app.feature.main.databinding.FragmentMainBinding
 import com.matter.virtual.device.app.feature.main.model.Menu
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.abs
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -54,16 +53,6 @@ class MainFragment : Fragment() {
 
     (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
     (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-    binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-      var ratio = 0F
-      if (abs(verticalOffset) != 0) {
-        ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
-      }
-
-      binding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
-      binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
-    }
 
     viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
       Timber.d("uiState:$uiState")

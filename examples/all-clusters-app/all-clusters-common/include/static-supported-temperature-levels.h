@@ -20,7 +20,7 @@
 
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/af.h>
-#include <zap-generated/gen_config.h>
+#include <app/util/config.h>
 
 namespace chip {
 namespace app {

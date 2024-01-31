@@ -25,11 +25,13 @@
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/CommonIterator.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 #include <stddef.h>
 
 namespace chip {
 namespace app {
 
+using namespace Protocols::SecureChannel;
 /**
  * The ICDClientStorage class is an abstract interface that defines the operations
  * for storing, retrieving and deleting ICD client information in persistent storage.
@@ -37,20 +39,11 @@ namespace app {
 class ICDClientStorage
 {
 public:
-    using ICDClientInfoIterator = CommonIterator<ICDClientInfo>;
-
     virtual ~ICDClientStorage() = default;
 
     /**
-     * Iterate through persisted ICD Client Info
-     *
-     * @return A valid iterator on success. Use CommonIterator accessor to retrieve ICDClientInfo
-     */
-    virtual ICDClientInfoIterator * IterateICDClientInfo() = 0;
-
-    /**
      * Called during ICD device registration in commissioning, commissioner/controller
-     * provides raw key data, the shared key handle in clientInfo is updated based upon raw key data
+     * provides raw key data, the shared aes key handle and hmac key handle in clientInfo are updated based upon raw key data
      *
      * @param[inout] clientInfo the ICD Client information to be updated with keyData and be saved
      * @param[in] aKeyData raw key data provided by application
@@ -66,19 +59,12 @@ public:
     virtual CHIP_ERROR StoreEntry(const ICDClientInfo & clientInfo) = 0;
 
     /**
-     * Remove ICD key from clientInfo when ICD registration fails
-     *
-     * @param[inout] clientInfo the updated ICD Client Info.
+     * This function removes the ICD key from the provided clientInfo object in the event
+     *  of a failed LIT ICD device registration attempt. If the key handle is not found within
+     *  the Keystore, the function will not perform any operation.
+     * @param[inout] clientInfo The ICD Client Info to update with uninitialized key handle if key is removed successfully.
      */
     virtual void RemoveKey(ICDClientInfo & clientInfo) = 0;
-
-    /**
-     * Get ICD ClientInfo from storage
-     * One user case is to retrieve UserActiveModeTriggerHint and inform how user how to wake up sleepy device.
-     * @param[in] peerNode scoped node with peer node id and fabric index
-     * @param[out] clientInfo the ICD Client Info.
-     */
-    virtual CHIP_ERROR GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo) = 0;
 
     /**
      * Delete ICD Client persistent information associated with the specified scoped node Id.
@@ -88,23 +74,17 @@ public:
     virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNode) = 0;
 
     /**
-     * Remove all ICDClient persistent information associated with the specified
-     * fabric index.  If no entries for the fabric index exist, this is a no-op
-     * and is considered successful.
-     * When the whole fabric is removed, all entries from persistent storage in current fabric index are removed.
-     *
-     * @param[in] fabricIndex the index of the fabric for which to remove ICDClient persistent information
-     */
-    virtual CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) = 0;
-
-    /**
-     * Process received ICD Check-in message payload.  The implementation needs to parse the payload,
+     * Process received ICD check-in message payload.  The implementation needs to parse the payload,
      * look for a key that allows successfully decrypting the payload, verify that the counter in the payload is valid,
      * and populate the clientInfo with the stored information corresponding to the key.
-     * @param[in] payload received checkIn Message payload
+     * @param[in] payload received check-in Message payload
      * @param[out] clientInfo retrieved matched clientInfo from storage
+     * @param[out] counter counter value received in the check-in message
      */
-    virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) = 0;
+    virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, CounterType & counter) = 0;
+
+    // 4 bytes for counter + 2 bytes for ActiveModeThreshold
+    static inline constexpr uint8_t kAppDataLength = 6;
 };
 } // namespace app
 } // namespace chip

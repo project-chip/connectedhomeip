@@ -607,7 +607,7 @@ tests:
 
     - label:
           "Step 5e: TH sends Set Credential Command to DUT with the following
-          fields: 1.OperationType as 0 2.Credential as 1 1- PIN, Index
+          fields: 1.OperationType as 0-Add 2.Credential as 1 1- PIN, Index
           3.CredentialData as 123456 4.UserIndex as 1 5.UserStatus as null
           6.UserType as null"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx

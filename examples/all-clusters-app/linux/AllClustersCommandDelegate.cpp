@@ -30,6 +30,7 @@
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
+#include <oven-modes.h>
 #include <rvc-modes.h>
 
 using namespace chip;

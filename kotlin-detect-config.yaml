@@ -300,6 +300,7 @@ complexity:
             - "**/src/controller/java/src/matter/tlv/TlvWriter.kt"
             - "**/src/controller/java/src/matter/controller/MatterControllerImpl.kt"
             - "**/src/controller/java/src/matter/controller/CompletionListenerAdapter.kt"
+            - "**/src/controller/java/src/matter/controller/MatterController.kt"
             - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"

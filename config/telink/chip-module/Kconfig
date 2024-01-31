@@ -31,6 +31,19 @@ config CHIP_APP_LOG_LEVEL
 	  option only within the application. To set the logging level for the
 	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
 
+config CHIP_NFC_COMMISSIONING
+	bool "Share onboarding payload in NFC tag"
+	default n
+	imply I2C
+	imply ST25DVXXKC
+	imply NFC		
+	imply NFC_NDEF
+	imply NFC_NDEF_MSG
+	imply NFC_NDEF_RECORD
+	imply NFC_NDEF_URI_REC
+	imply NFC_NDEF_URI_MSG
+	help
+	  Enables sharing the onboarding payload in the NFC tag.
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR

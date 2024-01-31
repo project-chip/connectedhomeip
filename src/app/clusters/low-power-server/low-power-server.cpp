@@ -31,6 +31,7 @@
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -93,6 +94,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 bool emberAfLowPowerClusterSleepCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                          const Commands::Sleep::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("Sleep", "LowPower");
     using Protocols::InteractionModel::Status;
 
     EndpointId endpoint = commandPath.mEndpointId;

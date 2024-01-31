@@ -24,6 +24,8 @@ private:
     bool mDocked   = false;
     bool mCharging = false;
 
+    uint8_t mStateBeforePause = 0;
+
 public:
     /**
      * This class is responsible for initialising all the RVC clusters and manging the interactions between them as required by

@@ -155,6 +155,16 @@ public:
      *
      */
     virtual CHIP_ERROR FinalizeBuffer(TLVWriter & writer, uint8_t * bufStart, uint32_t bufLen) = 0;
+
+    /**
+     * Returns whether call to GetNewBuffer will always fail.
+     *
+     * There are some implementations of TLVBackingStore that provide some level of utility, such as access to pool
+     * of particular kind of buffer and/or reserving space for headers. Some implementation allow the caller to
+     * specify that they only intend to use a single buffer. It is useful for TLVWriter to know if this is the case.
+     *
+     */
+    virtual bool GetNewBufferWillAlwaysFail() { return false; }
 };
 
 } // namespace TLV

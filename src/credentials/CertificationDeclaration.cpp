@@ -473,12 +473,12 @@ CHIP_ERROR EncodeSignerInfo(const ByteSpan & signerKeyId, const P256ECDSASignatu
             }
             ASN1_END_SEQUENCE;
 
-            uint8_t asn1SignatureBuf[kMax_ECDSA_Signature_Length_Der];
-            MutableByteSpan asn1Signature(asn1SignatureBuf);
-            ReturnErrorOnFailure(EcdsaRawSignatureToAsn1(kP256_FE_Length, signature.Span(), asn1Signature));
-
             // signature OCTET STRING
-            ReturnErrorOnFailure(writer.PutOctetString(asn1Signature.data(), static_cast<uint16_t>(asn1Signature.size())));
+            ASN1_START_OCTET_STRING_ENCAPSULATED
+            {
+                ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan(signature.ConstBytes()), writer));
+            }
+            ASN1_END_ENCAPSULATED;
         }
         ASN1_END_SEQUENCE;
     }

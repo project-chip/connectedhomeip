@@ -59,7 +59,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
-    <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
+    <revision revision="3" summary="Added SpecificationVersion attribute"/>
   </revisionHistory>
   <classification hierarchy="base" role="utility" picsCode="BINFO" scope="Node"/>
   <dataTypes>
@@ -160,11 +160,9 @@ Davis, CA 95616, USA
     </struct>
     <struct name="ProductAppearanceStruct">
       <field id="0" name="Finish" type="ProductFinishEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="PrimaryColor" type="ColorEnum">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -175,19 +173,20 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
+      <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0001" name="VendorName" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x0001" name="VendorName" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
       <constraint type="max" value="32"/>
     </attribute>
-    <attribute id="0x0002" name="VendorID" type="&lt;&lt;ref_DataTypeVendorId&gt;&gt;" default="MS">
+    <attribute id="0x0002" name="VendorID" type="ref_DataTypeVendorId" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0003" name="ProductName" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x0003" name="ProductName" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
@@ -198,13 +197,13 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0005" name="NodeLabel" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="&quot;">
+    <attribute id="0x0005" name="NodeLabel" type="ref_DataTypeString" default="&quot;">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="max" value="32"/>
     </attribute>
-    <attribute id="0x0006" name="Location" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="&quot;XX&quot;">
+    <attribute id="0x0006" name="Location" type="ref_DataTypeString" default="&quot;XX&quot;">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
@@ -215,7 +214,7 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0008" name="HardwareVersionString" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x0008" name="HardwareVersionString" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
@@ -227,37 +226,37 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000a" name="SoftwareVersionString" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x000A" name="SoftwareVersionString" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
       <constraint type="between" from="1" to="64"/>
     </attribute>
-    <attribute id="0x000b" name="ManufacturingDate" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x000B" name="ManufacturingDate" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform/>
       <constraint type="between" from="8" to="16"/>
     </attribute>
-    <attribute id="0x000c" name="PartNumber" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x000C" name="PartNumber" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform/>
       <constraint type="max" value="32"/>
     </attribute>
-    <attribute id="0x000d" name="ProductURL" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x000D" name="ProductURL" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform/>
       <constraint type="max" value="256"/>
     </attribute>
-    <attribute id="0x000e" name="ProductLabel" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x000E" name="ProductLabel" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform/>
       <constraint type="max" value="64"/>
     </attribute>
-    <attribute id="0x000f" name="SerialNumber" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x000F" name="SerialNumber" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform/>
@@ -272,7 +271,7 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0012" name="UniqueID" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x0012" name="UniqueID" type="ref_DataTypeString" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <optionalConform/>
@@ -293,12 +292,6 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
-    </attribute>
-    <attribute id="0x0016" name="MaxPathsPerInvoke" type="uint16" default="1">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform/>
-      <constraint type="min" value="1"/>
     </attribute>
   </attributes>
   <events>

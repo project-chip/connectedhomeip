@@ -49,7 +49,7 @@ void callback_event(uint32_t event)
     case SL_USART_EVENT_RECEIVE_COMPLETE:
 #ifdef ENABLE_CHIP_SHELL
         chip::NotifyShellProcessFromISR();
-#endif;
+#endif
     case SL_USART_EVENT_TRANSFER_COMPLETE:
         break;
     }
@@ -72,28 +72,25 @@ void uartConsoleInit(void)
     usart_config.synch_mode    = DISABLE;
     sl_si91x_usart_control_config_t get_config;
 
-    // Initialized board UART
-    DEBUGINIT();
-
     // Initialize the UART
     status = sl_si91x_usart_init((usart_peripheral_t) usart_config.usart_module, &usart_handle);
     if (status != SL_STATUS_OK)
     {
-        DEBUGOUT("sl_si91x_usart_initialize: Error Code : %lu \n", status);
+        SILABS_LOG("sl_si91x_usart_initialize: Error Code : %lu \n", status);
     }
 
     // Configure the USART configurations
     status = sl_si91x_usart_set_configuration(usart_handle, &usart_config);
     if (status != SL_STATUS_OK)
     {
-        DEBUGOUT("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
+        SILABS_LOG("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
     }
 
     // Register user callback function
     status = sl_si91x_usart_register_event_callback(callback_event);
     if (status != SL_STATUS_OK)
     {
-        DEBUGOUT("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
+        SILABS_LOG("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
     }
 
     NVIC_EnableIRQ(USART0_IRQn);

@@ -31,7 +31,6 @@
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
 #include "channel/ChannelManager.h"
-#include "content-app-observer/ContentAppObserver.h"
 #include "content-control/ContentController.h"
 #include "content-launcher/ContentLauncherManager.h"
 #include "keypad-input/KeypadInputManager.h"
@@ -51,6 +50,7 @@ static ApplicationLauncherManager applicationLauncherManager(false);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 static AudioOutputManager audioOutputManager;
 static ChannelManager channelManager;
+static ContentControlManager contentControlManager;
 static ContentLauncherManager contentLauncherManager;
 static KeypadInputManager keypadInputManager;
 static LowPowerManager lowPowerManager;
@@ -104,12 +104,6 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
 }
 
-void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDefaultDelegate");
-    ContentLauncher::SetDefaultDelegate(endpoint, &contentLauncherManager);
-}
-
 void emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: AccountLogin::SetDefaultDelegate");
@@ -132,6 +126,18 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
     AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
+}
+
+void emberAfContentControlClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: ContentControlManager::SetDefaultDelegate");
+    ContentControl::SetDefaultDelegate(endpoint, &contentControlManager);
+}
+
+void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDefaultDelegate");
+    ContentLauncher::SetDefaultDelegate(endpoint, &contentLauncherManager);
 }
 
 void emberAfChannelClusterInitCallback(EndpointId endpoint)

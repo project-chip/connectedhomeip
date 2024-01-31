@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="AlarmMap" type="bitmap32">
+  <bitmap name="AlarmBitmap" type="bitmap32">
      <cluster code="0x005D" />
      <field name="InflowError"           mask="0x01"/>
      <field name="DrainError"            mask="0x02"/>
@@ -37,27 +37,27 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MASK"      type="AlarmMap" default="0" writable="false" optional="false">Mask</attribute>
-    <attribute side="server" code="0x0001" define="LATCH"     type="AlarmMap" default="0" writable="false" optional="true">Latch</attribute>
-    <attribute side="server" code="0x0002" define="STATE"     type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
-    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmMap" default="0" writable="false" optional="false">Supported</attribute>
+    <attribute side="server" code="0x0000" define="MASK"      type="AlarmBitmap" default="0" writable="false" optional="false">Mask</attribute>
+    <attribute side="server" code="0x0001" define="LATCH"     type="AlarmBitmap" default="0" writable="false" optional="true">Latch</attribute>
+    <attribute side="server" code="0x0002" define="STATE"     type="AlarmBitmap" default="0" writable="false" optional="false">State</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">Supported</attribute>
 
     <command source="client" code="0x00" name="Reset" optional="true">
         <description>Reset alarm</description>
-        <arg name="Alarms" type="AlarmMap" optional="false"/>
+        <arg name="Alarms" type="AlarmBitmap" optional="false"/>
     </command>
 
     <command source="client" code="0x01" name="ModifyEnabledAlarms" optional="true">
         <description>Modify enabled alarms</description>
-        <arg name="Mask" type="AlarmMap" optional="false"/>
+        <arg name="Mask" type="AlarmBitmap" optional="false"/>
     </command>
 
     <event side="server" code="0x00" priority="info" name="Notify" optional="false">
         <description>Notify</description>
-        <field id="0" name="Active" type="AlarmMap" />
-        <field id="1" name="Inactive" type="AlarmMap" />
-        <field id="2" name="State" type="AlarmMap" />
-        <field id="3" name="Mask" type="AlarmMap" />
+        <field id="0" name="Active" type="AlarmBitmap" />
+        <field id="1" name="Inactive" type="AlarmBitmap" />
+        <field id="2" name="State" type="AlarmBitmap" />
+        <field id="3" name="Mask" type="AlarmBitmap" />
     </event>
   </cluster>
 

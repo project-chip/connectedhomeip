@@ -21,15 +21,15 @@
 		};
 		slot0_partition: partition@19000 {
 			label = "image-0";
-			reg = <0x19000 0xDC000>;
+			reg = <0x19000 0xda000>;
 		};
-		factory_partition: partition@F5000 {
+		factory_partition: partition@f3000 {
 			label = "factory-data";
-			reg = <0xF5000 0x1000>;
+			reg = <0xf3000 0x1000>;
 		};
-		storage_partition: partition@F6000 {
+		storage_partition: partition@f4000 {
 			label = "storage";
-			reg = <0xF6000 0x8000>;
+			reg = <0xf4000 0xa000>;
 		};
 		vendor_partition: partition@fe000 {
 			label = "vendor-data";

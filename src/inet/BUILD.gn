@@ -20,12 +20,15 @@ import("//build_overrides/nlio.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/tests.gni")
-import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
 if (chip_system_config_use_open_thread_inet_endpoints) {
   import("//build_overrides/openthread.gni")
+}
+
+if (chip_system_config_use_lwip) {
+  import("//build_overrides/lwip.gni")
 }
 
 declare_args() {
@@ -105,7 +108,7 @@ static_library("inet") {
 
   if (chip_system_config_use_lwip) {
     sources += [ "EndPointStateLwIP.cpp" ]
-    public_deps += [ "${chip_root}/src/lwip" ]
+    public_deps += [ "${lwip_root}:lwip" ]
   }
 
   if (chip_system_config_use_open_thread_inet_endpoints) {

@@ -127,7 +127,7 @@ limitations under the License.
         <field mask="0x04" name="MaskVal3" />
         <field mask="0x40000000" name="MaskVal4" />
     </bitmap>
-    
+
     <bitmap name="Bitmap64MaskMap" type="bitmap64">
         <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
@@ -135,7 +135,7 @@ limitations under the License.
         <field mask="0x04" name="MaskVal3" />
         <field mask="0x4000000000000000" name="MaskVal4" />
     </bitmap>
-    
+
   <cluster apiMaturity="internal">
     <domain>CHIP</domain>
     <name>Unit Testing</name>
@@ -234,13 +234,17 @@ limitations under the License.
 
     <attribute side="server" code="0x402A" define="WRITE_ONLY_INT8U" type="int8u" writable="true" default="0" optional="true">write_only_int8u</attribute>
 
+    <!-- Attribute MEI sample having a different vendor ID than the cluster. -->
+    <attribute side="server" code="0xFFF24F01" define="MEI_INT8U" type="int8u" writable="true" default="0" optional="false">mei_int8u</attribute>
+
     <!-- This attribute should not be enabled on the server side -->
     <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="boolean" writable="true" optional="true">unsupported</attribute>
 
     <!-- Test Commands -->
     <command source="client" code="0x00" name="Test" optional="false">
       <description>
-        Simple command without any parameters and without a specific response
+        Simple command without any parameters and without a specific response.
+        To aid in unit testing, this command will re-initialize attribute storage to defaults.
       </description>
     </command>
 
@@ -440,6 +444,34 @@ limitations under the License.
       <arg name="arg1" type="int8u"/>
     </command>
 
+    <command source="client" code="0x16" name="TestBatchHelperRequest"
+             optional="true" response="TestBatchHelperResponse" apiMaturity="provisional">
+      <description>
+        Command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter.
+      </description>
+      <arg name="sleepBeforeResponseTimeMs" type="int16u"/>
+      <arg name="sizeOfResponseBuffer" min="0" max="800" type="int16u"/>
+      <arg name="fillCharacter" type="int8u"/>
+    </command>
+
+    <command source="client" code="0x17" name="TestSecondBatchHelperRequest"
+             optional="true" response="TestBatchHelperResponse" apiMaturity="provisional">
+      <description>
+        Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter.
+      </description>
+      <arg name="sleepBeforeResponseTimeMs" type="int16u"/>
+      <arg name="sizeOfResponseBuffer" min="0" max="800" type="int16u"/>
+      <arg name="fillCharacter" type="int8u"/>
+    </command>
+
+    <command source="client" code="0xFFF200AA" name="TestDifferentVendorMeiRequest"
+             optional="true" response="TestDifferentVendorMeiResponse">
+      <description>
+        Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent.
+      </description>
+      <arg name="arg1" type="int8u"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="true" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value
@@ -566,6 +598,21 @@ limitations under the License.
       <arg name="value" type="int64u"/>
     </command>
 
+    <command source="server" code="0x0C" name="TestBatchHelperResponse" optional="true" disableDefaultResponse="true" apiMaturity="provisional">
+      <description>
+        Response to TestBatchHelperRequest or TestSecondBatchHelperRequest. Buffer in response is filled as directed in the Request.
+      </description>
+      <arg name="buffer" type="octet_string" length="800"/>
+    </command>
+
+    <command source="server" code="0xFFF200BB" name="TestDifferentVendorMeiResponse" optional="true" disableDefaultResponse="true">
+      <description>
+        Response to TestDifferentVendorMeiRequest, which is a command having a different MEI vendor ID than the cluster.
+      </description>
+      <arg name="arg1" type="int8u"/>
+      <arg name="eventNumber" type="int64u"/>>
+    </command>
+
     <event code="0x0001" name="TestEvent" priority="info" side="server">
       <description>Example test event</description>
       <field id="1" name="arg1" type="int8u"/>
@@ -580,5 +627,9 @@ limitations under the License.
       <description>Example test event</description>
     </event>
 
+    <event code="0xFFF200EE" name="TestDifferentVendorMeiEvent" priority="info" side="server">
+      <description>Example test event having a different vendor ID in the MEI than the cluster.</description>
+      <field id="1" name="arg1" type="int8u"/>
+    </event>
   </cluster>
 </configurator>

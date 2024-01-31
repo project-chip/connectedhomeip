@@ -37,6 +37,7 @@
 #include <nlunit-test.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 using namespace chip;
 using namespace chip::Logging;
@@ -277,6 +278,12 @@ int TestPlatformMgr_Setup(void * inContext)
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
         return FAILURE;
+
+    // Setup a fake commissionable data provider since required by internals of several
+    // Device/SystemLayer components.
+    static chip::DeviceLayer::TestOnlyCommissionableDataProvider commissionable_data_provider;
+    chip::DeviceLayer::SetCommissionableDataProvider(&commissionable_data_provider);
+
     return SUCCESS;
 }
 

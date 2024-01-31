@@ -12,7 +12,7 @@
     ],
     "resources": {
         "availability-data": "availability.yaml",
-        "config-data": "../../../../app/common/templates/config-data.yaml"
+        "config-data": "config-data.yaml"
     },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [

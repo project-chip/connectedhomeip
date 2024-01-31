@@ -36,7 +36,8 @@
 using namespace ::chip::DeviceLayer::NetworkCommissioning;
 
 namespace {
-static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
+
+constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
 {
     switch (state)
     {
@@ -49,7 +50,7 @@ static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e
     }
 }
 
-static constexpr const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
+constexpr const char * __WiFiScanStateToStr(wifi_manager_scan_state_e state)
 {
     switch (state)
     {
@@ -62,7 +63,7 @@ static constexpr const char * __WiFiScanStateToStr(wifi_manager_scan_state_e sta
     }
 }
 
-static constexpr const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
+constexpr const char * __WiFiConnectionStateToStr(wifi_manager_connection_state_e state)
 {
     switch (state)
     {
@@ -81,7 +82,7 @@ static constexpr const char * __WiFiConnectionStateToStr(wifi_manager_connection
     }
 }
 
-static constexpr const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
+constexpr const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflict_state_e state)
 {
     switch (state)
     {
@@ -94,7 +95,7 @@ static constexpr const char * __WiFiIPConflictStateToStr(wifi_manager_ip_conflic
     }
 }
 
-static constexpr const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
+constexpr const char * __WiFiModuleStateToStr(wifi_manager_module_state_e state)
 {
     switch (state)
     {
@@ -107,7 +108,7 @@ static constexpr const char * __WiFiModuleStateToStr(wifi_manager_module_state_e
     }
 }
 
-static constexpr const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
+constexpr const char * __WiFiSecurityTypeToStr(wifi_manager_security_type_e type)
 {
     switch (type)
     {
@@ -136,7 +137,7 @@ static constexpr const char * __WiFiSecurityTypeToStr(wifi_manager_security_type
 
 // wifi_manager's scan results don't contains the channel infomation, so we need this lookup table for resolving the band and
 // channel infomation.
-std::pair<WiFiBand, int> _GetBandAndChannelFromFrequency(int freq)
+constexpr std::pair<WiFiBand, int> _GetBandAndChannelFromFrequency(int freq)
 {
     std::pair<WiFiBand, int> ret = std::make_pair(WiFiBand::k2g4, 0);
     if (freq <= 931)
@@ -229,7 +230,7 @@ std::pair<WiFiBand, int> _GetBandAndChannelFromFrequency(int freq)
     return ret;
 }
 
-uint8_t _GetNetworkSecurityType(wifi_manager_security_type_e type)
+constexpr uint8_t _GetNetworkSecurityType(wifi_manager_security_type_e type)
 {
     switch (type)
     {
@@ -255,6 +256,7 @@ uint8_t _GetNetworkSecurityType(wifi_manager_security_type_e type)
         return 0x0;
     }
 }
+
 } // namespace
 
 namespace chip {

@@ -28,6 +28,8 @@ PROVISIONAL_CONFORM = 'provisionalConform'
 MANDATORY_CONFORM = 'mandatoryConform'
 DEPRECATE_CONFORM = 'deprecateConform'
 DISALLOW_CONFORM = 'disallowConform'
+TOP_LEVEL_CONFORMANCE_TAGS = {OTHERWISE_CONFORM, OPTIONAL_CONFORM,
+                              PROVISIONAL_CONFORM, MANDATORY_CONFORM, DEPRECATE_CONFORM, DISALLOW_CONFORM}
 AND_TERM = 'andTerm'
 OR_TERM = 'orTerm'
 NOT_TERM = 'notTerm'
@@ -66,6 +68,11 @@ def conformance_allowed(conformance_decision: ConformanceDecision, allow_provisi
     if conformance_decision == ConformanceDecision.PROVISIONAL:
         return allow_provisional
     return True
+
+
+def is_disallowed(conformance: Callable):
+    # Deprecated and disallowed conformances will come back as disallowed regardless of the implemented features / attributes / etc.
+    return conformance(0, [], []) == ConformanceDecision.DISALLOWED
 
 
 class zigbee:

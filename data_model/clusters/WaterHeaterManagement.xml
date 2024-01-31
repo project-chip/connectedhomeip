@@ -117,7 +117,7 @@ Davis, CA 95616, USA
         <feature name="EM"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0003" name="EstimatedHeatRequired" type="&lt;&lt;ref_Energy&gt;&gt;" default="0">
+    <attribute id="0x0003" name="EstimatedHeatRequired" type="energy-mWh" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="EM"/>

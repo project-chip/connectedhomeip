@@ -68,6 +68,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_BIG_ENDIAN_TARGET=${chip_target_is_big_endian}",
     "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE=${chip_tlv_validate_char_string_on_write}",
     "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ=${chip_tlv_validate_char_string_on_read}",
+    "CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED=${chip_enable_sending_batch_commands}",
   ]
 
   visibility = [ ":chip_config_header" ]

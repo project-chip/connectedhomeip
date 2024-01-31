@@ -98,6 +98,9 @@ declare_args() {
   #   - SHALL be valid UTF8
   chip_tlv_validate_char_string_on_write = true
   chip_tlv_validate_char_string_on_read = false
+
+  chip_enable_sending_batch_commands =
+      current_os == "linux" || current_os == "mac" || current_os == "ios"
 }
 
 if (chip_target_style == "") {

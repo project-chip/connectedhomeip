@@ -13,10 +13,11 @@
 # limitations under the License.
 #
 import("//build_overrides/chip.gni")
+import("//build_overrides/lwip.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/mt793x_sdk.gni")
 import("${chip_root}/src/crypto/crypto.gni")
-import("${chip_root}/src/platform/mt793x/args.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/mt793x/lwip/lwip.gni")
 
 #

@@ -14,8 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    Window Covering [TC-WNCV-4.5] Positions Storage Verification with server as
-    DUT
+    Window Covering [TC-WNCV-4.5] Positions Storage Verification [DUT as Server]
 
 PICS:
     - WNCV.S

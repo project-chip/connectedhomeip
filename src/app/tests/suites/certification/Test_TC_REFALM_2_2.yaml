@@ -66,7 +66,7 @@ tests:
       PICS: REFALM.S.A0002
       verification: |
           ./chip-tool refrigeratoralarm read state 1 1
-          On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 0 set to 0.
+          On TH(chip-tool), Verify that the DUT response contains a 32-bit value with bit 0 set to 1.
 
           [1688447820.603249][4247:4249] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0057 Attribute 0x0000_0002 DataVersion: 1795162772
           [1688447820.603415][4247:4249] CHIP:TOO:   State: 1

@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the global attribute: ClusterRevision"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +41,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3: TH reads the FeatureMap attribute from the DUT"
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       PICS: MOD.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -48,7 +50,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 3: TH reads the FeatureMap attribute from the DUT"
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       PICS: " !MOD.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -57,7 +59,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -66,7 +68,7 @@ tests:
               type: list
               contains: [0, 1, 2, 3, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -87,7 +89,7 @@ tests:
               contains: [4]
 
     - label:
-          "Step 4c: TH reads the feature dependent attribute(OnMode) in
+          "Step 4c: TH reads the Feature dependent attribute(OnMode) in
           AttributeList from the DUT"
       PICS: MOD.S.F00 && MOD.S.A0005
       command: "readAttribute"
@@ -97,7 +99,7 @@ tests:
               type: list
               contains: [5]
 
-    - label: "Step 5: TH reads from the DUT the EventList attribute"
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -106,7 +108,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: TH reads AcceptedCommandList attribute from DUT"
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -114,7 +116,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 7: TH reads GeneratedCommandList attribute from DUT"
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

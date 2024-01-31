@@ -62,7 +62,7 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Added optional measurement clusters for energy and power"/>
   </revisionHistory>
   <clusters>
-    <cluster id="0x002f" name="Power Source" side="server">
+    <cluster id="0x002F" name="Power Source" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0090" name="Electrical Power Measurement" side="server">

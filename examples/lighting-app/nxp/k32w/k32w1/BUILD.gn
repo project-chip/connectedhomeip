@@ -82,6 +82,8 @@ k32w1_executable("light_app") {
     "main/main.cpp",
   ]
 
+  public = [ "${chip_root}/src/platform/nxp/k32w/k32w1/DefaultTestEventTriggerDelegate.h" ]
+
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",

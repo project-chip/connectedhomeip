@@ -47,7 +47,7 @@ jobject extractJAppParameter(jobject jAppParameters, const char * methodName, co
 JNI_METHOD(jobject, finishInitialization)(JNIEnv *, jobject, jobject jAppParameters)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "JNI_METHOD CastingAppJNI.finishInitialization called");
+    ChipLogProgress(AppServer, "JNI_METHOD CastingApp-JNI::finishInitialization() called");
     VerifyOrReturnValue(jAppParameters != nullptr, support::createJMatterError(CHIP_ERROR_INVALID_ARGUMENT));
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -81,7 +81,7 @@ JNI_METHOD(jobject, finishInitialization)(JNIEnv *, jobject, jobject jAppParamet
 JNI_METHOD(jobject, finishStartup)(JNIEnv *, jobject)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "JNI_METHOD CastingAppJNI.finishStartup called");
+    ChipLogProgress(AppServer, "JNI_METHOD CastingAppJNI::finishStartup() called");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto & server  = chip::Server::GetInstance();
@@ -107,7 +107,7 @@ JNI_METHOD(jobject, finishStartup)(JNIEnv *, jobject)
 
 jobject extractJAppParameter(jobject jAppParameters, const char * methodName, const char * methodSig)
 {
-    ChipLogProgress(AppServer, "JNI_METHOD extractJAppParameter called");
+    ChipLogProgress(AppServer, "JNI_METHOD CastingApp-JNI::extractJAppParameter() called");
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jAppParametersClass;
