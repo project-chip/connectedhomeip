@@ -202,7 +202,7 @@ jobject CurrentStateSuccessHandlerJNI::ConvertToJObject(
 {
     ChipLogProgress(AppServer, "CurrentStateSuccessHandlerJNI::ConvertToJObject called");
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "Could not get JNIEnv for current thread"));
+    VerifyOrReturnValue(env != nullptr, nullptr);
     JniLocalReferenceManager manager(env);
 
     jclass enumClass = nullptr;
@@ -253,7 +253,7 @@ jobject SampledPositionSuccessHandlerJNI::ConvertToJObject(
 {
     ChipLogProgress(AppServer, "SampledPositionSuccessHandlerJNI::ConvertToJObject called");
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "Could not get JNIEnv for current thread"));
+    VerifyOrReturnValue(env != nullptr, nullptr);
     JniLocalReferenceManager manager(env);
 
     jobject jSampledPosition = nullptr;
@@ -322,7 +322,7 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
     ChipLogProgress(AppServer, "TargetListSuccessHandlerJNI::ConvertToJObject called");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "Could not get JNIEnv for current thread"));
+    VerifyOrReturnValue(env != nullptr, nullptr);
     JniLocalReferenceManager manager(env);
 
     jobject jArrayList;
