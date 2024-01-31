@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <lib/support/UnitTestRegistration.h>
 #include <app/ConcreteAttributePath.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
 using namespace chip;
@@ -46,53 +46,66 @@ void TestConcreteAttributePathInequalityDifferentAttributeId(nlTestSuite * aSuit
     NL_TEST_ASSERT(aSuite, path_one != path_two);
 }
 
-void TestConcreteReadAttributePathEqualityDefaultConstructor(nlTestSuite* aSuite, void * aContext) {
+void TestConcreteReadAttributePathEqualityDefaultConstructor(nlTestSuite * aSuite, void * aContext)
+{
     ConcreteReadAttributePath path_one;
     ConcreteReadAttributePath path_two;
     NL_TEST_ASSERT(aSuite, path_one == path_two);
 }
 
-void TestConcreteReadAttributePathInequalityDifferentListIndex(nlTestSuite* aSuite, void * aContext) {
+void TestConcreteReadAttributePathInequalityDifferentListIndex(nlTestSuite * aSuite, void * aContext)
+{
     ConcreteReadAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/4);
     ConcreteReadAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/5);
     NL_TEST_ASSERT(aSuite, path_one != path_two);
 }
 
-void TestConcreteDataAttributePathEqualityDefaultConstructor(nlTestSuite* aSuite, void * aContext) {
+void TestConcreteDataAttributePathEqualityDefaultConstructor(nlTestSuite * aSuite, void * aContext)
+{
     ConcreteDataAttributePath path_one;
     ConcreteDataAttributePath path_two;
     NL_TEST_ASSERT(aSuite, path_one == path_two);
 }
 
-void TestConcreteDataAttributePathInequalityDifferentDataVersion(nlTestSuite* aSuite, void * aContext) {
+void TestConcreteDataAttributePathInequalityDifferentDataVersion(nlTestSuite * aSuite, void * aContext)
+{
     ConcreteDataAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aDataVersion=*/MakeOptional(4));
     ConcreteDataAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aDataVersion=*/MakeOptional(5));
     NL_TEST_ASSERT(aSuite, path_one != path_two);
 }
 
-void TestConcreteDataAttributePathInequalityDifferentListOp(nlTestSuite* aSuite, void * aContext) {
-    ConcreteDataAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, ConcreteDataAttributePath::ListOperation::ReplaceAll, /*aListIndex=*/4);
-    ConcreteDataAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, ConcreteDataAttributePath::ListOperation::ReplaceItem, /*aListIndex=*/4);
+void TestConcreteDataAttributePathInequalityDifferentListOp(nlTestSuite * aSuite, void * aContext)
+{
+    ConcreteDataAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3,
+                                       ConcreteDataAttributePath::ListOperation::ReplaceAll, /*aListIndex=*/4);
+    ConcreteDataAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3,
+                                       ConcreteDataAttributePath::ListOperation::ReplaceItem, /*aListIndex=*/4);
     NL_TEST_ASSERT(aSuite, path_one != path_two);
 }
 
-void TestConcreteDataAttributePathInequalityDifferentListIndex(nlTestSuite* aSuite, void * aContext) {
-    ConcreteDataAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, ConcreteDataAttributePath::ListOperation::NotList, /*aListIndex=*/4);
-    ConcreteDataAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, ConcreteDataAttributePath::ListOperation::NotList, /*aListIndex=*/5);
+void TestConcreteDataAttributePathInequalityDifferentListIndex(nlTestSuite * aSuite, void * aContext)
+{
+    ConcreteDataAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3,
+                                       ConcreteDataAttributePath::ListOperation::NotList, /*aListIndex=*/4);
+    ConcreteDataAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3,
+                                       ConcreteDataAttributePath::ListOperation::NotList, /*aListIndex=*/5);
     NL_TEST_ASSERT(aSuite, path_one != path_two);
 }
 
 const nlTest sTests[] = {
-  NL_TEST_DEF("TestConcreteAttributePathEqualityDefaultConstructor", TestConcreteAttributePathEqualityDefaultConstructor),
-  NL_TEST_DEF("TestConcreteAttributePathEquality", TestConcreteAttributePathEquality),
-  NL_TEST_DEF("TestConcreteAttributePathInequalityDifferentAttributeId", TestConcreteAttributePathInequalityDifferentAttributeId),
-  NL_TEST_DEF("TestConcreteReadAttributePathEqualityDefaultConstructor", TestConcreteReadAttributePathEqualityDefaultConstructor),
-  NL_TEST_DEF("TestConcreteReadAttributePathInequalityDifferentListIndex", TestConcreteReadAttributePathInequalityDifferentListIndex),
-  NL_TEST_DEF("TestConcreteDataAttributePathEqualityDefaultConstructor", TestConcreteDataAttributePathEqualityDefaultConstructor),
-  NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentDataVersion", TestConcreteDataAttributePathInequalityDifferentDataVersion),
-  NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentListOp", TestConcreteDataAttributePathInequalityDifferentListOp),
-  NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentListIndex", TestConcreteDataAttributePathInequalityDifferentListIndex),
-  NL_TEST_SENTINEL()
+    NL_TEST_DEF("TestConcreteAttributePathEqualityDefaultConstructor", TestConcreteAttributePathEqualityDefaultConstructor),
+    NL_TEST_DEF("TestConcreteAttributePathEquality", TestConcreteAttributePathEquality),
+    NL_TEST_DEF("TestConcreteAttributePathInequalityDifferentAttributeId", TestConcreteAttributePathInequalityDifferentAttributeId),
+    NL_TEST_DEF("TestConcreteReadAttributePathEqualityDefaultConstructor", TestConcreteReadAttributePathEqualityDefaultConstructor),
+    NL_TEST_DEF("TestConcreteReadAttributePathInequalityDifferentListIndex",
+                TestConcreteReadAttributePathInequalityDifferentListIndex),
+    NL_TEST_DEF("TestConcreteDataAttributePathEqualityDefaultConstructor", TestConcreteDataAttributePathEqualityDefaultConstructor),
+    NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentDataVersion",
+                TestConcreteDataAttributePathInequalityDifferentDataVersion),
+    NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentListOp", TestConcreteDataAttributePathInequalityDifferentListOp),
+    NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentListIndex",
+                TestConcreteDataAttributePathInequalityDifferentListIndex),
+    NL_TEST_SENTINEL()
 };
 
 } // anonymous namespace

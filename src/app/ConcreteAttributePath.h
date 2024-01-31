@@ -147,7 +147,8 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
 
     bool operator==(const ConcreteDataAttributePath & aOther) const
     {
-        return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex) && (mListOp == aOther.mListOp) && (mDataVersion == aOther.mDataVersion);
+        return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex) && (mListOp == aOther.mListOp) &&
+            (mDataVersion == aOther.mDataVersion);
     }
 
     bool operator!=(const ConcreteDataAttributePath & aOther) const { return !(*this == aOther); }
