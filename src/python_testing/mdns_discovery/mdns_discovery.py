@@ -105,11 +105,31 @@ class MdnsDiscovery:
     async def get_commissioner_service(self, log_output: bool = False,
                                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
                                        ) -> MdnsServiceInfo:
+        """
+        Asynchronously discovers a commissioner mDNS service within the network.
+
+        Args:
+            log_output (bool): Logs the discovered services to the console. Defaults to False.
+            discovery_timeout_sec (float): Defaults to 15 seconds.
+
+        Returns:
+            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
+        """
         return await self._get_service(MdnsServiceType.COMMISSIONER, log_output, discovery_timeout_sec)
 
     async def get_commissionable_service(self, log_output: bool = False,
                                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
                                          ) -> MdnsServiceInfo:
+        """
+        Asynchronously discovers a commissionable mDNS service within the network.
+
+        Args:
+            log_output (bool): Logs the discovered services to the console. Defaults to False.
+            discovery_timeout_sec (float): Defaults to 15 seconds.
+
+        Returns:
+            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
+        """
         return await self._get_service(MdnsServiceType.COMMISSIONABLE, log_output, discovery_timeout_sec)
 
     async def get_operational_service(self, service_name: str = None,
@@ -117,6 +137,18 @@ class MdnsDiscovery:
                                       discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                                       log_output: bool = False
                                       ) -> Optional[MdnsServiceInfo]:
+        """
+        Asynchronously discovers an operational mDNS service within the network.
+
+        Args:
+            log_output (bool): Logs the discovered services to the console. Defaults to False.
+            discovery_timeout_sec (float): Defaults to 15 seconds.
+            service_name (str): The unique name of the mDNS service. Defaults to None.
+            service_type (str): The service type of the service. Defaults to None.
+
+        Returns:
+            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
+        """
         # Validation to ensure both or none of the parameters are provided
         if (service_name is None) != (service_type is None):
             raise ValueError("Both service_name and service_type must be provided together or not at all.")
@@ -144,11 +176,32 @@ class MdnsDiscovery:
     async def get_border_router_service(self, log_output: bool = False,
                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
                                         ) -> MdnsServiceInfo:
+        """
+        Asynchronously discovers a border router mDNS service within the network.
+
+        Args:
+            log_output (bool): Logs the discovered services to the console. Defaults to False.
+            discovery_timeout_sec (float): Defaults to 15 seconds.
+
+        Returns:
+            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo or None if timeout reached.
+        """
         return await self._get_service(MdnsServiceType.BORDER_ROUTER, log_output, discovery_timeout_sec)
 
     async def get_all_services(self, log_output: bool = False,
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
                                ) -> Dict[str, List[MdnsServiceInfo]]:
+        """
+        Asynchronously discovers all available mDNS services within the network.
+
+        Args:
+            log_output (bool): Logs the discovered services to the console. Defaults to False.
+            discovery_timeout_sec (float): Defaults to 15 seconds.
+
+        Returns:
+            Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types (str) to
+                                            lists of MdnsServiceInfo objects.
+        """        
         return await self._discover(all_services=True,
                                     discovery_timeout_sec=discovery_timeout_sec,
                                     log_output=log_output)
@@ -159,26 +212,23 @@ class MdnsDiscovery:
                         all_services: bool = False,
                         log_output: bool = False) -> None:
         """
-        Asynchronously discovers network services of specified types using mDNS and returns the discovered services.
-
-        This method initiates a multicast DNS (mDNS) service discovery process to find network services. The
-        discovery process runs for a configurable duration, allowing network responses to be received and
-        processed.
-
+        Asynchronously discovers network services using multicast DNS (mDNS).
+        
         Args:
-            discovery_timeout_sec (float): The duration in seconds for which the discovery process should wait
-                                            to allow for service announcements. If not provided, defaults to a
-                                            predetermined duration (e.g., 3 seconds).
-            log_output (bool): Logs discovered services to the console in JSON format, defaults to True.
+            discovery_timeout_sec (float): The duration in seconds to wait for the discovery process, allowing for service
+                                        announcements to be collected. Defaults to a specified duration if not provided.
+            all_services (bool): If True, discovers all available mDNS services. If False, discovers services based on the
+                                predefined `_service_types` list. Defaults to False.
+            log_output (bool): If True, logs the discovered services to the console in JSON format for debugging or informational
+                            purposes. Defaults to False.
+                            
+        Returns:
+            None: This method does not return any value.
 
         Note:
-            The discovery duration may need adjustment based on network conditions and the expected response
-            time for service announcements.
-
-        Returns:
-            dict: A dictionary containing the discovered services, organized by service type. Each key in the
-                dictionary represents a service type, and each value is a list of MdnsServiceInfo objects, each
-                containing details of a discovered service.
+            The discovery duration may need to be adjusted based on network conditions and expected response times for service
+            announcements. The method leverages an asyncio event to manage asynchronous waiting and cancellation based on discovery
+            success or timeout.
         """
         self._event.clear()
 
@@ -244,9 +294,7 @@ class MdnsDiscovery:
             identifies the service instance within the local network.
 
         Returns:
-            None: This method does not return any value. It processes and stores the results of the service query
-                internally in a dictionary which organizes services by their type for easy
-                retrieval.
+            None: This method does not return any value.
         """
         # Get service info
         service_info = AsyncServiceInfo(service_type, service_name)
@@ -292,6 +340,19 @@ class MdnsDiscovery:
                            log_output: bool = False,
                            discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
                            ) -> MdnsServiceInfo:
+        """
+        Asynchronously discovers a specific type of mDNS service within the network and returns its details.
+
+        Args:
+            service_type (MdnsServiceType): The enum representing the type of mDNS service to discover.
+            log_output (bool): Logs the discovered services to the console. Defaults to False.
+            discovery_timeout_sec (float): Defaults to 15 seconds.
+
+        Returns:
+            Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
+                                    any. Returns None if no service of the specified type is discovered within
+                                    the timeout period.
+        """
         mdns_service_info = None
         self._service_types = [service_type.value]
         await self._discover(log_output=log_output, discovery_timeout_sec=discovery_timeout_sec)
@@ -301,6 +362,12 @@ class MdnsDiscovery:
         return mdns_service_info
 
     def _log_output(self) -> str:
+        """
+        Converts the discovered services to a JSON string and prints it.
+
+        The method is intended to be used for debugging or informational purposes, providing a clear and
+        comprehensive view of all services discovered during the mDNS service discovery process.
+        """
         converted_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
         json_str = json.dumps(converted_services, indent=4)
         print(json_str)
