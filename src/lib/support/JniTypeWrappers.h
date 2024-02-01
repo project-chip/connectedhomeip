@@ -186,13 +186,14 @@ private:
 class JniLocalReferenceManager
 {
 public:
-    JniLocalReferenceManager(JNIEnv * env) : mEnv(env)
+    explicit JniLocalReferenceManager(JNIEnv * env) : mEnv(env)
     {
         if (mEnv->PushLocalFrame(JNI_LOCAL_REF_COUNT) == 0)
         {
             mlocalFramePushed = true;
         }
     }
+
     ~JniLocalReferenceManager()
     {
         if (mlocalFramePushed)
@@ -202,8 +203,12 @@ public:
         }
     }
 
+    // Delete copy constructor and copy assignment operator
+    JniLocalReferenceManager(const JniLocalReferenceManager &)             = delete;
+    JniLocalReferenceManager & operator=(const JniLocalReferenceManager &) = delete;
+
 private:
-    JNIEnv * mEnv          = nullptr;
+    JNIEnv * const mEnv;
     bool mlocalFramePushed = false;
 };
 
