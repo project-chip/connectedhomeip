@@ -53,8 +53,7 @@ Example command:
 
 #### TC 2.1
 
-PIXIT:
-`PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2`  
+PIXIT: `PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2`  
 Example command:
 `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --int-arg PICS_SDK_CI_ONLY:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:1 PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:2"`
 
@@ -80,8 +79,7 @@ Example command:
 
 #### TC 2.1
 
-PIXIT:
-`PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2 PIXIT.RVCRUNM.MODE_CHANGE_OK:0`  
+PIXIT: `PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2 PIXIT.RVCRUNM.MODE_CHANGE_OK:0`  
 Example command:
 `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCRUNM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --int-arg PICS_SDK_CI_ONLY:1 PIXIT.RVCRUNM.MODE_CHANGE_OK:0 PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2"`
 
@@ -94,8 +92,7 @@ transition to mode 0", do nothing.
 
 #### TC 2.2
 
-PIXIT:
-`PIXIT.RVCRUNM.MODE_A:1 PIXIT.RVCRUNM.MODE_B:2`  
+PIXIT: `PIXIT.RVCRUNM.MODE_A:1 PIXIT.RVCRUNM.MODE_B:2`  
 Example command:
 `./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCRUNM_2_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --int-arg PIXIT.RVCRUNM.MODE_A:1 PIXIT.RVCRUNM.MODE_B:2"`
 
