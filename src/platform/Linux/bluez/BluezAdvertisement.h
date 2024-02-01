@@ -79,10 +79,10 @@ private:
 
     Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
     char * mpAdvPath = nullptr;
-    char * mpAdvName = nullptr;
     char * mpAdvUUID = nullptr;
     ChipAdvType mAdvType;
     uint16_t mAdvDurationMs = 0;
+    char mAdvName[32]       = "";
 };
 
 } // namespace Internal
