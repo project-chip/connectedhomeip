@@ -18,10 +18,10 @@
 
 /**
  *    @file
- *      This file defines an interface that exposes all the public subscription management APIs.
+ *      This file defines an interface that exposes all the public subscription information APIs.
  *      The interface is implemented by the InteractionModelEngine to avoid creating unnecessary dependencies
- *      Since the IMEgine has more dependency than its consummers need.
- *      By leveraging the SubscriptionManager APIs, a consummer avoids depending on the global data model functions.
+ *      since the IMEngine has more dependency than its consummers need.
+ *      By leveraging the SubscriptionInfoProvider APIs, a consumer avoids depending on the global data model functions.
  */
 
 #pragma once
@@ -32,35 +32,33 @@
 namespace chip {
 namespace app {
 
-class SubscriptionManager
+class SubscriptionsInfoProvider
 {
 public:
-    virtual ~SubscriptionManager(){};
+    virtual ~SubscriptionsInfoProvider(){};
 
     /**
      * @brief Check if a given subject (CAT or operational NodeId) has at least 1 active subscription.
      *
      * @param[in] aFabricIndex fabric index of the subject
-     * @param[in] subject NodeId of the subect
+     * @param[in] subjectID NodeId of the subject
      *
      * @return true subject has at least one active subscription with the device
-     *         false subject doesn't have any acitve subscription with the device
+     *         false subject doesn't have any active subscription with the device
      */
-    virtual bool SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) = 0;
+    virtual bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subjectID) = 0;
 
     /**
      * @brief Check if a given subject (CAT or operational NodeId) has at least 1 persisted subscription.
-     *        If CHIP_CONFIG_PERSIST_SUBSCRIPTIONS is not enable, function alweays returns false.
      *        See the CHIP_CONFIG_PERSIST_SUBSCRIPTIONS for more information on persisted subscriptions.
      *
      * @param[in] aFabricIndex fabric index of the subject
-     * @param[in] subject NodeId of the subect
+     * @param[in] subjectID NodeId of the subject
      *
      * @return true subject has at least one persisted subscription with the device
-     *         false subject doesn't have any acitve subscription with the device
-     *         false If CHIP_CONFIG_PERSIST_SUBSCRIPTIONS is not enabled
+     *         false subject doesn't have any persisted subscription with the device
      */
-    virtual bool SubjectHasPersistedSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) = 0;
+    virtual bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) = 0;
 };
 
 } // namespace app
