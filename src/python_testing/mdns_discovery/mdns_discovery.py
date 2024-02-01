@@ -158,7 +158,7 @@ class MdnsDiscovery:
         if service_name is None and service_type is None:
             mdns_service_info = await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec)
         else:
-            print(f"Looking for MDNS service: Type: {service_type} - Name {service_name}")
+            print(f"Looking for MDNS service type '{service_type}',  service name '{service_name}'")
 
             # Get service info
             service_info = AsyncServiceInfo(service_type, service_name)
@@ -203,8 +203,8 @@ class MdnsDiscovery:
                                             lists of MdnsServiceInfo objects.
         """
         await self._discover(all_services=True,
-                                    discovery_timeout_sec=discovery_timeout_sec,
-                                    log_output=log_output)
+                             discovery_timeout_sec=discovery_timeout_sec,
+                             log_output=log_output)
 
         return self._discovered_services
 
