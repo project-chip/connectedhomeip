@@ -19762,7 +19762,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass measurementAccuracyRangeStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct",
                         measurementAccuracyRangeStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
@@ -19795,7 +19795,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass measurementAccuracyStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalPowerMeasurementClusterMeasurementAccuracyStruct",
                     measurementAccuracyStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -20007,7 +20007,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass measurementRangeStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalPowerMeasurementClusterMeasurementRangeStruct",
                     measurementRangeStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -20337,7 +20337,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass harmonicMeasurementStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$ElectricalPowerMeasurementClusterHarmonicMeasurementStruct",
                         harmonicMeasurementStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
@@ -20411,7 +20411,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass harmonicMeasurementStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$ElectricalPowerMeasurementClusterHarmonicMeasurementStruct",
                         harmonicMeasurementStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
@@ -21429,7 +21429,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass cumulativeEnergyResetStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct",
                     cumulativeEnergyResetStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
