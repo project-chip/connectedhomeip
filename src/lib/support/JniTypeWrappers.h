@@ -167,19 +167,6 @@ private:
     jbyteArray mArray = nullptr;
 };
 
-/// Manages an pre-existing global reference to a jclass.
-class JniClass
-{
-public:
-    explicit JniClass(jclass mClassRef) : mClassRef(mClassRef) {}
-    ~JniClass() { chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mClassRef); }
-
-    jclass classRef() { return mClassRef; }
-
-private:
-    jclass mClassRef;
-};
-
 // Manages an pre-existing global reference to a jobject.
 class JniGlobalRefWrapper
 {
@@ -199,13 +186,14 @@ private:
 class JniLocalReferenceManager
 {
 public:
-    JniLocalReferenceManager(JNIEnv * env) : mEnv(env)
+    explicit JniLocalReferenceManager(JNIEnv * env) : mEnv(env)
     {
         if (mEnv->PushLocalFrame(JNI_LOCAL_REF_COUNT) == 0)
         {
             mlocalFramePushed = true;
         }
     }
+
     ~JniLocalReferenceManager()
     {
         if (mlocalFramePushed)
@@ -215,8 +203,12 @@ public:
         }
     }
 
+    // Delete copy constructor and copy assignment operator
+    JniLocalReferenceManager(const JniLocalReferenceManager &)             = delete;
+    JniLocalReferenceManager & operator=(const JniLocalReferenceManager &) = delete;
+
 private:
-    JNIEnv * mEnv          = nullptr;
+    JNIEnv * const mEnv;
     bool mlocalFramePushed = false;
 };
 

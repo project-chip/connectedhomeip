@@ -1,6 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,23 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import "MTRMetrics.h"
 
-/**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP system layer library error string
- *      library unit tests.
- *
- */
+NS_ASSUME_NONNULL_BEGIN
 
-#include "TestCryptoLayer.h"
+#define MTRMetricCommissioningStatusKey @"com.matter.metric.commissioningStatus"
 
-#include <nlunit-test.h>
+@interface MTRMetrics ()
 
-int main()
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
+- (void)setValue:(id _Nullable)value forKey:(NSString *)key;
 
-    return (TestCHIPCryptoPAL());
-}
+- (void)removeValueForKey:(NSString *)key;
+
+@end
+
+NS_ASSUME_NONNULL_END

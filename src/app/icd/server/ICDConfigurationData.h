@@ -17,16 +17,18 @@
 
 #pragma once
 
+#include <lib/core/Optional.h>
+#include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <system/SystemClock.h>
 
 namespace chip {
 
 namespace app {
-// Forward declaration of ICDManager to allow it to be friend with ICDConfigurationData
+// Forward declaration of ICDManager to allow it to be friend with ICDConfigurationData.
 class ICDManager;
 
-// Forward declaration of TestICDManager to allow it to be friend with the ICDConfigurationData
+// Forward declaration of TestICDManager to allow it to be friend with the ICDConfigurationData.
 // Used in unit tests
 class TestICDManager;
 
@@ -104,19 +106,21 @@ private:
     static constexpr uint32_t kMinLitActiveModeThreshold_ms = 5000;
 
     /**
-     * @brief Change the ActiveModeDuration and IdleModeDuration value
-     *        To only change one value, pass the old value for the other one
+     * @brief Change the ActiveModeDuration or the IdleModeDuration value
+     *        If only one value is provided, check will be done agaisn't the other already set value.
      *
      * @param[in] activeModeDuration_ms new ActiveModeDuration value
-     * @param[in] idleModeDuration_s new IdleModeDuration value
-     * @return CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT is returned if idleModeDuration_s is smaller than activeModeDuration_ms
-     *                                                is returned if idleModeDuration_s is greater than 64800 seconds
-     *                                                is returned if idleModeDuration_s is smaller than 1 seconds
+     * @param[in] idleModeDuration_ms new IdleModeDuration value
+     *                                The precision of the IdleModeDuration must be seconds.
+     * @return CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT is returned if idleModeDuration_ms is smaller than activeModeDuration_ms
+     *                                                is returned if idleModeDuration_ms is greater than 64800000 ms
+     *                                                is returned if idleModeDuration_ms is smaller than 1000 ms
+     *                                                is returned if no valid values are provided
      *                    CHIP_NO_ERROR is returned if the new intervals were set
      */
-    CHIP_ERROR SetModeDurations(uint32_t activeModeDuration_ms, uint32_t idleModeDuration_s);
+    CHIP_ERROR SetModeDurations(Optional<uint32_t> activeModeDuration_ms, Optional<uint32_t> idleModeDuration_ms);
 
-    static constexpr uint32_t kMaxIdleModeDuration_s = 64800;
+    static constexpr uint32_t kMaxIdleModeDuration_s = (18 * kSecondsPerHour);
     static constexpr uint32_t kMinIdleModeDuration_s = 1;
 
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= kMaxIdleModeDuration_s,

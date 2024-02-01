@@ -109,6 +109,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     chip::JniLocalReferenceManager manager(env);
 
     jobject otaProviderDelegate      = nullptr;

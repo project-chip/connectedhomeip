@@ -39,7 +39,6 @@
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningWindowOpener.h>
-#include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/GroupDeviceProxy.h>
 #include <credentials/CHIPCert.h>
 #include <jni.h>
@@ -533,7 +532,7 @@ exit:
 }
 
 JNI_METHOD(void, setAttestationTrustStoreDelegate)
-(JNIEnv * env, jobject self, jlong handle, jobject attestationTrustStoreDelegate)
+(JNIEnv * env, jobject self, jlong handle, jobject attestationTrustStoreDelegate, jobject cdTrustKeys)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -544,7 +543,7 @@ JNI_METHOD(void, setAttestationTrustStoreDelegate)
     if (attestationTrustStoreDelegate != nullptr)
     {
         jobject attestationTrustStoreDelegateRef = env->NewGlobalRef(attestationTrustStoreDelegate);
-        err                                      = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef);
+        err = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef, cdTrustKeys);
         SuccessOrExit(err);
     }
 
@@ -3073,8 +3072,7 @@ CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray p
     jmethodID constructor;
     jclass paramsClass;
 
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/PaseVerifierParams", paramsClass);
-    JniClass paseVerifierParamsClass(paramsClass);
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/PaseVerifierParams", paramsClass);
     SuccessOrExit(err);
 
     env->ExceptionClear();
@@ -3094,8 +3092,7 @@ CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jint 
     jmethodID constructor;
     jclass locationClass;
 
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/NetworkLocation", locationClass);
-    JniClass networkLocationClass(locationClass);
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/NetworkLocation", locationClass);
     SuccessOrExit(err);
 
     env->ExceptionClear();
