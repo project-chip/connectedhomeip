@@ -132,18 +132,26 @@ permanently, you need to make the following changes:
 ## Installing ZAP tool
 
 For platforms defined in [`scripts/setup/zap.json`](/scripts/setup/zap.json),
-`bootstrap.sh` will download a compatible ZAP tool version and set it up in
-`$PATH`. If you want to install or use a different version of the tool, you may
-download one from the ZAP project's
-[Releases](https://github.com/project-chip/zap/releases) page.
+`bootstrap.sh` will download a compatible ZAP tool version from CIPD and set it
+up in `$PATH`.
+
+ZAP releases are copied to CIPD by an automated bot. You can check if a release
+was copied by looking at tags created at
+[here](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/zap) in
+various platforms.
 
 ### Custom ZAP
 
+If you want to install or use a different version of the tool, you may download
+one from the ZAP project's
+[Releases](https://github.com/project-chip/zap/releases) page or build it from
+source.
+
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
-so you can download a compatible version from the zap project
-[Releases](https://github.com/project-chip/zap/releases). The version is also
+so you can refer to it to find a compatible version. The version is also
 maintained at [`scripts/setup/zap.version`](/scripts/setup/zap.version).
-To checkout as source code the corresponding tag should exist in the zap
+
+To checkout as source code, the corresponding tag should exist in the zap
 [repository tags](https://github.com/project-chip/zap/tags) list.
 
 Example commands:
