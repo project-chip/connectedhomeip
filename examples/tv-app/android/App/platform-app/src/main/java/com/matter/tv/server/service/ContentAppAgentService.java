@@ -36,7 +36,7 @@ public class ContentAppAgentService extends Service {
   public static final int FAILED_UNKNOWN = 0x01;
   public static final int FAILED_TIMEOUT = 0x94;
 
-  private static final int COMMAND_TIMEOUT = 8; // seconds
+  private static final int COMMAND_TIMEOUT = 4; // seconds
   private static final int ATTRIBUTE_TIMEOUT = 2; // seconds
 
   private static ResponseRegistry responseRegistry = new ResponseRegistry();

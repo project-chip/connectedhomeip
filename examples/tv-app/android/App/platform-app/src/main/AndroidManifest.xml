@@ -13,6 +13,7 @@
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.matter.tv.app.api.permission.SEND_DATA" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -36,7 +37,8 @@
         android:theme="@style/Theme.MatterTVSlave">
 
         <activity android:name="com.matter.tv.server.MainActivity"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

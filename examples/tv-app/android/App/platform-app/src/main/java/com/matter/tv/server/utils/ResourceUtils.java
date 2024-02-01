@@ -1,8 +1,11 @@
 package com.matter.tv.server.utils;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.util.JsonReader;
 import android.util.Log;
+import android.util.TypedValue;
+
 import com.matter.tv.app.api.SupportedCluster;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -106,5 +109,9 @@ public class ResourceUtils {
       Log.e(TAG, "Could not find raw resource for id " + resId);
     }
     return supportedClusters;
+  }
+
+  public static int dp2px(Context context, float value){
+    return (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, context.getResources().getDisplayMetrics()) + 0.5f);
   }
 }
