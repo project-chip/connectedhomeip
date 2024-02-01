@@ -238,7 +238,6 @@ static_library("support") {
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
     "TimeUtils.h",
-    "UnitTestContext.h",
     "Variant.h",
     "ZclString.cpp",
     "ZclString.h",
@@ -365,6 +364,7 @@ static_library("testing_nlunit") {
     "UnitTestExtendedAssertions.h",
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",
+    "UnitTestContext.h",
   ]
 
   public_deps = [
