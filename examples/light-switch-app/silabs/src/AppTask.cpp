@@ -25,32 +25,23 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "BindingHandler.h"
-
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-#include "sl_power_manager.h"
-#endif
-
 #include "LEDWidget.h"
-
 #include "LightSwitchMgr.h"
-
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
-
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-
-#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 /**********************************************************
  * Defines and Constants
@@ -128,12 +119,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 #endif
 
     SILABS_LOG("App Task started");
-
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-    SILABS_LOG("----------------------------------------------- ADING EM1 requirement ---------------------------------");
-    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
-
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);

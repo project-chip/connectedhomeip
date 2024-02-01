@@ -198,6 +198,10 @@ else
                 optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
                 shift
                 ;;
+            --ssed)
+                optArgs+="enable_synchronized_sed=true "
+                shift
+                ;;
             --low-power)
                 optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true "
                 shift
