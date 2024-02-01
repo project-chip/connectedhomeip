@@ -361,10 +361,10 @@ static_library("testing_nlunit") {
   output_dir = "${root_out_dir}/lib"
 
   sources = [
+    "UnitTestContext.h",
     "UnitTestExtendedAssertions.h",
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",
-    "UnitTestContext.h",
   ]
 
   public_deps = [
