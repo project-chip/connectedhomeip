@@ -62,7 +62,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
                           g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &mDeviceIdInfo, sizeof(mDeviceIdInfo), sizeof(uint8_t)));
     g_variant_builder_add(&serviceUUIDsBuilder, "s", mpAdvUUID);
 
-    localNamePtr = mpAdapterName;
+    localNamePtr = mpAdvName;
     if (localNamePtr == nullptr)
     {
         g_snprintf(localName, sizeof(localName), "%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff);
@@ -134,7 +134,7 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
 }
 
 CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID,
-                                    uint32_t aAdvDurationMs)
+                                    uint32_t aAdvDurationMs, const char * aAdvName)
 {
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
@@ -142,13 +142,13 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType
     VerifyOrExit(mpAdv == nullptr, err = CHIP_ERROR_INCORRECT_STATE;
                  ChipLogError(DeviceLayer, "FAIL: BLE advertisement already initialized in %s", __func__));
 
-    mpRoot        = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.GetGattApplicationObjectManager()));
-    mpAdapter     = reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter()));
-    mpAdapterName = g_strdup(aEndpoint.GetAdapterName());
+    mpRoot    = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.GetGattApplicationObjectManager()));
+    mpAdapter = reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter()));
 
     g_object_get(G_OBJECT(mpRoot), "object-path", &MakeUniquePointerReceiver(rootPath).Get(), nullptr);
     mpAdvPath      = g_strdup_printf("%s/advertising", rootPath.get());
     mAdvType       = aAdvType;
+    mpAdvName      = g_strdup(aAdvName);
     mpAdvUUID      = g_strdup(aAdvUUID);
     mAdvDurationMs = aAdvDurationMs;
 
@@ -209,8 +209,8 @@ void BluezAdvertisement::Shutdown()
 
     g_free(mpAdvPath);
     mpAdvPath = nullptr;
-    g_free(mpAdapterName);
-    mpAdapterName = nullptr;
+    g_free(mpAdvName);
+    mpAdvName = nullptr;
     g_free(mpAdvUUID);
     mpAdvUUID = nullptr;
 
