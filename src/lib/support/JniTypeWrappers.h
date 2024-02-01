@@ -167,19 +167,6 @@ private:
     jbyteArray mArray = nullptr;
 };
 
-/// Manages an pre-existing global reference to a jclass.
-class JniClass
-{
-public:
-    explicit JniClass(jclass mClassRef) : mClassRef(mClassRef) {}
-    ~JniClass() { chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mClassRef); }
-
-    jclass classRef() { return mClassRef; }
-
-private:
-    jclass mClassRef;
-};
-
 // Manages an pre-existing global reference to a jobject.
 class JniGlobalRefWrapper
 {

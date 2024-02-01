@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/SubscriptionManager.h>
+#include <app/SubscriptionsInfoProvider.h>
 #include <app/icd/server/ICDCheckInSender.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDMonitoringTable.h>
@@ -67,7 +67,7 @@ public:
 
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, SubscriptionManager * manager);
+              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * manager);
     void Shutdown();
     void UpdateICDMode();
     void UpdateOperationState(OperationalState state);
@@ -148,7 +148,7 @@ private:
     FabricTable * mFabricTable                     = nullptr;
     Messaging::ExchangeManager * mExchangeManager  = nullptr;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
-    SubscriptionManager * mSubManager              = nullptr;
+    SubscriptionsInfoProvider * mSubManager        = nullptr;
 
     bool mTransitionToIdleCalled = false;
 
