@@ -42,8 +42,8 @@
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
-#include <app/SubscriptionManager.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
+#include <app/SubscriptionsInfoProvider.h>
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
@@ -80,7 +80,7 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
-                               public SubscriptionManager
+                               public SubscriptionsInfoProvider
 {
 public:
     /**
@@ -324,9 +324,9 @@ public:
 
     CHIP_ERROR ResumeSubscriptions();
 
-    bool SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) override;
+    bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
-    bool SubjectHasPersistedSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) override;
+    bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
@@ -406,6 +406,8 @@ private:
     void OnDone(ReadHandler & apReadObj) override;
 
     ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
+
+    InteractionModelEngine * GetInteractionModelEngine() override { return this; }
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 

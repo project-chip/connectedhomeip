@@ -84,7 +84,13 @@ limitations under the License.
       <description>
         Command for requesting messages be presented
       </description>
-      <arg name="Messages" type="MessageStruct" array="true" optional="false"/>
+      <arg name="MessageID" type="octet_string" length="16" optional="false"/>
+      <arg name="Priority" type="MessagePriorityEnum" optional="false"/>
+      <arg name="MessageControl" type="MessageControlBitmap" default="0" optional="false"/>
+      <arg name="StartTime" type="epoch_s" default="0" optional="false" isNullable="true"/>
+      <arg name="Duration" type="int16u" default="0" optional="false" isNullable="true"/>
+      <arg name="MessageText" type="char_string" length="256" optional="false"/>
+      <arg name="Responses" type="MessageResponseOptionStruct" array="true" length="4" optional="true"/>
     </command>
     <command source="client" code="0x01" name="CancelMessagesRequest" isFabricScoped="true" optional="false">
       <description>

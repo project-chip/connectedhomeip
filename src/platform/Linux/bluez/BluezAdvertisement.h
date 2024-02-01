@@ -41,7 +41,8 @@ public:
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
+    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs,
+                    const char * aAdvName);
     void Shutdown();
 
     /// Start BLE advertising.
@@ -77,11 +78,11 @@ private:
     bool mIsAdvertising = false;
 
     Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
-    char * mpAdvPath     = nullptr;
-    char * mpAdapterName = nullptr;
-    char * mpAdvUUID     = nullptr;
+    char * mpAdvPath = nullptr;
+    char * mpAdvUUID = nullptr;
     ChipAdvType mAdvType;
     uint16_t mAdvDurationMs = 0;
+    char mAdvName[32]       = "";
 };
 
 } // namespace Internal

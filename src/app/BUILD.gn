@@ -89,14 +89,19 @@ source_set("paths") {
   public_deps = [
     ":app_config",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
   ]
 }
 
 source_set("global-attributes") {
   sources = [ "GlobalAttributes.h" ]
 
-  # This also depends on zap-generated code which is currently impossible to split outs
-  public_deps = [ "${chip_root}/src/lib/support" ]
+  # This also depends on zap-generated code which is currently impossible to split out
+  # as a dependency
+  public_deps = [
+    ":app_config",
+    "${chip_root}/src/lib/support",
+  ]
 }
 
 source_set("pre-encoded-value") {
@@ -114,7 +119,7 @@ source_set("pre-encoded-value") {
 }
 
 source_set("subscription-manager") {
-  sources = [ "SubscriptionManager.h" ]
+  sources = [ "SubscriptionsInfoProvider.h" ]
 
   public_deps = [ "${chip_root}/src/lib/core" ]
 }
