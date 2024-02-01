@@ -189,7 +189,6 @@ static_library("support") {
     "BytesToHex.h",
     "CHIPArgParser.cpp",
     "CHIPCounter.h",
-    "CHIPListUtils.h",
     "CHIPMemString.h",
     "CommonIterator.h",
     "CommonPersistentData.h",

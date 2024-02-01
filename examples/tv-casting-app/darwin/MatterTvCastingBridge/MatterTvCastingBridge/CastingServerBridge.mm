@@ -28,7 +28,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <lib/support/CHIPListUtils.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 
