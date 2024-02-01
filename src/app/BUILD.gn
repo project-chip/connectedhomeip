@@ -90,6 +90,7 @@ source_set("paths") {
   public_deps = [
     ":app_config",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
   ]
 }
 
@@ -115,7 +116,7 @@ source_set("pre-encoded-value") {
 }
 
 source_set("subscription-manager") {
-  sources = [ "SubscriptionManager.h" ]
+  sources = [ "SubscriptionsInfoProvider.h" ]
 
   public_deps = [ "${chip_root}/src/lib/core" ]
 }
