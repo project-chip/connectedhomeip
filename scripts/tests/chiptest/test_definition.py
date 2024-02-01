@@ -83,8 +83,8 @@ class App:
     def waitForAnyAdvertisement(self):
         self.__waitFor("mDNS service published:", self.process, self.outpipe)
 
-    def waitForMessage(self, message):
-        self.__waitFor(message, self.process, self.outpipe)
+    def waitForMessage(self, message, timeoutInSeconds=10):
+        self.__waitFor(message, self.process, self.outpipe, timeoutInSeconds)
         return True
 
     def kill(self):
@@ -124,7 +124,7 @@ class App:
                     self.kvsPathSet.add(value)
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
-    def __waitFor(self, waitForString, server_process, outpipe):
+    def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
         logging.debug('Waiting for %s' % waitForString)
 
         start_time = time.monotonic()
@@ -139,7 +139,7 @@ class App:
                             (waitForString, server_process.returncode))
                 logging.error(died_str)
                 raise Exception(died_str)
-            if time.monotonic() - start_time > 10:
+            if time.monotonic() - start_time > timeoutInSeconds:
                 raise Exception('Timeout while waiting for %s' % waitForString)
             time.sleep(0.1)
             ready, self.lastLogIndex = outpipe.CapturedLogContains(
