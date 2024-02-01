@@ -285,7 +285,7 @@ public:
 
     void ResetCounter() { onFinalCalledTimes = 0; }
 
-    uint32_t GetMagicNumber() const { return 1; }
+    uint32_t GetInteractionModelEngineMagicNumber() const { return chip::app::InteractionModelEngine::GetInstance()->GetInteractionModelEngineMagicNumber(); }
 
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;

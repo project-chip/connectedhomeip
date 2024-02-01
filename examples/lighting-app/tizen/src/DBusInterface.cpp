@@ -44,6 +44,7 @@ public:
     void OnDone(CommandHandler & apCommandObj) {}
     void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
     Status CommandExists(const ConcreteCommandPath & aCommandPath) { return Status::Success; }
+    uint32_t GetInteractionModelEngineMagicNumber() const { return InteractionModelEngine::GetInstance()->GetInteractionModelEngineMagicNumber(); }
 };
 
 DBusInterface::DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpointId)

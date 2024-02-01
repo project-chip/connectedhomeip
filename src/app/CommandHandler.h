@@ -87,9 +87,10 @@ public:
         virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
 
         /*
-         * Get the magic number of the InteractionModelEngine.
+         * Get the magic number of the InteractionModelEngine. A CommandHandler::Handle is valid iff
+         * its magic number is equals to the InteractionModelEngine's one.
          */
-        virtual uint32_t GetMagicNumber() const = 0;
+        virtual uint32_t GetInteractionModelEngineMagicNumber() const = 0;
     };
 
     /**
@@ -148,7 +149,7 @@ public:
         }
 
         /**
-         * Get the CommandHandler object it holds. Get() may return a nullptr if the CommandHandler object is holds is no longer
+         * Get the CommandHandler object it holds. Get() may return a nullptr if the CommandHandler object it holds is no longer
          * valid.
          */
         CommandHandler * Get();

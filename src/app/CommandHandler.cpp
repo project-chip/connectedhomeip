@@ -810,14 +810,14 @@ CommandHandler * CommandHandler::Handle::Get()
     // Not safe to work with CommandHandler in parallel with other Matter work.
     assertChipStackLockedByCurrentThread();
 
-    return (mMagic == mpHandler->mpCallback->GetMagicNumber()) ? mpHandler : nullptr;
+    return (mMagic == mpHandler->mpCallback->GetInteractionModelEngineMagicNumber()) ? mpHandler : nullptr;
 }
 
 void CommandHandler::Handle::Release()
 {
     if (mpHandler != nullptr)
     {
-        if (mMagic == mpHandler->mpCallback->GetMagicNumber())
+        if (mMagic == mpHandler->mpCallback->GetInteractionModelEngineMagicNumber())
         {
             mpHandler->DecrementHoldOff();
         }
@@ -832,7 +832,7 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
     {
         handle->IncrementHoldOff();
         mpHandler = handle;
-        mMagic    = mpHandler->mpCallback->GetMagicNumber();
+        mMagic    = mpHandler->mpCallback->GetInteractionModelEngineMagicNumber();
     }
 }
 
