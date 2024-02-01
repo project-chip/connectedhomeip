@@ -128,6 +128,50 @@ tests:
           to the DUT."
       PICS: S.S.A0002
       verification: |
+            ./chip-tool interactive start
+            >>> any subscribe-by-id 0x0062 0x0002 min-interval max-interval node-id endpoint
+
+            [1706797894.295033][5179:5181] CHIP:DMG: ReportDataMessage =
+            [1706797894.295276][5179:5181] CHIP:DMG: {
+            [1706797894.295462][5179:5181] CHIP:DMG: 	SubscriptionId = 0x8537dfcd,
+            [1706797894.295532][5179:5181] CHIP:DMG: 	AttributeReportIBs =
+            [1706797894.295615][5179:5181] CHIP:DMG: 	[
+            [1706797894.295697][5179:5181] CHIP:DMG: 		AttributeReportIB =
+            [1706797894.295780][5179:5181] CHIP:DMG: 		{
+            [1706797894.296057][5179:5181] CHIP:DMG: 			AttributeDataIB =
+            [1706797894.296260][5179:5181] CHIP:DMG: 			{
+            [1706797894.296342][5179:5181] CHIP:DMG: 				DataVersion = 0xf68347d6,
+            [1706797894.296443][5179:5181] CHIP:DMG: 				AttributePathIB =
+            [1706797894.296525][5179:5181] CHIP:DMG: 				{
+            [1706797894.296605][5179:5181] CHIP:DMG: 					Endpoint = 0x1,
+            [1706797894.296689][5179:5181] CHIP:DMG: 					Cluster = 0x62,
+            [1706797894.296795][5179:5181] CHIP:DMG: 					Attribute = 0x0000_0002,
+            [1706797894.296877][5179:5181] CHIP:DMG: 				}
+            [1706797894.296984][5179:5181] CHIP:DMG:
+            [1706797894.297063][5179:5181] CHIP:DMG: 				Data = [
+            [1706797894.297141][5179:5181] CHIP:DMG:
+            [1706797894.297247][5179:5181] CHIP:DMG: 				],
+            [1706797894.297322][5179:5181] CHIP:DMG: 			},
+            [1706797894.297403][5179:5181] CHIP:DMG:
+            [1706797894.297490][5179:5181] CHIP:DMG: 		},
+            [1706797894.297566][5179:5181] CHIP:DMG:
+            [1706797894.297624][5179:5181] CHIP:DMG: 	],
+            [1706797894.297721][5179:5181] CHIP:DMG:
+            [1706797894.297781][5179:5181] CHIP:DMG: 	InteractionModelRevision = 11
+            [1706797894.297839][5179:5181] CHIP:DMG: }
+            [1706797894.301676][5179:5181] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 
+            [1706797894.305047][5179:5181] CHIP:TOO:   FabricSceneInfo: 0 entries
+            ...
+            [1706797894.367789][5179:5181] CHIP:DMG: Subscription established with SubscriptionID = 0x8537dfcd MinInterval = 0s MaxInterval = 60s Peer = 01:0000000000000001
+            ...
+            [1706798074.365189][5179:5181] CHIP:EM: >>> [E:29283r S:30665 M:266174816] (S) Msg RX from 1:0000000000000001 [0714] --- Type 0001:05 (IM:ReportData)
+            [1706798074.365317][5179:5181] CHIP:EM: Handling via exchange: 29283r, Delegate: 0xaaaacccf2a88
+            [1706798074.365449][5179:5181] CHIP:DMG: ReportDataMessage =
+            [1706798074.365517][5179:5181] CHIP:DMG: {
+            [1706798074.365576][5179:5181] CHIP:DMG: 	SubscriptionId = 0x8537dfcd,
+            [1706798074.365638][5179:5181] CHIP:DMG: 	InteractionModelRevision = 11
+            [1706798074.365696][5179:5181] CHIP:DMG: }
+            [1706798074.365883][5179:5181] CHIP:DMG: Refresh LivenessCheckTime for 64224 milliseconds with SubscriptionId = 0x8537dfcd Peer = 01:0000000000000001
 
       disabled: true
 
@@ -135,6 +179,9 @@ tests:
           "Step 4c: Keep subscription session active for the remainder of the
           test"
       verification: |
+            Confirm that the subscription session is active for the remainder of the test by the reception of Liveness checks:
+
+            [1706798074.365883][5179:5181] CHIP:DMG: Refresh LivenessCheckTime for 64224 milliseconds with SubscriptionId = 0x8537dfcd Peer = 01:0000000000000001
 
       disabled: true
 
