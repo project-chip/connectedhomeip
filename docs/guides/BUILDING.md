@@ -131,21 +131,19 @@ permanently, you need to make the following changes:
 
 ## Installing ZAP tool
 
+For platforms defined in [`scripts/setup/zap.json`](/scripts/setup/zap.json),
 `bootstrap.sh` will download a compatible ZAP tool version and set it up in
 `$PATH`. If you want to install or use a different version of the tool, you may
 download one from the ZAP project's
 [Releases](https://github.com/project-chip/zap/releases) page.
 
-### Linux ARM
-
-Zap does not provide binary releases for arm. Rosetta solves this for Darwin,
-however for linux arm you will have to use a local ZAP, generally through
-setting `$ZAP_DEVELOPMENT_PATH` (see the section `Which zap to use` below).
+### Custom ZAP
 
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
 so you can download a compatible version from the zap project
-[Releases](https://github.com/project-chip/zap/releases). To checkout as source
-code the corresponding tag should exist in the zap
+[Releases](https://github.com/project-chip/zap/releases). The version is also
+maintained at [`scripts/setup/zap.version`](/scripts/setup/zap.version).
+To checkout as source code the corresponding tag should exist in the zap
 [repository tags](https://github.com/project-chip/zap/tags) list.
 
 Example commands:
@@ -161,7 +159,7 @@ RUN set -x \
 ENV ZAP_DEVELOPMENT_PATH=/opt/zap-${ZAP_VERSION}
 ```
 
-### Which ZAP to use
+### ZAP environment variables
 
 The ZAP tool scripting uses the following detection, in order of importance:
 
