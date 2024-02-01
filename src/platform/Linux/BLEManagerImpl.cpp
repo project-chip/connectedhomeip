@@ -571,7 +571,7 @@ void BLEManagerImpl::DriveBLEState()
     // Initializes the Bluez BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kBluezBLELayerInitialized))
     {
-        SuccessOrExit(err = mEndpoint.Init(mAdapterId, mIsCentral, nullptr, mDeviceName));
+        SuccessOrExit(err = mEndpoint.Init(mAdapterId, mIsCentral, nullptr));
         mFlags.Set(Flags::kBluezBLELayerInitialized);
     }
 
@@ -595,7 +595,7 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs));
+                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs, mDeviceName));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 

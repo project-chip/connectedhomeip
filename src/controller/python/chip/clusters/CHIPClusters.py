@@ -6542,7 +6542,13 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "PresentMessagesRequest",
                 "args": {
-                    "messages": "MessageStruct",
+                    "messageID": "bytes",
+                    "priority": "int",
+                    "messageControl": "int",
+                    "startTime": "int",
+                    "duration": "int",
+                    "messageText": "str",
+                    "responses": "MessageResponseOptionStruct",
                 },
             },
             0x00000001: {

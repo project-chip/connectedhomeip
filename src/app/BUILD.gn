@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlio.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -90,14 +89,19 @@ source_set("paths") {
   public_deps = [
     ":app_config",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
   ]
 }
 
 source_set("global-attributes") {
   sources = [ "GlobalAttributes.h" ]
 
-  # This also depends on zap-generated code which is currently impossible to split outs
-  public_deps = [ "${chip_root}/src/lib/support" ]
+  # This also depends on zap-generated code which is currently impossible to split out
+  # as a dependency
+  public_deps = [
+    ":app_config",
+    "${chip_root}/src/lib/support",
+  ]
 }
 
 source_set("pre-encoded-value") {
@@ -115,7 +119,7 @@ source_set("pre-encoded-value") {
 }
 
 source_set("subscription-manager") {
-  sources = [ "SubscriptionManager.h" ]
+  sources = [ "SubscriptionsInfoProvider.h" ]
 
   public_deps = [ "${chip_root}/src/lib/core" ]
 }
@@ -339,7 +343,6 @@ static_library("app") {
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/system",
-    "${nlio_root}:nlio",
   ]
 
   if (chip_enable_read_client) {

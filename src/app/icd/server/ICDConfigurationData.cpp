@@ -37,14 +37,20 @@ System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
     return mSlowPollingInterval;
 }
 
-CHIP_ERROR ICDConfigurationData::SetModeDurations(uint32_t activeModeDuration_ms, uint32_t idleModeInterval_s)
+CHIP_ERROR ICDConfigurationData::SetModeDurations(Optional<uint32_t> activeModeDuration_ms, Optional<uint32_t> idleModeDuration_ms)
 {
-    VerifyOrReturnError(activeModeDuration_ms <= (idleModeInterval_s * 1000), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(idleModeInterval_s <= kMaxIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(idleModeInterval_s >= kMinIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(activeModeDuration_ms.HasValue() || idleModeDuration_ms.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    mIdleModeDuration_s    = idleModeInterval_s;
-    mActiveModeDuration_ms = activeModeDuration_ms;
+    uint32_t tmpIdleModeDuration_s =
+        idleModeDuration_ms.HasValue() ? (idleModeDuration_ms.Value() / kMillisecondsPerSecond) : mIdleModeDuration_s;
+    uint32_t tmpActiveModeDuration_ms = activeModeDuration_ms.HasValue() ? activeModeDuration_ms.Value() : mActiveModeDuration_ms;
+
+    VerifyOrReturnError(tmpActiveModeDuration_ms <= (tmpIdleModeDuration_s * kMillisecondsPerSecond), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(tmpIdleModeDuration_s <= kMaxIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(tmpIdleModeDuration_s >= kMinIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mIdleModeDuration_s    = tmpIdleModeDuration_s;
+    mActiveModeDuration_ms = tmpActiveModeDuration_ms;
 
     return CHIP_NO_ERROR;
 }
