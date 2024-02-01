@@ -94,7 +94,7 @@ namespace DoorLock {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
-} // namespace AccountLogin
+} // namespace DoorLock
 } // namespace Clusters
 } // namespace app
 } // namespace chip
