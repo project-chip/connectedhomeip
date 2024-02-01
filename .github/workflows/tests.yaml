@@ -118,6 +118,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/measurement-and-sensing.xml \
                       src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
@@ -194,6 +195,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml \
                     "
             - name: Build Apps
               run: |
