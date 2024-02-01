@@ -71,7 +71,7 @@ CHIP_ERROR AttestationTrustStoreBridge::GetPaaCertFromJava(const chip::ByteSpan 
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/AttestationTrustStoreDelegate",
                                                   attestationTrustStoreDelegateCls);

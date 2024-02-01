@@ -55,7 +55,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -110,7 +110,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContentUrl");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -164,7 +164,7 @@ CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncod
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::list<std::string> acceptedHeadersList;
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::GetAcceptHeader");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -207,7 +207,7 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
     JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
     uint32_t supportedStreamingProtocols = 0;
     VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::GetSupportedStreamingProtocols");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

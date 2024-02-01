@@ -54,7 +54,7 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleGetInputList");
     VerifyOrExit(mMediaInputManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -125,7 +125,7 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
     jint index     = -1;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleGetCurrentInput");
     VerifyOrExit(mMediaInputManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -157,7 +157,7 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleSelectInput %d", index);
     VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
@@ -182,7 +182,7 @@ bool MediaInputManager::HandleShowInputStatus()
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleShowInputStatus");
     VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
@@ -207,7 +207,7 @@ bool MediaInputManager::HandleHideInputStatus()
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleHideInputStatus");
     VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
@@ -233,7 +233,7 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleRenameInput %d to %s", index, name.data());
     VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
