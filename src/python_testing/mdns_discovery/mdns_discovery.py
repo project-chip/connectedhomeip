@@ -44,10 +44,10 @@ class MdnsServiceInfo:
     port: int
 
     # A list of IP addresses associated with the service.
-    addresses: list
+    addresses: list[str]
 
     # A dictionary of key-value pairs representing the service's metadata.
-    txt_record: dict
+    txt_record: dict[str, str]
 
     # The priority of the service, used in service selection when multiple instances are available.
     priority: int
@@ -202,9 +202,11 @@ class MdnsDiscovery:
             Dict[str, List[MdnsServiceInfo]]: A dictionary mapping service types (str) to
                                             lists of MdnsServiceInfo objects.
         """
-        return await self._discover(all_services=True,
+        await self._discover(all_services=True,
                                     discovery_timeout_sec=discovery_timeout_sec,
                                     log_output=log_output)
+
+        return self._discovered_services
 
     # Private methods
     async def _discover(self,
