@@ -242,13 +242,10 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
                                              (app::CommandPathFlags::kEndpointIdValid) };
 
-        CommandSender::AdditionalCommandParameters additionalParams;
+        CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.commandRef.SetValue(static_cast<uint16_t>(i));
 
-        SuccessOrExit(err = sender->PrepareCommand(cmdParams, additionalParams));
-        if (testOnlyCommandRefsOverride != nullptr)
-        {
-            additionalParams.commandRef.SetValue(testOnlyCommandRefsOverride[i]);
-        }
+        SuccessOrExit(err = sender->PrepareCommand(cmdParams, prepareCommandParams));
         {
             auto writer = sender->GetCommandDataIBTLVWriter();
             VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -258,23 +255,32 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
         }
 
-        SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                             : Optional<uint16_t>::Missing(),
-                                                  additionalParams));
-
-        // CommandSender provides us with the CommandReference for this associated command. In order to match responses
-        // we have to add CommandRef to index lookup.
-        VerifyOrExit(additionalParams.commandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        Optional<uint16_t> timedRequestTimeout = timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
+                                                                           : Optional<uint16_t>::Missing();
+        CommandSender::FinishCommandParameters finishCommandParams(timedRequestTimeout);
         if (testOnlyCommandRefsOverride != nullptr)
         {
-            // Making sure the value we used to override CommandRef was actually used.
-            VerifyOrDie(additionalParams.commandRef.Value() == testOnlyCommandRefsOverride[i]);
-            // Ignoring the result of adding to index as the test might be trying to set duplicate CommandRefs.
-            callback->AddCommandRefToIndexLookup(additionalParams.commandRef.Value(), i);
+            finishCommandParams.commandRef.SetValue(testOnlyCommandRefsOverride[i]);
         }
         else
         {
-            SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.commandRef.Value(), i));
+            finishCommandParams.commandRef = prepareCommandParams.commandRef;
+        }
+        SuccessOrExit(err = sender->TestOnlyFinishCommand(finishCommandParams));
+
+        // CommandSender provides us with the CommandReference for this associated command. In order to match responses
+        // we have to add CommandRef to index lookup.
+        VerifyOrExit(finishCommandParams.commandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        if (testOnlyCommandRefsOverride != nullptr)
+        {
+            // Making sure the value we used to override CommandRef was actually used.
+            VerifyOrDie(finishCommandParams.commandRef.Value() == testOnlyCommandRefsOverride[i]);
+            // Ignoring the result of adding to index as the test might be trying to set duplicate CommandRefs.
+            callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i);
+        }
+        else
+        {
+            SuccessOrExit(err = callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i));
         }
     }
 
