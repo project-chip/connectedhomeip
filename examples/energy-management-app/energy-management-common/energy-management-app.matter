@@ -948,8 +948,15 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
     MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
   }
 
+  struct CumulativeEnergyResetStruct {
+    optional nullable epoch_s importedResetTimestamp = 0;
+    optional nullable epoch_s exportedResetTimestamp = 1;
+    optional nullable systime_ms importedResetSystime = 2;
+    optional nullable systime_ms exportedResetSystime = 3;
+  }
+
   struct EnergyMeasurementStruct {
-    int64s energy = 0;
+    energy_mwh energy = 0;
     optional epoch_s startTimestamp = 1;
     optional epoch_s endTimestamp = 2;
     optional systime_ms startSystime = 3;
@@ -971,6 +978,7 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
   readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyExported = 2;
   readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyImported = 3;
   readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyExported = 4;
+  readonly attribute optional nullable CumulativeEnergyResetStruct cumulativeEnergyReset = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1685,7 +1693,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 5;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 

@@ -12937,7 +12937,6 @@
           "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "measurement type",
