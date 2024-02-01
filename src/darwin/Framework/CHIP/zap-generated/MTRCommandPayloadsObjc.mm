@@ -26,8 +26,8 @@
 #import "NSStringSpanConversion.h"
 
 #include <app/data-model/Decode.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
 #include <lib/core/TLV.h>
-#include <lib/support/CHIPListUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
