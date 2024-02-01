@@ -20,7 +20,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Oven Cavity Operational State"
     endpoint: 0
 
 tests:
@@ -30,9 +30,12 @@ tests:
       disabled: true
 
     - label: "Step 1: Commission DUT to TH"
-      verification: |
-
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Step 2: Set up a subscription to the OperationCompletion event"
       PICS: OVENOPSTATE.S.E01
@@ -50,20 +53,12 @@ tests:
 
     - label: "Step 3: TH reads from the DUT the OperationalState attribute"
       PICS: OVENOPSTATE.S.A0004
-      verification: |
-          ./chip-tool ovencavityoperationalstate read operational-state 1 1
-
-            Via the TH (chip-tool), verify:
-            - the response includes an ID (enum8) amd a label (string)
-            - the provided ID is found in the set provided in step 4
-            - the provided ID is in the allowed range
-
-           [1689673213.434610][16591:16593] CHIP:DMG: }
-           [1689673213.434686][16591:16593] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 2102885775
-           [1689673213.434721][16591:16593] CHIP:TOO: OperationalState: {
-           [1689673213.434728][16591:16593] CHIP:TOO: OperationalStateID: 0
-           [1689673213.434735][16591:16593] CHIP:TOO: }
-      disabled: true
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
 
     - label:
           "Step 4: Manually put the DUT into a state wherein it can receive a
@@ -89,23 +84,11 @@ tests:
 
     - label: "Step 6: TH sends Start command to the DUT"
       PICS: OVENOPSTATE.S.C02.Rsp && OVENOPSTATE.S.C04.Tx
-      verification: |
-          ./chip-tool ovencavityoperationalstate start 1 1
-
-            Via the TH (chip-tool), verify:
-            - the response is an instance of OperationalCommandResponse
-            - The ErrorStateID field is set to 0x00 (NoError)
-
-           [1689674637.555734][17326:17328] CHIP:DMG:
-           [1689674637.555742][17326:17328] CHIP:DMG: InteractionModelRevision = 1
-           [1689674637.555751][17326:17328] CHIP:DMG: },
-           [1689674637.555784][17326:17328] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
-           [1689674637.555805][17326:17328] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
-           [1689674637.555853][17326:17328] CHIP:TOO: OperationalCommandResponse: {
-           [1689674637.555862][17326:17328] CHIP:TOO: commandResponseState: {
-           [1689674637.555872][17326:17328] CHIP:TOO: ErrorStateID: 0
-           [1689674637.555883][17326:17328] CHIP:TOO: }
-      disabled: true
+      command: "Start"
+      response:
+        values:
+          - name: "CommandResponseState"
+            value: { ErrorStateID: 0 }
 
     - label: "Step 7: TH waits for {PIXIT.WAITTIME}"
       verification: |
@@ -114,19 +97,12 @@ tests:
 
     - label: "Step 8: TH reads from the DUT the OperationalState attribute"
       PICS: OVENOPSTATE.S.A0004
-      verification: |
-          ./chip-tool ovencavityoperationalstate read operational-state 1 1
-
-            Via the TH (chip-tool), verify:
-            - the response has an OperationalStateID field that is set to 0x01 (Running)
-
-           [1689674196.878722][17249:17251] CHIP:DMG: InteractionModelRevision = 1
-           [1689674196.878727][17249:17251] CHIP:DMG: }
-           [1689674196.878800][17249:17251] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 2102885775
-           [1689674196.878834][17249:17251] CHIP:TOO: OperationalState: {
-           [1689674196.878841][17249:17251] CHIP:TOO: OperationalStateID: 1
-           [1689674196.878847][17249:17251] CHIP:TOO: }
-      disabled: true
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 1
+          constraints:
+              type: enum8
 
     - label: "Step 9: TH waits for initial-countdown-time"
       verification: |
@@ -136,22 +112,11 @@ tests:
 
     - label: "Step 10: TH sends Stop command to the DUT"
       PICS: OVENOPSTATE.S.C01.Rsp && OVENOPSTATE.S.C04.Tx
-      verification: |
-          ./chip-tool ovencavityoperationalstate stop 1 1
-
-           Via the TH (chip-tool), verify:
-           - the response is an instance of OperationalCommandResponse
-           - The ErrorStateID field is set to 0x00 (NoError)
-
-          [1689674653.322963][17330:17332] CHIP:DMG: },
-          [1689674653.322994][17330:17332] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
-          [1689674653.323014][17330:17332] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
-          [1689674653.323058][17330:17332] CHIP:TOO:   OperationalCommandResponse: {
-          [1689674653.323066][17330:17332] CHIP:TOO:     commandResponseState: {
-          [1689674653.323076][17330:17332] CHIP:TOO:       ErrorStateID: 0
-          [1689674653.323085][17330:17332] CHIP:TOO:      }
-          [1689674653.323094][17330:17332] CHIP:TOO:    }
-      disabled: true
+      command: "Stop"
+      response:
+          values:
+              - name: "CommandResponseState"
+                value: { ErrorStateID: 0 }
 
     - label:
           "Step 11: erify TH receives an OperationCompletion event from the DUT
@@ -175,18 +140,12 @@ tests:
 
     - label: "Step 12: TH reads from the DUT the OperationalState attribute"
       PICS: OVENOPSTATE.S.A0004
-      verification: |
-          ./chip-tool ovencavityoperationalstate read operational-state 1 1
-
-           Via the TH (chip-tool), verify:
-           - the response has an OperationalStateID field that is set to 0x00 (Stopped)
-
-          [1689674675.459656][17333:17335] CHIP:DMG: }
-          [1689674675.459738][17333:17335] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 2102885775
-          [1689674675.459772][17333:17335] CHIP:TOO:   OperationalState: {
-          [1689674675.459790][17333:17335] CHIP:TOO:     OperationalStateID: 0
-          [1689674675.459799][17333:17335] CHIP:TOO:    }
-      disabled: true
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
 
     - label: "Step 13: Restart DUT and repeat step 5"
       verification: |
@@ -195,24 +154,11 @@ tests:
 
     - label: "Step 14: TH sends Start command to the DUT"
       PICS: OVENOPSTATE.S.C02.Rsp && OVENOPSTATE.S.C04.Tx
-      verification: |
-          ./chip-tool ovencavityoperationalstate start 1 1
-
-           Via the TH (chip-tool), verify:
-           - the response is an instance of OperationalCommandResponse
-           - The ErrorStateID field is set to 0x00 (NoError)
-
-          [1689674637.555734][17326:17328] CHIP:DMG:
-          [1689674637.555742][17326:17328] CHIP:DMG:         InteractionModelRevision = 1
-          [1689674637.555751][17326:17328] CHIP:DMG: },
-          [1689674637.555784][17326:17328] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
-          [1689674637.555805][17326:17328] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
-          [1689674637.555853][17326:17328] CHIP:TOO:   OperationalCommandResponse: {
-          [1689674637.555862][17326:17328] CHIP:TOO:     commandResponseState: {
-          [1689674637.555872][17326:17328] CHIP:TOO:       ErrorStateID: 0
-          [1689674637.555883][17326:17328] CHIP:TOO:      }
-          [1689674637.555891][17326:17328] CHIP:TOO:    }
-      disabled: true
+      command: "Start"
+      response:
+        values:
+          - name: "CommandResponseState"
+            value: { ErrorStateID: 0 }
 
     - label: "Step 15: TH waits for {PIXIT.WAITTIME}"
       verification: |
@@ -221,52 +167,29 @@ tests:
 
     - label: "Step 16: TH reads from the DUT the OperationalState attribute"
       PICS: OVENOPSTATE.S.A0004
-      verification: |
-          ./chip-tool ovencavityoperationalstate read operational-state 1 1
-
-           Via the TH (chip-tool), verify:
-           - the response has an OperationalStateID field that is set to 0x01 (Running)
-
-          [1689674196.878722][17249:17251] CHIP:DMG:         InteractionModelRevision = 1
-          [1689674196.878727][17249:17251] CHIP:DMG: }
-          [1689674196.878800][17249:17251] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 2102885775
-          [1689674196.878834][17249:17251] CHIP:TOO:   OperationalState: {
-          [1689674196.878841][17249:17251] CHIP:TOO:     OperationalStateID: 1
-          [1689674196.878847][17249:17251] CHIP:TOO:    }
-      disabled: true
-
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 1
+          constraints:
+              type: enum8
+     
     - label: "Step 17: TH sends Pause command to the DUT"
       PICS: OVENOPSTATE.S.C00.Rsp && OVENOPSTATE.S.C04.Tx
-      verification: |
-          ./chip-tool ovencavityoperationalstate pause 1 1
-
-           Via the TH (chip-tool), verify:
-           - the response is an instance of OperationalCommandResponse
-           - The ErrorStateID field is set to 0x00 (NoError)
-
-          [1690457565.893634][18795:18797] CHIP:DMG: },
-          [1690457565.893663][18795:18797] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
-          [1690457565.893681][18795:18797] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
-          [1690457565.893714][18795:18797] CHIP:TOO:   OperationalCommandResponse: {
-          [1690457565.893729][18795:18797] CHIP:TOO:     commandResponseState: {
-          [1690457565.893736][18795:18797] CHIP:TOO:       ErrorStateID: 0
-          [1690457565.893744][18795:18797] CHIP:TOO:      }
-          [1690457565.893750][18795:18797] CHIP:TOO:    }
-      disabled: true
+      command: "Pause"
+      response:
+        values:
+          - name: "CommandResponseState"
+            value: { ErrorStateID: 0 }
 
     - label: "Step 18: TH reads from the DUT the OperationalState attribute"
       PICS: OVENOPSTATE.S.A0004
-      verification: |
-          ./chip-tool ovencavityoperationalstate read operational-state 1 1
-
-          Via the TH (chip-tool), verify:
-           - the response has an OperationalStateID field that is set to 0x02 (Paused)
-
-          [1690457601.103082][18800:18802] CHIP:DMG:         InteractionModelRevision = 1
-          [1690457601.103090][18800:18802] CHIP:DMG: }
-          [1690457601.103210][18800:18802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 4112784416
-          [1690457601.103259][18800:18802] CHIP:TOO:   OperationalState: 2
-      disabled: true
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 2
+          constraints:
+              type: enum8
 
     - label: "Step 19: TH waits for half of initial-countdown-time"
       verification: |
@@ -275,38 +198,20 @@ tests:
 
     - label: "Step 20: TH sends Resume command to the DUT"
       PICS: OVENOPSTATE.S.C03.Rsp && OVENOPSTATE.S.C04.Tx
-      verification: |
-          ./chip-tool ovencavityoperationalstate resume 1 1
-
-           Via the TH (chip-tool), verify:
-           - the response is an instance of OperationalCommandResponse
-           - The ErrorStateID field is set to 0x03 (CommandInvalidInState)
-
-          [1690457852.049135][18877:18879] CHIP:DMG: },
-          [1690457852.049164][18877:18879] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0060 Command=0x0000_0004
-          [1690457852.049183][18877:18879] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
-          [1690457852.049217][18877:18879] CHIP:TOO:   OperationalCommandResponse: {
-          [1690457852.049224][18877:18879] CHIP:TOO:     commandResponseState: {
-          [1690457852.049238][18877:18879] CHIP:TOO:       ErrorStateID: 3
-          [1690457852.049246][18877:18879] CHIP:TOO:      }
-          [1690457852.049252][18877:18879] CHIP:TOO:    }
-      disabled: true
+      command: "Resume"
+      response:
+        values:
+          - name: "CommandResponseState"
+            value: { ErrorStateID: 3}
 
     - label: "Step 21: TH reads from the DUT the OperationalState attribute"
       PICS: OVENOPSTATE.S.A0004
-      verification: |
-          ./chip-tool ovencavityoperationalstate read operational-state 1 1
-
-           Via the TH (chip-tool), verify:
-           - the response has an OperationalStateID field that is set to 0x01 (Running)
-
-          [1689674196.878722][17249:17251] CHIP:DMG:         InteractionModelRevision = 1
-          [1689674196.878727][17249:17251] CHIP:DMG: }
-          [1689674196.878800][17249:17251] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0004 DataVersion: 2102885775
-          [1689674196.878834][17249:17251] CHIP:TOO:   OperationalState: {
-          [1689674196.878841][17249:17251] CHIP:TOO:     OperationalStateID: 1
-          [1689674196.878847][17249:17251] CHIP:TOO:    }
-      disabled: true
+      command: "readAttribute"
+      attribute: "OperationalState"
+      response:
+          value: 1
+          constraints:
+              type: enum8
 
     - label: "Step 22: TH waits for initial-countdown-time"
       verification: |
@@ -315,6 +220,11 @@ tests:
 
     - label: "Step 23: TH sends Stop command to the DUT"
       PICS: OVENOPSTATE.S.C01.Rsp && OVENOPSTATE.S.C04.Tx
+      command: "Stop"
+      response:
+        values:
+          - name: "CommandResponseState"
+            value: { ErrorStateID: 0 }
       verification: |
           ./chip-tool ovencavityoperationalstate stop 1 1
 
