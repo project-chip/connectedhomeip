@@ -180,7 +180,7 @@ public:
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
      */
-    uint32_t GetMagicNumber() const { return mMagic; }
+    uint32_t GetMagicNumber() const override { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 

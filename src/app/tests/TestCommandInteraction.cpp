@@ -285,6 +285,8 @@ public:
 
     void ResetCounter() { onFinalCalledTimes = 0; }
 
+    uint32_t GetMagicNumber() const { return 1; }
+
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;
 

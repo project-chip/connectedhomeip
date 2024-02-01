@@ -85,6 +85,11 @@ public:
          * fails to exist.
          */
         virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
+
+        /*
+         * Get the magic number of the InteractionModelEngine.
+         */
+        virtual uint32_t GetMagicNumber() const = 0;
     };
 
     /**
