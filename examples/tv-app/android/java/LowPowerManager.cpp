@@ -46,7 +46,7 @@ void LowPowerManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for LowPowerManager"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     mLowPowerManagerObject = env->NewGlobalRef(managerObject);
     VerifyOrReturn(mLowPowerManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef LowPowerManager"));
@@ -66,7 +66,7 @@ bool LowPowerManager::HandleSleep()
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received LowPowerManager::Sleep");
     VerifyOrExit(mLowPowerManagerObject != nullptr, ChipLogError(Zcl, "mLowPowerManagerObject null"));

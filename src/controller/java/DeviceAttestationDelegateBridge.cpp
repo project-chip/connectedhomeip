@@ -72,7 +72,7 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-        JniLocalReferenceManager manager(env);
+        JniLocalReferenceScope scope(env);
         jclass deviceAttestationDelegateCls = nullptr;
         JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
                                                       deviceAttestationDelegateCls);
