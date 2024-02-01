@@ -20,9 +20,13 @@ source_set("data-model") {
     "Decode.h",
     "Encode.h",
     "FabricScoped.h",
+    "FabricScopedPreEncodedValue.cpp",
+    "FabricScopedPreEncodedValue.h",
     "List.h",
-    "NullObject.h",
     "Nullable.h",
+    "NullObject.h",
+    "PreEncodedValue.cpp",
+    "PreEncodedValue.h",
     "TagBoundEncoder.h",
     "WrappedStructEncoder.h",
   ]
@@ -42,16 +46,3 @@ source_set("data-model") {
   ]
 }
 
-source_set("pre-encoded-value") {
-  sources = [
-    "FabricScopedPreEncodedValue.cpp",
-    "FabricScopedPreEncodedValue.h",
-    "PreEncodedValue.cpp",
-    "PreEncodedValue.h",
-  ]
-
-  deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-}
