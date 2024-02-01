@@ -104,20 +104,6 @@ source_set("global-attributes") {
   ]
 }
 
-source_set("pre-encoded-value") {
-  sources = [
-    "data-model/FabricScopedPreEncodedValue.cpp",
-    "data-model/FabricScopedPreEncodedValue.h",
-    "data-model/PreEncodedValue.cpp",
-    "data-model/PreEncodedValue.h",
-  ]
-
-  deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-}
-
 source_set("subscription-manager") {
   sources = [ "SubscriptionsInfoProvider.h" ]
 
@@ -335,8 +321,8 @@ static_library("app") {
     ":app_config",
     ":global-attributes",
     ":interaction-model",
-    ":pre-encoded-value",
     ":revision_info",
+    "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
