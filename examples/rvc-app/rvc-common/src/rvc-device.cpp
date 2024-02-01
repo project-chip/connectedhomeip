@@ -139,12 +139,14 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
     switch (mOperationalStateInstance.GetCurrentOperationalState())
     {
     case to_underlying(OperationalState::OperationalStateEnum::kStopped): {
-        if (mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeIdle) {
+        if (mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeIdle)
+        {
             err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
             return;
         }
 
-        auto error = mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+        auto error = mOperationalStateInstance.SetOperationalState(
+            to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
 
         err.Set((error == CHIP_NO_ERROR) ? to_underlying(OperationalState::ErrorStateEnum::kNoError)
                                          : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
