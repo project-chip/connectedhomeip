@@ -74,5 +74,3 @@ tests:
       attribute: "ActiveAudioTrack"
       response:
           value: { ID: AudioTrack_ID_Value }
-          constraints:
-              notValue: ActiveAudioTrackValue

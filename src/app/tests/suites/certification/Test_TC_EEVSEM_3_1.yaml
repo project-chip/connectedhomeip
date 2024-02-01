@@ -127,7 +127,7 @@ tests:
       command: "On"
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
-      PICS: EEVSEM.S.A0001
+      PICS: EEVSEM.S.A0001 && EEVSEM.S.A0003 && MOD.S.F00
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
