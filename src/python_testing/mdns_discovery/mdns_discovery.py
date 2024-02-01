@@ -84,22 +84,22 @@ class MdnsDiscovery:
         Initializes the MdnsDiscovery instance.
 
         Main methods:
-            - get_commissioner_service_info()
-            - get_commissionable_service_info()
-            - get_operational_service_info()
-            - get_border_router_service_info()
-            - _discover()
+            - get_commissioner_service
+            - get_commissionable_service
+            - get_operational_service
+            - get_border_router_service
+            - get_all_services
         """
         # An instance of Zeroconf to manage mDNS operations.
-        # This is used for handling the low-level details of mDNS.
         self._zc = Zeroconf(ip_version=IPVersion.V6Only)
 
         # A dictionary to store discovered services.
-        # As services are discovered, they are added to this dictionary.
         self._discovered_services = {}
-        
+
+        # A list of service types
         self._service_types = []
-        
+
+        # An asyncio Event to signal when a service has been discovered
         self._event = asyncio.Event()
 
     async def get_commissioner_service(self, log_output: bool = False,
@@ -131,10 +131,8 @@ class MdnsDiscovery:
             # Get service info
             service_info = AsyncServiceInfo(service_type, service_name)
             is_discovered = await service_info.async_request(self._zc, 3000)
-
             if is_discovered:
                 mdns_service_info = self._to_mdns_service_info_class(service_info)
-
             self._discovered_services = {}
             self._discovered_services[service_type] = [mdns_service_info]
 
@@ -152,14 +150,14 @@ class MdnsDiscovery:
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
                                ) -> Dict[str, List[MdnsServiceInfo]]:
         return await self._discover(all_services=True,
-                                   discovery_timeout_sec=discovery_timeout_sec,
-                                   log_output=log_output)
+                                    discovery_timeout_sec=discovery_timeout_sec,
+                                    log_output=log_output)
 
     # Private methods
     async def _discover(self,
-                       discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                       all_services: bool = False,
-                       log_output: bool = False) -> None:
+                        discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                        all_services: bool = False,
+                        log_output: bool = False) -> None:
         """
         Asynchronously discovers network services of specified types using mDNS and returns the discovered services.
 
@@ -188,7 +186,7 @@ class MdnsDiscovery:
             self._service_types = list(await AsyncZeroconfServiceTypes.async_find())
 
         print(f"Browsing for MDNS service(s) of type: {self._service_types}")
-        
+
         aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
                                          type_=self._service_types,
                                          handlers=[self._on_service_state_change]
@@ -291,15 +289,15 @@ class MdnsDiscovery:
         return mdns_service_info
 
     async def _get_service(self, service_type: MdnsServiceType,
-                          log_output: bool = False,
-                          discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
-                          ) -> MdnsServiceInfo:
+                           log_output: bool = False,
+                           discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
+                           ) -> MdnsServiceInfo:
         mdns_service_info = None
         self._service_types = [service_type.value]
         await self._discover(log_output=log_output, discovery_timeout_sec=discovery_timeout_sec)
         if service_type.value in self._discovered_services:
             mdns_service_info = self._discovered_services[service_type.value][0]
-        
+
         return mdns_service_info
 
     def _log_output(self) -> str:
