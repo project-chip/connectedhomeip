@@ -18,9 +18,9 @@ fi
 # RVC Clean Mode cluster
 ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCCLEANM_1_1 --PICS "$RVC_DEVICE_PICS" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
 
-# RVC Operational State cluster
-./scripts/tests/yaml/chiptool.py tests Test_TC_RVCOPSTATE_1_1 --PICS "$RVC_DEVICE_PICS" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
+    # RVC Operational State cluster
+    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCOPSTATE_1_1 --PICS "$RVC_DEVICE_PICS" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
 
-# RVC Run Mode cluster
-./scripts/tests/yaml/chiptool.py tests Test_TC_RVCRUNM_1_1 --PICS "$RVC_DEVICE_PICS" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
-echo done
+    # RVC Run Mode cluster
+    ./scripts/tests/yaml/chiptool.py tests Test_TC_RVCRUNM_1_1 --PICS "$RVC_DEVICE_PICS" --nodeId "$NODEID" --endpoint "$RVC_DEVICE_ENDPOINT" &&
+    echo done
