@@ -442,7 +442,8 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
 #endif
 }
 
-CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, PrepareCommandParameters & aPrepareCommandParams)
+CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams,
+                                         PrepareCommandParameters & aPrepareCommandParams)
 {
     ReturnErrorOnFailure(AllocateBuffer());
 

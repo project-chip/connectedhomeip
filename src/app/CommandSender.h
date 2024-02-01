@@ -209,7 +209,9 @@ public:
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
         PrepareCommandParameters() {}
 
-        PrepareCommandParameters(const AddRequestDataParameters & aAddRequestDataParam) : commandRef(aAddRequestDataParam.commandRef) {}
+        PrepareCommandParameters(const AddRequestDataParameters & aAddRequestDataParam) :
+            commandRef(aAddRequestDataParam.commandRef)
+        {}
 
         PrepareCommandParameters & SetStartDataStruct(bool aStartDataStruct)
         {
@@ -246,7 +248,9 @@ public:
         FinishCommandParameters() {}
 
         FinishCommandParameters(const Optional<uint16_t> & aTimedInvokeTimeoutMs) : timedInvokeTimeoutMs(aTimedInvokeTimeoutMs) {}
-        FinishCommandParameters(const AddRequestDataParameters & aAddRequestDataParam) : timedInvokeTimeoutMs(aAddRequestDataParam.timedInvokeTimeoutMs), commandRef(aAddRequestDataParam.commandRef) {}
+        FinishCommandParameters(const AddRequestDataParameters & aAddRequestDataParam) :
+            timedInvokeTimeoutMs(aAddRequestDataParam.timedInvokeTimeoutMs), commandRef(aAddRequestDataParam.commandRef)
+        {}
 
         FinishCommandParameters & SetEndDataStruct(bool aEndDataStruct)
         {
@@ -356,7 +360,8 @@ public:
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               AddRequestDataParameters & aAddRequestDataParams)
     {
-        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aAddRequestDataParams.timedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aAddRequestDataParams.timedInvokeTimeoutMs.HasValue(),
+                            CHIP_ERROR_INVALID_ARGUMENT);
 
         return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
     }

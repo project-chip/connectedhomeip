@@ -255,8 +255,8 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
         }
 
-        Optional<uint16_t> timedRequestTimeout = timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                           : Optional<uint16_t>::Missing();
+        Optional<uint16_t> timedRequestTimeout =
+            timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs) : Optional<uint16_t>::Missing();
         CommandSender::FinishCommandParameters finishCommandParams(timedRequestTimeout);
         if (testOnlyCommandRefsOverride != nullptr)
         {
