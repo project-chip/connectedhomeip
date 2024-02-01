@@ -23,8 +23,8 @@ source_set("data-model") {
     "FabricScopedPreEncodedValue.cpp",
     "FabricScopedPreEncodedValue.h",
     "List.h",
-    "Nullable.h",
     "NullObject.h",
+    "Nullable.h",
     "PreEncodedValue.cpp",
     "PreEncodedValue.h",
     "TagBoundEncoder.h",
@@ -45,4 +45,3 @@ source_set("data-model") {
     "${chip_root}/src/protocols/interaction_model",
   ]
 }
-
