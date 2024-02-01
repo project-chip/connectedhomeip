@@ -4241,7 +4241,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 }
 
                 jclass measurementRangeStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalPowerMeasurementClusterMeasurementRangeStruct",
                     measurementRangeStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -4273,7 +4273,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass measurementPeriodRangesStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent",
                 measurementPeriodRangesStructClass);
             if (err != CHIP_NO_ERROR)
