@@ -9497,6 +9497,9 @@ PICS:
     - label: "Does the device implement receiving the Resume command?"
       id: RVCOPSTATE.S.C03.Rsp
 
+    - label: "Does the device implement receiving the GoHome command?"
+      id: RVCOPSTATE.S.C128.Rsp
+
     #Commands generated
     - label:
           "Does the device implement generating the OperationalCommandResponse

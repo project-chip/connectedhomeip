@@ -22,12 +22,11 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
-
 
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.endpoint = None
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcOperationalState
@@ -54,12 +53,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCOPSTATE_2_1(self):
-
-        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT_ENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        self.endpoint = self.matter_test_config.endpoint
+        asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
 
         attributes = Clusters.RvcOperationalState.Attributes
 
@@ -108,8 +103,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
             defined_states = [state.value for state in Clusters.OperationalState.Enums.OperationalStateEnum
                               if state is not Clusters.OperationalState.Enums.OperationalStateEnum.kUnknownEnumValue]
-            defined_states.extend(state.value for state in Clusters.RvcOperationalState.Enums.OperationalStateEnum
-                                  if state is not Clusters.RvcOperationalState.Enums.OperationalStateEnum.kUnknownEnumValue)
+            defined_states.extend(state.value for state in Clusters.RvcOperationalState.Enums.OperationalStateEnum)
 
             for state in operational_state_list:
                 in_range = (0x80 <= state.operationalStateID <= 0xBF)
@@ -172,8 +166,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
             # Defined Errors
             defined_errors = [error.value for error in Clusters.OperationalState.Enums.ErrorStateEnum
                               if error is not Clusters.OperationalState.Enums.ErrorStateEnum.kUnknownEnumValue]
-            defined_errors.extend(error.value for error in Clusters.RvcOperationalState.Enums.ErrorStateEnum
-                                  if error is not Clusters.RvcOperationalState.Enums.ErrorStateEnum.kUnknownEnumValue)
+            defined_errors.extend(error.value for error in Clusters.RvcOperationalState.Enums.ErrorStateEnum)
 
             in_range = (0x80 <= operational_error.errorStateID <= 0xBF)
             asserts.assert_true(operational_error.errorStateID in defined_errors
