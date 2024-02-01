@@ -287,7 +287,7 @@ class MdnsDiscovery:
     async def _query_service_info(self, zeroconf: Zeroconf, service_type: str, service_name: str) -> None:
         """
         This method queries for service details such as its address, port, and TXT records
-        containing metadata. 
+        containing metadata.
 
         Args:
             zeroconf (Zeroconf): The Zeroconf instance used for managing network operations and service discovery.
