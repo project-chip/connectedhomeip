@@ -159,7 +159,7 @@ tests:
             [1706797894.297721][5179:5181] CHIP:DMG:
             [1706797894.297781][5179:5181] CHIP:DMG: 	InteractionModelRevision = 11
             [1706797894.297839][5179:5181] CHIP:DMG: }
-            [1706797894.301676][5179:5181] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 
+            [1706797894.301676][5179:5181] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion:
             [1706797894.305047][5179:5181] CHIP:TOO:   FabricSceneInfo: 0 entries
             ...
             [1706797894.367789][5179:5181] CHIP:DMG: Subscription established with SubscriptionID = 0x8537dfcd MinInterval = 0s MaxInterval = 60s Peer = 01:0000000000000001
