@@ -131,7 +131,6 @@ template("chip_data_model") {
     deps += [
       ":${_data_model_name}_zapgen",
       "${chip_root}/src/app/common:cluster-objects",
-      "${chip_root}/src/app/common:enums",
     ]
   }
 
