@@ -103,6 +103,9 @@ void chip::CHIPDefaultFailureCallback::CallbackFn(void * context, CHIP_ERROR err
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID javaMethod;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
+
     jobject javaCallbackRef;
     jthrowable exception;
     CHIPDefaultFailureCallback * cppCallback = nullptr;
