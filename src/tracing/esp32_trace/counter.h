@@ -18,24 +18,26 @@
 
 #include <esp_diagnostics_metrics.h>
 #include <esp_log.h>
-#include <string.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 
-#define PATH1 "sys.cnt"
+#define PATH "insights.cnt"
+
 namespace Insights {
 class ESPInsightsCounter
 {
 private:
-    static ESPInsightsCounter * mHead;
-    char label[50];
+    static ESPInsightsCounter * mHead; // head of the counter list
+    char label[50];                    // unique key
     char group[50];
     int instanceCount;
-    ESPInsightsCounter * mNext;
+    ESPInsightsCounter * mNext; // pointer to point to the next entry in the list
     bool registered = false;
 
     ESPInsightsCounter(const char * labelParam, const char * groupParam) : instanceCount(1), mNext(nullptr)
     {
-        strncpy(label, labelParam, sizeof(label));
-        strncpy(group, groupParam, sizeof(group));
+        chip::Platform::CopyString(label, sizeof(label), labelParam);
+        chip::Platform::CopyString(group, sizeof(group), groupParam);
     }
 
 public:
@@ -47,10 +49,12 @@ public:
     {
         if (!registered)
         {
-            esp_diag_metrics_register("SYS_CNT", label, label, PATH1, ESP_DIAG_DATA_TYPE_UINT);
+            esp_diag_metrics_register("SYS_CNT" /* Tag of metrics */, label /* Unique key 8 */,
+                                      label /* label displayed on dashboard */, PATH /* hierarchical path */,
+                                      ESP_DIAG_DATA_TYPE_UINT /* data_type */);
             registered = true;
         }
-        ESP_LOGI("Mtr", "Label = %s Count = %d", label, instanceCount);
+        ESP_LOGI("mtr", "Label = %s Count = %d", label, instanceCount);
         esp_diag_metrics_add_uint(label, instanceCount);
     }
 };

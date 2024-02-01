@@ -16,16 +16,18 @@
  *    limitations under the License.
  */
 
+#include <string.h>
 #include <tracing/esp32_trace/counter.h>
 
+using namespace chip;
+
 namespace Insights {
-ESPInsightsCounter * ESPInsightsCounter::mHead = nullptr;
+ESPInsightsCounter * ESPInsightsCounter::mHead = nullptr; // Pointer to head of the counter linked list
 
 ESPInsightsCounter * ESPInsightsCounter::GetInstance(const char * label, const char * group)
 {
 
-    ESPInsightsCounter * current  = mHead;
-    ESPInsightsCounter * previous = nullptr;
+    ESPInsightsCounter * current = mHead; // Provisional pointer to traverse the counter list
 
     while (current != nullptr)
     {
@@ -34,13 +36,17 @@ ESPInsightsCounter * ESPInsightsCounter::GetInstance(const char * label, const c
             current->instanceCount++;
             return current;
         }
-        previous = current;
-        current  = current->mNext;
+        current = current->mNext;
     }
 
-    ESPInsightsCounter * newInstance = new ESPInsightsCounter(label, group);
+    // Allocate a new instance if counter is not present in the list.
+    void * ptr = Platform::MemoryAlloc(sizeof(ESPInsightsCounter));
+    VerifyOrDie(ptr != nullptr);
+
+    ESPInsightsCounter * newInstance = new (ptr) ESPInsightsCounter(label, group);
     newInstance->mNext               = mHead;
     mHead                            = newInstance;
+
     return newInstance;
 }
 

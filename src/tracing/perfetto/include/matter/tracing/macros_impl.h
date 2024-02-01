@@ -34,6 +34,6 @@ PERFETTO_DEFINE_CATEGORIES(perfetto::Category("Matter").SetDescription("Matter t
 #define MATTER_TRACE_COUNTER(label, group)                                                                                         \
     do                                                                                                                             \
     {                                                                                                                              \
-        static int count##_label = 0;                                                                                              \
-        TRACE_COUNTER("Matter", perfetto::CounterTrack(label), ++count##_label);                                                   \
+        static int count##_label##_group = 0;                                                                                      \
+        TRACE_COUNTER("Matter", perfetto::CounterTrack(label), ++count##_label##_group);                                           \
     } while (0)
