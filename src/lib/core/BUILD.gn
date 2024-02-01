@@ -104,6 +104,11 @@ source_set("error") {
   ]
 }
 
+source_set("encoding") {
+  sources = [ "CHIPEncoding.h" ]
+  public_deps = [ "${nlio_root}:nlio" ]
+}
+
 source_set("types") {
   sources = [
     "CHIPSafeCasts.h",
@@ -125,14 +130,9 @@ static_library("core") {
   output_name = "libChipCore"
 
   sources = [
-    # For now cluster enum/bitmap definitions are in zzz-generated.
-    # We should consider putting them directly in this directory
-    # instead.
-    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
     "CASEAuthTag.h",
     "CHIPCallback.h",
     "CHIPCore.h",
-    "CHIPEncoding.h",
     "CHIPKeyIds.cpp",
     "CHIPKeyIds.h",
     "CHIPPersistentStorageDelegate.h",
@@ -171,11 +171,11 @@ static_library("core") {
   public_deps = [
     ":chip_config_header",
     ":error",
+    "${chip_root}/src/app/common:enums",
     "${chip_root}/src/ble",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/system",
-    "${nlio_root}:nlio",
   ]
 
   allow_circular_includes_from = [
