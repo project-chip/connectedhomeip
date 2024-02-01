@@ -27,10 +27,6 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 
-#include <nlbyteorder.hpp>
-#include <nlio-byteorder.hpp>
-#include <nlio.hpp>
-
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
 using namespace chip::DeviceLayer::NetworkCommissioning;
