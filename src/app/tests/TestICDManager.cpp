@@ -198,7 +198,7 @@ public:
 
         // Set New durations for test case
         uint32_t oldActiveModeDuration_ms = icdConfigData.GetActiveModeDurationMs();
-        icdConfigData.SetModeDurations(MakeOptional(static_cast<uint32_t>(0)), Optional<uint32_t>::Missing());
+        icdConfigData.SetModeDurations(MakeOptional(static_cast<uint32_t>(0)), NullOptional);
 
         // Verify That ICDManager starts in Idle
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
@@ -256,7 +256,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Reset Old durations
-        icdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration_ms), Optional<uint32_t>::Missing());
+        icdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration_ms), NullOptional);
     }
 
     /**
@@ -277,7 +277,7 @@ public:
 
         // Set New durations for test case
         uint32_t oldActiveModeDuration_ms = icdConfigData.GetActiveModeDurationMs();
-        icdConfigData.SetModeDurations(MakeOptional(static_cast<uint32_t>(0)), Optional<uint32_t>::Missing());
+        icdConfigData.SetModeDurations(MakeOptional(static_cast<uint32_t>(0)), NullOptional);
 
         // Verify That ICDManager starts in Idle
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
@@ -346,7 +346,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Reset Old durations
-        icdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration_ms), Optional<uint32_t>::Missing());
+        icdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration_ms), NullOptional);
     }
 
     static void TestKeepActivemodeRequests(nlTestSuite * aSuite, void * aContext)
