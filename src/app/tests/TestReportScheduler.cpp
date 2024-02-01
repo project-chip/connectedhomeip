@@ -34,6 +34,10 @@ class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallbac
 public:
     void OnDone(chip::app::ReadHandler & apReadHandlerObj) override {}
     chip::app::ReadHandler::ApplicationCallback * GetAppCallback() override { return nullptr; }
+    chip::app::InteractionModelEngine * GetInteractionModelEngine() override
+    {
+        return chip::app::InteractionModelEngine::GetInstance();
+    }
 };
 
 } // namespace

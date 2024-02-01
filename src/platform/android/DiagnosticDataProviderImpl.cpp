@@ -97,9 +97,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT,
+                        ChipLogError(DeviceLayer, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
     VerifyOrExit(mDiagnosticDataProviderManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetNifMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
     {
         ChipLogProgress(DeviceLayer, "Received GetNetworkInterfaces");
         jobjectArray nifList = (jobjectArray) env->CallObjectMethod(mDiagnosticDataProviderManagerObject, mGetNifMethod);

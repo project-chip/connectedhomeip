@@ -149,7 +149,10 @@ source_set("verifymacros") {
 source_set("span") {
   sources = [ "Span.h" ]
 
-  public_deps = [ ":verifymacros" ]
+  public_deps = [
+    ":verifymacros",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("chip_version_header") {
@@ -254,6 +257,7 @@ static_library("support") {
     ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/platform:platform_config_header",
     "${chip_root}/src/system:system_config_header",
     "${nlassert_root}:nlassert",
