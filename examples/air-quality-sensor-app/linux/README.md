@@ -158,3 +158,9 @@ Generate event `CarbonMonoxideConcentrationMeasurement`, to change the CO value.
 ```
 $ echo '{"Name":"CarbonMonoxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
 ```
+
+Generate event `NitrogenDioxideConcentrationMeasurement`, to change the NO₂ value.
+
+```
+$ echo '{"Name":"NitrogenDioxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+```
