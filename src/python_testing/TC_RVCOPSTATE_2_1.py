@@ -25,6 +25,7 @@ from time import sleep
 
 wait_time = 0.5
 
+
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(*args)

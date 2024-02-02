@@ -15,15 +15,14 @@
 #    limitations under the License.
 #
 
+from mobly import asserts
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.clusters.Types import NullValue
+import chip.clusters as Clusters
 import logging
 from time import sleep
 
 wait_time = 0.5
-
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
-from mobly import asserts
 
 
 # Takes an OpState or RvcOpState state enum and returns a string representation

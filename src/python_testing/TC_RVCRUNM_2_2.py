@@ -112,7 +112,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                 asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
             self.app_pipe = self.app_pipe + str(app_pid)
 
-
         asserts.assert_true(self.check_pics("RVCRUNM.S"), "RVCRUNM.S must be supported")
         # I think that the following PICS should be listed in the preconditions section in the test plan as if either
         # of these PICS is not supported, this test would not be useful.

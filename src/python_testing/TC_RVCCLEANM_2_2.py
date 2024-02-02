@@ -22,6 +22,7 @@ from time import sleep
 
 wait_time = 0.5
 
+
 class TC_RVCCLEANM_2_2(MatterBaseTest):
 
     def __init__(self, *args):
@@ -94,7 +95,8 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
             self.write_to_app_pipe('{"Name": "Reset"}')
             sleep(wait_time)
 
-        self.print_step(2, "Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag.")
+        self.print_step(
+            2, "Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag.")
         if self.is_ci:
             await self.send_run_change_to_mode_cmd(1)
             sleep(wait_time)
