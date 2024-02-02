@@ -50,7 +50,6 @@ CHIP_CONTROLLER_SOURCES = [
 
 CHIP_READ_CLIENT_SOURCES = [
   "CHIPDeviceController.cpp",
-  "CHIPDeviceController.h",
   "CommissioningWindowOpener.cpp",
   "CommissioningWindowOpener.h",
   "CurrentFabricRemover.cpp",
@@ -77,7 +76,16 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
+    # TODO: these dependencies are borken. Specifically:
+    #       a) ChipDeviceControllerFactory.h includes CHIPDeviceController.h
+    #       b) CHIPDeviceController.cpp is only compiled for read_client
+    # These conditionals are NOT ok and should have been solved with separate
+    # source sets - either include some functionality or do not
+    #
+    # Unfortunately this is hard to fix in one go, hence these odd list of header-only
+    # dependencies
     "CHIPCluster.h",
+    "CHIPDeviceController.h",
     "CommandSenderAllocator.h",
     "InvokeInteraction.h",
     "ReadInteraction.h",
