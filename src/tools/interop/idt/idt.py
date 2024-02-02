@@ -74,7 +74,7 @@ class InteropDebuggingTool:
         if create_artifact_dir:
             safe_mkdir(self.artifact_dir)
             border_print(f"Using artifact dir {self.artifact_dir}")
-
+        # TODO: Make the choices readable
         self.advertise_device_type_choices = [int(i, 16) for i in MATTER_APPLICATION_DEVICE_TYPES.keys()]
 
         self.capture_platforms_choices = controller.list_available_platforms()
@@ -84,7 +84,7 @@ class InteropDebuggingTool:
         self.capture_ecosystems_default = "ALL"
         self.capture_ecosystems_choices.append(self.capture_ecosystems_default)
         self.capture_pcap_interfaces_choices = current_platform.get_interfaces_available_for_pcap()
-        # TODO: No None below
+        # TODO: No None for capture_pcap_interfaces_default
         self.capture_pcap_interfaces_default = "any" if "any" in self.capture_pcap_interfaces_choices else None
         self.capture_pcap_interface_required = self.capture_pcap_interfaces_default is None
         self.capture_pcap_wlan_channel_default, self.capture_pcap_wlan_width_default = current_platform. \

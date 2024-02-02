@@ -300,7 +300,7 @@ options:
     -   If the build script fails for you, try `idt_linux_install_compilers_for_arm_tcpdump`.
 -   You may disable colors and splash by setting `ENABLE_COLOR` in `config.py`
     to `False`.
--   `idt_child_clean` will kill any stray `tcpdump` and `adb` commands.
+-   `idt_child_kill` will kill any stray `tcpdump` and `adb` commands.
     -   `idt_child_check` will look for leftover processes.
     -   Not expected to be needed outside of development scenarios.
 
@@ -313,7 +313,7 @@ options:
 
 #### `advertise`
 
-- `advertise` re-uses the library used in discovery to produce dns-sd advertisements mimicking matter devices.
+- `advertise` re-uses the library used in discovery to produce DNS-SD advertisements mimicking matter devices.
 
 #### `capture`
 
@@ -342,10 +342,7 @@ options:
 
 #### `setup`
 
-- Contains setup implementations. The only requirement for a setup implementation is a class with a single method
-  (`setup`). 
-- The package itself (not implementations) is very minimal. It exists just to glue purpose built scripts 
-  (the setup implementation) to the main commandline args.
+- Contains setup implementations.
 
 ### `utils`
 
