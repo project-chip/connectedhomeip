@@ -250,6 +250,7 @@ namespace {
 #define BLE_SEND_INDICATION_TIMER_PERIOD_MS (10)
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
+TimerHandle_t sbleSendIndicationTimeoutTimer; // FreeRTOS sw timer.
 
 const uint8_t UUID_CHIPoBLEService[]       = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
                                                0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
@@ -289,6 +290,13 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                              // Just a text name, not used by the RTOS kernel
                                        pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD_MS), // == default timer period
+                                       false,                                      // no timer reload (==one-shot)
+                                       (void *) this,                              // init timer id = ble obj context
+                                       BleAdvTimeoutHandler                        // timer callback handler
+    );
+
+    sbleSendIndicationTimeoutTimer = xTimerCreate("SendIndicationTimer",                              // Just a text name, not used by the RTOS kernel
+                                       pdMS_TO_TICKS(BLE_SEND_INDICATION_TIMER_PERIOD_MS), // == default timer period
                                        false,                                      // no timer reload (==one-shot)
                                        (void *) this,                              // init timer id = ble obj context
                                        BleAdvTimeoutHandler                        // timer callback handler
@@ -466,12 +474,6 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return (conState != NULL) ? conState->mtu : 0;
 }
 
-void BLEManagerImpl::OnSendIndicationTimeout(System::Layer * aLayer, void * appState)
-{
-    BLEManagerImpl * pBLEManagerImpl = reinterpret_cast<BLEManagerImpl *>(appState);
-    pBLEManagerImpl->HandleSoftTimerEvent();
-}
-
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                     PacketBufferHandle data)
 {
@@ -479,8 +481,9 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
         status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
                                     data->Start());
     
-    // start timer for light indication confirmation. Long delay for spake2 indication
-    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(BLE_SEND_INDICATION_TIMER_PERIOD_MS), OnSendIndicationTimeout, this);
+    ChipLogProgress(DeviceLayer, "StartTimer start");
+    StartBleSendIndicationTimeoutTimer(BLE_SEND_INDICATION_TIMER_PERIOD_MS);
+    ChipLogProgress(DeviceLayer, "StartTimer Stop");
 
     if (status != RSI_SUCCESS)
     {
@@ -935,8 +938,8 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
-    DeviceLayer::SystemLayer().CancelTimer(OnSendIndicationTimeout, this);
     PlatformMgr().PostEventOrDie(&event);
+    CancelBleSendIndicationTimeoutTimer();
 }
 
 
@@ -1114,6 +1117,36 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
     // FreeRTOS- Block for a maximum of 100 ticks if the change period command
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(100)) != pdPASS)
+    {
+        ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
+    }
+}
+
+
+void BLEManagerImpl::BleSendIndicationTimeoutHandler(TimerHandle_t xTimer)
+{
+        sInstance.HandleSoftTimerEvent();
+}
+
+void BLEManagerImpl::CancelBleSendIndicationTimeoutTimer(void)
+{
+    if (xTimerStop(sbleSendIndicationTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    {
+        ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
+    }
+}
+
+void BLEManagerImpl::StartBleSendIndicationTimeoutTimer(uint32_t aTimeoutInMs)
+{
+    if (xTimerIsTimerActive(sbleSendIndicationTimeoutTimer))
+    {
+        CancelBleAdvTimeoutTimer();
+    }
+
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sbleSendIndicationTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(100)) != pdPASS)
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }

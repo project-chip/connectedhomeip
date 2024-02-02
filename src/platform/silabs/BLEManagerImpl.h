@@ -198,6 +198,9 @@ private:
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
     void HandleRXCharWrite(rsi_ble_event_write_t * evt);
+    void StartBleSendIndicationTimeoutTimer(uint32_t aTimeoutInMs);
+    void CancelBleSendIndicationTimeoutTimer(void);
+    static void BleSendIndicationTimeoutHandler(TimerHandle_t xTimer);
 #else
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
 #endif
@@ -209,12 +212,6 @@ private:
     static void DriveBLEState(intptr_t arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
-
-
- #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)   
-    protected:
-    static void OnSendIndicationTimeout(System::Layer * aLayer, void * appState);
-#endif
 };
 
 /**
