@@ -34,7 +34,6 @@ CHIP_CONTROLLER_SOURCES = [
   "CHIPDeviceControllerFactory.cpp",
   "CHIPDeviceControllerFactory.h",
   "CHIPDeviceControllerSystemState.h",
-  "CommandSenderAllocator.h",
   "CommissioneeDeviceProxy.cpp",
   "CommissioneeDeviceProxy.h",
   "CommissionerDiscoveryController.cpp",
@@ -45,13 +44,8 @@ CHIP_CONTROLLER_SOURCES = [
   "DevicePairingDelegate.h",
   "ExampleOperationalCredentialsIssuer.cpp",
   "ExampleOperationalCredentialsIssuer.h",
-  "InvokeInteraction.h",
-  "ReadInteraction.h",
   "SetUpCodePairer.cpp",
   "SetUpCodePairer.h",
-  "TypedCommandCallback.h",
-  "TypedReadCallback.h",
-  "WriteInteraction.h",
 ]
 
 CHIP_READ_CLIENT_SOURCES = [
@@ -82,7 +76,15 @@ source_set("delegates") {
 static_library("controller") {
   output_name = "libChipController"
 
-  sources = [ "CHIPCluster.h" ]
+  sources = [
+    "CHIPCluster.h",
+    "CommandSenderAllocator.h",
+    "InvokeInteraction.h",
+    "ReadInteraction.h",
+    "TypedCommandCallback.h",
+    "TypedReadCallback.h",
+    "WriteInteraction.h",
+  ]
 
   if (chip_controller && chip_build_controller) {
     sources += CHIP_CONTROLLER_SOURCES
