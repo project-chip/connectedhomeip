@@ -76,8 +76,9 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi:
 
 ## Thread
 
-Thread captures require a compatible development kit. The thread implementation in this
-tool currently targets the `Maker Diary nrf52840 Micro Development Kit` (NOT the dongle version).
+Thread captures require a compatible development kit. The thread implementation
+in this tool currently targets the `Maker Diary nrf52840 Micro Development Kit`
+(NOT the dongle version).
 
 ## Raspberry Pi installation
 
