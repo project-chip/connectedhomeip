@@ -68,8 +68,7 @@ Timestamp ClockBase::GetMonotonicTimestamp()
     // it by widening the #ifdefs later.
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
     uint64_t prevTimestamp = __atomic_load_n(&mLastTimestamp, __ATOMIC_SEQ_CST);
-    static_assert(sizeof(prevTimestamp) == sizeof(Timestamp),
-                  "Must have scalar match between timestamp and uint64_t for atomics.");
+    static_assert(sizeof(prevTimestamp) == sizeof(Timestamp), "Must have scalar match between timestamp and uint64_t for atomics.");
 
     // Force a reorder barrier to prevent GetMonotonicMilliseconds64() from being
     // optimizer-called before prevTimestamp loading, so that newTimestamp acquisition happens-after
@@ -89,7 +88,7 @@ Timestamp ClockBase::GetMonotonicTimestamp()
     // newTimestamp guaranteed to never be < the last timestamp.
     __atomic_store_n(&mLastTimestamp, newTimestamp.count(), __ATOMIC_SEQ_CST);
 #else
-    mLastTimestamp = newTimestamp.count();
+    mLastTimestamp         = newTimestamp.count();
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
 
     return newTimestamp;
