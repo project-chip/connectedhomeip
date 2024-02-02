@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/icd/ICDMonitoringTable.h>
+#include <app/icd/server/ICDMonitoringTable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
