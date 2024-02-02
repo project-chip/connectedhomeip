@@ -23,7 +23,7 @@ else
         source idt/venv/bin/activate
         pip install -r idt/requirements.txt
     else
-      echo "Failed to created venv"
-      idt_clean_all
+        echo "Failed to created venv"
+        idt_clean_all
     fi
 fi

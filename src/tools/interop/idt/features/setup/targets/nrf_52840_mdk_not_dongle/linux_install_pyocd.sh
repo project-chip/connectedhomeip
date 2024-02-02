@@ -22,7 +22,8 @@ set -e
 # as instructed by the reference above, to support RPi
 # TODO: Script to auto update this file based on input version
 pip install --no-deps pyocd==0.36.0
-requirements=$(cat <<-END
+requirements=$(
+    cat <<-END
 capstone>=4.0,<5.0
 colorama<1.0
 importlib_metadata>=3.6
@@ -43,7 +44,7 @@ END
 
 )
 
-echo "$requirements" > linux_pyocd_requirements.txt
+echo "$requirements" >linux_pyocd_requirements.txt
 pip install -r linux_pyocd_requirements.txt
 
 # Reference https://pyocd.io/docs/installing#udev-rules-on-linux
