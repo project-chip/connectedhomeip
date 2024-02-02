@@ -26,26 +26,18 @@ source_set("nodatamodel") {
 
 CHIP_CONTROLLER_SOURCES = [
   "AbstractDnssdDiscoveryController.cpp",
-  "AbstractDnssdDiscoveryController.h",
   "AutoCommissioner.cpp",
-  "AutoCommissioner.h",
   "CHIPCommissionableNodeController.cpp",
   "CHIPCommissionableNodeController.h",
   "CHIPDeviceControllerFactory.cpp",
   "CHIPDeviceControllerFactory.h",
-  "CHIPDeviceControllerSystemState.h",
   "CommissioneeDeviceProxy.cpp",
-  "CommissioneeDeviceProxy.h",
   "CommissionerDiscoveryController.cpp",
   "CommissionerDiscoveryController.h",
   "CommissioningDelegate.cpp",
-  "CommissioningDelegate.h",
-  "DeviceDiscoveryDelegate.h",
-  "DevicePairingDelegate.h",
   "ExampleOperationalCredentialsIssuer.cpp",
   "ExampleOperationalCredentialsIssuer.h",
   "SetUpCodePairer.cpp",
-  "SetUpCodePairer.h",
 ]
 
 CHIP_READ_CLIENT_SOURCES = [
@@ -82,13 +74,24 @@ static_library("controller") {
     # These conditionals are NOT ok and should have been solved with separate
     # source sets - either include some functionality or do not
     #
+    # Then CHIPDeviceController.h pulls in AbstractDnssdDiscoveryController and everything
+    # cascades. In the end it looks like basically every header file is pulled in.
+    #
     # Unfortunately this is hard to fix in one go, hence these odd list of header-only
     # dependencies
+    "AbstractDnssdDiscoveryController.h",
+    "AutoCommissioner.h",
     "CHIPCluster.h",
     "CHIPDeviceController.h",
+    "CHIPDeviceControllerSystemState.h",
     "CommandSenderAllocator.h",
+    "CommissioneeDeviceProxy.h",
+    "CommissioningDelegate.h",
+    "DeviceDiscoveryDelegate.h",
+    "DevicePairingDelegate.h",
     "InvokeInteraction.h",
     "ReadInteraction.h",
+    "SetUpCodePairer.h",
     "TypedCommandCallback.h",
     "TypedReadCallback.h",
     "WriteInteraction.h",
