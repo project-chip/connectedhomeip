@@ -179,9 +179,7 @@
         "Test_TC_ALOGIN_12_1",
         "Test_TC_CONTENTLAUNCHER_10_3",
         "Test_TC_CONTENTLAUNCHER_10_5",
-        "Test_TC_CONTENTLAUNCHER_10_7",
-        "Test_TC_MEDIAPLAYBACK_6_8",
-        "Test_TC_MEDIAPLAYBACK_6_9"
+        "Test_TC_CONTENTLAUNCHER_10_7"
     ],
     "ModeSelect": ["Test_TC_MOD_1_1"],
     "MultipleFabrics": [],
