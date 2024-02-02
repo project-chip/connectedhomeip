@@ -24,13 +24,7 @@ source_set("nodatamodel") {
   public_deps = [ "${chip_root}/src/app" ]
 }
 
-static_library("controller") {
-  output_name = "libChipController"
-
-  sources = [ "CHIPCluster.h" ]
-
-  if (chip_controller && chip_build_controller) {
-    sources += [
+CHIP_CONTROLLER_SOURCES = [
       "AbstractDnssdDiscoveryController.cpp",
       "AbstractDnssdDiscoveryController.h",
       "AutoCommissioner.cpp",
@@ -49,26 +43,51 @@ static_library("controller") {
       "CommissioningDelegate.h",
       "DeviceDiscoveryDelegate.h",
       "DevicePairingDelegate.h",
-      "ExampleOperationalCredentialsIssuer.cpp",
-      "ExampleOperationalCredentialsIssuer.h",
-      "InvokeInteraction.h",
-      "OperationalCredentialsDelegate.h",
-      "ReadInteraction.h",
-      "SetUpCodePairer.cpp",
-      "SetUpCodePairer.h",
-      "TypedCommandCallback.h",
-      "TypedReadCallback.h",
-      "WriteInteraction.h",
-    ]
+  "ExampleOperationalCredentialsIssuer.cpp",
+  "ExampleOperationalCredentialsIssuer.h",
+  "InvokeInteraction.h",
+  "ReadInteraction.h",
+  "SetUpCodePairer.cpp",
+  "SetUpCodePairer.h",
+  "TypedCommandCallback.h",
+  "TypedReadCallback.h",
+  "WriteInteraction.h",
+]
+
+CHIP_READ_CLIENT_SOURCES = [
+  "CHIPDeviceController.cpp",
+  "CHIPDeviceController.h",
+  "CommissioningWindowOpener.cpp",
+  "CommissioningWindowOpener.h",
+  "CurrentFabricRemover.cpp",
+  "CurrentFabricRemover.h",
+]
+
+# This source set exists specifically to deny including them without dependencies
+# if "controller" sources do not contain them
+#
+# They are NOT intended to be used directly
+source_set("compile_check_chip_controller_sources") {
+  sources = CHIP_CONTROLLER_SOURCES
+}
+
+source_set("compile_check_chip_read_client_sources") {
+  sources = CHIP_READ_CLIENT_SOURCES
+}
+
+source_set("delegates") {
+  sources = ["OperationalCredentialsDelegate.h"]
+}
+
+static_library("controller") {
+  output_name = "libChipController"
+
+  sources = [ "CHIPCluster.h" ]
+
+  if (chip_controller && chip_build_controller) {
+    sources += CHIP_CONTROLLER_SOURCES
     if (chip_enable_read_client) {
-      sources += [
-        "CHIPDeviceController.cpp",
-        "CHIPDeviceController.h",
-        "CommissioningWindowOpener.cpp",
-        "CommissioningWindowOpener.h",
-        "CurrentFabricRemover.cpp",
-        "CurrentFabricRemover.h",
-      ]
+      sources += CHIP_READ_CLIENT_SOURCES
     }
   }
 
