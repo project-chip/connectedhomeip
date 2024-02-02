@@ -325,3 +325,10 @@ void RvcDevice::HandleClearErrorMessage()
     mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
     SetDeviceToIdleState();
 }
+
+void RvcDevice::HandleResetMessage()
+{
+    mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
+    mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    mCleanModeInstance.UpdateCurrentMode(RvcCleanMode::ModeQuick);
+}

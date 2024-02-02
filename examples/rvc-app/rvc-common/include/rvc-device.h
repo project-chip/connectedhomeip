@@ -111,6 +111,8 @@ public:
     void HandleErrorEvent(const std::string & error);
 
     void HandleClearErrorMessage();
+
+    void HandleResetMessage();
 };
 
 } // namespace Clusters
