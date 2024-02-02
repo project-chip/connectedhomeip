@@ -1317,6 +1317,8 @@ public class ChipDeviceController {
     shutdownCommissioning(deviceControllerPtr);
   }
 
+  public static native byte[] validateAndExtractCSR(byte[] csrElements, byte[] csrNonce);
+
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
 
