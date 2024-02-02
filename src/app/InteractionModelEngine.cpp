@@ -402,6 +402,8 @@ void InteractionModelEngine::TryToResumeSubscriptions()
         mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
             System::Clock::Seconds32(timeTillNextSubscriptionResumptionSecs), ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
+        ChipLogProgress(InteractionModel, "Schedule subscription resumption when failing to establish session, Retries: %" PRIu32,
+                        mNumSubscriptionResumptionRetries);
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 }
@@ -1997,7 +1999,7 @@ uint32_t InteractionModelEngine::ComputeTimeSecondsTillNextSubscriptionResumptio
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     if (mSubscriptionResumptionRetrySecondsOverride > 0)
     {
-        return mSubscriptionResumptionRetrySecondsOverride;
+        return static_cast<uint32_t>(mSubscriptionResumptionRetrySecondsOverride);
     }
 #endif
     if (mNumSubscriptionResumptionRetries > CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)

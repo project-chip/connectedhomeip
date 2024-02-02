@@ -145,8 +145,6 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
     VerifyOrReturn(record);
     record->mSubscriptionId          = subscriptionInfo.mSubscriptionId;
     record->mSessionEstablishRetries = record->mSessionEstablishRetries == UINT16_MAX ? 1 : record->mSessionEstablishRetries + 1;
-    ChipLogProgress(DataManagement, "Schedule subscription resumption when failing to establish session, Retries: %" PRId16,
-                    record->mSessionEstablishRetries);
     InteractionModelEngine::GetInstance()->TryToResumeSubscriptions();
     if (record->mSessionEstablishRetries > CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)
     {
