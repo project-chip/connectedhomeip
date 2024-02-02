@@ -53,7 +53,7 @@ pw_python_package("build_examples") {
     "builders/host.py",
     "builders/imx.py",
     "builders/infineon.py",
-    "builders/k32w.py",
+    "builders/nxp/builder.py",
     "builders/mbed.py",
     "builders/mw320.py",
     "builders/nrf.py",
