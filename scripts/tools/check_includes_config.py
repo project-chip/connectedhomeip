@@ -158,7 +158,7 @@ ALLOW: Dict[str, Set[str]] = {
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
-    'src/tracing/json/json_tracing.h': {'fstream'},
+    'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map'},
 
     # Not intended for embedded clients
     'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream'},
