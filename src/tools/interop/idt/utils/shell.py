@@ -122,7 +122,7 @@ class Bash:
         # subshell if redirect is present; otherwise just compare the first arg of self.command
         command_recycled = \
             currently_running_command == "/bin/bash" or currently_running_command == "bash" if ">" in self.command else \
-                currently_running_command == self.command.split(" ")[0]
+            currently_running_command == self.command.split(" ")[0]
         self.logger.debug(f"Found {currently_running_command} Expected {self.command}")
         return command_recycled, currently_running_command
 

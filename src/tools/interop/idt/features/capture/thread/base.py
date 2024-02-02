@@ -30,4 +30,3 @@ class ThreadCapture(ABC):
     @abstractmethod
     def stop(self) -> None:
         raise NotImplementedError
-

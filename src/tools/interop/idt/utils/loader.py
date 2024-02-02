@@ -77,8 +77,8 @@ class CaptureImplsLoader:
                 actual_signature = inspect.signature(getattr(subclass, item))
                 if expected_signature != actual_signature:
                     self.logger.error(f"Invalid signature in {subclass}.{item}().\n"
-                                        f"Expected {expected_signature}\n"
-                                        f"Actual   {actual_signature}\n")
+                                      f"Expected {expected_signature}\n"
+                                      f"Actual   {actual_signature}\n")
                     arguments_match = False
         return arguments_match
 

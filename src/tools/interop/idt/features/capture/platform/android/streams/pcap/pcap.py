@@ -95,7 +95,7 @@ class AndroidPcap(AndroidStream):
         if not self.platform.run_adb_command(f"shell ls {self.target_output_dir}/tcpdump").finished_success():
             self.logger.warning("Pushing tcpdump to device")
             push_command = self.platform.run_adb_command(
-                    f"push {os.path.join(self.build_dir, 'tcpdump')} f{self.target_output_dir}")
+                f"push {os.path.join(self.build_dir, 'tcpdump')} f{self.target_output_dir}")
             chmod_command = self.platform.run_adb_command(f"chmod +x {self.target_output_dir}/tcpdump")
             if not push_command.finished_success() or not chmod_command.finished_success():
                 self.logger.error("Failed to push tcp dump!")

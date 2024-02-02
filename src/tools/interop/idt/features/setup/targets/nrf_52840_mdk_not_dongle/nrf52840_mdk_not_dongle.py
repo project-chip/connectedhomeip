@@ -120,4 +120,3 @@ class Nrf52840MdkNotDongle(Setup):
         else:
             self.logger.info(f"Build already found in {self.build_dir}; skipping!")
             self._flash()
-

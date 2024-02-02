@@ -53,7 +53,7 @@ class PlayServicesAnalysis(PrescriptiveTextAnalysis, TextAnalysisObserver):
                                     "matter_commissioner_logs",
                                     "End device discovered via DNS-SD, but session handshake failed! Try $ idt probe",
                                     []),
-                      ])
+            ])
         ]
         PrescriptiveTextAnalysis.__init__(self, causes, self.output_file_name, logger)
 
