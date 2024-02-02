@@ -22,15 +22,15 @@ from termcolor import colored
 
 import config
 
-_CONFIG_LEVEL = config.log_level
+_CONFIG_LEVEL = config.LOG_LEVEL
 
-_FORMAT_PRE_FSTRING = "%(asctime)s %(levelname)s {%(module)s} [%(funcName)s] "
-_FORMAT_PRE = colored(_FORMAT_PRE_FSTRING, "blue") if config.enable_color else _FORMAT_PRE_FSTRING
+_FORMAT_PRE_FSTRING = "%(asctime)s %(levelname)s {%(module)s} [%(funcName)s] " if config.DEBUG else "%(asctime)s "
+_FORMAT_PRE = colored(_FORMAT_PRE_FSTRING, "blue") if config.ENABLE_COLOR else _FORMAT_PRE_FSTRING
 _FORMAT_POST = "%(message)s"
 _FORMAT_NO_COLOR = _FORMAT_PRE_FSTRING+_FORMAT_POST
 
 FORMATS = {
-    logging.DEBUG: _FORMAT_PRE + colored(_FORMAT_POST, "blue"),
+    logging.DEBUG: _FORMAT_PRE + colored(_FORMAT_POST, "cyan"),
     logging.INFO: _FORMAT_PRE + colored(_FORMAT_POST, "green"),
     logging.WARNING: _FORMAT_PRE + colored(_FORMAT_POST, "yellow"),
     logging.ERROR: _FORMAT_PRE + colored(_FORMAT_POST, "red", attrs=["bold"]),
@@ -41,7 +41,7 @@ FORMATS = {
 class LoggingFormatter(logging.Formatter):
 
     def format(self, record):
-        log_fmt = FORMATS.get(record.levelno) if config.enable_color else _FORMAT_NO_COLOR
+        log_fmt = FORMATS.get(record.levelno) if config.ENABLE_COLOR else _FORMAT_NO_COLOR
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
@@ -62,13 +62,15 @@ def border_print(to_print: str, important: bool = False) -> None:
     border = f"\n{'_' * len_borders}\n"
     i_border = f"\n{'!' * len_borders}\n" if important else ""
     to_print = f"{border}{i_border}{to_print}{i_border}{border}"
-    if config.enable_color:
+    if config.ENABLE_COLOR:
         to_print = colored(to_print, "magenta")
     print(to_print)
 
 
-def print_and_write(to_print: str, file: TextIO) -> None:
-    if config.enable_color:
+def print_and_write(to_print: str, file: TextIO, important: bool = False) -> None:
+    if config.ENABLE_COLOR and important:
+        print(colored(to_print, "red", attrs=["bold"]))
+    elif config.ENABLE_COLOR:
         print(colored(to_print, "green"))
     else:
         print(to_print)

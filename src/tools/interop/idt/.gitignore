@@ -8,3 +8,5 @@ pycache/
 venv/
 .zip
 BUILD
+BUILD_LOG.txt
+prober_urls.txt

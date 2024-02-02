@@ -15,12 +15,12 @@
 #    limitations under the License.
 #
 
-from capture.base import EcosystemCapture
+from features.capture.base import EcosystemCapture, PlatformLogStreamer
 
 
 class DemoExtEcosystem(EcosystemCapture):
 
-    def __init__(self, platform, artifact_dir: str) -> None:
+    def __init__(self, platform: PlatformLogStreamer, artifact_dir: str) -> None:
         self.artifact_dir = artifact_dir
         self.platform = platform
         self.message = "in the demo external ecosystem"
@@ -32,4 +32,4 @@ class DemoExtEcosystem(EcosystemCapture):
         print("Stop capture " + self.message)
 
     async def analyze_capture(self) -> None:
-        print("Analyze capture " + self.message)
+        print("Analyze capture real time" + self.message)

@@ -15,11 +15,11 @@
 #    limitations under the License.
 #
 
-from . import artifact, host_platform, log, shell
+from . import artifact, host, log, shell
 
 __all__ = [
     'artifact',
-    'host_platform',
+    'host',
     'log',
     'shell',
 ]

@@ -29,11 +29,27 @@ issue uncovered via the manual test. Each ecosystem may implement an analysis
 that analyzes capture data, displays info to the user, probes the local
 environment and generates additional artifacts.
 
+### Other functions
+
+#### Advertise
+
+Create fake advertisements for Matter devices, useful in controller testing.
+
+#### Probe
+
+Collect basic networking info from the environment, e.g. resolve and ping all matter devices.
+
+#### Setup
+
+Provides ready-made setup scripts for specific, one-time build / installation tasks, e.g. setting up a devkit as a 
+thread sniffer.
+
 ## Single host installation (no Raspberry Pi)
 
-All features of `idt` are available on macOS and Linux (tested with Debian based
-systems).  
-If you would prefer to execute capture and discovery from a Raspberry Pi, read
+`idt` can be run on both macOS and Linux (tested with Debian based systems).  
+See the feature map section at the bottom of this page for details on feature support by host platform.
+
+If you prefer to execute capture and discovery from a Raspberry Pi, read
 the next section instead.
 
 The machine running `idt` should be connected to the same Wi-Fi network used for
@@ -55,6 +71,11 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi:
         -   A single `abort` message and no further output in the terminal.
         -   Failure with a relevant stack trace in the terminal.
         -   A prompt to allow the application access to bluetooth.
+
+## Thread
+
+Thread captures require a compatible devkit. 
+The thread implementation in this tool currently targets the `Maker Diary nrf52840-MDK` (NOT the dongle version).
 
 ## Raspberry Pi installation
 
@@ -148,35 +169,21 @@ This directory contains tools for use on both the admin computer and the RPi.
     cd ~                               # Go to idt parent dir
     source idt/scripts/setup_shell.sh  # Setup atuo aliases
     source idt/scripts/alias.sh        # Get aliases now
-    idt_bootstrap                      # Initial configuration
-    idt_build                          # Build the container image
     ```
 
-### Install updates
-
-SCP may not overwrite all files. To clear the `idt` dir off of the RPi safely
-between pushes, exit the container and:
-
-```
-idt_clean
-```
-
-NOTE the idt artifacts directory is contained in idt, so running this will
-delete any artifacts.
-
-Then from the admin computer:
-
-```
-idt_push
-```
+[TODO] Drop docker and audit native installation instructions
 
 ## User guide
 
 > **_IMPORTANT_**  
 > `idt_` commands are shell aliases helpful for administrative commands.  
-> `idt` invokes the `idt` python package.  
+> `idt` invokes the `idt` python package.
+> 
 > Output from `idt` will generally be colorized while output from sub processes
 > is generally not.
+> 
+> Each command will produce artifacts in a new directory within `idt/IDT_ARTIFACTS` and display the archive path 
+> at the end of execution.
 
 RPi users, as needed:
 
@@ -184,10 +191,6 @@ RPi users, as needed:
 -   Other users reconnect `ssh` to the RPi (from your admin computer):
     ```
     idt_connect
-    ```
--   Run the `idt` container (from the RPi):
-    ```
-    idt_activate
     ```
 
 ### Capture
@@ -197,20 +200,28 @@ RPi users, as needed:
 > enter to stop!" before launching the app under test.
 
 ```
-idt capture -h
-
-usage: idt capture [-h] [--platform {Android}] [--ecosystem {PlayServicesUser,PlayServices,ALL}] [--pcap {t,f}] [--interface {wlp0s20f3,lo,docker0,any}]
+usage: idt capture [-h] [--platform {Android}] [--ecosystem {PlayServices,PlayServicesUser,ALL}] [--pcap {t,f}] [--interface {any}] [--monitor {t,f}] [--channel CHANNEL] [--band {2,5}] [--width WIDTH] [--thread {none,sniff,on_network}]
 
 options:
   -h, --help            show this help message and exit
   --platform {Android}, -p {Android}
                         Run capture for a particular platform (default Android)
-  --ecosystem {PlayServicesUser,PlayServices,ALL}, -e {PlayServicesUser,PlayServices,ALL}
+  --ecosystem {PlayServices,PlayServicesUser,ALL}, -e {PlayServices,PlayServicesUser,ALL}
                         Run capture for a particular ecosystem or ALL ecosystems (default ALL)
   --pcap {t,f}, -c {t,f}
                         Run packet capture (default t)
-  --interface {wlp0s20f3,lo,docker0,any}, -i {wlp0s20f3,lo,docker0,any}
+  --interface {any}, -i {any}
                         Specify packet capture interface (default any)
+  --monitor {t,f}, -m {t,f}
+                        Run packet capture using a monitor mode interface (default f)
+  --channel CHANNEL, -n CHANNEL
+                        Use this Wi-Fi channel if in monitor mode (default 1)
+  --band {2,5}, -b {2,5}
+                        Use 2 for 2.4GHz, 5 for 5GHz (default 2)
+  --width WIDTH, -w WIDTH
+                        Optionally set the channel width of a monitor mode pcap (default None)
+  --thread {none,sniff,on_network}, -t {none,sniff,on_network}
+                        Execute thread sniffer or join OTBR to network (Default none)
 ```
 
 For packet capture interface (`-i`/`--interface`:
@@ -219,40 +230,46 @@ For packet capture interface (`-i`/`--interface`:
 -   On Linux, `idt` checks available interfaces from `/sys/class/net/` as well
     as allowing `any`.
 
-#### Artifacts
-
-Each ecosystem and platform involved in the capture will have their own
-subdirectory in the root artifact dir.
-
 ### Discovery
 
 ```
-idt discover -h
-
-usage: idt discover [-h] --type {ble,b,dnssd,d}
+usage: idt discover [-h] --type {ble,b,dnssd,d} [--vid VID] [--pid PID] [--v4 {t,f}] [--v6 {t,f}]
 
 options:
   -h, --help            show this help message and exit
   --type {ble,b,dnssd,d}, -t {ble,b,dnssd,d}
                         Specify the type of discovery to execute
+  --vid VID, -v VID     Only display advertisements with this Vendor ID. Hex values (without 0x prefix) are expected. Eg FFF1
+  --pid PID, -p PID     If vid argument is set, filter advertisements by this Product ID as well. Hex values (without 0x prefix) are expected. Eg 8000
+  --v4 {t,f}, -4 {t,f}  Whether to browse on IPv4 or not (Default t)
+  --v6 {t,f}, -6 {t,f}  Whether to browse on IPv6 or not (Default t)
 ```
 
-#### BLE
+### Advertise
 
 ```
-idt discover -t b
+usage: idt advertise [-h] [--vid VID] [--pid PID] [--discriminator DISCRIMINATOR] [--device_name DEVICE_NAME] [--device_type {256,257,268,269,266,267,771,259,260,261,2112,772,15,21,262,263,770,773,774,775,2128,10,11,514,515,768,769,43,40,35,34,36,41,42,39}] [--port PORT] [--commissioning_open {t,f}] [--mac_address MAC_ADDRESS] [--allow_gua {t,f}] --type {ble,b,dnssd,d}
+
+options:
+  -h, --help            show this help message and exit
+  --vid VID, -v VID     Vendor ID to use in the advertisement (int, default: 65521)
+  --pid PID, -p PID     Product ID to use in the advertisement (int, default: 32768)
+  --discriminator DISCRIMINATOR, -i DISCRIMINATOR
+                        Discriminator to use in the advertisement (int, default: 10)
+  --device_name DEVICE_NAME, -n DEVICE_NAME
+                        Device name to be used in the advertisement (str, default: IDT fake device)
+  --device_type {256,257,268,269,266,267,771,259,260,261,2112,772,15,21,262,263,770,773,774,775,2128,10,11,514,515,768,769,43,40,35,34,36,41,42,39}, -d {256,257,268,269,266,267,771,259,260,261,2112,772,15,21,262,263,770,773,774,775,2128,10,11,514,515,768,769,43,40,35,34,36,41,42,39}
+                        Device type to be used in the advertisement (int, default: 770)
+  --port PORT, -o PORT  The port that this device is reachable on (int, default: 5540)
+  --commissioning_open {t,f}, -c {t,f}
+                        Whether commissioning window is open or not (default: t)
+  --mac_address MAC_ADDRESS, -m MAC_ADDRESS
+                        MAC Address to use for the instance name in this advertisement (str, default: A683E7C1029A)
+  --allow_gua {t,f}, -g {t,f}
+                        Whether DNS-SD advertisements should include GUAs (if they're available on the host)(default: f)
+  --type {ble,b,dnssd,d}, -t {ble,b,dnssd,d}
+                        Specify the type of advertisement to create
 ```
-
-#### mDNS
-
-```
-idt discover -t d
-```
-
-#### Artifacts
-
-There is a per device log in `ble` and `dnssd` subdirectory of the root artifact
-dir.
 
 ### Probe
 
@@ -263,47 +280,59 @@ options:
   -h, --help  show this help message and exit
 ```
 
-Collect contextually relevant networking info from the local environment and
-provide artifacts.
+### Setup
+
+```
+usage: idt setup [-h] --target {Nrf52840MdkNotDongle}
+
+options:
+  -h, --help            show this help message and exit
+  --target {Nrf52840MdkNotDongle}, -t {Nrf52840MdkNotDongle}
+                        The target to setup
+```
 
 ## Troubleshooting
 
 -   Wireless `adb` may fail to connect indefinitely depending on network
     configuration. Use a wired connection if wireless fails repeatedly.
--   Change log level from `INFO` to `DEBUG` in root `config.py` for additional
-    logging.
+-   Set `DEBUG=True` in the root `config.py` for additional logging.
 -   Compiling `tcpdump` for android may require additional dependencies.
-    -   If the build script fails for you, try
-        `idt_go && source idt/scripts/compilers.sh`.
--   You may disable colors and splash by setting `enable_color` in `config.py`
+    -   If the build script fails for you, try `idt_linux_install_compilers_for_arm_tcpdump`.
+-   You may disable colors and splash by setting `ENABLE_COLOR` in `config.py`
     to `False`.
--   `idt_clean_child` will kill any stray `tcpdump` and `adb` commands.
-    -   `idt_check_child` will look for leftover processes.
+-   `idt_child_clean` will kill any stray `tcpdump` and `adb` commands.
+    -   `idt_child_check` will look for leftover processes.
     -   Not expected to be needed outside of development scenarios.
 
 ## Project overview
 
--   The entry point is in `idt.py` which contains simple CLI parsing with
+-   The entry point of each feature is in `idt.py` which contains simple CLI parsing with
     `argparse`.
 
-### `capture`
+### Features
+
+#### `advertise`
+
+- `advertise` re-uses the library used in discovery to produce dns-sd advertisements mimicking matter devices.
+
+#### `capture`
 
 -   `base` contains the base classes for ecosystems and platforms.
--   `controller` contains the ecosystem and platform producer and controller
--   `loader` is a generic class loader that dynamically imports classes matching
-    a given super class from a given directory.
+-   `controller` manages platform and ecosystem implementations at run time.
 -   `/platform` and `/ecosystem` contain one package for each platform and
     ecosystem, which should each contain one implementation of the respective
     base class.
+-   `pcap` contains the implementation for pcaps on the idt host.
+-   `thread` contains the implementation for thread captures on the idt host.
 
-### `discovery`
+#### `discovery`
 
--   `matter_ble` provides a simple ble scanner that shows matter devices being
+-   `ble` provides a simple ble scanner that shows matter devices being
     discovered and lost, as well as their VID/PID, RSSI, etc.
--   `matter_dnssd` provides a simple DNS-SD browser that searches for matter
+-   `dnssd` provides a simple DNS-SD browser that searches for matter
     devices and thread border routers.
 
-### `probe`
+#### `probe`
 
 -   `probe` contains the base class for (`idt`'s) host platform specific
     implementation.
@@ -311,25 +340,36 @@ provide artifacts.
     -   Calls platform + addr type specific probe methods for each target.
 -   `linux` and `mac` contain `probe` implementations for each host platform.
 
+#### `setup`
+
+- Contains setup implementations. The only requirement for a setup implementation is a class with a single method
+  (`setup`). 
+- The package itself (not implementations) is very minimal. It exists just to glue purpose built scripts 
+  (the setup implementation) to the main commandline args.
+
 ### `utils`
 
--   `log` contains logging utilities used by everything in the project.
--   `artifact` contains helper functions for managing artifacts.
--   `shell` contains a simple helper class for background and foreground Bash
-    commands.
--   `host_platform` contains helper functions for the interacting with the host
-    running `idt`.
+
+- `host` contains helper functions for interacting with the host
+   running `idt`.
+- `analysis` contains utilities for simple causal analysis of text based logs.
+- `artifact` contains helper functions for managing artifacts.
+- `data` contains metadat e.g. matter device type map  
+- `error` contains facilities for error reporting.
+- `loader` is a generic class loader that dynamically imports classes matching
+  a given super class from a given directory.
+- `log` contains logging utilities.
+- `net` contains utility functions for networking topics like ip addr type.
+- `shell` contains a simple helper class for background and foreground Bash
+  commands.
 
 ### Conventions
 
--   `config.py` should be used to hold development configs within the directory
-    where they are needed.
-    -   It may also hold configs for flaky/cumbersome features that might need
-        to be disabled in an emergency.
-    -   `config.py` **should not** be used for everyday operation.
+-   List host dependencies and their help text and download links in the respective array in the root `config.py`.
+-   Users should not need to modify source files as part of any regular operation of the tool (e.g. modifying any
+    `config.py` should not be required). Use commandline args for runtime options.
 -   When needed, execute builds in a folder called `BUILD` within the source
     tree.
-    -   `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
 
 ## Extending functionality
 
@@ -340,7 +380,7 @@ Ecosystem and Platform implementations are dynamically loaded.
 For each package in `capture/ecosystem`, the ecosystem loader expects a module
 name matching the package name.  
 This module must contain a single class which is a subclass of
-`capture.base.EcosystemCapture`.
+`capture.base.EcosystemCapture` with matching function signatures and coroutines.
 
 `/capture/ecosystem/play_services_user` contains a minimal example
 implementation.
@@ -363,3 +403,33 @@ For each package in `capture/platform`, the platform loader expects a module
 name matching the package name.  
 This module must contain a single class which is a subclass of
 `capture.base.PlatformLogStreamer`.
+
+The loader is also used elsewhere in the project.
+
+## Feature map
+
+| Icon               | Meaning              |
+|--------------------|----------------------|
+| :white_check_mark: | Supported            |
+| :x:                | Not (/yet) supported |
+
+| Feature   | Function                                | Linux              | MacOS              | Note                  |
+|-----------|-----------------------------------------|--------------------|--------------------|-----------------------|
+| Advertise | DNS-SD                                  | :white_check_mark: | :white_check_mark: |                       |
+| Advertise | BLE                                     | :x:                | :x:                | Not implemented       |
+| Capture   | Android: logcat collection and analysis | :white_check_mark: | :white_check_mark: |                       |
+| Capture   | Android: screen recording               | :white_check_mark: | :white_check_mark: |                       |
+| Capture   | Android: packet capture                 | :white_check_mark: | :white_check_mark: | Requires rooted phone |
+| Capture   | PCAP: Managed mode on `idt` host        | :white_check_mark: | :white_check_mark: |                       |
+| Capture   | PCAP: Monitor mode on `idt` host        | :white_check_mark: | :white_check_mark: |                       |
+| Capture   | Thread: Execute sniffer capture         | :white_check_mark: | :x:                | Requires ncp + setup  |
+| Capture   | Thread: Execute on-network capture      | :x:                | :x:                | Not implemented       |
+| Discovery | BLE                                     | :white_check_mark: | :white_check_mark: |                       |
+| Discovery | DNS-SD                                  | :white_check_mark: | :white_check_mark: |                       |
+| Probe     | Resolve and ping                        | :white_check_mark: | :white_check_mark: |                       |
+
+### Setup support
+
+| Target               | Supports             | Linux              | MacOS | Description                         |
+|----------------------|----------------------|--------------------|-------|-------------------------------------|
+| Nrf52840MdkNotDongle | capture.thread.sniff | :white_check_mark: | :x:   | Setup thread sniffer on Nrf52840MDK |

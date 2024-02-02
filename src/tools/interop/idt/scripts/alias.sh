@@ -15,6 +15,9 @@
 #    limitations under the License.
 #
 
+# The IDT installation directory is located via relative path to this file.
+# Different shells offer different facilities for checking the path of a sourced file at run time,
+# so we have different configs here accordingly.
 if [[ $SHELL == "/bin/zsh" ]]; then
     echo "idt using zsh config"
     export IDT_SRC_PARENT="$(dirname "$0")/../.."
@@ -23,30 +26,38 @@ else
     export IDT_SRC_PARENT="$(dirname "${BASH_SOURCE[0]:-$0}")/../.."
 fi
 
+# Make sure these are setup before anything else runs
 export IDT_OUTPUT_DIR="IDT_ARTIFACTS"
-
 alias idt_dir="echo \"idt dir $IDT_SRC_PARENT\""
-idt_dir
 alias idt_go="cd \"$IDT_SRC_PARENT\""
 
-alias idt_activate="idt_go && source idt/scripts/activate.sh"
-alias idt_bootstrap="idt_go && source idt/scripts/bootstrap.sh"
-alias idt_build="idt_go && source idt/scripts/build.sh"
-alias idt_clean="idt_go && source idt/scripts/clean.sh"
-alias idt_connect="idt_go && source idt/scripts/connect.sh"
-alias idt_fetch_artifacts="idt_go && source idt/scripts/fetch_artifacts.sh"
-alias idt_prune_docker="idt_go && source idt/scripts/prune_docker.sh"
-alias idt_push="idt_go && source idt/scripts/push.sh"
+# One time setup should not be aliases
 alias idt_vars="idt_go && source idt/scripts/vars.sh"
-alias idt_clean_artifacts="idt_go && source idt/scripts/clean_artifacts.sh"
-alias idt_clean_all="idt_go && source idt/scripts/clean_all.sh"
-alias idt_create_vars="idt_go && source idt/scripts/create_vars.sh"
-alias idt_check_child="idt_go && source idt/scripts/check_child.sh"
-alias idt_clean_child="idt_go && source idt/scripts/clean_child.sh"
 
+# Setting things up this way allows us to edit the source of the aliases without having to manually call
+# source / relaunch shell for changes to take effect (unless changing the alias declaration itself)
+# also, if the script is deleted, an old shell won't have access to run the alises anymore, which is desired
+alias_src_path="idt_go && source idt/scripts/aliases"
+alias idt_artifacts_fetch="$alias_src_path/artifacts_fetch.sh"
+alias idt_child_check="$alias_src_path/child_check.sh"
+alias idt_child_kill="$alias_src_path/child_kill.sh"
+alias idt_clean_all="$alias_src_path/clean_all.sh"
+alias idt_clean_artifacts="$alias_src_path/clean_artifacts.sh"
+alias idt_connect="$alias_src_path/connect.sh"
+alias idt_delete="$alias_src_path/delete.sh"
+alias idt_docker_build="$alias_src_path/docker_build.sh"
+alias idt_docker_prune="$alias_src_path/docker_prune.sh"
+alias idt_docker_run="$alias_src_path/docker_run.sh"
+alias idt_linux_bootstrap="$alias_src_path/linux_bootstrap.sh"
+alias idt_push="$alias_src_path/push.sh"
+alias idt_vars_create="$alias_src_path/vars_create.sh"
+alias idt_linux_install_compilers_for_arm_tcpdump="$alias_src_path/linux_install_compilers_for_arm_tcpdump.sh"
+
+# Setup the venv if it doesn't exist; ensure byte code cache is compartmentalized
 alias idt="idt_go && \
 if [ -z $PYTHONPYCACHEPREFIX ]; then export PYTHONPYCACHEPREFIX=$IDT_SRC_PARENT/idt/pycache; fi && \
-if [ -z $VIRTUAL_ENV]; then source idt/scripts/py_venv.sh; fi && \
+if [ -z $VIRTUAL_ENV ]; then source idt/scripts/py_venv.sh; fi && \
 python3 idt "
 
+idt_dir
 echo "idt commands available! type idt and press tab twice to see available commands."

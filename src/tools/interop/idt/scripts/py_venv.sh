@@ -15,12 +15,15 @@
 #    limitations under the License.
 #
 
-cd idt
-if [ -d venv ]; then
-    source venv/bin/activate
+if [ -f idt/venv/bin/activate ]; then
+    source idt/venv/bin/activate
 else
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
+    python3 -m venv idt/venv
+    if [ -f idt/venv/bin/activate ]; then
+        source idt/venv/bin/activate
+        pip install -r idt/requirements.txt
+    else
+      echo "Failed to created venv"
+      idt_clean_all
+    fi
 fi
-cd ..

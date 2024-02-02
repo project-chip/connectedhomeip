@@ -16,10 +16,12 @@
 #
 
 import multiprocessing
+import os
 import shlex
 import subprocess
 
 import psutil
+from utils.error import log_error
 
 from . import log
 
@@ -47,6 +49,7 @@ class Bash:
         self.args: list[str] = []
         self._init_args()
         self.proc: None | subprocess.CompletedProcess | subprocess.Popen = None
+        self.logger.debug(f"New Bash sync={sync} instantiated: {command}")
 
     def _init_args(self) -> None:
         command_escaped = self.command.replace('"', '\"')
@@ -59,8 +62,22 @@ class Bash:
         return "" if not self.capture_output or not self.sync \
             else self.proc.stdout.decode().strip()
 
+    def get_available_output(self) -> str:
+        stdout = ""
+        if self.proc.stdout:
+            stdout = self.proc.stdout.decode().strip()
+        stderr = ""
+        if self.proc.stderr:
+            stderr = self.proc.stderr.decode().strip()
+        return stdout, stderr
+
+    # TODO: Add facility for awaitable background process
     def start_command(self) -> None:
+        # TODO: Make sudo auth automatic here if needed
         if self.proc is None:
+            # TODO: This does guard against a crash for a bad dir, but need to ensure no side effects before adding
+            # if self.cwd and not os.path.exists(self.cwd):
+            #    self.logger.error(f"Bash instantiated in a directory that doesn't exist: {self.cwd}")
             if self.sync:
                 self.proc = subprocess.run(self.args, capture_output=self.capture_output, cwd=self.cwd)
             else:
@@ -88,6 +105,27 @@ class Bash:
         else:
             proc.kill()
 
+    @staticmethod
+    def get_current_command_for_pid(pid: int) -> str:
+        get_command_for_pid_command = Bash(f"ps -p {pid} -o comm=", sync=True, capture_output=True)
+        get_command_for_pid_command.start_command()
+        return get_command_for_pid_command.get_captured_output()
+
+    @staticmethod
+    def get_current_command_for_pid_full(pid: int) -> str:
+        get_command_for_pid_command = Bash(f"ps {pid}", sync=True, capture_output=True)
+        get_command_for_pid_command.start_command()
+        return get_command_for_pid_command.get_captured_output()
+
+    def verify_pid_not_recycled(self) -> (bool, str):
+        currently_running_command = self.get_current_command_for_pid(self.proc.pid)
+        # subshell if redirect is present; otherwise just compare the first arg of self.command
+        command_recycled = \
+            currently_running_command == "/bin/bash" or currently_running_command == "bash" if ">" in self.command else \
+                currently_running_command == self.command.split(" ")[0]
+        self.logger.debug(f"Found {currently_running_command} Expected {self.command}")
+        return command_recycled, currently_running_command
+
     def stop_single_proc(self, proc: multiprocessing.Process) -> None:
         self.logger.debug(f"Killing process {proc.pid}")
         try:
@@ -105,6 +143,13 @@ class Bash:
 
     def stop_command(self) -> None:
         if self.command_is_running():
+            pid_not_recycled, currently_running_command = self.verify_pid_not_recycled()
+            if not pid_not_recycled:
+                help_message = f"pid {self.proc.pid} appears to be recycled, expected {self.command} but found " \
+                               f"{currently_running_command}!"
+                self.logger.critical(help_message)
+                log_error("utils.shell", help_message, stack_trace=False)
+                return
             psutil_proc = psutil.Process(self.proc.pid)
             suffix = f"{psutil_proc.pid} for command {self.command}"
             self.logger.debug(f"Stopping children of {suffix}")
