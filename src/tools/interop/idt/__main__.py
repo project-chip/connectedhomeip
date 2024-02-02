@@ -19,7 +19,6 @@ import os
 import sys
 
 import psutil
-
 from idt import InteropDebuggingTool
 from utils.host import current_platform
 from utils.log import get_logger

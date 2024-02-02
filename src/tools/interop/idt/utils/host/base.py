@@ -22,13 +22,13 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Callable
 
-from config import HOST_DEPENDENCIES
 from utils import log
 from utils.log import border_print
+from utils.net import WIFI_CHANNELS_2G, is_ipv4, is_ipv6_global_unicast, is_ipv6_link_local, is_ipv6_unique_local
 from utils.shell import Bash
-from utils.net import is_ipv4, is_ipv6_global_unicast, is_ipv6_unique_local, is_ipv6_link_local, WIFI_CHANNELS_2G
 
 import config
+from config import HOST_DEPENDENCIES
 
 logger = log.get_logger(__file__)
 

@@ -17,6 +17,7 @@
 
 import ipaddress
 from typing import Callable
+
 from .log import get_logger
 
 _LOGGER = get_logger(__file__)

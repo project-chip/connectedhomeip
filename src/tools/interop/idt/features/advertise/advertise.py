@@ -19,11 +19,10 @@ import asyncio
 import sys
 from abc import ABC, abstractmethod
 
-from zeroconf import IPVersion
-from zeroconf.asyncio import AsyncServiceInfo, AsyncZeroconf
-
 from utils.host import current_platform
 from utils.log import get_logger
+from zeroconf import IPVersion
+from zeroconf.asyncio import AsyncServiceInfo, AsyncZeroconf
 
 
 class FakeMatterAd(ABC):

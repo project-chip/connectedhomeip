@@ -18,7 +18,8 @@
 from utils.host import current_platform
 from utils.log import get_logger
 
-from . import config, probe as p
+from . import config
+from . import probe as p
 
 logger = get_logger(__file__)
 

@@ -18,10 +18,11 @@
 import traceback
 from dataclasses import dataclass
 from typing import Callable
+
 from utils.artifact import log
+from utils.data import MATTER_APPLICATION_DEVICE_TYPES, MATTER_COMMISSIONING_MODE_DESCRIPTIONS, MATTER_PAIRING_HINTS
 from utils.log import add_border
 from zeroconf import ServiceInfo
-from utils.data import MATTER_APPLICATION_DEVICE_TYPES, MATTER_COMMISSIONING_MODE_DESCRIPTIONS, MATTER_PAIRING_HINTS
 
 logger = log.get_logger(__file__)
 

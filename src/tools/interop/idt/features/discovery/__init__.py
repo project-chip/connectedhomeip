@@ -15,8 +15,9 @@
 #    limitations under the License.
 #
 
-from .ble import MatterBleScanner
 from features.discovery.dnssd.dnssd import MatterDnssdListener
+
+from .ble import MatterBleScanner
 
 __all__ = [
     'MatterBleScanner',

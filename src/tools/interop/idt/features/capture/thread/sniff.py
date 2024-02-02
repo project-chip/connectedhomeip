@@ -16,12 +16,12 @@
 #
 
 import os
+import time
 
 from features.capture.thread.base import ThreadCapture
 from utils import log
 from utils.artifact import create_standard_log_name
 from utils.shell import Bash
-import time
 
 _LOGGER = log.get_logger(__file__)
 

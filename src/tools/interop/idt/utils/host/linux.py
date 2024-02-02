@@ -18,8 +18,8 @@
 import os
 
 from utils.host.base import HostPlatform
-from utils.shell import Bash
 from utils.log import get_logger
+from utils.shell import Bash
 
 logger = get_logger(__file__)
 

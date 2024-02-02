@@ -17,7 +17,7 @@
 
 import os
 
-from features.capture.base import EcosystemCapture, UnsupportedCapturePlatformException, PlatformLogStreamer
+from features.capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
 from features.capture.platform.android.android import Android
 from features.capture.platform.android.streams.logcat import LogcatStreamer
 from utils.analysis import TextAnalysisObserver

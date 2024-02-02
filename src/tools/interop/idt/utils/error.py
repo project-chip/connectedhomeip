@@ -16,11 +16,11 @@
 #
 
 import traceback
-from typing import Dict, List
 from dataclasses import dataclass
+from typing import Dict, List
 
 from utils.artifact import create_standard_log_name
-from utils.log import get_logger, print_and_write, add_border
+from utils.log import add_border, get_logger, print_and_write
 
 logger = get_logger(__file__)
 

@@ -22,10 +22,10 @@ from abc import ABC, abstractmethod
 from features.discovery import MatterDnssdListener
 from utils.artifact import create_standard_log_name
 from utils.log import get_logger
+from utils.net import is_ipv4, is_ipv6, is_ipv6_link_local
 from utils.shell import Bash
 
 from . import ProbeTarget, config
-from utils.net import is_ipv4, is_ipv6, is_ipv6_link_local
 
 logger = get_logger(__file__)
 

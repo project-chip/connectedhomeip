@@ -17,7 +17,6 @@
 
 import os
 import time
-
 from abc import ABC
 from typing import Optional
 

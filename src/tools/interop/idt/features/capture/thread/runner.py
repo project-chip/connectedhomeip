@@ -17,8 +17,8 @@
 
 from abc import ABC
 
-from features.capture.thread.on_network import MacThreadCaptureOnNetwork, LinuxThreadCaptureOnNetwork
-from features.capture.thread.sniff import MacThreadCaptureSniffer, LinuxThreadCaptureSniffer
+from features.capture.thread.on_network import LinuxThreadCaptureOnNetwork, MacThreadCaptureOnNetwork
+from features.capture.thread.sniff import LinuxThreadCaptureSniffer, MacThreadCaptureSniffer
 from utils.artifact import log
 from utils.host import current_platform
 

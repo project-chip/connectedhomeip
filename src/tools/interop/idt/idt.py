@@ -24,16 +24,16 @@ from pathlib import Path
 
 import features.probe.runner as probe_runner
 from features.advertise import FakeMatterAdBle, FakeMatterAdDnssd
+from features.advertise import config as advertise_config
 from features.capture import PacketCaptureRunner, controller
 from features.capture.thread.runner import ThreadCaptureRunner
 from features.discovery import MatterBleScanner, MatterDnssdListener
+from features.setup import do_setup, list_available_targets
 from utils.artifact import create_file_timestamp, safe_mkdir
+from utils.data import MATTER_APPLICATION_DEVICE_TYPES
+from utils.error import write_error_report
 from utils.host import current_platform
 from utils.log import border_print, get_logger
-from utils.error import write_error_report
-from features.advertise import config as advertise_config
-from utils.data import MATTER_APPLICATION_DEVICE_TYPES
-from features.setup import list_available_targets, do_setup
 
 import config
 

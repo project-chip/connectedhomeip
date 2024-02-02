@@ -19,7 +19,7 @@ import os
 
 from features.capture.platform.android import Android
 from features.capture.platform.android.streams.logcat import LogcatStreamer
-from utils.analysis import TextCause, PrescriptiveTextAnalysis, TextAnalysisObserver
+from utils.analysis import PrescriptiveTextAnalysis, TextAnalysisObserver, TextCause
 from utils.artifact import create_standard_log_name, log
 from utils.log import add_border, print_and_write
 

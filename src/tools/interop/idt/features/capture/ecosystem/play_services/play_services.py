@@ -19,14 +19,14 @@ import json
 import os
 from typing import IO, Dict
 
-from features.capture.base import EcosystemCapture, UnsupportedCapturePlatformException, PlatformLogStreamer
+from features.capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
 from features.capture.platform.android import Android
 from features.capture.platform.android.streams.logcat import LogcatStreamer
 from utils.artifact import create_standard_log_name, log
 
 from . import config
-from .command_map import DUMPSYS, GET_PROP
 from .analysis import PlayServicesAnalysis
+from .command_map import DUMPSYS, GET_PROP
 from .probe import PlayServicesProber
 
 logger = log.get_logger(__file__)

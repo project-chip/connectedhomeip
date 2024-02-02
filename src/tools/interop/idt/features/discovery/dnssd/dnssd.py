@@ -20,13 +20,13 @@ import os
 from datetime import datetime
 
 import zeroconf
-
 from features.probe import ProbeTarget
-from utils.net import get_addr_type
 from utils.artifact import create_standard_log_name, log
 from utils.log import add_border, border_print
+from utils.net import get_addr_type
 from zeroconf import ServiceBrowser, ServiceInfo, ServiceListener, Zeroconf
-from .parsers import ServiceLibrary, MatterTxtRecordParser
+
+from .parsers import MatterTxtRecordParser, ServiceLibrary
 
 logger = log.get_logger(__file__)
 

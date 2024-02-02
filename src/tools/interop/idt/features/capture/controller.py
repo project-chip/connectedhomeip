@@ -22,12 +22,12 @@ import sys
 import typing
 from asyncio import Task
 
-from .. import capture
-from utils.error import log_error
 from features.capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
 from utils.artifact import safe_mkdir
+from utils.error import log_error
 from utils.log import border_print, get_logger
 
+from .. import capture
 from . import config
 
 _PLATFORM_MAP: typing.Dict[str, PlatformLogStreamer] = {}

@@ -19,13 +19,13 @@ import inspect
 import os
 import shutil
 
+from features.capture.thread import sniff
 from features.setup.targets.base import Setup
 from utils import log
 from utils.artifact import safe_mkdir
-from utils.shell import Bash
 from utils.error import log_error, write_error_report
 from utils.host import current_platform
-from features.capture.thread import sniff
+from utils.shell import Bash
 
 _LOGGER = log.get_logger(__file__)
 

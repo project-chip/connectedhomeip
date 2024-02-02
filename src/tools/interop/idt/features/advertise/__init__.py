@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-from .advertise import FakeMatterAdDnssd, FakeMatterAdBle
+from .advertise import FakeMatterAdBle, FakeMatterAdDnssd
 
 __all__ = [
     "FakeMatterAdDnssd",

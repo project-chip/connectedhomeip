@@ -18,8 +18,8 @@ import os.path
 from typing import Optional
 
 from features.capture.pcap.base import PacketCaptureBase
-from utils.shell import Bash
 from utils.host import current_platform
+from utils.shell import Bash
 
 
 class LinuxPacketCaptureRunner(PacketCaptureBase):
