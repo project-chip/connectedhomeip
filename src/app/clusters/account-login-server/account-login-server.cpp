@@ -264,7 +264,7 @@ exit:
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterAccountLoginPluginServerInitCallback() 
+void MatterAccountLoginPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAccountLoginAttrAccess);
 }
