@@ -434,5 +434,5 @@ The loader is also used elsewhere in the project.
 ### Setup support
 
 | Target                 | Supports             | Linux              | MacOS | Description                                  |
-|------------------------| -------------------- | ------------------ | ----- |----------------------------------------------|
+| ---------------------- | -------------------- | ------------------ | ----- | -------------------------------------------- |
 | `Nrf52840MdkNotDongle` | capture.thread.sniff | :white_check_mark: | :x:   | Setup thread sniffer on Maker diary Nrf52840 |
