@@ -63,6 +63,9 @@ ClockBase * gClockBase = &gClockImpl;
 
 Timestamp ClockBase::GetMonotonicTimestamp()
 {
+    // Below implementation uses `__atomic_*` API which has wider support than
+    // <atomic> on embedded platforms, so that embedded platforms can use
+    // it by widening the #ifdefs later.
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
     uint64_t prevTimestamp = __atomic_load_n(&mLastTimestamp, __ATOMIC_SEQ_CST);
     static_assert(sizeof(prevTimestamp) == sizeof(Timestamp),
@@ -86,7 +89,7 @@ Timestamp ClockBase::GetMonotonicTimestamp()
     // newTimestamp guaranteed to never be < the last timestamp.
     __atomic_store_n(&mLastTimestamp, newTimestamp.count(), __ATOMIC_SEQ_CST);
 #else
-    mLastTimestamp newTimestamp.count();
+    mLastTimestamp = newTimestamp.count();
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
 
     return newTimestamp;
