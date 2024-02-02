@@ -37,20 +37,22 @@ Create fake advertisements for Matter devices, useful in controller testing.
 
 #### Probe
 
-Collect basic networking info from the environment, e.g. resolve and ping all matter devices.
+Collect basic networking info from the environment, e.g. resolve and ping all
+matter devices.
 
 #### Setup
 
-Provides ready-made setup scripts for specific, one-time build / installation tasks, e.g. setting up a devkit as a 
-thread sniffer.
+Provides ready-made setup scripts for specific, one-time build / installation
+tasks, e.g. setting up a devkit as a thread sniffer.
 
 ## Single host installation (no Raspberry Pi)
 
 `idt` can be run on both macOS and Linux (tested with Debian based systems).  
-See the feature map section at the bottom of this page for details on feature support by host platform.
+See the feature map section at the bottom of this page for details on feature
+support by host platform.
 
-If you prefer to execute capture and discovery from a Raspberry Pi, read
-the next section instead.
+If you prefer to execute capture and discovery from a Raspberry Pi, read the
+next section instead.
 
 The machine running `idt` should be connected to the same Wi-Fi network used for
 testing.  
@@ -74,8 +76,8 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi:
 
 ## Thread
 
-Thread captures require a compatible devkit. 
-The thread implementation in this tool currently targets the `Maker Diary nrf52840-MDK` (NOT the dongle version).
+Thread captures require a compatible devkit. The thread implementation in this
+tool currently targets the `Maker Diary nrf52840-MDK` (NOT the dongle version).
 
 ## Raspberry Pi installation
 
@@ -178,12 +180,12 @@ This directory contains tools for use on both the admin computer and the RPi.
 > **_IMPORTANT_**  
 > `idt_` commands are shell aliases helpful for administrative commands.  
 > `idt` invokes the `idt` python package.
-> 
+>
 > Output from `idt` will generally be colorized while output from sub processes
 > is generally not.
-> 
-> Each command will produce artifacts in a new directory within `idt/IDT_ARTIFACTS` and display the archive path 
-> at the end of execution.
+>
+> Each command will produce artifacts in a new directory within
+> `idt/IDT_ARTIFACTS` and display the archive path at the end of execution.
 
 RPi users, as needed:
 
@@ -297,7 +299,8 @@ options:
     configuration. Use a wired connection if wireless fails repeatedly.
 -   Set `DEBUG=True` in the root `config.py` for additional logging.
 -   Compiling `tcpdump` for android may require additional dependencies.
-    -   If the build script fails for you, try `idt_linux_install_compilers_for_arm_tcpdump`.
+    -   If the build script fails for you, try
+        `idt_linux_install_compilers_for_arm_tcpdump`.
 -   You may disable colors and splash by setting `ENABLE_COLOR` in `config.py`
     to `False`.
 -   `idt_child_kill` will kill any stray `tcpdump` and `adb` commands.
@@ -306,14 +309,15 @@ options:
 
 ## Project overview
 
--   The entry point of each feature is in `idt.py` which contains simple CLI parsing with
-    `argparse`.
+-   The entry point of each feature is in `idt.py` which contains simple CLI
+    parsing with `argparse`.
 
 ### Features
 
 #### `advertise`
 
-- `advertise` re-uses the library used in discovery to produce DNS-SD advertisements mimicking matter devices.
+-   `advertise` re-uses the library used in discovery to produce DNS-SD
+    advertisements mimicking matter devices.
 
 #### `capture`
 
@@ -329,8 +333,8 @@ options:
 
 -   `ble` provides a simple ble scanner that shows matter devices being
     discovered and lost, as well as their VID/PID, RSSI, etc.
--   `dnssd` provides a simple DNS-SD browser that searches for matter
-    devices and thread border routers.
+-   `dnssd` provides a simple DNS-SD browser that searches for matter devices
+    and thread border routers.
 
 #### `probe`
 
@@ -342,29 +346,30 @@ options:
 
 #### `setup`
 
-- Contains setup implementations.
+-   Contains setup implementations.
 
 ### `utils`
 
-
-- `host` contains helper functions for interacting with the host
-   running `idt`.
-- `analysis` contains utilities for simple causal analysis of text based logs.
-- `artifact` contains helper functions for managing artifacts.
-- `data` contains metadat e.g. matter device type map  
-- `error` contains facilities for error reporting.
-- `loader` is a generic class loader that dynamically imports classes matching
-  a given super class from a given directory.
-- `log` contains logging utilities.
-- `net` contains utility functions for networking topics like ip addr type.
-- `shell` contains a simple helper class for background and foreground Bash
-  commands.
+-   `host` contains helper functions for interacting with the host running
+    `idt`.
+-   `analysis` contains utilities for simple causal analysis of text based logs.
+-   `artifact` contains helper functions for managing artifacts.
+-   `data` contains metadat e.g. matter device type map
+-   `error` contains facilities for error reporting.
+-   `loader` is a generic class loader that dynamically imports classes matching
+    a given super class from a given directory.
+-   `log` contains logging utilities.
+-   `net` contains utility functions for networking topics like ip addr type.
+-   `shell` contains a simple helper class for background and foreground Bash
+    commands.
 
 ### Conventions
 
--   List host dependencies and their help text and download links in the respective array in the root `config.py`.
--   Users should not need to modify source files as part of any regular operation of the tool (e.g. modifying any
-    `config.py` should not be required). Use commandline args for runtime options.
+-   List host dependencies and their help text and download links in the
+    respective array in the root `config.py`.
+-   Users should not need to modify source files as part of any regular
+    operation of the tool (e.g. modifying any `config.py` should not be
+    required). Use commandline args for runtime options.
 -   When needed, execute builds in a folder called `BUILD` within the source
     tree.
 
@@ -377,7 +382,8 @@ Ecosystem and Platform implementations are dynamically loaded.
 For each package in `capture/ecosystem`, the ecosystem loader expects a module
 name matching the package name.  
 This module must contain a single class which is a subclass of
-`capture.base.EcosystemCapture` with matching function signatures and coroutines.
+`capture.base.EcosystemCapture` with matching function signatures and
+coroutines.
 
 `/capture/ecosystem/play_services_user` contains a minimal example
 implementation.
@@ -406,12 +412,12 @@ The loader is also used elsewhere in the project.
 ## Feature map
 
 | Icon               | Meaning              |
-|--------------------|----------------------|
+| ------------------ | -------------------- |
 | :white_check_mark: | Supported            |
 | :x:                | Not (/yet) supported |
 
 | Feature   | Function                                | Linux              | MacOS              | Note                  |
-|-----------|-----------------------------------------|--------------------|--------------------|-----------------------|
+| --------- | --------------------------------------- | ------------------ | ------------------ | --------------------- |
 | Advertise | DNS-SD                                  | :white_check_mark: | :white_check_mark: |                       |
 | Advertise | BLE                                     | :x:                | :x:                | Not implemented       |
 | Capture   | Android: logcat collection and analysis | :white_check_mark: | :white_check_mark: |                       |
@@ -428,5 +434,5 @@ The loader is also used elsewhere in the project.
 ### Setup support
 
 | Target               | Supports             | Linux              | MacOS | Description                         |
-|----------------------|----------------------|--------------------|-------|-------------------------------------|
+| -------------------- | -------------------- | ------------------ | ----- | ----------------------------------- |
 | Nrf52840MdkNotDongle | capture.thread.sniff | :white_check_mark: | :x:   | Setup thread sniffer on Nrf52840MDK |
