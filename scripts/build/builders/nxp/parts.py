@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import json
-import jsonschema
 import os
 import sys
-
 from dataclasses import dataclass
+
+import jsonschema
 
 
 def validate_json(data: str):
