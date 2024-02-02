@@ -39,7 +39,10 @@ source_set("configurations") {
     "ReliableMessageProtocolConfig.h",
   ]
 
-  public_deps = [ "${chip_root}/src/system" ]
+  public_deps = [
+    "${chip_root}/src/system",
+    "${chip_root}/src/lib/core",
+  ]
 }
 
 static_library("messaging") {
