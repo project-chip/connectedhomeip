@@ -67,7 +67,7 @@ using chip::app::DataModel::NullNullable;
 using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
 using LockOpCredentials = CredentialStruct;
 
-using Feature = chip::app::Clusters::DoorLock::Feature;
+using Feature                       = chip::app::Clusters::DoorLock::Feature;
 using OnFabricRemovedCustomCallback = void (*)(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR   = 23;
