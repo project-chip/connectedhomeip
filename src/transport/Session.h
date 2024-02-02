@@ -26,7 +26,7 @@
 #include <lib/support/ReferenceCountedHandle.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/LockTracker.h>
-#include <protocols/secure_channel/SessionParameters.h>
+#include <messaging/SessionParameters.h>
 #include <transport/SessionDelegate.h>
 
 namespace chip {
