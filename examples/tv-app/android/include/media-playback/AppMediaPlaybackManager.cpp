@@ -283,3 +283,15 @@ uint32_t AppMediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
 }
+
+uint16_t AppMediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    Attributes::ClusterRevision::Get(endpoint, &clusterRevision);
+    return clusterRevision;
+}

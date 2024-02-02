@@ -19,6 +19,7 @@
 #include "AccountLoginManager.h"
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <json/json.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -102,3 +103,15 @@ void AccountLoginManager::GetSetupPin(char * setupPin, size_t setupPinSize, cons
     }
     ChipLogProgress(Zcl, "Returning pin for content app for endpoint %d", mEndpointId);
 };
+
+uint16_t AccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    Attributes::ClusterRevision::Get(endpoint, &clusterRevision);
+    return clusterRevision;
+}

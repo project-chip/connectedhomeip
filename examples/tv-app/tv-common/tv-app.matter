@@ -3570,7 +3570,7 @@ endpoint 1 {
     callback attribute lineup;
     callback attribute currentChannel;
     ram      attribute featureMap default = 0x0003;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeChannel;
     handle command ChangeChannelResponse;
@@ -3587,7 +3587,7 @@ endpoint 1 {
     callback attribute targetList;
     ram      attribute currentTarget default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command NavigateTarget;
     handle command NavigateTargetResponse;

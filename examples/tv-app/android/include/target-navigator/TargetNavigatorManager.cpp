@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include "TargetNavigatorManager.h"
 #include <json/json.h>
 
@@ -143,4 +144,16 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
+}
+
+uint16_t TargetNavigatorManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    Attributes::ClusterRevision::Get(endpoint, &clusterRevision);
+    return clusterRevision;
 }

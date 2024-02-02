@@ -128,6 +128,7 @@ public:
 private:
     CHIP_ERROR ReadTargetListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadCurrentTargetAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 TargetNavigatorAttrAccess gTargetNavigatorAttrAccess;
@@ -155,6 +156,14 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
 
         return ReadCurrentTargetAttribute(aEncoder, delegate);
     }
+    case app::Clusters::TargetNavigator::Attributes::ClusterRevision::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    }
     default: {
         break;
     }
@@ -172,6 +181,13 @@ CHIP_ERROR TargetNavigatorAttrAccess::ReadCurrentTargetAttribute(app::AttributeV
 {
     uint8_t currentTarget = delegate->HandleGetCurrentTarget();
     return aEncoder.Encode(currentTarget);
+}
+
+CHIP_ERROR TargetNavigatorAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                         Delegate * delegate)
+{
+    uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
+    return aEncoder.Encode(clusterRevision);
 }
 
 } // anonymous namespace

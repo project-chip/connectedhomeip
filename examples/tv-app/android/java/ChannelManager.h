@@ -64,6 +64,7 @@ public:
                                    const chip::ByteSpan & data) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 private:
     jobject mChannelManagerObject      = nullptr;
@@ -81,4 +82,5 @@ private:
 
     // TODO: set this based upon meta data from app
     uint32_t mDynamicEndpointFeatureMap = 3;
+    uint16_t mDynamicClusterRevision = 2;
 };

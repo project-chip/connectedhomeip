@@ -71,6 +71,7 @@ public:
     virtual bool HandleDeactivateTextTrack()                                                                = 0;
 
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint) = 0;
+    virtual uint16_t GetClusterRevision(chip::EndpointId endpoint) = 0;
 
     virtual ~Delegate() = default;
 };

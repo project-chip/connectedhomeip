@@ -139,6 +139,7 @@ private:
     CHIP_ERROR ReadActiveTextTrackAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadAvailableTextTracksAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 MediaPlaybackAttrAccess gMediaPlaybackAttrAccess;
@@ -205,6 +206,9 @@ CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & 
     case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id: {
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
+    case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id: {
+        return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    }
     default: {
         break;
     }
@@ -218,6 +222,13 @@ CHIP_ERROR MediaPlaybackAttrAccess::ReadFeatureFlagAttribute(EndpointId endpoint
 {
     uint32_t featureFlag = delegate->GetFeatureMap(endpoint);
     return aEncoder.Encode(featureFlag);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                         Delegate * delegate)
+{
+    uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
+    return aEncoder.Encode(clusterRevision);
 }
 
 CHIP_ERROR MediaPlaybackAttrAccess::ReadCurrentStateAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)

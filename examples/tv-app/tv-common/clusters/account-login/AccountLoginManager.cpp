@@ -18,6 +18,7 @@
 
 #include "AccountLoginManager.h"
 #include <app/CommandHandler.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/af.h>
 
 using namespace std;
@@ -63,4 +64,16 @@ void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINRes
 
     response.setupPIN = CharSpan::fromCharString(mSetupPin);
     helper.Success(response);
+}
+
+uint16_t AccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    Attributes::ClusterRevision::Get(endpoint, &clusterRevision);
+    return clusterRevision;
 }

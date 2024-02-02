@@ -24,6 +24,7 @@
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/account-login-server/account-login-server.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -110,6 +111,57 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// -----------------------------------------------------------------------------
+// Attribute Accessor Implementation
+
+namespace {
+
+class AccountLoginAttrAccess : public app::AttributeAccessInterface
+{
+public:
+    AccountLoginAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), AccountLogin::Id) {}
+
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+};
+
+AccountLoginAttrAccess gAccountLoginAttrAccess;
+
+CHIP_ERROR AccountLoginAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+{
+    EndpointId endpoint = aPath.mEndpointId;
+    Delegate * delegate = GetDelegate(endpoint);
+
+    switch (aPath.mAttributeId)
+    {
+    case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AccountLoginAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                         Delegate * delegate)
+{
+    uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
+    return aEncoder.Encode(clusterRevision);
+}
+
+} // anonymous namespace
+
 
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
@@ -212,4 +264,7 @@ exit:
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterAccountLoginPluginServerInitCallback() {}
+void MatterAccountLoginPluginServerInitCallback() 
+{
+    registerAttributeAccessOverride(&gAccountLoginAttrAccess);
+}
