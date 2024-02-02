@@ -267,13 +267,14 @@ public final class ControllerParams {
     /**
      * Used when the Commissioner disables Attestation Certificate Validation.
      *
-     * <p>Specifically, this sets SkipAttestationCertificateValidation in the CommissioningParameters passed to
-     * the CommissioningDelegate.
+     * <p>Specifically, this sets SkipAttestationCertificateValidation in the
+     * CommissioningParameters passed to the CommissioningDelegate.
      *
      * @param skipAttestationCertificateValidation
      * @return
      */
-    public Builder setSkipAttestationCertificateValidation(boolean skipAttestationCertificateValidation) {
+    public Builder setSkipAttestationCertificateValidation(
+        boolean skipAttestationCertificateValidation) {
       this.skipAttestationCertificateValidation = skipAttestationCertificateValidation;
       return this;
     }
