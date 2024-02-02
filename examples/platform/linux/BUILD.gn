@@ -32,24 +32,24 @@ config("app-main-config") {
 
 source_set("ota-test-event-trigger") {
   sources = [
-    "${chip_root}/src/app/clusters/ota-requestor/OTATestEventTriggerDelegate.h",
+    "${chip_root}/src/app/clusters/ota-requestor/OTATestEventTriggerHandler.h",
   ]
 }
 
 source_set("smco-test-event-trigger") {
-  sources = [ "${chip_root}/src/app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h" ]
+  sources = [ "${chip_root}/src/app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h" ]
 }
 
 source_set("boolean-state-configuration-test-event-trigger") {
-  sources = [ "${chip_root}/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerDelegate.h" ]
+  sources = [ "${chip_root}/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h" ]
 }
 
 source_set("energy-evse-test-event-trigger") {
-  sources = [ "${chip_root}/src/app/clusters/energy-evse-server/EnergyEvseTestEventTriggerDelegate.h" ]
+  sources = [ "${chip_root}/src/app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h" ]
 }
 
 source_set("energy-reporting-test-event-trigger") {
-  sources = [ "${chip_root}/src/app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerDelegate.h" ]
+  sources = [ "${chip_root}/src/app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h" ]
 }
 
 source_set("app-main") {

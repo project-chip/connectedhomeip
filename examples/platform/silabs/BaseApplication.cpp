@@ -36,7 +36,7 @@
 
 #include "SilabsDeviceDataProvider.h"
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>

@@ -24,7 +24,6 @@ chip_test_suite_using_nltest("tests") {
 
   sources = [
     "AES_CCM_128_test_vectors.h",
-    "CHIPCryptoPALTest.cpp",
     "DacValidationExplicitVectors.h",
     "DerSigConversion_test_vectors.h",
     "ECDH_P256_test_vectors.h",
@@ -46,6 +45,7 @@ chip_test_suite_using_nltest("tests") {
   ]
 
   test_sources = [
+    "TestChipCryptoPAL.cpp",
     "TestGroupOperationalCredentials.cpp",
     "TestSessionKeystore.cpp",
   ]
@@ -69,10 +69,9 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
   ]
-
-  tests = [ "CHIPCryptoPALTest" ]
 }

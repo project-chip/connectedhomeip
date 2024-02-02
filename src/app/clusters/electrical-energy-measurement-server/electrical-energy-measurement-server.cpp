@@ -26,25 +26,28 @@
 
 using chip::Protocols::InteractionModel::Status;
 
-namespace {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ElectricalEnergyMeasurement {
 
 using namespace chip;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 
 MeasurementData
     gMeasurements[EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
-class ElectricalEnergyMeasurementAttrAccess : public app::AttributeAccessInterface
+CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
 {
-public:
-    ElectricalEnergyMeasurementAttrAccess() :
-        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ElectricalEnergyMeasurement::Id)
-    {}
+    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
+}
 
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
-};
+void ElectricalEnergyMeasurementAttrAccess::Shutdown()
+{
+    unregisterAttributeAccessOverride(this);
+}
 
 CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
                                                        app::AttributeValueEncoder & aEncoder)
@@ -55,6 +58,9 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAt
 
     switch (aPath.mAttributeId)
     {
+    case FeatureMap::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
+        break;
     case Accuracy::Id:
         if (data == nullptr)
         {
@@ -62,42 +68,77 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAt
         }
         return aEncoder.Encode(data->measurementAccuracy);
     case CumulativeEnergyImported::Id:
+        VerifyOrReturnError(
+            HasFeature(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy) &&
+                HasFeature(ElectricalEnergyMeasurement::Feature::kImportedEnergy),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Energy Measurement: can not get CumulativeEnergyImported, feature is not supported"));
         if ((data == nullptr) || !data->cumulativeImported.HasValue())
         {
             return aEncoder.EncodeNull();
         }
         return aEncoder.Encode(data->cumulativeImported.Value());
     case CumulativeEnergyExported::Id:
+        VerifyOrReturnError(
+            HasFeature(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy) &&
+                HasFeature(ElectricalEnergyMeasurement::Feature::kExportedEnergy),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Energy Measurement: can not get CumulativeEnergyExported, feature is not supported"));
         if ((data == nullptr) || !data->cumulativeExported.HasValue())
         {
             return aEncoder.EncodeNull();
         }
         return aEncoder.Encode(data->cumulativeExported.Value());
     case PeriodicEnergyImported::Id:
+        VerifyOrReturnError(
+            HasFeature(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy) &&
+                HasFeature(ElectricalEnergyMeasurement::Feature::kImportedEnergy),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Energy Measurement: can not get PeriodicEnergyImported, feature is not supported"));
         if ((data == nullptr) || !data->periodicImported.HasValue())
         {
             return aEncoder.EncodeNull();
         }
         return aEncoder.Encode(data->periodicImported.Value());
     case PeriodicEnergyExported::Id:
+        VerifyOrReturnError(
+            HasFeature(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy) &&
+                HasFeature(ElectricalEnergyMeasurement::Feature::kExportedEnergy),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Energy Measurement: can not get PeriodicEnergyExported, feature is not supported"));
         if ((data == nullptr) || !data->periodicExported.HasValue())
         {
             return aEncoder.EncodeNull();
         }
         return aEncoder.Encode(data->periodicExported.Value());
+    case CumulativeEnergyReset::Id:
+        VerifyOrReturnError(
+            HasFeature(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Energy Measurement: can not get CumulativeEnergyReset, feature is not supported"));
+
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+        if ((data == nullptr) || !data->cumulativeReset.HasValue())
+        {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.Encode(data->cumulativeReset.Value());
     }
 
     return CHIP_NO_ERROR;
 }
 
-ElectricalEnergyMeasurementAttrAccess gAttrAccess;
+bool ElectricalEnergyMeasurementAttrAccess::HasFeature(Feature aFeature) const
+{
+    return mFeature.Has(aFeature);
+}
 
-} // namespace
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ElectricalEnergyMeasurement {
+bool ElectricalEnergyMeasurementAttrAccess::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
+{
+    return mOptionalAttrs.Has(aOptionalAttrs);
+}
 
 MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
 {
@@ -126,6 +167,19 @@ CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccura
     data->measurementAccuracy = accuracy;
 
     MatterReportingAttributeChangeCallback(endpointId, ElectricalEnergyMeasurement::Id, Accuracy::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<CumulativeEnergyResetStruct::Type> & cumulativeReset)
+{
+
+    MeasurementData * data = MeasurementDataForEndpoint(endpointId);
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    data->cumulativeReset = cumulativeReset;
+
+    MatterReportingAttributeChangeCallback(endpointId, ElectricalEnergyMeasurement::Id, CumulativeEnergyReset::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -192,8 +246,3 @@ bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMe
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterElectricalEnergyMeasurementPluginServerInitCallback()
-{
-    registerAttributeAccessOverride(&gAttrAccess);
-}

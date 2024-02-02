@@ -39,35 +39,6 @@
  */
 void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
-/** @brief Allow Network Write Attribute
- *
- * This function is called by the application framework before it writes an
- * attribute in response to a write attribute request from an external device.
- * The value passed into this callback is the value to which the attribute is to
- * be set by the framework.
-        Example:    In mirroring simple metering data
- * on an Energy Services Interface (ESI) (formerly called Energy Service Portal
- * (ESP) in SE 1.0).), a mirrored simple meter needs to write read-only
- * attributes on its mirror. The-meter-mirror sample application, located in
- * app/framework/sample-apps, uses this callback to allow the mirrored device to
- * write simple metering attributes on the mirror regardless of the fact that
- * most simple metering attributes are defined as read-only by the ZigBee
- * specification.
-        Note:   The ZCL specification does not (as of this
- * writing) specify any permission-level security for writing writeable
- * attributes. As far as the ZCL specification is concerned, if an attribute is
- * writeable, any device that has a link key for the device should be able to
- * write that attribute. Furthermore if an attribute is read only, it should not
- * be written over the air. Thus, if you implement permissions for writing
- * attributes as a feature, you MAY be operating outside the specification. This
- * is unlikely to be a problem for writing read-only attributes, but it may be a
- * problem for attributes that are writeable according to the specification but
- * restricted by the application implementing this callback.
- */
-EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                          chip::AttributeId attributeId, uint8_t * value,
-                                                                          uint8_t type);
-
 /** @brief Attribute Read Access
  *
  * This function is called whenever the Application Framework needs to check

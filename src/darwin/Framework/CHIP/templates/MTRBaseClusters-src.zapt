@@ -17,7 +17,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/im-client-callbacks.h>
 #include <controller/CHIPCluster.h>
-#include <lib/support/CHIPListUtils.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <type_traits>

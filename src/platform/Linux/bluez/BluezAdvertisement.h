@@ -49,7 +49,7 @@ public:
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID);
+    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, const char * aAdvName);
     CHIP_ERROR SetupServiceData(ServiceDataFlags aFlags);
     CHIP_ERROR SetIntervals(AdvertisingIntervals aAdvIntervals);
     void Shutdown();
@@ -86,9 +86,9 @@ private:
     bool mIsInitialized = false;
     bool mIsAdvertising = false;
 
-    char * mpAdvPath     = nullptr;
-    char * mpAdapterName = nullptr;
-    char * mpAdvUUID     = nullptr;
+    char * mpAdvPath  = nullptr;
+    char * mpAdvUUID  = nullptr;
+    char mAdvName[32] = "";
 };
 
 } // namespace Internal

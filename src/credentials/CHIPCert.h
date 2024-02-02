@@ -40,6 +40,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Credentials {
