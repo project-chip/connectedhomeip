@@ -206,9 +206,7 @@ CHIP_ERROR ChannelAttrAccess::ReadCurrentChannelAttribute(app::AttributeValueEnc
     return delegate->HandleGetCurrentChannel(aEncoder);
 }
 
-
-CHIP_ERROR ChannelAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
-                                                         Delegate * delegate)
+CHIP_ERROR ChannelAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
     return aEncoder.Encode(clusterRevision);

@@ -17,9 +17,9 @@
  */
 
 #include "AccountLoginManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <json/json.h>
 #include <lib/core/DataModelTypes.h>
 

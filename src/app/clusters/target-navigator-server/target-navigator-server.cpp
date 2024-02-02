@@ -184,7 +184,7 @@ CHIP_ERROR TargetNavigatorAttrAccess::ReadCurrentTargetAttribute(app::AttributeV
 }
 
 CHIP_ERROR TargetNavigatorAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
-                                                         Delegate * delegate)
+                                                            Delegate * delegate)
 {
     uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
     return aEncoder.Encode(clusterRevision);

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include "TargetNavigatorManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <json/json.h>
 
 using namespace std;

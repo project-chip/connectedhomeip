@@ -68,7 +68,6 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     helper.Success(response);
 }
 
-
 uint16_t TargetNavigatorManager::GetClusterRevision(chip::EndpointId endpoint)
 {
     if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)

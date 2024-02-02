@@ -225,7 +225,7 @@ CHIP_ERROR MediaPlaybackAttrAccess::ReadFeatureFlagAttribute(EndpointId endpoint
 }
 
 CHIP_ERROR MediaPlaybackAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
-                                                         Delegate * delegate)
+                                                          Delegate * delegate)
 {
     uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
     return aEncoder.Encode(clusterRevision);

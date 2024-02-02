@@ -43,6 +43,7 @@ protected:
     static const uint8_t kNoCurrentTarget = 0;
     std::list<std::string> mTargets;
     uint8_t mCurrentTarget;
+
 private:
     // TODO: set this based upon meta data from app
     uint16_t mDynamicClusterRevision = 2;

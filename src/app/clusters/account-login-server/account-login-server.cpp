@@ -24,8 +24,8 @@
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/account-login-server/account-login-server.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
@@ -161,7 +161,6 @@ CHIP_ERROR AccountLoginAttrAccess::ReadRevisionAttribute(EndpointId endpoint, ap
 }
 
 } // anonymous namespace
-
 
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
