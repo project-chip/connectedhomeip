@@ -202,7 +202,7 @@ public:
     CHIP_ERROR UpdateDeviceAttestationDelegateBridge(jobject deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
                                                      bool shouldWaitAfterDeviceAttestation);
 
-    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate);
+    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate, jobject cdTrustKeys);
 
     CHIP_ERROR StartOTAProvider(jobject otaProviderDelegate);
 
