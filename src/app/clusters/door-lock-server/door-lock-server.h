@@ -38,29 +38,6 @@
 #define DOOR_LOCK_SERVER_ENDPOINT 1
 #endif
 
-using chip::Optional;
-using chip::app::Clusters::DoorLock::AlarmCodeEnum;
-using chip::app::Clusters::DoorLock::CredentialRuleEnum;
-using chip::app::Clusters::DoorLock::CredentialTypeEnum;
-using chip::app::Clusters::DoorLock::DataOperationTypeEnum;
-using chip::app::Clusters::DoorLock::DaysMaskMap;
-using chip::app::Clusters::DoorLock::DlLockState;
-using chip::app::Clusters::DoorLock::DlStatus;
-using chip::app::Clusters::DoorLock::DoorStateEnum;
-using chip::app::Clusters::DoorLock::LockDataTypeEnum;
-using chip::app::Clusters::DoorLock::LockOperationTypeEnum;
-using chip::app::Clusters::DoorLock::OperatingModeEnum;
-using chip::app::Clusters::DoorLock::OperationErrorEnum;
-using chip::app::Clusters::DoorLock::OperationSourceEnum;
-using chip::app::Clusters::DoorLock::UserStatusEnum;
-using chip::app::Clusters::DoorLock::UserTypeEnum;
-using chip::app::DataModel::List;
-using chip::app::DataModel::Nullable;
-using chip::app::DataModel::NullNullable;
-
-using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
-using LockOpCredentials = CredentialStruct;
-
 /**
  * Handler for executing remote lock operations.
  *
@@ -107,9 +84,6 @@ class DoorLockServer : public chip::app::AttributeAccessInterface
 public:
     DoorLockServer() : AttributeAccessInterface(chip::Optional<chip::EndpointId>::Missing(), chip::app::Clusters::DoorLock::Id) {}
     static DoorLockServer & Instance();
-
-    using Feature                       = chip::app::Clusters::DoorLock::Feature;
-    using OnFabricRemovedCustomCallback = void (*)(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
     void InitServer(chip::EndpointId endpointId);
 
