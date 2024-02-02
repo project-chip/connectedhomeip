@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/server/Server.h>
+#include <controller/CHIPDeviceController.h>
 #include <controller/CommissionerDiscoveryController.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>

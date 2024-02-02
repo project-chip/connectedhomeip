@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <controller/CHIPDeviceController.h>
 #include <controller/CommissionerDiscoveryController.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <lib/core/CHIPError.h>
