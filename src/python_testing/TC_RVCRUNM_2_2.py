@@ -89,7 +89,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
 
-
     def pics_TC_RVCRUNM_2_2(self) -> list[str]:
         return ["RVCRUNM.S"]
 
