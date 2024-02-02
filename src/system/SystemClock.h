@@ -28,7 +28,6 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/TimeUtils.h>
 #include <system/SystemError.h>
@@ -150,29 +149,13 @@ public:
      *
      * Although some platforms may choose to return a value that measures the time since boot for the
      * system, applications must *not* rely on this.
+     *
+     * WARNING: *** It is up to each platform to ensure that GetMonotonicTimestamp can be
+     *              called safely in a re-entrant way from multiple contexts if making use
+     *              of this method from the application, outside the Matter stack execution
+     *              serialization context. ***
      */
-    Timestamp GetMonotonicTimestamp()
-    {
-        uint64_t prevTimestamp = __atomic_load_n(&mLastTimestamp, __ATOMIC_SEQ_CST);
-        static_assert(sizeof(prevTimestamp) == sizeof(Timestamp),
-                      "Must have scalar match between timestamp and uint64_t for atomics.");
-
-        // Force a reorder barrier to prevent GetMonotonicMilliseconds64() from being
-        // optimizer-called before prevTimestamp loading, so that newTimestamp acquisition happens-after
-        // the prevTimestamp load.
-        __atomic_signal_fence(__ATOMIC_SEQ_CST);
-
-        Timestamp newTimestamp = GetMonotonicMilliseconds64();
-
-        // Need to guarantee the invariant that monotonic clock never goes backwards, which would break multiple system
-        // assumptions which use these clocks.
-        VerifyOrDie(newTimestamp.count() >= prevTimestamp);
-
-        // newTimestamp guaranteed to never be < the last timestamp.
-        __atomic_store_n(&mLastTimestamp, newTimestamp.count(), __ATOMIC_SEQ_CST);
-
-        return newTimestamp;
-    }
+    virtual Timestamp GetMonotonicTimestamp();
 
     /**
      * Returns a monotonic system time in units of microseconds, from the platform.
