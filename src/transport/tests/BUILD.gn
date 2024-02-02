@@ -19,7 +19,10 @@ import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 source_set("helpers") {
-  sources = [ "LoopbackTransportManager.h" ]
+  sources = [
+    "LoopbackTransportManager.h",
+    "UDPTransportManager.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/transport:transport",
