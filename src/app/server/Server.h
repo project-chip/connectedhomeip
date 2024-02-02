@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/AppConfig.h>
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
@@ -70,7 +70,7 @@
 #include <transport/raw/UDP.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h> // nogncheck
+#include <app/icd/server/ICDManager.h> // nogncheck
 #endif
 
 namespace chip {

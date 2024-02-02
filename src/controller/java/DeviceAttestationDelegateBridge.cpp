@@ -37,8 +37,7 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, const chip::Credentials::DeviceAtte
     const ByteSpan PAI                                    = info.paiDerBuffer();
     const Optional<ByteSpan> certificationDeclarationSpan = info.cdBuffer();
 
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/AttestationInfo", infoClass);
-    JniClass attestationInfoClass(infoClass);
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/AttestationInfo", infoClass);
     SuccessOrExit(err);
 
     env->ExceptionClear();
@@ -71,16 +70,14 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
     mResult = attestationResult;
     if (mDeviceAttestationDelegate != nullptr)
     {
-        JNIEnv * env                        = JniReferences::GetInstance().GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+        JniLocalReferenceScope scope(env);
         jclass deviceAttestationDelegateCls = nullptr;
-
-        JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
-                                                 deviceAttestationDelegateCls);
+        JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
+                                                      deviceAttestationDelegateCls);
         VerifyOrReturn(deviceAttestationDelegateCls != nullptr,
                        ChipLogError(Controller, "Could not find device attestation delegate class."));
-
-        // Auto delete deviceAttestationDelegateCls object when exit from the local scope
-        JniClass deviceAttestationDelegateJniCls(deviceAttestationDelegateCls);
 
         if (env->IsInstanceOf(mDeviceAttestationDelegate, deviceAttestationDelegateCls))
         {

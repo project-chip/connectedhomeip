@@ -93,7 +93,7 @@ DENY: Set[str] = {
     'vector',
 
     # CHIP headers using STL containers.
-    'lib/support/CHIPListUtils.h',      # uses std::set
+    'app/data-model/ListLargeSystemExtensions.h',      # uses std::set
     'src/platform/DeviceSafeQueue.h',   # uses std::deque
 }
 
@@ -113,7 +113,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/support/IniEscaping.h': {'string'},
 
     # Itself in DENY.
-    'src/lib/support/CHIPListUtils.h': {'set'},
+    'src/app/data-model/ListLargeSystemExtensions.h': {'set'},
     'src/platform/DeviceSafeQueue.h': {'queue'},
 
     # Only uses <chrono> for zero-cost types.

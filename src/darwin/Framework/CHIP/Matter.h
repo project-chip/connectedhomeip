@@ -19,6 +19,7 @@
 
 #define MTR_INCLUDED_FROM_UMBRELLA_HEADER
 
+#import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
 #import <Matter/MTRBackwardsCompatShims.h>
 #import <Matter/MTRBaseClusters.h>
@@ -45,17 +46,22 @@
 #import <Matter/MTRDeviceControllerParameters.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
+#import <Matter/MTRDeviceTypeRevision.h>
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTRError.h>
 #import <Matter/MTRFabricInfo.h>
 #import <Matter/MTRKeypair.h>
 #import <Matter/MTRLogging.h>
 #import <Matter/MTRManualSetupPayloadParser.h>
+#import <Matter/MTRMetrics.h>
 #import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTROnboardingPayloadParser.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
 #import <Matter/MTRQRCodeSetupPayloadParser.h>
+#import <Matter/MTRServerAttribute.h>
+#import <Matter/MTRServerCluster.h>
+#import <Matter/MTRServerEndpoint.h>
 #import <Matter/MTRSetupPayload.h>
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
