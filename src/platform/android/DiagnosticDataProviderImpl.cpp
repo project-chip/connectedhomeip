@@ -99,7 +99,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT,
                         ChipLogError(DeviceLayer, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
     VerifyOrExit(mDiagnosticDataProviderManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetNifMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     {

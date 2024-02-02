@@ -407,6 +407,8 @@ private:
 
     ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
 
+    InteractionModelEngine * GetInteractionModelEngine() override { return this; }
+
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     /**

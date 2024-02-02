@@ -45,6 +45,7 @@ static_library("messaging") {
   sources = [
     "ApplicationExchangeDispatch.cpp",
     "ApplicationExchangeDispatch.h",
+    "EphemeralExchangeDispatch.h",
     "ErrorCategory.cpp",
     "ErrorCategory.h",
     "ExchangeContext.cpp",

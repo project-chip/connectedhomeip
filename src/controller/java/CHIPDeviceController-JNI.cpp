@@ -2180,7 +2180,7 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
 
     jmethodID constructor;
     jclass infoClass;
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDClientInfo", infoClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,

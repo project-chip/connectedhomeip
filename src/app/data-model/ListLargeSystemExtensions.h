@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_LISTUTILS_INTERNAL_H
-#define CHIP_LISTUTILS_INTERNAL_H
+#pragma once
 
+// NOTE: Functionality in this class uses HEAP and std::set. It is generally
+//       intended for large systems only
 #include <app/data-model/List.h>
+
 #include <set>
 #include <type_traits>
 
@@ -27,6 +29,7 @@ template <typename T>
 struct ListMemberTypeGetter
 {
 };
+
 template <typename T>
 struct ListMemberTypeGetter<chip::app::DataModel::List<T>>
 {
@@ -63,5 +66,3 @@ struct ListFreer
 
     std::set<ListHolderBase *> mListHolders;
 };
-
-#endif /* CHIP_LISTUTILS_INTERNAL_H */
