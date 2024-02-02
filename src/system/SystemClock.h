@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include <atomic>
-
 // Include configuration headers
 #include <system/SystemConfig.h>
 
@@ -155,21 +153,22 @@ public:
      */
     Timestamp GetMonotonicTimestamp()
     {
-        Timestamp prevTimestamp = mLastTimestamp.load();
+        uint64_t prevTimestamp = __atomic_load_n(&mLastTimestamp, __ATOMIC_SEQ_CST);
+        static_assert(sizeof(prevTimestamp) == sizeof(Timestamp), "Must have scalar match between timestamp and uint64_t for atomics.");
 
-        // Force a memory barrier so that the new timestamp is always acquired after any ongoing prevTimestamp store from
-        // other contexts.
-        std::atomic_thread_fence(std::memory_order_seq_cst);
+        // Force a reorder barrier to prevent GetMonotonicMilliseconds64() from being
+        // optimizer-called before prevTimestamp loading, so that newTimestamp acquisition happens-after
+        // the prevTimestamp load.
+        __atomic_signal_fence(__ATOMIC_SEQ_CST);
 
-        // newTimestamp acquire happens-after the prevTimestamp load
         Timestamp newTimestamp = GetMonotonicMilliseconds64();
 
         // Need to guarantee the invariant that monotonic clock never goes backwards, which would break multiple system
         // assumptions which use these clocks.
-        VerifyOrDie(newTimestamp >= prevTimestamp);
+        VerifyOrDie(newTimestamp.count() >= prevTimestamp);
 
-        // NewTimestamp guaranteed to never be < the last timestamp.
-        mLastTimestamp.store(newTimestamp);
+        // newTimestamp guaranteed to never be < the last timestamp.
+        __atomic_store_n(&mLastTimestamp, newTimestamp.count(), __ATOMIC_SEQ_CST);
 
         return newTimestamp;
     }
@@ -312,7 +311,7 @@ public:
     virtual CHIP_ERROR SetClock_RealTime(Microseconds64 aNewCurTime) = 0;
 
 protected:
-    std::atomic<Timestamp> mLastTimestamp{chip::System::Clock::kZero};
+    uint64_t mLastTimestamp = 0;
 };
 
 // Currently we have a single implementation class, ClockImpl, whose members are implemented in build-specific files.
@@ -359,9 +358,10 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void SetMonotonic(Milliseconds64 timestamp) {
+    void SetMonotonic(Milliseconds64 timestamp)
+    {
         mSystemTime = timestamp;
-        mLastTimestamp.store(timestamp);
+        __atomic_store_n(&mLastTimestamp, timestamp.count(), __ATOMIC_SEQ_CST);
     }
 
     void AdvanceMonotonic(Milliseconds64 increment) { mSystemTime += increment; }
