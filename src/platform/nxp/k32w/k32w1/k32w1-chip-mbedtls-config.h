@@ -16,7 +16,8 @@
  */
 
 // Spans multiple lines to avoid being processed by unifdef
-#ifndef MBEDTLS_CONFIG_H
+#ifndef \
+    MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
 
 #include "openthread-core-config.h"
@@ -97,35 +98,38 @@
 #define MBEDTLS_PK_WRITE_C
 #endif
 
-#define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
-#define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
-#define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
-#define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
-#define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
-#define MBEDTLS_ENTROPY_MAX_SOURCES 2   /**< Maximum number of sources supported */
+#define MBEDTLS_MPI_WINDOW_SIZE            1 /**< Maximum windows size used. */
+#define MBEDTLS_MPI_MAX_SIZE              32 /**< Maximum number of bytes for usable MPIs. */
+#define MBEDTLS_ECP_MAX_BITS             256 /**< Maximum bit size of groups */
+#define MBEDTLS_ECP_WINDOW_SIZE            2 /**< Maximum window size used */
+#define MBEDTLS_ECP_FIXED_POINT_OPTIM      0 /**< Enable fixed-point speed-up */
+#define MBEDTLS_ENTROPY_MAX_SOURCES        2 /**< Maximum number of sources supported */
 
 #if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
-#define MBEDTLS_PLATFORM_STD_CALLOC otPlatCAlloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE otPlatFree     /**< Default free to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_CALLOC      otPlatCAlloc /**< Default allocator to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_FREE        otPlatFree /**< Default free to use, can be undefined */
 #else
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 #endif
 
 #if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
-#define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN      900 /**< Maxium fragment length in bytes */
 #else
-#define MBEDTLS_SSL_MAX_CONTENT_LEN 768 /**< Maxium fragment length in bytes */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN      768 /**< Maxium fragment length in bytes */
 #endif
 
-#define MBEDTLS_SSL_IN_CONTENT_LEN MBEDTLS_SSL_MAX_CONTENT_LEN
-#define MBEDTLS_SSL_OUT_CONTENT_LEN MBEDTLS_SSL_MAX_CONTENT_LEN
-#define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
+#define MBEDTLS_SSL_IN_CONTENT_LEN       MBEDTLS_SSL_MAX_CONTENT_LEN
+#define MBEDTLS_SSL_OUT_CONTENT_LEN      MBEDTLS_SSL_MAX_CONTENT_LEN
+#define MBEDTLS_SSL_CIPHERSUITES         MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
 // Spans multiple lines to avoid being processed by unifdef
-#if defined(MBEDTLS_USER_CONFIG_FILE)
+#if defined(\
+    MBEDTLS_USER_CONFIG_FILE)
 #include MBEDTLS_USER_CONFIG_FILE
 #endif
 
 #include "mbedtls/check_config.h"
 
 #endif /* MBEDTLS_CONFIG_H */
+
+

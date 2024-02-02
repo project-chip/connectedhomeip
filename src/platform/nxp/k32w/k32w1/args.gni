@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w1_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 declare_args() {
@@ -22,9 +22,25 @@ declare_args() {
   sdk_release = 1
 }
 
-chip_device_platform = "k32w1"
+nxp_platform = "k32w/k32w1"
+nxp_sdk_name = "k32w1_sdk"
+nxp_device_layer = "nxp/${nxp_platform}"
+nxp_use_lwip = false
+nxp_use_mbedtls_port = false
 
-lwip_platform = "k32w1"
+# ARM architecture flags will be set based on NXP board.
+arm_platform_config = "${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_arm.gni"
+
+chip_device_platform = "nxp"
+
+chip_device_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_inet_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"
+chip_ble_project_config_include = "<CHIPProjectConfig.h>"
+chip_project_config_include_dirs = ["${chip_root}/examples/platform/${nxp_platform}/app/project_include"]
+
+chip_enable_openthread = true
 
 chip_inet_config_enable_ipv4 = false
 
@@ -39,12 +55,12 @@ chip_mdns = "platform"
 
 chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false
-mbedtls_target = "${chip_root}/third_party/nxp/k32w1_sdk:mbedtls"
+mbedtls_target = "${nxp_sdk_build_root}/${nxp_sdk_name}:mbedtls"
 openthread_external_mbedtls = mbedtls_target
 
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_platform_check_file =
-    "openthread-core-k32w1-config-check.h"
+     "openthread-core-k32w1-config-check.h"
 openthread_core_config_deps = [ "${chip_root}/examples/platform/nxp/k32w/k32w1:openthread_core_config_k32w1_chip_examples" ]
 
 openthread_external_platform = "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w1:libopenthread-k32w1"

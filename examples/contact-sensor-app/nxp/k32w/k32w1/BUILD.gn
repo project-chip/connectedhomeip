@@ -14,15 +14,17 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w1_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-import("${k32w1_sdk_build_root}/k32w1_executable.gni")
-import("${k32w1_sdk_build_root}/k32w1_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 declare_args() {
   chip_software_version = 0
@@ -110,6 +112,7 @@ k32w1_executable("contact_sensor_app") {
   output_dir = root_out_dir
 
   ldscript = "${k32w1_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc/connectivity.ld"
+
 
   inputs = [ ldscript ]
 

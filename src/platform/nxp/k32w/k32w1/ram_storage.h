@@ -48,7 +48,7 @@ typedef struct
 {
     uint16_t ramBufferLen;
     uint16_t ramBufferMaxLen;
-    uint8_t pRamBuffer[1];
+    uint8_t  pRamBuffer[1];
 } ramBufferDescriptor;
 
 struct settingsBlock
@@ -57,7 +57,7 @@ struct settingsBlock
     uint16_t length;
 } __attribute__((packed));
 
-#if defined(PDM_USE_DYNAMIC_MEMORY) && PDM_USE_DYNAMIC_MEMORY && defined(OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE) &&                \
+#if defined(PDM_USE_DYNAMIC_MEMORY) && PDM_USE_DYNAMIC_MEMORY && defined(OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE) && \
     OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #define ENABLE_STORAGE_DYNAMIC_MEMORY 1
 #else
@@ -77,24 +77,28 @@ extern "C" {
 #endif
 
 /* search RAM Buffer for aKey and return its value in aValue. aValueLength will contain the length of aValueLength */
-rsError ramStorageGet(const ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength);
+rsError ramStorageGet(const ramBufferDescriptor *pBuffer,
+                      uint16_t                   aKey,
+                      int                        aIndex,
+                      uint8_t *                  aValue,
+                      uint16_t *                 aValueLength);
 
 /* search RAM buffer for aKey and set its value to aValue (having aValueLength length)
  * - aValue and aValueLength can be NULL - the function checks only for the existence of aKey
  * - if only aValue is NULL and aKey exists in the RAM buffer - the function will return its value in aValueLength
  */
-rsError ramStorageSet(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
+rsError ramStorageSet(ramBufferDescriptor *pBuffer, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength);
 
 /* adds a settingsBlock (aKey:aValue) to the end of the RAM Buffer:
  * - doesn't check if aKey already exists in the RAM Buffer
  * - aValueLength can be 0
  */
-rsError ramStorageAdd(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
+rsError ramStorageAdd(ramBufferDescriptor *pBuffer, uint16_t aKey, const uint8_t *aValue, uint16_t aValueLength);
 
 /* search RAM Buffer for aKey (with aIndex) and delete it:
- * - if aIndex is -1 then all the  occurrences of aKey are deleted
+ * - if aIndex is -1 then all the  occurences of aKey are deleted
  */
-rsError ramStorageDelete(ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex);
+rsError ramStorageDelete(ramBufferDescriptor *pBuffer, uint16_t aKey, int aIndex);
 
 #ifdef __cplusplus
 }

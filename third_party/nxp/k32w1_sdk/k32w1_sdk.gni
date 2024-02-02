@@ -13,15 +13,15 @@
 # limitations under the License.
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w1_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/crypto/crypto.gni")
-import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/platform/nxp/k32w/k32w1/args.gni")
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 declare_args() {
   # Location of the k32w1 SDK.
@@ -34,7 +34,7 @@ openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 assert(k32w1_sdk_root != "", "k32w1_sdk_root must be specified")
 
 assert(!(use_smu2_as_system_memory && !chip_openthread_ftd),
-       "SMU2 can be used as system memory only with OT-FTD suppport")
+    "SMU2 can be used as system memory only with OT-FTD suppport")
 
 # Defines an k32w1 SDK build target.
 #
@@ -46,9 +46,9 @@ template("k32w1_sdk") {
     k32w1_sdk_root = invoker.k32w1_sdk_root
   }
 
-  assert(chip_with_low_power == 0 ||
-             (chip_with_low_power == 1 && chip_with_ot_cli == 0),
-         "Please disable low power if openthread CLI is needed!")
+  assert(
+      chip_with_low_power == 0 || (chip_with_low_power == 1 && chip_with_ot_cli == 0),
+      "Please disable low power if openthread CLI is needed!")
 
   sdk_target_name = target_name
 
@@ -114,6 +114,7 @@ template("k32w1_sdk") {
 
       "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/include",
       "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/include/platform/k32w1",
+      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/include/environment/freertos",
       "${k32w1_sdk_root}/middleware/multicore/mcmgr/src",
 
       "${k32w1_sdk_root}/middleware/wireless/ble_controller/interface",
@@ -148,13 +149,13 @@ template("k32w1_sdk") {
 
     if (sdk_release == 1) {
       _sdk_include_dirs += [
-        "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/matter",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers",
-        "${k32w1_sdk_root}/devices/K32W1480/utilities",
-        "${k32w1_sdk_root}/devices/K32W1480/utilities/debug_console",
-        "${k32w1_sdk_root}/devices/K32W1480/utilities/str",
-        "${k32w1_sdk_root}/devices/K32W1480/utilities/format",
-      ]
+       "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/matter",
+       "${k32w1_sdk_root}/devices/K32W1480/drivers",
+       "${k32w1_sdk_root}/devices/K32W1480/utilities",
+       "${k32w1_sdk_root}/devices/K32W1480/utilities/debug_console",
+       "${k32w1_sdk_root}/devices/K32W1480/utilities/str",
+       "${k32w1_sdk_root}/devices/K32W1480/utilities/format",
+     ]
     } else {
       _sdk_include_dirs += [
         "${k32w1_sdk_root}/devices/KW45B41Z83/drivers",
@@ -242,18 +243,15 @@ template("k32w1_sdk") {
       "gLoggingActive_d=0",
       "gLogRingPlacementOffset_c=0xF000",
       "CHIP_PLAT_NVM_SUPPORT=1",
-      "mAdvertisingDefaultTxPower_c=0",  # default advertising TX power
+      "mAdvertisingDefaultTxPower_c=0", # default advertising TX power
       "mConnectionDefaultTxPower_c=0",  # default connection TX power
-      "BLE_HIGH_TX_POWER=0",  # when enabled overwrite default tx power with
-                              # following values gAdvertisingPowerLeveldBm_c and
-                              # gConnectPowerLeveldBm_c
+      "BLE_HIGH_TX_POWER=0",            # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
       "gAdvertisingPowerLeveldBm_c=0",
       "gConnectPowerLeveldBm_c=0",
     ]
 
     if (chip_with_low_power == 1 && chip_logging == true) {
-      print(
-          "WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
+      print("WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
       print("WARNING: set chip_logging=false to disable logging.")
     }
 
@@ -287,13 +285,13 @@ template("k32w1_sdk") {
       if (chip_logging == false) {
         defines += [
           "K32W_LOG_ENABLED=0",
-          "gUartDebugConsole_d=0",
+          "gUartDebugConsole_d=0"
         ]
       } else {
         defines += [
           "K32W_LOG_ENABLED=1",
           "OSA_USED=1",
-          "gUartDebugConsole_d=1",
+          "gUartDebugConsole_d=1"
         ]
       }
     } else {
@@ -343,133 +341,139 @@ template("k32w1_sdk") {
     }
 
     if (sdk_release == 1) {
-      sources += [
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ccm32k.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_clock.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_cmc.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_crc.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_gpio.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_imu.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_controller.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_flash.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpspi.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lptmr.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpuart.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ltc.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_snt.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_spc.c",
-        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_wuu.c",
-        "${k32w1_sdk_root}/devices/K32W1480/utilities/debug_console/fsl_debug_console.c",
-        "${k32w1_sdk_root}/devices/K32W1480/utilities/fsl_assert.c",
-        "${k32w1_sdk_root}/devices/K32W1480/utilities/str/fsl_str.c",
-        "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/matter/ble_init.c",
-      ]
+     sources += [
+      "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/matter/ble_init.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_flash.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_controller.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_clock.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_gpio.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpuart.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ltc.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lptmr.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpspi.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_snt.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_spc.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_wuu.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_imu.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_crc.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_cmc.c",
+      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ccm32k.c",
+      "${k32w1_sdk_root}/devices/K32W1480/utilities/fsl_assert.c",
+      "${k32w1_sdk_root}/devices/K32W1480/utilities/debug_console/fsl_debug_console.c",
+      "${k32w1_sdk_root}/devices/K32W1480/utilities/str/fsl_str.c",
+     ]
     } else {
       sources += [
-        "${k32w1_sdk_root}/devices/KW45B41Z83/drivers/fsl_clock.c",
-        "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/ble_init.c",
-        "${k32w1_sdk_root}/platform/drivers/ccm32k/fsl_ccm32k.c",
-        "${k32w1_sdk_root}/platform/drivers/cmc/fsl_cmc.c",
-        "${k32w1_sdk_root}/platform/drivers/crc/fsl_crc.c",
-        "${k32w1_sdk_root}/platform/drivers/flash_k4/fsl_k4_controller.c",
-        "${k32w1_sdk_root}/platform/drivers/flash_k4/fsl_k4_flash.c",
-        "${k32w1_sdk_root}/platform/drivers/gpio/fsl_gpio.c",
-        "${k32w1_sdk_root}/platform/drivers/imu/fsl_imu.c",
-        "${k32w1_sdk_root}/platform/drivers/lpspi/fsl_lpspi.c",
-        "${k32w1_sdk_root}/platform/drivers/lptmr/fsl_lptmr.c",
-        "${k32w1_sdk_root}/platform/drivers/lpuart/fsl_lpuart.c",
-        "${k32w1_sdk_root}/platform/drivers/ltc/fsl_ltc.c",
-        "${k32w1_sdk_root}/platform/drivers/snt/fsl_snt.c",
-        "${k32w1_sdk_root}/platform/drivers/spc/fsl_spc.c",
-        "${k32w1_sdk_root}/platform/drivers/wuu/fsl_wuu.c",
-        "${k32w1_sdk_root}/platform/utilities/assert/fsl_assert.c",
-        "${k32w1_sdk_root}/platform/utilities/debug_console/fsl_debug_console.c",
-        "${k32w1_sdk_root}/platform/utilities/str/fsl_str.c",
+      "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/ble_init.c",
+      "${k32w1_sdk_root}/platform/drivers/flash_k4/fsl_k4_flash.c",
+      "${k32w1_sdk_root}/platform/drivers/flash_k4/fsl_k4_controller.c",
+      "${k32w1_sdk_root}/devices/KW45B41Z83/drivers/fsl_clock.c",
+      "${k32w1_sdk_root}/platform/drivers/gpio/fsl_gpio.c",
+      "${k32w1_sdk_root}/platform/drivers/lpuart/fsl_lpuart.c",
+      "${k32w1_sdk_root}/platform/drivers/ltc/fsl_ltc.c",
+      "${k32w1_sdk_root}/platform/drivers/lptmr/fsl_lptmr.c",
+      "${k32w1_sdk_root}/platform/drivers/lpspi/fsl_lpspi.c",
+      "${k32w1_sdk_root}/platform/drivers/snt/fsl_snt.c",
+      "${k32w1_sdk_root}/platform/drivers/spc/fsl_spc.c",
+      "${k32w1_sdk_root}/platform/drivers/wuu/fsl_wuu.c",
+      "${k32w1_sdk_root}/platform/drivers/imu/fsl_imu.c",
+      "${k32w1_sdk_root}/platform/drivers/crc/fsl_crc.c",
+      "${k32w1_sdk_root}/platform/drivers/cmc/fsl_cmc.c",
+      "${k32w1_sdk_root}/platform/drivers/ccm32k/fsl_ccm32k.c",
+      "${k32w1_sdk_root}/platform/utilities/assert/fsl_assert.c",
+      "${k32w1_sdk_root}/platform/utilities/debug_console/fsl_debug_console.c",
+      "${k32w1_sdk_root}/platform/utilities/str/fsl_str.c",
       ]
     }
 
     sources += [
-      "${k32w1_sdk_root}/components/button/fsl_component_button.c",
-      "${k32w1_sdk_root}/components/flash//nor/lpspi/fsl_lpspi_mem_adapter.c",
-      "${k32w1_sdk_root}/components/flash//nor/lpspi/fsl_lpspi_nor_flash.c",
-      "${k32w1_sdk_root}/components/gpio/fsl_adapter_gpio.c",
-      "${k32w1_sdk_root}/components/internal_flash/fsl_adapter_k4_flash.c",
-      "${k32w1_sdk_root}/components/led/fsl_component_led.c",
-      "${k32w1_sdk_root}/components/lists/fsl_component_generic_list.c",
-      "${k32w1_sdk_root}/components/mem_manager/fsl_component_mem_manager_light.c",
-      "${k32w1_sdk_root}/components/messaging/fsl_component_messaging.c",
-      "${k32w1_sdk_root}/components/osa/fsl_os_abstraction_free_rtos.c",
-      "${k32w1_sdk_root}/components/panic/fsl_component_panic.c",
-      "${k32w1_sdk_root}/components/power_manager/boards/K32W148-EVK/fsl_pm_board.c",
-      "${k32w1_sdk_root}/components/power_manager/core/fsl_pm_core.c",
-      "${k32w1_sdk_root}/components/reset/fsl_adapter_reset.c",
-      "${k32w1_sdk_root}/components/rpmsg/fsl_adapter_rpmsg.c",
-      "${k32w1_sdk_root}/components/serial_manager/fsl_component_serial_manager.c",
-      "${k32w1_sdk_root}/components/serial_manager/fsl_component_serial_port_uart.c",
-      "${k32w1_sdk_root}/components/time_stamp/fsl_adapter_lptmr_time_stamp.c",
-      "${k32w1_sdk_root}/components/timer/fsl_adapter_lptmr.c",
-      "${k32w1_sdk_root}/components/timer_manager/fsl_component_timer_manager.c",
-      "${k32w1_sdk_root}/components/uart/fsl_adapter_lpuart.c",
       "${k32w1_sdk_root}/devices/K32W1480/gcc/startup_K32W1480.S",
       "${k32w1_sdk_root}/devices/K32W1480/system_K32W1480.c",
+      "${k32w1_sdk_root}/components/rpmsg/fsl_adapter_rpmsg.c",
+      "${k32w1_sdk_root}/components/osa/fsl_os_abstraction_free_rtos.c",
+      "${k32w1_sdk_root}/components/lists/fsl_component_generic_list.c",
+      "${k32w1_sdk_root}/components/messaging/fsl_component_messaging.c",
+      "${k32w1_sdk_root}/components/mem_manager/fsl_component_mem_manager_light.c",
+      "${k32w1_sdk_root}/components/panic/fsl_component_panic.c",
+      "${k32w1_sdk_root}/components/serial_manager/fsl_component_serial_manager.c",
+      "${k32w1_sdk_root}/components/serial_manager/fsl_component_serial_port_uart.c",
+      "${k32w1_sdk_root}/components/uart/fsl_adapter_lpuart.c",
+      "${k32w1_sdk_root}/components/gpio/fsl_adapter_gpio.c",
+      "${k32w1_sdk_root}/components/led/fsl_component_led.c",
+      "${k32w1_sdk_root}/components/button/fsl_component_button.c",
+      "${k32w1_sdk_root}/components/timer_manager/fsl_component_timer_manager.c",
+      "${k32w1_sdk_root}/components/timer/fsl_adapter_lptmr.c",
+      "${k32w1_sdk_root}/components/time_stamp/fsl_adapter_lptmr_time_stamp.c",
+      "${k32w1_sdk_root}/components/internal_flash/fsl_adapter_k4_flash.c",
+      "${k32w1_sdk_root}/components/reset/fsl_adapter_reset.c",
+      "${k32w1_sdk_root}/components/flash//nor/lpspi/fsl_lpspi_nor_flash.c",
+      "${k32w1_sdk_root}/components/flash//nor/lpspi/fsl_lpspi_mem_adapter.c",
+      "${k32w1_sdk_root}/components/power_manager/boards/K32W148-EVK/fsl_pm_board.c",
+      "${k32w1_sdk_root}/components/power_manager/core/fsl_pm_core.c",
+
+      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480/clock_config.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480/pin_mux.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_comp.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/app_services_init.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_dcdc.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/FunctionLib/FunctionLib.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/HWParameter/HWParameter.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/Sensors/sensors.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_lowpower.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_lowpower_timer.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ble.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ot.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ics.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ota.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_extflash.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/RNG/RNG.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/LowPower/PWR.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/LowPower/PWR_systicks.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Source/NV_Flash.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/SecLib/SecLib_sss.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaSupport.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaExternalFlash.c",
+
+      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/rpmsg_lite/rpmsg_lite.c",
+      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/rpmsg_lite/porting/environment/rpmsg_env_freertos.c",
+      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform.c",
+      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/common/llist.c",
+      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/virtio/virtqueue.c",
       "${k32w1_sdk_root}/middleware/multicore/mcmgr/src/mcmgr.c",
       "${k32w1_sdk_root}/middleware/multicore/mcmgr/src/mcmgr_imu_internal.c",
       "${k32w1_sdk_root}/middleware/multicore/mcmgr/src/mcmgr_internal_core_api_k32w1.c",
-      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/common/llist.c",
-      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/rpmsg_lite/porting/environment/rpmsg_env_freertos.c",
-      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform.c",
-      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/rpmsg_lite/rpmsg_lite.c",
-      "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite/lib/virtio/virtqueue.c",
-      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_aes.c",
-      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_aes_cmac.c",
-      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_ecdh.c",
-      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_init.c",
-      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_sha256.c",
-      "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sscp_mu.c",
-      "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sss_mgmt.c",
-      "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sss_sscp.c",
       "${k32w1_sdk_root}/middleware/wireless/ble_controller/src/controller_api.c",
+      "${k32w1_sdk_root}/middleware/wireless/bluetooth/port/fwk_generic_list.c",
       "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/ble_conn_manager.c",
       "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/gatt_db/gatt_database.c",
       "${k32w1_sdk_root}/middleware/wireless/bluetooth/hci_transport/source/hcit_generic_adapter_interface.c",
       "${k32w1_sdk_root}/middleware/wireless/bluetooth/host/config/ble_globals.c",
-      "${k32w1_sdk_root}/middleware/wireless/bluetooth/port/fwk_generic_list.c",
       "${k32w1_sdk_root}/middleware/wireless/bluetooth/port/fwk_timer_manager.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/Common/rtos/freertos/heap_mem_manager.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/FunctionLib/FunctionLib.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/HWParameter/HWParameter.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/LowPower/PWR.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/LowPower/PWR_systicks.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/NVM/Source/NV_Flash.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaExternalFlash.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaSupport.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/RNG/RNG.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/SecLib/SecLib_sss.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/Sensors/sensors.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480/clock_config.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/K32W1480/pin_mux.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/app_services_init.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_comp.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_dcdc.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ble.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_extflash.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ics.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_lowpower.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ot.c",
-      "${k32w1_sdk_root}/middleware/wireless/framework/platform/kw45_k32w1/fwk_platform_ota.c",
-      "${k32w1_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/PhyTime.c",
+
+      "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sscp_mu.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sss_mgmt.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/src/sscp/fsl_sss_sscp.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_init.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_aes.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_sha256.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_ecdh.c",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1/sss_aes_cmac.c",
+
       "${k32w1_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/SerialDevice/ASP.c",
       "${k32w1_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/SerialDevice/Phy.c",
+      "${k32w1_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/PhyTime.c",
+
+      "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
+      "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
+      "${k32w1_sdk_root}/middleware/wireless/framework/Common/rtos/freertos/heap_mem_manager.c",
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/croutine.c",
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/event_groups.c",
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/list.c",
-      "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
-      "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/queue.c",
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/stream_buffer.c",
       "${k32w1_sdk_root}/rtos/freertos/freertos_kernel/tasks.c",

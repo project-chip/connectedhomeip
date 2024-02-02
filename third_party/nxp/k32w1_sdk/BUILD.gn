@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/k32w1_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 
-import("${k32w1_sdk_build_root}/k32w1_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 import("${mbedtls_root}/mbedtls.gni")
 
 declare_args() {
@@ -25,7 +26,7 @@ declare_args() {
 
 assert(k32w1_sdk_target != "", "k32w1_sdk_target must be specified")
 
-group("k32w1_sdk") {
+group("nxp_sdk") {
   public_deps = [ k32w1_sdk_target ]
 }
 
@@ -45,12 +46,12 @@ config("mbedtls_k32w1_config") {
     "MBEDTLS_ERROR_C",
     "MBEDTLS_PKCS5_C",
 
-    "MBEDTLS_ECP_FIXED_POINT_OPTIM=0",  # To reduce peak memory usage
+    "MBEDTLS_ECP_FIXED_POINT_OPTIM=0", # To reduce peak memory usage 
     "MBEDTLS_MPI_WINDOW_SIZE=1",
     "MBEDTLS_ECP_WINDOW_SIZE=2",
-    "MBEDTLS_MPI_MAX_SIZE=32",  # Maximum number of bytes for usable MPIs.
-    "MBEDTLS_ECP_MAX_BITS=256",  # Maximum bit size of groups */
-    "MBEDTLS_ENTROPY_MAX_SOURCES=1",  # Maximum number of sources supported
+    "MBEDTLS_MPI_MAX_SIZE=32",         # Maximum number of bytes for usable MPIs.
+    "MBEDTLS_ECP_MAX_BITS=256",        # Maximum bit size of groups */
+    "MBEDTLS_ENTROPY_MAX_SOURCES=1",   # Maximum number of sources supported
 
     "MBEDTLS_ENTROPY_HARDWARE_ALT",
   ]
@@ -62,20 +63,25 @@ config("mbedtls_k32w1_config") {
       "MBEDTLS_BASE64_C",
     ]
   }
+  if (chip_crypto == "platform") {
+   defines += [
+     # "MBEDTLS_CCM_ALT",
+   ]
+  }
 
   include_dirs = [ chip_root ]
 }
 
 mbedtls_target("mbedtls") {
   sources = [
-    "${k32w1_sdk_root}/middleware/mbedtls/port/sssapi/ccm_alt.c",
     "${k32w1_sdk_root}/middleware/mbedtls/port/sssapi/entropy_poll_alt.c",
+    "${k32w1_sdk_root}/middleware/mbedtls/port/sssapi/ccm_alt.c",
   ]
 
   public_configs = [ ":mbedtls_k32w1_config" ]
 
   public_deps = [
-    ":k32w1_sdk",
+    ":nxp_sdk",
     "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w1:openthread_mbedtls_config_k32w1",
   ]
 }
