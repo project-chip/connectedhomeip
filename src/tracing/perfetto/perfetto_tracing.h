@@ -17,7 +17,6 @@
  */
 #pragma once
 
-#include <atomic>
 #include <tracing/backend.h>
 
 #include <memory>

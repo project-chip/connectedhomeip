@@ -23,10 +23,10 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
+#include <log_json/log_json_build_config.h>
 #include <transport/TracingStructs.h>
 
 #include <json/json.h>
-#include <log_json/log_json_build_config.h>
 
 #include <errno.h>
 

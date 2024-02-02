@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,33 +44,9 @@ public:
 
     int GetInstanceCount() const;
 
-    void ReportMetrics()
-    {
-        if (!registered)
-        {
-            esp_diag_metrics_register("SYS_CNT" /* Tag of metrics */, label /* Unique key 8 */,
-                                      label /* label displayed on dashboard */, PATH /* hierarchical path */,
-                                      ESP_DIAG_DATA_TYPE_UINT /* data_type */);
-            registered = true;
-        }
-        ESP_LOGI("mtr", "Label = %s Count = %d", label, instanceCount);
-        esp_diag_metrics_add_uint(label, instanceCount);
-    }
+    void ReportMetrics();
 
-    // Destructor to free the dynamically allocated memory
-    ~ESPInsightsCounter()
-    {
-        chip::Platform::MemoryFree((void *) label);
-
-        ESPInsightsCounter * current = mHead;
-        while (current)
-        {
-            ESPInsightsCounter * next = current->mNext;
-            chip::Platform::MemoryFree((void *) current);
-            current = next;
-        }
-        mHead = nullptr;
-    }
+    ~ESPInsightsCounter();
 };
 
 } // namespace Insights

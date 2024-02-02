@@ -245,6 +245,7 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
     {
         MATTER_TRACE_SCOPE("OnDisconnectionDetected", "WiFiDiagnosticsDelegate");
         ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
+
         for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
         {
             // If WiFi Network Diagnostics cluster is implemented on this endpoint
