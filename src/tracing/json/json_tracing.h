@@ -51,7 +51,7 @@ public:
     void TraceBegin(const char * label, const char * group) override;
     void TraceEnd(const char * label, const char * group) override;
     void TraceInstant(const char * label, const char * group) override;
-    void TraceCounter(const char * label, const char * group) override;
+    void TraceCounter(const char * label) override;
     void LogMessageSend(MessageSendInfo &) override;
     void LogMessageReceived(MessageReceivedInfo &) override;
     void LogNodeLookup(NodeLookupInfo &) override;

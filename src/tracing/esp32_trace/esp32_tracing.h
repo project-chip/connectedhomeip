@@ -28,7 +28,7 @@ public:
     /// Trace a zero-sized event
     void TraceInstant(const char * label, const char * group) override;
 
-    void TraceCounter(const char * label, const char * group) override;
+    void TraceCounter(const char * label) override;
 
     void LogMessageSend(MessageSendInfo &) override;
     void LogMessageReceived(MessageReceivedInfo &) override;

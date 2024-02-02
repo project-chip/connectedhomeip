@@ -76,11 +76,11 @@ void Instant(const char * label, const char * group)
     }
 }
 
-void Counter(const char * label, const char * group)
+void Counter(const char * label)
 {
     for (auto & backend : gTracingBackends)
     {
-        backend.TraceCounter(label, group);
+        backend.TraceCounter(label);
     }
 }
 

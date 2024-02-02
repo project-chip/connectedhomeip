@@ -22,16 +22,16 @@
 using namespace chip;
 
 namespace Insights {
-ESPInsightsCounter * ESPInsightsCounter::mHead = nullptr; // Pointer to head of the counter linked list
+// It need not be freed. One time allocation . Need to track counters till the device being online.
+ESPInsightsCounter * ESPInsightsCounter::mHead = nullptr;
 
-ESPInsightsCounter * ESPInsightsCounter::GetInstance(const char * label, const char * group)
+ESPInsightsCounter * ESPInsightsCounter::GetInstance(const char * label)
 {
-
     ESPInsightsCounter * current = mHead; // Provisional pointer to traverse the counter list
 
     while (current != nullptr)
     {
-        if (strcmp(current->label, label) == 0 && strcmp(current->group, group) == 0)
+        if (strcmp(current->label, label) == 0)
         {
             current->instanceCount++;
             return current;
@@ -43,7 +43,7 @@ ESPInsightsCounter * ESPInsightsCounter::GetInstance(const char * label, const c
     void * ptr = Platform::MemoryAlloc(sizeof(ESPInsightsCounter));
     VerifyOrDie(ptr != nullptr);
 
-    ESPInsightsCounter * newInstance = new (ptr) ESPInsightsCounter(label, group);
+    ESPInsightsCounter * newInstance = new (ptr) ESPInsightsCounter(label);
     newInstance->mNext               = mHead;
     mHead                            = newInstance;
 

@@ -149,9 +149,9 @@ void ESP32Backend::LogNodeDiscovered(NodeDiscoveredInfo & info) {}
 
 void ESP32Backend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 
-void ESP32Backend::TraceCounter(const char * label, const char * group)
+void ESP32Backend::TraceCounter(const char * label)
 {
-    ::Insights::ESPInsightsCounter::GetInstance(label, group)->ReportMetrics();
+    ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
 }
 void ESP32Backend::TraceBegin(const char * label, const char * group)
 {

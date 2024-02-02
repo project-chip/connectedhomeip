@@ -275,7 +275,7 @@ void JsonBackend::TraceInstant(const char * label, const char * group)
     OutputValue(value);
 }
 
-void JsonBackend::TraceCounter(const char * label, const char * group)
+void JsonBackend::TraceCounter(const char * label)
 {
     std::string counterId = std::string(label);
     if (mCounters.find(counterId) == mCounters.end())
@@ -289,7 +289,6 @@ void JsonBackend::TraceCounter(const char * label, const char * group)
     ::Json::Value value;
     value["event"] = "TraceCounter";
     value["label"] = label;
-    value["group"] = group;
     value["count"] = mCounters[counterId];
 
     // Output the counter event

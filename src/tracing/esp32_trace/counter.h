@@ -20,6 +20,7 @@
 #include <esp_log.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <string.h>
 
 #define PATH "insights.cnt"
 
@@ -28,20 +29,18 @@ class ESPInsightsCounter
 {
 private:
     static ESPInsightsCounter * mHead; // head of the counter list
-    char label[50];                    // unique key
-    char group[50];
+    const char * label;                // unique key
     int instanceCount;
     ESPInsightsCounter * mNext; // pointer to point to the next entry in the list
     bool registered = false;
 
-    ESPInsightsCounter(const char * labelParam, const char * groupParam) : instanceCount(1), mNext(nullptr)
+    ESPInsightsCounter(const char * labelParam) : instanceCount(1), mNext(nullptr)
     {
-        chip::Platform::CopyString(label, sizeof(label), labelParam);
-        chip::Platform::CopyString(group, sizeof(group), groupParam);
+        label = chip::Platform::MemoryAllocString(labelParam, strlen(labelParam));
     }
 
 public:
-    static ESPInsightsCounter * GetInstance(const char * label, const char * group);
+    static ESPInsightsCounter * GetInstance(const char * label);
 
     int GetInstanceCount() const;
 
@@ -56,6 +55,21 @@ public:
         }
         ESP_LOGI("mtr", "Label = %s Count = %d", label, instanceCount);
         esp_diag_metrics_add_uint(label, instanceCount);
+    }
+
+    // Destructor to free the dynamically allocated memory
+    ~ESPInsightsCounter()
+    {
+        chip::Platform::MemoryFree((void *) label);
+
+        ESPInsightsCounter * current = mHead;
+        while (current)
+        {
+            ESPInsightsCounter * next = current->mNext;
+            chip::Platform::MemoryFree((void *) current);
+            current = next;
+        }
+        mHead = nullptr;
     }
 };
 
