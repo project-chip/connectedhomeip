@@ -43,7 +43,7 @@ matter devices.
 #### Setup
 
 Provides ready-made setup scripts for specific, one-time build / installation
-tasks, e.g. setting up a devkit as a thread sniffer.
+tasks, e.g. setting up a development kit as a thread sniffer.
 
 ## Single host installation (no Raspberry Pi)
 
@@ -76,8 +76,8 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi:
 
 ## Thread
 
-Thread captures require a compatible devkit. The thread implementation in this
-tool currently targets the `Maker Diary nrf52840-MDK` (NOT the dongle version).
+Thread captures require a compatible development kit. The thread implementation in this
+tool currently targets the `Maker Diary nrf52840 Micro Development Kit` (NOT the dongle version).
 
 ## Raspberry Pi installation
 
@@ -354,7 +354,7 @@ options:
     `idt`.
 -   `analysis` contains utilities for simple causal analysis of text based logs.
 -   `artifact` contains helper functions for managing artifacts.
--   `data` contains metadat e.g. matter device type map
+-   `data` contains metadata e.g. matter device type map
 -   `error` contains facilities for error reporting.
 -   `loader` is a generic class loader that dynamically imports classes matching
     a given super class from a given directory.
@@ -382,8 +382,7 @@ Ecosystem and Platform implementations are dynamically loaded.
 For each package in `capture/ecosystem`, the ecosystem loader expects a module
 name matching the package name.  
 This module must contain a single class which is a subclass of
-`capture.base.EcosystemCapture` with matching function signatures and
-coroutines.
+`capture.base.EcosystemCapture` with matching function signatures.
 
 `/capture/ecosystem/play_services_user` contains a minimal example
 implementation.
@@ -416,20 +415,20 @@ The loader is also used elsewhere in the project.
 | :white_check_mark: | Supported            |
 | :x:                | Not (/yet) supported |
 
-| Feature   | Function                                | Linux              | MacOS              | Note                  |
-| --------- | --------------------------------------- | ------------------ | ------------------ | --------------------- |
-| Advertise | DNS-SD                                  | :white_check_mark: | :white_check_mark: |                       |
-| Advertise | BLE                                     | :x:                | :x:                | Not implemented       |
-| Capture   | Android: logcat collection and analysis | :white_check_mark: | :white_check_mark: |                       |
-| Capture   | Android: screen recording               | :white_check_mark: | :white_check_mark: |                       |
-| Capture   | Android: packet capture                 | :white_check_mark: | :white_check_mark: | Requires rooted phone |
-| Capture   | PCAP: Managed mode on `idt` host        | :white_check_mark: | :white_check_mark: |                       |
-| Capture   | PCAP: Monitor mode on `idt` host        | :white_check_mark: | :white_check_mark: |                       |
-| Capture   | Thread: Execute sniffer capture         | :white_check_mark: | :x:                | Requires ncp + setup  |
-| Capture   | Thread: Execute on-network capture      | :x:                | :x:                | Not implemented       |
-| Discovery | BLE                                     | :white_check_mark: | :white_check_mark: |                       |
-| Discovery | DNS-SD                                  | :white_check_mark: | :white_check_mark: |                       |
-| Probe     | Resolve and ping                        | :white_check_mark: | :white_check_mark: |                       |
+| Feature   | Function                             | Linux              | MacOS              | Note                  |
+| --------- | ------------------------------------ | ------------------ | ------------------ | --------------------- |
+| Advertise | DNS-SD                               | :white_check_mark: | :white_check_mark: |                       |
+| Advertise | BLE                                  | :x:                | :x:                | Not implemented       |
+| Capture   | Android: log collection and analysis | :white_check_mark: | :white_check_mark: |                       |
+| Capture   | Android: screen recording            | :white_check_mark: | :white_check_mark: |                       |
+| Capture   | Android: packet capture              | :white_check_mark: | :white_check_mark: | Requires rooted phone |
+| Capture   | PCAP: Managed mode on `idt` host     | :white_check_mark: | :white_check_mark: |                       |
+| Capture   | PCAP: Monitor mode on `idt` host     | :white_check_mark: | :white_check_mark: |                       |
+| Capture   | Thread: Execute sniffer capture      | :white_check_mark: | :x:                | Requires ncp + setup  |
+| Capture   | Thread: Execute on-network capture   | :x:                | :x:                | Not implemented       |
+| Discovery | BLE                                  | :white_check_mark: | :white_check_mark: |                       |
+| Discovery | DNS-SD                               | :white_check_mark: | :white_check_mark: |                       |
+| Probe     | Resolve and ping                     | :white_check_mark: | :white_check_mark: |                       |
 
 ### Setup support
 
