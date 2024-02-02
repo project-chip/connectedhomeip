@@ -184,7 +184,7 @@ public:
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
                 jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
+                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure);
 
     void Shutdown();
 
