@@ -64,6 +64,7 @@ extern void DisplayBanner();
 #define AIR_QUALITY_SENSOR_ENDPOINT 2
 #define TEMPERATURE_SENSOR_ENDPOINT 3
 #define RELATIVE_HUMIDITY_SENSOR_ENDPOINT 4
+#define THERMOSTAT_ENDPOINT 5
 
 // Added the below three for DNS Server Initialization
 using namespace ::chip;
@@ -178,9 +179,11 @@ int AppTask::Init()
     SetParentEndpointForEndpoint(AIR_QUALITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(TEMPERATURE_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(RELATIVE_HUMIDITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
+    SetParentEndpointForEndpoint(THERMOSTAT_ENDPOINT, AIR_PURIFIER_ENDPOINT);
 
     AirPurifierManager::InitInstance(EndpointId(AIR_PURIFIER_ENDPOINT), EndpointId(AIR_QUALITY_SENSOR_ENDPOINT),
-                                     EndpointId(TEMPERATURE_SENSOR_ENDPOINT), EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT));
+                                     EndpointId(TEMPERATURE_SENSOR_ENDPOINT), EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT),
+                                     EndpointId(THERMOSTAT_ENDPOINT));
 
     ConfigurationMgr().LogDeviceConfig();
 
