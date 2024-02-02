@@ -32,23 +32,33 @@ static_library("controller") {
   if (chip_controller && chip_build_controller) {
     sources += [
       "AbstractDnssdDiscoveryController.cpp",
+      "AbstractDnssdDiscoveryController.h",
       "AutoCommissioner.cpp",
       "AutoCommissioner.h",
       "CHIPCommissionableNodeController.cpp",
       "CHIPCommissionableNodeController.h",
       "CHIPDeviceControllerFactory.cpp",
       "CHIPDeviceControllerFactory.h",
+      "CHIPDeviceControllerSystemState.h",
+      "CommandSenderAllocator.h",
       "CommissioneeDeviceProxy.cpp",
       "CommissioneeDeviceProxy.h",
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
+      "CommissioningDelegate.h",
       "DeviceDiscoveryDelegate.h",
       "DevicePairingDelegate.h",
       "ExampleOperationalCredentialsIssuer.cpp",
       "ExampleOperationalCredentialsIssuer.h",
+      "InvokeInteraction.h",
+      "OperationalCredentialsDelegate.h",
+      "ReadInteraction.h",
       "SetUpCodePairer.cpp",
       "SetUpCodePairer.h",
+      "TypedCommandCallback.h",
+      "TypedReadCallback.h",
+      "WriteInteraction.h",
     ]
     if (chip_enable_read_client) {
       sources += [
