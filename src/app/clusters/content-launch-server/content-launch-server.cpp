@@ -130,6 +130,7 @@ private:
     CHIP_ERROR ReadAcceptHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadSupportedStreamingProtocolsAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 ContentLauncherAttrAccess gContentLauncherAttrAccess;
@@ -165,6 +166,14 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
+    case app::Clusters::ContentLauncher::Attributes::ClusterRevision::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    }
     default: {
         break;
     }
@@ -190,6 +199,13 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocolsAttribute(a
 {
     uint32_t streamingProtocols = delegate->HandleGetSupportedStreamingProtocols();
     return aEncoder.Encode(streamingProtocols);
+}
+
+CHIP_ERROR ContentLauncherAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                            Delegate * delegate)
+{
+    uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
+    return aEncoder.Encode(clusterRevision);
 }
 
 } // anonymous namespace
