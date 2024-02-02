@@ -186,6 +186,13 @@ menu "CHIP Core"
             help
                 Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
 
+        config ENABLE_ENDPOINT_QUEUE_FILTER
+            bool "Enable UDP Endpoint queue filter for mDNS Broadcast packets"
+            depends on USE_MINIMAL_MDNS
+            default y
+            help
+                Enable this option to start a UDP Endpoint queue filter for mDNS Broadcast packets
+
         config ENABLE_LWIP_THREAD_SAFETY
             bool "Enable LwIP Thread safety options"
             default y
