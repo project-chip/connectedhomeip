@@ -24,10 +24,13 @@
 
 #pragma once
 
+#include <atomic>
+
 // Include configuration headers
 #include <system/SystemConfig.h>
 
 // Include dependent headers
+#include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/TimeUtils.h>
 #include <system/SystemError.h>
@@ -150,14 +153,33 @@ public:
      * Although some platforms may choose to return a value that measures the time since boot for the
      * system, applications must *not* rely on this.
      */
-    Timestamp GetMonotonicTimestamp() { return GetMonotonicMilliseconds64(); }
+    Timestamp GetMonotonicTimestamp()
+    {
+        Timestamp prevTimestamp = mLastTimestamp.load();
+
+        // Force a memory barrier so that the new timestamp is always acquired after any ongoing prevTimestamp store from
+        // other contexts.
+        std::atomic_thread_fence(std::memory_order_seq_cst);
+
+        // newTimestamp acquire happens-after the prevTimestamp load
+        Timestamp newTimestamp = GetMonotonicMilliseconds64();
+
+        // Need to guarantee the invariant that monotonic clock never goes backwards, which would break multiple system
+        // assumptions which use these clocks.
+        VerifyOrDie(newTimestamp >= prevTimestamp);
+
+        // NewTimestamp guaranteed to never be < the last timestamp.
+        mLastTimestamp.store(newTimestamp);
+
+        return newTimestamp;
+    }
 
     /**
-     * Returns a monotonic system time in units of microseconds.
+     * Returns a monotonic system time in units of microseconds, from the platform.
      *
      * This function returns an elapsed time in microseconds since an arbitrary, platform-defined epoch.
-     * The value returned is guaranteed to be ever-increasing (i.e. never wrapping or decreasing) between
-     * reboots of the system.  Additionally, the underlying time source is guaranteed to tick
+     * The value returned MUST BE guaranteed to be ever-increasing (i.e. never wrapping or decreasing) until
+     * reboot of the system.  Additionally, the underlying time source is guaranteed to tick
      * continuously during any system sleep modes that do not entail a restart upon wake.
      *
      * Although some platforms may choose to return a value that measures the time since boot for the
@@ -176,11 +198,11 @@ public:
     virtual Microseconds64 GetMonotonicMicroseconds64() = 0;
 
     /**
-     * Returns a monotonic system time in units of milliseconds.
+     * Returns a monotonic system time in units of microseconds, from the platform.
      *
      * This function returns an elapsed time in milliseconds since an arbitrary, platform-defined epoch.
-     * The value returned is guaranteed to be ever-increasing (i.e. never wrapping or decreasing) between
-     * reboots of the system.  Additionally, the underlying time source is guaranteed to tick
+     * The value returned MUST BE guaranteed to be ever-increasing (i.e. never wrapping or decreasing) until
+     * reboot of the system.  Additionally, the underlying time source is guaranteed to tick
      * continuously during any system sleep modes that do not entail a restart upon wake.
      *
      * Although some platforms may choose to return a value that measures the time since boot for the
@@ -288,6 +310,9 @@ public:
      *                                      current time.
      */
     virtual CHIP_ERROR SetClock_RealTime(Microseconds64 aNewCurTime) = 0;
+
+protected:
+    std::atomic<Timestamp> mLastTimestamp{chip::System::Clock::kZero};
 };
 
 // Currently we have a single implementation class, ClockImpl, whose members are implemented in build-specific files.
@@ -334,7 +359,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void SetMonotonic(Milliseconds64 timestamp) { mSystemTime = timestamp; }
+    void SetMonotonic(Milliseconds64 timestamp) {
+        mSystemTime = timestamp;
+        mLastTimestamp.store(timestamp);
+    }
+
     void AdvanceMonotonic(Milliseconds64 increment) { mSystemTime += increment; }
     void AdvanceRealTime(Milliseconds64 increment) { mRealTime += increment; }
 
