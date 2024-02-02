@@ -142,10 +142,8 @@ class HostPlatform(ABC):
         Returns true if the host is using 5g band
         """
         using_5g = str(self.current_wifi_channel_width()[0]) not in WIFI_CHANNELS_2G
-        if using_5g:
-            logger.info(f"Using 5g Wi-Fi")
-        else:
-            logger.info(f"Using 2g Wi-Fi")
+        to_log = "5" if using_5g else "2"
+        logger.info(f"Using {to_log}g Wi-Fi band")
         return using_5g
 
     def verify_py_version(self) -> None:

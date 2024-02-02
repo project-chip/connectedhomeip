@@ -16,7 +16,6 @@
 #
 
 import multiprocessing
-import os
 import shlex
 import subprocess
 
