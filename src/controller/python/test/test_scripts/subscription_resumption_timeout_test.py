@@ -30,6 +30,7 @@ TEST_SETUPPIN = 20202021
 
 TEST_ENDPOINT_ID = 0
 
+
 def main():
     optParser = OptionParser()
     optParser.add_option(
@@ -103,7 +104,7 @@ def main():
         "Failed on on-network commissioing")
     try:
         test.devCtrl.ZCLSubscribeAttribute("BasicInformation", "NodeLabel", options.nodeid, TEST_ENDPOINT_ID, 1, 2,
-                                            keepSubscriptions=True, autoResubscribe=False)
+                                           keepSubscriptions=True, autoResubscribe=False)
     except Exception as ex:
         TestFail(f"Failed to subscribe attribute: {ex}")
 
