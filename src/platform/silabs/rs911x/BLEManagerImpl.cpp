@@ -247,7 +247,7 @@ namespace {
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
 #define BLE_DEFAULT_TIMER_PERIOD_MS (1)
-#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (400)
+#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (500) // Time kept to support all WiFi chips BLE (RS9116/ SiWx917 NCP/SOC)
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 TimerHandle_t sbleSendIndicationTimeoutTimer; // FreeRTOS sw timer.
@@ -481,9 +481,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
                                     data->Start());
     
-    ChipLogProgress(DeviceLayer, "StartTimer start");
     StartBleSendIndicationTimeoutTimer(BLE_SEND_INDICATION_TIMER_PERIOD_MS);
-    ChipLogProgress(DeviceLayer, "StartTimer Stop");
 
     if (status != RSI_SUCCESS)
     {
@@ -951,7 +949,6 @@ void BLEManagerImpl::HandleSoftTimerEvent(void)
     event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
     event.CHIPoBLEConnectionError.ConId                          = connHandle;
     event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
     PlatformMgr().PostEventOrDie(&event);
 }
 
