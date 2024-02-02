@@ -41,7 +41,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
             response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle."));
+                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
             return;
         }
 
@@ -58,7 +58,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
             response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle."));
+                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
             return;
         }
 
@@ -72,7 +72,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
 
     // If we fall through at any point, it's because the change is not supported in the current state.
     response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-    response.statusText.SetValue(chip::CharSpan::fromCharString("This change is not allowed at this time."));
+    response.statusText.SetValue(chip::CharSpan::fromCharString("This change is not allowed at this time"));
 }
 
 void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
