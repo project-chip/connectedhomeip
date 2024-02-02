@@ -17,5 +17,5 @@
 #
 
 echo "$0 setting interface $1 back to managed mode"
-sudo airmon-ng stop $1
+sudo airmon-ng stop "$1"
 sudo systemctl restart NetworkManager

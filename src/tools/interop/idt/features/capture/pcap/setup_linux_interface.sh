@@ -20,4 +20,4 @@ set -e
 echo "$0 setting interface $1 to monitor mode on channel $2"
 sudo airmon-ng check
 sudo airmon-ng check kill
-sudo airmon-ng start $1 $2
+sudo airmon-ng start "$1" "$2"
