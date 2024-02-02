@@ -241,8 +241,9 @@ combination with JLinkRTTClient as follows:
           <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
           <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
-    **LED 0** shows the overall state of the device and its connectivity. However, this status LED is disabled by default
-    on Silab's ICD LIT application.
+    **LED 0** shows the overall state of the device and its connectivity.
+    However, this status LED is disabled by default on Silab's ICD LIT
+    application.
 
     **Push Button 0**
 
