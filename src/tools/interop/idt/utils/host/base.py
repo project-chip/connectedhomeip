@@ -35,9 +35,6 @@ logger = log.get_logger(__file__)
 
 @dataclass
 class HostIps:
-    """
-    Object that holds three types of unicast addresses the host may have
-    """
     v4: [str]
     v6_global: [str]
     v6_unique_local: [str]
