@@ -247,7 +247,7 @@ namespace {
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
 #define BLE_DEFAULT_TIMER_PERIOD_MS (1)
-#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (10)
+#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (400)
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 TimerHandle_t sbleSendIndicationTimeoutTimer; // FreeRTOS sw timer.
@@ -951,6 +951,7 @@ void BLEManagerImpl::HandleSoftTimerEvent(void)
     event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
     event.CHIPoBLEConnectionError.ConId                          = connHandle;
     event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -1125,6 +1126,7 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 
 void BLEManagerImpl::BleSendIndicationTimeoutHandler(TimerHandle_t xTimer)
 {
+        ChipLogProgress(DeviceLayer, "BleSendIndicationTimeoutHandler::Start");
         sInstance.HandleSoftTimerEvent();
 }
 
