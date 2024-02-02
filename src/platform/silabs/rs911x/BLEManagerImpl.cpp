@@ -299,7 +299,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
                                        pdMS_TO_TICKS(BLE_SEND_INDICATION_TIMER_PERIOD_MS), // == default timer period
                                        false,                                      // no timer reload (==one-shot)
                                        (void *) this,                              // init timer id = ble obj context
-                                       BleAdvTimeoutHandler                        // timer callback handler
+                                       BleSendIndicationTimeoutHandler                        // timer callback handler
     );
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
