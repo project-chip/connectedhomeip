@@ -150,8 +150,9 @@ int MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attr
 {
     NSNumber * _Nullable neededPrivilege = [[MTRDeviceControllerFactory sharedInstance] neededReadPrivilegeForClusterID:@(cluster) attributeID:@(attribute)];
     if (neededPrivilege == nil) {
-        // Default is View.
-        return kMatterAccessPrivilegeView;
+        // No privileges declared for this attribute on this cluster.  Treat as
+        // "needs admin privileges", so we fail closed.
+        return kMatterAccessPrivilegeAdminister;
     }
 
     switch (neededPrivilege.unsignedLongLongValue) {
@@ -182,12 +183,10 @@ int MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId att
     return kMatterAccessPrivilegeOperate;
 }
 
-@implementation MTRServerAccessControl
-
-+ (void)init
+void InitializeServerAccessControl()
 {
+    assertChipStackLockedByCurrentThread();
+
     // Ensure the access control bits are created.  No-op after the first call.
     gControllerAccessControl.get();
 }
-
-@end

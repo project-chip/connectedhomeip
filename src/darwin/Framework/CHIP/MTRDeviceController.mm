@@ -981,7 +981,17 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return YES;
 }
 
-- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_NEWLY_AVAILABLE
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion
+{
+    [self removeServerEndpointInternal:endpoint queue:queue completion:completion];
+}
+
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint
+{
+    [self removeServerEndpointInternal:endpoint queue:nil completion:nil];
+}
+
+- (void)removeServerEndpointInternal:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t _Nullable)queue completion:(dispatch_block_t _Nullable)completion
 {
     VerifyOrReturn([self checkIsRunning]);
 
@@ -989,11 +999,15 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     // tearing it down.
     [self asyncDispatchToMatterQueue:^() {
         [self removeServerEndpointOnMatterQueue:endpoint];
-        dispatch_async(queue, completion);
+        if (queue != nil && completion != nil) {
+            dispatch_async(queue, completion);
+        }
     }
         errorHandler:^(NSError * error) {
             // Error means we got shut down, so the endpoint is removed now.
-            dispatch_async(queue, completion);
+            if (queue != nil && completion != nil) {
+                dispatch_async(queue, completion);
+            }
         }];
 }
 

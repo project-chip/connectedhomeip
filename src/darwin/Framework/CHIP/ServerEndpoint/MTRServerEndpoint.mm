@@ -175,10 +175,10 @@ MTR_DIRECT_MEMBERS
     DECLARE_DYNAMIC_ATTRIBUTE(attrID, ARRAY, 0, 0)
 
 static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
-    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID),
-    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeServerListID),
-    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeClientListID),
-    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributePartsListID),
+    DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID, ARRAY, 0, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeServerListID, ARRAY, 0, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeClientListID, ARRAY, 0, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributePartsListID, ARRAY, 0, 0),
     DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeGlobalAttributeFeatureMapID, BITMAP32, 4, 0),
     DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeGlobalAttributeClusterRevisionID, INT16U, 2, 0),
 };
@@ -257,7 +257,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
         auto attrMetadata = cluster.matterAttributeMetadata;
         metadata.attributes = attrMetadata.data();
-        // This cast is safe because cluster's check for this constraint on
+        // This cast is safe because clusters check for this constraint on
         // number of attributes.
         metadata.attributeCount = static_cast<uint16_t>(attrMetadata.size());
 

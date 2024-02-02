@@ -20,20 +20,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * An access control implementation that looks at the MTRAccessGrants we have.
- */
-@interface MTRServerAccessControl : NSObject
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-+ (instancetype)alloc NS_UNAVAILABLE;
-
-/**
  * Initialize the access control module. Must be called on the Matter task
  * queue.
  */
-+ (void)init;
-
-@end
+void InitializeServerAccessControl();
 
 NS_ASSUME_NONNULL_END

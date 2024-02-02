@@ -71,30 +71,11 @@ MTR_DIRECT_MEMBERS
     std::unique_ptr<MTRServerAttributeAccessInterface> _attributeAccessInterface;
     // We can't use something like std::unique_ptr<EmberAfAttributeMetadata[]>
     // because EmberAfAttributeMetadata does not have a default constructor, so
-    // we can't alloc and then initializer later.  And we need a contiguous
-    // buffer for all the attribute metadata, so we need to do this by hand.
-    EmberAfAttributeMetadata * _matterAttributeMetadata;
-    size_t _matterAttributeMetadataCount;
+    // we can't alloc and then initializer later.
+    std::vector<EmberAfAttributeMetadata> _matterAttributeMetadata;
 
     std::unique_ptr<CommandId[]> _matterAcceptedCommandList;
     std::unique_ptr<CommandId[]> _matterGeneratedCommandList;
-}
-
-- (void)dealloc
-{
-    [self deallocateAttributeMetadata];
-}
-
-- (void)deallocateAttributeMetadata
-{
-    if (_matterAttributeMetadata != nullptr) {
-        for (size_t i = 0; i < _matterAttributeMetadataCount; ++i) {
-            _matterAttributeMetadata[i].~EmberAfAttributeMetadata();
-        }
-        free(_matterAttributeMetadata);
-        _matterAttributeMetadata = nullptr;
-    }
-    _matterAttributeMetadataCount = 0;
 }
 
 - (nullable instancetype)initWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision
@@ -225,17 +206,12 @@ MTR_DIRECT_MEMBERS
     return YES;
 }
 
-#define MTR_DECLARE_LIST_ATTRIBUTE(attrID) \
-    DECLARE_DYNAMIC_ATTRIBUTE(attrID, ARRAY, 0, 0)
-
 static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
-    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID),
-    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeServerListID),
-    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeClientListID),
-    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributePartsListID),
+    DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID, ARRAY, 0, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeServerListID, ARRAY, 0, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeClientListID, ARRAY, 0, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributePartsListID, ARRAY, 0, 0),
 };
-
-#undef MTR_DECLARE_LIST_ATTRIBUTE
 
 - (BOOL)associateWithController:(nullable MTRDeviceController *)controller
 {
@@ -292,49 +268,40 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
         return NO;
     }
 
-    _matterAttributeMetadata = static_cast<EmberAfAttributeMetadata *>(calloc(attributeCount, sizeof(EmberAfAttributeMetadata)));
-    if (_matterAttributeMetadata == nullptr) {
-        return NO;
-    }
-
-    _matterAttributeMetadataCount = attributeCount;
-
     size_t attrIndex = 0;
     for (; attrIndex < _attributes.count; ++attrIndex) {
         auto * attr = _attributes[attrIndex];
-        // Placement-new into the right slot.
-        new (&_matterAttributeMetadata[attrIndex])
-            EmberAfAttributeMetadata(DECLARE_DYNAMIC_ATTRIBUTE(static_cast<AttributeId>(attr.attributeID.unsignedLongLongValue),
-                // The type does not actually matter, since we plan to
-                // handle this entirely via AttributeAccessInterface.
-                // Claim Array because that one will keep random IM
-                // code from trying to do things with the attribute
-                // store.
-                ARRAY,
-                // Size in bytes does not matter, since we plan to
-                // handle this entirely via AttributeAccessInterface.
-                0,
-                // ATTRIBUTE_MASK_NULLABLE is not relevant because we
-                // are handling this all via AttributeAccessInterface.
-                0));
+        _matterAttributeMetadata.emplace_back(EmberAfAttributeMetadata(DECLARE_DYNAMIC_ATTRIBUTE(static_cast<AttributeId>(attr.attributeID.unsignedLongLongValue),
+            // The type does not actually matter, since we plan to
+            // handle this entirely via AttributeAccessInterface.
+            // Claim Array because that one will keep random IM
+            // code from trying to do things with the attribute
+            // store.
+            ARRAY,
+            // Size in bytes does not matter, since we plan to
+            // handle this entirely via AttributeAccessInterface.
+            0,
+            // ATTRIBUTE_MASK_NULLABLE is not relevant because we
+            // are handling this all via AttributeAccessInterface.
+            0)));
     }
 
     if (needsFeatureMap) {
-        new (&_matterAttributeMetadata[attrIndex]) EmberAfAttributeMetadata(DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-            BITMAP32, 4, 0));
+        _matterAttributeMetadata.emplace_back(EmberAfAttributeMetadata(DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+            BITMAP32, 4, 0)));
         ++attrIndex;
     }
 
     if (needsDescriptorAttributes) {
         for (auto & data : sDescriptorAttributesMetadata) {
-            new (&_matterAttributeMetadata[attrIndex]) EmberAfAttributeMetadata(data);
+            _matterAttributeMetadata.emplace_back(data);
             ++attrIndex;
         }
     }
 
     // Add our ClusterRevision bit.
-    new (&_matterAttributeMetadata[attrIndex]) EmberAfAttributeMetadata(DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-        INT16U, 2, 0));
+    _matterAttributeMetadata.emplace_back(EmberAfAttributeMetadata(DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+        INT16U, 2, 0)));
     ++attrIndex;
 
     _attributeAccessInterface = std::make_unique<MTRServerAttributeAccessInterface>(_parentEndpoint,
@@ -362,7 +329,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     // queue after associateWithController succeeds, but we are no longer being
     // looked at from that queue, so it's safe to reset it here.
     _matterAccessGrants = [NSSet set];
-    [self deallocateAttributeMetadata];
+    _matterAttributeMetadata.clear();
     _attributeAccessInterface.reset();
     _matterAcceptedCommandList.reset();
     _matterGeneratedCommandList.reset();
@@ -413,7 +380,9 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
 - (Span<const EmberAfAttributeMetadata>)matterAttributeMetadata
 {
-    return Span<const EmberAfAttributeMetadata>(_matterAttributeMetadata, _matterAttributeMetadataCount);
+    // This is always called after our _matterAttributeMetadata has been set up
+    // by associateWithController.
+    return Span<const EmberAfAttributeMetadata>(_matterAttributeMetadata.data(), _matterAttributeMetadata.size());
 }
 
 - (CommandId *)matterAcceptedCommands

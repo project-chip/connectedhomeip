@@ -422,7 +422,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        [MTRServerAccessControl init];
+        InitializeServerAccessControl();
 
         if (startupParams.hasStorage) {
             _persistentStorageDelegate = new (std::nothrow) MTRPersistentStorageDelegateBridge(startupParams.storage);

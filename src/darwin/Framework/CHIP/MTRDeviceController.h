@@ -249,6 +249,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_NEWLY_AVAILABLE;
 
 /**
+ * Remove the given server endpoint without being notified when the removal
+ * completes.
+ */
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_NEWLY_AVAILABLE;
+
+/**
  * Compute a PASE verifier for the desired setup passcode.
  *
  * @param[in] setupPasscode   The desired passcode to use.
