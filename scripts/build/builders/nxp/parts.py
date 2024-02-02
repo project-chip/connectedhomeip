@@ -34,7 +34,7 @@ def validate_json(data: str):
 @dataclass
 class NxpBoard:
     """Class for describing NXP board examples support.
-    
+
     Args:
         name (str): Name of the board, e.g. k32w0.
         base_path (str): Parent folder of reference apps, e.g. k32w/k32w0
@@ -47,7 +47,7 @@ class NxpBoard:
 @dataclass
 class NxpApp:
     """Class for describing NXP reference apps and supported boards.
-    
+
     Args:
         name (str): Name of the application as metadata.
         artifacts (dict): Mapping between board and artifact name.
@@ -61,7 +61,7 @@ class NxpApp:
         if board not in self.supported_boards:
             self.supported_boards.append(board)
             self.artifacts[board] = artifact_name
-    
+
     def get_regex(self):
         return '-(' + '|'.join(self.supported_boards) + ')'
 
@@ -73,13 +73,14 @@ class NxpParts:
     The configuration should be defined in a JSON file. All JSON files under
     platforms will be parsed when generate_parts static method is called.
     """
+
     def __init__(self):
         self.boards = list()
         self.apps = dict()
         self.modifiers = dict()
         # Used by applications that have support for gn args with variable value
         self.var_modifiers = dict()
-    
+
     def add_board(self, board):
         if board['name'] != 'common':
             self.boards.append(NxpBoard(board['name'], board['base_path']))
@@ -95,7 +96,7 @@ class NxpParts:
 
         if 'variable_modifiers' in board:
             self.var_modifiers[board['name']] = board['variable_modifiers']
-    
+
     def append_modifiers(self, target):
         """Appends the corresponding modifiers to the given target."""
         for board, modifiers in self.modifiers.items():
@@ -113,7 +114,7 @@ class NxpParts:
     @staticmethod
     def generate_parts():
         """This function creates the NxpParts instance based on JSON files.
-        
+
         Supported platforms should be described in a JSON file found under platforms folder.
         Please see the currently supported platforms for a reference JSON format. Each JSON
         platform file will be checked against the platform.schema.

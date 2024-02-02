@@ -72,7 +72,8 @@ def generate_option_from_modifiers(modifiers, supported_modifiers):
         for supported_modifier in supported_modifiers:
             if id_ == supported_modifier['id']:
                 if len(supported_modifier['value']) != 1:
-                    print(f'Currently, variable modifier format supports only one entry in the "value" dict. Please check "{id_}" modifier.')
+                    print(
+                        f'Currently, variable modifier format supports only one entry in the "value" dict. Please check "{id_}" modifier.')
                     raise ValueError
                 gn_options += f'{next(iter(supported_modifier["value"]))}={val} '
 
@@ -86,7 +87,7 @@ class NxpBuilder(GnBuilder):
         self.board = kwargs.pop('board')
         self.var_modifiers = kwargs.pop('var_modifiers')
         self.args = kwargs
-        
+
         build_root = os.path.join(root, 'examples', self.app.name, 'nxp', self.board.base_path)
 
         super(NxpBuilder, self).__init__(root=build_root, runner=runner)
