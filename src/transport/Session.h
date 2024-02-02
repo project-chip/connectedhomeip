@@ -25,8 +25,8 @@
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/ReferenceCountedHandle.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
-#include <platform/LockTracker.h>
 #include <messaging/SessionParameters.h>
+#include <platform/LockTracker.h>
 #include <transport/SessionDelegate.h>
 
 namespace chip {

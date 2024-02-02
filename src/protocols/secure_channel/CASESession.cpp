@@ -37,11 +37,11 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/SessionParameters.h>
 #include <platform/PlatformManager.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/PairingSession.h>
-#include <messaging/SessionParameters.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemClock.h>

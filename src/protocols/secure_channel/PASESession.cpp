@@ -39,9 +39,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/SessionParameters.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-#include <messaging/SessionParameters.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/TLVPacketBufferBackingStore.h>

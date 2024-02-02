@@ -35,13 +35,13 @@ if (chip_config_resolve_peer_on_first_transmit_failure != "") {
 
 source_set("configurations") {
   sources = [
-    "SessionParameters.h",
     "ReliableMessageProtocolConfig.h",
+    "SessionParameters.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/system",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/system",
   ]
 }
 
