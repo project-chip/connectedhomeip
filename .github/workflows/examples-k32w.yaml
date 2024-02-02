@@ -54,6 +54,10 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
+            - name: Install Python modules needed by NXP scripts
+              run: |
+                  scripts/run_in_build_env.sh 'pip3 install -r scripts/setup/requirements.nxp.txt'
+
             - name: Build examples
               run: |
                   scripts/run_in_build_env.sh "\
