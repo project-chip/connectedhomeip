@@ -154,7 +154,8 @@ public:
     Timestamp GetMonotonicTimestamp()
     {
         uint64_t prevTimestamp = __atomic_load_n(&mLastTimestamp, __ATOMIC_SEQ_CST);
-        static_assert(sizeof(prevTimestamp) == sizeof(Timestamp), "Must have scalar match between timestamp and uint64_t for atomics.");
+        static_assert(sizeof(prevTimestamp) == sizeof(Timestamp),
+                      "Must have scalar match between timestamp and uint64_t for atomics.");
 
         // Force a reorder barrier to prevent GetMonotonicMilliseconds64() from being
         // optimizer-called before prevTimestamp loading, so that newTimestamp acquisition happens-after
