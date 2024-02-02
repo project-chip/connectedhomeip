@@ -46,7 +46,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: k32w
+                platform: nxp
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -58,42 +58,42 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target k32w-k32w0-light-crypto-platform-tokenizer \
-                      --target k32w-k32w0-lock-crypto-platform-tokenizer \
-                      --target k32w-k32w0-lock-crypto-platform-low-power-nologs \
-                      --target k32w-k32w0-contact-crypto-platform-tokenizer \
-                      --target k32w-k32w0-contact-crypto-platform-low-power-nologs \
-                      --target k32w-k32w0-shell-crypto-platform \
-                      --target k32w-k32w1-light-crypto-platform-openthread-ftd \
-                      --target k32w-k32w1-contact-crypto-platform-low-power-nologs \
+                      --target nxp-k32w0-lighting-app-crypto-platform-tokenizer \
+                      --target nxp-k32w0-contact-sensor-app-crypto-platform-tokenizer \
+                      --target nxp-k32w0-contact-sensor-app-crypto-platform-low-power-no-logs \
+                      --target nxp-k32w1-lighting-app-crypto-platform-ot-ftd \
+                      --target nxp-k32w1-contact-sensor-app-crypto-platform-low-power-no-logs \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            - name: Build example with variable modifier
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-k32w0-lighting-app-crypto-platform-tokenizer-sw-version \
+                      --variable-modifiers "sw-version=50000" \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Get light size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w0+release light \
-                    out/artifacts/k32w-k32w0-light-crypto-platform-tokenizer/chip-k32w0x-light-example.elf \
+                    nxp k32w0+release light \
+                    out/artifacts/nxp-k32w0-lighting-app-crypto-platform-tokenizer/chip-k32w0x-light-example.elf \
                     /tmp/bloat_reports/
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w1+release light \
-                    out/artifacts/k32w-k32w1-light-crypto-platform-openthread-ftd/chip-k32w1-light-example.elf \
-                    /tmp/bloat_reports/
-            - name: Get lock size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w0+release lock \
-                    out/artifacts/k32w-k32w0-lock-crypto-platform-tokenizer/chip-k32w0x-lock-example.elf \
+                    nxp k32w1+release light \
+                    out/artifacts/nxp-k32w1-lighting-app-crypto-platform-ot-ftd/chip-k32w1-light-example.elf \
                     /tmp/bloat_reports/
             - name: Get contact size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w0+release contact \
-                    out/artifacts/k32w-k32w0-contact-crypto-platform-tokenizer/chip-k32w0x-contact-example.elf \
+                    nxp k32w0+release contact \
+                    out/artifacts/nxp-k32w0-contact-sensor-app-crypto-platform-tokenizer/chip-k32w0x-contact-example.elf \
                     /tmp/bloat_reports/
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w1+release contact \
-                    out/artifacts/k32w-k32w1-contact-crypto-platform-low-power-nologs/chip-k32w1-contact-example.elf \
+                    nxp k32w1+release contact \
+                    out/artifacts/nxp-k32w1-contact-sensor-app-crypto-platform-low-power-no-logs/chip-k32w1-contact-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
