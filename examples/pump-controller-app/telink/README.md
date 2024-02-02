@@ -30,7 +30,7 @@ your own pump application.
     ```
 
 3. In the example dir run (replace _<build_target>_ with your board name, for
-   example, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9253b`):
+   example, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9258a`):
 
     ```bash
     $ west build -b <build_target>

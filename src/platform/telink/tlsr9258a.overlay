@@ -61,16 +61,16 @@
 
 &pinctrl {
 	pwm_ch0_pd0_default: pwm_ch0_pd0_default {
-		pinmux = <B9x_PINMUX_SET(B9x_PORT_D, B9x_PIN_0, B93_FUNC_PWM0)>;
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_D, B9x_PIN_0, B95_FUNC_PWM0)>;
 	};
 	pwm_ch1_pd1_default: pwm_ch1_pd1_default {
-		pinmux = <B9x_PINMUX_SET(B9x_PORT_D, B9x_PIN_1, B93_FUNC_PWM1)>;
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_D, B9x_PIN_1, B95_FUNC_PWM1)>;
 	};
 	pwm_ch2_pe2_default: pwm_ch2_pe2_default {
-		pinmux = <B9x_PINMUX_SET(B9x_PORT_E, B9x_PIN_2, B93_FUNC_PWM2)>;
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_E, B9x_PIN_2, B95_FUNC_PWM2)>;
 	};
 	pwm_ch3_pe0_default: pwm_ch3_pe0_default {
-		pinmux = <B9x_PINMUX_SET(B9x_PORT_E, B9x_PIN_0, B93_FUNC_PWM3)>;
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_E, B9x_PIN_0, B95_FUNC_PWM3)>;
 	};
 };
 

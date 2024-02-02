@@ -1,8 +1,6 @@
-# Matter Telink All Clusters Minimal Example Application
+# Matter Telink Thermostat Example Application
 
-The Telink All Clusters Minimal Example Application implements various ZCL
-clusters populated on three endpoints. You can use this example as a reference
-for creating your own application.
+You can use this example as a reference for creating your own application.
 
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
@@ -27,7 +25,7 @@ for creating your own application.
     ```
 
 3. In the example dir run (replace _<build_target>_ with your board name, for
-   example, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9253b`):
+   example, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9258a`):
 
     ```bash
     $ west build -b <build_target>
@@ -65,20 +63,37 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | Not used               | Not used                                                                                               |
-| Button 2 | Not used               | Not used                                                                                               |
+| Button 2 | NA                     | NA                                                                                                     |
+| Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
 ### LEDs
 
-**Red** LED indicates current state of Thread network. It ables to be in
+#### Indicate current state of Thread network
+
+**Red** LED indicates current state of Thread network. It is able to be in
 following states:
 
 | State                       | Description                                                                  |
 | :-------------------------- | :--------------------------------------------------------------------------- |
 | Blinks with short pulses    | Device is not commissioned to Thread, Thread is disabled                     |
-| Blinls with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
-| Blinks with whde pulses     | Device commissioned and joined to thread network as CHILD                    |
+| Blinks with frequent pulses | Device is commissioned, Thread enabled. Device trying to JOIN thread network |
+| Blinks with wide pulses     | Device commissioned and joined to thread network as CHILD                    |
+
+#### Indicate identify of device
+
+**Green** LED used to identify the device. The LED starts blinking when the
+Identify command of the Identify cluster is received. The command's argument can
+be used to specify the the effect. It is able to be in following effects:
+
+| Effect                          | Description                                                                  |
+| :------------------------------ | :--------------------------------------------------------------------------- |
+| Blinks (200 ms on/200 ms off)   | Blink (`Clusters::Identify::EffectIdentifierEnum::kBlink`)                   |
+| Breathe (during 1000 ms)        | Breathe (`Clusters::Identify::EffectIdentifierEnum::kBreathe`)               |
+| Blinks (50 ms on/950 ms off)    | Okay (`Clusters::Identify::EffectIdentifierEnum::kOkay`)                     |
+| Blinks (1000 ms on/1000 ms off) | Channel Change ( `Clusters::Identify::EffectIdentifierEnum::kChannelChange`) |
+| Blinks (950 ms on/50 ms off)    | Finish ( `Clusters::Identify::EffectIdentifierEnum::kFinishEffect`)          |
+| LED off                         | Stop (`Clusters::Identify::EffectIdentifierEnum::kStopEffect`)               |
 
 ### CHIP tool commands
 

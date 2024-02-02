@@ -1,6 +1,8 @@
-# Matter Telink Thermostat Example Application
+# Matter Telink All Clusters Example Application
 
-You can use this example as a reference for creating your own application.
+The Telink All Clusters Example Application implements various ZCL clusters
+populated on three endpoints. You can use this example as a reference for
+creating your own application.
 
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
@@ -25,7 +27,7 @@ You can use this example as a reference for creating your own application.
     ```
 
 3. In the example dir run (replace _<build_target>_ with your board name, for
-   example, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9253b`):
+   example, `tlsr9518adk80d`, `tlsr9528a` or `tlsr9258a`):
 
     ```bash
     $ west build -b <build_target>
@@ -63,7 +65,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | NA                     | NA                                                                                                     |
+| Button 2 | Not used               | Not used                                                                                               |
 | Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
