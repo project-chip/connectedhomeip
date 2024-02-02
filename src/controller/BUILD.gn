@@ -68,7 +68,7 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
-    # TODO: these dependencies are borken. Specifically:
+    # TODO: these dependencies are broken. Specifically:
     #       a) ChipDeviceControllerFactory.h includes CHIPDeviceController.h
     #       b) CHIPDeviceController.cpp is only compiled for read_client
     # These conditionals are NOT ok and should have been solved with separate
