@@ -332,6 +332,13 @@ class TestDefinition:
                     # so it will be commissionable again.
                     app.factoryReset()
 
+                    # It may sometimes be useful to run the same app multiple times depending
+                    # on the implementation. So this code creates a duplicate entry but with a different
+                    # key.
+                    app = App(runner, path)
+                    apps_register.add(f'{key}#2', app)
+                    app.factoryReset()
+
             if dry_run:
                 tool_storage_dir = None
                 tool_storage_args = []
