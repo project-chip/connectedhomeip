@@ -209,7 +209,7 @@ template("siwx917_sdk") {
     # the content of these, only when changing the filename itself.
     # To fix this, these files are also manually depended upon in the source set
     # declared in siwx917_mbedtls_config further down this file.
-    defines = [
+    defines += [
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "SILABS_LOG_ENABLED=${silabs_log_enabled}",
