@@ -86,8 +86,8 @@ private:
     ICDClientStorage * mpICDClientStorage = nullptr;
     CheckInDelegate * mpCheckInDelegate   = nullptr;
     RefreshKeyBuffer mNewKey;
-    chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
-    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 };
 } // namespace app
 } // namespace chip
