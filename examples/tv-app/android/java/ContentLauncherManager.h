@@ -48,6 +48,7 @@ public:
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 private:
     jobject mContentLauncherManagerObject           = nullptr;
@@ -55,4 +56,7 @@ private:
     jmethodID mGetSupportedStreamingProtocolsMethod = nullptr;
     jmethodID mLaunchContentMethod                  = nullptr;
     jmethodID mLaunchUrlMethod                      = nullptr;
+
+    // TODO: set this based upon meta data from app
+    uint16_t mDynamicClusterRevision    = 2;
 };
