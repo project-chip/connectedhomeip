@@ -213,6 +213,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeValveConfigurationAndControlID:
         result = @"ValveConfigurationAndControl";
         break;
+    case MTRClusterIDTypeElectricalPowerMeasurementID:
+        result = @"ElectricalPowerMeasurement";
+        break;
     case MTRClusterIDTypeElectricalEnergyMeasurementID:
         result = @"ElectricalEnergyMeasurement";
         break;
@@ -4124,6 +4127,116 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
         }
 
+    case MTRClusterIDTypeElectricalPowerMeasurementID:
+
+        switch (attributeID) {
+
+            // Cluster ElectricalPowerMeasurement attributes
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributePowerModeID:
+            result = @"PowerMode";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeNumberOfMeasurementTypesID:
+            result = @"NumberOfMeasurementTypes";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAccuracyID:
+            result = @"Accuracy";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRangesID:
+            result = @"Ranges";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeVoltageID:
+            result = @"Voltage";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeActiveCurrentID:
+            result = @"ActiveCurrent";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeReactiveCurrentID:
+            result = @"ReactiveCurrent";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeApparentCurrentID:
+            result = @"ApparentCurrent";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeActivePowerID:
+            result = @"ActivePower";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeReactivePowerID:
+            result = @"ReactivePower";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeApparentPowerID:
+            result = @"ApparentPower";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSVoltageID:
+            result = @"RMSVoltage";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSCurrentID:
+            result = @"RMSCurrent";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeRMSPowerID:
+            result = @"RMSPower";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeFrequencyID:
+            result = @"Frequency";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeHarmonicCurrentsID:
+            result = @"HarmonicCurrents";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeHarmonicPhasesID:
+            result = @"HarmonicPhases";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributePowerFactorID:
+            result = @"PowerFactor";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeNeutralCurrentID:
+            result = @"NeutralCurrent";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalPowerMeasurementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
     case MTRClusterIDTypeElectricalEnergyMeasurementID:
 
         switch (attributeID) {
@@ -4147,6 +4260,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyExportedID:
             result = @"PeriodicEnergyExported";
+            break;
+
+        case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyResetID:
+            result = @"CumulativeEnergyReset";
             break;
 
         case MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeGeneratedCommandListID:
