@@ -18,14 +18,6 @@
 
 #pragma once
 
-#if CHIP_HAVE_CONFIG_H
-#include <crypto/CryptoBuildConfig.h>
-#endif // CHIP_HAVE_CONFIG_H
-
-#define MBEDTLS_PLATFORM_C
-#define MBEDTLS_PLATFORM_MEMORY
-#define MBEDTLS_PKCS5_C
-#define MBEDTLS_HKDF_C
-
 // SLC GENERATED
-#include "sl_mbedtls_config.h"
+#include "psa_crypto_config.h"
+#include "sli_psa_builtin_config.h"
