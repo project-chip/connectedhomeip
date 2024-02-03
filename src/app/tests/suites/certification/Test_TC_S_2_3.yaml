@@ -309,8 +309,6 @@ tests:
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
           1000 (1s) and a set of extension fields appropriate to AC1."
       verification: |
-          Execute the following command in TH to generate the pre-condition to execute this test case:
-
           ./chip-tool scenes add-scene GroupID SceneID TransitionTime "SceneName" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": value}]}' nodeId endpointId
 
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
@@ -407,8 +405,6 @@ tests:
           set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
       verification: |
-          Execute the following command in TH to generate the pre-condition to execute this test case:
-
           ./chip-tool scenes view-scene GroupId SceneId Node-Id EndpointId
 
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
@@ -567,8 +563,6 @@ tests:
           field set to G1, the SceneID field set to 0x03, the TransitionTime
           field set to G1 and a set of extension fields appropriate to AC1."
       verification: |
-          Execute the following command in TH to generate the pre-condition to execute this test case:
-
           ./chip-tool scenes add-scene GroupID SceneID TransitionTime "SceneName" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": value}]}' groupID endpointId
 
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
@@ -657,8 +651,6 @@ tests:
           set to G1 and the SceneID field set to 0x03."
       PICS: S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
       verification: |
-          Execute the following command in TH to generate the pre-condition to execute this test case:
-
           ./chip-tool scenes view-scene GroupId SceneId Node-Id EndpointId
 
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application

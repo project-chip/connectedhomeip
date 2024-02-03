@@ -5870,11 +5870,6 @@ PICS:
     - label: "Does the device implement sending the CopyScene command?"
       id: S.C.C40.Tx
 
-    - label:
-          "Does the device process the TransitionTime parameter of the
-          RecallScene command?"
-      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME
-
     #
     # client / manually
     #
