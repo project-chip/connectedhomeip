@@ -42,6 +42,9 @@ declare_args() {
   }
 
   enable_provisional_features = config_enable_yaml_tests
+
+  # Disable generating compiler database by default
+  generate_compilation_database = false
 }
 
 sdk = "macosx"
@@ -105,6 +108,12 @@ action("build-darwin-framework") {
     args += [ "--clang" ]
   } else {
     args += [ "--no-clang" ]
+  }
+
+  if (generate_compilation_database) {
+    args += [ "--compdb" ]
+  } else {
+    args += [ "--no-compdb" ]
   }
 
   if (config_enable_yaml_tests) {

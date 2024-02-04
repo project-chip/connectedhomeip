@@ -8290,6 +8290,57 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
         }
         return value;
     }
+    case Attributes::CumulativeEnergyReset::Id: {
+        using TypeInfo = Attributes::CumulativeEnergyReset::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct new];
+            if (cppValue.Value().importedResetTimestamp.HasValue()) {
+                if (cppValue.Value().importedResetTimestamp.Value().IsNull()) {
+                    value.importedResetTimestamp = nil;
+                } else {
+                    value.importedResetTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().importedResetTimestamp.Value().Value()];
+                }
+            } else {
+                value.importedResetTimestamp = nil;
+            }
+            if (cppValue.Value().exportedResetTimestamp.HasValue()) {
+                if (cppValue.Value().exportedResetTimestamp.Value().IsNull()) {
+                    value.exportedResetTimestamp = nil;
+                } else {
+                    value.exportedResetTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().exportedResetTimestamp.Value().Value()];
+                }
+            } else {
+                value.exportedResetTimestamp = nil;
+            }
+            if (cppValue.Value().importedResetSystime.HasValue()) {
+                if (cppValue.Value().importedResetSystime.Value().IsNull()) {
+                    value.importedResetSystime = nil;
+                } else {
+                    value.importedResetSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().importedResetSystime.Value().Value()];
+                }
+            } else {
+                value.importedResetSystime = nil;
+            }
+            if (cppValue.Value().exportedResetSystime.HasValue()) {
+                if (cppValue.Value().exportedResetSystime.Value().IsNull()) {
+                    value.exportedResetSystime = nil;
+                } else {
+                    value.exportedResetSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().exportedResetSystime.Value().Value()];
+                }
+            } else {
+                value.exportedResetSystime = nil;
+            }
+        }
+        return value;
+    }
     default: {
         break;
     }

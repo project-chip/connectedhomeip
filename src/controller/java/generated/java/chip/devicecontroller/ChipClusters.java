@@ -28951,6 +28951,7 @@ public class ChipClusters {
     private static final long CUMULATIVE_ENERGY_EXPORTED_ATTRIBUTE_ID = 2L;
     private static final long PERIODIC_ENERGY_IMPORTED_ATTRIBUTE_ID = 3L;
     private static final long PERIODIC_ENERGY_EXPORTED_ATTRIBUTE_ID = 4L;
+    private static final long CUMULATIVE_ENERGY_RESET_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -28986,6 +28987,10 @@ public class ChipClusters {
 
     public interface PeriodicEnergyExportedAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value);
+    }
+
+    public interface CumulativeEnergyResetAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -29127,6 +29132,31 @@ public class ChipClusters {
             @Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, PERIODIC_ENERGY_EXPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCumulativeEnergyResetAttribute(
+        CumulativeEnergyResetAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CUMULATIVE_ENERGY_RESET_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CUMULATIVE_ENERGY_RESET_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCumulativeEnergyResetAttribute(
+        CumulativeEnergyResetAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CUMULATIVE_ENERGY_RESET_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, CUMULATIVE_ENERGY_RESET_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -29827,17 +29857,41 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> messages) {
-      presentMessagesRequest(callback, messages, 0);
+    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Integer duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses) {
+      presentMessagesRequest(callback, messageID, priority, messageControl, startTime, duration, messageText, responses, 0);
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> messages, int timedInvokeTimeoutMs) {
+    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Integer duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long messagesFieldID = 0L;
-      BaseTLVType messagestlvValue = ArrayType.generateArrayType(messages, (elementmessages) -> elementmessages.encodeTlv());
-      elements.add(new StructElement(messagesFieldID, messagestlvValue));
+      final long messageIDFieldID = 0L;
+      BaseTLVType messageIDtlvValue = new ByteArrayType(messageID);
+      elements.add(new StructElement(messageIDFieldID, messageIDtlvValue));
+
+      final long priorityFieldID = 1L;
+      BaseTLVType prioritytlvValue = new UIntType(priority);
+      elements.add(new StructElement(priorityFieldID, prioritytlvValue));
+
+      final long messageControlFieldID = 2L;
+      BaseTLVType messageControltlvValue = new UIntType(messageControl);
+      elements.add(new StructElement(messageControlFieldID, messageControltlvValue));
+
+      final long startTimeFieldID = 3L;
+      BaseTLVType startTimetlvValue = startTime != null ? new UIntType(startTime) : new NullType();
+      elements.add(new StructElement(startTimeFieldID, startTimetlvValue));
+
+      final long durationFieldID = 4L;
+      BaseTLVType durationtlvValue = duration != null ? new UIntType(duration) : new NullType();
+      elements.add(new StructElement(durationFieldID, durationtlvValue));
+
+      final long messageTextFieldID = 5L;
+      BaseTLVType messageTexttlvValue = new StringType(messageText);
+      elements.add(new StructElement(messageTextFieldID, messageTexttlvValue));
+
+      final long responsesFieldID = 6L;
+      BaseTLVType responsestlvValue = responses.<BaseTLVType>map((nonOptionalresponses) -> ArrayType.generateArrayType(nonOptionalresponses, (elementnonOptionalresponses) -> elementnonOptionalresponses.encodeTlv())).orElse(new EmptyType());
+      elements.add(new StructElement(responsesFieldID, responsestlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {

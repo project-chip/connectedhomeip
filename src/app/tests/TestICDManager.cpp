@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 #include <app/EventManagement.h>
-#include <app/SubscriptionManager.h>
-#include <app/icd/ICDConfigurationData.h>
-#include <app/icd/ICDManager.h>
-#include <app/icd/ICDNotifier.h>
-#include <app/icd/ICDStateObserver.h>
+#include <app/SubscriptionsInfoProvider.h>
+#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDManager.h>
+#include <app/icd/server/ICDNotifier.h>
+#include <app/icd/server/ICDStateObserver.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
@@ -71,16 +71,16 @@ public:
     void OnICDModeChange() {}
 };
 
-class TestSubscriptionManager : public SubscriptionManager
+class TestSubscriptionsInfoProvider : public SubscriptionsInfoProvider
 {
 public:
-    TestSubscriptionManager() = default;
-    ~TestSubscriptionManager(){};
+    TestSubscriptionsInfoProvider() = default;
+    ~TestSubscriptionsInfoProvider(){};
 
     void SetReturnValue(bool value) { mReturnValue = value; };
 
-    bool SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) { return mReturnValue; };
-    bool SubjectHasPersistedSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) { return mReturnValue; };
+    bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subject) { return mReturnValue; };
+    bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subject) { return mReturnValue; };
 
 private:
     bool mReturnValue = false;
@@ -126,7 +126,7 @@ public:
     System::Clock::Internal::MockClock mMockClock;
     TestSessionKeystoreImpl mKeystore;
     app::ICDManager mICDManager;
-    TestSubscriptionManager mSubManager;
+    TestSubscriptionsInfoProvider mSubManager;
     TestPersistentStorageDelegate testStorage;
 
 private:
@@ -198,7 +198,7 @@ public:
 
         // Set New durations for test case
         uint32_t oldActiveModeDuration_ms = icdConfigData.GetActiveModeDurationMs();
-        icdConfigData.SetModeDurations(0, icdConfigData.GetIdleModeDurationSec());
+        icdConfigData.SetModeDurations(MakeOptional(static_cast<uint32_t>(0)), NullOptional);
 
         // Verify That ICDManager starts in Idle
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
@@ -256,7 +256,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Reset Old durations
-        icdConfigData.SetModeDurations(oldActiveModeDuration_ms, icdConfigData.GetIdleModeDurationSec());
+        icdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration_ms), NullOptional);
     }
 
     /**
@@ -277,7 +277,7 @@ public:
 
         // Set New durations for test case
         uint32_t oldActiveModeDuration_ms = icdConfigData.GetActiveModeDurationMs();
-        icdConfigData.SetModeDurations(0, icdConfigData.GetIdleModeDurationSec());
+        icdConfigData.SetModeDurations(MakeOptional(static_cast<uint32_t>(0)), NullOptional);
 
         // Verify That ICDManager starts in Idle
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
@@ -346,7 +346,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Reset Old durations
-        icdConfigData.SetModeDurations(oldActiveModeDuration_ms, icdConfigData.GetIdleModeDurationSec());
+        icdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration_ms), NullOptional);
     }
 
     static void TestKeepActivemodeRequests(nlTestSuite * aSuite, void * aContext)

@@ -600,6 +600,7 @@
             "CumulativeEnergyExported",
             "PeriodicEnergyImported",
             "PeriodicEnergyExported",
+            "CumulativeEnergyReset",
             "FeatureMap"
         ],
         "Electrical Power Measurement": [
@@ -623,27 +624,6 @@
             "PowerFactor",
             "NeutralCurrent",
             "FeatureMap"
-        ],
-        "Electrical Power Measurement": [
-            "PowerMode",
-            "NumberOfMeasurementTypes",
-            "Accuracy",
-            "Ranges",
-            "Voltage",
-            "ActiveCurrent",
-            "ReactiveCurrent",
-            "ApparentCurrent",
-            "ActivePower",
-            "ReactivePower",
-            "ApparentPower",
-            "RMSVoltage",
-            "RMSCurrent",
-            "RMSPower",
-            "Frequency",
-            "HarmonicCurrents",
-            "HarmonicPhases",
-            "PowerFactor",
-            "NeutralCurrent"
         ],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"]

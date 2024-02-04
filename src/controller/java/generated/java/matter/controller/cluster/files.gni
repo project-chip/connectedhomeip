@@ -55,6 +55,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DishwasherModeClusterModeOptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DishwasherModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/DoorLockClusterCredentialStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct.kt",

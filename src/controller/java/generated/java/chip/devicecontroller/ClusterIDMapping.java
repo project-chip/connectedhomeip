@@ -9154,6 +9154,7 @@ public class ClusterIDMapping {
             CumulativeEnergyExported(2L),
             PeriodicEnergyImported(3L),
             PeriodicEnergyExported(4L),
+            CumulativeEnergyReset(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -9508,7 +9509,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum PresentMessagesRequestCommandField {Messages(0),;
+        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),;
                     private final int id;
                     PresentMessagesRequestCommandField(int id) {
                         this.id = id;

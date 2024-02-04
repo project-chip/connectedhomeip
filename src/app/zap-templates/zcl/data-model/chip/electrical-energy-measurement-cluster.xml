@@ -41,6 +41,7 @@ limitations under the License.
     <attribute code="0x0003" side="server" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyImported</attribute>
     <!--Conformance feature IMPE & PERE - for now optional-->
     <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyExported</attribute>
+    <attribute code="0x0005" side="server" define="CUMULATIVE_ENERGY_RESET" type="CumulativeEnergyResetStruct" isNullable="true" optional="true">CumulativeEnergyReset</attribute>
     <!--Conformance feature EXPE & PERE - for now optional-->
     <event code="0x00" side="server" name="CumulativeEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
       <description>CumulativeEnergyMeasured</description>
@@ -53,6 +54,13 @@ limitations under the License.
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
   </cluster>
+  <struct name="CumulativeEnergyResetStruct" apiMaturity="provisional">
+    <cluster code="0x0091"/>
+    <item fieldId="0" name="ImportedResetTimestamp" type="epoch_s" isNullable="true" optional="true"/>
+    <item fieldId="1" name="ExportedResetTimestamp" type="epoch_s" isNullable="true" optional="true"/>
+    <item fieldId="2" name="ImportedResetSystime" type="systime_ms" isNullable="true" optional="true"/>
+    <item fieldId="3" name="ExportedResetSystime" type="systime_ms" isNullable="true" optional="true"/>
+  </struct>
   <struct name="EnergyMeasurementStruct" apiMaturity="provisional">
     <cluster code="0x0091"/>
     <item fieldId="0" name="Energy" type="energy_mwh" min="0" max="4611686018427387904"/>

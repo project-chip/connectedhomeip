@@ -14181,6 +14181,57 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 namespace ElectricalEnergyMeasurement {
 namespace Structs {
 
+namespace CumulativeEnergyResetStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kImportedResetTimestamp), importedResetTimestamp);
+    encoder.Encode(to_underlying(Fields::kExportedResetTimestamp), exportedResetTimestamp);
+    encoder.Encode(to_underlying(Fields::kImportedResetSystime), importedResetSystime);
+    encoder.Encode(to_underlying(Fields::kExportedResetSystime), exportedResetSystime);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kImportedResetTimestamp))
+        {
+            err = DataModel::Decode(reader, importedResetTimestamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kExportedResetTimestamp))
+        {
+            err = DataModel::Decode(reader, exportedResetTimestamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kImportedResetSystime))
+        {
+            err = DataModel::Decode(reader, importedResetSystime);
+        }
+        else if (__context_tag == to_underlying(Fields::kExportedResetSystime))
+        {
+            err = DataModel::Decode(reader, exportedResetSystime);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace CumulativeEnergyResetStruct
+
 namespace EnergyMeasurementStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -14255,6 +14306,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, periodicEnergyImported);
     case Attributes::PeriodicEnergyExported::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, periodicEnergyExported);
+    case Attributes::CumulativeEnergyReset::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, cumulativeEnergyReset);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -15152,7 +15205,13 @@ namespace PresentMessagesRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kMessages), messages);
+    encoder.Encode(to_underlying(Fields::kMessageID), messageID);
+    encoder.Encode(to_underlying(Fields::kPriority), priority);
+    encoder.Encode(to_underlying(Fields::kMessageControl), messageControl);
+    encoder.Encode(to_underlying(Fields::kStartTime), startTime);
+    encoder.Encode(to_underlying(Fields::kDuration), duration);
+    encoder.Encode(to_underlying(Fields::kMessageText), messageText);
+    encoder.Encode(to_underlying(Fields::kResponses), responses);
     return encoder.Finalize();
 }
 
@@ -15170,9 +15229,33 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kMessages))
+        if (__context_tag == to_underlying(Fields::kMessageID))
         {
-            err = DataModel::Decode(reader, messages);
+            err = DataModel::Decode(reader, messageID);
+        }
+        else if (__context_tag == to_underlying(Fields::kPriority))
+        {
+            err = DataModel::Decode(reader, priority);
+        }
+        else if (__context_tag == to_underlying(Fields::kMessageControl))
+        {
+            err = DataModel::Decode(reader, messageControl);
+        }
+        else if (__context_tag == to_underlying(Fields::kStartTime))
+        {
+            err = DataModel::Decode(reader, startTime);
+        }
+        else if (__context_tag == to_underlying(Fields::kDuration))
+        {
+            err = DataModel::Decode(reader, duration);
+        }
+        else if (__context_tag == to_underlying(Fields::kMessageText))
+        {
+            err = DataModel::Decode(reader, messageText);
+        }
+        else if (__context_tag == to_underlying(Fields::kResponses))
+        {
+            err = DataModel::Decode(reader, responses);
         }
         else
         {

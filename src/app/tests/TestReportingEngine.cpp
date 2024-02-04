@@ -120,6 +120,10 @@ class DummyDelegate : public ReadHandler::ManagementCallback
 public:
     void OnDone(ReadHandler & apHandler) override {}
     chip::app::ReadHandler::ApplicationCallback * GetAppCallback() override { return nullptr; }
+    chip::app::InteractionModelEngine * GetInteractionModelEngine() override
+    {
+        return chip::app::InteractionModelEngine::GetInstance();
+    }
 };
 
 void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext)

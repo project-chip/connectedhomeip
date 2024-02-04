@@ -4585,6 +4585,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _importedResetTimestamp = nil;
+
+        _exportedResetTimestamp = nil;
+
+        _importedResetSystime = nil;
+
+        _exportedResetSystime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct alloc] init];
+
+    other.importedResetTimestamp = self.importedResetTimestamp;
+    other.exportedResetTimestamp = self.exportedResetTimestamp;
+    other.importedResetSystime = self.importedResetSystime;
+    other.exportedResetSystime = self.exportedResetSystime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: importedResetTimestamp:%@; exportedResetTimestamp:%@; importedResetSystime:%@; exportedResetSystime:%@; >", NSStringFromClass([self class]), _importedResetTimestamp, _exportedResetTimestamp, _importedResetSystime, _exportedResetSystime];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct
 - (instancetype)init
 {

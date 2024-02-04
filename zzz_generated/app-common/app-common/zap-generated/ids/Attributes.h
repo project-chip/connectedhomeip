@@ -3770,6 +3770,10 @@ namespace PeriodicEnergyExported {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace PeriodicEnergyExported
 
+namespace CumulativeEnergyReset {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CumulativeEnergyReset
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

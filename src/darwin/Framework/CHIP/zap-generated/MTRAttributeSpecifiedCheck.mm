@@ -3027,6 +3027,9 @@ static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId
     case Attributes::PeriodicEnergyExported::Id: {
         return YES;
     }
+    case Attributes::CumulativeEnergyReset::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

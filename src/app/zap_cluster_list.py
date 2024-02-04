@@ -23,7 +23,7 @@ def get_cluster_sources(clusters: typing.Set[str],
     for cluster in clusters:
         if cluster not in source_map:
             raise ValueError("Unhandled %s cluster: %s"
-                             " (hint: add to src/app/zap_cluster_list.py)" % (side, cluster))
+                             " (hint: add to src/app/zap_cluster_list.json)" % (side, cluster))
 
         cluster_sources.update(source_map[cluster])
 

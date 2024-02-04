@@ -6525,6 +6525,12 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000005: {
+                "attributeName": "CumulativeEnergyReset",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -6700,7 +6706,13 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "PresentMessagesRequest",
                 "args": {
-                    "messages": "MessageStruct",
+                    "messageID": "bytes",
+                    "priority": "int",
+                    "messageControl": "int",
+                    "startTime": "int",
+                    "duration": "int",
+                    "messageText": "str",
+                    "responses": "MessageResponseOptionStruct",
                 },
             },
             0x00000001: {
