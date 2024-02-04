@@ -44,6 +44,7 @@ static_library("transport") {
     "SessionManager.h",
     "SessionMessageCounter.h",
     "SessionMessageDelegate.h",
+    "SessionUpdateDelegate.h",
     "TracingStructs.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",
@@ -70,7 +71,10 @@ static_library("transport") {
   ]
 
   if (chip_enable_transport_trace) {
-    sources += [ "TraceMessage.cpp" ]
+    sources += [
+      "TraceMessage.cpp",
+      "TraceMessage.h",
+    ]
   }
   if (chip_enable_transport_pw_trace) {
     public_deps += [ "$dir_pw_trace" ]
