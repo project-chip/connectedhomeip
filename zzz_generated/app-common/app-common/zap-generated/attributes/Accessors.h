@@ -1956,17 +1956,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace ElectricalPowerMeasurement
-
-namespace ElectricalEnergyMeasurement {
-namespace Attributes {
-
-namespace ClusterRevision {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace ClusterRevision
-
-} // namespace Attributes
 } // namespace ElectricalEnergyMeasurement
 
 namespace DemandResponseLoadControl {
