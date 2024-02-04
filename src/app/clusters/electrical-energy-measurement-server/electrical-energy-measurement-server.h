@@ -65,25 +65,6 @@ private:
     BitMask<OptionalAttributes> mOptionalAttrs;
 };
 
-class ElectricalEnergyMeasurementAttrAccess : public AttributeAccessInterface
-{
-public:
-    ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature) :
-        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ElectricalEnergyMeasurement::Id),
-        mFeature(aFeature)
-    {}
-
-    ~ElectricalEnergyMeasurementAttrAccess() { Shutdown(); }
-
-    CHIP_ERROR Init();
-    void Shutdown();
-
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
-
-private:
-    BitMask<Feature> mFeature;
-};
-
 bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
                                     const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
 

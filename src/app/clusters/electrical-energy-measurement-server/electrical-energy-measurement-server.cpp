@@ -150,7 +150,7 @@ MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
         return nullptr;
     }
 
-    if (index >= EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (index >= ArraySize(gMeasurements))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected energy measurement index.");
         return nullptr;
