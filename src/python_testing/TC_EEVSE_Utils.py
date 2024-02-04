@@ -48,7 +48,7 @@ class EEVSEBaseTestHelper:
         asserts.assert_equal(result[0].Status, Status.Success, "UserMaximumChargeCurrent write failed")
 
     async def send_enable_charge_command(self, endpoint: int = None, charge_until: int = None, timedRequestTimeoutMs: int = 3000,
-                                         min_charge: int = None, max_charge: int = None, expected_status: Status = Status.Success):
+                                         min_charge: int = 6000, max_charge: int = 32000, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
                 chargingEnabledUntil=charge_until,
