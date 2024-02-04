@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -167,30 +167,34 @@ private:
     jbyteArray mArray = nullptr;
 };
 
-/// Manages an pre-existing global reference to a jclass.
-class JniClass
+// Manages an pre-existing global reference to a jobject.
+class JniGlobalRefWrapper
 {
 public:
-    explicit JniClass(jclass mClassRef) : mClassRef(mClassRef) {}
-    ~JniClass() { chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mClassRef); }
-
-    jclass classRef() { return mClassRef; }
+    explicit JniGlobalRefWrapper(jobject mGlobalRef) : mGlobalRef(mGlobalRef) {}
+    ~JniGlobalRefWrapper()
+    {
+        chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mGlobalRef);
+        mGlobalRef = nullptr;
+    }
+    jobject classRef() { return mGlobalRef; }
 
 private:
-    jclass mClassRef;
+    jobject mGlobalRef = nullptr;
 };
 
-class JniLocalReferenceManager
+class JniLocalReferenceScope
 {
 public:
-    JniLocalReferenceManager(JNIEnv * env) : mEnv(env)
+    explicit JniLocalReferenceScope(JNIEnv * env) : mEnv(env)
     {
         if (mEnv->PushLocalFrame(JNI_LOCAL_REF_COUNT) == 0)
         {
             mlocalFramePushed = true;
         }
     }
-    ~JniLocalReferenceManager()
+
+    ~JniLocalReferenceScope()
     {
         if (mlocalFramePushed)
         {
@@ -199,8 +203,12 @@ public:
         }
     }
 
+    // Delete copy constructor and copy assignment operator
+    JniLocalReferenceScope(const JniLocalReferenceScope &)             = delete;
+    JniLocalReferenceScope & operator=(const JniLocalReferenceScope &) = delete;
+
 private:
-    JNIEnv * mEnv          = nullptr;
+    JNIEnv * const mEnv;
     bool mlocalFramePushed = false;
 };
 

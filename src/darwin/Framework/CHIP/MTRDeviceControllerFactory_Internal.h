@@ -22,6 +22,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerParameters.h>
@@ -74,6 +75,16 @@ NS_ASSUME_NONNULL_BEGIN
  * compressed fabric id and node id has been observed.
  */
 - (void)operationalInstanceAdded:(chip::PeerId &)operationalID;
+
+/**
+ * Download log of the desired type from the device.
+ */
+- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
+                       controller:(MTRDeviceController *)controller
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                            queue:(dispatch_queue_t)queue
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 /**
  * Initialize an MTRDeviceController with the given parameters.

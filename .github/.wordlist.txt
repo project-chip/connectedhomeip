@@ -95,6 +95,7 @@ ASR
 AssertionError
 AST
 ASYNC
+ATLs
 atomics
 att
 attId
@@ -160,6 +161,7 @@ blockquote
 bluetoothd
 bluez
 BOOL
+booleans
 BooleanState
 bootable
 Bootloader
@@ -380,6 +382,7 @@ DefaultOTARequestor
 DefaultOTARequestorDriver
 DefaultOTARequestorStorage
 DefaultSuccess
+defaultValue
 definedValue
 DehumidificationControl
 DelayedActionTime
@@ -503,6 +506,7 @@ emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
 EmberAfInitializeAttributes
 emberAfSetDynamicEndpoint
+emsp
 EnableNetwork
 EnableWiFiNetwork
 endian
@@ -604,6 +608,7 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
+GetInDevelopmentTests
 GetIP
 getManualTests
 GetSafeAttributePersistenceProvider
@@ -629,6 +634,7 @@ GPL
 GPLv
 Gradle
 gradlew
+graphviz
 Groupcast
 GroupId
 GroupKeyManagement
@@ -673,6 +679,7 @@ IasWd
 iaszone
 ibb
 ICA
+ICAC
 ICD
 ICDs
 iCloud
@@ -724,6 +731,7 @@ IoT
 ipaddr
 iPadOS
 ipadr
+IPK
 ipp
 iptables
 iputils
@@ -935,6 +943,7 @@ namespacing
 nano
 natively
 navpad
+nbsp
 NCP
 ncs
 nding
@@ -1076,6 +1085,7 @@ Pigweed
 PinCode
 pinrequest
 PIXIT
+PIXITs
 pkgconfig
 PKI
 plaintext
@@ -1155,6 +1165,7 @@ RADVD
 raspberryPi
 RasPi
 rAv
+RCAC
 RCP
 ReadAttribute
 ReadConfigValue
@@ -1219,6 +1230,7 @@ RTOS
 RTT
 RTX
 runArgs
+runIf
 RUNAS
 RunMain
 runtime
@@ -1227,6 +1239,7 @@ rw
 RXD
 sandboxed
 saveAs
+saveDataVersschemaionAs
 sbin
 scalability
 scalable
@@ -1377,6 +1390,7 @@ TestArray
 TestCluster
 TestConstraints
 TestEmptyString
+TestEqualities
 TestGenExample
 TestGroupDemoConfig
 TestMultiRead

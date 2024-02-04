@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 62.1.1. [TC-PS-1.1] Global attributes with server as DUT
+name: 62.1.1. [TC-PS-1.1] Global Attributes with DUT as Server
 
 PICS:
     - PS.S
@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the global attribute: ClusterRevision"
+    - label: "Step 2: Test Harness Client reads ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +41,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3a: Read the global attribute: FeatureMap"
+    - label: "Step 3a: TH reads from the DUT the FeatureMap attribute."
       PICS: " !PS.S.F00 && !PS.S.F01 && !PS.S.F02 && !PS.S.F03 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -92,7 +94,7 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2, 0x8]
 
-    - label: "Step 4: Read the global attribute: AttributeList"
+    - label: "Step 4: Test Harness Client reads AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -102,7 +104,7 @@ tests:
               contains:
                   [0, 1, 2, 0x1f, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 4: Read the global attribute: AttributeList"
+    - label: "Step 4: Test Harness Client reads AttributeList attribute."
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -112,7 +114,7 @@ tests:
               contains: [0, 1, 2, 0x1f, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4a: Read the Feature dependent(PS.S.F00-WIRED) attribute in
+          "Step 4a: TH reads the Feature dependent(PS.S.F00-WIRED) attribute in
           AttributeList"
       PICS: PS.S.F00
       command: "readAttribute"
@@ -123,7 +125,7 @@ tests:
               contains: [5]
 
     - label:
-          "Step 4b: Read the Feature dependent(PS.S.F01-BAT) attribute in
+          "Step 4b: TH reads the Feature dependent(PS.S.F01-BAT) attribute in
           AttributeList"
       PICS: PS.S.F01
       command: "readAttribute"
@@ -134,7 +136,7 @@ tests:
               contains: [14, 15, 16]
 
     - label:
-          "Step 4c: Read the Feature dependent(PS.S.F02-RECHG) attribute in
+          "Step 4c: TH reads the Feature dependent(PS.S.F02-RECHG) attribute in
           AttributeList"
       PICS: PS.S.F02
       command: "readAttribute"
@@ -145,7 +147,7 @@ tests:
               contains: [26, 28]
 
     - label:
-          "Step 4d: Read the Feature dependent(PS.S.F03-REPLC) attribute in
+          "Step 4d: TH reads the Feature dependent(PS.S.F03-REPLC) attribute in
           AttributeList"
       PICS: PS.S.F03
       command: "readAttribute"
@@ -155,23 +157,7 @@ tests:
               type: list
               contains: [19, 25]
 
-    - label: "Step 5: Read the global attribute: AcceptedCommandList"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Step 6: Read the global attribute: GeneratedCommandList"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Step 7a: Read the global attribute: EventList"
+    - label: "Step 5a: Test Harness Client reads EventList attribute."
       PICS: "PICS_EVENT_LIST_ENABLED &&  !PS.S.E00 && !PS.S.E01 && !PS.S.E02 "
       command: "readAttribute"
       attribute: "EventList"
@@ -180,7 +166,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 7b: Read PS.S.E00(WiredFaultChange) event in EventList"
+    - label: "Step 5b: TH reads PS.S.E00(WiredFaultChange) event in EventList"
       PICS: PICS_EVENT_LIST_ENABLED && PS.S.E00
       command: "readAttribute"
       attribute: "EventList"
@@ -189,7 +175,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 7c: Read PS.S.E01(BatFaultChange) event in EventList"
+    - label: "Step 5c: TH reads PS.S.E01(BatFaultChange) event in EventList"
       PICS: PICS_EVENT_LIST_ENABLED && PS.S.E01
       command: "readAttribute"
       attribute: "EventList"
@@ -198,7 +184,8 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Step 7d: Read PS.S.E02(BatChargeFaultChange) event in EventList"
+    - label:
+          "Step 5d: TH reads PS.S.E02(BatChargeFaultChange) event in EventList"
       PICS: PICS_EVENT_LIST_ENABLED && PS.S.E02
       command: "readAttribute"
       attribute: "EventList"
@@ -206,3 +193,19 @@ tests:
           constraints:
               type: list
               contains: [2]
+
+    - label: "Step 6: Test Harness Client reads AcceptedCommandList attribute."
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: Test Harness Client reads GeneratedCommandList attribute."
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

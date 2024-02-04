@@ -179,6 +179,8 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
     err = manager.DeleteEntry(ScopedNodeId(nodeId1, fabricId1));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     iterator = manager.IterateICDClientInfo();
+    NL_TEST_ASSERT(apSuite, iterator != nullptr);
+    DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iterator);
     NL_TEST_ASSERT(apSuite, iterator->Count() == 2);
 
     err = manager.DeleteEntry(ScopedNodeId(nodeId2, fabricId1));
@@ -196,7 +198,7 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
     {
         count++;
     }
-    iterator->Release();
+
     NL_TEST_ASSERT(apSuite, count == 0);
 }
 

@@ -39,9 +39,10 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::InvalidAction));
 
         // If SendCommandResponse() fails, we are responsible for closing the exchange,
-        // as stipulated by the API contract. We fulfill this obligation by setting
-        // `failureStatusToSend` to a value that triggers the transmission of a final
-        // StatusResponse, which does not expect a response.
+        // as stipulated by the API contract. We fulfill this obligation by not sending
+        // a message expecting a response on the exchange. Since we are in the middle
+        // of processing an incoming message, the exchange will close itself once we are
+        // done processing it, if there is no response to wait for at that point.
         err = SendCommandResponse();
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::Failure));
 
@@ -88,8 +89,7 @@ CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
     // failure, the caller bears the responsibility of closing the exchange.
     ReturnErrorOnFailure(SendCommandResponse());
 
-    bool moreToSend = !mChunks.IsNull();
-    if (moreToSend)
+    if (HasMoreToSend())
     {
         MoveToState(State::AwaitingStatusResponse);
         mExchangeCtx->SetDelegate(this);
@@ -103,12 +103,18 @@ CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
 
 CHIP_ERROR CommandResponseSender::SendCommandResponse()
 {
-    VerifyOrReturnError(!mChunks.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(HasMoreToSend(), CHIP_ERROR_INCORRECT_STATE);
+    if (mChunks.IsNull())
+    {
+        VerifyOrReturnError(mReportResponseDropped, CHIP_ERROR_INCORRECT_STATE);
+        SendStatusResponse(Status::ResourceExhausted);
+        mReportResponseDropped = false;
+        return CHIP_NO_ERROR;
+    }
     System::PacketBufferHandle commandResponsePayload = mChunks.PopHead();
 
-    bool moreToSend               = !mChunks.IsNull();
     Messaging::SendFlags sendFlag = Messaging::SendMessageFlags::kNone;
-    if (moreToSend)
+    if (HasMoreToSend())
     {
         sendFlag = Messaging::SendMessageFlags::kExpectResponse;
         mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);

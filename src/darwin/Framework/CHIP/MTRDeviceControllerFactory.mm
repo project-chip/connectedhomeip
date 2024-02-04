@@ -31,6 +31,7 @@
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRDiagnosticLogsDownloader.h"
 #import "MTRError_Internal.h"
 #import "MTRFabricInfo_Internal.h"
 #import "MTRFramework.h"
@@ -132,6 +133,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 @property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
 @property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
+
+@property (nonatomic, readonly) MTRDiagnosticLogsDownloader * diagnosticLogsDownloader;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(MTRDeviceControllerStartupParams *)params
@@ -332,6 +335,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         delete _persistentStorageDelegate;
         _persistentStorageDelegate = nullptr;
     }
+
+    _diagnosticLogsDownloader = nil;
 }
 
 - (CHIP_ERROR)_initFabricTable:(FabricTable &)fabricTable
@@ -1066,6 +1071,33 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     return [self runningControllerForFabricIndex:fabricIndex includeControllerStartingUp:YES includeControllerShuttingDown:YES];
 }
 
+- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
+                       controller:(MTRDeviceController *)controller
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                            queue:(dispatch_queue_t)queue
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    dispatch_sync(_chipWorkQueue, ^{
+        if (![self isRunning]) {
+            return;
+        }
+
+        if (_diagnosticLogsDownloader == nil) {
+            _diagnosticLogsDownloader = [[MTRDiagnosticLogsDownloader alloc] init];
+            auto systemState = _controllerFactory->GetSystemState();
+            systemState->BDXTransferServer()->SetDelegate([_diagnosticLogsDownloader getBridge]);
+        }
+
+        [_diagnosticLogsDownloader downloadLogFromNodeWithID:nodeID
+                                                  controller:controller
+                                                        type:type
+                                                     timeout:timeout
+                                                       queue:queue
+                                                  completion:completion];
+    });
+}
+
 - (void)operationalInstanceAdded:(chip::PeerId &)operationalID
 {
     assertChipStackLockedByCurrentThread();
@@ -1128,7 +1160,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 @end
 
-MTR_HIDDEN
 @interface MTRDummyStorage : NSObject <MTRStorage>
 @end
 

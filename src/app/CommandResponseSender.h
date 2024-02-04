@@ -124,6 +124,11 @@ public:
     }
 
     /**
+     * @brief Called to indicate that response was dropped
+     */
+    void ResponseDropped() { mReportResponseDropped = true; }
+
+    /**
      * @brief Registers a callback to be invoked when CommandResponseSender has finished sending responses.
      */
     void RegisterOnResponseSenderDoneCallback(Callback::Callback<OnResponseSenderDone> * aResponseSenderDoneCallback)
@@ -144,6 +149,7 @@ private:
     const char * GetStateStr() const;
 
     CHIP_ERROR SendCommandResponse();
+    bool HasMoreToSend() { return !mChunks.IsNull() || mReportResponseDropped; }
     void Close();
 
     // A list of InvokeResponseMessages to be sent out by CommandResponseSender.
@@ -153,7 +159,8 @@ private:
     Messaging::ExchangeHolder mExchangeCtx;
     State mState = State::ReadyForInvokeResponses;
 
-    bool mCloseCalled = false;
+    bool mCloseCalled           = false;
+    bool mReportResponseDropped = false;
 };
 
 } // namespace app

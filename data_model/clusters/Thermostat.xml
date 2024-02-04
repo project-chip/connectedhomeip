@@ -85,21 +85,21 @@ Davis, CA 95616, USA
     <feature bit="2" code="OCC" name="Occupancy" summary="Supports Occupied and Unoccupied setpoints">
       <optionalConform/>
     </feature>
-    <feature bit="3" code="SCH" name="Zigbee Schedule Configuration" summary="Supports remote configuration of a weekly schedule of setpoint transitions">
+    <feature bit="3" code="SCH" name="ScheduleConfiguration" summary="Supports remote configuration of a weekly schedule of setpoint transitions">
       <otherwiseConform>
-        <deprecateConform/>
-        <mandatoryConform>
+        <optionalConform>
           <condition name="Zigbee"/>
-        </mandatoryConform>
+        </optionalConform>
+        <deprecateConform/>
       </otherwiseConform>
     </feature>
     <feature bit="4" code="SB" name="Setback" summary="Supports configurable setback (or span)">
       <optionalConform/>
     </feature>
-    <feature bit="5" code="AUTO" name="Auto Mode" summary="Supports a System Mode of Auto">
+    <feature bit="5" code="AUTO" name="AutoMode" summary="Supports a System Mode of Auto">
       <optionalConform/>
     </feature>
-    <feature bit="6" code="LTNE" name="Local Temperature Not Exposed" summary="Thermostat does not expose the LocalTemperature Value in the LocalTemperature attribute">
+    <feature bit="6" code="LTNE" name="LocalTemperatureNotExposed" summary="Thermostat does not expose the LocalTemperature Value in the LocalTemperature attribute">
       <optionalConform/>
     </feature>
   </features>
@@ -225,6 +225,26 @@ Davis, CA 95616, USA
         <optionalConform/>
       </item>
     </enum>
+    <enum name="SetpointRaiseLowerModeEnum">
+      <item value="0" name="Heat" summary="Adjust Heat Setpoint">
+        <mandatoryConform>
+          <feature name="HEAT"/>
+        </mandatoryConform>
+      </item>
+      <item value="1" name="Cool" summary="Adjust Cool Setpoint">
+        <mandatoryConform>
+          <feature name="COOL"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="Both" summary="Adjust Heat Setpoint and Cool Setpoint">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="HEAT"/>
+            <feature name="COOL"/>
+          </orTerm>
+        </mandatoryConform>
+      </item>
+    </enum>
     <enum name="StartOfWeekEnum">
       <item value="0" name="Sunday">
         <mandatoryConform/>
@@ -293,6 +313,21 @@ Davis, CA 95616, USA
       </item>
       <item value="1" name="SetpointHoldOn" summary="Maintain current setpoint, regardless of schedule transitions">
         <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ThermostatRunningModeEnum">
+      <item value="0" name="Off" summary="The Thermostat does not generate demand for Cooling or Heating">
+        <optionalConform/>
+      </item>
+      <item value="3" name="Cool" summary="Demand is only generated for Cooling">
+        <optionalConform>
+          <feature name="COOL"/>
+        </optionalConform>
+      </item>
+      <item value="4" name="Heat" summary="Demand is only generated for Heating">
+        <optionalConform>
+          <feature name="HEAT"/>
+        </optionalConform>
       </item>
     </enum>
     <bitmap name="ACErrorCodeBitmap">
@@ -416,26 +451,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <bitmap name="SetpointRaiseLowerModeBitmap">
-      <bitfield name="Heat" bit="0" summary="Adjust Heat Setpoint">
-        <mandatoryConform>
-          <feature name="HEAT"/>
-        </mandatoryConform>
-      </bitfield>
-      <bitfield name="Cool" bit="1" summary="Adjust Cool Setpoint">
-        <mandatoryConform>
-          <feature name="COOL"/>
-        </mandatoryConform>
-      </bitfield>
-      <bitfield name="Both" bit="2" summary="Adjust Heat Setpoint and Cool Setpoint">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="HEAT"/>
-            <feature name="COOL"/>
-          </orTerm>
-        </mandatoryConform>
-      </bitfield>
-    </bitmap>
     <bitmap name="TemperatureSetpointHoldPolicy">
       <bitfield name="HoldDurationElapsed" bit="0" summary="Hold will be cleared when the hold duration has elapsed">
         <mandatoryConform/>
@@ -452,10 +467,12 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="HeatSetpoint" type="temperature">
         <access read="true" write="true"/>
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="CoolSetpoint" type="temperature">
         <access read="true" write="true"/>
+        <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </struct>
@@ -640,10 +657,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001D" name="AlarmMask" type="AlarmCodeBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <optionalConform/>
+      <optionalConform>
+        <condition name="Zigbee"/>
+      </optionalConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x001E" name="ThermostatRunningMode" type="SystemModeEnum" default="0">
+    <attribute id="0x001E" name="ThermostatRunningMode" type="ThermostatRunningModeEnum" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="AUTO"/>
@@ -820,7 +839,7 @@ Davis, CA 95616, USA
     <command id="0x00" name="SetpointRaiseLower" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="Mode" type="SetpointRaiseLowerModeBitmap">
+      <field id="0" name="Mode" type="SetpointRaiseLowerModeEnum">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -833,6 +852,22 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
+      <field id="0" name="NumberOfTransitionsForSequence" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="2" name="ModeForSequence" type="ScheduleModeBitmap">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="3" name="Transitions" type="list">
+        <entry type="WeeklyScheduleTransitionStruct"/>
+        <mandatoryConform/>
+        <constraint type="maxCount" value="10"/>
+      </field>
     </command>
     <command id="0x01" name="SetWeeklySchedule" response="Y">
       <access invokePrivilege="manage"/>
@@ -842,7 +877,7 @@ Davis, CA 95616, USA
       <field id="0" name="NumberOfTransitionsForSequence" type="uint8">
         <mandatoryConform/>
       </field>
-      <field id="1" name="DayOfWeekforSequence" type="ScheduleDayOfWeekBitmap">
+      <field id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -899,7 +934,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x03" name="ClearWeeklySchedule">
+    <command id="0x03" name="ClearWeeklySchedule" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="SCH"/>
@@ -907,7 +942,9 @@ Davis, CA 95616, USA
     </command>
     <command id="0x04" name="GetRelayStatusLog" response="GetRelayStatusLogResponse">
       <access invokePrivilege="operate"/>
-      <optionalConform/>
+      <optionalConform>
+        <condition name="Zigbee"/>
+      </optionalConform>
     </command>
   </commands>
 </cluster>

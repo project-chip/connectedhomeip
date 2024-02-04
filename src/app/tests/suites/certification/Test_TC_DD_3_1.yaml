@@ -17,6 +17,7 @@ name: 3.3.1. [TC-DD-3.1] Commissioning Flow - Concurrent [DUT - Commissionee]
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
+    - "!MCORE.DD.NON_CONCURRENT_CONNECTION"
 
 config:
     nodeId: 0x12344321

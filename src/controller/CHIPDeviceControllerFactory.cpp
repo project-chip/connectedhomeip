@@ -177,6 +177,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.timerDelegate             = chip::Platform::New<chip::app::DefaultTimerDelegate>();
     stateParams.reportScheduler           = chip::Platform::New<app::reporting::ReportSchedulerImpl>(stateParams.timerDelegate);
     stateParams.sessionKeystore           = params.sessionKeystore;
+    stateParams.bdxTransferServer         = chip::Platform::New<bdx::BDXTransferServer>();
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
     stateParams.fabricTable = params.fabricTable;
@@ -225,6 +226,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
+    ReturnErrorOnFailure(stateParams.bdxTransferServer->ListenForSendInit(stateParams.systemLayer, stateParams.exchangeMgr));
 
     InitDataModelHandler();
 
@@ -436,6 +438,13 @@ void DeviceControllerSystemState::Shutdown()
 
         chip::Platform::Delete(mFabricTableDelegate);
         mFabricTableDelegate = nullptr;
+    }
+
+    if (mBDXTransferServer != nullptr)
+    {
+        mBDXTransferServer->Shutdown();
+        chip::Platform::Delete(mBDXTransferServer);
+        mBDXTransferServer = nullptr;
     }
 
     if (mCASEServer != nullptr)

@@ -2199,9 +2199,6 @@ static BOOL AttributeIsSpecifiedInRVCRunModeCluster(AttributeId aAttributeId)
     case Attributes::CurrentMode::Id: {
         return YES;
     }
-    case Attributes::OnMode::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2233,9 +2230,6 @@ static BOOL AttributeIsSpecifiedInRVCCleanModeCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::CurrentMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2697,21 +2691,6 @@ static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttribute
 {
     using namespace Clusters::ScenesManagement;
     switch (aAttributeId) {
-    case Attributes::SceneCount::Id: {
-        return YES;
-    }
-    case Attributes::CurrentScene::Id: {
-        return YES;
-    }
-    case Attributes::CurrentGroup::Id: {
-        return YES;
-    }
-    case Attributes::SceneValid::Id: {
-        return YES;
-    }
-    case Attributes::NameSupport::Id: {
-        return YES;
-    }
     case Attributes::LastConfiguredBy::Id: {
         return YES;
     }
@@ -2945,6 +2924,90 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     }
     }
 }
+static BOOL AttributeIsSpecifiedInElectricalPowerMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalPowerMeasurement;
+    switch (aAttributeId) {
+    case Attributes::PowerMode::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfMeasurementTypes::Id: {
+        return YES;
+    }
+    case Attributes::Accuracy::Id: {
+        return YES;
+    }
+    case Attributes::Ranges::Id: {
+        return YES;
+    }
+    case Attributes::Voltage::Id: {
+        return YES;
+    }
+    case Attributes::ActiveCurrent::Id: {
+        return YES;
+    }
+    case Attributes::ReactiveCurrent::Id: {
+        return YES;
+    }
+    case Attributes::ApparentCurrent::Id: {
+        return YES;
+    }
+    case Attributes::ActivePower::Id: {
+        return YES;
+    }
+    case Attributes::ReactivePower::Id: {
+        return YES;
+    }
+    case Attributes::ApparentPower::Id: {
+        return YES;
+    }
+    case Attributes::RMSVoltage::Id: {
+        return YES;
+    }
+    case Attributes::RMSCurrent::Id: {
+        return YES;
+    }
+    case Attributes::RMSPower::Id: {
+        return YES;
+    }
+    case Attributes::Frequency::Id: {
+        return YES;
+    }
+    case Attributes::HarmonicCurrents::Id: {
+        return YES;
+    }
+    case Attributes::HarmonicPhases::Id: {
+        return YES;
+    }
+    case Attributes::PowerFactor::Id: {
+        return YES;
+    }
+    case Attributes::NeutralCurrent::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalEnergyMeasurement;
@@ -2962,6 +3025,9 @@ static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId
         return YES;
     }
     case Attributes::PeriodicEnergyExported::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyReset::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3013,6 +3079,39 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
         return YES;
     }
     case Attributes::DefaultRandomDuration::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInMessagesCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Messages;
+    switch (aAttributeId) {
+    case Attributes::Messages::Id: {
+        return YES;
+    }
+    case Attributes::ActiveMessageIDs::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3202,6 +3301,84 @@ static BOOL AttributeIsSpecifiedInEnergyPreferenceCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::CurrentLowPowerModeSensitivity::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInEnergyEVSEModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyEvseMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DeviceEnergyManagementMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6261,6 +6438,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::ClusterRevision::Id: {
         return YES;
     }
+    case Attributes::MeiInt8u::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -6486,11 +6666,17 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ValveConfigurationAndControl::Id: {
         return AttributeIsSpecifiedInValveConfigurationAndControlCluster(aAttributeId);
     }
+    case Clusters::ElectricalPowerMeasurement::Id: {
+        return AttributeIsSpecifiedInElectricalPowerMeasurementCluster(aAttributeId);
+    }
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(aAttributeId);
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
+    }
+    case Clusters::Messages::Id: {
+        return AttributeIsSpecifiedInMessagesCluster(aAttributeId);
     }
     case Clusters::DeviceEnergyManagement::Id: {
         return AttributeIsSpecifiedInDeviceEnergyManagementCluster(aAttributeId);
@@ -6500,6 +6686,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::EnergyPreference::Id: {
         return AttributeIsSpecifiedInEnergyPreferenceCluster(aAttributeId);
+    }
+    case Clusters::EnergyEvseMode::Id: {
+        return AttributeIsSpecifiedInEnergyEVSEModeCluster(aAttributeId);
+    }
+    case Clusters::DeviceEnergyManagementMode::Id: {
+        return AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

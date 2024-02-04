@@ -16,6 +16,7 @@ cluster_and_device_type_dev/index
 guides/index
 style/index
 examples/index
+testing/index
 tools/index
 BUG_REPORT
 code_generation

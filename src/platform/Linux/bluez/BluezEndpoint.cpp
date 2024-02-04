@@ -617,12 +617,6 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
     VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, err->message));
 
-    if (mpAdapterName != nullptr)
-        mpOwningName = g_strdup_printf("%s", mpAdapterName);
-    else
-        mpOwningName = g_strdup_printf("C-%04x", getpid() & 0xffff);
-    ChipLogDetail(DeviceLayer, "TRACE: Bus acquired for name %s", mpOwningName);
-
     SetupGattServer(conn.get());
 
     mpObjMgr = g_dbus_object_manager_client_new_sync(
@@ -662,7 +656,7 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplication()
     return err;
 }
 
-CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName)
+CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr)
 {
     CHIP_ERROR err;
 
@@ -672,11 +666,7 @@ CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char 
     if (apBleAddr != nullptr)
         mpAdapterAddr = g_strdup(apBleAddr);
 
-    if (!aIsCentral)
-    {
-        mpAdapterName = g_strdup(apBleName);
-    }
-    else
+    if (aIsCentral)
     {
         mpConnectCancellable = g_cancellable_new();
     }
@@ -723,8 +713,6 @@ void BluezEndpoint::Shutdown()
         },
         this);
 
-    g_free(mpOwningName);
-    g_free(mpAdapterName);
     g_free(mpAdapterAddr);
     g_free(mpRootPath);
     g_free(mpServicePath);
