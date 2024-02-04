@@ -20,8 +20,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from TC_EEVSE_Utils import EEVSEBaseTestHelper, EventChangeCallback
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, EventChangeCallback
+from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
 
