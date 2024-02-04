@@ -3589,7 +3589,8 @@ public class ClusterIDMapping {
 
         public enum Command {
             TestEventTrigger(0L),
-            TimeSnapshot(1L),;
+            TimeSnapshot(1L),
+            PayloadTestRequest(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -3618,6 +3619,23 @@ public class ClusterIDMapping {
                     }
                     public static TestEventTriggerCommandField value(int id) throws NoSuchFieldError {
                         for (TestEventTriggerCommandField field : TestEventTriggerCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum PayloadTestRequestCommandField {EnableKey(0),Value(1),Count(2),;
+                    private final int id;
+                    PayloadTestRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PayloadTestRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (PayloadTestRequestCommandField field : PayloadTestRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

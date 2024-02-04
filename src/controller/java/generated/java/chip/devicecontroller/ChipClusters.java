@@ -10108,8 +10108,50 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
+    public void payloadTestRequest(PayloadTestResponseCallback callback, byte[] enableKey, Integer value, Integer count) {
+      payloadTestRequest(callback, enableKey, value, count, 0);
+    }
+
+    public void payloadTestRequest(PayloadTestResponseCallback callback, byte[] enableKey, Integer value, Integer count, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long enableKeyFieldID = 0L;
+      BaseTLVType enableKeytlvValue = new ByteArrayType(enableKey);
+      elements.add(new StructElement(enableKeyFieldID, enableKeytlvValue));
+
+      final long valueFieldID = 1L;
+      BaseTLVType valuetlvValue = new UIntType(value);
+      elements.add(new StructElement(valueFieldID, valuetlvValue));
+
+      final long countFieldID = 2L;
+      BaseTLVType counttlvValue = new UIntType(count);
+      elements.add(new StructElement(countFieldID, counttlvValue));
+
+      StructType value = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long payloadFieldID = 0L;
+          byte[] payload = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == payloadFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                payload = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(payload);
+        }}, commandId, value, timedInvokeTimeoutMs);
+    }
+
     public interface TimeSnapshotResponseCallback extends BaseClusterCallback {
       void onSuccess(Long systemTimeMs, @Nullable Long posixTimeMs);
+    }
+
+    public interface PayloadTestResponseCallback extends BaseClusterCallback {
+      void onSuccess(byte[] payload);
     }
 
     public interface NetworkInterfacesAttributeCallback extends BaseAttributeCallback {

@@ -2246,6 +2246,15 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "PayloadTestRequest",
+                "args": {
+                    "enableKey": "bytes",
+                    "value": "int",
+                    "count": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
