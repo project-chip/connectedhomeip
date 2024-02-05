@@ -1246,7 +1246,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = [] if args.tests is None else args.tests
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
-    config.endpoint = 0 if args.endpoint is None else args.endpoint
+    config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
