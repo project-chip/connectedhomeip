@@ -243,8 +243,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Remove the given server endpoint from this controller.  If the endpoint is
  * not attached to this controller, will just call the completion and do nothing
  * else.
- *
- * The endpoint being removed does not need to be disabled first.
  */
 - (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_NEWLY_AVAILABLE;
 
