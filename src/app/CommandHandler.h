@@ -87,10 +87,10 @@ public:
         virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
 
         /*
-         * Get the magic number of the InteractionModelEngine. A CommandHandler::Handle is valid iff
-         * its magic number is equals to the InteractionModelEngine's one.
+         * Get the generation number of the InteractionModelEngine. A CommandHandler::Handle is valid iff
+         * its number is equals to the InteractionModelEngine's one.
          */
-        virtual uint32_t GetInteractionModelEngineMagicNumber() const = 0;
+        virtual uint32_t GetInteractionModelEngineGeneration() const = 0;
     };
 
     /**
@@ -124,9 +124,9 @@ public:
         Handle(Handle && handle)
         {
             mpHandler        = handle.mpHandler;
-            mMagic           = handle.mMagic;
+            mImEngineGeneration           = handle.mImEngineGeneration;
             handle.mpHandler = nullptr;
-            handle.mMagic    = 0;
+            handle.mImEngineGeneration    = 0;
         }
         Handle(decltype(nullptr)) {}
         Handle(CommandHandler * handle);
@@ -136,9 +136,9 @@ public:
         {
             Release();
             mpHandler        = handle.mpHandler;
-            mMagic           = handle.mMagic;
+            mImEngineGeneration           = handle.mImEngineGeneration;
             handle.mpHandler = nullptr;
-            handle.mMagic    = 0;
+            handle.mImEngineGeneration    = 0;
             return *this;
         }
 
@@ -158,7 +158,7 @@ public:
 
     private:
         CommandHandler * mpHandler = nullptr;
-        uint32_t mMagic            = 0;
+        uint32_t mImEngineGeneration            = 0;
     };
 
     // Previously we kept adding arguments with default values individually as parameters. This is because there
