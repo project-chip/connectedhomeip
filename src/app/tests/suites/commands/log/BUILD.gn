@@ -25,5 +25,8 @@ static_library("log") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/lib/support" ]
+  public_deps = [
+    "${chip_root}/src/app/common:simulated",
+    "${chip_root}/src/lib/support",
+  ]
 }

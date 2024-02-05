@@ -243,3 +243,15 @@ emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpoin
 {
     return false;
 }
+
+bool __attribute__((weak))
+emberAfPluginDoorLockSetAliroReaderConfig(EndpointId endpointId, const ByteSpan & signingKey, const ByteSpan & verificationKey,
+                                          const ByteSpan & groupIdentifier, const Optional<ByteSpan> groupResolvingKey)
+{
+    return false;
+}
+
+bool __attribute__((weak)) emberAfPluginDoorLockClearAliroReaderConfig(chip::EndpointId endpointId)
+{
+    return false;
+}

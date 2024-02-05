@@ -15,5 +15,16 @@
 #
 mainmenu "Matter Telink Lock Example Application"
 
+if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
+config COMMON_LIBC_MALLOC_ARENA_SIZE
+    default 9216
+endif
+
+config SETTINGS_NVS_NAME_CACHE
+    default y
+
+config SETTINGS_NVS_NAME_CACHE_SIZE
+    default 256
+
 rsource "../../../config/telink/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

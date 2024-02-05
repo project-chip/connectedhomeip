@@ -104,7 +104,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 #endif
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
     jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds,
-    bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure)
+    bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
+    bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -168,8 +169,15 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 #endif
 
     // Initialize device attestation verifier
-    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-    chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    if (skipAttestationCertificateValidation)
+    {
+        chip::Credentials::SetDeviceAttestationVerifier(wrapper->GetPartialDACVerifier());
+    }
+    else
+    {
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    }
 
     *errInfoOnFailure = wrapper->mICDClientStorage.Init(wrapperStorage, &wrapper->mSessionKeystore);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
@@ -543,7 +551,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate)
+CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate,
+                                                                             jobject cdTrustKeys)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -565,6 +574,29 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(job
         delete mDeviceAttestationVerifier;
     }
     mDeviceAttestationVerifier = deviceAttestationVerifier;
+
+    if (cdTrustKeys != nullptr)
+    {
+        WellKnownKeysTrustStore * cdTrustStore = mDeviceAttestationVerifier->GetCertificationDeclarationTrustStore();
+        VerifyOrExit(cdTrustStore != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+        jint size;
+        err = JniReferences::GetInstance().GetListSize(cdTrustKeys, size);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        for (jint i = 0; i < size; i++)
+        {
+            jobject jTrustKey = nullptr;
+            err               = JniReferences::GetInstance().GetListItem(cdTrustKeys, i, jTrustKey);
+
+            VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+            JniByteArray jniTrustKey(env, static_cast<jbyteArray>(jTrustKey));
+            err = cdTrustStore->AddTrustedKey(jniTrustKey.byteSpan());
+            VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+        }
+    }
 
     mController->SetDeviceAttestationVerifier(mDeviceAttestationVerifier);
 
@@ -692,7 +724,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
     chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
     jmethodID onCommissioningStatusUpdateMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningStatusUpdate",
                                                              "(JLjava/lang/String;I)V", &onCommissioningStatusUpdateMethod);
@@ -727,8 +759,10 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID javaMethod;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
@@ -798,8 +832,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniRssi, newElement_rssi);
 
             jclass wiFiInterfaceScanResultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/WiFiScanResult",
-                                                                 wiFiInterfaceScanResultStructClass);
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/WiFiScanResult",
+                                                                      wiFiInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "Could not find class WiFiScanResult");
@@ -863,8 +897,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniLqi, newElement_lqi);
 
             jclass threadInterfaceScanResultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ThreadScanResult",
-                                                                 threadInterfaceScanResultStructClass);
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ThreadScanResult",
+                                                                      threadInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "Could not find class ThreadScanResult");
@@ -944,7 +978,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
     jmethodID onICDRegistrationCompleteMethod;
     jclass icdDeviceInfoClass         = nullptr;
     jmethodID icdDeviceInfoStructCtor = nullptr;

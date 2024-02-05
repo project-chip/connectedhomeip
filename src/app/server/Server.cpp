@@ -339,7 +339,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mICDManager.RegisterObserver(mReportScheduler);
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr);
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
+                     chip::app::InteractionModelEngine::GetInstance());
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // This code is necessary to restart listening to existing groups after a reboot
