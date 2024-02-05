@@ -60,10 +60,8 @@ if (!chip_controller || !chip_build_controller) {
     sources = CHIP_CONTROLLER_SOURCES
   }
 
-  if (!chip_enable_read_client) {
-    source_set("gen_check_chip_read_client_sources") {
-      sources = CHIP_READ_CLIENT_SOURCES
-    }
+  source_set("gen_check_chip_read_client_sources") {
+    sources = CHIP_READ_CLIENT_SOURCES
   }
 }
 
