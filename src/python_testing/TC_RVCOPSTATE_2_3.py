@@ -130,7 +130,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
     @async_test_body
     async def test_TC_RVCOPSTATE_2_3(self):
 
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint(default=None)
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
 
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0003"), "RVCOPSTATE.S.A0003 must be supported")

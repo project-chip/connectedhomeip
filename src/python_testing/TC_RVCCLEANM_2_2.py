@@ -62,7 +62,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
 
         asserts.assert_true(self.check_pics("RVCCLEANM.S"), "RVCCLEANM.S must be supported")
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")

@@ -51,7 +51,7 @@ class TC_FAN_3_4(MatterBaseTest):
             logger.info("Test skipped because PICS FAN.S.F03 is not set")
             return
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint(default=1)
 
         self.print_step(1, "Commissioning, already done")
 
