@@ -242,7 +242,7 @@ class InvokeRequest(
   }
 
   fun isEndpointIdValid(): Boolean {
-    return commandPath.groupId.isEmpty
+    return !commandPath.groupId.isPresent
   }
 
   fun isGroupIdValid(): Boolean {
