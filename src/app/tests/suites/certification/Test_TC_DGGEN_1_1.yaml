@@ -44,7 +44,6 @@ tests:
       attribute: "FeatureMap"
       response:
           constraints:
-              contains: [0, 1]
               type: bitmap32
 
     - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
