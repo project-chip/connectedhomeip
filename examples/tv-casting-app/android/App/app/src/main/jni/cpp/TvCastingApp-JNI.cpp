@@ -22,6 +22,7 @@
 #include "ConversionUtils.h"
 #include "JNIDACProvider.h"
 
+#include <app/data-model/ListLargeSystemExtensions.h>
 #include <app/server/Server.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -32,7 +33,6 @@
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CHIPJNIError.h>
-#include <lib/support/CHIPListUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 

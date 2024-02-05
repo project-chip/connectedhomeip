@@ -47,8 +47,6 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     GVariantBuilder serviceDataBuilder;
     GVariantBuilder serviceUUIDsBuilder;
     GAutoPtr<char> debugStr;
-    const char * localNamePtr;
-    char localName[32];
 
     ChipLogDetail(DeviceLayer, "Create BLE adv object at %s", mpAdvPath);
     object = bluez_object_skeleton_new(mpAdvPath);
@@ -61,13 +59,6 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     g_variant_builder_add(&serviceDataBuilder, "{sv}", mpAdvUUID,
                           g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &mDeviceIdInfo, sizeof(mDeviceIdInfo), sizeof(uint8_t)));
     g_variant_builder_add(&serviceUUIDsBuilder, "s", mpAdvUUID);
-
-    localNamePtr = mpAdapterName;
-    if (localNamePtr == nullptr)
-    {
-        g_snprintf(localName, sizeof(localName), "%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff);
-        localNamePtr = localName;
-    }
 
     serviceData = g_variant_builder_end(&serviceDataBuilder);
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
@@ -88,8 +79,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     if (mAdvType & BLUEZ_ADV_TYPE_SCANNABLE)
         bluez_leadvertisement1_set_discoverable_timeout(adv, UINT16_MAX);
 
-    // advertising name corresponding to the PID and object path, for debug purposes
-    bluez_leadvertisement1_set_local_name(adv, localNamePtr);
+    bluez_leadvertisement1_set_local_name(adv, mAdvName);
     bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
 
     // 0xffff means no appearance
@@ -134,7 +124,7 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
 }
 
 CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID,
-                                    uint32_t aAdvDurationMs)
+                                    uint32_t aAdvDurationMs, const char * aAdvName)
 {
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
@@ -142,15 +132,24 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType
     VerifyOrExit(mpAdv == nullptr, err = CHIP_ERROR_INCORRECT_STATE;
                  ChipLogError(DeviceLayer, "FAIL: BLE advertisement already initialized in %s", __func__));
 
-    mpRoot        = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.GetGattApplicationObjectManager()));
-    mpAdapter     = reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter()));
-    mpAdapterName = g_strdup(aEndpoint.GetAdapterName());
+    mpRoot    = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.GetGattApplicationObjectManager()));
+    mpAdapter = reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter()));
 
     g_object_get(G_OBJECT(mpRoot), "object-path", &MakeUniquePointerReceiver(rootPath).Get(), nullptr);
     mpAdvPath      = g_strdup_printf("%s/advertising", rootPath.get());
     mAdvType       = aAdvType;
     mpAdvUUID      = g_strdup(aAdvUUID);
     mAdvDurationMs = aAdvDurationMs;
+
+    if (aAdvName != nullptr)
+    {
+        g_snprintf(mAdvName, sizeof(mAdvName), "%s", aAdvName);
+    }
+    else
+    {
+        // Advertising name corresponding to the PID, for debug purposes.
+        g_snprintf(mAdvName, sizeof(mAdvName), "%s%04x", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, getpid() & 0xffff);
+    }
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     ReturnErrorOnFailure(err);
@@ -209,8 +208,6 @@ void BluezAdvertisement::Shutdown()
 
     g_free(mpAdvPath);
     mpAdvPath = nullptr;
-    g_free(mpAdapterName);
-    mpAdapterName = nullptr;
     g_free(mpAdvUUID);
     mpAdvUUID = nullptr;
 

@@ -104,7 +104,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 #endif
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
     jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds,
-    bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure)
+    bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
+    bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -168,8 +169,15 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 #endif
 
     // Initialize device attestation verifier
-    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-    chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    if (skipAttestationCertificateValidation)
+    {
+        chip::Credentials::SetDeviceAttestationVerifier(wrapper->GetPartialDACVerifier());
+    }
+    else
+    {
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    }
 
     *errInfoOnFailure = wrapper->mICDClientStorage.Init(wrapperStorage, &wrapper->mSessionKeystore);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
@@ -716,7 +724,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
     chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
     jmethodID onCommissioningStatusUpdateMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningStatusUpdate",
                                                              "(JLjava/lang/String;I)V", &onCommissioningStatusUpdateMethod);
@@ -754,7 +762,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     jmethodID javaMethod;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
@@ -970,7 +978,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
     jmethodID onICDRegistrationCompleteMethod;
     jclass icdDeviceInfoClass         = nullptr;
     jmethodID icdDeviceInfoStructCtor = nullptr;

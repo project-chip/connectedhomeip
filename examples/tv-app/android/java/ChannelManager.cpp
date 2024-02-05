@@ -60,7 +60,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetChannelList");
     VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -137,7 +137,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetLineup");
     VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -200,7 +200,7 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetCurrentChannel");
     VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -275,7 +275,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     std::string name(match.data(), match.size());
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannel name %s", name.c_str());
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
@@ -321,7 +321,7 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannelByNumber majorNumber %d, minorNumber %d", majorNumber,
                     minorNumber);
@@ -349,7 +349,7 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleSkipChannel count %d", count);
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
@@ -382,7 +382,7 @@ void ChannelManager::HandleGetProgramGuide(
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     std::vector<ProgramType *> needToFreePrograms;
     std::vector<ChannelInfoType *> needToFreeChannels;
@@ -593,7 +593,7 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleRecordProgram");
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
@@ -630,7 +630,7 @@ bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIde
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleCancelRecordProgram");
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));

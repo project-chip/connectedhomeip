@@ -16,13 +16,14 @@
  *    limitations under the License.
  */
 
-#include "esp32_tracing.h"
 #include <algorithm>
 #include <esp_heap_caps.h>
 #include <esp_insights.h>
 #include <esp_log.h>
 #include <memory>
 #include <tracing/backend.h>
+#include <tracing/esp32_trace/counter.h>
+#include <tracing/esp32_trace/esp32_tracing.h>
 
 namespace chip {
 namespace Tracing {
@@ -148,6 +149,10 @@ void ESP32Backend::LogNodeDiscovered(NodeDiscoveredInfo & info) {}
 
 void ESP32Backend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 
+void ESP32Backend::TraceCounter(const char * label)
+{
+    ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
+}
 void ESP32Backend::TraceBegin(const char * label, const char * group)
 {
     HashValue hashValue = MurmurHash(group);

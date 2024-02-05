@@ -38,6 +38,7 @@
         "DOOR_LOCK_CLUSTER": [],
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
+        "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [],
         "ENERGY_EVSE_CLUSTER": [],
         "ENERGY_EVSE_MODE_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -182,6 +183,9 @@
             "electrical-energy-measurement-server"
         ],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
+        "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [
+            "electrical-power-measurement-server"
+        ],
         "ENERGY_EVSE_CLUSTER": ["energy-evse-server"],
         "ENERGY_EVSE_MODE_CLUSTER": ["mode-base-server"],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
