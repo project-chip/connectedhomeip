@@ -248,6 +248,12 @@ static_library("system") {
   ]
 
   if (chip_system_layer_impl_config_file == "") {
+    # This includes one of:
+    #    - SystemLayerImplFreeRTOS.h
+    #    - SystemLayerImplFreeRTOS.cpp
+    # or
+    #    - SystemLayerImplSelect.h
+    #    - SystemLayerImplSelect.cpp
     sources += [
       "SystemLayerImpl${chip_system_config_event_loop}.cpp",
       "SystemLayerImpl${chip_system_config_event_loop}.h",
