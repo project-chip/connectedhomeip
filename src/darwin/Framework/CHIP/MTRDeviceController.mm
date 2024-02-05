@@ -56,6 +56,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
+#include <app/server/Dnssd.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningWindowOpener.h>
@@ -63,6 +64,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <inet/InetInterface.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/LockTracker.h>
 #include <platform/PlatformManager.h>
@@ -70,6 +72,7 @@
 #include <system/SystemClock.h>
 
 #include <atomic>
+#include <dns_sd.h>
 
 #import <os/lock.h>
 
@@ -1341,6 +1344,15 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
     return nil;
 }
+
+#ifdef DEBUG
++ (void)forceLocalhostAdvertisingOnly
+{
+    auto interfaceIndex = chip::Inet::InterfaceId::PlatformType(kDNSServiceInterfaceIndexLocalOnly);
+    auto interfaceId = chip::Inet::InterfaceId(interfaceIndex);
+    chip::app::DnssdServer::Instance().SetInterfaceId(interfaceId);
+}
+#endif // DEBUG
 
 @end
 

@@ -32,6 +32,12 @@ static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
 
+#ifdef DEBUG
+@interface MTRDeviceController (Test)
++ (void)forceLocalhostAdvertisingOnly;
+@end
+#endif // DEBUG
+
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @property (nonatomic, strong) NSNumber * deviceID;
@@ -1043,6 +1049,12 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 // startControllerWithRootKeys into a test helper.
 - (void)testControllerServer
 {
+#ifdef DEBUG
+    // Force our controllers to only advertise on localhost, to avoid DNS-SD
+    // crosstalk.
+    [MTRDeviceController forceLocalhostAdvertisingOnly];
+#endif // DEBUG
+
     __auto_type queue = dispatch_get_main_queue();
 
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
