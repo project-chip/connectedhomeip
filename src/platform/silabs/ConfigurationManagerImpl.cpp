@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides the implementation of the Device Layer ConfigurationManager object
- *          for EFR32 platforms using the Silicon Labs SDK.
+ *          for Silabs platforms using the Silicon Labs SDK.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/ConfigurationManager.h>
@@ -93,7 +93,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
     BootReasonType matterBootCause;
     uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
 
-#if defined(_SILICON_LABS_32B_SERIES_1)
+#if defined(_RMU_RSTCAUSE_MASK)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
     {
         matterBootCause = BootReasonType::kPowerOnReboot;
@@ -115,7 +115,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
         matterBootCause = BootReasonType::kUnspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
-#elif defined(_SILICON_LABS_32B_SERIES_2)
+#elif defined(_EMU_RSTCAUSE_MASK)
     if (rebootCause & EMU_RSTCAUSE_POR || rebootCause & EMU_RSTCAUSE_PIN) // PowerOn or External pin reset
     {
         matterBootCause = BootReasonType::kPowerOnReboot;
