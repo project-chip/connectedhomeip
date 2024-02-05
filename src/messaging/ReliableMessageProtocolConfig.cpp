@@ -76,8 +76,7 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
     // which the device can be at sleep and not be able to receive any messages).
     config.mIdleRetransTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
     config.mActiveRetransTimeout += ICDConfigurationData::GetInstance().GetFastPollingInterval();
-    config.mActiveThresholdTime =
-        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration());
+    config.mActiveThresholdTime = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
 #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

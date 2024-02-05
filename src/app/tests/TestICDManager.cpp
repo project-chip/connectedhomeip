@@ -210,7 +210,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Force the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is now 0
-        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms32);
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms16);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Expire Idle mode duration; ICDManager should remain in IdleMode since it has no message to send
@@ -238,7 +238,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Return the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is 0
-        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms32);
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms16);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Expire IdleModeDuration - Device should be in ActiveMode since it has an ICDM registration
@@ -250,7 +250,7 @@ public:
         NL_TEST_ASSERT(aSuite, table.IsEmpty());
 
         // Return the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is 0
-        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms32);
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms16);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Expire Idle mode duration; ICDManager should remain in IdleMode since it has no message to send
@@ -289,7 +289,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Force the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is now 0
-        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms32);
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms16);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Expire Idle mode duration; ICDManager should remain in IdleMode since it has no message to send
@@ -317,7 +317,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Return the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is 0
-        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms32);
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms16);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Expire IdleModeDuration - Device stay in IdleMode since it has an active subscription for the ICDM entry
@@ -340,7 +340,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Return the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is 0
-        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms32);
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeThreshold() + 1_ms16);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Expire Idle mode duration; ICDManager should remain in IdleMode since it has no message to send

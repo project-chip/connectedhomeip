@@ -339,7 +339,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         else
         {
-            Milliseconds32 activeModeThreshold = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
+            Milliseconds16 activeModeThreshold = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
             DeviceLayer::SystemLayer().ExtendTimerTo(activeModeThreshold, OnActiveModeDone, this);
 
             Milliseconds32 activeModeJitterThreshold = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);

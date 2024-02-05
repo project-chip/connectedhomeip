@@ -58,7 +58,7 @@ public:
 
     System::Clock::Milliseconds32 GetActiveModeDuration() { return mActiveModeDuration; }
 
-    System::Clock::Milliseconds32 GetActiveModeThreshold() { return mActiveThreshold; }
+    System::Clock::Milliseconds16 GetActiveModeThreshold() { return mActiveThreshold; }
 
     uint32_t GetICDCounter() { return mICDCounter; }
 
@@ -68,7 +68,7 @@ public:
 
     System::Clock::Milliseconds32 GetFastPollingInterval() { return mFastPollingInterval; }
 
-    System::Clock::Milliseconds32 GetMinLitActiveModeThreshold() { return kMinLitActiveModeThreshold; }
+    System::Clock::Milliseconds16 GetMinLitActiveModeThreshold() { return kMinLitActiveModeThreshold; }
 
     /**
      * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 0, function will always return the configured Slow Polling interval
@@ -103,7 +103,7 @@ private:
     void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };
     void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
 
-    static constexpr System::Clock::Milliseconds32 kMinLitActiveModeThreshold = System::Clock::Milliseconds32(5000);
+    static constexpr System::Clock::Milliseconds16 kMinLitActiveModeThreshold = System::Clock::Milliseconds16(5000);
 
     /**
      * @brief Change the ActiveModeDuration or the IdleModeDuration value
@@ -135,7 +135,7 @@ private:
                   "Spec requires the IdleModeDuration be equal or greater to the ActiveModeDuration.");
     System::Clock::Milliseconds32 mActiveModeDuration = System::Clock::Milliseconds32(CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS);
 
-    System::Clock::Milliseconds32 mActiveThreshold = System::Clock::Milliseconds32(CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS);
+    System::Clock::Milliseconds16 mActiveThreshold = System::Clock::Milliseconds16(CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS);
 
     uint32_t mICDCounter = 0;
 
