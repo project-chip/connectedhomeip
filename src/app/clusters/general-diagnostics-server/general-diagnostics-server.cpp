@@ -221,7 +221,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         uint32_t features = 0;
 
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
-        features |= chip::to_underlying(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
+        features |= to_underlying(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
 #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
 
         return aEncoder.Encode(features);
@@ -455,7 +455,7 @@ bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(CommandHandler *
     // Max allowed is 2048.
     if (commandData.count > 2048)
     {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
     }
 

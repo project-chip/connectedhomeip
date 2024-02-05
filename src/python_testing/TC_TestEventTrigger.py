@@ -146,8 +146,8 @@ class TestEventTrigger(MatterBaseTest):
         if has_data_model_test_feature:
             # Test count too large (above max 2048)
             with asserts.assert_raises_regex(InteractionModelError,
-                                             "InvalidCommand",
-                                             "PayloadTestRequest with request too large (> 2048) must return InvalidCommand"):
+                                             "ConstraintError",
+                                             "PayloadTestRequest with request too large (> 2048) must return ConstraintError"):
                 await dev_ctrl.SendCommand(
                     self.dut_node_id,
                     endpoint=0,
