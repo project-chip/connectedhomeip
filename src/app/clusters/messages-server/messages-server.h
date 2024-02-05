@@ -17,13 +17,14 @@
 
 #pragma once
 
+#include "messages-delegate.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Messaging {} // namespace Messaging
+namespace Messages {} // namespace Messages
 } // namespace Clusters
 } // namespace app
 } // namespace chip
