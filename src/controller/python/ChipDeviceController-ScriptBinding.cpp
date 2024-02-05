@@ -405,7 +405,7 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
 {
     sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters,
-                                             static_cast<chip::Controller::DiscoveryType>(DiscoveryType)));
+                                             static_cast<chip::Controller::DiscoveryType>(discoveryType)));
 }
 
 namespace {
