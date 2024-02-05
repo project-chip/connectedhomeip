@@ -19,7 +19,7 @@
 /*
  * @file PigweedLogger.cpp
  *
- * This file contains basic string writting function, based on Pigweed HDLC
+ * This file contains basic string writing function, based on Pigweed HDLC
  * over UART transport. It allows to send log messages even if the application
  * needs to use HDLC/UART for another purpose like the RPC server.
  */

@@ -165,10 +165,10 @@ changed, the names must be updated in `k32w1_app.ld`. See
 [k32w1_app.ld](../../../../platform/nxp/k32w/k32w1/app/ldscripts/k32w1_app.ld)
 for names and `SMU2` memory range size.
 
-The OpenThread buffers can be allocated from a 13KB SMU2 range after a
-successful commmissioning process until a factory reset is initiated. This way,
+The OpenThread buffers can be allocated from a 13KB `SMU2` range after a
+successful commissioning process until a factory reset is initiated. This way,
 the OpenThread buffers will be dynamically allocated instead of statically,
-freeing some SRAM. To enable this feature compile with OpenThread FTD support
+freeing some `SRAM`. To enable this feature compile with OpenThread FTD support
 (`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
 
 ## Manufacturing data
