@@ -64,12 +64,12 @@ CHIP_ERROR P256KeypairSSS::ImportBlob(P256SerializedKeypairSSS & input)
     if (false == mInitialized)
     {
         auto res = sss_sscp_key_object_init(keypair, &g_keyStore);
-        VerifyOrExit(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
         /* Allocate key handle */
         res = sss_sscp_key_object_allocate_handle(keypair, 0x0u, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P,
                                                   3 * kP256_PrivateKey_Length, SSS_KEYPROP_OPERATION_ASYM);
-        VerifyOrExit(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
     }
 
     VerifyOrExit((sss_sscp_key_store_import_key(&g_keyStore, keypair, input.Bytes(), input.Length(), kP256_PrivateKey_Length * 8,
