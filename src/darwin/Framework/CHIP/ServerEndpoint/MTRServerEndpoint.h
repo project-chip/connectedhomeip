@@ -77,8 +77,9 @@ MTR_NEWLY_AVAILABLE
 /**
  * A list of server clusters supported on this endpoint.  The Descriptor cluster
  * does not need to be included unless a TagList attribute is desired on it or
- * unless it has a non-empty PartsList.  If not included, the Descriptor cluster
- * will be generated automatically.
+ * it has a non-empty PartsList, or it needs to have cluster-specific access
+ * grants.  If not included, the Descriptor cluster will be generated
+ * automatically.
  */
 @property (nonatomic, copy, readonly) NSArray<MTRServerCluster *> * serverClusters;
 

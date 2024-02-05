@@ -95,8 +95,13 @@ MTR_DIRECT_MEMBERS
             return NO;
         }
         for (id item in dataValueList) {
+            if (![item isKindOfClass:NSDictionary.class]) {
+                MTR_LOG_ERROR("MTRServerAttribute value array should contain dictionaries");
+            }
+            NSDictionary<NSString *, id> * itemDictionary = item;
+
             NSError * encodingError;
-            NSData * encodedItem = MTREncodeTLVFromDataValueDictionary(item, &encodingError);
+            NSData * encodedItem = MTREncodeTLVFromDataValueDictionary(itemDictionary[MTRDataKey], &encodingError);
             if (encodedItem == nil) {
                 return NO;
             }
@@ -132,7 +137,7 @@ MTR_DIRECT_MEMBERS
     return YES;
 }
 
-- (BOOL)associateWithController:(MTRDeviceController *)controller
+- (BOOL)associateWithController:(nullable MTRDeviceController *)controller
 {
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
