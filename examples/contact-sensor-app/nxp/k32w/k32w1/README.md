@@ -109,9 +109,9 @@ initiate a reboot. The reset action can be cancelled by press SW2 button at any
 point before the 6 second limit.
 
 **Button SW3** can be used to change the state of the simulated contact sensor.
-The button behaves as a toggle, swapping the state every time it is short pressed.
-When long pressed, it does a clean soft reset that takes into account Matter
-shutdown procedure.
+The button behaves as a toggle, swapping the state every time it is short
+pressed. When long pressed, it does a clean soft reset that takes into account
+Matter shutdown procedure.
 
 ## Building
 
@@ -137,8 +137,9 @@ In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
 
 After a successful build, the `elf` and `srec` files are found in `out/debug/` -
+`see the files prefixed with chip-k32w1-contact-example`. After a successful
+build, the `elf` and `srec` files are found in `out/debug/` -
 `see the files prefixed with chip-k32w1-contact-example`.
-After a successful build, the `elf` and `srec` files are found in `out/debug/` - `see the files prefixed with chip-k32w1-contact-example`.
 
 ## Manufacturing data
 

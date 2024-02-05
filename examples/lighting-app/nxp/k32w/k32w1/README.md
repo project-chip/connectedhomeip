@@ -21,7 +21,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -    [SMU2](#smu2-memory)
+    -   [SMU2](#smu2-memory)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing](#flashing)
     -   [Flashing the NBU image](#flashing-the-nbu-image)
@@ -33,6 +33,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Convert sb3 into ota file](#convert-sb3-into-ota-file)
     -   [Running OTA](#running-ota)
     -   [Known issues](#known-issues)
+
 -   [Running RPC console](#running-rpc-console)
 
 </hr>
@@ -150,13 +151,13 @@ see the files prefixed with `chip-k32w1-light-example`.
 
 Some Matter instances and global variables can be placed in the `NBU` `SMU2`
 memory. When compiling with OpenThread FTD support (`chip_openthread_ftd=true`)
-and with `use_smu2_static=true`, the following components are placed
-in `SMU2` memory:
+and with `use_smu2_static=true`, the following components are placed in `SMU2`
+memory:
 
-* `gImageProcessor` from `OTAImageProcessorImpl.cpp`.
-* `gApplicationProcessor` from `OTAHooks.cpp`.
-* `Server::sServer` from `Server.cpp`.
-* `ThreadStackManagerImpl::sInstance` from `ThreadStackManagerImpl.cpp`.
+-   `gImageProcessor` from `OTAImageProcessorImpl.cpp`.
+-   `gApplicationProcessor` from `OTAHooks.cpp`.
+-   `Server::sServer` from `Server.cpp`.
+-   `ThreadStackManagerImpl::sInstance` from `ThreadStackManagerImpl.cpp`.
 
 These instances and global variables are placed in `SMU2` memory through name
 matching in the application linker script. They should not be changed or, if
@@ -164,11 +165,11 @@ changed, the names must be updated in `k32w1_app.ld`. See
 [k32w1_app.ld](../../../../platform/nxp/k32w/k32w1/app/ldscripts/k32w1_app.ld)
 for names and `SMU2` memory range size.
 
-The OpenThread buffers can be allocated from a 13KB SMU2 range after
-a successful commmissioning process until a factory reset is initiated.
-This way, the OpenThread buffers will be dynamically allocated instead
-of statically, freeing some SRAM. To enable this feature compile with
-OpenThread FTD support (`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
+The OpenThread buffers can be allocated from a 13KB SMU2 range after a
+successful commmissioning process until a factory reset is initiated. This way,
+the OpenThread buffers will be dynamically allocated instead of statically,
+freeing some SRAM. To enable this feature compile with OpenThread FTD support
+(`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
 
 ## Manufacturing data
 
@@ -442,16 +443,16 @@ user@computer1:~/connectedhomeip$ sudo ifconfig eth0 -multicast
 To build example with RPC enabled, use the following gn command:
 `gn gen out/debug --args='import("//with_pw_rpc.gni") treat_warnings_as_errors=false'`
 
-The application runs an RPC server and processes events coming from an RPC client.
-An example of an RPC client is the `chip-console`, which can be accessed by running:
+The application runs an RPC server and processes events coming from an RPC
+client. An example of an RPC client is the `chip-console`, which can be accessed
+by running:
 `chip-console --device /dev/tty.<SERIALDEVICE> -b 115200 -o pw_log.out`
 
-The console should already have been installed in the virtual environment.
-From the `chip-console`, a user can send specific commands to the device, e.g.:
+The console should already have been installed in the virtual environment. From
+the `chip-console`, a user can send specific commands to the device, e.g.:
+
 -   To toggle the LED (`#define LIGHT_BUTTON 2` in `app_config.h`)
     `rpcs.chip.rpc.Button.Event(idx=2)`
 -   To start BLE advertising (`#define BLE_BUTTON 4` in `app_config.h`)
     `rpcs.chip.rpc.Button.Event(idx=4)`
--   To reboot the device
-    `rpcs.chip.rpc.Device.Reboot()`
-
+-   To reboot the device `rpcs.chip.rpc.Device.Reboot()`
