@@ -17,8 +17,6 @@
  */
 package matter.controller.model
 
-import java.util.Optional
-
 /**
  * Represents a full path for reading an attribute from a node.
  *
@@ -30,17 +28,17 @@ data class AttributePath(val endpointId: UShort, val clusterId: UInt, val attrib
   override fun toString(): String = "$endpointId/$clusterId/$attributeId"
 
   @Suppress("UNUSED_PARAMETER")
-  fun getEndpointId(wildcardId: Long): Long {
+  private fun getEndpointId(wildcardId: Long): Long {
     return endpointId.toLong()
   }
 
   @Suppress("UNUSED_PARAMETER")
-  fun getClusterId(wildcardId: Long): Long {
+  private fun getClusterId(wildcardId: Long): Long {
     return clusterId.toLong()
   }
 
   @Suppress("UNUSED_PARAMETER")
-  fun getAttributeId(wildcardId: Long): Long {
+  private fun getAttributeId(wildcardId: Long): Long {
     return attributeId.toLong()
   }
 }
@@ -61,17 +59,17 @@ data class EventPath(
   override fun toString(): String = "$endpointId/$clusterId/$eventId"
 
   @Suppress("UNUSED_PARAMETER")
-  fun getEndpointId(wildcardId: Long): Long {
+  private fun getEndpointId(wildcardId: Long): Long {
     return endpointId.toLong()
   }
 
   @Suppress("UNUSED_PARAMETER")
-  fun getClusterId(wildcardId: Long): Long {
+  private fun getClusterId(wildcardId: Long): Long {
     return clusterId.toLong()
   }
 
   @Suppress("UNUSED_PARAMETER")
-  fun getEventId(wildcardId: Long): Long {
+  private fun getEventId(wildcardId: Long): Long {
     return eventId.toLong()
   }
 }
@@ -87,7 +85,7 @@ data class CommandPath(
   val endpointId: UShort,
   val clusterId: UInt,
   val commandId: UInt,
-  val groupId: Optional<UInt> = Optional.empty()
+  val groupId: UInt? = null
 ) {
   override fun toString(): String = "$endpointId/$clusterId/$commandId"
 }

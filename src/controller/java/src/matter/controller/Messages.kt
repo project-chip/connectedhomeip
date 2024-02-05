@@ -238,15 +238,15 @@ class InvokeRequest(
   }
 
   fun getGroupId(): Optional<Int> {
-    return commandPath.groupId.map { it.toInt() }
+    return Optional.ofNullable(commandPath.groupId?.toInt())
   }
 
   fun isEndpointIdValid(): Boolean {
-    return !commandPath.groupId.isPresent
+    return commandPath.groupId == null
   }
 
   fun isGroupIdValid(): Boolean {
-    return commandPath.groupId.isPresent
+    return commandPath.groupId != null
   }
 
   fun getTlvByteArray(): ByteArray {

@@ -22,7 +22,7 @@ package matter.controller.model
  *
  * @param endpoints A mapping of endpoint IDs with the associated cluster data.
  */
-data class NodeState(val endpoints: MutableMap<Int, EndpointState> = mutableMapOf()) {
+class NodeState(val endpoints: MutableMap<Int, EndpointState> = mutableMapOf()) {
   fun addAttribute(
     endpointId: UShort,
     clusterId: UInt,
@@ -56,7 +56,7 @@ data class NodeState(val endpoints: MutableMap<Int, EndpointState> = mutableMapO
  * @param id The endpoint ID.
  * @param clusters A mapping of cluster IDs to the cluster data.
  */
-data class EndpointState(
+class EndpointState(
   val id: Int,
   val clusters: MutableMap<Long, ClusterState> = mutableMapOf()
 ) {
@@ -86,7 +86,7 @@ data class EndpointState(
  * @param events A mapping of event IDs to lists of events that occurred on the node under this
  *   cluster.
  */
-data class ClusterState(
+class ClusterState(
   val id: Long,
   val attributes: MutableMap<Long, AttributeState> = mutableMapOf(),
   val events: MutableMap<Long, MutableList<EventState>> = mutableMapOf(),
