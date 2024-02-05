@@ -155,23 +155,25 @@ sealed class SubscriptionState {
 class WriteRequest(
   val attributePath: AttributePath,
   val tlvPayload: ByteArray,
-  val jsonString: String? = null,
   val dataVersion: UInt? = null
 ) {
   @Suppress("UNUSED_PARAMETER")
-  fun getEndpointId(wildcardId: Long): Long {
+  private fun getEndpointId(wildcardId: Long): Long {
     return attributePath.endpointId.toLong()
   }
 
   @Suppress("UNUSED_PARAMETER")
-  fun getClusterId(wildcardId: Long): Long {
+  private fun getClusterId(wildcardId: Long): Long {
     return attributePath.clusterId.toLong()
   }
 
   @Suppress("UNUSED_PARAMETER")
-  fun getAttributeId(wildcardId: Long): Long {
+  private fun getAttributeId(wildcardId: Long): Long {
     return attributePath.attributeId.toLong()
   }
+
+  // For JNI interface
+  private fun getJsonString(): String? = null
 
   fun getTlvByteArray(): ByteArray {
     return tlvPayload
@@ -223,17 +225,17 @@ class InvokeRequest(
   val jsonString: String? = null
 ) {
   @Suppress("UNUSED_PARAMETER")
-  fun getEndpointId(wildcardId: Long): Long {
+  private fun getEndpointId(wildcardId: Long): Long {
     return commandPath.endpointId.toLong()
   }
 
   @Suppress("UNUSED_PARAMETER")
-  fun getClusterId(wildcardId: Long): Long {
+  private fun getClusterId(wildcardId: Long): Long {
     return commandPath.clusterId.toLong()
   }
 
   @Suppress("UNUSED_PARAMETER")
-  fun getCommandId(wildcardId: Long): Long {
+  private fun getCommandId(wildcardId: Long): Long {
     return commandPath.commandId.toLong()
   }
 
