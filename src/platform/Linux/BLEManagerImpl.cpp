@@ -571,7 +571,7 @@ void BLEManagerImpl::DriveBLEState()
     // Initializes the Bluez BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kBluezBLELayerInitialized))
     {
-        SuccessOrExit(err = mEndpoint.Init(mAdapterId, mIsCentral, nullptr));
+        SuccessOrExit(err = mEndpoint.Init(mIsCentral, mAdapterId));
         mFlags.Set(Flags::kBluezBLELayerInitialized);
     }
 
