@@ -263,7 +263,7 @@ combination with JLinkRTTClient as follows:
           <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
     **LED 0** shows the overall state of the device and its connectivity.
-    However, this status LED is disabled by default on Silab's ICD Lock
+    However, this status LED is disabled by default on Silabs ICD Lock
     application.
 
     **LED 1** Simulates the Lock The following states are possible:
