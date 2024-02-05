@@ -21,13 +21,12 @@ using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters::Messages;
 
-
 // Commands
-void MessagesManager::HandlePresentMessagesRequest(const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
-                                  const chip::BitMask<MessageControlBitmap> & messageControl,
-                                  const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint16_t> & duration,
-                                  const chip::CharSpan & messageText,
-                                  const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
+void MessagesManager::HandlePresentMessagesRequest(
+    const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
+    const chip::BitMask<MessageControlBitmap> & messageControl, const chip::app::DataModel::Nullable<uint32_t> & startTime,
+    const chip::app::DataModel::Nullable<uint16_t> & duration, const chip::CharSpan & messageText,
+    const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     // TODO: Present Message
 }

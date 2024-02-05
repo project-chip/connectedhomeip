@@ -31,11 +31,11 @@ class MessagesManager : public MessagesDelegate
 {
 public:
     // Commands
-    void HandlePresentMessagesRequest(const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
-                                      const chip::BitMask<MessageControlBitmap> & messageControl,
-                                      const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint16_t> & duration,
-                                      const chip::CharSpan & messageText,
-                                      const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses) override;
+    void HandlePresentMessagesRequest(
+        const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
+        const chip::BitMask<MessageControlBitmap> & messageControl, const chip::app::DataModel::Nullable<uint32_t> & startTime,
+        const chip::app::DataModel::Nullable<uint16_t> & duration, const chip::CharSpan & messageText,
+        const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses) override;
     void HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes

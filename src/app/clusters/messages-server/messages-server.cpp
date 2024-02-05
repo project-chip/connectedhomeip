@@ -39,8 +39,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Messages;
-using chip::Protocols::InteractionModel::Status;
 using chip::app::LogEvent;
+using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kMessagesDelegateTableSize =
     EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -57,8 +57,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "MessagesCluster NOT returning delegate for endpoint:%u", endpoint);
 
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, Messages::Id, EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Messages::Id, EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kMessagesDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -73,7 +72,6 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 }
 } // namespace
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -81,8 +79,7 @@ namespace Messages {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Messages::Id,
-                                                       EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Messages::Id, EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kMessagesDelegateTableSize)
     {
@@ -103,7 +100,6 @@ bool Delegate::HasFeature(chip::EndpointId endpoint, Feature feature)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
 
 // -----------------------------------------------------------------------------
 // Attribute Accessor Implementation
@@ -164,7 +160,7 @@ CHIP_ERROR MessagesAttrAccess::Read(const app::ConcreteReadAttributePath & aPath
 }
 
 CHIP_ERROR MessagesAttrAccess::ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
-                                                               Delegate * delegate)
+                                                        Delegate * delegate)
 {
     uint32_t featureFlag = delegate->GetFeatureMap(endpoint);
     return aEncoder.Encode(featureFlag);
@@ -182,7 +178,6 @@ CHIP_ERROR MessagesAttrAccess::ReadActiveMessageIds(app::AttributeValueEncoder &
 
 } // anonymous namespace
 
-
 bool emberAfMessagesClusterPresentMessagesRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Messages::Commands::PresentMessagesRequest::DecodableType & commandData)
@@ -191,19 +186,18 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
     EndpointId endpoint = commandPath.mEndpointId;
     Status status       = Status::Success;
 
-    auto & messageId = commandData.messageID;
-    auto & priority = commandData.priority;
+    auto & messageId      = commandData.messageID;
+    auto & priority       = commandData.priority;
     auto & messageControl = commandData.messageControl;
-    auto & startTime = commandData.startTime;
-    auto & duration = commandData.duration;
-    auto & messageText = commandData.messageText;
-    auto & responses = commandData.responses;
+    auto & startTime      = commandData.startTime;
+    auto & duration       = commandData.duration;
+    auto & messageText    = commandData.messageText;
+    auto & responses      = commandData.responses;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime,
-                                               duration, messageText, responses);
+        delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses);
     }
 
 exit:

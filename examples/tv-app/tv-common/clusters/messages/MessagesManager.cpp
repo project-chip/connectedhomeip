@@ -21,26 +21,24 @@ using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters::Messages;
 
-
 // Commands
-void MessagesManager::HandlePresentMessagesRequest(const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
-                                                   const chip::BitMask<MessageControlBitmap> & messageControl,
-                                                   const chip::app::DataModel::Nullable<uint32_t> & startTime,
-                                                   const chip::app::DataModel::Nullable<uint16_t> & duration,
-                                                   const chip::CharSpan & messageText,
-                                                   const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
+void MessagesManager::HandlePresentMessagesRequest(
+    const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
+    const chip::BitMask<MessageControlBitmap> & messageControl, const chip::app::DataModel::Nullable<uint32_t> & startTime,
+    const chip::app::DataModel::Nullable<uint16_t> & duration, const chip::CharSpan & messageText,
+    const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     Message message;
     // TODO: Enable id
     // message.messageID = messageId;
-    message.priority = priority;
+    message.priority       = priority;
     message.messageControl = messageControl;
-    message.startTime = startTime;
-    message.duration = duration;
+    message.startTime      = startTime;
+    message.duration       = duration;
     // TODO: Enable text
     // message.messageText = messageText;
-    // TODO: Convert to  Optional<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>>
-    // message.responses = responses;
+    // TODO: Convert to  Optional<chip::app::DataModel::List<const
+    // chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> message.responses = responses;
 
     mMessages.push_back(message);
     // Add your code to present Message

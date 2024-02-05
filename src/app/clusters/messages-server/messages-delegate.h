@@ -39,15 +39,16 @@ class Delegate
 {
 public:
     // Commands
-    virtual void HandlePresentMessagesRequest(const ByteSpan & messageId, const MessagePriorityEnum & priority,
-                                              const chip::BitMask<MessageControlBitmap> & messageControl,
-                                              const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration,
-                                              const CharSpan & messageText,
-                                              const chip::Optional<DataModel::DecodableList<MessageResponseOption>> & responses) = 0;
-    virtual void HandleCancelMessagesRequest(const DataModel::DecodableList<chip::ByteSpan> & messageIds) = 0;
+    virtual void
+    HandlePresentMessagesRequest(const ByteSpan & messageId, const MessagePriorityEnum & priority,
+                                 const chip::BitMask<MessageControlBitmap> & messageControl,
+                                 const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration,
+                                 const CharSpan & messageText,
+                                 const chip::Optional<DataModel::DecodableList<MessageResponseOption>> & responses) = 0;
+    virtual void HandleCancelMessagesRequest(const DataModel::DecodableList<chip::ByteSpan> & messageIds)           = 0;
 
     // Attributes
-    virtual CHIP_ERROR HandleGetMessages(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR HandleGetMessages(app::AttributeValueEncoder & aEncoder)         = 0;
     virtual CHIP_ERROR HandleGetActiveMessageIds(app::AttributeValueEncoder & aEncoder) = 0;
 
     // Global Attributes
