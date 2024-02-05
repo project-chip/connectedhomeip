@@ -286,7 +286,6 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionD
     memset(&sBLEEndPointPool, 0, sizeof(sBLEEndPointPool));
 
     mState                       = kState_Initialized;
-    mTerminateOnPacketTxComplete = false;
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = NULL;
@@ -303,9 +302,9 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplication
 
 void BleLayer::Shutdown()
 {
-    mState = kState_NotInitialized;
-    CloseAllBleConnections();
-}
+        mState = kState_NotInitialized;
+        CloseAllBleConnections();
+    }
 
 void BleLayer::CloseAllBleConnections()
 {

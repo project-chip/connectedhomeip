@@ -44,7 +44,7 @@ public:
     virtual void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) = 0;
 
     // Called to determine whether the BLE connection should be closed when in Non-concurrent mode if sending
-    // ConnectNetworkResponse. The BTP will be in kState_Complete o all fragments have been sent.
+    // ConnectNetworkResponse. The BTP will be in kState_Complete when all fragments have been sent.
     virtual void CheckNonConcurrentBleClosing() {}
 };
 

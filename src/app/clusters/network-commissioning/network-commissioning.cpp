@@ -145,7 +145,7 @@ void Instance::SendNonConcurrentConnectNetworkResponse()
         return;
     }
 
-    chip::DeviceLayer::ConnectivityMgr().GetBleLayer()->mTerminateOnPacketTxComplete = true;
+    chip::DeviceLayer::ConnectivityMgr().GetBleLayer()->mState = chip::Ble::BleLayer::kState_Disconnecting;
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
     Commands::ConnectNetworkResponse::Type response;
     response.networkingStatus = NetworkCommissioning::Status::kSuccess;

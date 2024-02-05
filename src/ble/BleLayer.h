@@ -226,15 +226,13 @@ public:
     enum
     {
         kState_NotInitialized = 0,
-        kState_Initialized    = 1
+        kState_Initialized    = 1,
+        kState_Disconnecting  = 2
     } mState; ///< [READ-ONLY] Current state
 
     // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
     void * mAppState                 = nullptr;
     BleLayerDelegate * mBleTransport = nullptr;
-
-    // Set in Non-concurrent mode when the ConnectNetworkResponse has been requested
-    bool mTerminateOnPacketTxComplete = false;
 
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
     BleConnectionReceivedFunct OnChipBleConnectReceived;
