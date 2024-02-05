@@ -725,7 +725,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 #else
     // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
-    // network has been fully brought up and kWiFiDeviceAvailable is delivered.
+    // network has been fully brought up and kOperationalNetworkStarted is delivered.
     // mConnectingNetworkIDLen and mConnectingNetworkID contain the received SSID
     // As per spec, send the ConnectNetworkResponse(Success) prior to releasing the commissioning channel
     SendNonConcurrentConnectNetworkResponse();
@@ -1083,9 +1083,9 @@ void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event
     {
         this_->OnFailSafeTimerExpired();
     }
-    else if (event->Type == DeviceLayer::DeviceEventType::kWiFiDeviceAvailable)
+    else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkStarted)
     {
-        // In Non-Concurrent mode connect the Wi-Fi, as BLE has been stopped
+        // In Non-Concurrent mode connect the operational channel, as BLE has been stopped
         this_->HandleNonConcurrentConnectNetwork();
     }
 }

@@ -80,10 +80,10 @@ CHIP_ERROR DeviceControlServer::PostCloseAllBLEConnectionsToOperationalNetworkEv
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR DeviceControlServer::PostWiFiDeviceAvailableNetworkEvent()
+CHIP_ERROR DeviceControlServer::PostOperationalNetworkStartedEvent()
 {
     ChipDeviceEvent event;
-    event.Type = DeviceEventType::kWiFiDeviceAvailable;
+    event.Type = DeviceEventType::kOperationalNetworkStarted;
     return PlatformMgr().PostEvent(&event);
 }
 

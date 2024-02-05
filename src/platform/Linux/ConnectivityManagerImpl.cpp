@@ -770,7 +770,7 @@ void ConnectivityManagerImpl::StartNonConcurrentWiFiManagement()
     {
         if (IsWiFiManagementStarted())
         {
-            DeviceControlServer::DeviceControlSvr().PostWiFiDeviceAvailableNetworkEvent();
+            DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent();
             ChipLogProgress(DeviceLayer, "Non-concurrent mode Wi-Fi Management Started.");
             return;
         }
