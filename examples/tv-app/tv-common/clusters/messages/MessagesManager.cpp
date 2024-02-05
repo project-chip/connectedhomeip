@@ -31,12 +31,14 @@ void MessagesManager::HandlePresentMessagesRequest(const chip::ByteSpan & messag
                                                    const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     Message message;
-    message.messageID = messageId;
+    // TODO: Enable id
+    // message.messageID = messageId;
     message.priority = priority;
     message.messageControl = messageControl;
     message.startTime = startTime;
     message.duration = duration;
-    message.messageText = messageText;
+    // TODO: Enable text
+    // message.messageText = messageText;
     // TODO: Convert to  Optional<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>>
     // message.responses = responses;
 

@@ -172,11 +172,11 @@ void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
     MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
 }
 
-// void emberAfMessagesClusterInitCallback(EndpointId endpoint)
-// {
-//     ChipLogProgress(Zcl, "TV Linux App: Messages::SetDefaultDelegate");
-//     Messages::SetDefaultDelegate(endpoint, &messagesManager);
-// }
+void emberAfMessagesClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: Messages::SetDefaultDelegate");
+    Messages::SetDefaultDelegate(endpoint, &messagesManager);
+}
 
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {

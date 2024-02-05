@@ -249,5 +249,5 @@ exit:
 
 void MatterMessagesPluginServerInitCallback() 
 {
-    // registerAttributeAccessOverride(&gMessagesAttrAccess);
+    registerAttributeAccessOverride(&gMessagesAttrAccess);
 }
