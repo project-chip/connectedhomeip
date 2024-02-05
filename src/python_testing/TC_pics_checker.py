@@ -112,7 +112,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
     def test_TC_IDM_10_4(self):
         # wildcard read is done in setup_class
         self.step(1)
-        self.endpoint_id = self.matter_test_config.endpoint
+        self.endpoint_id = self.get_endpoint()
         self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True
 

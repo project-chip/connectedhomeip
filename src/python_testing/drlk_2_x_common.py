@@ -97,7 +97,7 @@ class DRLK_COMMON:
 
         self.createdCredential = None
 
-        self.endpoint = self.user_params.get("endpoint", 1)
+        self.endpoint = self.get_endpoint(default=1)
 
         # Allow for user overrides of these values
         credentialIndex = self.user_params.get("credential_index", 1)
