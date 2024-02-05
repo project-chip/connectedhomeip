@@ -514,6 +514,17 @@
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME "ap"
 #endif
 
+// -------------------- NFC/CHIPoNFC Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+ *
+ * Enable support for NFC Commissioning (chip-over-NFC).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING 0
+#endif
+
 // -------------------- BLE/CHIPoBLE Configuration --------------------
 
 /**

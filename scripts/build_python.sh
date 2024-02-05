@@ -38,6 +38,7 @@ CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
 declare enable_ble=true
+declare enable_nfc_commissioning=false
 declare chip_detail_logging=false
 declare chip_mdns
 declare case_retry_delta
@@ -58,6 +59,7 @@ Input Options:
                                                             By default it is false.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is minimal.
+  -n, --enable_nfc_commissioning <true/false>               Enable NFC in the controller (default=false)
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
@@ -99,6 +101,14 @@ while (($#)); do
             ;;
         --chip_mdns | -m)
             chip_mdns=$2
+            shift
+            ;;
+        --enable_nfc_commissioning | -n)
+            enable_nfc_commissioning=$2
+            if [[ "enable_nfc_commissioning" != "true" && "enable_nfc_commissioning" != "false" ]]; then
+                echo "chip_detail_logging should have a true/false value, not '$enable_nfc_commissioning'"
+                exit
+            fi
             shift
             ;;
         --time_between_case_retries | -t)
@@ -146,7 +156,7 @@ while (($#)); do
 done
 
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_ble=\"$enable_ble\""
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_ble=\"$enable_ble\", enable_nfc_commissioning=\"$enable_nfc_commissioning\""
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
@@ -173,7 +183,7 @@ export SYSTEM_VERSION_COMPAT=0
 # Make all possible human redable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_crypto=\"boringssl\""
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_enable_nfc_commissioning=$enable_nfc_commissioning chip_crypto=\"boringssl\""
 
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels

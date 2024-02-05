@@ -325,7 +325,7 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
-                 enable_ipv4=True, enable_ble=True, enable_wifi=True,
+                 enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_nfc_commissioning=False,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,

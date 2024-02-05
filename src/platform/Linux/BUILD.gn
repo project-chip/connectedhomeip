@@ -75,6 +75,14 @@ static_library("Linux") {
     "${chip_root}/src/setup_payload",
   ]
 
+  cflags = [
+    "-I/tmp/pcsc-lib/include/PCSC",    # Needed for NFCCommissioningManagerImpl
+  ]
+
+  libs = [
+    "pcsclite",               # Needed for NFCCommissioningManagerImpl
+  ]
+
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
   }
@@ -99,6 +107,13 @@ static_library("Linux") {
       "bluez/ChipDeviceScanner.cpp",
       "bluez/ChipDeviceScanner.h",
       "bluez/Types.h",
+    ]
+  }
+
+  if (chip_enable_nfc_commissioning) {
+    sources += [
+      "NFCCommissioningManagerImpl.cpp",
+      "NFCCommissioningManagerImpl.h",
     ]
   }
 
