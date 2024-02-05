@@ -128,11 +128,11 @@ static_library("inet") {
 
   if (chip_inet_config_enable_tcp_endpoint) {
     # Possible TCPEndpointImpl files:
-    #  - TCPEndPointImplLwIP.cpp                                                                                                                                                  │
-    #  - TCPEndPointImplLwIP.h                                                                                                                                                    │
-    #  - TCPEndPointImplOpenThread.cpp                                                                                                                                            │
-    #  - TCPEndPointImplOpenThread.h                                                                                                                                              │
-    #  - TCPEndPointImplSockets.cpp                                                                                                                                               │
+    #  - TCPEndPointImplLwIP.cpp
+    #  - TCPEndPointImplLwIP.h
+    #  - TCPEndPointImplOpenThread.cpp
+    #  - TCPEndPointImplOpenThread.h
+    #  - TCPEndPointImplSockets.cpp
     #  - TCPEndPointImplSockets.h
     sources += [
       "TCPEndPoint.cpp",
