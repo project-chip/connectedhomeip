@@ -184,8 +184,6 @@ public:
 
     inline bool SupportsFace(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kFaceCredentials); }
 
-    inline bool SupportsAliro(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kAliroProvisioning); }
-
     inline bool SupportsWeekDaySchedules(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId).Has(Feature::kWeekDayAccessSchedules);

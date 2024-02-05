@@ -2564,7 +2564,7 @@ bool DoorLockServer::credentialTypeSupported(chip::EndpointId endpointId, Creden
     case CredentialTypeEnum::kAliroEvictableEndpointKey:
     case CredentialTypeEnum::kAliroCredentialIssuerKey:
     case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
-        return SupportsAliro(endpointId);
+        return SupportsAliroProvisioning(endpointId);
     default:
         return false;
     }
