@@ -131,5 +131,3 @@
 #include "mbedtls/check_config.h"
 
 #endif /* MBEDTLS_CONFIG_H */
-
-
