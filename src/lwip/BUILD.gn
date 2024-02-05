@@ -226,11 +226,14 @@ if (current_os == "zephyr" || current_os == "mbed") {
     } else if (lwip_platform == "silabs") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
 
-      sources += [
-        "${lwip_platform}/lwipopts-rs911x.h",
-        "${lwip_platform}/lwipopts-thread.h",
-        "${lwip_platform}/lwipopts-wf200.h",
-      ]
+      # TODO: the files below are mutually exclusive,
+      if (use_rs9116 || use_SiWx917) {
+        sources += [ "${lwip_platform}/lwipopts-rs911x.h" ]
+      } else if (use_wf200) {
+        sources += [ "${lwip_platform}/lwipopts-wf200.h" ]
+      } else {
+        sources += [ "${lwip_platform}/lwipopts-thread.h" ]
+      }
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
     } else if (lwip_platform == "k32w0") {
