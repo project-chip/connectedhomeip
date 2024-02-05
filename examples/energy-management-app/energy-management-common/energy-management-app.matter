@@ -1892,6 +1892,7 @@ endpoint 1 {
     emits event CumulativeEnergyMeasured;
     callback attribute accuracy;
     callback attribute cumulativeEnergyImported;
+    callback attribute cumulativeEnergyExported;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
