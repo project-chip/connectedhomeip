@@ -2247,7 +2247,9 @@ endpoint 0 {
     ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    ram      attribute clusterRevision default = 1;
+    callback attribute specificationVersion;
+    callback attribute maxPathsPerInvoke;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster OtaSoftwareUpdateRequestor {
@@ -2331,7 +2333,10 @@ endpoint 0 {
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
+
+    handle command TimeSnapshot;
+    handle command TimeSnapshotResponse;
   }
 
   server cluster SoftwareDiagnostics {
