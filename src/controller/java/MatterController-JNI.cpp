@@ -28,7 +28,7 @@ JNI_METHOD(void, subscribe)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.Format());
-    }    
+    }
 }
 
 JNI_METHOD(void, read)

@@ -2255,7 +2255,7 @@ JNI_METHOD(void, subscribe)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.Format());
-    } 
+    }
 }
 
 JNI_METHOD(void, read)
@@ -2266,7 +2266,7 @@ JNI_METHOD(void, read)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Read Error: %" CHIP_ERROR_FORMAT, err.Format());
-    }   
+    }
 }
 
 JNI_METHOD(void, write)
@@ -2277,7 +2277,7 @@ JNI_METHOD(void, write)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Write Error: %" CHIP_ERROR_FORMAT, err.Format());
-    }   
+    }
 }
 
 JNI_METHOD(void, invoke)
@@ -2288,7 +2288,7 @@ JNI_METHOD(void, invoke)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
-    }  
+    }
 }
 
 void * IOThreadMain(void * arg)
