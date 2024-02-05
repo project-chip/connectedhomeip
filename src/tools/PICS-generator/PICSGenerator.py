@@ -41,44 +41,36 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     console.print(f"Handling PICS for {clusterName}")
 
     # Map clusters to common XML template if needed
-    accessControlCluster = "AccessControl"
-    groupKeyManagementCluster = "GroupKeyManagement"
-    laundryDryerControls = "Laundry Dryer Controls"
-    laundryWasherControls = "Laundry Washer Controls"
-    lowPowerCluster = "Low Power"
-    onOffCluster = "On/Off"
-    operationalCredentialsCluster = "Operational Credentials"
-    otaProviderCluster = "OTA Software Update Provider"
-    otaRequestorCluster = "OTA Software Update Requestor"
-    thermostatCluster = "Thermostat"
-    wakeOnLANCluster = "Wake on LAN"
-
-    if accessControlCluster in clusterName:
+    if "AccessControl" in clusterName:
         clusterName = "Access Control"
 
-    elif otaProviderCluster in clusterName or otaRequestorCluster in clusterName:
+    elif "OTA Software Update Provider" in clusterName or "OTA Software Update Requestor" in clusterName:
         clusterName = "OTA Software Update"
 
-    elif onOffCluster == clusterName:
+    elif "On/Off" == clusterName:
         clusterName = clusterName.replace("/", "-")
 
-    elif groupKeyManagementCluster == clusterName:
+    elif "GroupKeyManagement" == clusterName:
         clusterName = "Group Communication"
 
-    elif wakeOnLANCluster == clusterName or lowPowerCluster == clusterName:
+    elif "Wake on LAN" == clusterName or "Low Power" == clusterName:
         clusterName = "Media Cluster"
 
-    elif operationalCredentialsCluster == clusterName:
+    elif "Operational Credentials" == clusterName:
         clusterName = "Node Operational Credentials"
 
-    elif thermostatCluster == clusterName:
-        clusterName = "Thermostat Cluster"
-
-    elif laundryDryerControls == clusterName:
+    elif "Laundry Dryer Controls" == clusterName:
         clusterName = "Dryer Controls"
 
-    elif laundryWasherControls == clusterName:
+    elif "Laundry Washer Controls" == clusterName:
         clusterName = "Washer Controls"
+
+    # Workaround for naming colisions with current logic
+    elif "Thermostat" == clusterName:
+        clusterName = "Thermostat Cluster"
+
+    elif "Boolean State" == clusterName:
+        clusterName = "Boolean State Cluster"
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
