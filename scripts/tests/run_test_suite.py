@@ -123,8 +123,8 @@ class RunContext:
 )
 @click.option(
     '--runner',
-    type=click.Choice(['codegen', 'chip_repl_python', 'chip_tool_python'], case_sensitive=False),
-    default='codegen',
+    type=click.Choice(['chip_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
+    default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.option(
     '--chip-tool',
@@ -138,18 +138,18 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    runtime = TestRunTime.CHIP_TOOL_BUILTIN
+    runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'chip_repl_python':
         runtime = TestRunTime.CHIP_REPL_PYTHON
-    elif runner == 'chip_tool_python':
-        runtime = TestRunTime.CHIP_TOOL_PYTHON
-    elif chip_tool is not None and os.path.basename(chip_tool) == "darwin-framework-tool":
-        runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_BUILTIN
+    elif runner == 'darwin_framework_tool_python':
+        runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
 
     if chip_tool is None and not runtime == TestRunTime.CHIP_REPL_PYTHON:
-        # non yaml tests REQUIRE chip-tool. Yaml tests should not require chip-tool
         paths_finder = PathsFinder()
-        chip_tool = paths_finder.get('chip-tool')
+        if runtime == TestRunTime.CHIP_TOOL_PYTHON:
+            chip_tool = paths_finder.get('chip-tool')
+        else:
+            chip_tool = paths_finder.get('darwin-framework-tool')
 
     if include_tags:
         include_tags = set([TestTag.__members__[t] for t in include_tags])
@@ -160,10 +160,10 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.CHIP_REPL_PYTHON:
         all_tests = [test for test in chiptest.AllReplYamlTests()]
-    elif runtime == TestRunTime.CHIP_TOOL_PYTHON and os.path.basename(chip_tool) != "darwin-framework-tool":
-        all_tests = [test for test in chiptest.AllChipToolYamlTests()]
+    elif runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
+        all_tests = [test for test in chiptest.AllDarwinFrameworkToolYamlTests()]
     else:
-        all_tests = [test for test in chiptest.AllChipToolTests(chip_tool)]
+        all_tests = [test for test in chiptest.AllChipToolYamlTests()]
 
     tests = all_tests
 
@@ -178,7 +178,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             TestTag.PURPOSEFUL_FAILURE,
         }
 
-        if runtime != TestRunTime.CHIP_TOOL_PYTHON:
+        if runtime == TestRunTime.CHIP_REPL_PYTHON:
             exclude_tags.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     if 'all' not in target:
@@ -319,7 +319,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
 
     if chip_tool_with_python is None:
-        if context.obj.chip_tool and os.path.basename(context.obj.chip_tool) == "darwin-framework-tool":
+        if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
             chip_tool_with_python = paths_finder.get('darwinframeworktool.py')
         else:
             chip_tool_with_python = paths_finder.get('chiptool.py')
