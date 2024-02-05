@@ -137,5 +137,14 @@ struct InvokeCallback : public app::CommandSender::Callback
     JniGlobalReference mWrapperCallbackRef;
 };
 
+jlong newConnectedDeviceCallback(JNIEnv * env, jobject self, jobject callback);
+void deleteConnectedDeviceCallback(JNIEnv * env, jobject self, jlong callbackHandle);
+jlong newReportCallback(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject resubscriptionAttemptCallbackJava);
+void deleteReportCallback(JNIEnv * env, jobject self, jlong callbackHandle);
+jlong newWriteAttributesCallback(JNIEnv * env, jobject self);
+void deleteWriteAttributesCallback(JNIEnv * env, jobject self, jlong callbackHandle);
+jlong newInvokeCallback(JNIEnv * env, jobject self);
+void deleteInvokeCallback(JNIEnv * env, jobject self, jlong callbackHandle);
+
 } // namespace Controller
 } // namespace chip

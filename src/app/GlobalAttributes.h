@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/AppConfig.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {

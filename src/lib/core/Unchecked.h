@@ -14,13 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file defines the chip::Optional class to handle values which may
- *      or may not be present.
- *
- */
 #pragma once
 
 namespace chip {
