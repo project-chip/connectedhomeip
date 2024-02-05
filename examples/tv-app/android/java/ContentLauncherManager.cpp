@@ -295,6 +295,9 @@ uint16_t ContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint)
     }
 
     uint16_t clusterRevision = 0;
-    Attributes::ClusterRevision::Get(endpoint, &clusterRevision);
+    bool success = (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == EMBER_ZCL_STATUS_SUCCESS);
+    if (!success) {
+        ChipLogError(Zcl, "ContentLauncherManager::GetClusterRevision error reading cluster revision");
+    }
     return clusterRevision;
 }

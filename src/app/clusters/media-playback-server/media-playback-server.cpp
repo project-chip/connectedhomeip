@@ -170,48 +170,34 @@ CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & 
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::MediaPlayback::Attributes::CurrentState::Id: {
+    case app::Clusters::MediaPlayback::Attributes::CurrentState::Id:
         return ReadCurrentStateAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::StartTime::Id: {
+    case app::Clusters::MediaPlayback::Attributes::StartTime::Id:
         return ReadStartTimeAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::Duration::Id: {
+    case app::Clusters::MediaPlayback::Attributes::Duration::Id:
         return ReadDurationAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::SampledPosition::Id: {
+    case app::Clusters::MediaPlayback::Attributes::SampledPosition::Id:
         return ReadSampledPositionAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::Id: {
+    case app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::Id:
         return ReadPlaybackSpeedAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::SeekRangeStart::Id: {
+    case app::Clusters::MediaPlayback::Attributes::SeekRangeStart::Id:
         return ReadSeekRangeStartAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id: {
+    case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id:
         return ReadSeekRangeEndAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::Id: {
+    case app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::Id:
         return ReadActiveAudioTrackAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::Id: {
+    case app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::Id:
         return ReadAvailableAudioTracksAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::Id: {
+    case app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::Id:
         return ReadActiveTextTrackAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id: {
+    case app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id:
         return ReadAvailableTextTracksAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id: {
+    case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id:
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
-    }
-    case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id: {
+    case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id:
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
-    }
-    default: {
+    default:
         break;
-    }
     }
 
     return CHIP_NO_ERROR;
