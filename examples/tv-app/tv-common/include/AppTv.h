@@ -37,7 +37,6 @@
 #include "content-launcher/ContentLauncherManager.h"
 #include "keypad-input/KeypadInputManager.h"
 #include "media-playback/MediaPlaybackManager.h"
-#include "messages/MessagesManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
 
 #include <app/clusters/account-login-server/account-login-delegate.h>
@@ -47,7 +46,6 @@
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
-#include <app/clusters/messages-server/messages-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -63,7 +61,6 @@ using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
 using ContentControllerDelegate   = app::Clusters::ContentControl::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
-using MessagesDelegate            = app::Clusters::Messages::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 using SupportedProtocolsBitmap    = app::Clusters::ContentLauncher::SupportedProtocolsBitmap;
 
@@ -93,7 +90,6 @@ public:
     ContentControllerDelegate * GetContentControlDelegate() override { return &mContentControlDelegate; };
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
-    MessagesDelegate * GetMessagesDelegate() override { return &mMessagesDelegate; };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
 
 protected:
@@ -105,7 +101,6 @@ protected:
     ContentControlManager mContentControlDelegate;
     KeypadInputManager mKeypadInputDelegate;
     MediaPlaybackManager mMediaPlaybackDelegate;
-    MessagesManager mMessagesDelegate;
     TargetNavigatorManager mTargetNavigatorDelegate;
 };
 

@@ -19,23 +19,16 @@
 
 #include <app/clusters/messages-server/messages-server.h>
 
-#include <iostream>
-#include <map>
-
-using MessagesDelegate      = chip::app::Clusters::Messages::Delegate;
-using MessagePriorityEnum   = chip::app::Clusters::Messages::MessagePriorityEnum;
-using MessageControlBitmap  = chip::app::Clusters::Messages::MessageControlBitmap;
-using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type;
-using Message               = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
-class MessagesManager : public MessagesDelegate
+class MessagesManager : public chip::app::Clusters::Messages::Delegate
 {
 public:
     // Commands
-    void HandlePresentMessagesRequest(const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
-                                      const chip::BitMask<MessageControlBitmap> & messageControl,
+    void HandlePresentMessagesRequest(const chip::ByteSpan & messageId, 
+                                      const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
+                                      const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
                                       const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint16_t> & duration,
                                       const chip::CharSpan & messageText, 
-                                      const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses) override;
+                                      const chip::Optional<chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::DecodableType>> & responses) override;
     void HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes
@@ -46,5 +39,5 @@ public:
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
 protected:
-    std::list<Message> mMessages;
+    std::list<std::string> mMessages;
 };

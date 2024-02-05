@@ -24,12 +24,24 @@ using namespace chip::app::Clusters::Messages;
 
 // Commands
 void MessagesManager::HandlePresentMessagesRequest(const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
-                                  const chip::BitMask<MessageControlBitmap> & messageControl,
-                                  const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint16_t> & duration,
-                                  const chip::CharSpan & messageText, 
-                                  const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
+                                                   const chip::BitMask<MessageControlBitmap> & messageControl,
+                                                   const chip::app::DataModel::Nullable<uint32_t> & startTime, 
+                                                   const chip::app::DataModel::Nullable<uint16_t> & duration,
+                                                   const chip::CharSpan & messageText, 
+                                                   const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
 {
-    // TODO: Present Message
+    Message message;
+    message.messageID = messageId;
+    message.priority = priority;
+    message.messageControl = messageControl;
+    message.startTime = startTime;
+    message.duration = duration;
+    message.messageText = messageText;
+    // TODO: Convert to  Optional<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>>
+    // message.responses = responses;
+
+    mMessages.push_back(message);
+    // Add your code to present Message
 }
 
 void MessagesManager::HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds)
@@ -40,12 +52,24 @@ void MessagesManager::HandleCancelMessagesRequest(const chip::app::DataModel::De
 // Attributes
 CHIP_ERROR MessagesManager::HandleGetMessages(chip::app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeEmptyList();
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (Message & entry : mMessages)
+        {
+            ReturnErrorOnFailure(encoder.Encode(entry));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(chip::app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeEmptyList();
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (Message & entry : mMessages)
+        {
+            ReturnErrorOnFailure(encoder.Encode(entry.messageID));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 // Global Attributes

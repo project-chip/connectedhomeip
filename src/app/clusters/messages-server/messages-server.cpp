@@ -35,21 +35,12 @@
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/app-platform/ContentAppPlatform.h>
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Messages;
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-using namespace chip::AppPlatform;
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using chip::Protocols::InteractionModel::Status;
 using chip::app::LogEvent;
-
-
 
 static constexpr size_t kMessagesDelegateTableSize =
     EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -64,15 +55,7 @@ Delegate * gDelegateTable[kMessagesDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
-    if (app != nullptr)
-    {
-        ChipLogProgress(Zcl, "MessagesCluster returning ContentApp delegate for endpoint:%u", endpoint);
-        return app->GetMessagesDelegate();
-    }
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogProgress(Zcl, "MessagesCluster NOT returning ContentApp delegate for endpoint:%u", endpoint);
+    ChipLogProgress(Zcl, "MessagesCluster NOT returning delegate for endpoint:%u", endpoint);
 
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Messages::Id, EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT);
@@ -264,4 +247,7 @@ exit:
     return true;
 }
 
-void MatterMessagesPluginServerInitCallback() {}
+void MatterMessagesPluginServerInitCallback() 
+{
+    // registerAttributeAccessOverride(&gMessagesAttrAccess);
+}

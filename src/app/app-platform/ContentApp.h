@@ -31,7 +31,6 @@
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
-#include <app/clusters/messages-server/messages-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 #include <app/util/attribute-storage.h>
 
@@ -46,7 +45,6 @@ using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
 using ContentControlDelegate      = app::Clusters::ContentControl::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
-using MessagesDelegate            = app::Clusters::Messages::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 
 class DLL_EXPORT ContentApp
@@ -65,7 +63,6 @@ public:
     virtual ContentControlDelegate * GetContentControlDelegate()           = 0;
     virtual KeypadInputDelegate * GetKeypadInputDelegate()                 = 0;
     virtual MediaPlaybackDelegate * GetMediaPlaybackDelegate()             = 0;
-    virtual MessagesDelegate * GetMessagesDelegate()                       = 0;
     virtual TargetNavigatorDelegate * GetTargetNavigatorDelegate()         = 0;
 
     EmberAfStatus HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);

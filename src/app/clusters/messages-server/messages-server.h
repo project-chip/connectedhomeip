@@ -24,7 +24,11 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Messages {} // namespace Messages
+namespace Messages {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace Messages
 } // namespace Clusters
 } // namespace app
 } // namespace chip
