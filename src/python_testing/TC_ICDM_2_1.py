@@ -39,7 +39,7 @@ class TC_ICDM_2_1(MatterBaseTest):
             logger.info("Test skipped because PICS ICDM.S is not set")
             return
 
-        endpoint = self.user_params.get("endpoint", 0)
+        endpoint = self.get_endpoint(default=1)
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.IcdManagement.Attributes

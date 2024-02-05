@@ -35,7 +35,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_TIMESYNC_2_1(self):
 
-        endpoint = self.user_params.get("endpoint", 0)
+        endpoint = self.get_endpoint(default=1)
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
