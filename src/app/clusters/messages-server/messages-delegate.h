@@ -42,7 +42,7 @@ public:
     virtual void HandlePresentMessagesRequest(const ByteSpan & messageId, const MessagePriorityEnum & priority,
                                               const chip::BitMask<MessageControlBitmap> & messageControl,
                                               const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration,
-                                              const CharSpan & messageText, 
+                                              const CharSpan & messageText,
                                               const chip::Optional<DataModel::DecodableList<MessageResponseOption>> & responses) = 0;
     virtual void HandleCancelMessagesRequest(const DataModel::DecodableList<chip::ByteSpan> & messageIds) = 0;
 

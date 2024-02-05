@@ -202,7 +202,7 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, 
+        delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime,
                                                duration, messageText, responses);
     }
 
@@ -247,7 +247,7 @@ exit:
     return true;
 }
 
-void MatterMessagesPluginServerInitCallback() 
+void MatterMessagesPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gMessagesAttrAccess);
 }
