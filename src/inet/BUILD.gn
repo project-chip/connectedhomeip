@@ -82,9 +82,9 @@ static_library("inet") {
   output_name = "libInetLayer"
 
   # EndpointState header is one of:
-  #   - src/inet/EndPointStateLwIP.h                                                                                                                                                      │
-  #   - src/inet/EndPointStateNetworkFramework.h                                                                                                                                          │
-  #   - src/inet/EndPointStateOpenThread.h                                                                                                                                                │
+  #   - src/inet/EndPointStateLwIP.h
+  #   - src/inet/EndPointStateNetworkFramework.h
+  #   - src/inet/EndPointStateOpenThread.h
   #   - src/inet/EndPointStateSockets.h
   sources = [
     "EndPointBasis.h",
@@ -145,13 +145,13 @@ static_library("inet") {
 
   if (chip_inet_config_enable_udp_endpoint) {
     # Possible UDPEndpointImpl files:
-    #  - UDPEndPointImplLwIP.cpp                                                                                                                                                  │
-    #  - UDPEndPointImplLwIP.h                                                                                                                                                    │
-    #  - UDPEndPointImplNetworkFramework.cpp                                                                                                                                      │
-    #  - UDPEndPointImplNetworkFramework.h                                                                                                                                        │
-    #  - UDPEndPointImplOpenThread.cpp                                                                                                                                            │
-    #  - UDPEndPointImplOpenThread.h                                                                                                                                              │
-    #  - UDPEndPointImplSockets.cpp                                                                                                                                               │
+    #  - UDPEndPointImplLwIP.cpp
+    #  - UDPEndPointImplLwIP.h
+    #  - UDPEndPointImplNetworkFramework.cpp
+    #  - UDPEndPointImplNetworkFramework.h
+    #  - UDPEndPointImplOpenThread.cpp
+    #  - UDPEndPointImplOpenThread.h
+    #  - UDPEndPointImplSockets.cpp
     #  - UDPEndPointImplSockets.h
     sources += [
       "BasicPacketFilters.h",
