@@ -335,8 +335,9 @@ uint16_t MediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
     }
 
     uint16_t clusterRevision = 0;
-    bool success = (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == EMBER_ZCL_STATUS_SUCCESS);
-    if (!success) {
+    bool success             = (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == EMBER_ZCL_STATUS_SUCCESS);
+    if (!success)
+    {
         ChipLogError(Zcl, "MediaPlaybackManager::GetClusterRevision error reading cluster revision");
     }
     return clusterRevision;
