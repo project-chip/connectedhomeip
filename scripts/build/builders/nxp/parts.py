@@ -17,7 +17,11 @@ import os
 import sys
 from dataclasses import dataclass
 
-import jsonschema
+try:
+    import jsonschema
+    json_validation_on = True
+except ImportError:
+    json_validation_on = False
 
 
 def validate_json(data: str):
@@ -126,8 +130,9 @@ class NxpParts:
         for _file in json_files:
             with open(os.path.join(platforms, _file)) as _fd:
                 board = json.load(_fd)
-                validate_json(board)
-                print(f'JSON data is valid for {_file}')
+                if json_validation_on:
+                    validate_json(board)
+                    print(f'JSON data is valid for {_file}')
                 parts.add_board(board)
 
         return parts
