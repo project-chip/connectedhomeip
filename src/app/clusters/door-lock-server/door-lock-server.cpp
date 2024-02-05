@@ -44,8 +44,8 @@ using namespace chip::app::Clusters::DoorLock;
 using namespace chip::app::Clusters::DoorLock::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR        = 23;
-static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE      = 59;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR     = 23;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE   = 59;
 static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE = 65;
 
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
