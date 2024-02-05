@@ -22,15 +22,12 @@
  *          for EFR32 platforms using the Silicon Labs SDK.
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
-
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/silabs/SilabsConfig.h>
-
-#include "em_rmu.h"
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include "wfx_host_events.h"
@@ -55,12 +52,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<SilabsConfig>::Init();
     SuccessOrExit(err);
 
-    // TODO: Initialize the global GroupKeyStore object here (#1626)
-
     IncreaseBootCount();
-    rebootCause = RMU_ResetCauseGet();
-    RMU_ResetCauseClear();
-
     err = CHIP_NO_ERROR;
 
 exit:
@@ -99,6 +91,8 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
     // rebootCause is obtained at bootup.
     BootReasonType matterBootCause;
+    uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
+
 #if defined(_SILICON_LABS_32B_SERIES_1)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
     {
