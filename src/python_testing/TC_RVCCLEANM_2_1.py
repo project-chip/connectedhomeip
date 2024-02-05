@@ -47,7 +47,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
     async def send_clean_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse),
-                            "Unexpected return type for ChangeToMode")
+                            "Unexpected return type for RVC Clean Mode ChangeToMode")
         return ret
 
     async def send_run_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
@@ -81,7 +81,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         if self.is_ci:
             app_pid = self.matter_test_config.app_pid
             if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
         asserts.assert_true(self.check_pics("RVCCLEANM.S.A0000"), "RVCCLEANM.S.A0000 must be supported")
@@ -167,7 +167,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
 
         self.print_step(9, "Manually put the device in a state from which it will SUCCESSFULLY transition to mode %d" % (self.mode_ok))
         if self.is_ci:
-            print("Changing mode to Idel")
+            print("Changing mode to Idle")
             await self.send_run_change_to_mode_cmd(0)
         else:
             input("Press Enter when done.\n")
