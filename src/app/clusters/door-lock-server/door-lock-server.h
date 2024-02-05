@@ -87,6 +87,18 @@ struct EmberAfDoorLockEndpointContext
     int wrongCodeEntryAttempts;
 };
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DoorLock {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace DoorLock
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 /**
  * @brief Door Lock Server Plugin class.
  */
