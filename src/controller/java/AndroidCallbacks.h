@@ -139,7 +139,8 @@ struct InvokeCallback : public app::CommandSender::Callback
 
 jlong newConnectedDeviceCallback(JNIEnv * env, jobject self, jobject callback);
 void deleteConnectedDeviceCallback(JNIEnv * env, jobject self, jlong callbackHandle);
-jlong newReportCallback(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject resubscriptionAttemptCallbackJava);
+jlong newReportCallback(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava,
+                        jobject resubscriptionAttemptCallbackJava);
 void deleteReportCallback(JNIEnv * env, jobject self, jlong callbackHandle);
 jlong newWriteAttributesCallback(JNIEnv * env, jobject self);
 void deleteWriteAttributesCallback(JNIEnv * env, jobject self, jlong callbackHandle);

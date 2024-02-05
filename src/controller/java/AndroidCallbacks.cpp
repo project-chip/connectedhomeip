@@ -839,7 +839,8 @@ void deleteConnectedDeviceCallback(JNIEnv * env, jobject self, jlong callbackHan
     chip::Platform::Delete(connectedDeviceCallback);
 }
 
-jlong newReportCallback(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject resubscriptionAttemptCallbackJava)
+jlong newReportCallback(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava,
+                        jobject resubscriptionAttemptCallbackJava)
 {
     chip::DeviceLayer::StackLock lock;
     ReportCallback * reportCallback =

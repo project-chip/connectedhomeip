@@ -21,7 +21,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                           \
+#define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_##CLASS_NAME##_##METHOD_NAME
 
 using namespace chip::Controller;
