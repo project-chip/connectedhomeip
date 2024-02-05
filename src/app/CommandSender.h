@@ -318,6 +318,12 @@ public:
         return FinishCommand(aTimedInvokeTimeoutMs, optionalArgs);
     }
 
+    /**
+     * @brief Returns the number of InvokeResponseMessages received.
+     *
+     * Responses to multiple requests might be split across several InvokeResponseMessages.
+     * This function helps track the total count. Primarily for test validation purposes.
+     */
     size_t GetInvokeResponseMessageCount();
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
