@@ -51,3 +51,16 @@ def RedirectToPythonLogging():
 
     handle = _GetLoggingLibraryHandle()
     handle.pychip_logging_set_callback(_RedirectToPythonLogging)
+
+
+def SetLogFilter(category):
+    if category < 0 or category > pow(2, 8):
+        raise ValueError("category must be an unsigned 8-bit integer")
+
+    handle = _GetLoggingLibraryHandle()
+    handle.pychip_logging_SetLogFilter(category)
+
+
+def GetLogFilter():
+    handle = _GetLoggingLibraryHandle()
+    return handle.pychip_logging_GetLogFilter()
