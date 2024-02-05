@@ -39,7 +39,8 @@ chip_project_config_include = "<CHIPProjectConfig.h>"
 chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
 chip_ble_project_config_include = "<CHIPProjectConfig.h>"
-chip_project_config_include_dirs = ["${chip_root}/examples/platform/${nxp_platform}/app/project_include"]
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/platform/${nxp_platform}/app/project_include" ]
 
 chip_enable_openthread = true
 
@@ -61,7 +62,7 @@ openthread_external_mbedtls = mbedtls_target
 
 openthread_project_core_config_file = "OpenThreadConfig.h"
 openthread_core_config_platform_check_file =
-     "openthread-core-k32w1-config-check.h"
+    "openthread-core-k32w1-config-check.h"
 openthread_core_config_deps = [ "${chip_root}/examples/platform/nxp/k32w/k32w1:openthread_core_config_k32w1_chip_examples" ]
 
 openthread_external_platform = "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w1:libopenthread-k32w1"

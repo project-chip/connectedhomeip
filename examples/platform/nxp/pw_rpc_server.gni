@@ -31,7 +31,7 @@ pw_rpc_server = {
     "${nxp_platform_dir}/PigweedLogger.cpp",
     "${nxp_platform_dir}/Rpc.cpp",
   ]
-  
+
   include_dirs = [
     "${chip_root}/examples/common",
     "${chip_root}/examples/common/pigweed",

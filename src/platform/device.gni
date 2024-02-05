@@ -49,7 +49,8 @@ declare_args() {
   # Enable openthread support.
   chip_enable_openthread =
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
-      chip_device_platform == "cc13x2_26x2" || chip_device_platform == "cc13x4_26x4" ||
+      chip_device_platform == "cc13x2_26x2" ||
+      chip_device_platform == "cc13x4_26x4" ||
       chip_device_platform == "k32w0" || chip_device_platform == "tizen" ||
       chip_device_platform == "stm32" || chip_device_platform == "webos"
 }

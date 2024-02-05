@@ -32,7 +32,7 @@ config("openthread_k32w1_config") {
     "MBEDTLS_ENTROPY_HARDWARE_ALT=1",
     "OPENTHREAD_PLATFORM_CORE_CONFIG_FILE=\"app/project_include/OpenThreadConfig.h\"",
     "MBEDTLS_THREADING_C=1",
-    "MBEDTLS_THREADING_ALT=1"
+    "MBEDTLS_THREADING_ALT=1",
   ]
 
   if (use_smu2_dynamic) {
@@ -53,8 +53,7 @@ source_set("openthread_core_config_k32w1") {
 }
 
 source_set("openthread_mbedtls_config_k32w1") {
-  sources =
-      [ "${openthread_nxp_root}/src/k32w1/k32w1/k32w1-mbedtls-config.h" ]
+  sources = [ "${openthread_nxp_root}/src/k32w1/k32w1/k32w1-mbedtls-config.h" ]
 }
 
 source_set("libopenthread-k32w1") {
@@ -72,20 +71,14 @@ source_set("libopenthread-k32w1") {
   ]
 
   if (chip_crypto == "platform") {
-    sources += [
-      "${openthread_nxp_root}/src/k32w1/k32w1/ecdsa_sss.cpp",
-    ]
+    sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/ecdsa_sss.cpp" ]
 
     if (use_hw_sha256) {
-      sources += [
-        "${openthread_nxp_root}/src/k32w1/k32w1/sha256_sss.cpp",
-      ]
+      sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/sha256_sss.cpp" ]
     }
 
     if (use_hw_aes) {
-      sources += [
-        "${openthread_nxp_root}/src/k32w1/k32w1/aes_sss.cpp",
-      ]
+      sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/aes_sss.cpp" ]
     }
   }
 

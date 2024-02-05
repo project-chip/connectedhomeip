@@ -60,13 +60,13 @@ static_library("nxp_platform") {
   ]
 
   public = [
-    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
     "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
-    "${chip_root}/src/platform/nxp/k32w/k32w1/SMU2Manager.h"
+    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w1/SMU2Manager.h",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
@@ -76,9 +76,7 @@ static_library("nxp_platform") {
   }
 
   if (chip_enable_ota_requestor) {
-    public += [
-      "../common/OTAImageProcessorImpl.h"
-    ]
+    public += [ "../common/OTAImageProcessorImpl.h" ]
 
     sources += [
       "../common/OTAImageProcessorImpl.cpp",
@@ -98,24 +96,22 @@ static_library("nxp_platform") {
       "K32W1PersistentStorageOpKeystore.h",
     ]
 
-  if (chip_with_factory_data == 1) {
-    sources += [
-      "../common/FactoryDataProvider.cpp",
-      "FactoryDataProviderImpl.cpp",
-    ]
-    public += [
-      "${chip_root}/src/credentials/CHIPCert.h",
-      "${chip_root}/src/credentials/CertificationDeclaration.h",
-    ]
+    if (chip_with_factory_data == 1) {
+      sources += [
+        "../common/FactoryDataProvider.cpp",
+        "FactoryDataProviderImpl.cpp",
+      ]
+      public += [
+        "${chip_root}/src/credentials/CHIPCert.h",
+        "${chip_root}/src/credentials/CertificationDeclaration.h",
+      ]
 
-    if (chip_convert_dac_private_key == 1) {
-      defines = [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
+      if (chip_convert_dac_private_key == 1) {
+        defines = [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
+      }
     }
-  }
 
-  public_deps += [
-      "${mbedtls_root}:mbedtls",
-    ]
+    public_deps += [ "${mbedtls_root}:mbedtls" ]
   }
 
   deps = []
@@ -146,6 +142,6 @@ static_library("nxp_platform") {
 
   public_deps += [
     "${chip_root}/src/crypto",
-    "${chip_root}/src/platform/logging:headers"
+    "${chip_root}/src/platform/logging:headers",
   ]
 }

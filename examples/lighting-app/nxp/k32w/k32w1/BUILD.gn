@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
@@ -156,9 +155,7 @@ k32w1_executable("light_app") {
   ]
 
   if (chip_with_factory_data == 1) {
-    ldflags += [
-      "-Wl,--defsym=gUseFactoryData_d=1"
-    ]
+    ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
   }
 
   if (use_smu2_static) {
