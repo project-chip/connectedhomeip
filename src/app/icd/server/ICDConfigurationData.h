@@ -54,11 +54,11 @@ public:
 
     static ICDConfigurationData & GetInstance() { return instance; };
 
-    uint32_t GetIdleModeDurationSec() { return mIdleModeDuration_s; }
+    System::Clock::Seconds32 GetIdleModeDuration() { return mIdleModeDuration; }
 
-    uint32_t GetActiveModeDurationMs() { return mActiveModeDuration_ms; }
+    System::Clock::Milliseconds32 GetActiveModeDuration() { return mActiveModeDuration; }
 
-    uint16_t GetActiveModeThresholdMs() { return mActiveThreshold_ms; }
+    System::Clock::Milliseconds16 GetActiveModeThreshold() { return mActiveThreshold; }
 
     uint32_t GetICDCounter() { return mICDCounter; }
 
@@ -68,7 +68,7 @@ public:
 
     System::Clock::Milliseconds32 GetFastPollingInterval() { return mFastPollingInterval; }
 
-    uint32_t GetMinLitActiveModeThresholdMs() { return kMinLitActiveModeThreshold_ms; }
+    System::Clock::Milliseconds16 GetMinLitActiveModeThreshold() { return kMinLitActiveModeThreshold; }
 
     /**
      * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 0, function will always return the configured Slow Polling interval
@@ -103,14 +103,14 @@ private:
     void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };
     void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
 
-    static constexpr uint32_t kMinLitActiveModeThreshold_ms = 5000;
+    static constexpr System::Clock::Milliseconds16 kMinLitActiveModeThreshold = System::Clock::Milliseconds16(5000);
 
     /**
      * @brief Change the ActiveModeDuration or the IdleModeDuration value
      *        If only one value is provided, check will be done agaisn't the other already set value.
      *
-     * @param[in] activeModeDuration_ms new ActiveModeDuration value
-     * @param[in] idleModeDuration_ms new IdleModeDuration value
+     * @param[in] activeModeDuration new ActiveModeDuration value
+     * @param[in] idleModeDuration new IdleModeDuration value
      *                                The precision of the IdleModeDuration must be seconds.
      * @return CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT is returned if idleModeDuration_ms is smaller than activeModeDuration_ms
      *                                                is returned if idleModeDuration_ms is greater than 64800000 ms
@@ -118,22 +118,24 @@ private:
      *                                                is returned if no valid values are provided
      *                    CHIP_NO_ERROR is returned if the new intervals were set
      */
-    CHIP_ERROR SetModeDurations(Optional<uint32_t> activeModeDuration_ms, Optional<uint32_t> idleModeDuration_ms);
+    CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
+                                Optional<System::Clock::Milliseconds32> idleModeDuration);
 
-    static constexpr uint32_t kMaxIdleModeDuration_s = (18 * kSecondsPerHour);
-    static constexpr uint32_t kMinIdleModeDuration_s = 1;
+    static constexpr System::Clock::Seconds32 kMaxIdleModeDuration = System::Clock::Seconds32(18 * kSecondsPerHour);
+    static constexpr System::Clock::Seconds32 kMinIdleModeDuration = System::Clock::Seconds32(1);
 
-    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= kMaxIdleModeDuration_s,
+    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= kMaxIdleModeDuration.count(),
                   "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");
-    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= kMinIdleModeDuration_s,
+    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= kMinIdleModeDuration.count(),
                   "Spec requires the IdleModeDuration to be equal or greater to 1s.");
-    uint32_t mIdleModeDuration_s = CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC;
+    System::Clock::Seconds32 mIdleModeDuration = System::Clock::Seconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC);
 
-    static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS) <= (CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC * kMillisecondsPerSecond),
+    static_assert(System::Clock::Milliseconds32(CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS) <=
+                      System::Clock::Seconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC),
                   "Spec requires the IdleModeDuration be equal or greater to the ActiveModeDuration.");
-    uint32_t mActiveModeDuration_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS;
+    System::Clock::Milliseconds32 mActiveModeDuration = System::Clock::Milliseconds32(CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS);
 
-    uint16_t mActiveThreshold_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS;
+    System::Clock::Milliseconds16 mActiveThreshold = System::Clock::Milliseconds16(CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS);
 
     uint32_t mICDCounter = 0;
 

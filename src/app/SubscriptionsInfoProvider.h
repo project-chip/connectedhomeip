@@ -42,6 +42,7 @@ public:
      *
      * @param[in] aFabricIndex fabric index of the subject
      * @param[in] subjectID NodeId of the subject
+     *            subjectID may encode a CAT in the reserved section of the NodeID.
      *
      * @return true subject has at least one active subscription with the device
      *         false subject doesn't have any active subscription with the device
@@ -54,6 +55,7 @@ public:
      *
      * @param[in] aFabricIndex fabric index of the subject
      * @param[in] subjectID NodeId of the subject
+     *            subjectID may encode a CAT in the reserved section of the NodeID
      *
      * @return true subject has at least one persisted subscription with the device
      *         false subject doesn't have any persisted subscription with the device
