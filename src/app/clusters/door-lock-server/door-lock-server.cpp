@@ -1560,7 +1560,7 @@ DlStatus DoorLockServer::credentialLengthWithinRange(chip::EndpointId endpointId
     case CredentialTypeEnum::kAliroCredentialIssuerKey:
     case CredentialTypeEnum::kAliroEvictableEndpointKey:
     case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
-            minLen = maxLen = DOOR_LOCK_ALIRO_CREDENTIAL_MIN_MAX;
+        minLen = maxLen = DOOR_LOCK_ALIRO_CREDENTIAL_MIN_MAX;
         break;
     default:
         return DlStatus::kFailure;
