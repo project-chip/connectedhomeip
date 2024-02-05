@@ -13,10 +13,13 @@
 # limitations under the License.
 
 import("//build_overrides/nxp_sdk.gni")
+
 import("//build_overrides/mbedtls.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
 import("${mbedtls_root}/mbedtls.gni")
 
 declare_args() {

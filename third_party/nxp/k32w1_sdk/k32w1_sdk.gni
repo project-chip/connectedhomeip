@@ -13,15 +13,20 @@
 # limitations under the License.
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+
 import("//build_overrides/nxp_sdk.gni")
+
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+
 import("${chip_root}/src/platform/device.gni")
+
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 declare_args() {
