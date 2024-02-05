@@ -139,17 +139,10 @@ CHIP_ERROR AccountLoginAttrAccess::Read(const app::ConcreteReadAttributePath & a
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id: {
-        if (isDelegateNull(delegate, endpoint))
-        {
-            return CHIP_NO_ERROR;
-        }
-
+    case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id: 
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
-    }
-    default: {
+    default:
         break;
-    }
     }
 
     return CHIP_NO_ERROR;

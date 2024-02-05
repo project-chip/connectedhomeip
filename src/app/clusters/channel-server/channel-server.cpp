@@ -168,17 +168,10 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
-    case app::Clusters::Channel::Attributes::ClusterRevision::Id: {
-        if (isDelegateNull(delegate, endpoint))
-        {
-            return CHIP_NO_ERROR;
-        }
-
+    case app::Clusters::Channel::Attributes::ClusterRevision::Id:
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
-    }
-    default: {
+    default:
         break;
-    }
     }
 
     return CHIP_NO_ERROR;
