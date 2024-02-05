@@ -142,7 +142,7 @@ tests:
       response:
           value: old_current_mode_dut
           constraints:
-              type: int16u
+              type: int8u
 
     - label:
           "Step 9: Manually put the device in a state from which it will
