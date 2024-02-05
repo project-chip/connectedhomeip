@@ -253,11 +253,11 @@ void EVSEManufacturer::FakeReadingsUpdate()
 
     // Update readings
     // Avoid using floats - so we will do a basic rand() call which will generate a integer value between 0 and RAND_MAX
-    // first compute power as a nominal + some random value in range 0 to mPowerRandomness_mW
-    int64_t power = (rand() % gFakeReadingsData.mPowerRandomness_mW);
+    // first compute power as a mean + some random value in range +/- mPowerRandomness_mW
+    int64_t power = ((int64_t) rand() % (2 * gFakeReadingsData.mPowerRandomness_mW)) - gFakeReadingsData.mPowerRandomness_mW;
     power += gFakeReadingsData.mPower_mW; // add in the base power
 
-    int64_t voltage = (rand() % gFakeReadingsData.mVoltageRandomness_mV);
+    int64_t voltage = ((int64_t) rand() % (2 * gFakeReadingsData.mVoltageRandomness_mV)) - gFakeReadingsData.mVoltageRandomness_mV;
     voltage += gFakeReadingsData.mVoltage_mV; // add in the base voltage
 
     /* Note: whilst we could compute a current from the power and voltage,
@@ -267,7 +267,7 @@ void EVSEManufacturer::FakeReadingsUpdate()
      * This is meant more as an example to show how to use the APIs, not
      * to be a real representation of laws of physics.
      */
-    int64_t current = (rand() % gFakeReadingsData.mCurrentRandomness_mA);
+    int64_t current = ((int64_t) rand() % (2 * gFakeReadingsData.mCurrentRandomness_mA)) - gFakeReadingsData.mCurrentRandomness_mA;
     current += gFakeReadingsData.mCurrent_mA; // add in the base current
 
     SendPowerReading(gFakeReadingsData.mEndpointId, power, voltage, current);
