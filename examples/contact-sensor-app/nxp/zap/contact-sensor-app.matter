@@ -1351,7 +1351,6 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
@@ -1375,14 +1374,9 @@ endpoint 0 {
     callback attribute hardwareVersionString;
     callback attribute softwareVersion;
     callback attribute softwareVersionString;
-    callback attribute manufacturingDate;
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    persist  attribute localConfigDisabled default = 0;
-    callback attribute uniqueID;
     callback attribute capabilityMinima;
+    callback attribute specificationVersion;
+    callback attribute maxPathsPerInvoke;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
   }
@@ -1432,7 +1426,6 @@ endpoint 0 {
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
-    handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
     handle command NetworkConfigResponse;
@@ -1445,11 +1438,6 @@ endpoint 0 {
     emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
-    callback attribute upTime;
-    callback attribute totalOperationalHours;
-    callback attribute bootReason;
-    callback attribute activeHardwareFaults;
-    callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     ram      attribute featureMap default = 0;
@@ -1526,9 +1514,6 @@ endpoint 0 {
     callback attribute rxErrSecCount;
     callback attribute rxErrFcsCount;
     callback attribute rxErrOtherCount;
-    callback attribute activeTimestamp;
-    callback attribute pendingTimestamp;
-    callback attribute delay;
     callback attribute securityPolicy;
     callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
@@ -1547,7 +1532,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
 
     handle command OpenCommissioningWindow;
-    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
