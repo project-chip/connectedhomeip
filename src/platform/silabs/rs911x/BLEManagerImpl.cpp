@@ -247,7 +247,7 @@ namespace {
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
 #define BLE_DEFAULT_TIMER_PERIOD_MS (1)
-#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (500) // Time kept to support all WiFi chips BLE (RS9116/ SiWx917 NCP/SOC)
+#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (400) // Time kept to support all WiFi chips BLE (RS9116/ SiWx917 NCP/SOC)
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 TimerHandle_t sbleSendIndicationTimeoutTimer; // FreeRTOS sw timer.
@@ -1123,7 +1123,6 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 
 void BLEManagerImpl::BleSendIndicationTimeoutHandler(TimerHandle_t xTimer)
 {
-        ChipLogProgress(DeviceLayer, "BleSendIndicationTimeoutHandler::Start");
         sInstance.HandleSoftTimerEvent();
 }
 
@@ -1145,7 +1144,7 @@ void BLEManagerImpl::StartBleSendIndicationTimeoutTimer(uint32_t aTimeoutInMs)
     // timer is not active, change its period to required value (== restart).
     // FreeRTOS- Block for a maximum of 100 ticks if the change period command
     // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sbleSendIndicationTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(100)) != pdPASS)
+    if (xTimerChangePeriod(sbleSendIndicationTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(BLE_CONFIG_TIMEOUT)) != pdPASS)
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
