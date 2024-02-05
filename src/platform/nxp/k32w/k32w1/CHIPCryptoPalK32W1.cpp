@@ -147,7 +147,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     {
 #endif
         // Size of key is expressed in bits, hence the multiplication by 8.
-        result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray) * 8);
+        result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(),
+                                    sizeof(Symmetric128BitsKeyByteArray) * 8);
         VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
         // Encrypt
@@ -162,7 +163,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     {
         // Encrypt
         result = AES_128_CCM(Uint8::to_const_uchar(plaintext), plaintext_length, Uint8::to_const_uchar(aad), aad_length,
-                    Uint8::to_const_uchar(nonce), nonce_length, key.As<Symmetric128BitsKeyByteArray>(), ciphertext, tag, tag_length, gSecLib_CCM_Encrypt_c);
+                             Uint8::to_const_uchar(nonce), nonce_length, key.As<Symmetric128BitsKeyByteArray>(), ciphertext, tag,
+                             tag_length, gSecLib_CCM_Encrypt_c);
         VerifyOrExit(result == kStatus_Success, error = CHIP_ERROR_INTERNAL);
     }
 #endif
@@ -196,7 +198,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     {
 #endif
         // Size of key is expressed in bits, hence the multiplication by 8.
-        result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray) * 8);
+        result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(),
+                                    sizeof(Symmetric128BitsKeyByteArray) * 8);
         VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
         // Decrypt
@@ -211,7 +214,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     {
         // Decrypt
         result = AES_128_CCM(Uint8::to_const_uchar(ciphertext), ciphertext_len, Uint8::to_const_uchar(aad), aad_len,
-                    Uint8::to_const_uchar(nonce), nonce_length, key.As<Symmetric128BitsKeyByteArray>(), plaintext, (uint8_t*)tag, tag_length, gSecLib_CCM_Decrypt_c);
+                             Uint8::to_const_uchar(nonce), nonce_length, key.As<Symmetric128BitsKeyByteArray>(), plaintext,
+                             (uint8_t *) tag, tag_length, gSecLib_CCM_Decrypt_c);
         VerifyOrExit(result == kStatus_Success, error = CHIP_ERROR_INTERNAL);
     }
 #endif
@@ -267,16 +271,16 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
  * */
 typedef struct sha256_node
 {
-    uint8_t *data;
+    uint8_t * data;
     uint16_t size;
-    sha256_node *next;
+    sha256_node * next;
 } sha256_node;
 
 typedef struct S200_context
 {
-    void *sss_context;
-    sha256_node *head;
-    sha256_node *tail;
+    void * sss_context;
+    sha256_node * head;
+    sha256_node * tail;
 } S200_context;
 
 static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(S200_context),
@@ -302,8 +306,8 @@ Hash_SHA256_stream::Hash_SHA256_stream(void)
     S200_context * context = to_inner_hash_sha256_context(&mContext);
 
     context->sss_context = nullptr;
-    context->head = nullptr;
-    context->tail = nullptr;
+    context->head        = nullptr;
+    context->tail        = nullptr;
 #else
     mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
     mbedtls_sha256_init(context);
@@ -316,8 +320,8 @@ Hash_SHA256_stream::~Hash_SHA256_stream(void)
     S200_context * context = to_inner_hash_sha256_context(&mContext);
 
     context->sss_context = nullptr;
-    context->head = nullptr;
-    context->tail = nullptr;
+    context->head        = nullptr;
+    context->tail        = nullptr;
 #else
     mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
     mbedtls_sha256_free(context);
@@ -329,14 +333,14 @@ CHIP_ERROR Hash_SHA256_stream::Begin(void)
 {
 #if defined(USE_HW_SHA256)
     S200_context * context = to_inner_hash_sha256_context(&mContext);
-    context->sss_context = SHA256_AllocCtx();
+    context->sss_context   = SHA256_AllocCtx();
 
     SHA256_Init(context->sss_context);
 #else
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
-    const int result = mbedtls_sha256_starts(context, 0);
+    const int result                       = mbedtls_sha256_starts(context, 0);
 #else
     const int result = mbedtls_sha256_starts_ret(context, 0);
 #endif
@@ -351,19 +355,19 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 {
 #if defined(USE_HW_SHA256)
     S200_context * context = to_inner_hash_sha256_context(&mContext);
-    sha256_node *node = nullptr;
+    sha256_node * node     = nullptr;
 
     VerifyOrReturnError(context->sss_context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     SHA256_HashUpdate(context->sss_context, Uint8::to_const_uchar(data.data()), data.size());
 
-    node = (sha256_node*)malloc(sizeof(sha256_node));
+    node       = (sha256_node *) malloc(sizeof(sha256_node));
     node->size = data.size();
-    node->data = (uint8_t*)malloc(data.size());
+    node->data = (uint8_t *) malloc(data.size());
     node->next = nullptr;
     memcpy(node->data, Uint8::to_const_uchar(data.data()), node->size);
 
-    if(context->head == nullptr)
+    if (context->head == nullptr)
     {
         context->head = node;
         context->tail = node;
@@ -376,7 +380,7 @@ CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
-    const int result = mbedtls_sha256_update(context, Uint8::to_const_uchar(data.data()), data.size());
+    const int result                       = mbedtls_sha256_update(context, Uint8::to_const_uchar(data.data()), data.size());
 #else
     const int result = mbedtls_sha256_update_ret(context, Uint8::to_const_uchar(data.data()), data.size());
 #endif
@@ -393,12 +397,12 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
 
 #if defined(USE_HW_SHA256)
     S200_context * context = to_inner_hash_sha256_context(&mContext);
-    sha256_node *node = context->head;
-    void* ctx = SHA256_AllocCtx();
+    sha256_node * node     = context->head;
+    void * ctx             = SHA256_AllocCtx();
 
     SHA256_Init(ctx);
 
-    while(node)
+    while (node)
     {
         SHA256_HashUpdate(ctx, node->data, node->size);
         node = node->next;
@@ -431,14 +435,14 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 #if defined(USE_HW_SHA256)
     S200_context * context = to_inner_hash_sha256_context(&mContext);
 
-    sha256_node *node = nullptr;
+    sha256_node * node = nullptr;
 
     SHA256_HashFinish(context->sss_context, Uint8::to_uchar(out_buffer.data()));
     SHA256_FreeCtx(context->sss_context);
 
-    while(context->head)
+    while (context->head)
     {
-        node = context->head;
+        node          = context->head;
         context->head = context->head->next;
         free(node->data);
         free(node);
@@ -448,13 +452,13 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
-    const int result = mbedtls_sha256_finish(context, Uint8::to_uchar(out_buffer.data()));
+    const int result                       = mbedtls_sha256_finish(context, Uint8::to_uchar(out_buffer.data()));
 #else
     const int result = mbedtls_sha256_finish_ret(context, Uint8::to_uchar(out_buffer.data()));
 #endif
 
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
-    out_buffer = out_buffer.SubSpan(0, kSHA256_Hash_Length);
+    out_buffer                         = out_buffer.SubSpan(0, kSHA256_Hash_Length);
 #endif
 
     return CHIP_NO_ERROR;
@@ -504,7 +508,8 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if defined(USE_HW_SHA256)
-    ::HMAC_SHA256(Uint8::to_const_uchar(key), (uint32_t)key_length, Uint8::to_const_uchar(message), (uint32_t)message_length, out_buffer);
+    ::HMAC_SHA256(Uint8::to_const_uchar(key), (uint32_t) key_length, Uint8::to_const_uchar(message), (uint32_t) message_length,
+                  out_buffer);
 #else
     const mbedtls_md_info_t * const md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
     VerifyOrReturnError(md != nullptr, CHIP_ERROR_INTERNAL);

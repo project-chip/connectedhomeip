@@ -26,7 +26,7 @@ namespace DeviceLayer {
 
 // SSS adds 24 bytes of metadata when creating the blob
 static constexpr size_t kSssBlobMetadataLength = 24;
-static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length + kSssBlobMetadataLength;
+static constexpr size_t kPrivateKeyBlobLength  = Crypto::kP256_PrivateKey_Length + kSssBlobMetadataLength;
 
 FactoryDataProviderImpl::~FactoryDataProviderImpl()
 {
@@ -44,10 +44,8 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
 
     if (sum > kFactoryDataSize)
     {
-        ChipLogError(DeviceLayer,
-            "Max size of factory data: %lu is bigger than reserved factory data size: %lu",
-            sum, kFactoryDataSize
-        );
+        ChipLogError(DeviceLayer, "Max size of factory data: %lu is bigger than reserved factory data size: %lu", sum,
+                     kFactoryDataSize);
     }
 
     error = Validate();
@@ -99,11 +97,11 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_InitContext()
 CHIP_ERROR FactoryDataProviderImpl::SSS_ImportPrivateKeyBlob()
 {
     uint8_t blob[kPrivateKeyBlobLength] = { 0 };
-    uint16_t blobSize = 0;
+    uint16_t blobSize                   = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, blob, kPrivateKeyBlobLength, blobSize));
 
-    auto res = sss_sscp_key_store_import_key(&g_keyStore, &mContext, blob, kPrivateKeyBlobLength,
-                                             kPrivateKeyBlobLength * 8, kSSS_blobType_ELKE_blob);
+    auto res = sss_sscp_key_store_import_key(&g_keyStore, &mContext, blob, kPrivateKeyBlobLength, kPrivateKeyBlobLength * 8,
+                                             kSSS_blobType_ELKE_blob);
     VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -133,7 +131,7 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_ConvertDacKey()
     size_t blobSize                     = kPrivateKeyBlobLength;
     size_t newSize                      = sizeof(FactoryDataProvider::Header) + mHeader.size + kSssBlobMetadataLength;
     uint8_t blob[kPrivateKeyBlobLength] = { 0 };
-    uint8_t* data                       = static_cast<uint8_t*>(chip::Platform::MemoryAlloc(newSize));
+    uint8_t * data                      = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
     uint32_t offset                     = 0;
 
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_INTERNAL);
@@ -167,10 +165,12 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_ExportBlob(uint8_t * data, size_t * data
     MutableByteSpan dacPrivateKeySpan(keyBuf);
     uint16_t keySize = 0;
 
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize, &offset));
+    ReturnErrorOnFailure(
+        SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize, &offset));
     dacPrivateKeySpan.reduce_size(keySize);
 
-    auto res = SSS_KEY_STORE_SET_KEY(&mContext, dacPrivateKeySpan.data(), Crypto::kP256_PrivateKey_Length, keySize * 8, kSSS_KeyPart_Private);
+    auto res = SSS_KEY_STORE_SET_KEY(&mContext, dacPrivateKeySpan.data(), Crypto::kP256_PrivateKey_Length, keySize * 8,
+                                     kSSS_KeyPart_Private);
     VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     res = sss_sscp_key_store_export_key(&g_keyStore, &mContext, data, dataLen, kSSS_blobType_ELKE_blob);
@@ -181,12 +181,13 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_ExportBlob(uint8_t * data, size_t * data
 
 CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset)
 {
-    size_t newSize                      = mHeader.size + kSssBlobMetadataLength;
-    FactoryDataProvider::Header* header = reinterpret_cast<FactoryDataProvider::Header*>(data);
-    uint8_t* payload                    = data + sizeof(FactoryDataProvider::Header);
-    size_t subsequentDataOffset         = offset + kValueOffset + Crypto::kP256_PrivateKey_Length;
+    size_t newSize                       = mHeader.size + kSssBlobMetadataLength;
+    FactoryDataProvider::Header * header = reinterpret_cast<FactoryDataProvider::Header *>(data);
+    uint8_t * payload                    = data + sizeof(FactoryDataProvider::Header);
+    size_t subsequentDataOffset          = offset + kValueOffset + Crypto::kP256_PrivateKey_Length;
 
-    memmove(payload + subsequentDataOffset + kSssBlobMetadataLength, payload + subsequentDataOffset, mHeader.size - subsequentDataOffset);
+    memmove(payload + subsequentDataOffset + kSssBlobMetadataLength, payload + subsequentDataOffset,
+            mHeader.size - subsequentDataOffset);
     header->size = newSize;
     memcpy(payload + offset + kLengthOffset, (uint16_t *) &blobLen, sizeof(uint16_t));
     memcpy(payload + offset + kValueOffset, blob, blobLen);
@@ -201,20 +202,19 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
 
-#define _assert(condition)                                                 \
-        if (!condition) {                                                  \
-            ChipLogError(DeviceLayer, "Condition failed" #condition);      \
-            while(1);                                                      \
-        }
+#define _assert(condition)                                                                                                         \
+    if (!condition)                                                                                                                \
+    {                                                                                                                              \
+        ChipLogError(DeviceLayer, "Condition failed" #condition);                                                                  \
+        while (1)                                                                                                                  \
+            ;                                                                                                                      \
+    }
 
 void FactoryDataProviderImpl::SSS_RunApiTest()
 {
-    uint8_t privateKey[Crypto::kP256_PrivateKey_Length] = {
-        0x18, 0xfe, 0x9a, 0xd9, 0x30, 0xdd, 0x2f, 0x62,
-        0xbe, 0x99, 0x43, 0x93, 0xe8, 0xbe, 0x47, 0x28,
-        0x7f, 0xda, 0x5a, 0x71, 0x86, 0x1b, 0x0e, 0x3f,
-        0x91, 0x27, 0x52, 0xd0, 0xba, 0xa7, 0x40, 0x02
-    };
+    uint8_t privateKey[Crypto::kP256_PrivateKey_Length] = { 0x18, 0xfe, 0x9a, 0xd9, 0x30, 0xdd, 0x2f, 0x62, 0xbe, 0x99, 0x43,
+                                                            0x93, 0xe8, 0xbe, 0x47, 0x28, 0x7f, 0xda, 0x5a, 0x71, 0x86, 0x1b,
+                                                            0x0e, 0x3f, 0x91, 0x27, 0x52, 0xd0, 0xba, 0xa7, 0x40, 0x02 };
 
     auto error = SSS_InitContext();
     _assert((error == CHIP_NO_ERROR));
@@ -226,20 +226,21 @@ void FactoryDataProviderImpl::SSS_RunApiTest()
     uint16_t dummyLength     = 3;
     uint32_t numberOfDummies = 10;
     uint32_t dummySize       = numberOfDummies * (sizeof(dummyType) + sizeof(dummyLength) + dummyLength);
-    uint32_t size = sizeof(FactoryDataProvider::Header) + dummySize + sizeof(type) + sizeof(length) + kPrivateKeyBlobLength + dummySize;
-    uint8_t dummyData[3] = { 0xab };
+    uint32_t size =
+        sizeof(FactoryDataProvider::Header) + dummySize + sizeof(type) + sizeof(length) + kPrivateKeyBlobLength + dummySize;
+    uint8_t dummyData[3]                      = { 0xab };
     uint8_t hash[Crypto::kSHA256_Hash_Length] = { 0 };
-    mHeader.hashId = FactoryDataProvider::kHashId;
-    mHeader.size = size - sizeof(FactoryDataProvider::Header);
-    mHeader.hash[0] = 0xde;
-    mHeader.hash[1] = 0xad;
-    mHeader.hash[2] = 0xbe;
-    mHeader.hash[3] = 0xef;
+    mHeader.hashId                            = FactoryDataProvider::kHashId;
+    mHeader.size                              = size - sizeof(FactoryDataProvider::Header);
+    mHeader.hash[0]                           = 0xde;
+    mHeader.hash[1]                           = 0xad;
+    mHeader.hash[2]                           = 0xbe;
+    mHeader.hash[3]                           = 0xef;
 
-    uint8_t* factoryData = static_cast<uint8_t*>(chip::Platform::MemoryAlloc(size));
+    uint8_t * factoryData = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(size));
     _assert((factoryData != nullptr));
 
-    uint8_t* entry = factoryData + sizeof(mHeader);
+    uint8_t * entry = factoryData + sizeof(mHeader);
     for (auto i = 0; i < numberOfDummies; i++)
     {
         memcpy(entry, (void *) &dummyType, sizeof(dummyType));
@@ -265,12 +266,12 @@ void FactoryDataProviderImpl::SSS_RunApiTest()
         entry += dummyLength;
     }
 
-    FactoryDataProvider::kFactoryDataPayloadStart = (uint32_t)factoryData + sizeof(FactoryDataProvider::Header);
+    FactoryDataProvider::kFactoryDataPayloadStart = (uint32_t) factoryData + sizeof(FactoryDataProvider::Header);
 
     uint8_t keyBuf[Crypto::kP256_PrivateKey_Length];
     MutableByteSpan dacPrivateKeySpan(keyBuf);
     uint16_t keySize = 0;
-    error = SearchForId(FactoryDataId::kCertDeclarationId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize);
+    error            = SearchForId(FactoryDataId::kCertDeclarationId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize);
     _assert((error == CHIP_ERROR_NOT_FOUND));
     error = SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize);
     _assert((error == CHIP_NO_ERROR));
@@ -281,11 +282,11 @@ void FactoryDataProviderImpl::SSS_RunApiTest()
     uint8_t blob[kPrivateKeyBlobLength] = { 0 };
 
     uint32_t offset = 0;
-    error = SSS_ExportBlob(blob, &blobSize, offset);
+    error           = SSS_ExportBlob(blob, &blobSize, offset);
     _assert((error == CHIP_NO_ERROR));
     error = ReplaceWithBlob(factoryData, blob, blobSize, offset);
     _assert((error == CHIP_NO_ERROR));
-    FactoryDataProvider::Header* header = reinterpret_cast<FactoryDataProvider::Header*>(factoryData);
+    FactoryDataProvider::Header * header = reinterpret_cast<FactoryDataProvider::Header *>(factoryData);
     _assert((header->size == (mHeader.size + kSssBlobMetadataLength)));
     _assert((header->hash[0] != 0xde));
     _assert((header->hash[1] != 0xad));
@@ -296,7 +297,6 @@ void FactoryDataProviderImpl::SSS_RunApiTest()
     chip::Platform::MemoryFree(factoryData);
     FactoryDataProvider::kFactoryDataPayloadStart = FactoryDataProvider::kFactoryDataStart + sizeof(FactoryDataProvider::Header);
     SSS_KEY_OBJ_FREE(&mContext);
-
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
 

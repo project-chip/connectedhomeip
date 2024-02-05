@@ -33,9 +33,9 @@ using namespace chip::DeviceLayer::Internal;
 namespace chip::SMU2 {
 namespace {
 
-static const uint32_t AREA_START  = (0x489C5380U);
-static const uint32_t AREA_END    = (0x489C87FFU);
-static const uint32_t AREA_SIZE   = (AREA_END - AREA_START);
+static const uint32_t AREA_START = (0x489C5380U);
+static const uint32_t AREA_END   = (0x489C87FFU);
+static const uint32_t AREA_SIZE  = (AREA_END - AREA_START);
 
 uint8_t mAreaId = 0;
 
@@ -43,7 +43,7 @@ PersistentStorageDelegate * mStorage = nullptr;
 
 memAreaCfg_t mAreaDescriptor;
 bool mDeviceCommissioned = false;
-bool mUseAllocator = false;
+bool mUseAllocator       = false;
 
 StorageKeyName GetSMU2AllocatorKey()
 {
@@ -59,10 +59,10 @@ void RegisterArea(void)
 {
     mem_status_t st = kStatus_MemSuccess;
 
-    memset((void*)AREA_START, 0x00, AREA_SIZE);
+    memset((void *) AREA_START, 0x00, AREA_SIZE);
 
-    mAreaDescriptor.start_address = (void*)AREA_START;
-    mAreaDescriptor.end_address = (void*)AREA_END;
+    mAreaDescriptor.start_address = (void *) AREA_START;
+    mAreaDescriptor.end_address   = (void *) AREA_END;
 
     st = MEM_RegisterExtendedArea(&mAreaDescriptor, &mAreaId, AREA_FLAGS_POOL_NOT_SHARED);
     VerifyOrDie(st == kStatus_MemSuccess);
@@ -76,30 +76,28 @@ void UnregisterArea(void)
     VerifyOrDie(st == kStatus_MemSuccess);
     mAreaId = 0;
 
-    memset((void*)AREA_START, 0x00, AREA_SIZE);
+    memset((void *) AREA_START, 0x00, AREA_SIZE);
 }
 
 void EventHandler(const ChipDeviceEvent * event, intptr_t)
 {
     switch (event->Type)
     {
-        case DeviceEventType::kCommissioningComplete:
-        {
-            mDeviceCommissioned = true;
-            break;
-        }
+    case DeviceEventType::kCommissioningComplete: {
+        mDeviceCommissioned = true;
+        break;
+    }
 
-        case DeviceEventType::kCHIPoBLEConnectionClosed:
+    case DeviceEventType::kCHIPoBLEConnectionClosed: {
+        if (mDeviceCommissioned)
         {
-            if (mDeviceCommissioned)
-            {
-                mUseAllocator = true;
-                mStorage->SyncSetKeyValue(GetSMU2AllocatorKey().KeyName(), (void*)&mUseAllocator, (uint16_t)sizeof(mUseAllocator));
-                ResetBLEController();
-                RegisterArea();
-            }
-            break;
+            mUseAllocator = true;
+            mStorage->SyncSetKeyValue(GetSMU2AllocatorKey().KeyName(), (void *) &mUseAllocator, (uint16_t) sizeof(mUseAllocator));
+            ResetBLEController();
+            RegisterArea();
         }
+        break;
+    }
     }
 }
 
@@ -108,19 +106,19 @@ void EventHandler(const ChipDeviceEvent * event, intptr_t)
 CHIP_ERROR Init(PersistentStorageDelegate * storage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t size = (uint16_t)sizeof(mUseAllocator);
-    mStorage = storage;
+    uint16_t size  = (uint16_t) sizeof(mUseAllocator);
+    mStorage       = storage;
 
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     PlatformMgr().AddEventHandler(EventHandler, reinterpret_cast<intptr_t>(nullptr));
 
-    err = mStorage->SyncGetKeyValue(GetSMU2AllocatorKey().KeyName(), (void*)&mUseAllocator, size);
+    err = mStorage->SyncGetKeyValue(GetSMU2AllocatorKey().KeyName(), (void *) &mUseAllocator, size);
 
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         mUseAllocator = false;
-        err = mStorage->SyncSetKeyValue(GetSMU2AllocatorKey().KeyName(), (void*)&mUseAllocator, size);
+        err           = mStorage->SyncSetKeyValue(GetSMU2AllocatorKey().KeyName(), (void *) &mUseAllocator, size);
     }
     ReturnErrorOnFailure(err);
 
@@ -139,7 +137,7 @@ CHIP_ERROR Deactivate(void)
     if (mUseAllocator)
     {
         mUseAllocator = false;
-        err = mStorage->SyncDeleteKeyValue(GetSMU2AllocatorKey().KeyName());
+        err           = mStorage->SyncDeleteKeyValue(GetSMU2AllocatorKey().KeyName());
         ReturnErrorOnFailure(err);
 
         UnregisterArea();
@@ -149,7 +147,7 @@ CHIP_ERROR Deactivate(void)
     return CHIP_NO_ERROR;
 }
 
-void* Allocate(size_t size)
+void * Allocate(size_t size)
 {
     size_t smu2Size = 0;
     if (mAreaId)

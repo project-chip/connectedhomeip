@@ -64,38 +64,38 @@ private:
     CHIP_ERROR SSS_Sign(uint8_t * digest, Crypto::P256ECDSASignature & signature);
 #if CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
     /*!
-    * \brief Convert DAC private key to an SSS encrypted blob and update factory data
-    *
-    * @note This API should be called in manufacturing process context to replace
-    *       DAC private key with an SSS encrypted blob. The conversion will be a
-    *       one-time-only operation.
-    * @retval #CHIP_NO_ERROR if factory data was updated successfully.
-    */
+     * \brief Convert DAC private key to an SSS encrypted blob and update factory data
+     *
+     * @note This API should be called in manufacturing process context to replace
+     *       DAC private key with an SSS encrypted blob. The conversion will be a
+     *       one-time-only operation.
+     * @retval #CHIP_NO_ERROR if factory data was updated successfully.
+     */
     CHIP_ERROR SSS_ConvertDacKey();
 
     /*!
-    * \brief Export an SSS encrypted blob from the DAC private key found in factory data
-    *
-    * @param data        Pointer to an allocated buffer
-    * @param dataLen     Pointer to a variable that will store the blob length
-    * @param offset      Offset of private key from the start of factory data payload address (after header)
-    *
-    * @retval #CHIP_NO_ERROR if conversion to blob was successful.
-    */
+     * \brief Export an SSS encrypted blob from the DAC private key found in factory data
+     *
+     * @param data        Pointer to an allocated buffer
+     * @param dataLen     Pointer to a variable that will store the blob length
+     * @param offset      Offset of private key from the start of factory data payload address (after header)
+     *
+     * @retval #CHIP_NO_ERROR if conversion to blob was successful.
+     */
     CHIP_ERROR SSS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset);
 
     /*!
-    * \brief Replace DAC private key with the specified SSS encrypted blob
-    *
-    * @note A new hash has to be computed and written in the factory data header.
-    * @param data        Pointer to a RAM buffer that duplicates the current factory data
-    * @param blob        Pointer to blob data
-    * @param blobLen     Blob length
-    * @param offset      Offset of private key from the start of factory data payload address (after header)
-    *                    Extracted with SSS_ConvertToBlob.
-    *
-    * @retval #CHIP_NO_ERROR if conversion to blob was successful.
-    */
+     * \brief Replace DAC private key with the specified SSS encrypted blob
+     *
+     * @note A new hash has to be computed and written in the factory data header.
+     * @param data        Pointer to a RAM buffer that duplicates the current factory data
+     * @param blob        Pointer to blob data
+     * @param blobLen     Blob length
+     * @param offset      Offset of private key from the start of factory data payload address (after header)
+     *                    Extracted with SSS_ConvertToBlob.
+     *
+     * @retval #CHIP_NO_ERROR if conversion to blob was successful.
+     */
     CHIP_ERROR ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST

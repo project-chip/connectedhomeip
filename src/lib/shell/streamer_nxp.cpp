@@ -98,22 +98,21 @@ static SERIAL_MANAGER_HANDLE_DEFINE(streamerSerialHandle);
 static SERIAL_MANAGER_WRITE_HANDLE_DEFINE(streamerSerialWriteHandle);
 static SERIAL_MANAGER_READ_HANDLE_DEFINE(streamerSerialReadHandle);
 static volatile int txCount = 0;
-static bool readDone = true;
+static bool readDone        = true;
 
-static streamer_serial_port_uart_config_t uartConfig = {
-    .clockRate    = BOARD_APP_UART_CLK_FREQ,
-    .baudRate     = BOARD_DEBUG_UART_BAUDRATE,
-    .parityMode   = kSerialManager_UartParityDisabled,
-    .stopBitCount = kSerialManager_UartOneStopBit,
-    .enableRx     = 1,
-    .enableTx     = 1,
-    .enableRxRTS  = 0,
-    .enableTxCTS  = 0,
-    .instance     = BOARD_APP_UART_INSTANCE,
+static streamer_serial_port_uart_config_t uartConfig = { .clockRate    = BOARD_APP_UART_CLK_FREQ,
+                                                         .baudRate     = BOARD_DEBUG_UART_BAUDRATE,
+                                                         .parityMode   = kSerialManager_UartParityDisabled,
+                                                         .stopBitCount = kSerialManager_UartOneStopBit,
+                                                         .enableRx     = 1,
+                                                         .enableTx     = 1,
+                                                         .enableRxRTS  = 0,
+                                                         .enableTxCTS  = 0,
+                                                         .instance     = BOARD_APP_UART_INSTANCE,
 #if STREAMER_UART_USE_DMA
-    .dma_instance = 0,
-    .rx_channel   = 1,
-    .tx_channel   = 0
+                                                         .dma_instance = 0,
+                                                         .rx_channel   = 1,
+                                                         .tx_channel   = 0
 #endif
 };
 
@@ -122,12 +121,12 @@ static const serial_manager_config_t s_serialManagerConfig = {
     .ringBuffer     = &s_ringBuffer[0],
     .ringBufferSize = STREAMER_UART_SERIAL_MANAGER_RING_BUFFER_SIZE,
 #if STREAMER_UART_USE_DMA
-    .type           = kSerialPort_UartDma,
+    .type = kSerialPort_UartDma,
 #else
-    .type           = BOARD_DEBUG_UART_TYPE,
+    .type = BOARD_DEBUG_UART_TYPE,
 #endif
-    .blockType      = kSerialManager_NonBlocking,
-    .portConfig     = (serial_port_uart_config_t *) &uartConfig,
+    .blockType  = kSerialManager_NonBlocking,
+    .portConfig = (serial_port_uart_config_t *) &uartConfig,
 };
 
 /* -------------------------------------------------------------------------- */
@@ -186,7 +185,7 @@ int streamer_nxp_init(streamer_t * streamer)
 
 ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
 {
-    uint32_t bytesRead = 0;
+    uint32_t bytesRead             = 0;
     serial_manager_status_t status = kStatus_SerialManager_Success;
 
     if (length != 0)
@@ -194,21 +193,21 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
         /**
          * If the reading process is over,
          * let CLI Task enter blocked state until notification
-        **/
+         **/
         if (readDone)
         {
             ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
             readDone = false;
         }
 
-        status = SerialManager_TryRead((serial_read_handle_t)streamerSerialReadHandle, (uint8_t *)buffer, length, &bytesRead);
+        status = SerialManager_TryRead((serial_read_handle_t) streamerSerialReadHandle, (uint8_t *) buffer, length, &bytesRead);
         assert(status != kStatus_SerialManager_Error);
 
         /**
          * If we are at the end of the line or the buffer is empty,
          * consider the reading process done
-        **/
-        if ((buffer[length-1] == '\n') || (buffer[length-1] == '\r') || (bytesRead == 0))
+         **/
+        if ((buffer[length - 1] == '\n') || (buffer[length - 1] == '\r') || (bytesRead == 0))
         {
             readDone = true;
         }
@@ -225,7 +224,8 @@ ssize_t streamer_nxp_write(streamer_t * streamer, const char * buffer, size_t le
 
     intMask = DisableGlobalIRQ();
     txCount++;
-    status = SerialManager_WriteNonBlocking((serial_write_handle_t)streamerSerialWriteHandle, (uint8_t *)(const_cast<char *>(buffer)), (uint32_t) length);
+    status = SerialManager_WriteNonBlocking((serial_write_handle_t) streamerSerialWriteHandle,
+                                            (uint8_t *) (const_cast<char *>(buffer)), (uint32_t) length);
     EnableGlobalIRQ(intMask);
     if (status == kStatus_SerialManager_Success)
     {
@@ -260,7 +260,7 @@ streamer_t * streamer_get(void)
 /* -------------------------------------------------------------------------- */
 extern TaskHandle_t CONSUMER_TASK_HANDLE;
 
-static void Uart_RxCallBack(void *pData, serial_manager_callback_message_t *message, serial_manager_status_t status)
+static void Uart_RxCallBack(void * pData, serial_manager_callback_message_t * message, serial_manager_status_t status)
 {
     if (CONSUMER_TASK_HANDLE != NULL)
     {

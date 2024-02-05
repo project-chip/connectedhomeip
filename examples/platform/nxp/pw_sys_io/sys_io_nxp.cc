@@ -26,19 +26,19 @@
 
 int16_t console_getchar(char * chr)
 {
-    auto* streamer = chip::Shell::streamer_get();
+    auto * streamer = chip::Shell::streamer_get();
     return static_cast<int16_t>(streamer->read_cb(nullptr, chr, 1));
 }
 
 int16_t console_putchar(const char * chr)
 {
-    auto* streamer = chip::Shell::streamer_get();
+    auto * streamer = chip::Shell::streamer_get();
     return static_cast<int16_t>(streamer->write_cb(nullptr, chr, 1));
 }
 
 extern "C" void pw_sys_io_Init()
 {
-    auto* streamer = chip::Shell::streamer_get();
+    auto * streamer = chip::Shell::streamer_get();
     streamer->init_cb(nullptr);
 }
 

@@ -137,8 +137,7 @@ void Init()
 {
     PigweedLogger::Init();
 
-    xTaskCreate(RunRpcService, "RPC_TASK", RPC_TASK_STACK_SIZE, nullptr, RPC_TASK_PRIORITY,
-                &RpcTaskHandle);
+    xTaskCreate(RunRpcService, "RPC_TASK", RPC_TASK_STACK_SIZE, nullptr, RPC_TASK_PRIORITY, &RpcTaskHandle);
 }
 
 } // namespace rpc

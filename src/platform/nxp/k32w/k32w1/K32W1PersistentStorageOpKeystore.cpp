@@ -49,7 +49,7 @@ CHIP_ERROR P256KeypairSSS::ExportBlob(P256SerializedKeypairSSS & output) const
     sss_sscp_object_t * keypair = to_keypair(&mKeypair);
 
     size_t keyBlobLen = output.Capacity();
-    auto res = sss_sscp_key_store_export_key(&g_keyStore, keypair, output.Bytes(), &keyBlobLen, kSSS_blobType_ELKE_blob);
+    auto res          = sss_sscp_key_store_export_key(&g_keyStore, keypair, output.Bytes(), &keyBlobLen, kSSS_blobType_ELKE_blob);
     VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     output.SetLength(keyBlobLen);
@@ -73,7 +73,8 @@ CHIP_ERROR P256KeypairSSS::ImportBlob(P256SerializedKeypairSSS & input)
     }
 
     VerifyOrExit((sss_sscp_key_store_import_key(&g_keyStore, keypair, input.Bytes(), input.Length(), kP256_PrivateKey_Length * 8,
-                                                 kSSS_blobType_ELKE_blob) == kStatus_SSS_Success), CHIP_ERROR_INTERNAL);
+                                                kSSS_blobType_ELKE_blob) == kStatus_SSS_Success),
+                 CHIP_ERROR_INTERNAL);
 
     mInitialized = true;
 

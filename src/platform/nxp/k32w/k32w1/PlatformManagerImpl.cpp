@@ -29,8 +29,8 @@
 #include <openthread-system.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
-#include <platform/nxp/k32w/k32w1/DiagnosticDataProviderImpl.h>
 #include <platform/nxp/k32w/k32w1/ConfigurationManagerImpl.h>
+#include <platform/nxp/k32w/k32w1/DiagnosticDataProviderImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>

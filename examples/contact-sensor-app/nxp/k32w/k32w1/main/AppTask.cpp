@@ -441,7 +441,7 @@ button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_messa
 
         case CONTACT_SENSOR_BUTTON:
             K32W_LOG("pb2 long press");
-             ButtonEventHandler(SOFT_RESET_BUTTON, SOFT_RESET_BUTTON_PUSH);
+            ButtonEventHandler(SOFT_RESET_BUTTON, SOFT_RESET_BUTTON_PUSH);
             break;
         }
         break;
