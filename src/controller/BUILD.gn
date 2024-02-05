@@ -128,5 +128,7 @@ static_library("controller") {
     deps += [ "${chip_root}/src/lib/support:testing" ]
   }
 
-  defines = []
+  public_configs = [
+    "${chip_root}/src:includes"
+  ]
 }
