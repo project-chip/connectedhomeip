@@ -215,7 +215,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
         return aEncoder.Encode(isTestEventTriggersEnabled);
     }
-    // Note: Attribute ID 0x0009 was removed (#30002).
+        // Note: Attribute ID 0x0009 was removed (#30002).
 
     case FeatureMap::Id: {
         uint32_t features = 0;
@@ -448,8 +448,9 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
     return true;
 }
 
-bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::PayloadTestRequest::DecodableType & commandData)
+bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(CommandHandler * commandObj,
+                                                                const ConcreteCommandPath & commandPath,
+                                                                const Commands::PayloadTestRequest::DecodableType & commandData)
 {
     // Max allowed is 2048.
     if (commandData.count > 2048)
@@ -475,7 +476,7 @@ bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(CommandHandler *
     }
 
     memset(payload.Get(), commandData.value, payload.AllocatedSize());
-    response.payload = ByteSpan{payload.Get(), payload.AllocatedSize()};
+    response.payload = ByteSpan{ payload.Get(), payload.AllocatedSize() };
 
     if (commandObj->AddResponseData(commandPath, response) != CHIP_NO_ERROR)
     {
