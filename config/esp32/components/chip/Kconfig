@@ -1045,6 +1045,12 @@ menu "CHIP Device Layer"
 
     endmenu
 
+    config CHIP_ENABLE_BDX_LOG_TRANSFER
+        bool "Enable BDX log transfer"
+        default n
+        help
+            Enables the BDX protocol for diagnostics log transfer
+
     menu "Matter OTA Image"
 
         config CHIP_OTA_IMAGE_BUILD
