@@ -155,6 +155,7 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
+            - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
             - "**/src/controller/java/generated/java/**/*"
     ForbiddenComment:
@@ -162,7 +163,6 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
-            - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadParser.kt"
     ExplicitItLambdaParameter:
         excludes:
@@ -185,6 +185,7 @@ style:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
             - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/controller/Messages.kt"
             - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
     UseCheckOrError:
@@ -207,6 +208,7 @@ style:
     FunctionOnlyReturningConstant:
         excludes:
             - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/controller/Messages.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadGenerator.kt"
 
 exceptions:

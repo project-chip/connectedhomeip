@@ -56,10 +56,7 @@ class NodeState(val endpoints: MutableMap<Int, EndpointState> = mutableMapOf()) 
  * @param id The endpoint ID.
  * @param clusters A mapping of cluster IDs to the cluster data.
  */
-class EndpointState(
-  val id: Int,
-  val clusters: MutableMap<Long, ClusterState> = mutableMapOf()
-) {
+class EndpointState(val id: Int, val clusters: MutableMap<Long, ClusterState> = mutableMapOf()) {
   fun addAttribute(clusterId: UInt, attributeId: UInt, attributeState: AttributeState) {
     getClusterState(clusterId).addAttribute(attributeId, attributeState)
   }
