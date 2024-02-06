@@ -426,20 +426,6 @@ config("includes") {
 }
 
 if (chip_device_platform != "none") {
-  source_set("device-event") {
-    sources = [ "include/platform/CHIPDeviceEvent.h" ]
-
-    public_deps = [
-      "${chip_root}/src/ble",
-      "${chip_root}/src/inet",
-      "${chip_root}/src/lib/core",
-      "${chip_root}/src/lib/support",
-      "${chip_root}/src/system",
-    ]
-
-    public_configs = [ ":includes" ]
-  }
-
   source_set("device-safe-queue") {
     sources = [
       "DeviceSafeQueue.cpp",
@@ -447,7 +433,7 @@ if (chip_device_platform != "none") {
     ]
 
     public_deps = [
-      ":device-event",
+      ":platform_base",
       ":platform_config_header",
       "${chip_root}/src/lib/core",
     ]
@@ -456,6 +442,9 @@ if (chip_device_platform != "none") {
   }
 
   source_set("platform_base") {
+    sources = [
+      "include/platform/CHIPDeviceEvent.h"
+    ]
     public_deps = [
       ":platform_config_header",
       "${chip_root}/src/ble",
@@ -548,7 +537,6 @@ if (chip_device_platform != "none") {
     cflags = [ "-Wconversion" ]
 
     public_deps = [
-      ":device-event",
       ":device-safe-queue",
       ":platform_base",
       "${chip_root}/src/app:app_config",
