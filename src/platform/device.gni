@@ -103,8 +103,8 @@ declare_args() {
 
   # Enable Subscription persistence / resumption for CI and supported platforms
   if (chip_device_platform == "darwin" || chip_device_platform == "linux" ||
-      chip_device_platform == "esp32" || chip_device_platform == "fake" ||
-      chip_device_platform == "efr32" || chip_device_platform == "SiWx917") {
+      chip_device_platform == "fake" || chip_device_platform == "efr32" ||
+      chip_device_platform == "SiWx917") {
     chip_persist_subscriptions = true
   } else {
     chip_persist_subscriptions = false
