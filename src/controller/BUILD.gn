@@ -101,7 +101,7 @@ static_library("controller") {
     ]
     if (chip_enable_read_client) {
       sources += CHIP_READ_CLIENT_HEADERS
-      sources = [
+      sources += [
         "CHIPDeviceController.cpp",
         "CommissioningWindowOpener.cpp",
         "CurrentFabricRemover.cpp",
