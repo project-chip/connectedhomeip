@@ -37,6 +37,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 using namespace System::Clock;
 
+#define TOGGLE_STATE(state) ((state == OperationalState::IdleMode) ? OperationalState::ActiveMode : OperationalState::IdleMode)
+
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
@@ -542,6 +544,17 @@ bool ICDManager::CheckInMessagesWouldBeSent()
 
     // None of the registrations would require a Check-In message
     return false;
+}
+
+void ICDManager::TriggerCheckInMessages()
+{
+    VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
+
+    // Check if we have any Check-In messages to send
+    // We have Check-In messages to send. Transition the device to active mode.
+    // We don't have any Check-In messages to send. Transition the device to idle mode.
+    mOperationalState = CheckInMessagesWouldBeSent() ? OperationalState::IdleMode : OperationalState::ActiveMode;
+    UpdateOperationState(TOGGLE_STATE(mOperationalState));
 }
 
 } // namespace app
