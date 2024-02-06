@@ -267,16 +267,6 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace BooleanState
 
-namespace IcdManagement {
-namespace Events {
-
-namespace OnTransitionToActiveMode {
-static constexpr EventId Id = 0x00000000;
-} // namespace OnTransitionToActiveMode
-
-} // namespace Events
-} // namespace IcdManagement
-
 namespace OvenCavityOperationalState {
 namespace Events {
 
@@ -417,6 +407,16 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace ValveConfigurationAndControl
 
+namespace ElectricalPowerMeasurement {
+namespace Events {
+
+namespace MeasurementPeriodRanges {
+static constexpr EventId Id = 0x00000000;
+} // namespace MeasurementPeriodRanges
+
+} // namespace Events
+} // namespace ElectricalPowerMeasurement
+
 namespace ElectricalEnergyMeasurement {
 namespace Events {
 
@@ -440,6 +440,24 @@ static constexpr EventId Id = 0x00000000;
 
 } // namespace Events
 } // namespace DemandResponseLoadControl
+
+namespace Messages {
+namespace Events {
+
+namespace MessageQueued {
+static constexpr EventId Id = 0x00000000;
+} // namespace MessageQueued
+
+namespace MessagePresented {
+static constexpr EventId Id = 0x00000001;
+} // namespace MessagePresented
+
+namespace MessageComplete {
+static constexpr EventId Id = 0x00000002;
+} // namespace MessageComplete
+
+} // namespace Events
+} // namespace Messages
 
 namespace DeviceEnergyManagement {
 namespace Events {
@@ -643,6 +661,10 @@ static constexpr EventId Id = 0x00000001;
 namespace TestFabricScopedEvent {
 static constexpr EventId Id = 0x00000002;
 } // namespace TestFabricScopedEvent
+
+namespace TestDifferentVendorMeiEvent {
+static constexpr EventId Id = 0xFFF200EE;
+} // namespace TestDifferentVendorMeiEvent
 
 } // namespace Events
 } // namespace UnitTesting

@@ -39,6 +39,7 @@ chip_data_model("tv-casting-common") {
 
   sources = [
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
+    "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",
     "${chip_root}/examples/chip-tool/commands/common/CHIPCommand.h",
     "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Command.h",

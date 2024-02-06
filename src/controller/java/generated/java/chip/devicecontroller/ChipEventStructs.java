@@ -2297,34 +2297,6 @@ public static class BooleanStateClusterStateChangeEvent {
     return output.toString();
   }
 }
-public static class IcdManagementClusterOnTransitionToActiveModeEvent {
-
-  public IcdManagementClusterOnTransitionToActiveModeEvent(
-  ) {
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-
-    return new StructType(values);
-  }
-
-  public static IcdManagementClusterOnTransitionToActiveModeEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    return new IcdManagementClusterOnTransitionToActiveModeEvent(
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("IcdManagementClusterOnTransitionToActiveModeEvent {\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class OvenCavityOperationalStateClusterOperationalErrorEvent {
   public ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState;
   private static final long ERROR_STATE_ID = 0L;
@@ -3485,6 +3457,52 @@ public static class ValveConfigurationAndControlClusterValveFaultEvent {
     return output.toString();
   }
 }
+public static class ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent {
+  public ArrayList<ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct> ranges;
+  private static final long RANGES_ID = 0L;
+
+  public ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent(
+    ArrayList<ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct> ranges
+  ) {
+    this.ranges = ranges;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(RANGES_ID, ArrayType.generateArrayType(ranges, (elementranges) -> elementranges.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct> ranges = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == RANGES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          ranges = castingValue.map((elementcastingValue) -> ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent(
+      ranges
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent {\n");
+    output.append("\tranges: ");
+    output.append(ranges);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {
   public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported;
   public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported;
@@ -3783,6 +3801,189 @@ public static class DemandResponseLoadControlClusterLoadControlEventStatusChange
     output.append("\n");
     output.append("\theatingSourceControl: ");
     output.append(heatingSourceControl);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MessagesClusterMessageQueuedEvent {
+  public byte[] messageID;
+  private static final long MESSAGE_I_D_ID = 0L;
+
+  public MessagesClusterMessageQueuedEvent(
+    byte[] messageID
+  ) {
+    this.messageID = messageID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageQueuedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      }
+    }
+    return new MessagesClusterMessageQueuedEvent(
+      messageID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageQueuedEvent {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MessagesClusterMessagePresentedEvent {
+  public byte[] messageID;
+  private static final long MESSAGE_I_D_ID = 0L;
+
+  public MessagesClusterMessagePresentedEvent(
+    byte[] messageID
+  ) {
+    this.messageID = messageID;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessagePresentedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      }
+    }
+    return new MessagesClusterMessagePresentedEvent(
+      messageID
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessagePresentedEvent {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MessagesClusterMessageCompleteEvent {
+  public byte[] messageID;
+  public @Nullable Optional<Long> responseID;
+  public @Nullable Optional<String> reply;
+  public @Nullable Integer futureMessagesPreference;
+  private static final long MESSAGE_I_D_ID = 0L;
+  private static final long RESPONSE_I_D_ID = 1L;
+  private static final long REPLY_ID = 2L;
+  private static final long FUTURE_MESSAGES_PREFERENCE_ID = 3L;
+
+  public MessagesClusterMessageCompleteEvent(
+    byte[] messageID,
+    @Nullable Optional<Long> responseID,
+    @Nullable Optional<String> reply,
+    @Nullable Integer futureMessagesPreference
+  ) {
+    this.messageID = messageID;
+    this.responseID = responseID;
+    this.reply = reply;
+    this.futureMessagesPreference = futureMessagesPreference;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
+    values.add(new StructElement(RESPONSE_I_D_ID, responseID != null ? responseID.<BaseTLVType>map((nonOptionalresponseID) -> new UIntType(nonOptionalresponseID)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(REPLY_ID, reply != null ? reply.<BaseTLVType>map((nonOptionalreply) -> new StringType(nonOptionalreply)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(FUTURE_MESSAGES_PREFERENCE_ID, futureMessagesPreference != null ? new UIntType(futureMessagesPreference) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageCompleteEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    @Nullable Optional<Long> responseID = null;
+    @Nullable Optional<String> reply = null;
+    @Nullable Integer futureMessagesPreference = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == RESPONSE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          responseID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == REPLY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          reply = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == FUTURE_MESSAGES_PREFERENCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          futureMessagesPreference = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new MessagesClusterMessageCompleteEvent(
+      messageID,
+      responseID,
+      reply,
+      futureMessagesPreference
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageCompleteEvent {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("\tresponseID: ");
+    output.append(responseID);
+    output.append("\n");
+    output.append("\treply: ");
+    output.append(reply);
+    output.append("\n");
+    output.append("\tfutureMessagesPreference: ");
+    output.append(futureMessagesPreference);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -5861,6 +6062,52 @@ public static class UnitTestingClusterTestFabricScopedEventEvent {
     output.append("UnitTestingClusterTestFabricScopedEventEvent {\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class UnitTestingClusterTestDifferentVendorMeiEventEvent {
+  public Integer arg1;
+  private static final long ARG1_ID = 1L;
+
+  public UnitTestingClusterTestDifferentVendorMeiEventEvent(
+    Integer arg1
+  ) {
+    this.arg1 = arg1;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ARG1_ID, new UIntType(arg1)));
+
+    return new StructType(values);
+  }
+
+  public static UnitTestingClusterTestDifferentVendorMeiEventEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer arg1 = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ARG1_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          arg1 = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new UnitTestingClusterTestDifferentVendorMeiEventEvent(
+      arg1
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("UnitTestingClusterTestDifferentVendorMeiEventEvent {\n");
+    output.append("\targ1: ");
+    output.append(arg1);
     output.append("\n");
     output.append("}\n");
     return output.toString();

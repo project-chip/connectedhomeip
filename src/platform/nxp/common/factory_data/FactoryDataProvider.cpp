@@ -258,9 +258,9 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
     if (length == 10 && isdigit(date[0]) && isdigit(date[1]) && isdigit(date[2]) && isdigit(date[3]) && date[4] == '-' &&
         isdigit(date[5]) && isdigit(date[6]) && date[7] == '-' && isdigit(date[8]) && isdigit(date[9]))
     {
-        year  = 1000 * (date[0] - '0') + 100 * (date[1] - '0') + 10 * (date[2] - '0') + date[3] - '0';
-        month = 10 * (date[5] - '0') + date[6] - '0';
-        day   = 10 * (date[8] - '0') + date[9] - '0';
+        year  = (uint16_t) (1000 * (date[0] - '0') + 100 * (date[1] - '0') + 10 * (date[2] - '0') + date[3] - '0');
+        month = (uint8_t) (10 * (date[5] - '0') + date[6] - '0');
+        day   = (uint8_t) (10 * (date[8] - '0') + date[9] - '0');
     }
     else
     {

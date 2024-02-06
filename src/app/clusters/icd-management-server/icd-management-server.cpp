@@ -23,8 +23,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
-#include <app/icd/ICDMonitoringTable.h>
-#include <app/icd/ICDNotifier.h>
+#include <app/icd/server/ICDMonitoringTable.h>
+#include <app/icd/server/ICDNotifier.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -101,17 +101,17 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.Encode(mICDConfigurationData->GetIdleModeDurationSec());
+    return encoder.Encode(mICDConfigurationData->GetIdleModeDuration().count());
 }
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.Encode(mICDConfigurationData->GetActiveModeDurationMs());
+    return encoder.Encode(mICDConfigurationData->GetActiveModeDuration().count());
 }
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.Encode(mICDConfigurationData->GetActiveModeThresholdMs());
+    return encoder.Encode(mICDConfigurationData->GetActiveModeThreshold().count());
 }
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)

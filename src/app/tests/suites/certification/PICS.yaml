@@ -5781,7 +5781,7 @@ PICS:
     - label: "Write all supported optional attributes"
       id: RH.C.AO-WRITE
 
-    # Scenes Cluster Test Plan
+    # Scenes Management Cluster Test Plan
     - label: "Does the device implement the Scenes cluster as a server?"
       id: S.S
 
@@ -5869,11 +5869,6 @@ PICS:
 
     - label: "Does the device implement sending the CopyScene command?"
       id: S.C.C40.Tx
-
-    - label:
-          "Does the device process the TransitionTime parameter of the
-          RecallScene command?"
-      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
 
     #
     # client / manually
@@ -9204,12 +9199,6 @@ PICS:
     - label: "Does the device implement the CurrentMode attribute?"
       id: RVCCLEANM.S.A0001
 
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: RVCCLEANM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: RVCCLEANM.S.A0003
-
     #
     # server / Commands received
     #
@@ -9422,11 +9411,8 @@ PICS:
     - label: "Does the device implement the CurrentMode attribute?"
       id: RVCRUNM.S.A0001
 
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: RVCRUNM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: RVCRUNM.S.A0003
+    - label: "Can the mode change be manually controlled?"
+      id: RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED
 
     #Commands received
     - label: "Does the device implement receiving the ChangeToMode command?"
@@ -9593,6 +9579,9 @@ PICS:
 
     - label: "Does the device implement receiving the Resume command?"
       id: RVCOPSTATE.S.C03.Rsp
+
+    - label: "Does the device implement receiving the GoHome command?"
+      id: RVCOPSTATE.S.C128.Rsp
 
     #Commands generated
     - label:

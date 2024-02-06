@@ -22,6 +22,7 @@
 #include <filter-delegates.h>
 #include <relative-humidity-sensor-manager.h>
 #include <temperature-sensor-manager.h>
+#include <thermostat-manager.h>
 
 #pragma once
 
@@ -52,12 +53,13 @@ public:
     AirPurifierManager & operator=(const AirPurifierManager &) = delete;
 
     static void InitInstance(EndpointId aEndpointId = 1, EndpointId aAirQualitySensorEndpointId = 2,
-                             EndpointId aTemperatureSensorEndpointId = 3, EndpointId aHumiditySensorEndpointId = 4)
+                             EndpointId aTemperatureSensorEndpointId = 3, EndpointId aHumiditySensorEndpointId = 4,
+                             EndpointId aThermostatEndpointId = 5)
     {
         if (mInstance == nullptr)
         {
             mInstance = new AirPurifierManager(aEndpointId, aAirQualitySensorEndpointId, aTemperatureSensorEndpointId,
-                                               aHumiditySensorEndpointId);
+                                               aHumiditySensorEndpointId, aThermostatEndpointId);
             mInstance->Init();
         }
     };
@@ -89,6 +91,11 @@ public:
      */
     Protocols::InteractionModel::Status HandleStep(FanControl::StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
+    /**
+     * @brief Callback that thermostat manager calls when the heating state changes
+     */
+    void HeatingCallback();
+
 private:
     inline static AirPurifierManager * mInstance;
 
@@ -96,9 +103,12 @@ private:
     EndpointId mAirQualitySensorEndpointId;
     EndpointId mTemperatureSensorEndpointId;
     EndpointId mHumiditySensorEndpointId;
+    EndpointId mThermostatEndpointId;
 
     uint8_t percentCurrent;
     uint8_t speedCurrent;
+
+    bool fanWasStartedByUser = false;
 
     // Set up for Activated Carbon Filter Monitoring
     ActivatedCarbonFilterMonitoringDelegate activatedCarbonFilterDelegate;
@@ -112,6 +122,7 @@ private:
     AirQualitySensorManager mAirQualitySensorManager;
     TemperatureSensorManager mTemperatureSensorManager;
     RelativeHumiditySensorManager mHumiditySensorManager;
+    ThermostatManager mThermostatManager;
 
     // Fan Mode Limits
     static constexpr int FAN_MODE_LOW_LOWER_BOUND    = 1;
@@ -129,7 +140,7 @@ private:
      * @param[in] aHumiditySensorEndpointId    Endpoint that the humidity sensor is on
      */
     AirPurifierManager(EndpointId aEndpointId, EndpointId aAirQualitySensorEndpointId, EndpointId aTemperatureSensorEndpointId,
-                       EndpointId aHumiditySensorEndpointId) :
+                       EndpointId aHumiditySensorEndpointId, EndpointId aThermostatEndpointId) :
         FanControl::Delegate(aEndpointId),
         mEndpointId(aEndpointId),
         activatedCarbonFilterInstance(&activatedCarbonFilterDelegate, mEndpointId, ActivatedCarbonFilterMonitoring::Id,
@@ -139,7 +150,9 @@ private:
                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                            ResourceMonitoring::DegradationDirectionEnum::kDown, true),
         mAirQualitySensorManager(aAirQualitySensorEndpointId), mTemperatureSensorManager(aTemperatureSensorEndpointId),
-        mHumiditySensorManager(aHumiditySensorEndpointId){};
+        mHumiditySensorManager(aHumiditySensorEndpointId),
+        mThermostatManager(aThermostatEndpointId, [this]() { HeatingCallback(); })
+    {}
 
     /**
      * @brief Handle attribute changes for the Fan Control Cluster
@@ -155,6 +168,12 @@ private:
     void FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode);
 
     void SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting);
+    DataModel::Nullable<uint8_t> GetSpeedSetting();
+    DataModel::Nullable<Percent> GetPercentSetting();
+
+    void HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
+    void ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint);
+    void ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode);
 };
 
 } // namespace Clusters

@@ -104,7 +104,7 @@ tests:
           field set to G1."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chip-tool scenes remove-all-scenes 0x0001 1 1
+          ./chip-tool scenesmanagement remove-all-scenes 0x0001 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
           CHIP:TOO:   RemoveAllScenesResponse: {
@@ -114,20 +114,79 @@ tests:
       disabled: true
 
     - label: "Step 4a: TH reads from the DUT the SceneTableSize attribute"
-      PICS: S.S.A0006
       verification: |
-          ./chip-tool scenes read scene-table-size 1 1
+          ./chip-tool scenesmanagement read scene-table-size 1 1
 
           [1688019474.695136][1726:1728] CHIP:DMG: }
           [1688019474.695335][1726:1728] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0006 DataVersion: 1550229741
-          [1688019474.695397][1726:1728] CHIP:TOO:   SceneTableSize: 0
+          [1688019474.695397][1726:1728] CHIP:TOO:   SceneTableSize: (Default table size: 16)
       disabled: true
 
     - label:
           "Step 4b: TH sends a subscription request action for FabricSceneInfo
           to the DUT."
-      PICS: S.S.A0007
       verification: |
+          ./chip-tool interactive start
+          >>> any subscribe-by-id 0x0062 0x0002 min-interval max-interval node-id endpoint
+
+          [1706764465.493922][4438:4440] CHIP:DMG: ReportDataMessage =
+          [1706764465.493926][4438:4440] CHIP:DMG: {
+          [1706764465.493928][4438:4440] CHIP:DMG:         SubscriptionId = 0x8537dfcd,
+          [1706764465.493931][4438:4440] CHIP:DMG:         AttributeReportIBs =
+          [1706764465.493937][4438:4440] CHIP:DMG:         [
+          [1706764465.493939][4438:4440] CHIP:DMG:                 AttributeReportIB =
+          [1706764465.493944][4438:4440] CHIP:DMG:                 {
+          [1706764465.493947][4438:4440] CHIP:DMG:                         AttributeDataIB =
+          [1706764465.493949][4438:4440] CHIP:DMG:                         {
+          [1706764465.493952][4438:4440] CHIP:DMG:                                 DataVersion = 0xec4c4ec0,
+          [1706764465.493955][4438:4440] CHIP:DMG:                                 AttributePathIB =
+          [1706764465.493958][4438:4440] CHIP:DMG:                                 {
+          [1706764465.493961][4438:4440] CHIP:DMG:                                         Endpoint = 0x1,
+          [1706764465.493963][4438:4440] CHIP:DMG:                                         Cluster = 0x62,
+          [1706764465.493966][4438:4440] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1706764465.493969][4438:4440] CHIP:DMG:                                 }
+          [1706764465.493974][4438:4440] CHIP:DMG:
+          [1706764465.493979][4438:4440] CHIP:DMG:                                 Data = [
+          [1706764465.493985][4438:4440] CHIP:DMG:
+          [1706764465.493990][4438:4440] CHIP:DMG:                                         {
+          [1706764465.493997][4438:4440] CHIP:DMG:                                                 0x0 = 1,
+          [1706764465.494002][4438:4440] CHIP:DMG:                                                 0x1 = 1,
+          [1706764465.494007][4438:4440] CHIP:DMG:                                                 0x2 = 1,
+          [1706764465.494013][4438:4440] CHIP:DMG:                                                 0x3 = false,
+          [1706764465.494018][4438:4440] CHIP:DMG:                                                 0x4 = 6,
+          [1706764465.494023][4438:4440] CHIP:DMG:                                                 0xfe = 1,
+          [1706764465.494029][4438:4440] CHIP:DMG:                                         },
+          [1706764465.494034][4438:4440] CHIP:DMG:                                 ],
+          [1706764465.494038][4438:4440] CHIP:DMG:                         },
+          [1706764465.494047][4438:4440] CHIP:DMG:
+          [1706764465.494050][4438:4440] CHIP:DMG:                 },
+          [1706764465.494059][4438:4440] CHIP:DMG:
+          [1706764465.494062][4438:4440] CHIP:DMG:         ],
+          [1706764465.494070][4438:4440] CHIP:DMG:
+          [1706764465.494073][4438:4440] CHIP:DMG:         InteractionModelRevision = 11
+          [1706764465.494077][4438:4440] CHIP:DMG: }
+          [1706764465.494130][4438:4440] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion: 3964423872
+          [1706764465.494142][4438:4440] CHIP:TOO:   FabricSceneInfo: 1 entries
+          [1706764465.494152][4438:4440] CHIP:TOO:     [1]: {
+          [1706764465.494155][4438:4440] CHIP:TOO:       SceneCount: 1
+          [1706764465.494158][4438:4440] CHIP:TOO:       CurrentScene: 1
+          [1706764465.494161][4438:4440] CHIP:TOO:       CurrentGroup: 1
+          [1706764465.494164][4438:4440] CHIP:TOO:       SceneValid: FALSE
+          [1706764465.494167][4438:4440] CHIP:TOO:       RemainingCapacity: 6
+          [1706764465.494170][4438:4440] CHIP:TOO:       FabricIndex: 1
+          [1706764465.494174][4438:4440] CHIP:TOO:      }
+          ...
+          [1706797894.367789][5179:5181] CHIP:DMG: Subscription established with SubscriptionID = 0x8537dfcd MinInterval = 0s MaxInterval = 60s Peer = 01:0000000000000001
+          ...
+          [1706798074.365189][5179:5181] CHIP:EM: >>> [E:29283r S:30665 M:266174816] (S) Msg RX from 1:0000000000000001 [0714] --- Type 0001:05 (IM:ReportData)
+          [1706798074.365317][5179:5181] CHIP:EM: Handling via exchange: 29283r, Delegate: 0xaaaacccf2a88
+          [1706798074.365449][5179:5181] CHIP:DMG: ReportDataMessage =
+          [1706798074.365517][5179:5181] CHIP:DMG: {
+          [1706798074.365576][5179:5181] CHIP:DMG: 	SubscriptionId = 0x8537dfcd,
+          [1706798074.365638][5179:5181] CHIP:DMG: 	InteractionModelRevision = 11
+          [1706798074.365696][5179:5181] CHIP:DMG: }
+          [1706798074.365883][5179:5181] CHIP:DMG: Refresh LivenessCheckTime for 64224 milliseconds with SubscriptionId = 0x85
+          37dfcd Peer = 01:0000000000000001
 
       disabled: true
 
@@ -135,16 +194,19 @@ tests:
           "Step 4c: Keep subscription session active for the remainder of the
           test"
       verification: |
+          Confirm that the subscription session is active for the remainder of the test by the reception of Liveness checks:
+
+          [1706798074.365883][5179:5181] CHIP:DMG: Refresh LivenessCheckTime for 64224 milliseconds with SubscriptionId = 0x8537dfcd Peer = 01:0000000000000001
 
       disabled: true
 
     - label:
           "Step 5a: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
-          to 0x0014 (20s) and no extension field sets."
+          to 20000 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0001 0x1 0x0014 scene1 [] 1 1
+          ./chip-tool scenesmanagement add-scene 0x0001 0x1 20000 scene1 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -155,12 +217,59 @@ tests:
       disabled: true
 
     - label:
-          "Step 5b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 5b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity-1)."
-      PICS: S.S.A0007
       verification: |
+          CHIP:DMG: ReportDataMessage =
+          CHIP:DMG: {
+          CHIP:DMG: 	SubscriptionId = 0x8537dfcd,
+          CHIP:DMG: 	AttributeReportIBs =
+          CHIP:DMG: 	[
+          CHIP:DMG: 		AttributeReportIB =
+          CHIP:DMG: 		{
+          CHIP:DMG: 			AttributeDataIB =
+          CHIP:DMG: 			{
+          CHIP:DMG: 				DataVersion = 0x92ecb45d,
+          CHIP:DMG: 				AttributePathIB =
+          CHIP:DMG: 				{
+          CHIP:DMG: 					Endpoint = 0x1,
+          CHIP:DMG: 					Cluster = 0x62,
+          CHIP:DMG: 					Attribute = 0x0000_0002,
+          CHIP:DMG: 				}
+          CHIP:DMG:
+          CHIP:DMG: 				Data = [
+          CHIP:DMG:
+          CHIP:DMG: 					{
+          CHIP:DMG: 						0x0 = 1,
+          CHIP:DMG: 						0x1 = 0,
+          CHIP:DMG: 						0x2 = 0,
+          CHIP:DMG: 						0x3 = false,
+          CHIP:DMG: 						0x4 = 6,
+          CHIP:DMG: 						0xfe = 1,
+          CHIP:DMG: 					},
+          CHIP:DMG: 				],
+          CHIP:DMG: 			},
+          CHIP:DMG:
+          CHIP:DMG: 		},
+          CHIP:DMG:
+          CHIP:DMG: 	],
+          CHIP:DMG:
+          CHIP:DMG: 	InteractionModelRevision = 11
+          CHIP:DMG: }
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion:
+          CHIP:TOO:   FabricSceneInfo: 1 entries
+          CHIP:TOO:     [1]: {
+          CHIP:TOO:       SceneCount: 1
+          CHIP:TOO:       CurrentScene: 0
+          CHIP:TOO:       CurrentGroup: 0
+          CHIP:TOO:       SceneValid: FALSE
+          CHIP:TOO:       RemainingCapacity: 6
+          CHIP:TOO:       FabricIndex: 1
+          CHIP:TOO:      }
+          CHIP:DMG: Refresh LivenessCheckTime for 9224 milliseconds with SubscriptionId = 0x8537dfcd Peer = 01:0000000000000001
 
       disabled: true
 
@@ -171,7 +280,7 @@ tests:
           8a."
       PICS: S.S.C04.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0001 0x2 0x0014 scene2 [] 1 1
+          ./chip-tool scenesmanagement store-scene 0x0001 0x2 20000 scene2 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -182,33 +291,125 @@ tests:
       disabled: true
 
     - label:
-          "Step 6b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 6b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity-2)."
-      PICS: S.S.A0007
       verification: |
-
+          CHIP:DMG: ReportDataMessage =
+          CHIP:DMG: {
+          CHIP:DMG: 	SubscriptionId = 0x8537dfcd,
+          CHIP:DMG: 	AttributeReportIBs =
+          CHIP:DMG: 	[
+          CHIP:DMG: 		AttributeReportIB =
+          CHIP:DMG: 		{
+          CHIP:DMG: 			AttributeDataIB =
+          CHIP:DMG: 			{
+          CHIP:DMG: 				DataVersion = 0x92ecb45d,
+          CHIP:DMG: 				AttributePathIB =
+          CHIP:DMG: 				{
+          CHIP:DMG: 					Endpoint = 0x1,
+          CHIP:DMG: 					Cluster = 0x62,
+          CHIP:DMG: 					Attribute = 0x0000_0002,
+          CHIP:DMG: 				}
+          CHIP:DMG:
+          CHIP:DMG: 				Data = [
+          CHIP:DMG:
+          CHIP:DMG: 					{
+          CHIP:DMG: 						0x0 = 2,
+          CHIP:DMG: 						0x1 = 2,
+          CHIP:DMG: 						0x2 = 1,
+          CHIP:DMG: 						0x3 = true,
+          CHIP:DMG: 						0x4 = 5,
+          CHIP:DMG: 						0xfe = 1,
+          CHIP:DMG: 					},
+          CHIP:DMG: 				],
+          CHIP:DMG: 			},
+          CHIP:DMG:
+          CHIP:DMG: 		},
+          CHIP:DMG:
+          CHIP:DMG: 	],
+          CHIP:DMG:
+          CHIP:DMG: 	InteractionModelRevision = 11
+          CHIP:DMG: }
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion:
+          CHIP:TOO:   FabricSceneInfo: 1 entries
+          CHIP:TOO:     [1]: {
+          CHIP:TOO:       SceneCount: 2
+          CHIP:TOO:       CurrentScene: 2
+          CHIP:TOO:       CurrentGroup: 1
+          CHIP:TOO:       SceneValid: TRUE
+          CHIP:TOO:       RemainingCapacity: 5
+          CHIP:TOO:       FabricIndex: 1
+          CHIP:TOO:      }
+          CHIP:DMG: Refresh LivenessCheckTime for 9224 milliseconds with SubscriptionId = 0x8537dfcd Peer = 01:0000000000000001
       disabled: true
 
     - label:
           "Step 7a: If RemainingCapacity is greater than 0, TH sends a AddScene
           command to DUT with the GroupID field set to G1, the SceneID field set
-          to 0x03, the TransitionTime field set to 0x0014 (20s) and no extension
+          to 0x03, the TransitionTime field set to 20000 (20s) and no extension
           field sets. If RemainingCapacity is 0, continue to Step 8a."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0001 0x3 0x0014 scene3 [] 1 1
+          ./chip-tool scenesmanagement add-scene 0x0001 0x3 20000 scene3 [] 1 1
       disabled: true
 
     - label:
-          "Step 7b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 7b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity-3)."
-      PICS: S.S.A0007
       verification: |
-
+          CHIP:DMG: ReportDataMessage =
+          CHIP:DMG: {
+          CHIP:DMG: 	SubscriptionId = 0x8537dfcd,
+          CHIP:DMG: 	AttributeReportIBs =
+          CHIP:DMG: 	[
+          CHIP:DMG: 		AttributeReportIB =
+          CHIP:DMG: 		{
+          CHIP:DMG: 			AttributeDataIB =
+          CHIP:DMG: 			{
+          CHIP:DMG: 				DataVersion = 0x92ecb45d,
+          CHIP:DMG: 				AttributePathIB =
+          CHIP:DMG: 				{
+          CHIP:DMG: 					Endpoint = 0x1,
+          CHIP:DMG: 					Cluster = 0x62,
+          CHIP:DMG: 					Attribute = 0x0000_0002,
+          CHIP:DMG: 				}
+          CHIP:DMG:
+          CHIP:DMG: 				Data = [
+          CHIP:DMG:
+          CHIP:DMG: 					{
+          CHIP:DMG: 						0x0 = 3,
+          CHIP:DMG: 						0x1 = 2,
+          CHIP:DMG: 						0x2 = 1,
+          CHIP:DMG: 						0x3 = true,
+          CHIP:DMG: 						0x4 = 4,
+          CHIP:DMG: 						0xfe = 1,
+          CHIP:DMG: 					},
+          CHIP:DMG: 				],
+          CHIP:DMG: 			},
+          CHIP:DMG:
+          CHIP:DMG: 		},
+          CHIP:DMG:
+          CHIP:DMG: 	],
+          CHIP:DMG:
+          CHIP:DMG: 	InteractionModelRevision = 11
+          CHIP:DMG: }
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion:
+          CHIP:TOO:   FabricSceneInfo: 1 entries
+          CHIP:TOO:     [1]: {
+          CHIP:TOO:       SceneCount: 3
+          CHIP:TOO:       CurrentScene: 2
+          CHIP:TOO:       CurrentGroup: 1
+          CHIP:TOO:       SceneValid: TRUE
+          CHIP:TOO:       RemainingCapacity: 4
+          CHIP:TOO:       FabricIndex: 1
+          CHIP:TOO:      }
+          CHIP:DMG: Refresh LivenessCheckTime for 9224 milliseconds with SubscriptionId = 0x8537dfcd Peer = 01:0000000000000001
       disabled: true
 
     - label:
@@ -216,7 +417,7 @@ tests:
           set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C02.Rsp
       verification: |
-          ./chip-tool scenes remove-scene 0x0001 0x1 1 1
+          ./chip-tool scenesmanagement remove-scene 0x0001 0x1 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0002
           CHIP:TOO:   RemoveSceneResponse: {
@@ -227,13 +428,59 @@ tests:
       disabled: true
 
     - label:
-          "Step 8b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 8b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity-2)."
-      PICS: S.S.A0007
       verification: |
-
+          CHIP:DMG: ReportDataMessage =
+          CHIP:DMG: {
+          CHIP:DMG: 	SubscriptionId = 0x8537dfcd,
+          CHIP:DMG: 	AttributeReportIBs =
+          CHIP:DMG: 	[
+          CHIP:DMG: 		AttributeReportIB =
+          CHIP:DMG: 		{
+          CHIP:DMG: 			AttributeDataIB =
+          CHIP:DMG: 			{
+          CHIP:DMG: 				DataVersion = 0x92ecb45d,
+          CHIP:DMG: 				AttributePathIB =
+          CHIP:DMG: 				{
+          CHIP:DMG: 					Endpoint = 0x1,
+          CHIP:DMG: 					Cluster = 0x62,
+          CHIP:DMG: 					Attribute = 0x0000_0002,
+          CHIP:DMG: 				}
+          CHIP:DMG:
+          CHIP:DMG: 				Data = [
+          CHIP:DMG:
+          CHIP:DMG: 					{
+          CHIP:DMG: 						0x0 = 2,
+          CHIP:DMG: 						0x1 = 2,
+          CHIP:DMG: 						0x2 = 1,
+          CHIP:DMG: 						0x3 = true,
+          CHIP:DMG: 						0x4 = 5,
+          CHIP:DMG: 						0xfe = 1,
+          CHIP:DMG: 					},
+          CHIP:DMG: 				],
+          CHIP:DMG: 			},
+          CHIP:DMG:
+          CHIP:DMG: 		},
+          CHIP:DMG:
+          CHIP:DMG: 	],
+          CHIP:DMG:
+          CHIP:DMG: 	InteractionModelRevision = 11
+          CHIP:DMG: }
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion:
+          CHIP:TOO:   FabricSceneInfo: 1 entries
+          CHIP:TOO:     [1]: {
+          CHIP:TOO:       SceneCount: 2
+          CHIP:TOO:       CurrentScene: 2
+          CHIP:TOO:       CurrentGroup: 1
+          CHIP:TOO:       SceneValid: TRUE
+          CHIP:TOO:       RemainingCapacity: 5
+          CHIP:TOO:       FabricIndex: 1
+          CHIP:TOO:      }
+          CHIP:DMG: Refresh LivenessCheckTime for 9224 milliseconds with SubscriptionId = 0x8537dfcd Peer = 01:0000000000000001
       disabled: true
 
     - label:
@@ -241,7 +488,7 @@ tests:
           field set to G1."
       PICS: S.S.C03.Rsp
       verification: |
-          ./chip-tool scenes remove-all-scenes 0x0001 1 1
+          ./chip-tool scenesmanagement remove-all-scenes 0x0001 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0003
           CHIP:TOO:   RemoveAllScenesResponse: {
@@ -251,13 +498,59 @@ tests:
       disabled: true
 
     - label:
-          "Step 9b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 9b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity)."
-      PICS: S.S.A0007
       verification: |
-
+          CHIP:DMG: ReportDataMessage =
+          CHIP:DMG: {
+          CHIP:DMG: 	SubscriptionId = 0x8537dfcd,
+          CHIP:DMG: 	AttributeReportIBs =
+          CHIP:DMG: 	[
+          CHIP:DMG: 		AttributeReportIB =
+          CHIP:DMG: 		{
+          CHIP:DMG: 			AttributeDataIB =
+          CHIP:DMG: 			{
+          CHIP:DMG: 				DataVersion = 0x92ecb45d,
+          CHIP:DMG: 				AttributePathIB =
+          CHIP:DMG: 				{
+          CHIP:DMG: 					Endpoint = 0x1,
+          CHIP:DMG: 					Cluster = 0x62,
+          CHIP:DMG: 					Attribute = 0x0000_0002,
+          CHIP:DMG: 				}
+          CHIP:DMG:
+          CHIP:DMG: 				Data = [
+          CHIP:DMG:
+          CHIP:DMG: 					{
+          CHIP:DMG: 						0x0 = 0,
+          CHIP:DMG: 						0x1 = 2,
+          CHIP:DMG: 						0x2 = 1,
+          CHIP:DMG: 						0x3 = false,
+          CHIP:DMG: 						0x4 = 7,
+          CHIP:DMG: 						0xfe = 1,
+          CHIP:DMG: 					},
+          CHIP:DMG: 				],
+          CHIP:DMG: 			},
+          CHIP:DMG:
+          CHIP:DMG: 		},
+          CHIP:DMG:
+          CHIP:DMG: 	],
+          CHIP:DMG:
+          CHIP:DMG: 	InteractionModelRevision = 11
+          CHIP:DMG: }
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0002 DataVersion:
+          CHIP:TOO:   FabricSceneInfo: 1 entries
+          CHIP:TOO:     [1]: {
+          CHIP:TOO:       SceneCount: 0
+          CHIP:TOO:       CurrentScene: 2
+          CHIP:TOO:       CurrentGroup: 1
+          CHIP:TOO:       SceneValid: FALSE
+          CHIP:TOO:       RemainingCapacity: 7
+          CHIP:TOO:       FabricIndex: 1
+          CHIP:TOO:      }
+          CHIP:DMG: Refresh LivenessCheckTime for 9224 milliseconds with SubscriptionId = 0x8537dfcd Peer = 01:0000000000000001
       disabled: true
 
     - label:

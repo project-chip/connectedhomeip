@@ -18,6 +18,7 @@
 import argparse
 import asyncio
 import builtins
+import glob
 import inspect
 import json
 import logging
@@ -29,6 +30,7 @@ import re
 import sys
 import typing
 import uuid
+import xml.etree.ElementTree as ET
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -138,7 +140,7 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         return pathlib.Path.cwd()
 
 
-def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
+def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
     pics = {}
     for raw in lines:
         line, _, _ = raw.partition("#")
@@ -156,11 +158,30 @@ def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
     return pics
 
 
-def read_pics_from_file(filename: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file. """
-    with open(filename, 'r') as f:
-        lines = f.readlines()
-        return parse_pics(lines)
+def parse_pics_xml(contents: str) -> dict[str, bool]:
+    pics = {}
+    mytree = ET.fromstring(contents)
+    for pi in mytree.iter('picsItem'):
+        name = pi.find('itemNumber').text
+        support = pi.find('support').text
+        pics[name] = int(json.loads(support.lower())) == 1
+    return pics
+
+
+def read_pics_from_file(path: str) -> dict[str, bool]:
+    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
+    if os.path.isdir(os.path.abspath(path)):
+        pics_dict = {}
+        for filename in glob.glob(f'{path}/*.xml'):
+            with open(filename, 'r') as f:
+                contents = f.read()
+                pics_dict.update(parse_pics_xml(contents))
+        return pics_dict
+
+    else:
+        with open(path, 'r') as f:
+            lines = f.readlines()
+            return parse_pics(lines)
 
 
 def type_matches(received_value, desired_type):
@@ -303,6 +324,7 @@ class MatterTestConfig:
     tests: List[str] = field(default_factory=list)
     timeout: typing.Union[int, None] = None
     endpoint: int = 0
+    app_pid: int = 0
 
     commissioning_method: Optional[str] = None
     discriminators: Optional[List[int]] = None
@@ -888,7 +910,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             steps = self.get_test_steps(self.current_test_info.name)
             if self.current_step_index == 0:
                 asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
-            print(self.current_step_index-1)
             num = steps[self.current_step_index-1].test_plan_number
         except KeyError:
             num = self.current_step_index
@@ -905,6 +926,17 @@ class MatterBaseTest(base_test.BaseTestClass):
     def skip_step(self, step):
         self.step(step)
         self.mark_current_step_skipped()
+
+    def skip_all_remaining_steps(self, starting_step):
+        ''' Skips all remaining test steps starting with provided starting step
+
+            starting_step must be provided, and is not derived intentionally. By providing argument
+                test is more deliberately identifying where test skips are starting from, making
+                it easier to validate against the test plan for correctness.
+        '''
+        last_step = len(self.get_test_steps(self.current_test_info.name)) + 1
+        for index in range(starting_step, last_step):
+            self.skip_step(index)
 
     def step(self, step: typing.Union[int, str]):
         test_name = self.current_test_info.name
@@ -1234,6 +1266,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.tests = [] if args.tests is None else args.tests
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = 0 if args.endpoint is None else args.endpoint
+    config.app_pid = 0 if args.app_pid is None else args.app_pid
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -1286,6 +1319,7 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=0, help="Endpoint under test")
+    basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 

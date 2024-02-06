@@ -20,6 +20,8 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRAccessGrant.h>
+#import <Matter/MTRBaseDevice.h> // for MTRClusterPath
 
 #import "MTRDeviceConnectionBridge.h" // For MTRInternalDeviceConnectionCallback
 #import "MTRDeviceController.h"
@@ -33,6 +35,7 @@
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #else
@@ -232,6 +235,32 @@ NS_ASSUME_NONNULL_BEGIN
  * and a compressed fabric id that matches this controller has been observed.
  */
 - (void)operationalInstanceAdded:(chip::NodeId)nodeID;
+
+/**
+ * Download log of the desired type from the device.
+ */
+- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                            queue:(dispatch_queue_t)queue
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
+
+/**
+ * Get the access grants that apply for the given cluster path.
+ */
+- (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath;
+
+/**
+ * Get the privilege level needed to read the given attribute.  There's no
+ * endpoint provided because the expectation is that this information is the
+ * same for all cluster instances.
+ *
+ * Returns nil if we have no such attribute defined on any endpoint, otherwise
+ * one of MTRAccessControlEntry* constants wrapped in NSNumber.
+ *
+ * Only called on the Matter queue.
+ */
+- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
 
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages

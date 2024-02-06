@@ -48,9 +48,6 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     {
     case DeviceLayer::DeviceEventType::kDnssdInitialized:
     case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    case DeviceLayer::DeviceEventType::kICDPollingIntervalChange:
-#endif
         app::DnssdServer::Instance().StartServer();
         break;
     default:
@@ -499,7 +496,7 @@ CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[
 void DnssdServer::OnICDModeChange()
 {
     // ICDMode changed, restart DNS-SD advertising, because SII and ICD key are affected by this change.
-    // StartServer will take care of setting the operational and commissionable advertissements
+    // StartServer will take care of setting the operational and commissionable advertisements
     StartServer();
 }
 
