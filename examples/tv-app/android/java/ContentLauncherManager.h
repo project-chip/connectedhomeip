@@ -58,5 +58,5 @@ private:
     jmethodID mLaunchUrlMethod                      = nullptr;
 
     // TODO: set this based upon meta data from app
-    uint16_t mDynamicClusterRevision = 2;
+    uint16_t kClusterRevision = 2;
 };
