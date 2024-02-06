@@ -39,7 +39,7 @@ CHIP_READ_CLIENT_HEADERS = [
 # error out as `include not allowed due to missing dependency` even if
 # controller is built without these sources
 source_set("gen_check_chip_controller_headers") {
-  sources = CHIP_CONTROLLER_SOURCES
+  sources = CHIP_CONTROLLER_HEADERS
 }
 
 source_set("gen_check_chip_read_client_headers") {
