@@ -360,10 +360,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a CopyScene command to DUT with the mode field set to 0x00,
-          the group identifier from field set to 0x0000, the scene identifier
-          from field set to 0x01, the group identifier to field set to 0x0000
-          and the scene identifier to field set to 0xFE."
+          "Step 8: TH sends a CopyScene command to DUT with the mode field set
+          to 0x00, the group identifier from field set to 0x0000, the scene
+          identifier from field set to 0x01, the group identifier to field set
+          to 0x0000 and the scene identifier to field set to 0xFE."
       PICS: S.S.C40.Rsp
       verification: |
           ./chip-tool scenesmanagement copy-scene 0 0x0000 0x01 0x4E20 sceneFE [] 1 1
