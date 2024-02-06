@@ -9,7 +9,7 @@ source_set("check-in-counter") {
   ]
 }
 
-source_set("check-in-protocol") {
+source_set("check-in-message") {
   sources = [
     "CheckinMessage.cpp",
     "CheckinMessage.h",
@@ -76,7 +76,7 @@ static_library("secure_channel") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    ":check-in-protocol",
+    ":check-in-message",
     ":type_definitions",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
