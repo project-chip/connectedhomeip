@@ -31,7 +31,7 @@ CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { Ch
                                                                               CharSpan::fromCharString("Freezing") };
 
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
-    [EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
+    [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
         EndpointPair(2, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
                      ArraySize(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)), // Options for Endpoint 2
         EndpointPair(3, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
