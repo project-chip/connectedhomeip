@@ -1906,9 +1906,13 @@ endpoint 1 {
 
   server cluster ElectricalEnergyMeasurement {
     emits event CumulativeEnergyMeasured;
+    emits event PeriodicEnergyMeasured;
     callback attribute accuracy;
     callback attribute cumulativeEnergyImported;
     callback attribute cumulativeEnergyExported;
+    callback attribute periodicEnergyImported;
+    callback attribute periodicEnergyExported;
+    callback attribute cumulativeEnergyReset;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
