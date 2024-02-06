@@ -84,6 +84,7 @@ Generally regenerate using one of:
 |        152 |       0x98 | DeviceEnergyManagement                                  |
 |        153 |       0x99 | EnergyEvse                                              |
 |        155 |       0x9B | EnergyPreference                                        |
+|        156 |       0x9C | PowerTopology                                           |
 |        157 |       0x9D | EnergyEvseMode                                          |
 |        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        257 |      0x101 | DoorLock                                                |

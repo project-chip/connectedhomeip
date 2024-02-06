@@ -241,6 +241,9 @@ static constexpr ClusterId Id = 0x00000099;
 namespace EnergyPreference {
 static constexpr ClusterId Id = 0x0000009B;
 } // namespace EnergyPreference
+namespace PowerTopology {
+static constexpr ClusterId Id = 0x0000009C;
+} // namespace PowerTopology
 namespace EnergyEvseMode {
 static constexpr ClusterId Id = 0x0000009D;
 } // namespace EnergyEvseMode

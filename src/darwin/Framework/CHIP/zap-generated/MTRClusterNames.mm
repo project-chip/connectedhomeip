@@ -234,6 +234,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeEnergyPreferenceID:
         result = @"EnergyPreference";
         break;
+    case MTRClusterIDTypePowerTopologyID:
+        result = @"PowerTopology";
+        break;
     case MTRClusterIDTypeEnergyEVSEModeID:
         result = @"EnergyEVSEMode";
         break;
@@ -4641,6 +4644,48 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterEnergyPreferenceAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypePowerTopologyID:
+
+        switch (attributeID) {
+
+            // Cluster PowerTopology attributes
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeAvailableEndpointsID:
+            result = @"AvailableEndpoints";
+            break;
+
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeActiveEndpointsID:
+            result = @"ActiveEndpoints";
+            break;
+
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterPowerTopologyAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
