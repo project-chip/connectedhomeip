@@ -15,13 +15,10 @@
 #    limitations under the License.
 
 
-import logging
 import time
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
-
-logger = logging.getLogger(__name__)
 
 
 class TC_EEM_2_3(MatterBaseTest, EnergyReportingBaseTestHelper):
