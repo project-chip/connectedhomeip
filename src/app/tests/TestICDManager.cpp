@@ -27,6 +27,7 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestContext.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <system/SystemLayerImpl.h>
@@ -113,7 +114,7 @@ public:
     CHIP_ERROR SetUp() override
     {
         ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
-        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubManager);
+        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider);
         mICDManager.RegisterObserver(&mICDStateObserver);
         return CHIP_NO_ERROR;
     }
@@ -128,12 +129,12 @@ public:
     System::Clock::Internal::MockClock mMockClock;
     TestSessionKeystoreImpl mKeystore;
     app::ICDManager mICDManager;
-    TestSubscriptionsInfoProvider mSubManager;
+    TestSubscriptionsInfoProvider mSubInfoProvider;
     TestPersistentStorageDelegate testStorage;
+    TestICDStateObserver mICDStateObserver;
 
 private:
     System::Clock::ClockBase * mRealClock;
-    TestICDStateObserver mICDStateObserver;
 };
 
 } // namespace
@@ -196,7 +197,7 @@ public:
         ctx->mICDManager.SetTestFeatureMapValue(0x07);
 
         // Set that there are no matching subscriptions
-        ctx->mSubManager.SetReturnValue(false);
+        ctx->mSubInfoProvider.SetReturnValue(false);
 
         // Set New durations for test case
         Milliseconds32 oldActiveModeDuration = icdConfigData.GetActiveModeDuration();
@@ -275,7 +276,7 @@ public:
         ctx->mICDManager.SetTestFeatureMapValue(0x07);
 
         // Set that there are not matching subscriptions
-        ctx->mSubManager.SetReturnValue(true);
+        ctx->mSubInfoProvider.SetReturnValue(true);
 
         // Set New durations for test case
         Milliseconds32 oldActiveModeDuration = icdConfigData.GetActiveModeDuration();
@@ -506,10 +507,16 @@ public:
     static void TestICDCounter(nlTestSuite * aSuite, void * aContext)
     {
         TestContext * ctx = static_cast<TestContext *>(aContext);
-        uint32_t counter  = ICDConfigurationData::GetInstance().GetICDCounter();
-        ctx->mICDManager.IncrementCounter();
-        uint32_t counter2 = ICDConfigurationData::GetInstance().GetICDCounter();
-        NL_TEST_ASSERT(aSuite, (counter + 1) == counter2);
+        uint32_t counter  = ICDConfigurationData::GetInstance().GetICDCounter().GetValue();
+
+        // Shut down and reinit ICDManager to increment counter
+        ctx->mICDManager.Shutdown();
+        ctx->mICDManager.Init(&(ctx->testStorage), &(ctx->GetFabricTable()), &(ctx->mKeystore), &(ctx->GetExchangeManager()),
+                              &(ctx->mSubInfoProvider));
+        ctx->mICDManager.RegisterObserver(&(ctx->mICDStateObserver));
+
+        NL_TEST_ASSERT_EQUALS(aSuite, counter + ICDConfigurationData::kICDCounterPersistenceIncrement,
+                              ICDConfigurationData::GetInstance().GetICDCounter().GetValue());
     }
 
     static void TestOnSubscriptionReport(nlTestSuite * aSuite, void * aContext)
