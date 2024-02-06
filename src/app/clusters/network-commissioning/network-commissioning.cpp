@@ -37,6 +37,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <platform/ConnectivityManager.h>
 #include <tracing/macros.h>
 
 #include <array>
@@ -145,7 +146,7 @@ void Instance::SendNonConcurrentConnectNetworkResponse()
         return;
     }
 
-    chip::DeviceLayer::ConnectivityMgr().GetBleLayer()->mState = chip::Ble::BleLayer::kState_Disconnecting;
+    DeviceLayer::ConnectivityMgr().GetBleLayer()->mState = Ble::BleLayer::kState_Disconnecting;
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
     Commands::ConnectNetworkResponse::Type response;
     response.networkingStatus = NetworkCommissioning::Status::kSuccess;

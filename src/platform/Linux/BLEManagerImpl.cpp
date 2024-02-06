@@ -223,7 +223,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         // If BLE is being stopped, ignore any write messages
         if (mState != kState_Initialized)
         {
-            ChipLogProgress(DeviceLayer, "Non-concurrent mode BLE stopped, BLE write write ignored");
+            ChipLogProgress(DeviceLayer, "Non-concurrent mode BLE stopped, BLE write ignored");
         }
         else
 #endif
