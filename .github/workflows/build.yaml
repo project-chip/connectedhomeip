@@ -186,10 +186,10 @@ jobs:
               run: |
                   for BUILD_TYPE in asan tsan ubsan; do
                       case $BUILD_TYPE in
-                          "asan") GN_ARGS='is_clang=true is_asan=true';;
-                          "msan") GN_ARGS='is_clang=true is_msan=true';;
-                          "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
-                          "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
+                          "asan") GN_ARGS='is_clang=true chip_force_stdio_logging=true is_asan=true';;
+                          "msan") GN_ARGS='is_clang=true chip_force_stdio_logging=true is_msan=true';;
+                          "tsan") GN_ARGS='is_clang=true chip_force_stdio_logging=true is_tsan=true chip_enable_wifi=false';;
+                          "ubsan") GN_ARGS='is_clang=true chip_force_stdio_logging=true is_ubsan=true';;
                       esac
 
                       rm -rf ./out/sanitizers
