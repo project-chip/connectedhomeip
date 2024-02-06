@@ -34,10 +34,10 @@
 #include <lib/support/SortUtils.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/ConnectivityManager.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <platform/ConnectivityManager.h>
 #include <tracing/macros.h>
 
 #include <array>
