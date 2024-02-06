@@ -48,6 +48,7 @@ class OrphanChecker:
         self.known_failures: Set[str] = set()
         self.fatal_failures = 0
         self.failures = 0
+        self.found_failures: Set[str] = set()
 
     def AppendGnData(self, gn: PurePath):
         """Adds a GN file to the list of internally known GN data.
@@ -64,6 +65,9 @@ class OrphanChecker:
         """check if failing on the given path is a known/acceptable failure"""
         for k in self.known_failures:
             if path == k or path.endswith(os.path.sep + k):
+                # mark some found failures to report if something is supposed
+                # to be known but it is not
+                self.found_failures.add(k)
                 return True
         return False
 
@@ -160,6 +164,12 @@ def main(log_level, extensions, dirs, known_failure, skip_dir):
 
     if checker.failures:
         logging.warning("%d files not known to GN (%d fatal)", checker.failures, checker.fatal_failures)
+
+    if checker.known_failures != checker.found_failures:
+        not_failing = checker.known_failures - checker.found_failures
+        logging.warning("NOTE: %d failures are not found anymore:", len(not_failing))
+        for name in not_failing:
+            logging.warning("   - %s", name)
 
     if checker.fatal_failures > 0:
         sys.exit(1)
