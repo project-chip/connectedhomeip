@@ -55,14 +55,13 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Concentration Measurement Clusters" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x040C" name="Carbon Monoxide Concentration Measurement" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2882"/>
     <revision revision="3" summary="Cluster redesigned to add support for Level Indication, Peak/Average Measurement, Medium/Unit of Measurement and Uncertainty."/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x040C" name="Carbon Monoxide Concentration Measurement"/>
     <clusterId id="0x040D" name="Carbon Dioxide Concentration Measurement"/>
     <clusterId id="0x0413" name="Nitrogen Dioxide Concentration Measurement"/>
     <clusterId id="0x0415" name="Ozone Concentration Measurement"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,41 +55,31 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0024" name="Content App" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Wi" revision="1">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
-    <revision revision="1" summary="Initial release of this document"/>
+    <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
-  <clusters>
-    <cluster id="0x0504" name="Channel" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0505" name="Target Navigator" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0506" name="Media Playback" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0509" name="Keypad Input" side="server">
+  <classification hierarchy="base" role="application" picsCode="TODO" scope="Endpoint"/>
+  <attributes>
+    <attribute id="0x0001" name="SSID" type="octstr" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-    </cluster>
-    <cluster id="0x050A" name="Content Launcher" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x050C" name="Application Launcher" side="server">
+      <constraint type="lengthBetween" from="1" to="32"/>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="NetworkPassphraseRequest" response="NetworkPassphraseResponse">
+      <access invokePrivilege="admin"/>
       <mandatoryConform/>
-      <features>
-        <feature code="" name="Application">
-          <disallowConform/>
-        </feature>
-      </features>
-    </cluster>
-    <cluster id="0x050D" name="Application Basic" side="server">
+    </command>
+    <command id="0x01" name="NetworkPassphraseResponse" direction="responseFromServer">
+      <access invokePrivilege="operate"/>
       <mandatoryConform/>
-    </cluster>
-    <cluster id="0x050E" name="Account Login" side="server">
-      <optionalConform/>
-    </cluster>
-  </clusters>
-</deviceType>
+      <field name="Passphrase" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="64"/>
+      </field>
+    </command>
+  </commands>
+</cluster>

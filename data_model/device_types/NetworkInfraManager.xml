@@ -65,5 +65,8 @@ Davis, CA 95616, USA
     <cluster id="" name="Network Identity Management" side="server">
       <mandatoryConform/>
     </cluster>
+    <cluster id="" name="Wi" side="server">
+      <mandatoryConform/>
+    </cluster>
   </clusters>
 </deviceType>
