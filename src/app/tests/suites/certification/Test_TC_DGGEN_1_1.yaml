@@ -177,6 +177,6 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          contains: [2]
           constraints:
               type: list
+              contains: [2]
