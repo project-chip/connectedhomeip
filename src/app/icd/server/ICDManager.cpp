@@ -73,7 +73,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     mSubManager        = manager;
 
     VerifyOrDie(ICDConfigurationData::GetInstance().GetICDCounter().Init(mStorage, DefaultStorageKeyAllocator::ICDCheckInCounter(),
-                                                                         ICDConfigurationData::kICDCheckInCounterIncrement) ==
+                                                                         ICDConfigurationData::kICDCounterPersistenceIncrement) ==
                 CHIP_NO_ERROR);
 
     UpdateICDMode();

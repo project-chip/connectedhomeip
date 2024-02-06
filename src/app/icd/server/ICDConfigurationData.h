@@ -45,7 +45,7 @@ class TestICDManager;
 class ICDConfigurationData
 {
 public:
-    static constexpr uint32_t kICDCheckInCounterIncrement = 100;
+    static constexpr uint32_t kICDCounterPersistenceIncrement = 100;
 
     enum class ICDMode : uint8_t
     {
