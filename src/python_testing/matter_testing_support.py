@@ -290,7 +290,7 @@ class EventChangeCallback:
         self._subscription.SetEventUpdateCallback(self.__call__)
 
     def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an event is received. 
+        """This is the subscription callback when an event is received.
            It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
         if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
             logging.info(
@@ -887,8 +887,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
-           The enableKey can be passed into the function, or omitted which will then use the 
-           one provided to the script via --hex-arg enableKey:<HEX VALUE>
+           The enableKey can be passed into the function, or omitted which will then
+           use the one provided to the script via --hex-arg enableKey:<HEX VALUE>
            if not it defaults to 0x000102030405060708090a0b0c0d0e0f
         """
         # get the test event enable key or assume the default
