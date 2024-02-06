@@ -11547,6 +11547,132 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedPowerTopologyClusterAvailableEndpointsAttributeCallback implements ChipClusters.PowerTopologyCluster.AvailableEndpointsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterActiveEndpointsAttributeCallback implements ChipClusters.PowerTopologyCluster.ActiveEndpointsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterGeneratedCommandListAttributeCallback implements ChipClusters.PowerTopologyCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterAcceptedCommandListAttributeCallback implements ChipClusters.PowerTopologyCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterEventListAttributeCallback implements ChipClusters.PowerTopologyCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterAttributeListAttributeCallback implements ChipClusters.PowerTopologyCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
 
   public static class DelegatedEnergyEvseModeClusterChangeToModeResponseCallback implements ChipClusters.EnergyEvseModeCluster.ChangeToModeResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -20917,6 +21043,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.EnergyPreferenceCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("energyPreference", energyPreferenceClusterInfo);
 
+    ClusterInfo powerTopologyClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.PowerTopologyCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("powerTopology", powerTopologyClusterInfo);
+
     ClusterInfo energyEvseModeClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.EnergyEvseModeCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("energyEvseMode", energyEvseModeClusterInfo);
@@ -21173,6 +21303,7 @@ public class ClusterInfoMapping {
     destination.get("deviceEnergyManagement").combineCommands(source.get("deviceEnergyManagement"));
     destination.get("energyEvse").combineCommands(source.get("energyEvse"));
     destination.get("energyPreference").combineCommands(source.get("energyPreference"));
+    destination.get("powerTopology").combineCommands(source.get("powerTopology"));
     destination.get("energyEvseMode").combineCommands(source.get("energyEvseMode"));
     destination.get("deviceEnergyManagementMode").combineCommands(source.get("deviceEnergyManagementMode"));
     destination.get("doorLock").combineCommands(source.get("doorLock"));
@@ -24467,6 +24598,10 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> energyPreferenceClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("energyPreference", energyPreferenceClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> powerTopologyClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("powerTopology", powerTopologyClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> energyEvseModeClusterInteractionInfoMap = new LinkedHashMap<>();
 

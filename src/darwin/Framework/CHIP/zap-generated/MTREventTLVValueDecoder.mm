@@ -3252,6 +3252,18 @@ static id _Nullable DecodeEventPayloadForEnergyPreferenceCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForPowerTopologyCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::PowerTopology;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForEnergyEVSEModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::EnergyEvseMode;
@@ -4739,6 +4751,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::EnergyPreference::Id: {
         return DecodeEventPayloadForEnergyPreferenceCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::PowerTopology::Id: {
+        return DecodeEventPayloadForPowerTopologyCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::EnergyEvseMode::Id: {
         return DecodeEventPayloadForEnergyEVSEModeCluster(aPath.mEventId, aReader, aError);
