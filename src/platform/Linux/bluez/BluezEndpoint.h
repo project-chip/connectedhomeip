@@ -54,6 +54,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
 #include "BluezConnection.h"
@@ -69,7 +70,8 @@ public:
     BluezEndpoint()  = default;
     ~BluezEndpoint() = default;
 
-    CHIP_ERROR Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr);
+    CHIP_ERROR Init(bool aIsCentral, uint32_t aAdapterId);
+    CHIP_ERROR Init(bool aIsCentral, const char * apBleAddr);
     void Shutdown();
 
     BluezAdapter1 * GetAdapter() const { return mpAdapter; }
@@ -148,8 +150,8 @@ private:
     BluezGattCharacteristic1 * mpC3 = nullptr;
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
-    GCancellable * mpConnectCancellable = nullptr;
-    char * mpPeerDevicePath             = nullptr;
+    GAutoPtr<GCancellable> mConnectCancellable;
+    char * mpPeerDevicePath = nullptr;
 
     // Allow BluezConnection to access our private members
     friend class BluezConnection;

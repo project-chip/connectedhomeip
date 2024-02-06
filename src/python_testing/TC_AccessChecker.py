@@ -62,6 +62,12 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         self.TH2_nodeid = self.matter_test_config.controller_node_id + 1
         self.TH2 = fabric_admin.NewController(nodeId=self.TH2_nodeid)
 
+    # Both the tests in this suite are potentially long-running if there are a large number of attributes on the DUT
+    # and the network is slow. Set the default to 3 minutes to account for this.
+    @property
+    def default_timeout(self) -> int:
+        return 180
+
     @async_test_body
     async def setup_test(self):
         super().setup_test()

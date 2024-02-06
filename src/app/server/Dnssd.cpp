@@ -48,9 +48,6 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     {
     case DeviceLayer::DeviceEventType::kDnssdInitialized:
     case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    case DeviceLayer::DeviceEventType::kICDPollingIntervalChange:
-#endif
         app::DnssdServer::Instance().StartServer();
         break;
     default:

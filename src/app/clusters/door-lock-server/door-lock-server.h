@@ -87,6 +87,18 @@ struct EmberAfDoorLockEndpointContext
     int wrongCodeEntryAttempts;
 };
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DoorLock {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace DoorLock
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 /**
  * @brief Door Lock Server Plugin class.
  */
@@ -723,9 +735,9 @@ enum class DlAssetSource : uint8_t
  */
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    DlCredentialStatus status;         /**< Indicates if credential slot is occupied or not. */
-    CredentialTypeEnum credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::ByteSpan credentialData;     /**< Credential data bytes. */
+    DlCredentialStatus status = DlCredentialStatus::kAvailable; /**< Indicates if credential slot is occupied or not. */
+    CredentialTypeEnum credentialType;                          /**< Specifies the type of the credential (PIN, RFID, etc.). */
+    chip::ByteSpan credentialData;                              /**< Credential data bytes. */
 
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */

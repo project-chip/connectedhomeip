@@ -19,18 +19,15 @@
 /**
  *    @file
  *          Provides the implementation of the Device Layer ConfigurationManager object
- *          for EFR32 platforms using the Silicon Labs SDK.
+ *          for Silabs platforms using the Silicon Labs SDK.
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
-
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/silabs/SilabsConfig.h>
-
-#include "em_rmu.h"
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include "wfx_host_events.h"
@@ -55,12 +52,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<SilabsConfig>::Init();
     SuccessOrExit(err);
 
-    // TODO: Initialize the global GroupKeyStore object here (#1626)
-
     IncreaseBootCount();
-    rebootCause = RMU_ResetCauseGet();
-    RMU_ResetCauseClear();
-
     err = CHIP_NO_ERROR;
 
 exit:
@@ -99,7 +91,9 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
     // rebootCause is obtained at bootup.
     BootReasonType matterBootCause;
-#if defined(_SILICON_LABS_32B_SERIES_1)
+    uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
+
+#if defined(_RMU_RSTCAUSE_MASK)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
     {
         matterBootCause = BootReasonType::kPowerOnReboot;
@@ -121,7 +115,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
         matterBootCause = BootReasonType::kUnspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
-#elif defined(_SILICON_LABS_32B_SERIES_2)
+#elif defined(_EMU_RSTCAUSE_MASK)
     if (rebootCause & EMU_RSTCAUSE_POR || rebootCause & EMU_RSTCAUSE_PIN) // PowerOn or External pin reset
     {
         matterBootCause = BootReasonType::kPowerOnReboot;

@@ -28,9 +28,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/SessionParameters.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
-#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <transport/CryptoContext.h>
 #include <transport/SecureSession.h>
