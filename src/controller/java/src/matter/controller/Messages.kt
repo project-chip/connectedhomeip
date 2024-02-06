@@ -151,25 +151,23 @@ sealed class SubscriptionState {
  *
  * @param attributePath The attribute path information in the write request.
  * @param tlvPayload The ByteArray representation of the TLV payload.
+ * @param dataVersion The data version in the write request.
  */
 class WriteRequest(
   val attributePath: AttributePath,
   val tlvPayload: ByteArray,
   val dataVersion: UInt? = null
 ) {
-  @Suppress("UNUSED_PARAMETER")
   private fun getEndpointId(wildcardId: Long): Long {
-    return attributePath.endpointId.toLong()
+    return attributePath.endpointId?.toLong() ?: wildcardId
   }
 
-  @Suppress("UNUSED_PARAMETER")
   private fun getClusterId(wildcardId: Long): Long {
-    return attributePath.clusterId.toLong()
+    return attributePath.clusterId?.toLong() ?: wildcardId
   }
 
-  @Suppress("UNUSED_PARAMETER")
   private fun getAttributeId(wildcardId: Long): Long {
-    return attributePath.attributeId.toLong()
+    return attributePath.attributeId?.toLong() ?: wildcardId
   }
 
   // For JNI interface
@@ -224,9 +222,8 @@ class InvokeRequest(
   val timedRequest: Duration?,
   val jsonString: String? = null
 ) {
-  @Suppress("UNUSED_PARAMETER")
   private fun getEndpointId(wildcardId: Long): Long {
-    return commandPath.endpointId.toLong()
+    return commandPath.endpointId?.toLong() ?: wildcardId
   }
 
   @Suppress("UNUSED_PARAMETER")
