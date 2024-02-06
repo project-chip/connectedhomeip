@@ -72,7 +72,7 @@ stm32_sdk("sdk") {
     include_dirs += [
       "${stm32_project_dir}/include/STM32WB5",
       "${examples_plat_dir}/config_files/STM32WB5",
-      "${chip_root}/src/include",
+      "${chip_root}/src/platform/include",
     ]
   }
 
@@ -91,7 +91,7 @@ stm32_executable("lighting_app") {
     include_dirs = [
       "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
       "${chip_root}/examples/platform/stm32/common/STM32WB5MM-DK/Inc",
-      "${chip_root}/src/include/",
+      "${chip_root}/src/platform/include/",
     ]
     defines = []
 

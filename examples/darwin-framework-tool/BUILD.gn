@@ -242,7 +242,7 @@ executable("darwin-framework-tool") {
   include_dirs = [
     "${chip_root}/config/standalone/",
     "${chip_root}/src/",
-    "${chip_root}/src/include/",
+    "${chip_root}/src/platform/include/",
     "${chip_root}/src/protocols/",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/third_party/nlassert/repo/include/",

@@ -26,7 +26,7 @@ set(CHIPTest_srcs
         CHIPTest-JNI.cpp)
 add_library(CHIPTest SHARED ${CHIPTest_srcs})
 set_property(TARGET CHIPTest APPEND PROPERTY INCLUDE_DIRECTORIES
-        ${MATTER_SDK_ROOT}/src/include/
+        ${MATTER_SDK_ROOT}/src/platform/include/
         ${MATTER_SDK_ROOT}/src/
         ${MATTER_SDK_BUILD}/gen/include/
         ${MATTER_SDK_ROOT}/src/lib/
