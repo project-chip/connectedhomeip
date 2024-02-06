@@ -61,7 +61,7 @@ class PersistedCounter : public MonotonicallyIncreasingCounter<T>
 {
 public:
     PersistedCounter() : mKey(StorageKeyName::Uninitialized()) {}
-    virtual ~PersistedCounter() override {}
+   ~PersistedCounter() override {}
 
     /**
      *  @brief
@@ -206,8 +206,7 @@ private:
         aStartValue = Encoding::LittleEndian::HostSwap<T>(valueLE);
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        // Compiler should optimize these branches.
-        if (std::is_same_v<decltype(aStartValue), uint64_t>)
+        if constexpr (std::is_same_v<decltype(aStartValue), uint64_t>)
         {
             ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x" ChipLogFormatX64,
                           ChipLogValueX64(aStartValue));
@@ -225,7 +224,7 @@ private:
     /**
      * @brief Get the Initial Counter Value
      *
-     * @return T PersistedCounter always has 0 as an intial value
+     * By default, persisted counters start off at 0.
      */
     virtual inline T GetInitialCounterValue() { return 0; }
 
