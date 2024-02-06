@@ -7368,6 +7368,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GeneralDiagnostics::Commands::PayloadTestResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("payload", indent + 1, value.payload));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -18132,6 +18140,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TimeSnapshotResponse", 1, value);
+        }
+        case GeneralDiagnostics::Commands::PayloadTestResponse::Id: {
+            GeneralDiagnostics::Commands::PayloadTestResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PayloadTestResponse", 1, value);
         }
         }
         break;
