@@ -68,11 +68,11 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-StorageDelegate.cpp",
       "ChipDeviceController-StorageDelegate.h",
       "OpCredsBinding.cpp",
-      "chip/commissioning/PlaceholderOperationalCredentialsIssuer.h",
       "chip/clusters/attribute.cpp",
       "chip/clusters/command.cpp",
-      "chip/credentials/cert.h",
+      "chip/commissioning/PlaceholderOperationalCredentialsIssuer.h",
       "chip/credentials/cert.cpp",
+      "chip/credentials/cert.h",
       "chip/crypto/p256keypair.cpp",
       "chip/crypto/p256keypair.h",
       "chip/discovery/NodeResolution.cpp",
@@ -83,8 +83,8 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
       "chip/native/ChipMainLoopWork.h",
-      "chip/native/PyChipError.h",
       "chip/native/PyChipError.cpp",
+      "chip/native/PyChipError.h",
       "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
@@ -98,8 +98,8 @@ shared_library("ChipDeviceCtrl") {
     }
   } else {
     sources += [
-      "chip/server/Options.h",
       "chip/server/Options.cpp",
+      "chip/server/Options.h",
       "chip/server/ServerInit.cpp",
     ]
   }

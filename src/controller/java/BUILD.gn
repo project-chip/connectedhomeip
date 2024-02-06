@@ -58,9 +58,9 @@ shared_library("jni") {
     "AttestationTrustStoreBridge.cpp",
     "AttestationTrustStoreBridge.h",
     "BaseCHIPCluster-JNI.cpp",
-    "CHIPEventTLVValueDecoder.h"
     "CHIPAttributeTLVValueDecoder.h",
     "CHIPDeviceController-JNI.cpp",
+    "CHIPEventTLVValueDecoder.h",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
     "GroupDeviceProxy.h",
