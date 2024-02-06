@@ -276,22 +276,30 @@ class SimpleEventCallback:
 
 class EventChangeCallback:
     def __init__(self, expected_cluster: ClusterObjects):
+        """This class creates a queue to store received event callbacks, that can be checked by the test script
+           expected_cluster: is the cluster from which the events are expected
+        """
         self._q = queue.Queue()
         self._expected_cluster = expected_cluster
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int):
+        """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
         self._subscription = await dev_ctrl.ReadEvent(node_id,
                                                       events=[(endpoint, self._expected_cluster, True)], reportInterval=(1, 5),
                                                       fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
         self._subscription.SetEventUpdateCallback(self.__call__)
 
     def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an event is received. 
+           It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
         if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
             logging.info(
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
             self._q.put(res)
 
-    def WaitForEventReport(self, expected_event: ClusterObjects.ClusterEvent, timeout: int = 10):
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout: int = 10):
+        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
+           It returns the event data so that the values can be checked."""
         try:
             res = self._q.get(block=True, timeout=timeout)
         except queue.Empty:
@@ -876,7 +884,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
 
-    async def send_test_event_triggers(self, enableKey: bytes = None, eventTrigger: int = 0x0099000000000000):
+    async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
+        """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
+
+           The enableKey can be passed into the function, or omitted which will then use the 
+           one provided to the script via --hex-arg enableKey:<HEX VALUE>
+           if not it defaults to 0x000102030405060708090a0b0c0d0e0f
+        """
         # get the test event enable key or assume the default
         # This can be passed in on command line using
         #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
@@ -899,6 +913,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 f"Sending TestEventTrigger resulted in Unexpected error. Are they enabled in DUT? Command returned - {e.status}")
 
     async def check_test_event_triggers_enabled(self):
+        """This cluster checks that the General Diagnostics cluster TestEventTriggersEnabled attribute is True.
+           It will assert and fail the test if not True."""
         full_attr = Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
         cluster = Clusters.Objects.GeneralDiagnostics
         # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
