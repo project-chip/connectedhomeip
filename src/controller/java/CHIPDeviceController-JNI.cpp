@@ -1910,6 +1910,7 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
 
     if (data == nullptr)
     {
+        ChipLogError(Controller, "GetDiscoveredDevice - not found");
         return nullptr;
     }
 
@@ -1918,6 +1919,7 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
 
     jfieldID discrminatorID = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");
     jfieldID ipAddressID    = env->GetFieldID(discoveredDeviceCls, "ipAddress", "Ljava/lang/String;");
+    jfieldID portID         = env->GetFieldID(discoveredDeviceCls, "port", "I");
 
     jobject discoveredObj = env->NewObject(discoveredDeviceCls, constructor);
 
@@ -1926,12 +1928,10 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     char ipAddress[100];
     data->resolutionData.ipAddress[0].ToString(ipAddress, 100);
     jstring jniipAdress = env->NewStringUTF(ipAddress);
-    env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
 
-    if (data == nullptr)
-    {
-        ChipLogError(Controller, "GetDiscoveredDevice - not found");
-    }
+    env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
+    env->SetIntField(discoveredObj, portID, static_cast<jint>(data->resolutionData.port));
+
     return discoveredObj;
 }
 
