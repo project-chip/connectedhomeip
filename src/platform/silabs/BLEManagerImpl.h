@@ -30,6 +30,8 @@
 #define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
 #define BLE_SLAVE_LATENCY_MS 0
 #define BLE_TIMEOUT_MS 400
+#define BLE_DEFAULT_TIMER_PERIOD_MS (1)
+#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (400) // Time kept to support all WiFi chips BLE (RS9116/ SiWx917 NCP/SOC)
 #endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #include "FreeRTOS.h"
 #include "timers.h"

@@ -246,9 +246,6 @@ namespace {
 #define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
-#define BLE_DEFAULT_TIMER_PERIOD_MS (1)
-#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (400) // Time kept to support all WiFi chips BLE (RS9116/ SiWx917 NCP/SOC)
-
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 TimerHandle_t sbleSendIndicationTimeoutTimer; // FreeRTOS sw timer.
 
