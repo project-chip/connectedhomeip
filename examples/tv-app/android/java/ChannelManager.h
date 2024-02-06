@@ -81,6 +81,6 @@ private:
     jmethodID mCancelRecordProgramMethod = nullptr;
 
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
-    static constexpr uint16_t kClusterRevision    = 2;
+    uint32_t mDynamicEndpointFeatureMap        = 3;
+    static constexpr uint16_t kClusterRevision = 2;
 };
