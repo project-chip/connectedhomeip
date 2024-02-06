@@ -25,12 +25,12 @@ logger = logging.getLogger(__name__)
 
 class EnergyReportingBaseTestHelper:
 
-    async def read_epm_attribute_expect_success(self, endpoint: int = None, attribute: str = ""):
+    async def read_epm_attribute_expect_success(self, attribute: str = "", endpoint: int = None, ):
         cluster = Clusters.Objects.ElectricalPowerMeasurement
         full_attr = getattr(cluster.Attributes, attribute)
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
 
-    async def read_eem_attribute_expect_success(self, endpoint: int = None, attribute: str = ""):
+    async def read_eem_attribute_expect_success(self, attribute: str = "", endpoint: int = None):
         cluster = Clusters.Objects.ElectricalEnergyMeasurement
         full_attr = getattr(cluster.Attributes, attribute)
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)

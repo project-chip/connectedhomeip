@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -40,6 +41,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 
 static std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
 static std::unique_ptr<EnergyEvseManager> gEvseInstance;
@@ -48,6 +50,8 @@ static std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
 static std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
 static std::unique_ptr<ElectricalPowerMeasurementDelegate> gEPMDelegate;
 static std::unique_ptr<ElectricalPowerMeasurementInstance> gEPMInstance;
+// Electrical Energy Measurement cluster uses ember to initialise
+static std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
 
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
 {
@@ -356,4 +360,22 @@ void EvseApplicationShutdown()
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
+}
+
+void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(!gEEMAttrAccess);
+
+    gEEMAttrAccess = std::make_unique<ElectricalEnergyMeasurementAttrAccess>(
+        BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
+            ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
+            ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy),
+        BitMask<ElectricalEnergyMeasurement::OptionalAttributes, uint32_t>(
+            ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
+
+    if (gEEMAttrAccess)
+    {
+        gEEMAttrAccess->Init();
+    }
 }
