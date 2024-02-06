@@ -35,6 +35,7 @@ namespace app {
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
+using namespace System::Clock;
 
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
@@ -55,8 +56,8 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
                            "The CheckIn protocol feature is required for LIT support.");
         VerifyOrDieWithMsg(SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
                            "The user ActiveMode trigger feature is required for LIT support.");
-        VerifyOrDieWithMsg(ICDConfigurationData::GetInstance().GetMinLitActiveModeThresholdMs() <=
-                               ICDConfigurationData::GetInstance().GetActiveModeThresholdMs(),
+        VerifyOrDieWithMsg(ICDConfigurationData::GetInstance().GetMinLitActiveModeThreshold() <=
+                               ICDConfigurationData::GetInstance().GetActiveModeThreshold(),
                            AppServer, "The minimum ActiveModeThreshold value for a LIT ICD is 5 seconds.");
         // Disabling check until LIT support is compelte
         // VerifyOrDieWithMsg((GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
@@ -280,13 +281,12 @@ void ICDManager::UpdateOperationState(OperationalState state)
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
         // unless the device would need to send Check-In messages
         // TODO(#30281) : Verify how persistent subscriptions affects this at ICDManager::Init
-        if (ICDConfigurationData::GetInstance().GetActiveModeDurationMs() > 0 || CheckInMessagesWouldBeSent())
+        if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero || CheckInMessagesWouldBeSent())
         {
-            uint32_t idleModeDuration = ICDConfigurationData::GetInstance().GetIdleModeDurationSec();
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeDuration), OnIdleModeDone, this);
+            DeviceLayer::SystemLayer().StartTimer(ICDConfigurationData::GetInstance().GetIdleModeDuration(), OnIdleModeDone, this);
         }
 
-        System::Clock::Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
+        Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 
         // Going back to Idle, all Check-In messages are sent
         mICDSenderPool.ReleaseAll();
@@ -305,21 +305,23 @@ void ICDManager::UpdateOperationState(OperationalState state)
             // Make sure the idle mode timer is stopped
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
-            mOperationalState           = OperationalState::ActiveMode;
-            uint32_t activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDurationMs();
+            mOperationalState                 = OperationalState::ActiveMode;
+            Milliseconds32 activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
 
-            if (activeModeDuration == 0 && !mKeepActiveFlags.HasAny())
+            if (activeModeDuration == kZero && !mKeepActiveFlags.HasAny())
             {
                 // A Network Activity triggered the active mode and activeModeDuration is 0.
                 // Stay active for at least Active Mode Threshold.
-                activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeThresholdMs();
+                activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
             }
 
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeDuration), OnActiveModeDone, this);
+            DeviceLayer::SystemLayer().StartTimer(activeModeDuration, OnActiveModeDone, this);
 
-            uint32_t activeModeJitterInterval =
-                (activeModeDuration >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeDuration - ICD_ACTIVE_TIME_JITTER_MS : 0;
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeJitterInterval), OnTransitionToIdle, this);
+            Milliseconds32 activeModeJitterInterval = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
+            activeModeJitterInterval =
+                (activeModeDuration >= activeModeJitterInterval) ? activeModeDuration - activeModeJitterInterval : kZero;
+
+            DeviceLayer::SystemLayer().StartTimer(activeModeJitterInterval, OnTransitionToIdle, this);
 
             CHIP_ERROR err =
                 DeviceLayer::ConnectivityMgr().SetPollingInterval(ICDConfigurationData::GetInstance().GetFastPollingInterval());
@@ -337,14 +339,16 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         else
         {
-            uint16_t activeModeThreshold = ICDConfigurationData::GetInstance().GetActiveModeThresholdMs();
-            DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
-            uint16_t activeModeJitterThreshold =
-                (activeModeThreshold >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeThreshold - ICD_ACTIVE_TIME_JITTER_MS : 0;
+            Milliseconds16 activeModeThreshold = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
+            DeviceLayer::SystemLayer().ExtendTimerTo(activeModeThreshold, OnActiveModeDone, this);
+
+            Milliseconds32 activeModeJitterThreshold = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
+            activeModeJitterThreshold =
+                (activeModeThreshold >= activeModeJitterThreshold) ? activeModeThreshold - activeModeJitterThreshold : kZero;
+
             if (!mTransitionToIdleCalled)
             {
-                DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeJitterThreshold), OnTransitionToIdle,
-                                                         this);
+                DeviceLayer::SystemLayer().ExtendTimerTo(activeModeJitterThreshold, OnTransitionToIdle, this);
             }
         }
     }

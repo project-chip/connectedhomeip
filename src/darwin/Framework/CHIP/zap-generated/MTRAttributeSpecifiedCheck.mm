@@ -3326,6 +3326,39 @@ static BOOL AttributeIsSpecifiedInEnergyPreferenceCluster(AttributeId aAttribute
     }
     }
 }
+static BOOL AttributeIsSpecifiedInPowerTopologyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::PowerTopology;
+    switch (aAttributeId) {
+    case Attributes::AvailableEndpoints::Id: {
+        return YES;
+    }
+    case Attributes::ActiveEndpoints::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInEnergyEVSEModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EnergyEvseMode;
@@ -6686,6 +6719,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::EnergyPreference::Id: {
         return AttributeIsSpecifiedInEnergyPreferenceCluster(aAttributeId);
+    }
+    case Clusters::PowerTopology::Id: {
+        return AttributeIsSpecifiedInPowerTopologyCluster(aAttributeId);
     }
     case Clusters::EnergyEvseMode::Id: {
         return AttributeIsSpecifiedInEnergyEVSEModeCluster(aAttributeId);
