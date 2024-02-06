@@ -184,5 +184,7 @@ static_library("inet") {
     sources += [ "InetInterfaceImplDefault.cpp" ]
   }
 
+  public_configs = [ "${chip_root}/src/platform:includes" ]
+
   cflags = [ "-Wconversion" ]
 }

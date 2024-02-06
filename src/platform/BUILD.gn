@@ -466,7 +466,10 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/system",
     ]
 
-    public_configs = [ "${chip_root}/src:includes" ]
+    public_configs = [
+      ":includes",
+      "${chip_root}/src:includes",
+    ]
   }
 
   static_library("platform") {
@@ -636,12 +639,11 @@ if (chip_device_platform != "none") {
       _platform_target,
       "${chip_root}/src/lib/support",
     ]
-
-    public_configs = [ ":includes" ]
   }
 } else {
   group("platform") {
     public_deps = [ ":platform_buildconfig" ]
+    public_configs = [ ":includes" ]
   }
 }
 

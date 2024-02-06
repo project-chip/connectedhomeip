@@ -283,4 +283,6 @@ static_library("system") {
     ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
+
+  public_configs = [ "${chip_root}/src/platform:includes" ]
 }
