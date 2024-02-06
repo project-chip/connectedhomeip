@@ -277,7 +277,6 @@ struct DiscoveredNodeData
     }
 };
 
-
 /// Callbacks for resolving operational node resolution
 class OperationalResolveDelegate
 {

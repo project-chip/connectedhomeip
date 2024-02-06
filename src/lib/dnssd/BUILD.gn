@@ -19,9 +19,7 @@ import("${chip_root}/src/platform/device.gni")
 source_set("constants") {
   sources = [ "Constants.h" ]
 
-  public_deps = [
-    "${chip_root}/src/lib/support",
-  ]
+  public_deps = [ "${chip_root}/src/lib/support" ]
 }
 
 source_set("types") {
@@ -30,8 +28,8 @@ source_set("types") {
 
 source_set("naming") {
   sources = [
-    "ServiceNaming.h",
     "ServiceNaming.cpp",
+    "ServiceNaming.h",
   ]
 
   public_deps = [
