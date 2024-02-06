@@ -21,7 +21,6 @@
 #include <limits>
 #include <utility>
 
-#include "lib/support/logging/CHIPLogging.h"
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
@@ -30,7 +29,9 @@
 #include <lib/core/PeerId.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/dnssd/Constants.h>
+#include <lib/dnssd/Types.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
 namespace chip {
@@ -276,49 +277,6 @@ struct DiscoveredNodeData
     }
 };
 
-enum class DiscoveryFilterType : uint8_t
-{
-    kNone,
-    kShortDiscriminator,
-    kLongDiscriminator,
-    kVendorId,
-    kDeviceType,
-    kCommissioningMode,
-    kInstanceName,
-    kCommissioner,
-    kCompressedFabricId,
-};
-struct DiscoveryFilter
-{
-    DiscoveryFilterType type;
-    uint64_t code             = 0;
-    const char * instanceName = nullptr;
-    DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
-    DiscoveryFilter(const DiscoveryFilterType newType) : type(newType) {}
-    DiscoveryFilter(const DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
-    DiscoveryFilter(const DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName)
-    {}
-    bool operator==(const DiscoveryFilter & other) const
-    {
-        if (type != other.type)
-        {
-            return false;
-        }
-        if (type == DiscoveryFilterType::kInstanceName)
-        {
-            return (instanceName != nullptr) && (other.instanceName != nullptr) && (strcmp(instanceName, other.instanceName) == 0);
-        }
-
-        return code == other.code;
-    }
-};
-enum class DiscoveryType
-{
-    kUnknown,
-    kOperational,
-    kCommissionableNode,
-    kCommissionerNode
-};
 
 /// Callbacks for resolving operational node resolution
 class OperationalResolveDelegate
