@@ -867,6 +867,9 @@ class ChipDeviceControllerBase():
             remoteMaxPathsPerInvoke: Overrides the number of batch commands we think can be sent to remote node.
             suppressTimedRequestMessage: When set to true, we suppress sending Timed Request Message.
             commandRefsOverride: List of commandRefs to use for each command with the same index in `commands`.
+
+        Returns:
+            - TestOnlyBatchCommandResponse
         '''
         self.CheckIsActive()
 
