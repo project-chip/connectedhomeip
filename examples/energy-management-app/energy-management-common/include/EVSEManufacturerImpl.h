@@ -88,14 +88,26 @@ public:
     CHIP_ERROR SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aCurrent_mA);
 
     /**
-     * @brief   Allows a client application to send in energy readings into the system
+     * @brief   Allows a client application to send cumulative energy readings into the system
      *
      *          This is a helper function to add timestamps to the readings
      *
      * @param[in]  aCumulativeEnergyImported -total energy imported in milli-watthours
      * @param[in]  aCumulativeEnergyExported -total energy exported in milli-watthours
      */
-    CHIP_ERROR SendEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported, int64_t aCumulativeEnergyExported);
+    CHIP_ERROR SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
+                                           int64_t aCumulativeEnergyExported);
+
+    /**
+     * @brief   Allows a client application to send periodic energy readings into the system
+     *
+     *          This is a helper function to add timestamps to the readings
+     *
+     * @param[in]  aPeriodicEnergyImported - energy imported in milli-watthours in last period
+     * @param[in]  aPeriodicEnergyExported - energy exported in milli-watthours in last period
+     */
+    CHIP_ERROR SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
+                                         int64_t aCumulativeEnergyExported);
 
     /**  Fake Meter data generation - used for testing EPM/EEM clusters */
     /**

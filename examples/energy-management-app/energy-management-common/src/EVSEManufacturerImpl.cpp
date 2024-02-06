@@ -116,15 +116,15 @@ CHIP_ERROR EVSEManufacturer::SendPowerReading(EndpointId aEndpointId, int64_t aA
 }
 
 /**
- * @brief   Allows a client application to send in energy readings into the system
+ * @brief   Allows a client application to send cumulative energy readings into the system
  *
  *          This is a helper function to add timestamps to the readings
  *
  * @param[in]  aCumulativeEnergyImported -total energy imported in milli-watthours
  * @param[in]  aCumulativeEnergyExported -total energy exported in milli-watthours
  */
-CHIP_ERROR EVSEManufacturer::SendEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                               int64_t aCumulativeEnergyExported)
+CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
+                                                         int64_t aCumulativeEnergyExported)
 {
     MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
 
@@ -132,37 +132,125 @@ CHIP_ERROR EVSEManufacturer::SendEnergyReading(EndpointId aEndpointId, int64_t a
     EnergyMeasurementStruct::Type energyExported;
 
     // Get current timestamp
-    uint32_t currentTimestamp;
-    CHIP_ERROR err = GetEpochTS(currentTimestamp);
+    uint32_t currentTimestamp = 0;
+    uint64_t nowMS            = System::SystemClock().GetMonotonicMilliseconds64().count(); // In case we can't get real time
+    CHIP_ERROR err            = GetEpochTS(currentTimestamp);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "GetEpochTS returned error getting timestamp");
-        return err;
     }
 
     /** IMPORT */
     // Copy last endTimestamp into new startTimestamp if it exists
     energyImported.startTimestamp.ClearValue();
+    energyImported.startSystime.ClearValue();
     if (data->cumulativeImported.HasValue())
     {
         energyImported.startTimestamp = data->cumulativeImported.Value().endTimestamp;
+        energyImported.startSystime   = data->cumulativeImported.Value().endSystime;
     }
 
-    energyImported.endTimestamp.SetValue(currentTimestamp);
     energyImported.energy = aCumulativeEnergyImported;
 
     /** EXPORT */
     // Copy last endTimestamp into new startTimestamp if it exists
     energyExported.startTimestamp.ClearValue();
+    energyExported.startSystime.ClearValue();
     if (data->cumulativeExported.HasValue())
     {
         energyExported.startTimestamp = data->cumulativeExported.Value().endTimestamp;
+        energyExported.startSystime   = data->cumulativeExported.Value().endSystime;
     }
-    energyExported.endTimestamp.SetValue(currentTimestamp);
+
     energyExported.energy = aCumulativeEnergyExported;
+
+    if (currentTimestamp != 0)
+    {
+        // use EpochTS
+        energyImported.endTimestamp.SetValue(currentTimestamp);
+        energyExported.endTimestamp.SetValue(currentTimestamp);
+    }
+    else
+    {
+        // use systemtime-ms
+        energyImported.endSystime.SetValue(nowMS);
+        energyExported.endSystime.SetValue(nowMS);
+    }
 
     // call the SDK to update attributes and generate an event
     if (!NotifyCumulativeEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported)))
+    {
+        ChipLogError(AppServer, "Failed to notify Cumulative Energy reading.");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+/**
+ * @brief   Allows a client application to send periodic energy readings into the system
+ *
+ *          This is a helper function to add timestamps to the readings
+ *
+ * @param[in]  aPeriodicEnergyImported - energy imported in milli-watthours in last period
+ * @param[in]  aPeriodicEnergyExported - energy exported in milli-watthours in last period
+ */
+CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aPeriodicEnergyImported,
+                                                       int64_t aPeriodicEnergyExported)
+{
+    MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
+
+    EnergyMeasurementStruct::Type energyImported;
+    EnergyMeasurementStruct::Type energyExported;
+
+    // Get current timestamp
+    uint32_t currentTimestamp = 0;
+    uint64_t nowMS            = System::SystemClock().GetMonotonicMilliseconds64().count(); // In case we can't get real time
+    CHIP_ERROR err            = GetEpochTS(currentTimestamp);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "GetEpochTS returned error getting timestamp");
+    }
+
+    /** IMPORT */
+    // Copy last endTimestamp into new startTimestamp if it exists
+    energyImported.startTimestamp.ClearValue();
+    energyImported.startSystime.ClearValue();
+    if (data->periodicImported.HasValue())
+    {
+        energyImported.startTimestamp = data->periodicImported.Value().endTimestamp;
+        energyImported.startSystime   = data->periodicImported.Value().endSystime;
+    }
+
+    energyImported.energy = aPeriodicEnergyImported;
+
+    /** EXPORT */
+    // Copy last endTimestamp into new startTimestamp if it exists
+    energyExported.startTimestamp.ClearValue();
+    energyExported.startSystime.ClearValue();
+    if (data->periodicExported.HasValue())
+    {
+        energyExported.startTimestamp = data->periodicExported.Value().endTimestamp;
+        energyExported.startSystime   = data->periodicExported.Value().endSystime;
+    }
+
+    energyExported.energy = aPeriodicEnergyExported;
+
+    if (currentTimestamp != 0)
+    {
+        // use EpochTS
+        energyImported.endTimestamp.SetValue(currentTimestamp);
+        energyExported.endTimestamp.SetValue(currentTimestamp);
+    }
+    else
+    {
+        // use systemtime-ms
+        energyImported.endSystime.SetValue(nowMS);
+        energyExported.endSystime.SetValue(nowMS);
+    }
+
+    // call the SDK to update attributes and generate an event
+    if (!NotifyPeriodicEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported)))
     {
         ChipLogError(AppServer, "Failed to notify Cumulative Energy reading.");
         return CHIP_ERROR_INTERNAL;
@@ -185,8 +273,10 @@ struct FakeReadingsData
 
     /* These energy values can only be positive values.
      * however the underlying energy type (power_mWh) is signed, so keeping with that convention */
-    int64_t mTotalEnergyImported = 0; /* Energy Imported which is updated if mPower > 0 */
-    int64_t mTotalEnergyExported = 0; /* Energy Imported which is updated if mPower < 0 */
+    int64_t mTotalEnergyImported    = 0; /* Cumulative Energy Imported which is updated if mPower > 0 */
+    int64_t mTotalEnergyExported    = 0; /* Cumulative Energy Imported which is updated if mPower < 0 */
+    int64_t mPeriodicEnergyImported = 0; /* Periodic Energy Imported which is updated if mPower > 0 */
+    int64_t mPeriodicEnergyExported = 0; /* Periodic Energy Imported which is updated if mPower < 0 */
 };
 
 static FakeReadingsData gFakeReadingsData;
@@ -279,16 +369,23 @@ void EVSEManufacturer::FakeReadingsUpdate()
     if (gFakeReadingsData.mPower_mW > 0)
     {
         // Positive power - means power is imported
-        gFakeReadingsData.mTotalEnergyImported += ((power * gFakeReadingsData.mInterval_s) / 3600);
+        gFakeReadingsData.mPeriodicEnergyImported = ((power * gFakeReadingsData.mInterval_s) / 3600);
+        gFakeReadingsData.mPeriodicEnergyExported = 0;
+        gFakeReadingsData.mTotalEnergyImported += gFakeReadingsData.mPeriodicEnergyImported;
     }
     else
     {
-        // Negative power - means power is exported, but the cumulative energy is positive
-        gFakeReadingsData.mTotalEnergyExported += ((-power * gFakeReadingsData.mInterval_s) / 3600);
+        // Negative power - means power is exported, but the exported energy is reported positive
+        gFakeReadingsData.mPeriodicEnergyImported = 0;
+        gFakeReadingsData.mPeriodicEnergyExported = ((-power * gFakeReadingsData.mInterval_s) / 3600);
+        gFakeReadingsData.mTotalEnergyExported += gFakeReadingsData.mPeriodicEnergyExported;
     }
 
-    SendEnergyReading(gFakeReadingsData.mEndpointId, gFakeReadingsData.mTotalEnergyImported,
-                      gFakeReadingsData.mTotalEnergyExported);
+    SendPeriodicEnergyReading(gFakeReadingsData.mEndpointId, gFakeReadingsData.mPeriodicEnergyImported,
+                              gFakeReadingsData.mPeriodicEnergyExported);
+
+    SendCumulativeEnergyReading(gFakeReadingsData.mEndpointId, gFakeReadingsData.mTotalEnergyImported,
+                                gFakeReadingsData.mTotalEnergyExported);
 
     // start/restart the timer
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(gFakeReadingsData.mInterval_s), FakeReadingsTimerExpiry, this);

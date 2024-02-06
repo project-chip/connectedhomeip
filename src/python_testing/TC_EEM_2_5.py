@@ -24,32 +24,32 @@ from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 logger = logging.getLogger(__name__)
 
 
-class TC_EEM_2_3(MatterBaseTest, EnergyReportingBaseTestHelper):
+class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
 
-    def desc_TC_EEM_2_3(self) -> str:
+    def desc_TC_EEM_2_5(self) -> str:
         """Returns a description of this test"""
-        return "5.1.4. [TC-EEM-2.3] Optional cumulative exported energy attributes with DUT as Server"
+        return "5.1.6. [TC-EEM-2.5] Optional periodic exported energy attributes with DUT as Server"
 
-    def pics_TC_EEM_2_3(self):
+    def pics_TC_EEM_2_5(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["EEM.S", "EEM.S.F02(CUME)", "EEM.S.F01(EXPE)"]
+        return ["EEM.S", "EEM.S.F03(PERE)", "EEM.S.F01(EXPE)"]
 
-    def steps_TC_EEM_2_3(self) -> list[TestStep]:
+    def steps_TC_EEM_2_5(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Start Fake Load Test 1kW Event"),
             TestStep("4", "Wait 5 seconds"),
-            TestStep("4a", "TH reads from the DUT the CumulativeEnergyExported attribute. Verify the read is successful and note the value read."),
+            TestStep("4a", "TH reads from the DUT the PeriodicEnergyExported attribute. Verify the read is successful and note the value read."),
             TestStep("5", "Wait 5 seconds"),
-            TestStep("5a", "TH reads from the DUT the CumulativeEnergyExported attribute. Verify the read is successful and that the value is greater than the value measured in step 4a."),
+            TestStep("5a", "TH reads from the DUT the PeriodicEnergyExported attribute. Verify the read is successful and that the value read has to be different from value measure in step 4a."),
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Load Test Event."),
         ]
 
         return steps
 
     @async_test_body
-    async def test_TC_EEM_2_3(self):
+    async def test_TC_EEM_2_5(self):
 
         self.step("1")
         # Commission DUT - already done
@@ -64,15 +64,15 @@ class TC_EEM_2_3(MatterBaseTest, EnergyReportingBaseTestHelper):
         time.sleep(5)
 
         self.step("4a")
-        cumulative_energy_exported = await self.read_eem_attribute_expect_success("CumulativeEnergyExported")
+        periodic_energy_exported = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
 
         self.step("5")
         time.sleep(5)
 
         self.step("5a")
-        cumulative_energy_exported_2 = await self.read_eem_attribute_expect_success("CumulativeEnergyExported")
-        asserts.assert_greater(cumulative_energy_exported_2.energy, cumulative_energy_exported.energy,
-                               f"Expected cumulative energy readings {cumulative_energy_exported_2.energy} > {cumulative_energy_exported.energy}")
+        periodic_energy_exported_2 = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
+        asserts.assert_not_equal(periodic_energy_exported_2.energy, periodic_energy_exported.energy,
+                                 f"Expected different periodic energy readings {periodic_energy_exported_2.energy} to be != {periodic_energy_exported.energy}")
 
         self.step("6")
         await self.send_test_event_trigger_stop_fake_readings()
