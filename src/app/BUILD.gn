@@ -292,8 +292,11 @@ static_library("app") {
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePersistenceProvider.h",
+    "BufferedReadCallback.cpp",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
+    "ClusterStateCache.cpp",
+    "ClusterStateCache.h",
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
@@ -306,6 +309,7 @@ static_library("app") {
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "OTAUserConsentCommon.h",
+    "ReadClient.cpp",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
     "TimedRequest.cpp",
@@ -314,10 +318,6 @@ static_library("app") {
     "TimerDelegates.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
-    "BufferedReadCallback.cpp",
-    "ClusterStateCache.cpp",
-    "ClusterStateCache.h",
-    "ReadClient.cpp",
   ]
 
   public_deps = [

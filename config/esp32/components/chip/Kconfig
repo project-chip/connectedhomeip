@@ -124,12 +124,6 @@ menu "CHIP Core"
             help
                 Matter spec is based on IPv6 communication only. Enabling this option may save some flash/ram.
 
-        config DISABLE_READ_CLIENT
-            bool "Disable read client in Interaction Model"
-            default n
-            help
-                Some device types don't require the read client. Enabling this option may save some flash/ram.
-
         config ENABLE_PERSIST_SUBSCRIPTIONS
             bool "Enable persist subscriptions"
             default y

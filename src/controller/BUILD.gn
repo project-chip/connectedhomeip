@@ -86,17 +86,17 @@ static_library("controller") {
       "AbstractDnssdDiscoveryController.cpp",
       "AutoCommissioner.cpp",
       "CHIPCommissionableNodeController.cpp",
+      "CHIPDeviceController.cpp",
       "CHIPDeviceControllerFactory.cpp",
       "CHIPDeviceControllerFactory.h",
       "CommissioneeDeviceProxy.cpp",
       "CommissionerDiscoveryController.cpp",
       "CommissionerDiscoveryController.h",
       "CommissioningDelegate.cpp",
-      "ExampleOperationalCredentialsIssuer.cpp",
-      "SetUpCodePairer.cpp",
-      "CHIPDeviceController.cpp",
       "CommissioningWindowOpener.cpp",
       "CurrentFabricRemover.cpp",
+      "ExampleOperationalCredentialsIssuer.cpp",
+      "SetUpCodePairer.cpp",
     ]
   }
 
