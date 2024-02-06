@@ -43,6 +43,15 @@
 #include <chrono>
 #include <stdint.h>
 
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
+#define CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK 1
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
+
+#ifndef CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
+#define CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK 0
+#endif
+
 namespace chip {
 namespace System {
 
@@ -345,7 +354,9 @@ public:
     void SetMonotonic(Milliseconds64 timestamp)
     {
         mSystemTime = timestamp;
+#if CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
         __atomic_store_n(&mLastTimestamp, timestamp.count(), __ATOMIC_SEQ_CST);
+#endif // CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
     }
 
     void AdvanceMonotonic(Milliseconds64 increment) { mSystemTime += increment; }

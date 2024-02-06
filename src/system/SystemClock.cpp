@@ -66,7 +66,7 @@ Timestamp ClockBase::GetMonotonicTimestamp()
     // Below implementation uses `__atomic_*` API which has wider support than
     // <atomic> on embedded platforms, so that embedded platforms can use
     // it by widening the #ifdefs later.
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
+#if CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
     uint64_t prevTimestamp = __atomic_load_n(&mLastTimestamp, __ATOMIC_SEQ_CST);
     static_assert(sizeof(prevTimestamp) == sizeof(Timestamp), "Must have scalar match between timestamp and uint64_t for atomics.");
 
@@ -76,7 +76,7 @@ Timestamp ClockBase::GetMonotonicTimestamp()
     __atomic_signal_fence(__ATOMIC_SEQ_CST);
 #else
     uint64_t prevTimestamp = mLastTimestamp;
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
+#endif // CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
 
     Timestamp newTimestamp = GetMonotonicMilliseconds64();
 
@@ -84,12 +84,12 @@ Timestamp ClockBase::GetMonotonicTimestamp()
     // assumptions which use these clocks.
     VerifyOrDie(newTimestamp.count() >= prevTimestamp);
 
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
+#if CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
     // newTimestamp guaranteed to never be < the last timestamp.
     __atomic_store_n(&mLastTimestamp, newTimestamp.count(), __ATOMIC_SEQ_CST);
 #else
     mLastTimestamp         = newTimestamp.count();
-#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN || CHIP_DEVICE_LAYER_TARGET_LINUX
+#endif // CHIP_DEVICE_LAYER_USE_ATOMICS_FOR_CLOCK
 
     return newTimestamp;
 }
