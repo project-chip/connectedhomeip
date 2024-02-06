@@ -25,7 +25,6 @@
 #include <functional>
 #include <lib/support/CHIPMem.h>
 
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace Controller {
 
@@ -292,4 +291,3 @@ private:
 
 } // namespace Controller
 } // namespace chip
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

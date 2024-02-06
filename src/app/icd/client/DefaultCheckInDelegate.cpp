@@ -38,9 +38,7 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
     ChipLogProgress(
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
     InteractionModelEngine::GetInstance()->OnActiveModeNotification(clientInfo.peer_node);
-#endif
 }
 
 RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)

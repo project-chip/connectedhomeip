@@ -25,9 +25,6 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-class ReadClient;
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 struct AttributePathParams
 {
     //

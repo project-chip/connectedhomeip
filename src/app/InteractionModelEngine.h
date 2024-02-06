@@ -132,7 +132,6 @@ public:
      */
     CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
 
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
      * Tears down an active subscription.
      *
@@ -155,7 +154,6 @@ public:
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
@@ -239,7 +237,6 @@ public:
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
      *  Activate the idle subscriptions.
      *
@@ -276,7 +273,6 @@ public:
      * Return the number of active read clients being tracked by the engine.
      */
     size_t GetNumActiveReadClients();
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     /**
      * Returns the number of dirty subscriptions. Including the subscriptions that are generating reports.
@@ -375,7 +371,6 @@ public:
     //
     void ShutdownActiveReads()
     {
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
         for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
         {
             readClient->mpImEngine = nullptr;
@@ -389,7 +384,6 @@ public:
         // After that, we just null out our tracker.
         //
         mpActiveReadClientList = nullptr;
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
         mReadHandlers.ReleaseAll();
     }
@@ -630,11 +624,7 @@ private:
         mDataVersionFilterPool;
 
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mReadHandlers;
-
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-    ReadClient * mpActiveReadClientList = nullptr;
-#endif
-
+    ReadClient * mpActiveReadClientList                                 = nullptr;
     ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

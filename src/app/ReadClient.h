@@ -50,7 +50,6 @@
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace app {
 
@@ -671,6 +670,5 @@ private:
         kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
 };
 
-};     // namespace app
-};     // namespace chip
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+}; // namespace app
+}; // namespace chip

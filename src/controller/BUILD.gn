@@ -24,8 +24,8 @@ source_set("nodatamodel") {
   public_deps = [ "${chip_root}/src/app" ]
 }
 
-CHIP_CONTROLLER_HEADERS = [ "ExampleOperationalCredentialsIssuer.h" ]
-CHIP_READ_CLIENT_HEADERS = [
+CHIP_CONTROLLER_HEADERS = [
+  "ExampleOperationalCredentialsIssuer.h",
   "CommissioningWindowOpener.h",
   "CurrentFabricRemover.h",
 ]
@@ -40,10 +40,6 @@ CHIP_READ_CLIENT_HEADERS = [
 # controller is built without these sources
 source_set("gen_check_chip_controller_headers") {
   sources = CHIP_CONTROLLER_HEADERS
-}
-
-source_set("gen_check_chip_read_client_headers") {
-  sources = CHIP_READ_CLIENT_HEADERS
 }
 
 source_set("delegates") {
@@ -98,15 +94,10 @@ static_library("controller") {
       "CommissioningDelegate.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
       "SetUpCodePairer.cpp",
+      "CHIPDeviceController.cpp",
+      "CommissioningWindowOpener.cpp",
+      "CurrentFabricRemover.cpp",
     ]
-    if (chip_enable_read_client) {
-      sources += CHIP_READ_CLIENT_HEADERS
-      sources += [
-        "CHIPDeviceController.cpp",
-        "CommissioningWindowOpener.cpp",
-        "CurrentFabricRemover.cpp",
-      ]
-    }
   }
 
   cflags = [ "-Wconversion" ]
