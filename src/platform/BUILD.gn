@@ -636,6 +636,8 @@ if (chip_device_platform != "none") {
       _platform_target,
       "${chip_root}/src/lib/support",
     ]
+
+    public_configs = [ ":includes" ]
   }
 } else {
   group("platform") {
