@@ -88,6 +88,7 @@
         "operational-state-oven-cluster.xml",
         "operational-state-rvc-cluster.xml",
         "oven-mode-cluster.xml",
+        "power-topology-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",

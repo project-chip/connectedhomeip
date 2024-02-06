@@ -674,6 +674,15 @@ static BOOL CommandNeedsTimedInvokeInEnergyPreferenceCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInPowerTopologyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::PowerTopology;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInEnergyEVSEModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EnergyEvseMode;
@@ -1325,6 +1334,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::EnergyPreference::Id: {
         return CommandNeedsTimedInvokeInEnergyPreferenceCluster(commandID);
+    }
+    case Clusters::PowerTopology::Id: {
+        return CommandNeedsTimedInvokeInPowerTopologyCluster(commandID);
     }
     case Clusters::EnergyEvseMode::Id: {
         return CommandNeedsTimedInvokeInEnergyEVSEModeCluster(commandID);

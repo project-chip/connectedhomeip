@@ -10413,6 +10413,50 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterPowerTopology
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAvailableEndpointsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeAvailableEndpointsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveEndpointsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeActiveEndpointsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePowerTopologyID) attributeID:@(MTRAttributeIDTypeClusterPowerTopologyAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterEnergyEVSEMode
 
 - (void)changeToModeWithParams:(MTREnergyEVSEModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTREnergyEVSEModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
