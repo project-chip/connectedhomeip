@@ -625,7 +625,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
                                                          /* write = */ false);
 
-    if (emberStatus == EMBER_ZCL_STATUS_SUCCESS)
+    if (emberStatus == MATTER_CL_STATUS_SUCCESS)
     {
         EmberAfAttributeType attributeType = attributeMetadata->attributeType;
         bool isNullable                    = attributeMetadata->IsNullable();
@@ -822,7 +822,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         }
         default:
             ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-            emberStatus = EMBER_ZCL_STATUS_UNSUPPORTED_READ;
+            emberStatus = MATTER_CL_STATUS_UNSUPPORTED_READ;
         }
     }
 

@@ -297,7 +297,7 @@ void AllClustersAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
     EndpointId endpoint = 1;
 
     EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);
 
     Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
@@ -308,7 +308,7 @@ void AllClustersAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPosi
     EndpointId endpoint = 1;
 
     EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
 
     Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
@@ -319,7 +319,7 @@ void AllClustersAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPositio
     EndpointId endpoint = 1;
 
     EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
 
     Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
@@ -333,7 +333,7 @@ void AllClustersAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previous
     EndpointId endpoint = 1;
 
     EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The the previous value of the CurrentPosition when the momentary switch has been released:%d",
                   previousPosition);
 
@@ -345,7 +345,7 @@ void AllClustersAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousP
     EndpointId endpoint = 1;
 
     EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
     ChipLogDetail(NotSpecified,
                   "The the previous value of the CurrentPosition when the momentary switch has been released after having been "
                   "pressed for a long time:%d",
@@ -359,7 +359,7 @@ void AllClustersAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newP
     EndpointId endpoint = 1;
 
     EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed in a multi-press sequence:%d",
                   newPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
@@ -372,7 +372,7 @@ void AllClustersAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t pre
     EndpointId endpoint = 1;
 
     EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The previous position when the momentary switch has been pressed in a multi-press sequence:%d",
                   previousPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);

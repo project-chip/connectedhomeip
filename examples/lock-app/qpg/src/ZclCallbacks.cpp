@@ -115,7 +115,7 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     DoorLockServer::Instance().InitServer(endpoint);
 
     const auto logOnFailure = [](EmberAfStatus status, const char * attributeName) {
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(Zcl, "Failed to set DoorLock %s: %x", attributeName, status);
         }

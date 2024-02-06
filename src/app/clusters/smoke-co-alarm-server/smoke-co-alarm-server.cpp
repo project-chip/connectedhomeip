@@ -470,8 +470,8 @@ bool SmokeCoAlarmServer::GetAttribute(EndpointId endpointId, AttributeId attribu
                                       EmberAfStatus (*getFn)(EndpointId endpointId, T * value), T & value) const
 {
     EmberAfStatus status   = getFn(endpointId, &value);
-    bool success           = (EMBER_ZCL_STATUS_SUCCESS == status);
-    bool unsupportedStatus = (EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status);
+    bool success           = (MATTER_CL_STATUS_SUCCESS == status);
+    bool unsupportedStatus = (MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE == status);
 
     if (unsupportedStatus)
     {
@@ -490,7 +490,7 @@ bool SmokeCoAlarmServer::SetAttribute(EndpointId endpointId, AttributeId attribu
                                       EmberAfStatus (*setFn)(EndpointId endpointId, T value), T value)
 {
     EmberAfStatus status = setFn(endpointId, value);
-    bool success         = (EMBER_ZCL_STATUS_SUCCESS == status);
+    bool success         = (MATTER_CL_STATUS_SUCCESS == status);
 
     if (!success)
     {

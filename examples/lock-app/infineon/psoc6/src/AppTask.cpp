@@ -661,8 +661,8 @@ void AppTask::UpdateCluster(intptr_t context)
 
     // write the new lock value
     EmberAfStatus status =
-        DoorLockServer::Instance().SetLockState(1, newState, source) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+        DoorLockServer::Instance().SetLockState(1, newState, source) ? MATTER_CL_STATUS_SUCCESS : MATTER_CL_STATUS_FAILURE;
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         P6_LOG("ERR: updating lock state %x", status);
     }

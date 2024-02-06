@@ -78,7 +78,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
     // Read storedValue on/off value
     status = Attributes::OnOff::Get(endpoint, &storedValue);
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    if (status == MATTER_CL_STATUS_SUCCESS)
     {
         // Set actual state to the cluster state that was last persisted
         AppTask::Instance().GetPWMDevice().InitiateAction(storedValue ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,

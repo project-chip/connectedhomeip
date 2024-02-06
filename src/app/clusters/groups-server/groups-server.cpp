@@ -104,36 +104,36 @@ static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId g
 
 static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
 {
-    VerifyOrReturnError(IsValidGroupId(groupId), EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-    VerifyOrReturnError(GroupExists(fabricIndex, endpointId, groupId), EMBER_ZCL_STATUS_NOT_FOUND);
+    VerifyOrReturnError(IsValidGroupId(groupId), MATTER_CL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(GroupExists(fabricIndex, endpointId, groupId), MATTER_CL_STATUS_NOT_FOUND);
 
     GroupDataProvider * provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
+    VerifyOrReturnError(nullptr != provider, MATTER_CL_STATUS_NOT_FOUND);
 
     CHIP_ERROR err = provider->RemoveEndpoint(fabricIndex, groupId, endpointId);
     if (CHIP_NO_ERROR == err)
     {
         MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id,
                                                GroupKeyManagement::Attributes::GroupTable::Id);
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
 
     ChipLogDetail(Zcl, "ERR: Failed to remove mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
                   err.Format());
-    return EMBER_ZCL_STATUS_NOT_FOUND;
+    return MATTER_CL_STATUS_NOT_FOUND;
 }
 
 void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
 {
     // According to spec, highest bit (Group Names) MUST match feature bit 0 (Group Names)
     EmberAfStatus status = Attributes::NameSupport::Set(endpointId, NameSupportBitmap::kGroupNames);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing NameSupport %x", status);
     }
 
     status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(Feature::kGroupNames));
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing group feature map %x", status);
     }
@@ -162,17 +162,17 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
     GroupDataProvider::GroupInfo info;
     Groups::Commands::ViewGroupResponse::Type response;
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
+    EmberAfStatus status = MATTER_CL_STATUS_NOT_FOUND;
 
-    VerifyOrExit(IsValidGroupId(groupId), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-    VerifyOrExit(nullptr != provider, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(provider->HasEndpoint(fabricIndex, groupId, commandPath.mEndpointId), status = EMBER_ZCL_STATUS_NOT_FOUND);
+    VerifyOrExit(IsValidGroupId(groupId), status = MATTER_CL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrExit(nullptr != provider, status = MATTER_CL_STATUS_FAILURE);
+    VerifyOrExit(provider->HasEndpoint(fabricIndex, groupId, commandPath.mEndpointId), status = MATTER_CL_STATUS_NOT_FOUND);
 
     err = provider->GetGroupInfo(fabricIndex, groupId, info);
-    VerifyOrExit(CHIP_NO_ERROR == err, status = EMBER_ZCL_STATUS_NOT_FOUND);
+    VerifyOrExit(CHIP_NO_ERROR == err, status = MATTER_CL_STATUS_NOT_FOUND);
 
     response.groupName = CharSpan(info.name, strnlen(info.name, GroupDataProvider::GroupInfo::kGroupNameMax));
-    status             = EMBER_ZCL_STATUS_SUCCESS;
+    status             = MATTER_CL_STATUS_SUCCESS;
 exit:
     response.groupID = groupId;
     response.status  = status;

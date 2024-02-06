@@ -86,7 +86,7 @@ EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpoi
 {
     DataModel::Nullable<uint8_t> spinSpeedCurrentNow;
     EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrentNow);
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (spinSpeedCurrentNow != spinSpeedCurrent))
+    if ((res == MATTER_CL_STATUS_SUCCESS) && (spinSpeedCurrentNow != spinSpeedCurrent))
     {
         res = SpinSpeedCurrent::Set(endpointId, spinSpeedCurrent);
     }
@@ -105,7 +105,7 @@ EmberAfStatus LaundryWasherControlsServer::SetNumberOfRinses(EndpointId endpoint
     NumberOfRinsesEnum numberOfRinses;
     EmberAfStatus res = NumberOfRinses::Get(endpointId, &numberOfRinses);
 
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (numberOfRinses != newNumberOfRinses))
+    if ((res == MATTER_CL_STATUS_SUCCESS) && (numberOfRinses != newNumberOfRinses))
     {
         res = NumberOfRinses::Set(endpointId, newNumberOfRinses);
     }

@@ -91,7 +91,7 @@ template <typename ResponseType>
 CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
 {
     Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
-    EmberAfStatus status                 = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status                 = MATTER_CL_STATUS_SUCCESS;
 
     if (AuthMode::kCase == descriptor.authMode)
     {
@@ -103,7 +103,7 @@ CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
     }
 
     // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
-    VerifyOrReturnValue(!(EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
+    VerifyOrReturnValue(!(MATTER_CL_STATUS_SUCCESS == status || MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
     return AddResponseOnError(ctx, resp, status);
 }
 
@@ -1113,7 +1113,7 @@ using namespace chip::app::Clusters::ScenesManagement;
 void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
     EmberAfStatus status = Attributes::LastConfiguredBy::SetNull(endpoint);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    if (MATTER_CL_STATUS_SUCCESS != status)
     {
         ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
     }

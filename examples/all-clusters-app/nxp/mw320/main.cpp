@@ -295,7 +295,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     if(clusterId == Clusters::Switch::Id) {
         *buffer = g_ButtonPress;
     }
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 */
 
@@ -1620,7 +1620,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
                                                     const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     PRINTF("====> %s() \r\n", __FUNCTION__);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
@@ -1631,5 +1631,5 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     // default function (in callback-stub.cpp)
     //
     PRINTF("-> %s()\n\r", __FUNCTION__);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }

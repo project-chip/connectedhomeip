@@ -135,7 +135,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
     // Read storedValue on/off value
     status = Attributes::OnOff::Get(1, &storedValue);
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    if (status == MATTER_CL_STATUS_SUCCESS)
     {
         // Set actual state to stored before reboot
         GetAppTask().GetLightingDevice().Set(storedValue);

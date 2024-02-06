@@ -31,11 +31,11 @@ NS_ASSUME_NONNULL_BEGIN
     // This duplicates MTRError's errorToZCLErrorCode, but I can't
     // figure out a way to include/use that here.
     if (error == nil) {
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
 
     if (![error.domain isEqualToString:MTRInteractionErrorDomain]) {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return MATTER_CL_STATUS_FAILURE;
     }
 
     return static_cast<uint8_t>(error.code);

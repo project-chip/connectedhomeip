@@ -50,7 +50,7 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     DeviceAppJNIMgr().PostClusterInit(chip::app::Clusters::DoorLock::Id, endpoint);
     DoorLockServer::Instance().InitServer(endpoint);
     EmberAfStatus status = DoorLock::Attributes::FeatureMap::Set(endpoint, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Device App::DoorLock::emberAfDoorLockClusterInitCallback()::Updating feature map %x", status);
     }
@@ -106,7 +106,7 @@ jboolean DoorLockManager::SetLockType(jint endpoint, jint value)
 {
     EmberAfStatus status = app::Clusters::DoorLock::Attributes::LockType::Set(
         static_cast<chip::EndpointId>(endpoint), static_cast<app::Clusters::DoorLock::DlLockType>(value));
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    return status == MATTER_CL_STATUS_SUCCESS;
 }
 
 jboolean DoorLockManager::SetLockState(jint endpoint, jint value)
@@ -129,14 +129,14 @@ jboolean DoorLockManager::SetOperatingMode(jint endpoint, jint value)
 {
     EmberAfStatus status = app::Clusters::DoorLock::Attributes::OperatingMode::Set(
         static_cast<chip::EndpointId>(endpoint), static_cast<app::Clusters::DoorLock::OperatingModeEnum>(value));
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    return status == MATTER_CL_STATUS_SUCCESS;
 }
 
 jboolean DoorLockManager::SetSupportedOperatingModes(jint endpoint, jint value)
 {
     EmberAfStatus status = app::Clusters::DoorLock::Attributes::SupportedOperatingModes::Set(
         static_cast<chip::EndpointId>(endpoint), static_cast<app::Clusters::DoorLock::DlSupportedOperatingModes>(value));
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    return status == MATTER_CL_STATUS_SUCCESS;
 }
 
 jboolean DoorLockManager::SendLockAlarmEvent(jint endpoint)

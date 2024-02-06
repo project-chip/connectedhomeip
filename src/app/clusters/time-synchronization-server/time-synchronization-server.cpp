@@ -382,7 +382,7 @@ void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource
     }
     mGranularity         = granularity;
     EmberAfStatus status = TimeSource::Set(kRootEndpointId, timeSource);
-    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
+    if (!(status == MATTER_CL_STATUS_SUCCESS || status == MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
     }
@@ -395,7 +395,7 @@ void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessfu
         mGranularity = GranularityEnum::kMillisecondsGranularity;
         // Non-matter SNTP because we know it's external and there's only one source
         EmberAfStatus status = TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
-        if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
+        if (!(status == MATTER_CL_STATUS_SUCCESS || status == MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE))
         {
             ChipLogError(Zcl, "Writing TimeSource failed.");
         }
@@ -779,7 +779,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
     GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
     mGranularity         = granularity;
     EmberAfStatus status = TimeSource::Set(ep, source);
-    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
+    if (!(status == MATTER_CL_STATUS_SUCCESS || status == MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
         return CHIP_IM_GLOBAL_STATUS(Failure);
@@ -1264,7 +1264,7 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
             return true;
         }
         bool dnsResolve;
-        if (EMBER_ZCL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
+        if (MATTER_CL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
         {
             commandObj->AddStatus(commandPath, Status::Failure);
             return true;

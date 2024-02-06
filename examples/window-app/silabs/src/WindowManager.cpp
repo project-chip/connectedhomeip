@@ -283,7 +283,7 @@ void WindowManager::Cover::LiftStepToward(OperationalState direction)
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+    if ((status == MATTER_CL_STATUS_SUCCESS) && !current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
     }
@@ -347,7 +347,7 @@ void WindowManager::Cover::TiltStepToward(OperationalState direction)
     status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+    if ((status == MATTER_CL_STATUS_SUCCESS) && !current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
     }
@@ -412,7 +412,7 @@ void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, bool
     if (isTilt)
     {
         status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        if ((status == MATTER_CL_STATUS_SUCCESS) && !current.IsNull())
         {
             target = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
             (void) Attributes::TargetPositionTiltPercent100ths::Set(mEndpoint, target);
@@ -421,7 +421,7 @@ void WindowManager::Cover::UpdateTargetPosition(OperationalState direction, bool
     else
     {
         status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        if ((status == MATTER_CL_STATUS_SUCCESS) && !current.IsNull())
         {
             target = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
             (void) Attributes::TargetPositionLiftPercent100ths::Set(mEndpoint, target);

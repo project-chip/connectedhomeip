@@ -12,18 +12,18 @@ public:
     RelativeHumiditySensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId)
     {
         EmberAfStatus status = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, 0);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MinMeasuredValue attribute"));
 
         status = RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Set(mEndpointId, 100);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MaxMeasuredValue attribute"));
     };
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {
         EmberAfStatus status = RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MeasuredValue attribute"));
         ChipLogDetail(NotSpecified, "The new RelativeHumidityMeasurement value: %d", newValue);
     }

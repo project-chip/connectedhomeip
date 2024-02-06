@@ -138,7 +138,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
 
         DataModel::Nullable<uint8_t> startUpMode;
         EmberAfStatus status = Attributes::StartUpMode::Get(endpointId, startUpMode);
-        if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpMode.IsNull())
+        if (status == MATTER_CL_STATUS_SUCCESS && !startUpMode.IsNull())
         {
 #ifdef EMBER_AF_PLUGIN_ON_OFF
             // OnMode with Power Up
@@ -151,9 +151,9 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             {
                 Attributes::OnMode::TypeInfo::Type onMode;
                 bool onOffValueForStartUp = false;
-                if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
+                if (Attributes::OnMode::Get(endpointId, onMode) == MATTER_CL_STATUS_SUCCESS &&
                     !emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-                    OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
+                    OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == MATTER_CL_STATUS_SUCCESS)
                 {
                     if (onOffValueForStartUp && !onMode.IsNull())
                     {
@@ -183,10 +183,10 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             uint8_t currentMode = 0;
             status              = Attributes::CurrentMode::Get(endpointId, &currentMode);
 
-            if ((status == EMBER_ZCL_STATUS_SUCCESS) && (startUpMode.Value() != currentMode))
+            if ((status == MATTER_CL_STATUS_SUCCESS) && (startUpMode.Value() != currentMode))
             {
                 status = Attributes::CurrentMode::Set(endpointId, startUpMode.Value());
-                if (status != EMBER_ZCL_STATUS_SUCCESS)
+                if (status != MATTER_CL_STATUS_SUCCESS)
                 {
                     ChipLogError(Zcl, "ModeSelect: Error initializing CurrentMode, EmberAfStatus code 0x%02x", status);
                 }

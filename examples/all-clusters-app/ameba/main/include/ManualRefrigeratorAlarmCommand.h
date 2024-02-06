@@ -64,21 +64,21 @@ CHIP_ERROR ManualRefrigeratorAlarmDoorOpenCommandHandler(int argc, char ** argv)
     RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
 
     status = serverInstance.SetMaskValue(1, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, 1);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetSupportedValue(1, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
@@ -100,21 +100,21 @@ CHIP_ERROR ManualRefrigeratorAlarmDoorCloseCommandHandler(int argc, char ** argv
     RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
 
     status = serverInstance.SetMaskValue(1, 1);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetSupportedValue(1, 1);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
@@ -136,14 +136,14 @@ CHIP_ERROR ManualRefrigeratorAlarmSuppressCommandHandler(int argc, char ** argv)
     RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
 
     status = serverInstance.SetSupportedValue(1, 1);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;

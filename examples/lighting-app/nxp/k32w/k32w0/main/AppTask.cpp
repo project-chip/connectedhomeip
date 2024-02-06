@@ -956,7 +956,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
 
     // write the new on/off value
     EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }

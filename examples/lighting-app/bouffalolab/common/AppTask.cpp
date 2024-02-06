@@ -252,22 +252,22 @@ void AppTask::LightingUpdate(app_event_t status)
         {
             do
             {
-                if (EMBER_ZCL_STATUS_SUCCESS != Clusters::OnOff::Attributes::OnOff::Get(endpoint, &onoff))
+                if (MATTER_CL_STATUS_SUCCESS != Clusters::OnOff::Attributes::OnOff::Get(endpoint, &onoff))
                 {
                     break;
                 }
 
-                if (EMBER_ZCL_STATUS_SUCCESS != Clusters::LevelControl::Attributes::CurrentLevel::Get(endpoint, v))
+                if (MATTER_CL_STATUS_SUCCESS != Clusters::LevelControl::Attributes::CurrentLevel::Get(endpoint, v))
                 {
                     break;
                 }
 
-                if (EMBER_ZCL_STATUS_SUCCESS != Clusters::ColorControl::Attributes::CurrentHue::Get(endpoint, &hue))
+                if (MATTER_CL_STATUS_SUCCESS != Clusters::ColorControl::Attributes::CurrentHue::Get(endpoint, &hue))
                 {
                     break;
                 }
 
-                if (EMBER_ZCL_STATUS_SUCCESS != Clusters::ColorControl::Attributes::CurrentSaturation::Get(endpoint, &sat))
+                if (MATTER_CL_STATUS_SUCCESS != Clusters::ColorControl::Attributes::CurrentSaturation::Get(endpoint, &sat))
                 {
                     break;
                 }

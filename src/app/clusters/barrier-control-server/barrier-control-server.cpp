@@ -103,28 +103,28 @@ uint8_t emAfPluginBarrierControlServerGetBarrierPosition(EndpointId endpoint)
 {
     uint8_t position;
     EmberAfStatus status = Attributes::BarrierPosition::Get(endpoint, &position);
-    assert(status == EMBER_ZCL_STATUS_SUCCESS);
+    assert(status == MATTER_CL_STATUS_SUCCESS);
     return position;
 }
 
 void emAfPluginBarrierControlServerSetBarrierPosition(EndpointId endpoint, uint8_t position)
 {
     EmberAfStatus status = Attributes::BarrierPosition::Set(endpoint, position);
-    assert(status == EMBER_ZCL_STATUS_SUCCESS);
+    assert(status == MATTER_CL_STATUS_SUCCESS);
 }
 
 bool emAfPluginBarrierControlServerIsPartialBarrierSupported(EndpointId endpoint)
 {
     uint8_t bitmap;
     EmberAfStatus status = Attributes::BarrierCapabilities::Get(endpoint, &bitmap);
-    assert(status == EMBER_ZCL_STATUS_SUCCESS);
+    assert(status == MATTER_CL_STATUS_SUCCESS);
     return (bitmap & to_underlying(BarrierControlCapabilities::kPartialBarrier)) != 0;
 }
 
 static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
 {
     uint16_t period      = 0;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_OPEN_PERIOD_ATTRIBUTE)
     if (open)
     {
@@ -137,21 +137,21 @@ static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
         status = Attributes::BarrierClosePeriod::Get(endpoint, &period);
     }
 #endif
-    assert(status == EMBER_ZCL_STATUS_SUCCESS);
+    assert(status == MATTER_CL_STATUS_SUCCESS);
     return period;
 }
 
 static void setMovingState(EndpointId endpoint, uint8_t newState)
 {
     EmberAfStatus status = Attributes::BarrierMovingState::Set(endpoint, newState);
-    assert(status == EMBER_ZCL_STATUS_SUCCESS);
+    assert(status == MATTER_CL_STATUS_SUCCESS);
 }
 
 uint16_t emAfPluginBarrierControlServerGetSafetyStatus(EndpointId endpoint)
 {
     uint16_t safetyStatus;
     EmberAfStatus status = Attributes::BarrierSafetyStatus::Get(endpoint, &safetyStatus);
-    assert(status == EMBER_ZCL_STATUS_SUCCESS);
+    assert(status == MATTER_CL_STATUS_SUCCESS);
     return safetyStatus;
 }
 
@@ -163,7 +163,7 @@ static bool isRemoteLockoutOn(EndpointId endpoint)
 
 void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool open, bool command)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
     uint16_t events      = 0;
 
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_OPEN_EVENTS_ATTRIBUTE)
@@ -190,7 +190,7 @@ void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool ope
         status = Attributes::BarrierCommandCloseEvents::Get(endpoint, &events);
     }
 #endif
-    assert(status == EMBER_ZCL_STATUS_SUCCESS);
+    assert(status == MATTER_CL_STATUS_SUCCESS);
 
     // Section 7.1.2.1.5-8 says that this events counter SHALL NOT roll over.
     // The maximum 16-bit unsigned integer in Zigbee is 0xFFFE, so we have this
@@ -225,7 +225,7 @@ void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool ope
         status = Attributes::BarrierCommandCloseEvents::Set(endpoint, events);
     }
 #endif
-    assert(status == EMBER_ZCL_STATUS_SUCCESS);
+    assert(status == MATTER_CL_STATUS_SUCCESS);
 }
 
 // -----------------------------------------------------------------------------

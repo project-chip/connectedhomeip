@@ -93,7 +93,7 @@ bool HasFeature(chip::EndpointId endpoint, Feature feature)
     uint32_t featureMap = 0;
 
     EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    if (MATTER_CL_STATUS_SUCCESS == status)
     {
         hasFeature = (featureMap & chip::to_underlying(feature));
     }

@@ -80,7 +80,7 @@ DishwasherAlarmServer & DishwasherAlarmServer::Instance()
 EmberAfStatus DishwasherAlarmServer::GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask)
 {
     EmberAfStatus status = Attributes::Mask::Get(endpoint, mask);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: reading  mask, err:0x%x", status);
         return status;
@@ -93,11 +93,11 @@ EmberAfStatus DishwasherAlarmServer::GetLatchValue(EndpointId endpoint, BitMask<
     if (!HasResetFeature(endpoint))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm feature: Unsupport Latch attribute");
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        return MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
 
     EmberAfStatus status = Attributes::Latch::Get(endpoint, latch);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: reading  latch, err:0x%x", status);
         return status;
@@ -108,7 +108,7 @@ EmberAfStatus DishwasherAlarmServer::GetLatchValue(EndpointId endpoint, BitMask<
 EmberAfStatus DishwasherAlarmServer::GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state)
 {
     EmberAfStatus status = Attributes::State::Get(endpoint, state);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: get state, err:0x%x", status);
         return status;
@@ -119,7 +119,7 @@ EmberAfStatus DishwasherAlarmServer::GetStateValue(EndpointId endpoint, BitMask<
 EmberAfStatus DishwasherAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * supported)
 {
     EmberAfStatus status = Attributes::Supported::Get(endpoint, supported);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: reading  supported, err:0x%x", status);
     }
@@ -128,16 +128,16 @@ EmberAfStatus DishwasherAlarmServer::GetSupportedValue(EndpointId endpoint, BitM
 
 EmberAfStatus DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
     ;
-    if ((status = Attributes::Supported::Set(endpoint, supported)) != EMBER_ZCL_STATUS_SUCCESS)
+    if ((status = Attributes::Supported::Set(endpoint, supported)) != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing supported, err:0x%x", status);
         return status;
     }
     // Whenever there is change in Supported attribute, Latch should change accordingly (if possible).
     BitMask<AlarmMap> latch;
-    if (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS && !supported.HasAll(latch))
+    if (GetLatchValue(endpoint, &latch) == MATTER_CL_STATUS_SUCCESS && !supported.HasAll(latch))
     {
         latch  = latch & supported;
         status = SetLatchValue(endpoint, latch);
@@ -145,7 +145,7 @@ EmberAfStatus DishwasherAlarmServer::SetSupportedValue(EndpointId endpoint, cons
 
     // Whenever there is change in Supported attribute, Mask, State should change accordingly.
     BitMask<AlarmMap> mask;
-    if ((status = GetMaskValue(endpoint, &mask)) != EMBER_ZCL_STATUS_SUCCESS)
+    if ((status = GetMaskValue(endpoint, &mask)) != MATTER_CL_STATUS_SUCCESS)
     {
         return status;
     }
@@ -164,11 +164,11 @@ EmberAfStatus DishwasherAlarmServer::SetMaskValue(EndpointId endpoint, const Bit
     if (GetSupportedValue(endpoint, &supported) || !supported.HasAll(mask))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: Mask is not supported");
-        return EMBER_ZCL_STATUS_FAILURE;
+        return MATTER_CL_STATUS_FAILURE;
     }
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    if ((status = Attributes::Mask::Set(endpoint, mask)) != EMBER_ZCL_STATUS_SUCCESS)
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
+    if ((status = Attributes::Mask::Set(endpoint, mask)) != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing  mask, err:0x%x", status);
         return status;
@@ -177,7 +177,7 @@ EmberAfStatus DishwasherAlarmServer::SetMaskValue(EndpointId endpoint, const Bit
     // Whenever there is change in Mask, State should change accordingly.
     BitMask<AlarmMap> state;
     status = GetStateValue(endpoint, &state);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         return status;
     }
@@ -195,18 +195,18 @@ EmberAfStatus DishwasherAlarmServer::SetLatchValue(EndpointId endpoint, const Bi
     if (!HasResetFeature(endpoint))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm feature: Unsupport Latch attribute");
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        return MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE;
     }
 
     BitMask<AlarmMap> supported;
     if (GetSupportedValue(endpoint, &supported) || !supported.HasAll(latch))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: Latch is not supported");
-        return EMBER_ZCL_STATUS_FAILURE;
+        return MATTER_CL_STATUS_FAILURE;
     }
 
     EmberAfStatus status = Attributes::Latch::Set(endpoint, latch);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing  latch, err:0x%x", status);
         return status;
@@ -224,27 +224,27 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
     if (GetSupportedValue(endpoint, &supported) || !supported.HasAll(finalNewState))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: Alarm is not supported");
-        return EMBER_ZCL_STATUS_FAILURE;
+        return MATTER_CL_STATUS_FAILURE;
     }
 
     BitMask<AlarmMap> mask;
     if (GetMaskValue(endpoint, &mask) || !mask.HasAll(finalNewState))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: Alarm is suppressed");
-        return EMBER_ZCL_STATUS_FAILURE;
+        return MATTER_CL_STATUS_FAILURE;
     }
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
     BitMask<AlarmMap> currentState;
     status = Attributes::State::Get(endpoint, &currentState);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: reading  state, err:0x%x", status);
         return status;
     }
 
     BitMask<AlarmMap> latch;
-    if (!ignoreLatchState && (GetLatchValue(endpoint, &latch) == EMBER_ZCL_STATUS_SUCCESS))
+    if (!ignoreLatchState && (GetLatchValue(endpoint, &latch) == MATTER_CL_STATUS_SUCCESS))
     {
         // Restore bits that have their Latch bit set.
         auto bitsToKeep = latch & currentState;
@@ -253,7 +253,7 @@ EmberAfStatus DishwasherAlarmServer::SetStateValue(EndpointId endpoint, const Bi
 
     // Store the new value of the State attribute.
     status = Attributes::State::Set(endpoint, finalNewState);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: writing  state, err:0x%x", status);
         return status;
@@ -275,13 +275,13 @@ EmberAfStatus DishwasherAlarmServer::ResetLatchedAlarms(EndpointId endpoint, con
     if (GetSupportedValue(endpoint, &supported) || !supported.HasAll(alarms))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm: ERR: Alarm is not supported");
-        return EMBER_ZCL_STATUS_FAILURE;
+        return MATTER_CL_STATUS_FAILURE;
     }
 
     BitMask<AlarmMap> state;
-    if (GetStateValue(endpoint, &state) != EMBER_ZCL_STATUS_SUCCESS)
+    if (GetStateValue(endpoint, &state) != MATTER_CL_STATUS_SUCCESS)
     {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return MATTER_CL_STATUS_FAILURE;
     }
 
     state.Clear(alarms);
@@ -291,7 +291,7 @@ EmberAfStatus DishwasherAlarmServer::ResetLatchedAlarms(EndpointId endpoint, con
 bool DishwasherAlarmServer::HasResetFeature(EndpointId endpoint)
 {
     uint32_t featureMap = 0;
-    if (Attributes::FeatureMap::Get(endpoint, &featureMap) != EMBER_ZCL_STATUS_SUCCESS)
+    if (Attributes::FeatureMap::Get(endpoint, &featureMap) != MATTER_CL_STATUS_SUCCESS)
     {
         return false;
     }
@@ -320,7 +320,7 @@ static Status ModifyEnabledHandler(const app::ConcreteCommandPath & commandPath,
     EndpointId endpoint = commandPath.mEndpointId;
     BitMask<AlarmMap> supported;
 
-    if (DishwasherAlarmServer::Instance().GetSupportedValue(endpoint, &supported) != EMBER_ZCL_STATUS_SUCCESS)
+    if (DishwasherAlarmServer::Instance().GetSupportedValue(endpoint, &supported) != MATTER_CL_STATUS_SUCCESS)
     {
         return Status::Failure;
     }
@@ -341,7 +341,7 @@ static Status ModifyEnabledHandler(const app::ConcreteCommandPath & commandPath,
         return Status::Failure;
     }
     // The cluster will do this update if delegate.ModifyEnabledAlarmsCallback() returns true.
-    if (DishwasherAlarmServer::Instance().SetMaskValue(endpoint, mask) != EMBER_ZCL_STATUS_SUCCESS)
+    if (DishwasherAlarmServer::Instance().SetMaskValue(endpoint, mask) != MATTER_CL_STATUS_SUCCESS)
     {
         return Status::Failure;
     }
@@ -355,7 +355,7 @@ static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const B
     if (!DishwasherAlarmServer::Instance().HasResetFeature(endpoint))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm feature: Unsupport Reset Command");
-        return app::ToInteractionModelStatus(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        return app::ToInteractionModelStatus(MATTER_CL_STATUS_UNSUPPORTED_COMMAND);
     }
 
     // A server that is unable to reset alarms SHALL respond with a status code of FAILURE
@@ -367,7 +367,7 @@ static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const B
     }
 
     // The cluster will do this update if delegate.ResetAlarmsCallback() returns true.
-    if (DishwasherAlarmServer::Instance().ResetLatchedAlarms(endpoint, alarms) != EMBER_ZCL_STATUS_SUCCESS)
+    if (DishwasherAlarmServer::Instance().ResetLatchedAlarms(endpoint, alarms) != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "reset alarms fail");
         return Status::Failure;

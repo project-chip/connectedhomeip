@@ -644,14 +644,14 @@ void AppTask::UpdateClusterState(void)
         // Write the new on/off value
         EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
         }
 
         // Write new level value
         status = Clusters::LevelControl::Attributes::CurrentLevel::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().GetLevel());
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(NotSpecified, "ERR: updating level %x", status);
         }

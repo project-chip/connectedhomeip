@@ -135,7 +135,7 @@ CHIP_ERROR Instance::Init()
         DataModel::Nullable<uint8_t> onMode = GetOnMode();
         bool onOffValueForStartUp           = false;
         if (!emberAfIsKnownVolatileAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-            OnOffServer::Instance().getOnOffValueForStartUp(mEndpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
+            OnOffServer::Instance().getOnOffValueForStartUp(mEndpointId, onOffValueForStartUp) == MATTER_CL_STATUS_SUCCESS)
         {
             if (onOffValueForStartUp && !onMode.IsNull())
             {

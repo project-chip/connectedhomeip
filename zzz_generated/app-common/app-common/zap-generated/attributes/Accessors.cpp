@@ -47,10 +47,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Identify::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -60,7 +60,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -78,10 +78,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Identify::Iden
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Identify::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -91,7 +91,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Identify::Iden
     using Traits = NumericAttributeTraits<chip::app::Clusters::Identify::IdentifyTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -109,10 +109,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Identify::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -122,7 +122,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -140,10 +140,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Identify::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -153,7 +153,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -177,10 +177,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Groups::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -190,7 +190,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -208,10 +208,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Groups::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -221,7 +221,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -239,10 +239,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Groups::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -252,7 +252,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -276,10 +276,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -289,7 +289,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -307,10 +307,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -320,7 +320,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -338,10 +338,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -351,7 +351,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -369,10 +369,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -382,7 +382,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -400,7 +400,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clus
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -416,7 +416,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OnOff::StartUp
     using Traits = NumericAttributeTraits<chip::app::Clusters::OnOff::StartUpOnOffEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -454,10 +454,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -467,7 +467,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -485,10 +485,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -498,7 +498,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -522,10 +522,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -535,7 +535,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -553,10 +553,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -566,7 +566,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -584,10 +584,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -597,7 +597,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -615,10 +615,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -628,7 +628,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -652,7 +652,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -668,7 +668,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -705,10 +705,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -718,7 +718,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -736,10 +736,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -749,7 +749,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -767,10 +767,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -780,7 +780,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -798,10 +798,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -811,7 +811,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -829,10 +829,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -842,7 +842,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -860,10 +860,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -873,7 +873,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -891,10 +891,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -904,7 +904,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -922,10 +922,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -935,7 +935,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -953,7 +953,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -969,7 +969,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1006,7 +1006,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -1022,7 +1022,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1059,7 +1059,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -1075,7 +1075,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1112,7 +1112,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -1128,7 +1128,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1165,7 +1165,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -1181,7 +1181,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1218,10 +1218,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1231,7 +1231,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1249,10 +1249,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1262,7 +1262,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1284,14 +1284,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
@@ -1299,7 +1299,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -1315,14 +1315,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
@@ -1330,7 +1330,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -1346,14 +1346,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
@@ -1361,7 +1361,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -1379,10 +1379,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1392,7 +1392,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1410,10 +1410,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1423,7 +1423,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1441,10 +1441,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1454,7 +1454,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1472,10 +1472,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1485,7 +1485,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1503,10 +1503,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1516,7 +1516,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1534,10 +1534,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1547,7 +1547,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1565,10 +1565,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1578,7 +1578,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1596,10 +1596,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1609,7 +1609,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1633,10 +1633,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PulseWidthModulation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1646,7 +1646,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1664,10 +1664,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PulseWidthModulation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1677,7 +1677,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1705,10 +1705,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Binding::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1718,7 +1718,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1736,10 +1736,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Binding::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1749,7 +1749,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1773,10 +1773,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AccessControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1786,7 +1786,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1808,14 +1808,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[512 + 2];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Actions::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfLongStringLength(zclString);
     if (length == NumericAttributeTraits<uint16_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 512, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 512, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[2], 512);
     value.reduce_size(length);
     return status;
@@ -1823,7 +1823,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(512 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 512, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 512, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[512 + 2];
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
@@ -1841,10 +1841,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Actions::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1854,7 +1854,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1872,10 +1872,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Actions::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1885,7 +1885,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1907,14 +1907,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
@@ -1922,7 +1922,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -1940,10 +1940,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1953,7 +1953,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -1971,10 +1971,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -1984,7 +1984,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2002,10 +2002,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2015,7 +2015,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2033,10 +2033,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2046,7 +2046,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2070,10 +2070,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2083,7 +2083,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2101,10 +2101,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2114,7 +2114,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2138,10 +2138,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2151,7 +2151,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2169,10 +2169,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpd
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2182,7 +2182,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpd
     using Traits = NumericAttributeTraits<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2200,7 +2200,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -2216,7 +2216,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2253,10 +2253,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2266,7 +2266,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2284,10 +2284,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2297,7 +2297,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2320,14 +2320,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[35 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 35, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 35, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 35);
     value.reduce_size(length);
     return status;
@@ -2335,7 +2335,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(35 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 35, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 35, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[35 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -2353,10 +2353,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2366,7 +2366,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2384,10 +2384,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2397,7 +2397,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2421,10 +2421,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLoca
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2434,7 +2434,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLoca
     using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2452,10 +2452,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLoca
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2465,7 +2465,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLoca
     using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2483,10 +2483,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2496,7 +2496,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2514,10 +2514,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2527,7 +2527,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2551,10 +2551,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::UnitLocalizati
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitLocalization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2564,7 +2564,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::UnitLocalizati
     using Traits = NumericAttributeTraits<chip::app::Clusters::UnitLocalization::TempUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2582,10 +2582,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitLocalization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2595,7 +2595,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2613,10 +2613,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitLocalization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2626,7 +2626,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2650,10 +2650,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSourceConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2663,7 +2663,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2681,10 +2681,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSourceConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2694,7 +2694,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2718,10 +2718,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::P
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2731,7 +2731,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::P
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2749,10 +2749,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2762,7 +2762,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2778,14 +2778,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[60 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 60, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 60, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 60);
     value.reduce_size(length);
     return status;
@@ -2793,7 +2793,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(60 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 60, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 60, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[60 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -2811,7 +2811,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -2827,7 +2827,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2864,7 +2864,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -2880,7 +2880,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2917,10 +2917,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::W
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -2930,7 +2930,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::W
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -2948,7 +2948,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -2964,7 +2964,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3001,10 +3001,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3014,7 +3014,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3032,10 +3032,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3045,7 +3045,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3063,10 +3063,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3076,7 +3076,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3094,7 +3094,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -3110,7 +3110,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3147,7 +3147,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -3163,7 +3163,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3200,7 +3200,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -3216,7 +3216,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3253,10 +3253,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3266,7 +3266,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeLevelEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3284,10 +3284,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3297,7 +3297,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3315,10 +3315,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3328,7 +3328,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3346,10 +3346,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3359,7 +3359,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3375,14 +3375,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[60 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 60, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 60, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 60);
     value.reduce_size(length);
     return status;
@@ -3390,7 +3390,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(60 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 60, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 60, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[60 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -3408,10 +3408,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3421,7 +3421,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3437,14 +3437,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[20 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 20, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 20, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 20);
     value.reduce_size(length);
     return status;
@@ -3452,7 +3452,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(20 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 20, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 20, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[20 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -3468,14 +3468,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[20 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 20, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 20, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 20);
     value.reduce_size(length);
     return status;
@@ -3483,7 +3483,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(20 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 20, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 20, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[20 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -3501,10 +3501,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3514,7 +3514,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3532,10 +3532,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3545,7 +3545,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3563,10 +3563,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3576,7 +3576,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3594,10 +3594,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3607,7 +3607,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3625,7 +3625,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -3641,7 +3641,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3678,10 +3678,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3691,7 +3691,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3709,7 +3709,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -3725,7 +3725,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3762,10 +3762,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3775,7 +3775,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3793,10 +3793,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3806,7 +3806,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3830,10 +3830,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3843,7 +3843,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<uint64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3861,10 +3861,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3874,7 +3874,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3892,10 +3892,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3905,7 +3905,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3929,10 +3929,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3942,7 +3942,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3960,10 +3960,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -3973,7 +3973,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -3991,10 +3991,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4004,7 +4004,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4022,10 +4022,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4035,7 +4035,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4054,7 +4054,7 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -4070,7 +4070,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NetworkCommiss
     using Traits = NumericAttributeTraits<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4107,16 +4107,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
         value.SetNull();
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
     auto & span = value.SetNonNull();
 
-    VerifyOrReturnError(span.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(span.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(span.data(), &zclString[1], 32);
     span.reduce_size(length);
     return status;
@@ -4124,7 +4124,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -4158,7 +4158,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int32_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -4174,7 +4174,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     using Traits = NumericAttributeTraits<int32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4212,10 +4212,10 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4226,7 +4226,7 @@ EmberAfStatus Set(chip::EndpointId endpoint,
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4244,10 +4244,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4257,7 +4257,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4275,10 +4275,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4288,7 +4288,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4306,10 +4306,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4319,7 +4319,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4343,10 +4343,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DiagnosticLogs::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4356,7 +4356,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4374,10 +4374,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DiagnosticLogs::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4387,7 +4387,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4411,10 +4411,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4424,7 +4424,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4448,10 +4448,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SoftwareDiagnostics::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4461,7 +4461,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4485,10 +4485,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4498,7 +4498,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4516,10 +4516,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4529,7 +4529,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4553,10 +4553,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4566,7 +4566,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4584,10 +4584,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4597,7 +4597,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4621,10 +4621,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4634,7 +4634,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4652,10 +4652,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4665,7 +4665,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4689,10 +4689,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchroniz
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4702,7 +4702,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchroniz
     using Traits = NumericAttributeTraits<chip::app::Clusters::TimeSynchronization::TimeSourceEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4720,10 +4720,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchroniz
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4733,7 +4733,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchroniz
     using Traits = NumericAttributeTraits<chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4751,10 +4751,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4764,7 +4764,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4782,10 +4782,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4795,7 +4795,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4813,10 +4813,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4826,7 +4826,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4844,10 +4844,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4857,7 +4857,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4880,14 +4880,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
@@ -4895,7 +4895,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -4914,10 +4914,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -4927,7 +4927,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value)
     using Traits = NumericAttributeTraits<chip::VendorId>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -4944,14 +4944,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
@@ -4959,7 +4959,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -4977,14 +4977,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
@@ -4992,7 +4992,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -5011,10 +5011,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5024,7 +5024,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5041,14 +5041,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[64 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 64, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 64, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 64);
     value.reduce_size(length);
     return status;
@@ -5056,7 +5056,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 64, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 64, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[64 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -5075,10 +5075,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5088,7 +5088,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5105,14 +5105,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[64 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 64, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 64, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 64);
     value.reduce_size(length);
     return status;
@@ -5120,7 +5120,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 64, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 64, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[64 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -5138,14 +5138,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[16 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
@@ -5153,7 +5153,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -5171,14 +5171,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
@@ -5186,7 +5186,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -5204,14 +5204,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[256 + 2];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfLongStringLength(zclString);
     if (length == NumericAttributeTraits<uint16_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 256, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 256, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[2], 256);
     value.reduce_size(length);
     return status;
@@ -5219,7 +5219,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 256, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 256, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[256 + 2];
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
@@ -5237,14 +5237,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[64 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 64, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 64, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 64);
     value.reduce_size(length);
     return status;
@@ -5252,7 +5252,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 64, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 64, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[64 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -5270,14 +5270,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
@@ -5285,7 +5285,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -5304,10 +5304,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5317,7 +5317,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5334,14 +5334,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
     uint8_t zclString[32 + 1];
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
@@ -5349,7 +5349,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -5368,10 +5368,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5381,7 +5381,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5399,10 +5399,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5412,7 +5412,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5436,10 +5436,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Switch::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5449,7 +5449,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5467,10 +5467,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Switch::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5480,7 +5480,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5498,10 +5498,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Switch::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5511,7 +5511,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5529,10 +5529,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Switch::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5542,7 +5542,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5560,10 +5560,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Switch::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5573,7 +5573,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5597,10 +5597,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AdministratorCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5610,7 +5610,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5628,10 +5628,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AdministratorCommissioning::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5641,7 +5641,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5665,10 +5665,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5678,7 +5678,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5696,10 +5696,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5709,7 +5709,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5737,10 +5737,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FixedLabel::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5750,7 +5750,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5768,10 +5768,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FixedLabel::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5781,7 +5781,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5805,10 +5805,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UserLabel::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5818,7 +5818,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5836,10 +5836,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UserLabel::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5849,7 +5849,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5873,10 +5873,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ProxyConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5886,7 +5886,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5904,10 +5904,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ProxyConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5917,7 +5917,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5941,10 +5941,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ProxyDiscovery::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5954,7 +5954,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -5972,10 +5972,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ProxyDiscovery::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -5985,7 +5985,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6009,10 +6009,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ProxyValid::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6022,7 +6022,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6040,10 +6040,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ProxyValid::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6053,7 +6053,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6077,10 +6077,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanState::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6090,7 +6090,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6108,10 +6108,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanState::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6121,7 +6121,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6139,10 +6139,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanState::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6152,7 +6152,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6176,10 +6176,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IcdManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6189,7 +6189,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6205,14 +6205,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[128 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IcdManagement::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 128, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 128, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 128);
     value.reduce_size(length);
     return status;
@@ -6220,7 +6220,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(128 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 128, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 128, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[128 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -6238,10 +6238,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::IcdManagement:
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IcdManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6251,7 +6251,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::IcdManagement:
     using Traits = NumericAttributeTraits<chip::app::Clusters::IcdManagement::OperatingModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6269,10 +6269,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IcdManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6282,7 +6282,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6300,10 +6300,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IcdManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6313,7 +6313,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6337,10 +6337,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Timer::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6350,7 +6350,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6368,10 +6368,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Timer::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6381,7 +6381,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6399,10 +6399,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Timer::TimerSt
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Timer::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6412,7 +6412,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Timer::TimerSt
     using Traits = NumericAttributeTraits<chip::app::Clusters::Timer::TimerStatusEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6430,10 +6430,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Timer::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6443,7 +6443,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6461,10 +6461,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Timer::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6474,7 +6474,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6498,10 +6498,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OvenCavityOperationalState::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6511,7 +6511,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6529,10 +6529,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OvenCavityOperationalState::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6542,7 +6542,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6566,10 +6566,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OvenMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6579,7 +6579,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6597,7 +6597,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OvenMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -6613,7 +6613,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6650,7 +6650,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OvenMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -6666,7 +6666,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6703,10 +6703,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OvenMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6716,7 +6716,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6734,10 +6734,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OvenMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6747,7 +6747,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6772,7 +6772,7 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -6788,7 +6788,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryDryerCo
     using Traits = NumericAttributeTraits<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6826,10 +6826,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6839,7 +6839,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6857,10 +6857,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6870,7 +6870,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6892,14 +6892,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[64 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ModeSelect::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 64, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 64, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 64);
     value.reduce_size(length);
     return status;
@@ -6907,7 +6907,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 64, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 64, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[64 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -6925,7 +6925,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ModeSelect::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -6941,7 +6941,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -6978,10 +6978,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ModeSelect::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -6991,7 +6991,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7009,7 +7009,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ModeSelect::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -7025,7 +7025,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7062,7 +7062,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ModeSelect::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -7078,7 +7078,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7115,10 +7115,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ModeSelect::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7128,7 +7128,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7146,10 +7146,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ModeSelect::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7159,7 +7159,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7183,10 +7183,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LaundryWasherMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7196,7 +7196,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7221,10 +7221,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7234,7 +7234,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7259,7 +7259,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -7275,7 +7275,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7312,10 +7312,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LaundryWasherC
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7325,7 +7325,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryWasherC
     using Traits = NumericAttributeTraits<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7343,10 +7343,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7356,7 +7356,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7374,10 +7374,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7387,7 +7387,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7411,10 +7411,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RvcRunMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7424,7 +7424,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7448,10 +7448,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RvcCleanMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7461,7 +7461,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7485,10 +7485,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7498,7 +7498,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7516,10 +7516,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7529,7 +7529,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7547,10 +7547,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7560,7 +7560,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7578,10 +7578,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7591,7 +7591,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7609,10 +7609,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7622,7 +7622,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7640,10 +7640,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7653,7 +7653,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7671,10 +7671,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7684,7 +7684,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7708,10 +7708,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7721,7 +7721,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7739,10 +7739,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7752,7 +7752,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7770,10 +7770,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7783,7 +7783,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7801,10 +7801,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7814,7 +7814,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7832,10 +7832,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7845,7 +7845,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7869,10 +7869,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7882,7 +7882,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7906,10 +7906,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AirQuality::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7919,7 +7919,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7943,10 +7943,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7956,7 +7956,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -7974,10 +7974,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -7987,7 +7987,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8005,10 +8005,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8018,7 +8018,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8036,10 +8036,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8049,7 +8049,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8067,10 +8067,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8080,7 +8080,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8098,10 +8098,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8111,7 +8111,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8129,10 +8129,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8142,7 +8142,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8160,10 +8160,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8173,7 +8173,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8191,10 +8191,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8204,7 +8204,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8222,10 +8222,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8235,7 +8235,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8253,10 +8253,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8266,7 +8266,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8284,10 +8284,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8297,7 +8297,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::
     using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8315,10 +8315,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8328,7 +8328,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8346,10 +8346,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8359,7 +8359,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8377,10 +8377,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8390,7 +8390,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8414,10 +8414,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8427,7 +8427,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8445,10 +8445,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8458,7 +8458,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8476,10 +8476,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8489,7 +8489,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8507,10 +8507,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8520,7 +8520,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8538,10 +8538,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8551,7 +8551,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8569,10 +8569,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8582,7 +8582,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8606,10 +8606,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MicrowaveOvenMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8619,7 +8619,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8643,10 +8643,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MicrowaveOvenControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8656,7 +8656,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8680,10 +8680,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OperationalState::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8693,7 +8693,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8711,10 +8711,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OperationalState::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8724,7 +8724,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8748,10 +8748,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RvcOperationalState::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8761,7 +8761,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8779,10 +8779,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RvcOperationalState::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8792,7 +8792,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8816,7 +8816,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::NodeId> &
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -8832,7 +8832,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId value)
     using Traits = NumericAttributeTraits<chip::NodeId>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8869,10 +8869,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8882,7 +8882,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8900,10 +8900,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8913,7 +8913,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8931,10 +8931,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8944,7 +8944,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -8968,10 +8968,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HepaFilterMonitoring::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -8981,7 +8981,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9006,10 +9006,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9019,7 +9019,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9043,10 +9043,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9056,7 +9056,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9074,10 +9074,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9087,7 +9087,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9105,10 +9105,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9118,7 +9118,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9136,10 +9136,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9149,7 +9149,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9167,10 +9167,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9180,7 +9180,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9198,10 +9198,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9211,7 +9211,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9230,10 +9230,10 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9243,7 +9243,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9261,10 +9261,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9274,7 +9274,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9292,10 +9292,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9305,7 +9305,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9329,7 +9329,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -9345,7 +9345,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9382,7 +9382,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -9398,7 +9398,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9435,7 +9435,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -9451,7 +9451,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<uint64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9489,7 +9489,7 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -9505,7 +9505,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ValveConfigura
     using Traits = NumericAttributeTraits<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9544,7 +9544,7 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -9560,7 +9560,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ValveConfigura
     using Traits = NumericAttributeTraits<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9598,7 +9598,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> 
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -9614,7 +9614,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value)
     using Traits = NumericAttributeTraits<chip::Percent>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9651,7 +9651,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> 
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -9667,7 +9667,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value)
     using Traits = NumericAttributeTraits<chip::Percent>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9704,10 +9704,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9717,7 +9717,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value)
     using Traits = NumericAttributeTraits<chip::Percent>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9736,10 +9736,10 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9750,7 +9750,7 @@ EmberAfStatus Set(chip::EndpointId endpoint,
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9768,10 +9768,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9781,7 +9781,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9799,10 +9799,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9812,7 +9812,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9830,10 +9830,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9843,7 +9843,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9867,10 +9867,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalPowerMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9880,7 +9880,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9904,10 +9904,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9917,7 +9917,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9941,10 +9941,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9954,7 +9954,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -9972,10 +9972,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -9985,7 +9985,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10003,10 +10003,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10016,7 +10016,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10034,10 +10034,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10047,7 +10047,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10065,10 +10065,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10078,7 +10078,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10096,10 +10096,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10109,7 +10109,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10127,10 +10127,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10140,7 +10140,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10164,10 +10164,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Messages::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10177,7 +10177,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10195,10 +10195,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Messages::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10208,7 +10208,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10232,10 +10232,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DeviceEnergyManagement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10245,7 +10245,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10269,10 +10269,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EnergyEvse::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10282,7 +10282,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10306,10 +10306,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EnergyPreference::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10319,7 +10319,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10337,10 +10337,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EnergyPreference::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10350,7 +10350,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10368,10 +10368,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EnergyPreference::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10381,7 +10381,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10399,10 +10399,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EnergyPreference::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10412,7 +10412,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10436,10 +10436,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerTopology::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10449,7 +10449,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10467,10 +10467,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerTopology::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10480,7 +10480,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10504,7 +10504,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -10520,7 +10520,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10557,7 +10557,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -10573,7 +10573,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10610,10 +10610,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10623,7 +10623,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10647,7 +10647,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -10663,7 +10663,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10700,7 +10700,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -10716,7 +10716,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10753,10 +10753,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10766,7 +10766,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10790,7 +10790,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clus
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -10806,7 +10806,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLo
     using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlLockState>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10844,10 +10844,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLo
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10857,7 +10857,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLo
     using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlLockType>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10875,10 +10875,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10888,7 +10888,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10906,7 +10906,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clus
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -10922,7 +10922,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::Door
     using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DoorStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10960,10 +10960,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -10973,7 +10973,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -10991,10 +10991,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11004,7 +11004,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11022,10 +11022,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11035,7 +11035,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11053,10 +11053,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11066,7 +11066,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11084,10 +11084,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11097,7 +11097,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11115,10 +11115,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11128,7 +11128,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11146,10 +11146,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11159,7 +11159,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11177,10 +11177,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11190,7 +11190,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11208,10 +11208,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11221,7 +11221,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11239,10 +11239,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11252,7 +11252,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11270,10 +11270,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11283,7 +11283,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11301,10 +11301,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11314,7 +11314,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11332,10 +11332,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11345,7 +11345,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11363,10 +11363,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11376,7 +11376,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11394,10 +11394,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11407,7 +11407,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11423,14 +11423,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[3 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 3, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 3, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 3);
     value.reduce_size(length);
     return status;
@@ -11438,7 +11438,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(3 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 3, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 3, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[3 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -11456,10 +11456,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11469,7 +11469,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11487,10 +11487,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11500,7 +11500,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11518,10 +11518,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11531,7 +11531,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11549,10 +11549,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::Oper
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11562,7 +11562,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::Oper
     using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::OperatingModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11580,10 +11580,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11593,7 +11593,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11611,10 +11611,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11624,7 +11624,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11642,10 +11642,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11655,7 +11655,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11673,10 +11673,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11686,7 +11686,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11704,10 +11704,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11717,7 +11717,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11735,10 +11735,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11748,7 +11748,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11766,10 +11766,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11779,7 +11779,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11797,10 +11797,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11810,7 +11810,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11828,10 +11828,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11841,7 +11841,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11859,10 +11859,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11872,7 +11872,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11890,10 +11890,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11903,7 +11903,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11921,10 +11921,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -11934,7 +11934,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -11950,16 +11950,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 {
     uint8_t zclString[65 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
         value.SetNull();
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
     auto & span = value.SetNonNull();
 
-    VerifyOrReturnError(span.size() == 65, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(span.size() == 65, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(span.data(), &zclString[1], 65);
     span.reduce_size(length);
     return status;
@@ -11967,7 +11967,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(65 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 65, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 65, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[65 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -11999,16 +11999,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
         value.SetNull();
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
     auto & span = value.SetNonNull();
 
-    VerifyOrReturnError(span.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(span.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(span.data(), &zclString[1], 16);
     span.reduce_size(length);
     return status;
@@ -12016,7 +12016,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -12048,14 +12048,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
@@ -12063,7 +12063,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -12079,16 +12079,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
         value.SetNull();
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
     auto & span = value.SetNonNull();
 
-    VerifyOrReturnError(span.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(span.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(span.data(), &zclString[1], 16);
     span.reduce_size(length);
     return status;
@@ -12096,7 +12096,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -12130,10 +12130,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12143,7 +12143,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12161,10 +12161,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12174,7 +12174,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12192,10 +12192,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12205,7 +12205,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12223,10 +12223,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12236,7 +12236,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12254,10 +12254,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12267,7 +12267,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12291,10 +12291,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12304,7 +12304,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering
     using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::Type>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12322,10 +12322,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12335,7 +12335,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12353,10 +12353,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12366,7 +12366,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12384,7 +12384,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -12400,7 +12400,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12437,7 +12437,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -12453,7 +12453,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12490,10 +12490,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12503,7 +12503,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12521,10 +12521,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12534,7 +12534,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12552,10 +12552,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12565,7 +12565,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12583,7 +12583,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> 
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -12599,7 +12599,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value)
     using Traits = NumericAttributeTraits<chip::Percent>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12636,7 +12636,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> 
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -12652,7 +12652,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value)
     using Traits = NumericAttributeTraits<chip::Percent>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12689,10 +12689,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12702,7 +12702,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12720,7 +12720,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent10
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -12736,7 +12736,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value)
     using Traits = NumericAttributeTraits<chip::Percent100ths>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12773,7 +12773,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent10
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -12789,7 +12789,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value)
     using Traits = NumericAttributeTraits<chip::Percent100ths>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12826,10 +12826,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12839,7 +12839,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering
     using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::EndProductType>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12857,7 +12857,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent10
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -12873,7 +12873,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value)
     using Traits = NumericAttributeTraits<chip::Percent100ths>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12910,7 +12910,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent10
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -12926,7 +12926,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value)
     using Traits = NumericAttributeTraits<chip::Percent100ths>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12963,10 +12963,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -12976,7 +12976,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -12994,10 +12994,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13007,7 +13007,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13025,10 +13025,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13038,7 +13038,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13056,10 +13056,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13069,7 +13069,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13087,10 +13087,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13100,7 +13100,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13118,10 +13118,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13131,7 +13131,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13149,10 +13149,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13162,7 +13162,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13180,10 +13180,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13193,7 +13193,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13217,10 +13217,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13230,7 +13230,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13248,10 +13248,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13261,7 +13261,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13279,10 +13279,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13292,7 +13292,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13310,10 +13310,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13323,7 +13323,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13341,10 +13341,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13354,7 +13354,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13372,10 +13372,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13385,7 +13385,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13403,10 +13403,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13416,7 +13416,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13434,10 +13434,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13447,7 +13447,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13465,10 +13465,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13478,7 +13478,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13496,10 +13496,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13509,7 +13509,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13527,10 +13527,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13540,7 +13540,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13558,10 +13558,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BarrierControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -13571,7 +13571,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13595,7 +13595,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -13611,7 +13611,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13648,7 +13648,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -13664,7 +13664,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13701,7 +13701,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -13717,7 +13717,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13754,7 +13754,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -13770,7 +13770,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13807,7 +13807,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -13823,7 +13823,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13860,7 +13860,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -13876,7 +13876,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13913,7 +13913,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -13929,7 +13929,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -13966,7 +13966,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -13982,7 +13982,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14019,7 +14019,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14035,7 +14035,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14072,7 +14072,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14088,7 +14088,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14125,7 +14125,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14141,7 +14141,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14178,7 +14178,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14194,7 +14194,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14231,7 +14231,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14247,7 +14247,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14285,10 +14285,10 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14299,7 +14299,7 @@ EmberAfStatus Set(chip::EndpointId endpoint,
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14317,10 +14317,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14330,7 +14330,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14348,10 +14348,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14361,7 +14361,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14379,7 +14379,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14395,7 +14395,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14432,7 +14432,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14448,7 +14448,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14485,7 +14485,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14501,7 +14501,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14538,7 +14538,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14554,7 +14554,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14591,7 +14591,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14607,7 +14607,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14644,10 +14644,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14657,7 +14657,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14675,10 +14675,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14688,7 +14688,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurat
     using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14706,10 +14706,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14719,7 +14719,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14737,10 +14737,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14750,7 +14750,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14774,7 +14774,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14790,7 +14790,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14827,7 +14827,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -14843,7 +14843,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14880,10 +14880,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14893,7 +14893,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14911,10 +14911,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14924,7 +14924,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14942,10 +14942,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14955,7 +14955,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -14973,10 +14973,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -14986,7 +14986,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15004,10 +15004,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15017,7 +15017,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15035,10 +15035,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15048,7 +15048,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15066,10 +15066,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15079,7 +15079,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15097,10 +15097,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15110,7 +15110,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15128,10 +15128,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15141,7 +15141,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15159,10 +15159,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15172,7 +15172,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15190,10 +15190,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15203,7 +15203,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15221,10 +15221,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15234,7 +15234,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15252,10 +15252,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15265,7 +15265,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15283,10 +15283,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15296,7 +15296,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15314,10 +15314,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15327,7 +15327,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15345,10 +15345,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15358,7 +15358,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15376,10 +15376,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15389,7 +15389,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15407,10 +15407,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15420,7 +15420,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15438,10 +15438,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15451,7 +15451,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15469,10 +15469,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Co
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15482,7 +15482,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Co
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15500,10 +15500,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Sy
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15513,7 +15513,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Sy
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::SystemModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15531,10 +15531,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Th
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15544,7 +15544,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Th
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15562,10 +15562,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::St
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15575,7 +15575,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::St
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::StartOfWeekEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15593,10 +15593,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15606,7 +15606,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15624,10 +15624,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15637,7 +15637,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15655,10 +15655,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Te
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15668,7 +15668,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Te
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15686,7 +15686,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -15702,7 +15702,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15739,10 +15739,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15752,7 +15752,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15770,10 +15770,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15783,7 +15783,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15801,10 +15801,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Se
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15814,7 +15814,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Se
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::SetpointChangeSourceEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15832,7 +15832,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -15848,7 +15848,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15885,10 +15885,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -15898,7 +15898,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15916,7 +15916,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -15932,7 +15932,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -15969,7 +15969,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -15985,7 +15985,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16022,7 +16022,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -16038,7 +16038,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16075,7 +16075,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -16091,7 +16091,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16128,7 +16128,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -16144,7 +16144,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16181,7 +16181,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -16197,7 +16197,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16234,10 +16234,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16247,7 +16247,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16265,10 +16265,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16278,7 +16278,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16296,10 +16296,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16309,7 +16309,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16327,10 +16327,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16340,7 +16340,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16358,10 +16358,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16371,7 +16371,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACCompressorTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16389,10 +16389,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16402,7 +16402,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16420,10 +16420,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16433,7 +16433,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACLouverPositionEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16451,7 +16451,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -16467,7 +16467,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16504,10 +16504,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16517,7 +16517,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::AC
     using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACCapacityFormatEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16535,10 +16535,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16548,7 +16548,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16566,10 +16566,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16579,7 +16579,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16597,10 +16597,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16610,7 +16610,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16628,7 +16628,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -16644,7 +16644,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16679,16 +16679,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
         value.SetNull();
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
     auto & span = value.SetNonNull();
 
-    VerifyOrReturnError(span.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(span.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(span.data(), &zclString[1], 16);
     span.reduce_size(length);
     return status;
@@ -16696,7 +16696,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -16728,16 +16728,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
         value.SetNull();
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
     auto & span = value.SetNonNull();
 
-    VerifyOrReturnError(span.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(span.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(span.data(), &zclString[1], 16);
     span.reduce_size(length);
     return status;
@@ -16745,7 +16745,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -16779,10 +16779,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16792,7 +16792,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16811,10 +16811,10 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16825,7 +16825,7 @@ EmberAfStatus Set(chip::EndpointId endpoint,
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16843,7 +16843,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -16859,7 +16859,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16896,10 +16896,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16909,7 +16909,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16927,10 +16927,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16940,7 +16940,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16964,10 +16964,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FanControl::Fa
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -16977,7 +16977,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::Fa
     using Traits = NumericAttributeTraits<chip::app::Clusters::FanControl::FanModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -16995,10 +16995,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FanControl::Fa
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17008,7 +17008,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::Fa
     using Traits = NumericAttributeTraits<chip::app::Clusters::FanControl::FanModeSequenceEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17026,7 +17026,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> 
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -17042,7 +17042,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value)
     using Traits = NumericAttributeTraits<chip::Percent>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17079,10 +17079,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17092,7 +17092,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value)
     using Traits = NumericAttributeTraits<chip::Percent>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17110,10 +17110,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17123,7 +17123,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17141,7 +17141,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -17157,7 +17157,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17194,10 +17194,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17207,7 +17207,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17225,10 +17225,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17238,7 +17238,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17256,10 +17256,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17269,7 +17269,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17287,10 +17287,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17300,7 +17300,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17318,10 +17318,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17331,7 +17331,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17349,10 +17349,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FanControl::Ai
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17362,7 +17362,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::Ai
     using Traits = NumericAttributeTraits<chip::app::Clusters::FanControl::AirflowDirectionEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17380,10 +17380,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17393,7 +17393,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17411,10 +17411,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FanControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17424,7 +17424,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17450,10 +17450,10 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17464,7 +17464,7 @@ EmberAfStatus Set(chip::EndpointId endpoint,
     using Traits = NumericAttributeTraits<chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17484,10 +17484,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ThermostatUser
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17497,7 +17497,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ThermostatUser
     using Traits = NumericAttributeTraits<chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17519,10 +17519,10 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17534,7 +17534,7 @@ EmberAfStatus Set(chip::EndpointId endpoint,
         NumericAttributeTraits<chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17554,10 +17554,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17567,7 +17567,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17587,10 +17587,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17600,7 +17600,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17625,10 +17625,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17638,7 +17638,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17656,10 +17656,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17669,7 +17669,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17687,10 +17687,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17700,7 +17700,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17718,10 +17718,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17731,7 +17731,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17749,10 +17749,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17762,7 +17762,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17780,10 +17780,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17793,7 +17793,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17809,14 +17809,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[254 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 254, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 254, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 254);
     value.reduce_size(length);
     return status;
@@ -17824,7 +17824,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(254 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 254, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 254, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[254 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -17842,10 +17842,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17855,7 +17855,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17873,10 +17873,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17886,7 +17886,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17904,10 +17904,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -17917,7 +17917,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17935,7 +17935,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -17951,7 +17951,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -17988,10 +17988,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18001,7 +18001,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18019,10 +18019,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18032,7 +18032,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18050,7 +18050,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -18066,7 +18066,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18103,10 +18103,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18116,7 +18116,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18134,10 +18134,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18147,7 +18147,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18165,7 +18165,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -18181,7 +18181,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18218,10 +18218,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18231,7 +18231,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18249,10 +18249,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18262,7 +18262,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18280,7 +18280,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -18296,7 +18296,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18333,10 +18333,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18346,7 +18346,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18364,10 +18364,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18377,7 +18377,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18395,7 +18395,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -18411,7 +18411,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18448,10 +18448,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18461,7 +18461,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18479,10 +18479,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18492,7 +18492,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18510,7 +18510,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -18526,7 +18526,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18563,10 +18563,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18576,7 +18576,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18594,10 +18594,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18607,7 +18607,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18625,7 +18625,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -18641,7 +18641,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18678,10 +18678,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18691,7 +18691,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18709,10 +18709,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18722,7 +18722,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18740,10 +18740,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18753,7 +18753,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18771,10 +18771,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18784,7 +18784,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18802,7 +18802,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -18818,7 +18818,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18855,10 +18855,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18868,7 +18868,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18886,10 +18886,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18899,7 +18899,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18917,7 +18917,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -18933,7 +18933,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -18970,10 +18970,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -18983,7 +18983,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19001,10 +19001,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19014,7 +19014,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19032,7 +19032,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -19048,7 +19048,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19085,10 +19085,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19098,7 +19098,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19116,10 +19116,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19129,7 +19129,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19147,10 +19147,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19160,7 +19160,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19178,10 +19178,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19191,7 +19191,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19209,10 +19209,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19222,7 +19222,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19240,10 +19240,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19253,7 +19253,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19271,10 +19271,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19284,7 +19284,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19302,10 +19302,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19315,7 +19315,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19333,10 +19333,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19346,7 +19346,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19364,10 +19364,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19377,7 +19377,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19395,10 +19395,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19408,7 +19408,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19426,7 +19426,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -19442,7 +19442,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19479,10 +19479,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19492,7 +19492,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19510,10 +19510,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19523,7 +19523,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19547,10 +19547,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19560,7 +19560,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19578,10 +19578,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19591,7 +19591,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19609,10 +19609,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19622,7 +19622,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19640,10 +19640,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19653,7 +19653,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19671,10 +19671,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19684,7 +19684,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19702,7 +19702,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -19718,7 +19718,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19755,7 +19755,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -19771,7 +19771,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19808,10 +19808,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -19821,7 +19821,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19837,14 +19837,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
@@ -19852,7 +19852,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -19868,14 +19868,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
@@ -19883,7 +19883,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -19901,7 +19901,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -19917,7 +19917,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -19954,7 +19954,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -19970,7 +19970,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20007,10 +20007,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20020,7 +20020,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20038,7 +20038,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20054,7 +20054,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20091,10 +20091,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20104,7 +20104,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20122,10 +20122,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20135,7 +20135,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20159,7 +20159,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20175,7 +20175,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20212,7 +20212,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20228,7 +20228,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20265,7 +20265,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20281,7 +20281,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20318,10 +20318,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20331,7 +20331,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20350,7 +20350,7 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20366,7 +20366,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::IlluminanceMea
     using Traits = NumericAttributeTraits<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20404,10 +20404,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20417,7 +20417,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20435,10 +20435,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20448,7 +20448,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20472,7 +20472,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20488,7 +20488,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20525,7 +20525,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20541,7 +20541,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20578,7 +20578,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20594,7 +20594,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20631,10 +20631,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20644,7 +20644,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20662,10 +20662,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20675,7 +20675,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20693,10 +20693,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20706,7 +20706,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20730,7 +20730,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20746,7 +20746,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20783,7 +20783,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20799,7 +20799,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20836,7 +20836,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20852,7 +20852,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20889,10 +20889,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -20902,7 +20902,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20920,7 +20920,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20936,7 +20936,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -20973,7 +20973,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -20989,7 +20989,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21026,7 +21026,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -21042,7 +21042,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21079,10 +21079,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21092,7 +21092,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21110,10 +21110,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21123,7 +21123,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21141,10 +21141,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21154,7 +21154,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21172,10 +21172,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21185,7 +21185,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21209,7 +21209,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -21225,7 +21225,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21262,7 +21262,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -21278,7 +21278,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21315,7 +21315,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -21331,7 +21331,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21368,10 +21368,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21381,7 +21381,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21399,10 +21399,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21412,7 +21412,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21430,10 +21430,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21443,7 +21443,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21467,7 +21467,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -21483,7 +21483,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21520,7 +21520,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -21536,7 +21536,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21573,7 +21573,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -21589,7 +21589,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21626,10 +21626,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21639,7 +21639,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21657,10 +21657,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21670,7 +21670,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21688,10 +21688,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21701,7 +21701,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21725,10 +21725,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21738,7 +21738,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21756,10 +21756,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OccupancySensi
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21769,7 +21769,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OccupancySensi
     using Traits = NumericAttributeTraits<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21788,10 +21788,10 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21801,7 +21801,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21819,10 +21819,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21832,7 +21832,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21850,10 +21850,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21863,7 +21863,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21881,10 +21881,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21894,7 +21894,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21912,10 +21912,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21925,7 +21925,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21943,10 +21943,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21956,7 +21956,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -21974,10 +21974,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -21987,7 +21987,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22005,10 +22005,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22018,7 +22018,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22036,10 +22036,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22049,7 +22049,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22067,10 +22067,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22080,7 +22080,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22098,10 +22098,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22111,7 +22111,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22129,10 +22129,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OccupancySensing::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22142,7 +22142,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22167,10 +22167,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22180,7 +22180,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22206,10 +22206,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22219,7 +22219,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22245,10 +22245,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22258,7 +22258,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22283,10 +22283,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22296,7 +22296,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22320,10 +22320,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22333,7 +22333,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22358,10 +22358,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadAttribute(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22371,7 +22371,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22396,10 +22396,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22409,7 +22409,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22433,10 +22433,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22446,7 +22446,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22471,10 +22471,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id,
                                                 readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22484,7 +22484,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22509,10 +22509,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22522,7 +22522,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22544,14 +22544,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[12 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 12, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 12, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 12);
     value.reduce_size(length);
     return status;
@@ -22559,7 +22559,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(12 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 12, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 12, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[12 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -22575,14 +22575,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 {
     uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 16, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
@@ -22590,7 +22590,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 16, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -22608,10 +22608,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WakeOnLan::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22621,7 +22621,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22639,10 +22639,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::WakeOnLan::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22652,7 +22652,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22676,10 +22676,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Channel::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22689,7 +22689,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22707,10 +22707,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Channel::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22720,7 +22720,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22744,10 +22744,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TargetNavigator::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22757,7 +22757,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22775,10 +22775,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TargetNavigator::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22788,7 +22788,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22806,10 +22806,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TargetNavigator::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22819,7 +22819,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22843,10 +22843,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback:
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaPlayback::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22856,7 +22856,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback:
     using Traits = NumericAttributeTraits<chip::app::Clusters::MediaPlayback::PlaybackStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22874,7 +22874,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaPlayback::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -22890,7 +22890,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<uint64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22927,7 +22927,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaPlayback::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -22943,7 +22943,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<uint64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -22980,10 +22980,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, float * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaPlayback::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -22993,7 +22993,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
     using Traits = NumericAttributeTraits<float>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23011,7 +23011,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaPlayback::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -23027,7 +23027,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<uint64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23064,7 +23064,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaPlayback::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -23080,7 +23080,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<uint64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23117,10 +23117,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaPlayback::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23130,7 +23130,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23148,10 +23148,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaPlayback::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23161,7 +23161,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23185,10 +23185,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaInput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23198,7 +23198,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23216,10 +23216,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaInput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23229,7 +23229,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23247,10 +23247,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MediaInput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23260,7 +23260,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23284,10 +23284,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LowPower::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23297,7 +23297,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23315,10 +23315,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LowPower::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23328,7 +23328,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23352,10 +23352,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::KeypadInput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23365,7 +23365,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23383,10 +23383,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::KeypadInput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23396,7 +23396,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23420,10 +23420,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentLauncher::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23433,7 +23433,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23451,10 +23451,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentLauncher::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23464,7 +23464,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23482,10 +23482,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentLauncher::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23495,7 +23495,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23519,10 +23519,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AudioOutput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23532,7 +23532,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23550,10 +23550,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AudioOutput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23563,7 +23563,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23581,10 +23581,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AudioOutput::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23594,7 +23594,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23618,10 +23618,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23631,7 +23631,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23649,10 +23649,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23662,7 +23662,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23684,14 +23684,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
@@ -23699,7 +23699,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -23717,10 +23717,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23730,7 +23730,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value)
     using Traits = NumericAttributeTraits<chip::VendorId>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23746,14 +23746,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[256 + 2];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfLongStringLength(zclString);
     if (length == NumericAttributeTraits<uint16_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 256, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 256, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[2], 256);
     value.reduce_size(length);
     return status;
@@ -23761,7 +23761,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 256, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 256, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[256 + 2];
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
@@ -23779,10 +23779,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23792,7 +23792,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23810,10 +23810,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBas
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23823,7 +23823,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBas
     using Traits = NumericAttributeTraits<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23839,14 +23839,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[32 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 32, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 32);
     value.reduce_size(length);
     return status;
@@ -23854,7 +23854,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 32, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[32 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -23872,10 +23872,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23885,7 +23885,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23903,10 +23903,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23916,7 +23916,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23940,10 +23940,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AccountLogin::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23953,7 +23953,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -23971,10 +23971,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AccountLogin::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -23984,7 +23984,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24008,10 +24008,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24021,7 +24021,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24037,14 +24037,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[8 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentControl::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 8, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 8, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 8);
     value.reduce_size(length);
     return status;
@@ -24052,7 +24052,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(8 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 8, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 8, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[8 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -24068,14 +24068,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[8 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentControl::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 8, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 8, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 8);
     value.reduce_size(length);
     return status;
@@ -24083,7 +24083,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(8 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 8, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 8, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[8 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -24101,10 +24101,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24114,7 +24114,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24132,10 +24132,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24145,7 +24145,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24163,10 +24163,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24176,7 +24176,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24194,10 +24194,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24207,7 +24207,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24225,10 +24225,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentControl::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24238,7 +24238,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24262,10 +24262,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentAppObserver::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24275,7 +24275,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24293,10 +24293,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ContentAppObserver::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24306,7 +24306,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24330,10 +24330,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24343,7 +24343,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24361,10 +24361,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24374,7 +24374,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24392,10 +24392,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24405,7 +24405,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24423,10 +24423,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24436,7 +24436,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24454,10 +24454,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24467,7 +24467,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24485,10 +24485,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24498,7 +24498,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24516,10 +24516,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24529,7 +24529,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24547,10 +24547,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24560,7 +24560,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24578,10 +24578,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24591,7 +24591,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24609,10 +24609,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24622,7 +24622,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24640,10 +24640,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24653,7 +24653,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24671,10 +24671,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24684,7 +24684,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24702,10 +24702,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24715,7 +24715,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24733,10 +24733,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24746,7 +24746,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24764,10 +24764,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24777,7 +24777,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24795,10 +24795,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24808,7 +24808,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24826,10 +24826,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24839,7 +24839,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24857,10 +24857,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24870,7 +24870,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24888,10 +24888,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24901,7 +24901,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24919,10 +24919,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24932,7 +24932,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24950,10 +24950,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24963,7 +24963,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     using Traits = NumericAttributeTraits<int32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -24981,10 +24981,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -24994,7 +24994,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     using Traits = NumericAttributeTraits<int32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25012,10 +25012,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25025,7 +25025,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25043,10 +25043,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25056,7 +25056,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25074,10 +25074,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25087,7 +25087,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25105,10 +25105,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25118,7 +25118,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25136,10 +25136,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25149,7 +25149,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25167,10 +25167,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25180,7 +25180,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25198,10 +25198,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25211,7 +25211,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25229,10 +25229,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25242,7 +25242,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25260,10 +25260,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25273,7 +25273,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25291,10 +25291,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25304,7 +25304,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25322,10 +25322,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25335,7 +25335,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25353,10 +25353,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25366,7 +25366,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25384,10 +25384,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25397,7 +25397,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25415,10 +25415,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25428,7 +25428,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25446,10 +25446,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25459,7 +25459,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25477,10 +25477,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25490,7 +25490,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25508,10 +25508,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25521,7 +25521,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25539,10 +25539,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25552,7 +25552,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25570,10 +25570,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25583,7 +25583,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25601,10 +25601,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25614,7 +25614,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25632,10 +25632,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25645,7 +25645,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25663,10 +25663,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25676,7 +25676,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25694,10 +25694,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25707,7 +25707,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25725,10 +25725,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25738,7 +25738,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25756,10 +25756,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25769,7 +25769,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25787,10 +25787,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25800,7 +25800,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25818,10 +25818,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25831,7 +25831,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25849,10 +25849,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25862,7 +25862,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25880,10 +25880,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25893,7 +25893,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25911,10 +25911,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25924,7 +25924,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25942,10 +25942,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25955,7 +25955,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -25973,10 +25973,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -25986,7 +25986,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26004,10 +26004,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26017,7 +26017,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26035,10 +26035,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26048,7 +26048,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26066,10 +26066,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26079,7 +26079,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26097,10 +26097,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26110,7 +26110,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26128,10 +26128,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26141,7 +26141,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26159,10 +26159,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26172,7 +26172,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26190,10 +26190,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26203,7 +26203,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26221,10 +26221,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26234,7 +26234,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26252,10 +26252,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26265,7 +26265,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26283,10 +26283,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26296,7 +26296,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26314,10 +26314,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26327,7 +26327,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26345,10 +26345,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26358,7 +26358,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26376,10 +26376,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26389,7 +26389,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26407,10 +26407,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26420,7 +26420,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26438,10 +26438,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26451,7 +26451,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26469,10 +26469,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26482,7 +26482,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26500,10 +26500,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26513,7 +26513,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26531,10 +26531,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26544,7 +26544,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26562,10 +26562,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26575,7 +26575,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26593,10 +26593,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26606,7 +26606,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26624,10 +26624,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26637,7 +26637,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26655,10 +26655,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26668,7 +26668,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26686,10 +26686,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26699,7 +26699,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26717,10 +26717,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26730,7 +26730,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26748,10 +26748,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26761,7 +26761,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26779,10 +26779,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26792,7 +26792,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26810,10 +26810,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26823,7 +26823,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26841,10 +26841,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26854,7 +26854,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26872,10 +26872,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26885,7 +26885,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26903,10 +26903,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26916,7 +26916,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26934,10 +26934,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26947,7 +26947,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26965,10 +26965,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -26978,7 +26978,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -26996,10 +26996,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27009,7 +27009,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27027,10 +27027,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27040,7 +27040,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27058,10 +27058,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27071,7 +27071,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27089,10 +27089,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27102,7 +27102,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27120,10 +27120,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27133,7 +27133,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27151,10 +27151,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27164,7 +27164,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27182,10 +27182,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27195,7 +27195,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27213,10 +27213,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27226,7 +27226,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27244,10 +27244,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27257,7 +27257,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27275,10 +27275,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27288,7 +27288,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27306,10 +27306,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27319,7 +27319,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27337,10 +27337,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27350,7 +27350,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27368,10 +27368,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27381,7 +27381,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27399,10 +27399,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27412,7 +27412,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27430,10 +27430,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27443,7 +27443,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27461,10 +27461,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27474,7 +27474,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27492,10 +27492,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27505,7 +27505,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27523,10 +27523,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27536,7 +27536,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27554,10 +27554,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27567,7 +27567,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27585,10 +27585,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27598,7 +27598,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27616,10 +27616,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27629,7 +27629,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27647,10 +27647,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27660,7 +27660,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27678,10 +27678,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27691,7 +27691,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27709,10 +27709,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27722,7 +27722,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27740,10 +27740,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27753,7 +27753,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27771,10 +27771,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27784,7 +27784,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27802,10 +27802,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27815,7 +27815,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27833,10 +27833,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27846,7 +27846,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27864,10 +27864,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27877,7 +27877,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27895,10 +27895,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27908,7 +27908,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27926,10 +27926,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27939,7 +27939,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27957,10 +27957,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -27970,7 +27970,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -27988,10 +27988,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28001,7 +28001,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28019,10 +28019,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28032,7 +28032,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28050,10 +28050,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28063,7 +28063,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28081,10 +28081,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28094,7 +28094,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28112,10 +28112,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28125,7 +28125,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28143,10 +28143,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28156,7 +28156,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28174,10 +28174,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28187,7 +28187,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28205,10 +28205,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28218,7 +28218,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28236,10 +28236,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28249,7 +28249,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28267,10 +28267,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28280,7 +28280,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28298,10 +28298,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28311,7 +28311,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28329,10 +28329,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28342,7 +28342,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28366,10 +28366,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28379,7 +28379,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28397,10 +28397,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28410,7 +28410,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28428,10 +28428,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28441,7 +28441,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28459,10 +28459,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28472,7 +28472,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28490,10 +28490,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28503,7 +28503,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28521,10 +28521,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28534,7 +28534,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28552,10 +28552,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28565,7 +28565,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28583,10 +28583,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28596,7 +28596,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28614,10 +28614,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28627,7 +28627,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28645,10 +28645,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28658,7 +28658,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<5, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28676,10 +28676,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28689,7 +28689,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<6, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28707,10 +28707,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28720,7 +28720,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<7, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28738,10 +28738,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28751,7 +28751,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<uint64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28769,10 +28769,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28782,7 +28782,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28800,10 +28800,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28813,7 +28813,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28831,10 +28831,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28844,7 +28844,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, true>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28862,10 +28862,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28875,7 +28875,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     using Traits = NumericAttributeTraits<int32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28893,10 +28893,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28906,7 +28906,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<5, true>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28924,10 +28924,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28937,7 +28937,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<6, true>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28955,10 +28955,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28968,7 +28968,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<7, true>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -28986,10 +28986,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -28999,7 +28999,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     using Traits = NumericAttributeTraits<int64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29017,10 +29017,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29030,7 +29030,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29048,10 +29048,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29061,7 +29061,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29079,10 +29079,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, float * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29092,7 +29092,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
     using Traits = NumericAttributeTraits<float>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29110,10 +29110,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, double * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29123,7 +29123,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, double value)
     using Traits = NumericAttributeTraits<double>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29139,14 +29139,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 {
     uint8_t zclString[10 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 10, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 10, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 10);
     value.reduce_size(length);
     return status;
@@ -29154,7 +29154,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 10, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 10, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[10 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -29170,14 +29170,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 {
     uint8_t zclString[1000 + 2];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfLongStringLength(zclString);
     if (length == NumericAttributeTraits<uint16_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 1000, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 1000, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[2], 1000);
     value.reduce_size(length);
     return status;
@@ -29185,7 +29185,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(1000 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 1000, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 1000, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[1000 + 2];
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
@@ -29201,14 +29201,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[10 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 10, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 10, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[1], 10);
     value.reduce_size(length);
     return status;
@@ -29216,7 +29216,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 10, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 10, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[10 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -29232,14 +29232,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
     uint8_t zclString[1000 + 2];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfLongStringLength(zclString);
     if (length == NumericAttributeTraits<uint16_t>::kNullValue)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 1000, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(value.size() == 1000, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(value.data(), &zclString[2], 1000);
     value.reduce_size(length);
     return status;
@@ -29247,7 +29247,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(1000 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 1000, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 1000, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[1000 + 2];
     auto length = static_cast<uint16_t>(value.size());
     Encoding::LittleEndian::Put16(zclString, length);
@@ -29265,10 +29265,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29278,7 +29278,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<uint64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29296,10 +29296,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29309,7 +29309,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29327,10 +29327,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29340,7 +29340,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value)
     using Traits = NumericAttributeTraits<chip::VendorId>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29358,10 +29358,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::S
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29371,7 +29371,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::S
     using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29389,10 +29389,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29402,7 +29402,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29420,10 +29420,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29433,7 +29433,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29451,10 +29451,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29464,7 +29464,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29482,10 +29482,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29495,7 +29495,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29513,10 +29513,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29526,7 +29526,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29544,10 +29544,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -29557,7 +29557,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29575,7 +29575,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<bool> & value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -29591,7 +29591,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29629,7 +29629,7 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -29645,7 +29645,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29684,7 +29684,7 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -29700,7 +29700,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29739,7 +29739,7 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -29755,7 +29755,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29794,7 +29794,7 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -29810,7 +29810,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29848,7 +29848,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -29864,7 +29864,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29901,7 +29901,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -29917,7 +29917,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -29954,7 +29954,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -29970,7 +29970,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30007,7 +30007,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30023,7 +30023,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30060,7 +30060,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30076,7 +30076,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<5, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30113,7 +30113,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30129,7 +30129,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<6, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30166,7 +30166,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30182,7 +30182,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<7, false>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30219,7 +30219,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30235,7 +30235,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     using Traits = NumericAttributeTraits<uint64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30272,7 +30272,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int8_t> & value
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30288,7 +30288,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30325,7 +30325,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30341,7 +30341,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30378,7 +30378,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int32_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30394,7 +30394,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, true>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30431,7 +30431,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int32_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30447,7 +30447,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     using Traits = NumericAttributeTraits<int32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30484,7 +30484,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30500,7 +30500,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<5, true>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30537,7 +30537,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30553,7 +30553,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<6, true>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30590,7 +30590,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30606,7 +30606,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     using Traits = NumericAttributeTraits<OddSizedInteger<7, true>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30643,7 +30643,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30659,7 +30659,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     using Traits = NumericAttributeTraits<int64_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30696,7 +30696,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30712,7 +30712,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30749,7 +30749,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30765,7 +30765,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30802,7 +30802,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30818,7 +30818,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
     using Traits = NumericAttributeTraits<float>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30855,7 +30855,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<double> & value
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -30871,7 +30871,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, double value)
     using Traits = NumericAttributeTraits<double>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -30906,16 +30906,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 {
     uint8_t zclString[10 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
         value.SetNull();
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
     auto & span = value.SetNonNull();
 
-    VerifyOrReturnError(span.size() == 10, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(span.size() == 10, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(span.data(), &zclString[1], 10);
     span.reduce_size(length);
     return status;
@@ -30923,7 +30923,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableBy
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
     static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 10, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 10, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[10 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -30955,16 +30955,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableCh
 {
     uint8_t zclString[10 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
     {
         value.SetNull();
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
     auto & span = value.SetNonNull();
 
-    VerifyOrReturnError(span.size() == 10, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError(span.size() == 10, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy(span.data(), &zclString[1], 10);
     span.reduce_size(length);
     return status;
@@ -30972,7 +30972,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableCh
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
     static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 10, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= 10, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[10 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
@@ -31006,7 +31006,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clus
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -31022,7 +31022,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::S
     using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31060,7 +31060,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -31076,7 +31076,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31113,7 +31113,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int8_t> & value
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -31129,7 +31129,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     using Traits = NumericAttributeTraits<int8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31166,7 +31166,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -31182,7 +31182,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31219,7 +31219,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
         value.SetNull();
@@ -31235,7 +31235,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     using Traits = NumericAttributeTraits<int16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31272,10 +31272,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -31285,7 +31285,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31303,10 +31303,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -31316,7 +31316,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31334,10 +31334,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -31347,7 +31347,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31365,10 +31365,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -31378,7 +31378,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31402,10 +31402,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FaultInjection::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -31415,7 +31415,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31433,10 +31433,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FaultInjection::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -31446,7 +31446,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31470,10 +31470,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SampleMei::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -31483,7 +31483,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     using Traits = NumericAttributeTraits<bool>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31501,10 +31501,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SampleMei::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -31514,7 +31514,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
@@ -31532,10 +31532,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SampleMei::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     return status;
@@ -31545,7 +31545,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     using Traits = NumericAttributeTraits<uint16_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);

@@ -245,7 +245,7 @@ void AppTask::UpdateClusterState(intptr_t context)
     EmberStatus status;
     bool onOffState = !PumpMgr().IsStopped();
     status          = chip::app::Clusters::OnOff::Attributes::OnOff::Set(PCC_CLUSTER_ENDPOINT, onOffState);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", status);
     }

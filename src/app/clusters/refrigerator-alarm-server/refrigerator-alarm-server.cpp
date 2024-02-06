@@ -44,7 +44,7 @@ RefrigeratorAlarmServer & RefrigeratorAlarmServer::Instance()
 EmberAfStatus RefrigeratorAlarmServer::GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask)
 {
     EmberAfStatus status = Attributes::Mask::Get(endpoint, mask);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  mask, err:0x%x", status);
     }
@@ -59,7 +59,7 @@ EmberAfStatus RefrigeratorAlarmServer::GetMaskValue(EndpointId endpoint, BitMask
 EmberAfStatus RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state)
 {
     EmberAfStatus status = Attributes::State::Get(endpoint, state);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading state, err:0x%x", status);
     }
@@ -74,7 +74,7 @@ EmberAfStatus RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMas
 EmberAfStatus RefrigeratorAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * supported)
 {
     EmberAfStatus status = Attributes::Supported::Get(endpoint, supported);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  supported, err:0x%x", status);
     }
@@ -88,9 +88,9 @@ EmberAfStatus RefrigeratorAlarmServer::GetSupportedValue(EndpointId endpoint, Bi
 
 EmberAfStatus RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
     status               = Attributes::Mask::Set(endpoint, mask);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing  mask, err:0x%x", status);
         return status;
@@ -101,7 +101,7 @@ EmberAfStatus RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const B
     // Whenever there is change in Mask, State should change accordingly.
     BitMask<AlarmMap> state;
     status = GetStateValue(endpoint, &state);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         return status;
     }
@@ -116,18 +116,18 @@ EmberAfStatus RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const B
 
 EmberAfStatus RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, BitMask<AlarmMap> newState)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
     BitMask<AlarmMap> currentState;
 
     status = Attributes::State::Get(endpoint, &currentState);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  state, err:0x%x", status);
         return status;
     }
 
     status = Attributes::State::Set(endpoint, newState);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing  state, err:0x%x", status);
         return status;
@@ -144,7 +144,7 @@ EmberAfStatus RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, BitMas
     BitMask<AlarmMap> mask;
 
     status = GetMaskValue(endpoint, &mask);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         return status;
     }
@@ -155,9 +155,9 @@ EmberAfStatus RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, BitMas
 
 EmberAfStatus RefrigeratorAlarmServer::SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
     status               = Attributes::Supported::Set(endpoint, supported);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing supported, err:0x%x", status);
         return status;
@@ -168,7 +168,7 @@ EmberAfStatus RefrigeratorAlarmServer::SetSupportedValue(EndpointId endpoint, co
     // Whenever there is change in Supported attribute, Mask, State should change accordingly.
     BitMask<AlarmMap> mask;
     status = GetMaskValue(endpoint, &mask);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         return status;
     }

@@ -58,7 +58,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     default:
         break;
     }
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 /*
@@ -105,7 +105,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     default:
         break;
     }
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 // Include door lock callbacks only when the server is enabled

@@ -849,7 +849,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                       XCTAssertNil(result[@"data"]);
                                       XCTAssertTrue([result[@"error"] isKindOfClass:[NSError class]]);
                                       XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]],
-                                          EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+                                          MATTER_CL_STATUS_UNSUPPORTED_CLUSTER);
                                   }
 
                                   [expectation fulfill];
@@ -878,7 +878,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
 
                               XCTAssertNil(values);
-                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE);
+                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE);
 
                               [expectation fulfill];
                           }];
@@ -916,7 +916,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
                              XCTAssertNil(values);
-                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], MATTER_CL_STATUS_UNSUPPORTED_COMMAND);
 
                              [expectation fulfill];
                          }];
@@ -930,9 +930,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * errorReportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         // Because our subscription has no existent paths, it gets an
-        // InvalidAction response, which is EMBER_ZCL_STATUS_MALFORMED_COMMAND.
+        // InvalidAction response, which is MATTER_CL_STATUS_MALFORMED_COMMAND.
         XCTAssertNil(values);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], MATTER_CL_STATUS_MALFORMED_COMMAND);
         [errorReportExpectation fulfill];
     };
 

@@ -463,7 +463,7 @@ void AppTask::UpdateClusterState()
 
     // write the new on/off value
     EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(1, onoff);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "Updating on/off cluster failed: %x", status);
     }
@@ -472,7 +472,7 @@ void AppTask::UpdateClusterState()
 
     status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(1, level);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "Updating level cluster failed: %x", status);
     }

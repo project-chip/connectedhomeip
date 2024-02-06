@@ -74,7 +74,7 @@ void Light::UpdateState()
             mEndpointId, mTargetLightIsOn.Value() ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id,
             false /* initiatedByLevelChange */);
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(AppServer, "Failed to set on/off value: %d", status);
         }

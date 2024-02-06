@@ -204,7 +204,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     CalendarTypeEnum validType;
     EmberAfStatus status = ActiveCalendarType::Get(endpoint, &calendarType);
 
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+    VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status,
                    ChipLogError(Zcl, "Failed to read calendar type with error: 0x%02x", status));
 
     // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
@@ -212,7 +212,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     if (!IsSupportedCalendarType(calendarType, validType))
     {
         status = ActiveCalendarType::Set(endpoint, validType);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status,
                        ChipLogError(Zcl, "Failed to write calendar type with error: 0x%02x", status));
     }
 }

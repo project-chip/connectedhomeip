@@ -86,7 +86,7 @@ void asr_matter_onoff(int value)
     EmberAfStatus status = chip::app::Clusters::OnOff::Attributes::OnOff::Set(
         /* endpoint ID */ 1, (uint8_t *) &value);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "ERR: updating on/off %x", status);
     }

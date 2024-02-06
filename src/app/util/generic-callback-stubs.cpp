@@ -38,14 +38,14 @@ EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                      uint8_t * buffer, uint16_t maxReadLength)
 {
-    return EMBER_ZCL_STATUS_FAILURE;
+    return MATTER_CL_STATUS_FAILURE;
 }
 
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                       uint8_t * buffer)
 {
-    return EMBER_ZCL_STATUS_FAILURE;
+    return MATTER_CL_STATUS_FAILURE;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))

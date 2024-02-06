@@ -59,7 +59,7 @@ CHIP_ERROR ChefFanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEn
     DataModel::Nullable<Percent> percentSetting;
     EmberAfStatus status = PercentSetting::Get(mEndpoint, percentSetting);
 
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, CHIP_ERROR_READ_FAILED);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, CHIP_ERROR_READ_FAILED);
 
     return aEncoder.Encode(percentSetting.ValueOr(0));
 }
@@ -70,7 +70,7 @@ CHIP_ERROR ChefFanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEnco
     DataModel::Nullable<uint8_t> speedSetting;
     EmberAfStatus status = SpeedSetting::Get(mEndpoint, speedSetting);
 
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, CHIP_ERROR_READ_FAILED);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, CHIP_ERROR_READ_FAILED);
 
     return aEncoder.Encode(speedSetting.ValueOr(0));
 }
@@ -86,15 +86,15 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
 
     uint8_t speedMax;
     status = SpeedMax::Get(mEndpoint, &speedMax);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidCommand);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, Status::InvalidCommand);
 
     uint8_t speedCurrent;
     status = SpeedCurrent::Get(mEndpoint, &speedCurrent);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidCommand);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, Status::InvalidCommand);
 
     DataModel::Nullable<uint8_t> speedSetting;
     status = SpeedSetting::Get(mEndpoint, speedSetting);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidCommand);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, Status::InvalidCommand);
 
     uint8_t newSpeedSetting    = speedSetting.ValueOr(0);
     uint8_t speedValue         = speedSetting.ValueOr(speedCurrent);

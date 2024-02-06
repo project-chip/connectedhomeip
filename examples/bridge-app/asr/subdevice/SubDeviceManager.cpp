@@ -62,13 +62,13 @@ int AddDeviceEndpoint(SubDevice * dev, EmberAfEndpointType * ep, const Span<cons
                 dev->SetEndpointId(gCurrentEndpointId);
                 ret =
                     emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
-                if (ret == EMBER_ZCL_STATUS_SUCCESS)
+                if (ret == MATTER_CL_STATUS_SUCCESS)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
                                     gCurrentEndpointId, index);
                     return index;
                 }
-                else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+                else if (ret != MATTER_CL_STATUS_DUPLICATE_EXISTS)
                 {
                     return -1;
                 }
@@ -125,10 +125,10 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(SubDevice * dev, chip::Attri
     }
     else
     {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return MATTER_CL_STATUS_FAILURE;
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 EmberAfStatus HandleReadOnOffAttribute(SubDevice * dev, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
@@ -145,19 +145,19 @@ EmberAfStatus HandleReadOnOffAttribute(SubDevice * dev, chip::AttributeId attrib
     }
     else
     {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return MATTER_CL_STATUS_FAILURE;
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 EmberAfStatus HandleWriteOnOffAttribute(SubDevice * dev, chip::AttributeId attributeId, uint8_t * buffer)
 {
     ChipLogProgress(DeviceLayer, "HandleWriteOnOffAttribute: attrId=%" PRIu32, attributeId);
 
-    ReturnErrorCodeIf((attributeId != OnOff::Attributes::OnOff::Id) || (!dev->IsReachable()), EMBER_ZCL_STATUS_FAILURE);
+    ReturnErrorCodeIf((attributeId != OnOff::Attributes::OnOff::Id) || (!dev->IsReachable()), MATTER_CL_STATUS_FAILURE);
     dev->SetOnOff(*buffer == 1);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
@@ -181,7 +181,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         }
     }
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return MATTER_CL_STATUS_FAILURE;
 }
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
@@ -199,7 +199,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
         }
     }
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return MATTER_CL_STATUS_FAILURE;
 }
 
 namespace {

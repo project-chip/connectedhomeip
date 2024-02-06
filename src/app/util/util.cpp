@@ -57,7 +57,7 @@ bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
     uint16_t identifyTime;
     EmberAfStatus status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
-    return (status == EMBER_ZCL_STATUS_SUCCESS && 0 < identifyTime);
+    return (status == MATTER_CL_STATUS_SUCCESS && 0 < identifyTime);
 #else
     return false;
 #endif

@@ -497,7 +497,7 @@ void AppTask::UpdateClusterState(void)
 
         EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
         }

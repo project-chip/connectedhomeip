@@ -240,13 +240,13 @@ void AppTask::UpdateClusterState(void)
 
     // write the new on/off value
     status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         LOG_ERR("Update OnOff fail: %x", status);
     }
 
     status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kExampleEndpointId, setLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         LOG_ERR("Update CurrentLevel fail: %x", status);
     }

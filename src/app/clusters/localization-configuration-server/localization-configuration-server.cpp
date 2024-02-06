@@ -165,7 +165,7 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
     MutableCharSpan activeLocale(outBuf);
     EmberAfStatus status = ActiveLocale::Get(endpoint, activeLocale);
 
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Failed to read ActiveLocale with error: 0x%02x", status));
+    VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Failed to read ActiveLocale with error: 0x%02x", status));
 
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
 
@@ -208,7 +208,7 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
         {
             // If initial value is not one of the allowed values, write the valid value it.
             status = ActiveLocale::Set(endpoint, validLocale);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+            VerifyOrReturn(MATTER_CL_STATUS_SUCCESS == status,
                            ChipLogError(Zcl, "Failed to write active locale with error: 0x%02x", status));
         }
     }

@@ -206,7 +206,7 @@ void DBusInterface::InitOnOff()
 {
     bool isOn   = false;
     auto status = Clusters::OnOff::Attributes::OnOff::Get(mEndpointId, &isOn);
-    VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(NotSpecified, "Error getting OnOff: 0x%x", status));
+    VerifyOrReturn(status == MATTER_CL_STATUS_SUCCESS, ChipLogError(NotSpecified, "Error getting OnOff: 0x%x", status));
     light_app_on_off_set_on_off(mIfaceOnOff, isOn);
 }
 
@@ -215,13 +215,13 @@ void DBusInterface::InitColor()
     {
         uint8_t value = 0;
         auto status   = Clusters::ColorControl::Attributes::ColorMode::Get(mEndpointId, &value);
-        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(NotSpecified, "Error getting ColorMode: 0x%x", status));
+        VerifyOrReturn(status == MATTER_CL_STATUS_SUCCESS, ChipLogError(NotSpecified, "Error getting ColorMode: 0x%x", status));
         light_app_color_control_set_color_mode(mIfaceColorControl, value);
     }
     {
         uint16_t value = 0;
         auto status    = Clusters::ColorControl::Attributes::ColorTemperatureMireds::Get(mEndpointId, &value);
-        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS,
+        VerifyOrReturn(status == MATTER_CL_STATUS_SUCCESS,
                        ChipLogError(NotSpecified, "Error getting ColorTemperatureMireds: 0x%x", status));
         light_app_color_control_set_color_temperature_mireds(mIfaceColorControl, value);
     }

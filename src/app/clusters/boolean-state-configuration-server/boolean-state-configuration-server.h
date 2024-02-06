@@ -46,7 +46,7 @@ CHIP_ERROR EmitSensorFault(EndpointId ep, chip::BitMask<BooleanStateConfiguratio
 inline bool HasFeature(EndpointId ep, Feature feature)
 {
     uint32_t map;
-    bool success = (Attributes::FeatureMap::Get(ep, &map) == EMBER_ZCL_STATUS_SUCCESS);
+    bool success = (Attributes::FeatureMap::Get(ep, &map) == MATTER_CL_STATUS_SUCCESS);
     return success ? (map & to_underlying(feature)) : false;
 }
 

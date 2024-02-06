@@ -40,11 +40,11 @@ constexpr pw::Status ToPwStatus(EmberAfStatus ember_status)
 {
     switch (ember_status)
     {
-    case EMBER_ZCL_STATUS_SUCCESS:
+    case MATTER_CL_STATUS_SUCCESS:
         return pw::OkStatus();
-    case EMBER_ZCL_STATUS_NOT_FOUND:
+    case MATTER_CL_STATUS_NOT_FOUND:
         return pw::Status::NotFound();
-    case EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS:
+    case MATTER_CL_STATUS_UNSUPPORTED_ACCESS:
         return pw::Status::PermissionDenied();
     default:
         return pw::Status::Unknown();

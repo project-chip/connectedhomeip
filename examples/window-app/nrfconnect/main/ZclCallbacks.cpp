@@ -83,7 +83,7 @@ void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::Concre
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
     const auto logOnFailure = [](EmberAfStatus status, const char * attributeName) {
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(Zcl, "Failed to set WindowCovering %s: %x", attributeName, status);
         }

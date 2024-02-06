@@ -48,15 +48,15 @@ EmberAfStatus emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::Cluste
  * testing or setting the initial value of the attribute on the device.
  *
  * this returns:
- * - EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT: if endpoint isn't supported by the device.
- * - EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER: if cluster isn't supported on the endpoint.
- * - EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isn't supported in the cluster.
- * - EMBER_ZCL_STATUS_INVALID_DATA_TYPE: if the data type passed in doesnt match the type
+ * - MATTER_CL_STATUS_UNSUPPORTED_ENDPOINT: if endpoint isn't supported by the device.
+ * - MATTER_CL_STATUS_UNSUPPORTED_CLUSTER: if cluster isn't supported on the endpoint.
+ * - MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isn't supported in the cluster.
+ * - MATTER_CL_STATUS_INVALID_DATA_TYPE: if the data type passed in doesnt match the type
  *           stored in the attribute table
- * - EMBER_ZCL_STATUS_UNSUPPORTED_WRITE: if the attribute isnt writable
- * - EMBER_ZCL_STATUS_CONSTRAINT_ERROR: if the value is set out of the allowable range for
+ * - MATTER_CL_STATUS_UNSUPPORTED_WRITE: if the attribute isnt writable
+ * - MATTER_CL_STATUS_CONSTRAINT_ERROR: if the value is set out of the allowable range for
  *           the attribute
- * - EMBER_ZCL_STATUS_SUCCESS: if the attribute was found and successfully written
+ * - MATTER_CL_STATUS_SUCCESS: if the attribute was found and successfully written
  */
 EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
                                  EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);

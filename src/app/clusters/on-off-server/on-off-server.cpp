@@ -153,7 +153,7 @@ public:
         bool currentValue;
         // read current on/off value
         EmberAfStatus status = Attributes::OnOff::Get(endpoint, &currentValue);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(Zcl, "ERR: reading on/off %x", status);
             return CHIP_ERROR_READ_FAILED;
@@ -312,7 +312,7 @@ bool OnOffServer::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;
-    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == MATTER_CL_STATUS_SUCCESS);
 
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
@@ -321,7 +321,7 @@ EmberAfStatus OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * curre
 {
     // read current on/off value
     EmberAfStatus status = Attributes::OnOff::Get(endpoint, currentOnOffValue);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "ERR: reading on/off %x", status);
     }
@@ -348,7 +348,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
 
     // read current on/off value
     status = Attributes::OnOff::Get(endpoint, &currentValue);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "ERR: reading on/off %x", status);
         return status;
@@ -358,7 +358,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
     if ((!currentValue && command == Commands::Off::Id) || (currentValue && command == Commands::On::Id))
     {
         ChipLogProgress(Zcl, "Endpoint %x On/off already set to new value", endpoint);
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
 
     // we either got a toggle, or an on when off, or an off when on,
@@ -397,7 +397,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
 
         // write the new on/off value
         status = Attributes::OnOff::Set(endpoint, newValue);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogProgress(Zcl, "ERR: writing on/off %x", status);
             return status;
@@ -417,7 +417,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
             emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
         {
             ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
-            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
+            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == MATTER_CL_STATUS_SUCCESS && !onMode.IsNull())
             {
                 ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
                 status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
@@ -443,7 +443,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
         {
             // write the new on/off value
             status = Attributes::OnOff::Set(endpoint, newValue);
-            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            if (status != MATTER_CL_STATUS_SUCCESS)
             {
                 ChipLogProgress(Zcl, "ERR: writing on/off %x", status);
                 return status;
@@ -467,7 +467,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
 
     // The returned status is based solely on the On/Off cluster.  Errors in the
     // Level Control and/or Scenes cluster are ignored.
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
@@ -496,7 +496,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 
         bool onOffValueForStartUp = false;
         EmberAfStatus status      = getOnOffValueForStartUp(endpoint, onOffValueForStartUp);
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
+        if (status == MATTER_CL_STATUS_SUCCESS)
         {
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
@@ -513,7 +513,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
         {
             ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
-            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
+            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == MATTER_CL_STATUS_SUCCESS && !onMode.IsNull())
             {
                 ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
                 status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
@@ -537,12 +537,12 @@ EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bo
 {
     app::DataModel::Nullable<OnOff::StartUpOnOffEnum> startUpOnOff;
     EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    if (status == MATTER_CL_STATUS_SUCCESS)
     {
         // Initialise updated value to 0
         bool updatedOnOff = false;
         status            = Attributes::OnOff::Get(endpoint, &updatedOnOff);
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
+        if (status == MATTER_CL_STATUS_SUCCESS)
         {
             if (!startUpOnOff.IsNull())
             {

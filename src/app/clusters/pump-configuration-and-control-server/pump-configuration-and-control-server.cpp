@@ -232,7 +232,7 @@ bool HasFeature(EndpointId endpoint, Feature feature)
 {
     bool hasFeature;
     uint32_t featureMap;
-    hasFeature = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    hasFeature = (Attributes::FeatureMap::Get(endpoint, &featureMap) == MATTER_CL_STATUS_SUCCESS);
 
     return hasFeature ? ((featureMap & to_underlying(feature)) != 0) : false;
 }

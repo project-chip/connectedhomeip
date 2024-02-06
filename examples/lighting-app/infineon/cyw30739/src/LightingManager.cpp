@@ -52,7 +52,7 @@ bool LightingManager::IsLightOn(void)
     bool on                    = true;
     const EmberAfStatus status = OnOff::Attributes::OnOff::Get(1, &on);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         printf("Error ReadServerAttribute 0x%02x\n", status);
     }
@@ -101,7 +101,7 @@ void LightingManager::WriteClusterState(uint8_t value)
 {
     const EmberAfStatus status = OnOff::Attributes::OnOff::Set(1, value);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         printf("Error WriteServerAttribute 0x%02x\n", status);
     }
@@ -111,7 +111,7 @@ void LightingManager::WriteClusterLevel(uint8_t value)
 {
     const EmberAfStatus status = LevelControl::Attributes::CurrentLevel::Set(1, value);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         printf("Error WriteServerAttribute 0x%02x\n", status);
     }

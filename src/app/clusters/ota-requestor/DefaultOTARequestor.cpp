@@ -410,14 +410,14 @@ void DefaultOTARequestor::CancelImageUpdate()
 
 CHIP_ERROR DefaultOTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
 {
-    VerifyOrReturnError(OtaRequestorServerGetUpdateStateProgress(endpointId, progress) == EMBER_ZCL_STATUS_SUCCESS,
+    VerifyOrReturnError(OtaRequestorServerGetUpdateStateProgress(endpointId, progress) == MATTER_CL_STATUS_SUCCESS,
                         CHIP_ERROR_BAD_REQUEST);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DefaultOTARequestor::GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state)
 {
-    VerifyOrReturnError(OtaRequestorServerGetUpdateState(endpointId, state) == EMBER_ZCL_STATUS_SUCCESS, CHIP_ERROR_BAD_REQUEST);
+    VerifyOrReturnError(OtaRequestorServerGetUpdateState(endpointId, state) == MATTER_CL_STATUS_SUCCESS, CHIP_ERROR_BAD_REQUEST);
     return CHIP_NO_ERROR;
 }
 

@@ -59,8 +59,8 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
-    VerifyOrReturn(Attributes::TargetPositionLiftPercent100ths::Get(Endpoint(), target) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) == MATTER_CL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::TargetPositionLiftPercent100ths::Get(Endpoint(), target) == MATTER_CL_STATUS_SUCCESS);
 
     UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
 
@@ -70,7 +70,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     // assume single move completed
     Instance().mInLiftMove = false;
 
-    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) == MATTER_CL_STATUS_SUCCESS);
 
     if (!TargetCompleted(WindowCoveringType::Lift, current, target))
     {
@@ -102,7 +102,7 @@ chip::Percent100ths WindowCovering::CalculateSingleStep(WindowCoveringType aMove
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
     }
 
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+    if ((status == MATTER_CL_STATUS_SUCCESS) && !current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(opState, current.Value(), sPercentDelta);
     }
@@ -152,8 +152,8 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
-    VerifyOrReturn(Attributes::TargetPositionTiltPercent100ths::Get(Endpoint(), target) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) == MATTER_CL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::TargetPositionTiltPercent100ths::Get(Endpoint(), target) == MATTER_CL_STATUS_SUCCESS);
 
     UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
 
@@ -163,7 +163,7 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     // assume single move completed
     Instance().mInTiltMove = false;
 
-    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) == MATTER_CL_STATUS_SUCCESS);
 
     if (!TargetCompleted(WindowCoveringType::Tilt, current, target))
     {
@@ -235,7 +235,7 @@ void WindowCovering::SetTargetPosition(OperationalState aDirection, chip::Percen
         status = Attributes::TargetPositionTiltPercent100ths::Set(Endpoint(), aPosition);
     }
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         LOG_ERR("Cannot set the target position. Error: %d", static_cast<uint8_t>(status));
     }
@@ -249,7 +249,7 @@ void WindowCovering::PositionLEDUpdate(WindowCoveringType aMoveType)
     if (aMoveType == WindowCoveringType::Lift)
     {
         status = Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), currentPosition);
-        if (EMBER_ZCL_STATUS_SUCCESS == status && !currentPosition.IsNull())
+        if (MATTER_CL_STATUS_SUCCESS == status && !currentPosition.IsNull())
         {
             Instance().SetBrightness(WindowCoveringType::Lift, currentPosition.Value());
         }
@@ -257,7 +257,7 @@ void WindowCovering::PositionLEDUpdate(WindowCoveringType aMoveType)
     else if (aMoveType == WindowCoveringType::Tilt)
     {
         status = Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), currentPosition);
-        if (EMBER_ZCL_STATUS_SUCCESS == status && !currentPosition.IsNull())
+        if (MATTER_CL_STATUS_SUCCESS == status && !currentPosition.IsNull())
         {
             Instance().SetBrightness(WindowCoveringType::Tilt, currentPosition.Value());
         }

@@ -62,12 +62,12 @@ EmberAfStatus chefConcentrationMeasurementWriteCallback(
     AttributeId measuredValueId, chip::EndpointId endpoint, chip::ClusterId clusterId,
     const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
-    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus ret = MATTER_CL_STATUS_SUCCESS;
 
     if (map.find(endpoint) == map.end())
     {
         ChipLogError(DeviceLayer, "Invalid Endpoind ID: %d", endpoint);
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+        return MATTER_CL_STATUS_UNSUPPORTED_ENDPOINT;
     }
 
     Instance<NumericMeasurementEnabled, LevelIndicationEnabled, MediumLevelEnabled, CriticalLevelEnabled, PeakMeasurementEnabled,
@@ -95,13 +95,13 @@ EmberAfStatus chefConcentrationMeasurementWriteCallback(
         }
         else
         {
-            ret = EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+            ret = MATTER_CL_STATUS_UNSUPPORTED_WRITE;
             ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else
     {
-        ret = EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        ret = MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE;
         ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
     }
 
@@ -111,7 +111,7 @@ EmberAfStatus chefConcentrationMeasurementWriteCallback(
 EmberAfStatus chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                         const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
-    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus ret = MATTER_CL_STATUS_SUCCESS;
 
     switch (clusterId)
     {
@@ -178,7 +178,7 @@ EmberAfStatus chefConcentrationMeasurementReadCallback(chip::EndpointId endpoint
                                                        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                        uint16_t maxReadLength)
 {
-    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus ret = MATTER_CL_STATUS_SUCCESS;
 
     return ret;
 }

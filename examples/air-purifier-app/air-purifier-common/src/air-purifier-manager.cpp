@@ -199,7 +199,7 @@ void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
         ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingWriteCallback: %d", aNewPercentSetting);
         percentCurrent       = aNewPercentSetting;
         EmberAfStatus status = FanControl::Attributes::PercentCurrent::Set(mEndpointId, percentCurrent);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(NotSpecified,
                          "AirPurifierManager::PercentSettingWriteCallback: failed to set PercentCurrent attribute: %d", status);
@@ -214,7 +214,7 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
         ChipLogDetail(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: %d", aNewSpeedSetting);
         speedCurrent         = aNewSpeedSetting;
         EmberAfStatus status = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, speedCurrent);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: failed to set SpeedCurrent attribute: %d",
                          status);
@@ -301,7 +301,7 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
     if (aNewSpeedSetting.Value() != speedCurrent)
     {
         EmberAfStatus status = FanControl::Attributes::SpeedSetting::Set(mEndpointId, aNewSpeedSetting);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d", status);
         }
@@ -313,7 +313,7 @@ DataModel::Nullable<uint8_t> AirPurifierManager::GetSpeedSetting()
     DataModel::Nullable<uint8_t> speedSetting;
     EmberAfStatus status = FanControl::Attributes::SpeedSetting::Get(mEndpointId, speedSetting);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedSetting: failed to get SpeedSetting attribute: %d", status);
     }
@@ -326,7 +326,7 @@ DataModel::Nullable<Percent> AirPurifierManager::GetPercentSetting()
     DataModel::Nullable<Percent> percentSetting;
     EmberAfStatus status = FanControl::Attributes::PercentSetting::Get(mEndpointId, percentSetting);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get PercentSetting attribute: %d", status);
     }

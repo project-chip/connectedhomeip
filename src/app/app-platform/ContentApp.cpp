@@ -48,7 +48,7 @@ EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, AttributeId a
                     "Read Attribute for endpoint " ChipLogFormatMEI " cluster " ChipLogFormatMEI " attribute " ChipLogFormatMEI,
                     ChipLogValueMEI(mEndpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return MATTER_CL_STATUS_FAILURE;
 }
 
 EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer)
@@ -57,7 +57,7 @@ EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, AttributeId 
                     "Read Attribute for endpoint " ChipLogFormatMEI " cluster " ChipLogFormatMEI " attribute " ChipLogFormatMEI,
                     ChipLogValueMEI(mEndpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return MATTER_CL_STATUS_FAILURE;
 }
 
 } // namespace AppPlatform

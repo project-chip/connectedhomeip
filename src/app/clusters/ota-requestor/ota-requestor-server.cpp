@@ -149,19 +149,19 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const 
 // Global functions
 EmberAfStatus OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
     {
         OTAUpdateStateEnum currentValue;
         status = Attributes::UpdateState::Get(endpoint, &currentValue);
-        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+        VerifyOrDie(MATTER_CL_STATUS_SUCCESS == status);
 
         if (currentValue != value)
         {
             status = Attributes::UpdateState::Set(endpoint, value);
-            VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+            VerifyOrDie(MATTER_CL_STATUS_SUCCESS == status);
         }
     }
 
@@ -175,19 +175,19 @@ EmberAfStatus OtaRequestorServerGetUpdateState(chip::EndpointId endpointId, OTAU
 
 EmberAfStatus OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t> value)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
     {
         app::DataModel::Nullable<uint8_t> currentValue;
         status = Attributes::UpdateStateProgress::Get(endpoint, currentValue);
-        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+        VerifyOrDie(MATTER_CL_STATUS_SUCCESS == status);
 
         if (currentValue != value)
         {
             status = Attributes::UpdateStateProgress::Set(endpoint, value);
-            VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+            VerifyOrDie(MATTER_CL_STATUS_SUCCESS == status);
         }
     }
 

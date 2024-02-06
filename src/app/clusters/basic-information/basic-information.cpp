@@ -465,7 +465,7 @@ bool IsLocalConfigDisabled()
 {
     bool disabled        = false;
     EmberAfStatus status = LocalConfigDisabled::Get(0, &disabled);
-    return status == EMBER_ZCL_STATUS_SUCCESS && disabled;
+    return status == MATTER_CL_STATUS_SUCCESS && disabled;
 }
 } // namespace BasicInformation
 } // namespace Clusters

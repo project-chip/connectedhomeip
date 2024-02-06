@@ -103,7 +103,7 @@ bool ICDManager::SupportsFeature(Feature feature)
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
     uint32_t featureMap = 0;
-    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == MATTER_CL_STATUS_SUCCESS);
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 #else
     return ((mFeatureMap & to_underlying(feature)) != 0);

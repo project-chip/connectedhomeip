@@ -43,7 +43,7 @@ public:
     inline bool HasFeature(Feature feature)
     {
         uint32_t map;
-        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == EMBER_ZCL_STATUS_SUCCESS);
+        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == MATTER_CL_STATUS_SUCCESS);
         return success ? (map & to_underlying(feature)) : false;
     }
 

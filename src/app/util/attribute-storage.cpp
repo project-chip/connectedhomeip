@@ -261,17 +261,17 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
 
     if (realIndex >= MAX_ENDPOINT_COUNT)
     {
-        return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
+        return MATTER_CL_STATUS_RESOURCE_EXHAUSTED;
     }
     if (id == kInvalidEndpointId)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
 
     auto serverClusterCount = emberAfClusterCountForEndpointType(ep, /* server = */ true);
     if (dataVersionStorage.size() < serverClusterCount)
     {
-        return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
+        return MATTER_CL_STATUS_RESOURCE_EXHAUSTED;
     }
 
     index = static_cast<uint16_t>(realIndex);
@@ -279,7 +279,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
     {
         if (emAfEndpoints[i].endpoint == id)
         {
-            return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
+            return MATTER_CL_STATUS_DUPLICATE_EXISTS;
         }
     }
 
@@ -307,7 +307,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
     // Now enable the endpoint.
     emberAfEndpointEnableDisable(id, true);
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 EndpointId emberAfClearDynamicEndpoint(uint16_t index)
@@ -380,12 +380,12 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     {
         if (!emberAfEndpointIsEnabled(attributePath.mEndpointId))
         {
-            return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+            return MATTER_CL_STATUS_UNSUPPORTED_ENDPOINT;
         }
-        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+        return MATTER_CL_STATUS_UNSUPPORTED_CLUSTER;
     }
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = MATTER_CL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
     EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
@@ -500,7 +500,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     {
         if (bufferSize < 1)
         {
-            return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
+            return MATTER_CL_STATUS_RESOURCE_EXHAUSTED;
         }
         emberAfCopyString(dest, src, bufferSize - 1);
     }
@@ -508,7 +508,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     {
         if (bufferSize < 2)
         {
-            return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
+            return MATTER_CL_STATUS_RESOURCE_EXHAUSTED;
         }
         emberAfCopyLongString(dest, src, bufferSize - 2);
     }
@@ -516,7 +516,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     {
         if (bufferSize < 2)
         {
-            return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
+            return MATTER_CL_STATUS_RESOURCE_EXHAUSTED;
         }
 
         // Just copy the length.
@@ -526,7 +526,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     {
         if (!ignoreReadLength && readLength < am->size)
         {
-            return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
+            return MATTER_CL_STATUS_RESOURCE_EXHAUSTED;
         }
         if (src == nullptr)
         {
@@ -537,7 +537,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
             memmove(dest, src, am->size);
         }
     }
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 /**
@@ -630,14 +630,14 @@ EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attR
                                     if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
                                                                              am->attributeId))
                                     {
-                                        return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
+                                        return MATTER_CL_STATUS_UNSUPPORTED_ACCESS;
                                     }
                                 }
                                 else
                                 {
                                     if (buffer == nullptr)
                                     {
-                                        return EMBER_ZCL_STATUS_SUCCESS;
+                                        return MATTER_CL_STATUS_SUCCESS;
                                     }
 
                                     src = attributeLocation;
@@ -645,7 +645,7 @@ EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attR
                                     if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
                                                                             am->attributeId))
                                     {
-                                        return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
+                                        return MATTER_CL_STATUS_UNSUPPORTED_ACCESS;
                                     }
                                 }
 
@@ -664,7 +664,7 @@ EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attR
                                     return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
                                 }
 
-                                return EMBER_ZCL_STATUS_FAILURE;
+                                return MATTER_CL_STATUS_FAILURE;
                             }
                         }
                         else
@@ -678,7 +678,7 @@ EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attR
                     }
 
                     // Attribute is not in the cluster.
-                    return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+                    return MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE;
                 }
 
                 // Not the cluster we are looking for
@@ -686,7 +686,7 @@ EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attR
             }
 
             // Cluster is not in the endpoint.
-            return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+            return MATTER_CL_STATUS_UNSUPPORTED_CLUSTER;
         }
 
         // Not the endpoint we are looking for
@@ -696,7 +696,7 @@ EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attR
             attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
         }
     }
-    return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT; // Sorry, endpoint was not found.
+    return MATTER_CL_STATUS_UNSUPPORTED_ENDPOINT; // Sorry, endpoint was not found.
 }
 
 const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId)

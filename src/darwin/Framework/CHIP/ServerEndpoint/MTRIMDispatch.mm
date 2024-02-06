@@ -46,7 +46,7 @@ EmberAfStatus emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster,
 
     // All of our attributes are handled via AttributeAccessInterface, so this
     // should be unreached.
-    return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+    return MATTER_CL_STATUS_UNSUPPORTED_ATTRIBUTE;
 }
 
 namespace chip {

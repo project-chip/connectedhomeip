@@ -57,7 +57,7 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 
     // Temp. code for testing purpose, need to be updated
     const auto logOnFailure = [](EmberAfStatus status, const char * attributeName) {
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(Zcl, "Failed to set DoorLock %s: %x", attributeName, status);
         }

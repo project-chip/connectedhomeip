@@ -41,22 +41,22 @@ EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
     {{~#*inline "lengthType"}}uint{{#if (isShortString type)}}8{{else}}16{{/if}}_t{{/inline}}
     uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
     EmberAfStatus status = emberAfReadAttribute(endpoint, {{>clusterId}}, Id, zclString, sizeof(zclString));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     size_t length = emberAf{{#if (isLongString type)}}Long{{/if}}StringLength(zclString);
     if (length == NumericAttributeTraits<{{>lengthType}}>::kNullValue)
     {
       {{#if isNullable}}
       value.SetNull();
-      return EMBER_ZCL_STATUS_SUCCESS;
+      return MATTER_CL_STATUS_SUCCESS;
       {{else}}
-      return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+      return MATTER_CL_STATUS_CONSTRAINT_ERROR;
       {{/if}}
     }
     {{#if isNullable}}
     auto & span = value.SetNonNull();
     {{/if}}
     {{~#*inline "value"}}{{#if isNullable}}span{{else}}value{{/if}}{{/inline}}
-    VerifyOrReturnError({{>value}}.size() == {{maxLength}}, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    VerifyOrReturnError({{>value}}.size() == {{maxLength}}, MATTER_CL_STATUS_INVALID_DATA_TYPE);
     memcpy({{>value}}.data(), &zclString[{{>sizingBytes}}], {{maxLength}});
     {{>value}}.reduce_size(length);
     return status;
@@ -65,7 +65,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, {{>clusterId}}, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    VerifyOrReturnError(MATTER_CL_STATUS_SUCCESS == status, status);
     {{#if isNullable}}
     if (Traits::IsNullValue(temp))
     {
@@ -78,7 +78,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
     {{else}}
     if (!Traits::CanRepresentValue(/* isNullable = */ {{isNullable}}, temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     *value = Traits::StorageToWorking(temp);
     {{/if}}
@@ -91,7 +91,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectTy
     {{~#*inline "lengthType"}}uint{{#if (isShortString type)}}8{{else}}16{{/if}}_t{{/inline}}
     static_assert({{maxLength}} < NumericAttributeTraits<{{>lengthType}}>::kNullValue,
                   "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= {{maxLength}}, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(value.size() <= {{maxLength}}, MATTER_CL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
     auto length = static_cast<{{>lengthType}}>(value.size());
     {{#if (isShortString type)}}
@@ -105,7 +105,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectTy
     using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
     if (!Traits::CanRepresentValue(/* isNullable = */ {{isNullable}}, value))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return MATTER_CL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);

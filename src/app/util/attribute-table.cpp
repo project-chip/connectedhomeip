@@ -130,18 +130,18 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         if (dataType != metadata->attributeType)
         {
             ChipLogProgress(Zcl, "%p invalid data type", "WRITE ERR: ");
-            return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
+            return MATTER_CL_STATUS_INVALID_DATA_TYPE;
         }
 
         if (metadata->IsReadOnly())
         {
             ChipLogProgress(Zcl, "%p attr not writable", "WRITE ERR: ");
-            return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+            return MATTER_CL_STATUS_UNSUPPORTED_WRITE;
         }
     }
 
     // if the value the attribute is being set to is out of range
-    // return EMBER_ZCL_STATUS_CONSTRAINT_ERROR
+    // return MATTER_CL_STATUS_CONSTRAINT_ERROR
     if ((metadata->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
     {
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
@@ -178,7 +178,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             // null value is always in-range for a nullable attribute.
             (!metadata->IsNullable() || !IsNullValue(data, dataLen, isAttributeSigned)))
         {
-            return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+            return MATTER_CL_STATUS_CONSTRAINT_ERROR;
         }
     }
 
@@ -198,12 +198,12 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     status = emAfClusterPreAttributeChangedCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
 
     // Ignore the following write operation and return success
-    if (status == EMBER_ZCL_STATUS_WRITE_IGNORED)
+    if (status == MATTER_CL_STATUS_WRITE_IGNORED)
     {
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return MATTER_CL_STATUS_SUCCESS;
     }
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         return status;
     }
@@ -215,7 +215,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
                                       0,     // buffer size - unused
                                       true); // write?
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != MATTER_CL_STATUS_SUCCESS)
     {
         return status;
     }
@@ -234,7 +234,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     // to the cluster that the attribute lives in.
     emAfClusterAttributeChangedCallback(attributePath);
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return MATTER_CL_STATUS_SUCCESS;
 }
 
 EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
@@ -250,7 +250,7 @@ EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attri
                                                   false); // write?
 
     // failed, print debug info
-    if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
+    if (status == MATTER_CL_STATUS_RESOURCE_EXHAUSTED)
     {
         ChipLogProgress(Zcl, "READ: attribute size too large for caller");
     }

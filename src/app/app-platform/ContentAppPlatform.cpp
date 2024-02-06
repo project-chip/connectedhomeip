@@ -53,7 +53,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 
     ChipLogDetail(DeviceLayer, "emberAfExternalAttributeReadCallback endpoint %d ", endpointIndex);
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
+    EmberAfStatus ret = MATTER_CL_STATUS_FAILURE;
 
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
@@ -75,7 +75,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 
     ChipLogDetail(DeviceLayer, "emberAfExternalAttributeWriteCallback endpoint %d ", endpointIndex);
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
+    EmberAfStatus ret = MATTER_CL_STATUS_FAILURE;
 
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
@@ -97,14 +97,14 @@ EmberAfStatus __attribute__((weak)) AppPlatformExternalAttributeReadCallback(End
                                                                              const EmberAfAttributeMetadata * attributeMetadata,
                                                                              uint8_t * buffer, uint16_t maxReadLength)
 {
-    return (EMBER_ZCL_STATUS_FAILURE);
+    return (MATTER_CL_STATUS_FAILURE);
 }
 
 EmberAfStatus __attribute__((weak))
 AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                           const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
-    return (EMBER_ZCL_STATUS_FAILURE);
+    return (MATTER_CL_STATUS_FAILURE);
 }
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
@@ -142,7 +142,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
         do
         {
             ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
-            if (ret == EMBER_ZCL_STATUS_SUCCESS)
+            if (ret == MATTER_CL_STATUS_SUCCESS)
             {
                 ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
                                 mCurrentEndpointId, index);
@@ -151,7 +151,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
                 IncrementCurrentEndpointID();
                 return app->GetEndpointId();
             }
-            else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+            else if (ret != MATTER_CL_STATUS_DUPLICATE_EXISTS)
             {
                 ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
                 return kNoCurrentEndpointId;
@@ -203,7 +203,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             continue;
         }
         EmberAfStatus ret = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
-        if (ret != EMBER_ZCL_STATUS_SUCCESS)
+        if (ret != MATTER_CL_STATUS_SUCCESS)
         {
             ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
             return kNoCurrentEndpointId;
