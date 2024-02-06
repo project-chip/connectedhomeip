@@ -537,7 +537,6 @@ if (chip_device_platform != "none") {
     cflags = [ "-Wconversion" ]
 
     public_deps = [
-      ":device-safe-queue",
       ":platform_base",
       "${chip_root}/src/app:app_config",
       "${chip_root}/src/app/common:cluster-objects",
