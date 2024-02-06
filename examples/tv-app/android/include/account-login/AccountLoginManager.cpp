@@ -108,7 +108,7 @@ uint16_t AccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
 {
     if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return mDynamicClusterRevision;
+        return kClusterRevision;
     }
 
     uint16_t clusterRevision = 0;

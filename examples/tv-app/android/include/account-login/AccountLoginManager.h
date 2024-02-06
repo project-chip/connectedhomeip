@@ -56,5 +56,5 @@ private:
     ContentAppCommandDelegate * mCommandDelegate;
     EndpointId mEndpointId;
 
-    uint16_t mDynamicClusterRevision = 2;
+    static constexpr uint16_t kClusterRevision = 2;
 };
