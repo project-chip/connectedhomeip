@@ -21,7 +21,7 @@
 #include <json/json.h>
 #include <lib/support/Base64.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 using namespace chip::DeviceLayer;
 
