@@ -415,14 +415,19 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 }
 
 source_set("platform_config_header") {
-  sources = [ "../include/platform/CHIPDeviceConfig.h" ]
+  sources = [ "include/platform/CHIPDeviceConfig.h" ]
 
   deps = [ ":platform_buildconfig" ]
 }
 
+config("includes") {
+  # Platform includes are stored separately from cpp files
+  include_dirs = [ "include" ]
+}
+
 if (chip_device_platform != "none") {
   source_set("device-event") {
-    sources = [ "../include/platform/CHIPDeviceEvent.h" ]
+    sources = [ "include/platform/CHIPDeviceEvent.h" ]
 
     public_deps = [
       "${chip_root}/src/ble",
@@ -430,8 +435,9 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
       "${chip_root}/src/system",
-
     ]
+
+    public_configs = [ ":includes" ]
   }
 
   source_set("device-safe-queue") {
@@ -445,6 +451,8 @@ if (chip_device_platform != "none") {
       ":platform_config_header",
       "${chip_root}/src/lib/core",
     ]
+
+    public_configs = [ ":includes" ]
   }
 
   source_set("platform_base") {
@@ -465,52 +473,6 @@ if (chip_device_platform != "none") {
     output_name = "libDeviceLayer"
 
     sources = [
-      "../include/platform/BuildTime.h",
-      "../include/platform/CHIPDeviceError.h",
-      "../include/platform/CHIPDeviceLayer.h",
-      "../include/platform/CommissionableDataProvider.h",
-      "../include/platform/ConfigurationManager.h",
-      "../include/platform/ConnectivityManager.h",
-      "../include/platform/DeviceControlServer.h",
-      "../include/platform/DeviceInstanceInfoProvider.h",
-      "../include/platform/GeneralUtils.h",
-      "../include/platform/KeyValueStoreManager.h",
-      "../include/platform/KvsPersistentStorageDelegate.h",
-      "../include/platform/PersistedStorage.h",
-      "../include/platform/PlatformManager.h",
-      "../include/platform/RuntimeOptionsProvider.h",
-      "../include/platform/TestOnlyCommissionableDataProvider.h",
-      "../include/platform/ThreadStackManager.h",
-      "../include/platform/internal/BLEManager.h",
-      "../include/platform/internal/CHIPDeviceLayerInternal.h",
-      "../include/platform/internal/DeviceNetworkInfo.h",
-      "../include/platform/internal/EventLogging.h",
-      "../include/platform/internal/GenericConfigurationManagerImpl.h",
-      "../include/platform/internal/GenericConfigurationManagerImpl.ipp",
-      "../include/platform/internal/GenericConnectivityManagerImpl.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_BLE.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_BLE.ipp",
-      "../include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_NoThread.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_TCP.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_TCP.ipp",
-      "../include/platform/internal/GenericConnectivityManagerImpl_Thread.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp",
-      "../include/platform/internal/GenericConnectivityManagerImpl_UDP.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_UDP.ipp",
-      "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.h",
-      "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.ipp",
-      "../include/platform/internal/GenericDeviceInstanceInfoProvider.h",
-      "../include/platform/internal/GenericDeviceInstanceInfoProvider.ipp",
-      "../include/platform/internal/GenericPlatformManagerImpl.h",
-      "../include/platform/internal/GenericPlatformManagerImpl.ipp",
-      "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
-      "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp",
-      "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
-      "../include/platform/internal/GenericPlatformManagerImpl_POSIX.ipp",
-      "../include/platform/internal/GenericPlatformManagerImpl_Zephyr.ipp",
-      "../include/platform/internal/testing/ConfigUnitTest.h",
       "CommissionableDataProvider.cpp",
       "DeviceControlServer.cpp",
       "DeviceInfoProvider.cpp",
@@ -523,6 +485,52 @@ if (chip_device_platform != "none") {
       "PersistedStorage.cpp",
       "PlatformEventSupport.cpp",
       "RuntimeOptionsProvider.cpp",
+      "include/platform/BuildTime.h",
+      "include/platform/CHIPDeviceError.h",
+      "include/platform/CHIPDeviceLayer.h",
+      "include/platform/CommissionableDataProvider.h",
+      "include/platform/ConfigurationManager.h",
+      "include/platform/ConnectivityManager.h",
+      "include/platform/DeviceControlServer.h",
+      "include/platform/DeviceInstanceInfoProvider.h",
+      "include/platform/GeneralUtils.h",
+      "include/platform/KeyValueStoreManager.h",
+      "include/platform/KvsPersistentStorageDelegate.h",
+      "include/platform/PersistedStorage.h",
+      "include/platform/PlatformManager.h",
+      "include/platform/RuntimeOptionsProvider.h",
+      "include/platform/TestOnlyCommissionableDataProvider.h",
+      "include/platform/ThreadStackManager.h",
+      "include/platform/internal/BLEManager.h",
+      "include/platform/internal/CHIPDeviceLayerInternal.h",
+      "include/platform/internal/DeviceNetworkInfo.h",
+      "include/platform/internal/EventLogging.h",
+      "include/platform/internal/GenericConfigurationManagerImpl.h",
+      "include/platform/internal/GenericConfigurationManagerImpl.ipp",
+      "include/platform/internal/GenericConnectivityManagerImpl.h",
+      "include/platform/internal/GenericConnectivityManagerImpl_BLE.h",
+      "include/platform/internal/GenericConnectivityManagerImpl_BLE.ipp",
+      "include/platform/internal/GenericConnectivityManagerImpl_NoBLE.h",
+      "include/platform/internal/GenericConnectivityManagerImpl_NoThread.h",
+      "include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h",
+      "include/platform/internal/GenericConnectivityManagerImpl_TCP.h",
+      "include/platform/internal/GenericConnectivityManagerImpl_TCP.ipp",
+      "include/platform/internal/GenericConnectivityManagerImpl_Thread.h",
+      "include/platform/internal/GenericConnectivityManagerImpl_Thread.ipp",
+      "include/platform/internal/GenericConnectivityManagerImpl_UDP.h",
+      "include/platform/internal/GenericConnectivityManagerImpl_UDP.ipp",
+      "include/platform/internal/GenericConnectivityManagerImpl_WiFi.h",
+      "include/platform/internal/GenericConnectivityManagerImpl_WiFi.ipp",
+      "include/platform/internal/GenericDeviceInstanceInfoProvider.h",
+      "include/platform/internal/GenericDeviceInstanceInfoProvider.ipp",
+      "include/platform/internal/GenericPlatformManagerImpl.h",
+      "include/platform/internal/GenericPlatformManagerImpl.ipp",
+      "include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
+      "include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp",
+      "include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
+      "include/platform/internal/GenericPlatformManagerImpl_POSIX.ipp",
+      "include/platform/internal/GenericPlatformManagerImpl_Zephyr.ipp",
+      "include/platform/internal/testing/ConfigUnitTest.h",
     ]
 
     # Linux has its own NetworkCommissioningThreadDriver

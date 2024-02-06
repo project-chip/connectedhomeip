@@ -33,7 +33,6 @@ build_relative_chip_root = rebase_path("${chip_root}/.", root_build_dir)
 
 config("includes") {
   include_dirs = [
-    "include",
     ".",
     "${root_gen_dir}/include",
   ]
