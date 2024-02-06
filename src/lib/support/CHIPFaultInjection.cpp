@@ -37,7 +37,10 @@ static const nl::FaultInjection::Name sManagerName  = "chip";
 static const nl::FaultInjection::Name sFaultNames[] = {
     "AllocExchangeContext", "DropIncomingUDPMsg",   "DropOutgoingUDPMsg", "AllocBinding", "SendAlarm",
     "HandleAlarm",          "FuzzExchangeHeaderTx", "RMPDoubleTx",        "RMPSendError", "BDXBadBlockCounter",
-    "BDXAllocTransfer",     "CASEKeyConfirm",       "SecMgrBusy",
+    "BDXAllocTransfer",     "SecMgrBusy",
+    "BatchCommandIdmTcHelper1"
+    "BatchCommandIdmTcHelper2"
+    "BatchCommandIdmTcHelper3"
 #if CONFIG_NETWORK_LAYER_BLE
     "CHIPOBLESend",
 #endif // CONFIG_NETWORK_LAYER_BLE

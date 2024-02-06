@@ -57,11 +57,19 @@ typedef enum
     kFault_BDXBadBlockCounter,   /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,     /**< Fail the allocation of a BDXTransfer object */
     kFault_SecMgrBusy,           /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
+    // TODO find a better name for these
+    kFault_BatchCommandIdmTcHelper1, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2 InvokeResponseMessages */
+    kFault_BatchCommandIdmTcHelper2, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2 InvokeResponseMessages where response are inverted order to the request order */
+    kFault_BatchCommandIdmTcHelper3, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 1 InvokeResponseMessages, dropping the response to the second request */
 #if CONFIG_NETWORK_LAYER_BLE
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif                   // CONFIG_NETWORK_LAYER_BLE
     kFault_NumItems,
 } Id;
+
+static_assert(kFault_BatchCommandIdmTcHelper1 == 12, "Test plan specification and automation code relies on this value being 12");
+static_assert(kFault_BatchCommandIdmTcHelper2 == 13, "Test plan specification and automation code relies on this value being 13");
+static_assert(kFault_BatchCommandIdmTcHelper3 == 14, "Test plan specification and automation code relies on this value being 14");
 
 DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 

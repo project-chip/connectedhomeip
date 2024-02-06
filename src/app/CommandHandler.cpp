@@ -911,6 +911,99 @@ void CommandHandler::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "Command handler moving to [%10.10s]", GetStateStr());
 }
 
+#if CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+namespace {
+
+CHIP_ERROR TestOnlyExtractCommandPathFromNextInvokeRequest(TLV::TLVReader & invokeRequestsReader, ConcreteCommandPath & concretePath)
+{
+    CommandPathIB::Parser commandPath;
+    ReturnErrorOnFailure(invokeRequestsReader.Next());
+    VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_ARGUMENT);
+    CommandDataIB::Parser commandData;
+    ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
+    ReturnErrorOnFailure(commandData.GetPath(&commandPath));
+    return commandPath.GetConcreteCommandPath(concretePath);
+}
+
+} // anonymous namespace
+
+// This method copies code from other sections of this file. Minimal attempt is made at consolidating
+// repeatative code because within this method we want to server to crash with a helpful message that
+// is actionable to understand why test failed.
+void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec,
+                            System::PacketBufferHandle && payload, bool isTimedInvoke,
+                            bool oneReponsePerMessage, bool invertResponseOrdering, bool dropSecondResponse)
+{
+    VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH failured: Incoming exchange context should not be null");
+    VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH failured: state should be Idle, issue with TH");
+
+    // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
+    // Exchange Manager for unsolicited InvokeCommand Requests.
+    mResponseSender.SetExchangeContext(ec);
+    Handle workHandle(this);
+    mResponseSender.WillSendMessage();
+    VerifyOrDieWithMsg(!mResponseSender.IsForGroup(), DataManagement, "DUT failure: Unexpected Group Command");
+
+    System::PacketBufferTLVReader reader;
+    InvokeRequestMessage::Parser invokeRequestMessage;
+    InvokeRequests::Parser invokeRequests;
+    reader.Init(std::move(payload));
+    VerifyOrDieWithMsg(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, DataManagement, "TH failure: Failed 'invokeRequestMessage.Init(reader)'");
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    invokeRequestMessage.PrettyPrint();
+#endif
+
+    VerifyOrDieWithMsg(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, DataManagement, "DUT failure: Manditory SuppressResponse field missing");
+    VerifyOrDieWithMsg(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, DataManagement, "DUT failure: Manditory TimedRequest field missing");
+    VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement, "DUT failure: Manditory InvokeRequests field missing");
+    VerifyOrDieWithMsg(mTimedRequest == isTimedInvoke, DataManagement, "DUT failure: TimedRequest value in message mismatches action");
+
+    {
+        InvokeRequestMessage::Parser validationInvokeRequestMessage = invokeRequestMessage;
+        VerifyOrDieWithMsg(ValidateInvokeRequestMessageAndBuildRegistry(validationInvokeRequestMessage) == CHIP_NO_ERROR,
+                           DataManagement, "DUT failure: Failed to validate InvokeRequestMessage contents");
+    }
+
+    TLV::TLVReader invokeRequestsReader;
+    invokeRequests.GetReader(&invokeRequestsReader);
+
+    size_t commandCount = 0;
+    VerifyOrDieWithMsg(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */) == CHIP_NO_ERROR,
+                       DataManagement, "TH failure: Failed to get length of InvokeRequests after InvokeRequest Message validation");
+    VerifyOrDieWithMsg(commandCount == 2, DataManagement, "DUT failure: We were strictly expecting exactly 2 InvokeRequests");
+    mReserveSpaceForMoreChunkMessages = true;
+
+    {
+        // Response path is the same as request path since we are reply with a failure message.
+        ConcreteCommandPath concreteResponsePath1(0, 0, 0);
+        ConcreteCommandPath concreteResponsePath2(0, 0, 0);
+        VerifyOrDieWithMsg(TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath1) == CHIP_NO_ERROR, DataManagement, "DUT Failure: Issues extracting first ConcretePath");
+        VerifyOrDieWithMsg(TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath2) == CHIP_NO_ERROR, DataManagement, "DUT Failure: Issues extracting second ConcretePath");
+
+        if (invertResponseOrdering)
+        {
+            ConcreteCommandPath temp(concreteResponsePath1);
+            concreteResponsePath1 = concreteResponsePath2;
+            concreteResponsePath2 = temp;
+        }
+
+        VerifyOrDieWithMsg(FallibleAddStatus(concreteResponsePath1, Status::Failure) == CHIP_NO_ERROR, DataManagement, "TH Failure: Failed to add first InvokeResponse error");
+        if (oneReponsePerMessage)
+        {
+            VerifyOrDieWithMsg(FinalizeInvokeResponseMessageAndPrepareNext() == CHIP_NO_ERROR, DataManagement, "TH Failure: Failed to create second InvokeResponseMessage");
+        }
+        if (!dropSecondResponse)
+        {
+            VerifyOrDieWithMsg(FallibleAddStatus(concreteResponsePath2, Status::Failure) == CHIP_NO_ERROR, DataManagement, "TH Failure: Failed to add second InvokeResponse error");
+        }
+    }
+
+    VerifyOrDieWithMsg(invokeRequestsReader.Next() == CHIP_END_OF_TLV, DataManagement, "DUT Failure: Unexpected TLV ending of InvokeRequests");
+    VerifyOrDieWithMsg(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, DataManagement, "DUT Failure: Failed to exit TLV contain for InvokeRequestMessage");
+}
+#endif  // CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
 } // namespace app
 } // namespace chip
 

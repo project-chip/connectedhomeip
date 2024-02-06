@@ -37,6 +37,7 @@
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
+#include <lib/support/CHIPFaultInjection.h>
 
 namespace chip {
 namespace app {
@@ -411,6 +412,9 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
         return Status::Busy;
     }
+    CHIP_FAULT_INJECT(FaultInjection::kFault_BatchCommandIdmTcHelper1, commandHandler->TestOnlyTcIdm1_3FaultInjection(apExchangeContext, std::move(aPayload), aIsTimedInvoke, /* oneReponsePerMessage = */true, /* invertResponseOrdering = */false, /* dropSecondResponse = */false); return Status::Success;);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_BatchCommandIdmTcHelper2, commandHandler->TestOnlyTcIdm1_3FaultInjection(apExchangeContext, std::move(aPayload), aIsTimedInvoke, /* oneReponsePerMessage = */true, /* invertResponseOrdering = */true, /* dropSecondResponse = */false); return Status::Success;);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_BatchCommandIdmTcHelper3, commandHandler->TestOnlyTcIdm1_3FaultInjection(apExchangeContext, std::move(aPayload), aIsTimedInvoke, /* oneReponsePerMessage = */false, /* invertResponseOrdering = */false, /* dropSecondResponse = */true); return Status::Success;);
     commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke);
     return Status::Success;
 }
