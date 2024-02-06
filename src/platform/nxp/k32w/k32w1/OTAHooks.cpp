@@ -17,7 +17,7 @@
  */
 
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
-#include <src/include/platform/CHIPDeviceLayer.h>
+#include <src/platform/include/platform/CHIPDeviceLayer.h>
 
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 

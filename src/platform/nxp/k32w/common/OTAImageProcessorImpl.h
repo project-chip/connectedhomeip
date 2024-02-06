@@ -23,8 +23,8 @@
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <src/include/platform/CHIPDeviceLayer.h>
-#include <src/include/platform/OTAImageProcessor.h>
+#include <src/platform/include/platform/CHIPDeviceLayer.h>
+#include <src/platform/include/platform/OTAImageProcessor.h>
 
 /*
  * OTA hooks that can be overwritten by application.

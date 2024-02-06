@@ -178,7 +178,7 @@ target_include_directories(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/include
     ${chip_dir_output}/gen/include
-    ${chip_dir}/src/include/
+    ${chip_dir}/src/platform/include/
     ${chip_dir}/src/lib/
     ${chip_dir}/src/
     ${chip_dir}/third_party/nlassert/repo/include/

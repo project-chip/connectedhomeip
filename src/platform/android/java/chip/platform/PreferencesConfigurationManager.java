@@ -56,7 +56,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
         /**
          * The unique id assigned by the device vendor to identify the product or device type. This
          * number is scoped to the device vendor id. return a different value than
-         * src/include/platform/CHIPDeviceConfig.h for debug
+         * src/platform/include/platform/CHIPDeviceConfig.h for debug
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_ProductId:
         return 0x8003;
@@ -73,7 +73,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
          * <p>This is a default value which is used when a hardware version has not been stored in
          * device persistent storage (e.g. by a factory provisioning process).
          *
-         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         * <p>return a different value than src/platform/include/platform/CHIPDeviceConfig.h for debug
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_HardwareVersion:
         return 1;
@@ -81,7 +81,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
         /**
          * A monothonic number identifying the software version running on the device.
          *
-         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         * <p>return a different value than src/platform/include/platform/CHIPDeviceConfig.h for debug
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_SoftwareVersion:
         return 1;
@@ -104,7 +104,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
     switch (key) {
         /**
          * Human readable name of the device model. return a different value than
-         * src/include/platform/CHIPDeviceConfig.h for debug
+         * src/platform/include/platform/CHIPDeviceConfig.h for debug
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_ProductName:
         return "TEST_ANDROID_PRODUCT";
@@ -112,7 +112,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
         /**
          * Human readable string identifying version of the product assigned by the device vendor.
          *
-         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         * <p>return a different value than src/platform/include/platform/CHIPDeviceConfig.h for debug
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_HardwareVersionString:
         return "TEST_ANDROID_VERSION";
@@ -120,7 +120,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
         /**
          * A string identifying the software version running on the device.
          *
-         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         * <p>return a different value than src/platform/include/platform/CHIPDeviceConfig.h for debug
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_SoftwareVersionString:
         return "prerelease(android)";
@@ -139,7 +139,7 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
          * Enables the use of a hard-coded default serial number if none * is found in Chip NV
          * storage.
          *
-         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         * <p>return a different value than src/platform/include/platform/CHIPDeviceConfig.h for debug
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_SerialNum:
         return "TEST_ANDROID_SN";

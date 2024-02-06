@@ -1280,7 +1280,7 @@ void ShellCLIMain(void * pvParameter)
         PRINTF("Connecting to [%s, %s] \r\n", def_ssid, def_psk);
 
         // TODO: ConnectivityMgrImpl is the platform implementation of ConnectivityMgr layer.
-        // Application should use the APIs defined src/include/platform to talk to the Matter
+        // Application should use the APIs defined src/platform/include/platform to talk to the Matter
         // platfrom layer, instead of calling into the functions defined in the platform implemenation.
         // ConnectivityMgrImpl().ProvisionWiFiNetwork(def_ssid, def_psk);
     }

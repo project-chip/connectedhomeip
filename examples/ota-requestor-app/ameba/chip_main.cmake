@@ -51,7 +51,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/zzz_generated
     ${chip_dir_output}/gen/include
-    ${chip_dir}/src/include/
+    ${chip_dir}/src/platform/include/
     ${chip_dir}/src/lib/
     ${chip_dir}/src/
     ${chip_dir}/third_party/nlassert/repo/include/
