@@ -130,6 +130,7 @@ shared_library("ChipDeviceCtrl") {
     public_deps += [
       "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
+      "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/tracing/json",
       "${chip_root}/src/tracing/perfetto",
       "${chip_root}/src/tracing/perfetto:file_output",

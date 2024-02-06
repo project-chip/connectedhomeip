@@ -323,6 +323,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
                                                         &getSkipCommissioningComplete);
     SuccessOrExit(err);
 
+    jmethodID getSkipAttestationCertificateValidation;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getSkipAttestationCertificateValidation", "()Z",
+                                                        &getSkipAttestationCertificateValidation);
+    SuccessOrExit(err);
+
     jmethodID getCountryCode;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getCountryCode", "()Ljava/util/Optional;",
                                                         &getCountryCode);
@@ -372,9 +377,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         uint16_t failsafeTimerSeconds      = static_cast<uint16_t>(env->CallIntMethod(controllerParams, getFailsafeTimerSeconds));
         uint16_t caseFailsafeTimerSeconds =
             static_cast<uint16_t>(env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds));
-        bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
-        bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
-        bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
+        bool attemptNetworkScanWiFi    = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
+        bool attemptNetworkScanThread  = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
+        bool skipCommissioningComplete = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
+        bool skipAttestationCertificateValidation =
+            env->CallBooleanMethod(controllerParams, getSkipAttestationCertificateValidation);
         uint64_t adminSubject              = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getAdminSubject));
         jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
         jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
@@ -390,7 +397,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             sJVM, self, kLocalDeviceId, fabricId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(),
             DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
             rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
-            failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete, &err);
+            failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete,
+            skipAttestationCertificateValidation, &err);
         SuccessOrExit(err);
 
         if (caseFailsafeTimerSeconds > 0)
@@ -2156,6 +2164,33 @@ exit:
     return nullptr;
 }
 
+JNI_METHOD(jbyteArray, validateAndExtractCSR)(JNIEnv * env, jclass clazz, jbyteArray jCsrElements, jbyteArray jCsrNonce)
+{
+
+    chip::JniByteArray csrElements(env, jCsrElements);
+    chip::JniByteArray csrNonce(env, jCsrNonce);
+
+    chip::ByteSpan csrSpan;
+    chip::ByteSpan csrNonceSpan;
+    chip::ByteSpan vendor_reserved1, vendor_reserved2, vendor_reserved3;
+    CHIP_ERROR err = chip::Credentials::DeconstructNOCSRElements(csrElements.byteSpan(), csrSpan, csrNonceSpan, vendor_reserved1,
+                                                                 vendor_reserved2, vendor_reserved3);
+
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Controller, "CsrElement decoding error: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnValue(csrNonceSpan.size() == Controller::kCSRNonceLength, nullptr,
+                        ChipLogError(Controller, "csrNonce size is invalid"));
+
+    // Verify that Nonce matches with what we sent
+    VerifyOrReturnValue(csrNonceSpan.data_equal(csrNonce.byteSpan()), nullptr,
+                        ChipLogError(Controller, "csrNonce is not matched!"));
+
+    jbyteArray javaCsr;
+    chip::JniReferences::GetInstance().N2J_ByteArray(chip::JniReferences::GetInstance().GetEnvForCurrentThread(), csrSpan.data(),
+                                                     static_cast<jsize>(csrSpan.size()), javaCsr);
+    return javaCsr;
+}
+
 JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, jint jFabricIndex)
 {
     chip::DeviceLayer::StackLock lock;
@@ -2180,7 +2215,7 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
 
     jmethodID constructor;
     jclass infoClass;
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDClientInfo", infoClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,

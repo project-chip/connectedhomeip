@@ -44,8 +44,9 @@ using namespace chip::app::Clusters::DoorLock;
 using namespace chip::app::Clusters::DoorLock::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR   = 23;
-static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 59;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR     = 23;
+static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE   = 59;
+static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE = 65;
 
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
 
@@ -1556,6 +1557,11 @@ DlStatus DoorLockServer::credentialLengthWithinRange(chip::EndpointId endpointId
     case CredentialTypeEnum::kFace:
         statusMin = statusMax = emberAfPluginDoorLockGetFaceCredentialLengthConstraints(endpointId, minLen, maxLen);
         break;
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        minLen = maxLen = DOOR_LOCK_ALIRO_CREDENTIAL_SIZE;
+        break;
     default:
         return DlStatus::kFailure;
     }
@@ -2555,6 +2561,10 @@ bool DoorLockServer::credentialTypeSupported(chip::EndpointId endpointId, Creden
         return SupportsFingers(endpointId);
     case CredentialTypeEnum::kFace:
         return SupportsFace(endpointId);
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        return SupportsAliroProvisioning(endpointId);
     default:
         return false;
     }

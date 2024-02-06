@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -183,10 +183,10 @@ private:
     jobject mGlobalRef = nullptr;
 };
 
-class JniLocalReferenceManager
+class JniLocalReferenceScope
 {
 public:
-    explicit JniLocalReferenceManager(JNIEnv * env) : mEnv(env)
+    explicit JniLocalReferenceScope(JNIEnv * env) : mEnv(env)
     {
         if (mEnv->PushLocalFrame(JNI_LOCAL_REF_COUNT) == 0)
         {
@@ -194,7 +194,7 @@ public:
         }
     }
 
-    ~JniLocalReferenceManager()
+    ~JniLocalReferenceScope()
     {
         if (mlocalFramePushed)
         {
@@ -204,8 +204,8 @@ public:
     }
 
     // Delete copy constructor and copy assignment operator
-    JniLocalReferenceManager(const JniLocalReferenceManager &)             = delete;
-    JniLocalReferenceManager & operator=(const JniLocalReferenceManager &) = delete;
+    JniLocalReferenceScope(const JniLocalReferenceScope &)             = delete;
+    JniLocalReferenceScope & operator=(const JniLocalReferenceScope &) = delete;
 
 private:
     JNIEnv * const mEnv;

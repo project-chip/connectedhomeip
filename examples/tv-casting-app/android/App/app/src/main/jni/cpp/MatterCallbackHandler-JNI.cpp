@@ -203,7 +203,7 @@ jobject CurrentStateSuccessHandlerJNI::ConvertToJObject(
     ChipLogProgress(AppServer, "CurrentStateSuccessHandlerJNI::ConvertToJObject called");
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, nullptr);
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     jclass enumClass = nullptr;
     CHIP_ERROR err =
@@ -254,7 +254,7 @@ jobject SampledPositionSuccessHandlerJNI::ConvertToJObject(
     ChipLogProgress(AppServer, "SampledPositionSuccessHandlerJNI::ConvertToJObject called");
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, nullptr);
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     jobject jSampledPosition = nullptr;
     if (!responseData.IsNull())
@@ -323,7 +323,7 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, nullptr);
-    JniLocalReferenceManager manager(env);
+    JniLocalReferenceScope scope(env);
 
     jobject jArrayList;
     chip::JniReferences::GetInstance().CreateArrayList(jArrayList);

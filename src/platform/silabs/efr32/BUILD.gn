@@ -44,6 +44,7 @@ static_library("efr32") {
     "${silabs_platform_dir}/CHIPDevicePlatformEvent.h",
     "${silabs_platform_dir}/CHIPMem-Platform.cpp",
     "${silabs_platform_dir}/CHIPPlatformConfig.h",
+    "${silabs_platform_dir}/ConfigurationManagerImpl.cpp",
     "${silabs_platform_dir}/ConfigurationManagerImpl.h",
     "${silabs_platform_dir}/ConnectivityManagerImpl.h",
     "${silabs_platform_dir}/DiagnosticDataProviderImpl.cpp",
@@ -62,7 +63,6 @@ static_library("efr32") {
     "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "ConfigurationManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
   ]
 

@@ -9928,6 +9928,447 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedElectricalPowerMeasurementClusterAccuracyAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.AccuracyAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ElectricalPowerMeasurementClusterMeasurementAccuracyStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ElectricalPowerMeasurementClusterMeasurementAccuracyStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterRangesAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.RangesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterVoltageAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.VoltageAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterActiveCurrentAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.ActiveCurrentAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterReactiveCurrentAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.ReactiveCurrentAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterApparentCurrentAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.ApparentCurrentAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterActivePowerAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.ActivePowerAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterReactivePowerAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.ReactivePowerAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterApparentPowerAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.ApparentPowerAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterRMSVoltageAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.RMSVoltageAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterRMSCurrentAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.RMSCurrentAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterRMSPowerAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.RMSPowerAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterFrequencyAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.FrequencyAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterHarmonicCurrentsAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.HarmonicCurrentsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.ElectricalPowerMeasurementClusterHarmonicMeasurementStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ElectricalPowerMeasurementClusterHarmonicMeasurementStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterHarmonicPhasesAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.HarmonicPhasesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable List<ChipStructs.ElectricalPowerMeasurementClusterHarmonicMeasurementStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ElectricalPowerMeasurementClusterHarmonicMeasurementStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterPowerFactorAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.PowerFactorAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterNeutralCurrentAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.NeutralCurrentAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterGeneratedCommandListAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterEventListAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalPowerMeasurementClusterAttributeListAttributeCallback implements ChipClusters.ElectricalPowerMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedElectricalEnergyMeasurementClusterAccuracyAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.AccuracyAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -10023,6 +10464,27 @@ public class ClusterInfoMapping {
     public void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalEnergyMeasurementClusterCumulativeEnergyResetAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.CumulativeEnergyResetAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -11065,6 +11527,132 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedEnergyPreferenceClusterAttributeListAttributeCallback implements ChipClusters.EnergyPreferenceCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterAvailableEndpointsAttributeCallback implements ChipClusters.PowerTopologyCluster.AvailableEndpointsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterActiveEndpointsAttributeCallback implements ChipClusters.PowerTopologyCluster.ActiveEndpointsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterGeneratedCommandListAttributeCallback implements ChipClusters.PowerTopologyCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterAcceptedCommandListAttributeCallback implements ChipClusters.PowerTopologyCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterEventListAttributeCallback implements ChipClusters.PowerTopologyCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerTopologyClusterAttributeListAttributeCallback implements ChipClusters.PowerTopologyCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20427,6 +21015,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ValveConfigurationAndControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("valveConfigurationAndControl", valveConfigurationAndControlClusterInfo);
 
+    ClusterInfo electricalPowerMeasurementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ElectricalPowerMeasurementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("electricalPowerMeasurement", electricalPowerMeasurementClusterInfo);
+
     ClusterInfo electricalEnergyMeasurementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ElectricalEnergyMeasurementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("electricalEnergyMeasurement", electricalEnergyMeasurementClusterInfo);
@@ -20450,6 +21042,10 @@ public class ClusterInfoMapping {
     ClusterInfo energyPreferenceClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.EnergyPreferenceCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("energyPreference", energyPreferenceClusterInfo);
+
+    ClusterInfo powerTopologyClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.PowerTopologyCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("powerTopology", powerTopologyClusterInfo);
 
     ClusterInfo energyEvseModeClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.EnergyEvseModeCluster(ptr, endpointId), new HashMap<>());
@@ -20700,12 +21296,14 @@ public class ClusterInfoMapping {
     destination.get("activatedCarbonFilterMonitoring").combineCommands(source.get("activatedCarbonFilterMonitoring"));
     destination.get("booleanStateConfiguration").combineCommands(source.get("booleanStateConfiguration"));
     destination.get("valveConfigurationAndControl").combineCommands(source.get("valveConfigurationAndControl"));
+    destination.get("electricalPowerMeasurement").combineCommands(source.get("electricalPowerMeasurement"));
     destination.get("electricalEnergyMeasurement").combineCommands(source.get("electricalEnergyMeasurement"));
     destination.get("demandResponseLoadControl").combineCommands(source.get("demandResponseLoadControl"));
     destination.get("messages").combineCommands(source.get("messages"));
     destination.get("deviceEnergyManagement").combineCommands(source.get("deviceEnergyManagement"));
     destination.get("energyEvse").combineCommands(source.get("energyEvse"));
     destination.get("energyPreference").combineCommands(source.get("energyPreference"));
+    destination.get("powerTopology").combineCommands(source.get("powerTopology"));
     destination.get("energyEvseMode").combineCommands(source.get("energyEvseMode"));
     destination.get("deviceEnergyManagementMode").combineCommands(source.get("deviceEnergyManagementMode"));
     destination.get("doorLock").combineCommands(source.get("doorLock"));
@@ -23566,6 +24164,10 @@ public class ClusterInfoMapping {
 
     commandMap.put("valveConfigurationAndControl", valveConfigurationAndControlClusterInteractionInfoMap);
 
+    Map<String, InteractionInfo> electricalPowerMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("electricalPowerMeasurement", electricalPowerMeasurementClusterInteractionInfoMap);
+
     Map<String, InteractionInfo> electricalEnergyMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("electricalEnergyMeasurement", electricalEnergyMeasurementClusterInteractionInfoMap);
@@ -23996,6 +24598,10 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> energyPreferenceClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("energyPreference", energyPreferenceClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> powerTopologyClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("powerTopology", powerTopologyClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> energyEvseModeClusterInteractionInfoMap = new LinkedHashMap<>();
 
