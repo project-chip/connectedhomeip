@@ -51,6 +51,10 @@ class OrphanChecker:
         self.failures = 0
 
     def AppendGnData(self, gn: PurePath):
+        """Adds a GN file to the list of internally known GN data.
+
+        Will read the entire content of the GN file in memory for future reference.
+        """
         logging.debug(f'Adding GN {gn!s} for {gn.parent!s}')
         self.gn_data[str(gn.parent)] = gn.read_text('utf-8')
 
@@ -64,7 +68,14 @@ class OrphanChecker:
                 return True
         return False
 
-    def Check(self, top_dir, file: PurePath):
+    def Check(self, top_dir: str, file: PurePath):
+        """
+        Validates that the given path is somehow referenced in GN files in any
+        of the parent sub-directories of the file.
+
+        `file` must be relative to `top_dir`. Top_dir is used to resolve relative
+        paths in error reports and known failure checks.
+        """
         # Check logic:
         #   - ensure the file name is included in some GN file inside this or
         #     upper directory (although upper directory is not ideal)
