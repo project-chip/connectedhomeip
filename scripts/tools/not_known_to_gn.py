@@ -170,6 +170,9 @@ def main(log_level, extensions, dirs, known_failure, skip_dir):
         logging.warning("NOTE: %d failures are not found anymore:", len(not_failing))
         for name in not_failing:
             logging.warning("   - %s", name)
+        # Assume this is fatal - remove some of the "known-failing" should be easy.
+        # This forces scripts to always be correct and not accumulate bad input.
+        sys.exit(1)
 
     if checker.fatal_failures > 0:
         sys.exit(1)
