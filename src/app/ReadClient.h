@@ -670,5 +670,5 @@ private:
         kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
 };
 
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip
