@@ -25,15 +25,15 @@ comment or some actual 'source' element.
 It is intended as a failsafe to not foget adding source files
 to gn.
 """
-import click
-import coloredlogs
-
+import glob
 import logging
 import os
-import glob
 import sys
 from pathlib import Path, PurePath
 from typing import Dict
+
+import click
+import coloredlogs
 
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
@@ -41,6 +41,7 @@ __LOG_LEVELS__ = {
     'warn': logging.WARN,
     'fatal': logging.FATAL,
 }
+
 
 class OrphanChecker:
     def __init__(self):
@@ -111,7 +112,7 @@ class OrphanChecker:
     help='Skip a specific sub-directory from checks',
 )
 @click.argument('dirs',
-    type=click.Path(exists=True, file_okay=False, resolve_path=True), nargs=-1)
+                type=click.Path(exists=True, file_okay=False, resolve_path=True), nargs=-1)
 def main(log_level, extensions, dirs, known_failure, skip_dir):
     coloredlogs.install(level=__LOG_LEVELS__[log_level],
                         fmt='%(asctime)s %(levelname)-7s %(message)s')
