@@ -44,8 +44,6 @@ config("darwin_config") {
 
 static_library("Darwin") {
   sources = [
-    "../DeviceSafeQueue.cpp",
-    "../DeviceSafeQueue.h",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
@@ -98,6 +96,7 @@ static_library("Darwin") {
   deps = [
     ":logging",
     "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/platform:device-safe-queue",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
   ]

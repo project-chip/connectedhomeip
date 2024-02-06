@@ -421,6 +421,32 @@ source_set("platform_config_header") {
 }
 
 if (chip_device_platform != "none") {
+  source_set("device-event") {
+    sources = [ "../include/platform/CHIPDeviceEvent.h" ]
+
+    public_deps = [
+      "${chip_root}/src/ble",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/system",
+
+    ]
+  }
+
+  source_set("device-safe-queue") {
+    sources = [
+      "DeviceSafeQueue.cpp",
+      "DeviceSafeQueue.h",
+    ]
+
+    public_deps = [
+      ":device-event",
+      ":platform_config_header",
+      "${chip_root}/src/lib/core",
+    ]
+  }
+
   source_set("platform_base") {
     public_deps = [
       ":platform_config_header",
@@ -441,7 +467,6 @@ if (chip_device_platform != "none") {
     sources = [
       "../include/platform/BuildTime.h",
       "../include/platform/CHIPDeviceError.h",
-      "../include/platform/CHIPDeviceEvent.h",
       "../include/platform/CHIPDeviceLayer.h",
       "../include/platform/CommissionableDataProvider.h",
       "../include/platform/ConfigurationManager.h",
@@ -512,6 +537,8 @@ if (chip_device_platform != "none") {
     cflags = [ "-Wconversion" ]
 
     public_deps = [
+      ":device-event",
+      ":device-safe-queue",
       ":platform_base",
       "${chip_root}/src/app:app_config",
       "${chip_root}/src/app/common:cluster-objects",

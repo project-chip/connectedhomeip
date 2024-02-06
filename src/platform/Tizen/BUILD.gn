@@ -29,8 +29,6 @@ assert(chip_device_platform == "tizen")
 
 static_library("Tizen") {
   sources = [
-    "../DeviceSafeQueue.cpp",
-    "../DeviceSafeQueue.h",
     "../SingletonConfigurationManager.cpp",
     "AppPreference.cpp",
     "AppPreference.h",
@@ -66,6 +64,7 @@ static_library("Tizen") {
   ]
 
   deps = [
+    "${chip_root}/src/platform:device-safe-queue",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
   ]

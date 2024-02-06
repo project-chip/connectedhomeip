@@ -39,8 +39,6 @@ if (chip_mdns == "platform") {
 
 static_library("Linux") {
   sources = [
-    "../DeviceSafeQueue.cpp",
-    "../DeviceSafeQueue.h",
     "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
     "CHIPDevicePlatformConfig.h",
@@ -73,7 +71,10 @@ static_library("Linux") {
     "SystemTimeSupport.cpp",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload" ]
+  deps = [
+    "${chip_root}/src/platform:device-safe-queue",
+    "${chip_root}/src/setup_payload",
+  ]
 
   if (!chip_use_external_logging) {
     sources += [ "Logging.cpp" ]

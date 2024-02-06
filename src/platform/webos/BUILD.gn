@@ -57,8 +57,6 @@ static_library("webos") {
     defines = [ "USE_SYSLOG=1" ]
   }
   sources = [
-    "../DeviceSafeQueue.cpp",
-    "../DeviceSafeQueue.h",
     "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
@@ -101,6 +99,7 @@ static_library("webos") {
   ]
 
   deps = [
+    "${chip_root}/src/platform:device-safe-queue",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
   ]
