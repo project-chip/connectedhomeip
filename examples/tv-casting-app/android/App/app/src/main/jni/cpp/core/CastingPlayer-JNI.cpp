@@ -77,7 +77,7 @@ JNI_METHOD(jobject, VerifyOrEstablishConnection)
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "ConnectCallback, env == nullptr"));
         // Ensures proper cleanup of local references to Java objects.
-        JniLocalReferenceManager manager(env);
+        JniLocalReferenceScope scope(env);
         // Ensures proper cleanup of global references to Java objects.
         JniGlobalRefWrapper globalRefWrapper(completableFutureObjGlobalRef);
 

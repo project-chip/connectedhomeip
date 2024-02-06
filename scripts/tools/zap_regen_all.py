@@ -39,9 +39,6 @@ CHIP_ROOT_DIR = os.path.realpath(
 class TargetType(Flag):
     """Type of targets that can be re-generated"""
 
-    # Tests for golden images
-    TESTS = auto()
-
     # Global templates: generally examples and chip controller
     GLOBAL = auto()
 
@@ -56,11 +53,10 @@ class TargetType(Flag):
     GOLDEN_TEST_IMAGES = auto()
 
     # All possible targets. Convenience constant
-    ALL = TESTS | GLOBAL | IDL_CODEGEN | SPECIFIC | GOLDEN_TEST_IMAGES
+    ALL = GLOBAL | IDL_CODEGEN | SPECIFIC | GOLDEN_TEST_IMAGES
 
 
 __TARGET_TYPES__ = {
-    'tests': TargetType.TESTS,
     'global': TargetType.GLOBAL,
     'idl_codegen': TargetType.IDL_CODEGEN,
     'specific': TargetType.SPECIFIC,
@@ -338,8 +334,6 @@ def setupArgumentsParser():
         description='Generate content from ZAP files')
     parser.add_argument('--type', action='append', choices=__TARGET_TYPES__.keys(),
                         help='Choose which content type to generate (default: all)')
-    parser.add_argument('--tests', default='all', choices=['all', 'darwin-framework-tool', 'app1', 'app2'],
-                        help='When generating tests only target, Choose which tests to generate (default: all)')
     parser.add_argument('--dry-run', default=False, action='store_true',
                         help="Don't do any generation, just log what targets would be generated (default: False)")
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
@@ -446,25 +440,6 @@ def getCodegenTemplates():
     return targets
 
 
-def getTestsTemplatesTargets(test_target):
-    zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
-    templates = {
-        'darwin-framework-tool': {
-            'template': 'examples/darwin-framework-tool/templates/tests/templates.json',
-            'output_dir': 'zzz_generated/darwin-framework-tool/zap-generated'
-        }
-    }
-
-    targets = []
-    for key, target in templates.items():
-        if test_target == 'all' or test_target == key:
-            logging.info("Found test target %s (via %s)" %
-                         (key, target['template']))
-            targets.append(ZAPGenerateTarget(zap_input, template=target['template'], output_dir=target['output_dir']))
-
-    return targets
-
-
 def getGoldenTestImageTargets():
     return [GoldenTestImageTarget()]
 
@@ -491,11 +466,8 @@ def getSpecificTemplatesTargets():
     return targets
 
 
-def getTargets(type, test_target):
+def getTargets(type):
     targets = []
-
-    if type & TargetType.TESTS:
-        targets.extend(getTestsTemplatesTargets(test_target))
 
     if type & TargetType.GLOBAL:
         targets.extend(getGlobalTemplatesTargets())
@@ -549,7 +521,7 @@ def main():
     os.chdir(CHIP_ROOT_DIR)
     args = setupArgumentsParser()
 
-    targets = getTargets(args.type, args.tests)
+    targets = getTargets(args.type)
 
     if args.dry_run:
         sys.exit(0)

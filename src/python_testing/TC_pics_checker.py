@@ -20,7 +20,7 @@ import chip.clusters as Clusters
 from basic_composition_support import BasicCompositionTests
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
-                                    MatterBaseTest, async_test_body, default_matter_test_main)
+                                    MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 from spec_parsing_support import build_xml_clusters
 
@@ -101,27 +101,48 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
 
             self._check_and_record_errors(location, required, pics)
 
-    def test_TC_pics_checker(self):
+    def steps_TC_IDM_10_4(self):
+        return [TestStep(1, "TH performs a wildcard read of all attributes on the endpoint under test"),
+                TestStep(2, "For every standard cluster: If the cluster is present on the endpoint, ensure the server-side PICS code for the cluster is present in the PICS file (e.g. OO.S for On/Off cluster).If the cluster is not present on the endpoint, ensure the cluster server PICS code is not present in the PICS file."),
+                TestStep(3, "For every standard cluster, for every attribute in the cluster:If the cluster is present on the endpoint and the attribute ID is present in the AttributeList global attribute within the cluster, ensure the server-side PICS code for the attribute is present in the PICS file (e.g. OO.S.A000 for On/Off cluster’s OnOff attribute).Otherwise, ensure the attribute PICS code is NOT present in the PICS file."),
+                TestStep(4, "For every cluster present in the spec, for every client → server command in the cluster: If the cluster is present on the endpoint and the command id is present in the accepted commands list, ensure the PICS code for the accepted command is present in the PICS file. Otherwise, ensure the accepted command PICS code is not present in the PICS file."),
+                TestStep(5, "For every cluster present in the spec, for every server → client command in the cluster: If the cluster is present on the endpoint and the command id is present in the generated commands list, ensure the PICS code for the generated command is present in the PICS file. Otherwise, ensure the generated command PICS code is not present in the PICS file."),
+                TestStep(6, "For every cluster present in the spec, for every feature in the cluster: If the cluster is present on the endpoint and the feature is marked in the feature map, ensure the PICS code for the feature is present in the PICS file. Otherwise, ensure the feature PICS code is not present in the PICS file.")]
+
+    def test_TC_IDM_10_4(self):
+        # wildcard read is done in setup_class
+        self.step(1)
         self.endpoint_id = self.matter_test_config.endpoint
         self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True
 
-        for cluster_id, cluster in Clusters.ClusterObjects.ALL_CLUSTERS.items():
-            # Data model XML is used to get the PICS code for this cluster. If we don't know the PICS
-            # code, we can't evaluate the PICS list. Clusters that are present on the device but are
-            # not present in the spec are checked in the IDM tests.
-            if cluster_id not in self.xml_clusters or self.xml_clusters[cluster_id].pics is None:
-                continue
+        # Data model XML is used to get the PICS code for this cluster. If we don't know the PICS
+        # code, we can't evaluate the PICS list. Clusters that are present on the device but are
+        # not present in the spec are checked in the IDM tests.
+        checkable_clusters = {cluster_id: cluster for cluster_id, cluster in Clusters.ClusterObjects.ALL_CLUSTERS.items(
+        ) if cluster_id in self.xml_clusters and self.xml_clusters[cluster_id].pics is not None}
 
+        self.step(2)
+        for cluster_id, cluster in checkable_clusters.items():
             # Ensure the PICS.S code is correctly marked
             pics_cluster = f'{self.xml_clusters[cluster_id].pics}.S'
             location = ClusterPathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id)
             self._check_and_record_errors(location, cluster_id in self.endpoint, pics_cluster)
 
+        self.step(3)
+        for cluster_id, cluster in checkable_clusters.items():
             self._add_pics_for_lists(cluster_id, GlobalAttributeIds.ATTRIBUTE_LIST_ID)
+
+        self.step(4)
+        for cluster_id, cluster in checkable_clusters.items():
             self._add_pics_for_lists(cluster_id, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
+
+        self.step(5)
+        for cluster_id, cluster in checkable_clusters.items():
             self._add_pics_for_lists(cluster_id, GlobalAttributeIds.GENERATED_COMMAND_LIST_ID)
 
+        self.step(6)
+        for cluster_id, cluster in checkable_clusters.items():
             try:
                 cluster_features = cluster.Bitmaps.Feature
             except AttributeError:

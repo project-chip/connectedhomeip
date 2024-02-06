@@ -12,6 +12,7 @@ static_library("type_definitions") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/lib/support:type-traits",
     "${chip_root}/src/protocols:type_definitions",
     "${chip_root}/src/system",
   ]
@@ -55,6 +56,7 @@ static_library("secure_channel") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:type-traits",
     "${chip_root}/src/messaging",
     "${chip_root}/src/system",
     "${chip_root}/src/tracing",

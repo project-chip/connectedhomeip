@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/dnssd/Advertiser.h>
 
 #include <string>
@@ -210,7 +210,7 @@ CommissionAdvertisingParameters commissionableNodeParamsEnhancedAsICDLIT =
         .SetTcpSupported(chip::Optional<bool>(true))
         .SetICDOperatingAsLIT(chip::Optional<bool>(true))
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600000_ms32, 65535_ms16));
-// With ICD Operation as LIT, SII key will not be added to the advertissement
+// With ICD Operation as LIT, SII key will not be added to the advertisement
 QNamePart txtCommissionableNodeParamsEnhancedAsICDLITParts[] = { "D=22",          "VP=555+897", "CM=2", "DT=70000",
                                                                  "DN=testy-test", "PI=Pair me", "PH=3", "SAI=3600000",
                                                                  "SAT=65535",     "T=1",        "ICD=1" };

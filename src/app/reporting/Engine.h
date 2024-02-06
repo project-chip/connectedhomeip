@@ -25,6 +25,7 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <app/InteractionModelEngine.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
@@ -56,6 +57,11 @@ namespace reporting {
 class Engine
 {
 public:
+    /**
+     *  Constructor Engine with a valid InteractionModelEngine pointer.
+     */
+    Engine(InteractionModelEngine * apImEngine);
+
     /**
      * Initializes the reporting engine. Should only be called once.
      *
@@ -279,6 +285,8 @@ private:
     uint32_t mReservedSize          = 0;
     uint32_t mMaxAttributesPerChunk = UINT32_MAX;
 #endif
+
+    InteractionModelEngine * mpImEngine = nullptr;
 };
 
 }; // namespace reporting

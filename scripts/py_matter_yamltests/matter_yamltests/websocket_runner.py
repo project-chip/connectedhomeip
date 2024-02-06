@@ -70,7 +70,7 @@ class WebSocketRunner(TestRunner):
             return await instance.recv()
         return None
 
-    async def _start_client(self, url, max_retries=4, interval_between_retries=1):
+    async def _start_client(self, url, max_retries=5, interval_between_retries=1):
         if max_retries:
             start = time.time()
             try:
