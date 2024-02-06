@@ -254,7 +254,8 @@ void EVSEManufacturer::FakeReadingsUpdate()
     // Update readings
     // Avoid using floats - so we will do a basic rand() call which will generate a integer value between 0 and RAND_MAX
     // first compute power as a mean + some random value in range +/- mPowerRandomness_mW
-    int64_t power = ((int64_t) rand() % (2 * gFakeReadingsData.mPowerRandomness_mW)) - gFakeReadingsData.mPowerRandomness_mW;
+    int64_t power =
+        (static_cast<int64_t>(rand()) % (2 * gFakeReadingsData.mPowerRandomness_mW)) - gFakeReadingsData.mPowerRandomness_mW;
     power += gFakeReadingsData.mPower_mW; // add in the base power
 
     int64_t voltage = ((int64_t) rand() % (2 * gFakeReadingsData.mVoltageRandomness_mV)) - gFakeReadingsData.mVoltageRandomness_mV;
