@@ -18,6 +18,7 @@
 
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
+#include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
@@ -511,6 +512,60 @@ bool HandleEnergyReportingTestEventTrigger(uint64_t eventTrigger)
     case EnergyReportingTrigger::kFakeReadingsGenStart_3kW_5s:
         ChipLogProgress(Support, "[EnergyReporting-Test-Event] => Start Fake generator 3kW @5s Export");
         SetTestEventTrigger_FakeReadingsGeneratorStart();
+        break;
+
+    default:
+        return false;
+    }
+
+    return true;
+}
+
+bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
+{
+    DeviceEnergyManagementTrigger trigger = static_cast<DeviceEnergyManagementTrigger>(eventTrigger);
+
+    switch (trigger)
+    {
+    case DeviceEnergyManagementTrigger::kPowerAdjustment:
+        ChipLogProgress(Support, "[PowerAdjustment-Test-Event] => Create PowerAdjustment struct");
+        // TODO call implementation
+        break;
+    case DeviceEnergyManagementTrigger::kPowerAdjustmentClear:
+        ChipLogProgress(Support, "[PowerAdjustmentClear-Test-Event] => Clear PowerAdjustment struct");
+        // TODO call implementation
+        break;
+    case DeviceEnergyManagementTrigger::kUserOptOutLocalOptimization:
+        ChipLogProgress(Support, "[UserOptOutLocalOptimization-Test-Event] => Set User opt-out Local Optimization");
+        // TODO call implementation
+        break;
+    case DeviceEnergyManagementTrigger::kUserOptOutGridOptimization:
+        ChipLogProgress(Support, "[UserOptOutGrisOptimization-Test-Event] => Set User opt-out Grid Optimization");
+        // TODO call implementation
+        break;
+    case DeviceEnergyManagementTrigger::kUserOptOutClearAll:
+        ChipLogProgress(Support, "[UserOptOutClearAll-Test-Event] => Clear all User opt-outs");
+        // TODO call implementation
+        break;
+    case DeviceEnergyManagementTrigger::kStartTimeAdjustment:
+        ChipLogProgress(Support, "[StartTimeAdjustment-Test-Event] => Create simulated forecast to allow StartTimeAdjustment");
+        // TODO call implementation
+        break;
+    case DeviceEnergyManagementTrigger::kStartTimeAdjustmentClear:
+        ChipLogProgress(Support, "[StartTimeAdjustmentClear-Test-Event] => Clear StartTimeAdjustment forecast");
+        // TODO call implementation
+        break;
+    case DeviceEnergyManagementTrigger::kPausable:
+        ChipLogProgress(Support, "[Pausable-Test-Event] => Create Pausable forecast");
+        // TODO call implementation
+        break;
+    case DeviceEnergyManagementTrigger::kPausableNextSlot:
+        ChipLogProgress(Support, "[PausableNextSlot-Test-Event] => Move to next Pausable slot in forecast");
+        // TODO call implementation
+        break;
+    case DeviceEnergyManagementTrigger::kPausableClear:
+        ChipLogProgress(Support, "[PausableClear-Test-Event] => Clear Pausable forecast");
+        // TODO call implementation
         break;
 
     default:
