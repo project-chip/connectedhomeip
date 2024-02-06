@@ -87,6 +87,18 @@ struct EmberAfDoorLockEndpointContext
     int wrongCodeEntryAttempts;
 };
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DoorLock {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace DoorLock
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 /**
  * @brief Door Lock Server Plugin class.
  */
@@ -190,7 +202,8 @@ public:
     inline bool SupportsAnyCredential(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId)
-            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials);
+            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials,
+                    Feature::kAliroProvisioning);
     }
 
     inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)

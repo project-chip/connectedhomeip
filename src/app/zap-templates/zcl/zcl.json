@@ -85,6 +85,7 @@
         "operational-state-oven-cluster.xml",
         "operational-state-rvc-cluster.xml",
         "oven-mode-cluster.xml",
+        "power-topology-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",
@@ -249,7 +250,9 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReason"
+            "BootReason",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Group Key Management": [
             "ClusterRevision",

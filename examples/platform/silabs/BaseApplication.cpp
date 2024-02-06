@@ -453,7 +453,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
         {
             // The factory reset sequence was not initiated,
             // Press and Release:
-            // - Open the commissioning window and start BLE advertissement in fast mode when not  commissioned
+            // - Open the commissioning window and start BLE advertisement in fast mode when not  commissioned
             // - Output qr code in logs
             // - Cycle LCD screen
             CancelFunctionTimer();
@@ -477,7 +477,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             }
             else
             {
-                SILABS_LOG("Network is already provisioned, Ble advertissement not enabled");
+                SILABS_LOG("Network is already provisioned, Ble advertisement not enabled");
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
                 // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
                 PlatformMgr().LockChipStack();

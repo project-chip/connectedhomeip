@@ -94,6 +94,33 @@ Complete the following steps:
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
 
+#### Enable experimental Bluetooth support in BlueZ
+
+The Matter application on Linux uses BlueZ to communicate with the Bluetooth
+controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
+the features required by the Matter application by default. To enable these
+features, you need to enable experimental Bluetooth support in BlueZ.
+
+1. Edit the `bluetooth.service` unit by running the following command:
+
+    ```sh
+    sudo systemctl edit bluetooth.service
+    ```
+
+1. Add the following content to the override file:
+
+    ```ini
+    [Service]
+    ExecStart=
+    ExecStart=/usr/lib/bluetooth/bluetoothd -E
+    ```
+
+1. Restart the Bluetooth service by running the following command:
+
+    ```sh
+    sudo systemctl restart bluetooth.service
+    ```
+
 #### Configuring wpa_supplicant for storing permanent changes
 
 By default, wpa_supplicant is not allowed to update (overwrite) configuration.
