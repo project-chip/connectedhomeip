@@ -30,6 +30,7 @@ from mobly import asserts
 # --int-arg PIXIT.ACE.ENDPOINT:<endpoint> PIXIT.ACE.APPDEVTYPE:<device_type_id>
 # --string-arg PIXIT.ACE.APPCLUSTER:<cluster_name> PIXIT.ACE.APPATTRIBUTE:<attribute_name>
 
+
 class TC_IDM_1_4(MatterBaseTest):
 
     def steps_TC_IDM_1_4(self) -> list[TestStep]:
@@ -279,10 +280,10 @@ class TC_IDM_1_4(MatterBaseTest):
         enable_key = self.matter_test_config.global_test_params['PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY']
         endpoint = 0
         command = Clusters.GeneralDiagnostics.Commands.PayloadTestRequest(
-                enableKey=enable_key,
-                value=ord('A'),
-                count=800
-            )
+            enableKey=enable_key,
+            value=ord('A'),
+            count=800
+        )
         invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
 
         command = Clusters.OperationalCredentials.Commands.CertificateChainRequest(
@@ -305,7 +306,6 @@ class TC_IDM_1_4(MatterBaseTest):
         asserts.assert_equal(responses[0].payload, b'A' * 800, "Expect response to match for count == 800")
         # If this assert fails then some assumptions we were relying on are now no longer true.
         asserts.assert_greater_equal(result.ResponseMessageCount, 2, "DUT was expected to send multiple InvokeResponseMessages")
-
 
 
 if __name__ == "__main__":
