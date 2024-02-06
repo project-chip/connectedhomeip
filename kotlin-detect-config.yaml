@@ -186,6 +186,7 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
             - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/matter/controller/Messages.kt"
+            - "**/src/controller/java/src/matter/controller/model/Paths.kt"
             - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
     UseCheckOrError:
