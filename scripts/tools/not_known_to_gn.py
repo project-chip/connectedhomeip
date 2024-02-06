@@ -25,12 +25,11 @@ comment or some actual 'source' element.
 It is intended as a failsafe to not foget adding source files
 to gn.
 """
-import glob
 import logging
 import os
 import sys
 from pathlib import Path, PurePath
-from typing import Dict
+from typing import Dict, Set
 
 import click
 import coloredlogs
