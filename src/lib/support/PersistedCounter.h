@@ -61,7 +61,7 @@ class PersistedCounter : public MonotonicallyIncreasingCounter<T>
 {
 public:
     PersistedCounter() : mKey(StorageKeyName::Uninitialized()) {}
-   ~PersistedCounter() override {}
+    ~PersistedCounter() override {}
 
     /**
      *  @brief
@@ -92,8 +92,7 @@ public:
         ReturnErrorOnFailure(ReadStartValue(startValue));
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        // Compiler should optimize these branches.
-        if (std::is_same_v<decltype(startValue), uint64_t>)
+        if constexpr (std::is_same_v<decltype(startValue), uint64_t>)
         {
             ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x" ChipLogFormatX64 " startValue 0x" ChipLogFormatX64,
                           ChipLogValueX64(aEpoch), ChipLogValueX64(startValue));
@@ -151,8 +150,7 @@ private:
     {
         mNextEpoch = aStartValue;
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        // Compiler should optimize these branches.
-        if (std::is_same_v<decltype(aStartValue), uint64_t>)
+        if constexpr (std::is_same_v<decltype(aStartValue), uint64_t>)
         {
             ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x" ChipLogFormatX64,
                           ChipLogValueX64(aStartValue));
