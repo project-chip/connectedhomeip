@@ -24,47 +24,26 @@ source_set("nodatamodel") {
   public_deps = [ "${chip_root}/src/app" ]
 }
 
-CHIP_CONTROLLER_SOURCES = [
-  "AbstractDnssdDiscoveryController.cpp",
-  "AutoCommissioner.cpp",
-  "CHIPCommissionableNodeController.cpp",
-  "CHIPDeviceControllerFactory.cpp",
-  "CHIPDeviceControllerFactory.h",
-  "CommissioneeDeviceProxy.cpp",
-  "CommissionerDiscoveryController.cpp",
-  "CommissionerDiscoveryController.h",
-  "CommissioningDelegate.cpp",
-  "ExampleOperationalCredentialsIssuer.cpp",
-  "ExampleOperationalCredentialsIssuer.h",
-  "SetUpCodePairer.cpp",
-]
-
-CHIP_READ_CLIENT_SOURCES = [
-  "CHIPDeviceController.cpp",
-  "CommissioningWindowOpener.cpp",
+CHIP_CONTROLLER_HEADERS = [ "ExampleOperationalCredentialsIssuer.h" ]
+CHIP_READ_CLIENT_HEADERS = [
   "CommissioningWindowOpener.h",
-  "CurrentFabricRemover.cpp",
   "CurrentFabricRemover.h",
 ]
 
-if (!chip_controller || !chip_build_controller) {
-  # This source set exists specifically to deny including them without dependencies
-  # if "controller" sources do not contain them
-  #
-  # They are NOT intended to be used directly
-  #
-  # Also note: these source_sets are NOT compilable/usable.
-  #            expect tools like clang-tidy to fail to find include paths if these
-  #            are enabled.
-  source_set("gen_check_chip_controller_sources") {
-    sources = CHIP_CONTROLLER_SOURCES
-  }
+# This source set exists specifically to deny including them without dependencies
+# if "controller" sources do not contain them
+#
+# They are NOT intended to be used directly.
+#
+# The intent for this is to force gn to be aware that these files are known and
+# error out as `include not allowed due to missing dependency` even if
+# controller is built without these sources
+source_set("gen_check_chip_controller_headers") {
+  sources = CHIP_CONTROLLER_SOURCES
 }
 
-if (!chip_controller || !chip_build_controller || !chip_enable_read_client) {
-  source_set("gen_check_chip_read_client_sources") {
-    sources = CHIP_READ_CLIENT_SOURCES
-  }
+source_set("gen_check_chip_read_client_headers") {
+  sources = CHIP_READ_CLIENT_HEADERS
 }
 
 source_set("delegates") {
@@ -106,9 +85,27 @@ static_library("controller") {
   ]
 
   if (chip_controller && chip_build_controller) {
-    sources += CHIP_CONTROLLER_SOURCES
+    sources += CHIP_CONTROLLER_HEADERS
+    sources += [
+      "AbstractDnssdDiscoveryController.cpp",
+      "AutoCommissioner.cpp",
+      "CHIPCommissionableNodeController.cpp",
+      "CHIPDeviceControllerFactory.cpp",
+      "CHIPDeviceControllerFactory.h",
+      "CommissioneeDeviceProxy.cpp",
+      "CommissionerDiscoveryController.cpp",
+      "CommissionerDiscoveryController.h",
+      "CommissioningDelegate.cpp",
+      "ExampleOperationalCredentialsIssuer.cpp",
+      "SetUpCodePairer.cpp",
+    ]
     if (chip_enable_read_client) {
-      sources += CHIP_READ_CLIENT_SOURCES
+      sources += CHIP_READ_CLIENT_HEADERS
+      sources = [
+        "CHIPDeviceController.cpp",
+        "CommissioningWindowOpener.cpp",
+        "CurrentFabricRemover.cpp",
+      ]
     }
   }
 
