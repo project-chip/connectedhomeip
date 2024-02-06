@@ -161,7 +161,6 @@ public class ChipClusters {
 
     @Deprecated
     public void deleteCluster(long chipClusterPtr) {}
-    
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
       super.finalize();
@@ -316,12 +315,12 @@ public class ChipClusters {
       BaseTLVType identifyTimetlvValue = new UIntType(identifyTime);
       elements.add(new StructElement(identifyTimeFieldID, identifyTimetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void triggerEffect(DefaultClusterCallback callback, Integer effectIdentifier, Integer effectVariant) {
@@ -340,12 +339,12 @@ public class ChipClusters {
       BaseTLVType effectVarianttlvValue = new UIntType(effectVariant);
       elements.add(new StructElement(effectVariantFieldID, effectVarianttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -611,7 +610,7 @@ public class ChipClusters {
       BaseTLVType groupNametlvValue = new StringType(groupName);
       elements.add(new StructElement(groupNameFieldID, groupNametlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -633,7 +632,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, groupID);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void viewGroup(ViewGroupResponseCallback callback, Integer groupID) {
@@ -648,7 +647,7 @@ public class ChipClusters {
       BaseTLVType groupIDtlvValue = new UIntType(groupID);
       elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -677,7 +676,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, groupID, groupName);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getGroupMembership(GetGroupMembershipResponseCallback callback, ArrayList<Integer> groupList) {
@@ -692,7 +691,7 @@ public class ChipClusters {
       BaseTLVType groupListtlvValue = ArrayType.generateArrayType(groupList, (elementgroupList) -> new UIntType(elementgroupList));
       elements.add(new StructElement(groupListFieldID, groupListtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -714,7 +713,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(capacity, groupList);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void removeGroup(RemoveGroupResponseCallback callback, Integer groupID) {
@@ -729,7 +728,7 @@ public class ChipClusters {
       BaseTLVType groupIDtlvValue = new UIntType(groupID);
       elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -751,7 +750,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, groupID);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void removeAllGroups(DefaultClusterCallback callback) {
@@ -762,12 +761,12 @@ public class ChipClusters {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addGroupIfIdentifying(DefaultClusterCallback callback, Integer groupID, String groupName) {
@@ -786,12 +785,12 @@ public class ChipClusters {
       BaseTLVType groupNametlvValue = new StringType(groupName);
       elements.add(new StructElement(groupNameFieldID, groupNametlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface AddGroupResponseCallback extends BaseClusterCallback {
@@ -1035,12 +1034,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void on(DefaultClusterCallback callback) {
@@ -1051,12 +1050,12 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void toggle(DefaultClusterCallback callback) {
@@ -1067,12 +1066,12 @@ public class ChipClusters {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void offWithEffect(DefaultClusterCallback callback, Integer effectIdentifier, Integer effectVariant) {
@@ -1091,12 +1090,12 @@ public class ChipClusters {
       BaseTLVType effectVarianttlvValue = new UIntType(effectVariant);
       elements.add(new StructElement(effectVariantFieldID, effectVarianttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void onWithRecallGlobalScene(DefaultClusterCallback callback) {
@@ -1107,12 +1106,12 @@ public class ChipClusters {
       final long commandId = 65L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void onWithTimedOff(DefaultClusterCallback callback, Integer onOffControl, Integer onTime, Integer offWaitTime) {
@@ -1135,12 +1134,12 @@ public class ChipClusters {
       BaseTLVType offWaitTimetlvValue = new UIntType(offWaitTime);
       elements.add(new StructElement(offWaitTimeFieldID, offWaitTimetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface StartUpOnOffAttributeCallback extends BaseAttributeCallback {
@@ -1772,12 +1771,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void move(DefaultClusterCallback callback, Integer moveMode, @Nullable Integer rate, Integer optionsMask, Integer optionsOverride) {
@@ -1804,12 +1803,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void step(DefaultClusterCallback callback, Integer stepMode, Integer stepSize, @Nullable Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -1840,12 +1839,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stop(DefaultClusterCallback callback, Integer optionsMask, Integer optionsOverride) {
@@ -1864,12 +1863,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveToLevelWithOnOff(DefaultClusterCallback callback, Integer level, @Nullable Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -1896,12 +1895,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveWithOnOff(DefaultClusterCallback callback, Integer moveMode, @Nullable Integer rate, Integer optionsMask, Integer optionsOverride) {
@@ -1928,12 +1927,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stepWithOnOff(DefaultClusterCallback callback, Integer stepMode, Integer stepSize, @Nullable Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -1964,12 +1963,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stopWithOnOff(DefaultClusterCallback callback, Integer optionsMask, Integer optionsOverride) {
@@ -1988,12 +1987,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveToClosestFrequency(DefaultClusterCallback callback, Integer frequency) {
@@ -2008,12 +2007,12 @@ public class ChipClusters {
       BaseTLVType frequencytlvValue = new UIntType(frequency);
       elements.add(new StructElement(frequencyFieldID, frequencytlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface CurrentLevelAttributeCallback extends BaseAttributeCallback {
@@ -4242,12 +4241,12 @@ public class ChipClusters {
       BaseTLVType invokeIDtlvValue = invokeID.<BaseTLVType>map((nonOptionalinvokeID) -> new UIntType(nonOptionalinvokeID)).orElse(new EmptyType());
       elements.add(new StructElement(invokeIDFieldID, invokeIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void instantActionWithTransition(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID, Integer transitionTime) {
@@ -4270,12 +4269,12 @@ public class ChipClusters {
       BaseTLVType transitionTimetlvValue = new UIntType(transitionTime);
       elements.add(new StructElement(transitionTimeFieldID, transitionTimetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void startAction(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID) {
@@ -4294,12 +4293,12 @@ public class ChipClusters {
       BaseTLVType invokeIDtlvValue = invokeID.<BaseTLVType>map((nonOptionalinvokeID) -> new UIntType(nonOptionalinvokeID)).orElse(new EmptyType());
       elements.add(new StructElement(invokeIDFieldID, invokeIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void startActionWithDuration(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID, Long duration) {
@@ -4322,12 +4321,12 @@ public class ChipClusters {
       BaseTLVType durationtlvValue = new UIntType(duration);
       elements.add(new StructElement(durationFieldID, durationtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stopAction(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID) {
@@ -4346,12 +4345,12 @@ public class ChipClusters {
       BaseTLVType invokeIDtlvValue = invokeID.<BaseTLVType>map((nonOptionalinvokeID) -> new UIntType(nonOptionalinvokeID)).orElse(new EmptyType());
       elements.add(new StructElement(invokeIDFieldID, invokeIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void pauseAction(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID) {
@@ -4370,12 +4369,12 @@ public class ChipClusters {
       BaseTLVType invokeIDtlvValue = invokeID.<BaseTLVType>map((nonOptionalinvokeID) -> new UIntType(nonOptionalinvokeID)).orElse(new EmptyType());
       elements.add(new StructElement(invokeIDFieldID, invokeIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void pauseActionWithDuration(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID, Long duration) {
@@ -4398,12 +4397,12 @@ public class ChipClusters {
       BaseTLVType durationtlvValue = new UIntType(duration);
       elements.add(new StructElement(durationFieldID, durationtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void resumeAction(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID) {
@@ -4422,12 +4421,12 @@ public class ChipClusters {
       BaseTLVType invokeIDtlvValue = invokeID.<BaseTLVType>map((nonOptionalinvokeID) -> new UIntType(nonOptionalinvokeID)).orElse(new EmptyType());
       elements.add(new StructElement(invokeIDFieldID, invokeIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void enableAction(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID) {
@@ -4446,12 +4445,12 @@ public class ChipClusters {
       BaseTLVType invokeIDtlvValue = invokeID.<BaseTLVType>map((nonOptionalinvokeID) -> new UIntType(nonOptionalinvokeID)).orElse(new EmptyType());
       elements.add(new StructElement(invokeIDFieldID, invokeIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void enableActionWithDuration(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID, Long duration) {
@@ -4474,12 +4473,12 @@ public class ChipClusters {
       BaseTLVType durationtlvValue = new UIntType(duration);
       elements.add(new StructElement(durationFieldID, durationtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void disableAction(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID) {
@@ -4498,12 +4497,12 @@ public class ChipClusters {
       BaseTLVType invokeIDtlvValue = invokeID.<BaseTLVType>map((nonOptionalinvokeID) -> new UIntType(nonOptionalinvokeID)).orElse(new EmptyType());
       elements.add(new StructElement(invokeIDFieldID, invokeIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void disableActionWithDuration(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID, Long duration) {
@@ -4526,12 +4525,12 @@ public class ChipClusters {
       BaseTLVType durationtlvValue = new UIntType(duration);
       elements.add(new StructElement(durationFieldID, durationtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ActionListAttributeCallback extends BaseAttributeCallback {
@@ -4835,12 +4834,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface CapabilityMinimaAttributeCallback extends BaseAttributeCallback {
@@ -5680,7 +5679,7 @@ public class ChipClusters {
       BaseTLVType metadataForProvidertlvValue = metadataForProvider.<BaseTLVType>map((nonOptionalmetadataForProvider) -> new ByteArrayType(nonOptionalmetadataForProvider)).orElse(new EmptyType());
       elements.add(new StructElement(metadataForProviderFieldID, metadataForProvidertlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -5744,7 +5743,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, delayedActionTime, imageURI, softwareVersion, softwareVersionString, updateToken, userConsentNeeded, metadataForRequestor);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void applyUpdateRequest(ApplyUpdateResponseCallback callback, byte[] updateToken, Long newVersion) {
@@ -5763,7 +5762,7 @@ public class ChipClusters {
       BaseTLVType newVersiontlvValue = new UIntType(newVersion);
       elements.add(new StructElement(newVersionFieldID, newVersiontlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -5785,7 +5784,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(action, delayedActionTime);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void notifyUpdateApplied(DefaultClusterCallback callback, byte[] updateToken, Long softwareVersion) {
@@ -5804,12 +5803,12 @@ public class ChipClusters {
       BaseTLVType softwareVersiontlvValue = new UIntType(softwareVersion);
       elements.add(new StructElement(softwareVersionFieldID, softwareVersiontlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface QueryImageResponseCallback extends BaseClusterCallback {
@@ -6039,12 +6038,12 @@ public class ChipClusters {
       BaseTLVType endpointtlvValue = new UIntType(endpoint);
       elements.add(new StructElement(endpointFieldID, endpointtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface DefaultOTAProvidersAttributeCallback extends BaseAttributeCallback {
@@ -8422,7 +8421,7 @@ public class ChipClusters {
       BaseTLVType breadcrumbtlvValue = new UIntType(breadcrumb);
       elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -8444,7 +8443,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(errorCode, debugText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setRegulatoryConfig(SetRegulatoryConfigResponseCallback callback, Integer newRegulatoryConfig, String countryCode, Long breadcrumb) {
@@ -8467,7 +8466,7 @@ public class ChipClusters {
       BaseTLVType breadcrumbtlvValue = new UIntType(breadcrumb);
       elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -8489,7 +8488,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(errorCode, debugText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void commissioningComplete(CommissioningCompleteResponseCallback callback) {
@@ -8500,7 +8499,7 @@ public class ChipClusters {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -8522,7 +8521,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(errorCode, debugText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ArmFailSafeResponseCallback extends BaseClusterCallback {
@@ -8889,7 +8888,7 @@ public class ChipClusters {
       BaseTLVType breadcrumbtlvValue = breadcrumb.<BaseTLVType>map((nonOptionalbreadcrumb) -> new UIntType(nonOptionalbreadcrumb)).orElse(new EmptyType());
       elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -8925,7 +8924,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(networkingStatus, debugText, wiFiScanResults, threadScanResults);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addOrUpdateWiFiNetwork(NetworkConfigResponseCallback callback, byte[] ssid, byte[] credentials, Optional<Long> breadcrumb, Optional<byte[]> networkIdentity, Optional<byte[]> clientIdentifier, Optional<byte[]> possessionNonce) {
@@ -8960,7 +8959,7 @@ public class ChipClusters {
       BaseTLVType possessionNoncetlvValue = possessionNonce.<BaseTLVType>map((nonOptionalpossessionNonce) -> new ByteArrayType(nonOptionalpossessionNonce)).orElse(new EmptyType());
       elements.add(new StructElement(possessionNonceFieldID, possessionNoncetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -9003,7 +9002,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(networkingStatus, debugText, networkIndex, clientIdentity, possessionSignature);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addOrUpdateThreadNetwork(NetworkConfigResponseCallback callback, byte[] operationalDataset, Optional<Long> breadcrumb) {
@@ -9022,7 +9021,7 @@ public class ChipClusters {
       BaseTLVType breadcrumbtlvValue = breadcrumb.<BaseTLVType>map((nonOptionalbreadcrumb) -> new UIntType(nonOptionalbreadcrumb)).orElse(new EmptyType());
       elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -9065,7 +9064,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(networkingStatus, debugText, networkIndex, clientIdentity, possessionSignature);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void removeNetwork(NetworkConfigResponseCallback callback, byte[] networkID, Optional<Long> breadcrumb) {
@@ -9084,7 +9083,7 @@ public class ChipClusters {
       BaseTLVType breadcrumbtlvValue = breadcrumb.<BaseTLVType>map((nonOptionalbreadcrumb) -> new UIntType(nonOptionalbreadcrumb)).orElse(new EmptyType());
       elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -9127,7 +9126,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(networkingStatus, debugText, networkIndex, clientIdentity, possessionSignature);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void connectNetwork(ConnectNetworkResponseCallback callback, byte[] networkID, Optional<Long> breadcrumb) {
@@ -9146,7 +9145,7 @@ public class ChipClusters {
       BaseTLVType breadcrumbtlvValue = breadcrumb.<BaseTLVType>map((nonOptionalbreadcrumb) -> new UIntType(nonOptionalbreadcrumb)).orElse(new EmptyType());
       elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -9175,7 +9174,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(networkingStatus, debugText, errorValue);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void reorderNetwork(NetworkConfigResponseCallback callback, byte[] networkID, Integer networkIndex, Optional<Long> breadcrumb) {
@@ -9198,7 +9197,7 @@ public class ChipClusters {
       BaseTLVType breadcrumbtlvValue = breadcrumb.<BaseTLVType>map((nonOptionalbreadcrumb) -> new UIntType(nonOptionalbreadcrumb)).orElse(new EmptyType());
       elements.add(new StructElement(breadcrumbFieldID, breadcrumbtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -9241,7 +9240,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(networkingStatus, debugText, networkIndex, clientIdentity, possessionSignature);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void queryIdentity(QueryIdentityResponseCallback callback, byte[] keyIdentifier, Optional<byte[]> possessionNonce) {
@@ -9260,7 +9259,7 @@ public class ChipClusters {
       BaseTLVType possessionNoncetlvValue = possessionNonce.<BaseTLVType>map((nonOptionalpossessionNonce) -> new ByteArrayType(nonOptionalpossessionNonce)).orElse(new EmptyType());
       elements.add(new StructElement(possessionNonceFieldID, possessionNoncetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -9282,7 +9281,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(identity, possessionSignature);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ScanNetworksResponseCallback extends BaseClusterCallback {
@@ -9812,7 +9811,7 @@ public class ChipClusters {
       BaseTLVType transferFileDesignatortlvValue = transferFileDesignator.<BaseTLVType>map((nonOptionaltransferFileDesignator) -> new StringType(nonOptionaltransferFileDesignator)).orElse(new EmptyType());
       elements.add(new StructElement(transferFileDesignatorFieldID, transferFileDesignatortlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -9848,7 +9847,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, logContent, UTCTimeStamp, timeSinceBoot);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface RetrieveLogsResponseCallback extends BaseClusterCallback {
@@ -10067,12 +10066,12 @@ public class ChipClusters {
       BaseTLVType eventTriggertlvValue = new UIntType(eventTrigger);
       elements.add(new StructElement(eventTriggerFieldID, eventTriggertlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void timeSnapshot(TimeSnapshotResponseCallback callback) {
@@ -10083,7 +10082,7 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -10105,11 +10104,53 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(systemTimeMs, posixTimeMs);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void payloadTestRequest(PayloadTestResponseCallback callback, byte[] enableKey, Integer value, Integer count) {
+      payloadTestRequest(callback, enableKey, value, count, 0);
+    }
+
+    public void payloadTestRequest(PayloadTestResponseCallback callback, byte[] enableKey, Integer value, Integer count, int timedInvokeTimeoutMs) {
+      final long commandId = 3L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long enableKeyFieldID = 0L;
+      BaseTLVType enableKeytlvValue = new ByteArrayType(enableKey);
+      elements.add(new StructElement(enableKeyFieldID, enableKeytlvValue));
+
+      final long valueFieldID = 1L;
+      BaseTLVType valuetlvValue = new UIntType(value);
+      elements.add(new StructElement(valueFieldID, valuetlvValue));
+
+      final long countFieldID = 2L;
+      BaseTLVType counttlvValue = new UIntType(count);
+      elements.add(new StructElement(countFieldID, counttlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long payloadFieldID = 0L;
+          byte[] payload = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == payloadFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                payload = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(payload);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface TimeSnapshotResponseCallback extends BaseClusterCallback {
       void onSuccess(Long systemTimeMs, @Nullable Long posixTimeMs);
+    }
+
+    public interface PayloadTestResponseCallback extends BaseClusterCallback {
+      void onSuccess(byte[] payload);
     }
 
     public interface NetworkInterfacesAttributeCallback extends BaseAttributeCallback {
@@ -10552,12 +10593,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ThreadMetricsAttributeCallback extends BaseAttributeCallback {
@@ -10922,12 +10963,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChannelAttributeCallback extends BaseAttributeCallback {
@@ -12793,12 +12834,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface BssidAttributeCallback extends BaseAttributeCallback {
@@ -13382,12 +13423,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface PHYRateAttributeCallback extends BaseAttributeCallback {
@@ -13847,12 +13888,12 @@ public class ChipClusters {
       BaseTLVType timeSourcetlvValue = timeSource.<BaseTLVType>map((nonOptionaltimeSource) -> new UIntType(nonOptionaltimeSource)).orElse(new EmptyType());
       elements.add(new StructElement(timeSourceFieldID, timeSourcetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setTrustedTimeSource(DefaultClusterCallback callback, @Nullable ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct trustedTimeSource) {
@@ -13867,12 +13908,12 @@ public class ChipClusters {
       BaseTLVType trustedTimeSourcetlvValue = trustedTimeSource != null ? trustedTimeSource.encodeTlv() : new NullType();
       elements.add(new StructElement(trustedTimeSourceFieldID, trustedTimeSourcetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setTimeZone(SetTimeZoneResponseCallback callback, ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct> timeZone) {
@@ -13887,7 +13928,7 @@ public class ChipClusters {
       BaseTLVType timeZonetlvValue = ArrayType.generateArrayType(timeZone, (elementtimeZone) -> elementtimeZone.encodeTlv());
       elements.add(new StructElement(timeZoneFieldID, timeZonetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -13902,7 +13943,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(DSTOffsetRequired);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setDSTOffset(DefaultClusterCallback callback, ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> DSTOffset) {
@@ -13917,12 +13958,12 @@ public class ChipClusters {
       BaseTLVType DSTOffsettlvValue = ArrayType.generateArrayType(DSTOffset, (elementDSTOffset) -> elementDSTOffset.encodeTlv());
       elements.add(new StructElement(DSTOffsetFieldID, DSTOffsettlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setDefaultNTP(DefaultClusterCallback callback, @Nullable String defaultNTP) {
@@ -13937,12 +13978,12 @@ public class ChipClusters {
       BaseTLVType defaultNTPtlvValue = defaultNTP != null ? new StringType(defaultNTP) : new NullType();
       elements.add(new StructElement(defaultNTPFieldID, defaultNTPtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface SetTimeZoneResponseCallback extends BaseClusterCallback {
@@ -15394,12 +15435,12 @@ public class ChipClusters {
       BaseTLVType salttlvValue = new ByteArrayType(salt);
       elements.add(new StructElement(saltFieldID, salttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -15411,12 +15452,12 @@ public class ChipClusters {
       BaseTLVType commissioningTimeouttlvValue = new UIntType(commissioningTimeout);
       elements.add(new StructElement(commissioningTimeoutFieldID, commissioningTimeouttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -15424,12 +15465,12 @@ public class ChipClusters {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface AdminFabricIndexAttributeCallback extends BaseAttributeCallback {
@@ -15720,7 +15761,7 @@ public class ChipClusters {
       BaseTLVType attestationNoncetlvValue = new ByteArrayType(attestationNonce);
       elements.add(new StructElement(attestationNonceFieldID, attestationNoncetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -15742,7 +15783,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(attestationElements, attestationSignature);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void certificateChainRequest(CertificateChainResponseCallback callback, Integer certificateType) {
@@ -15757,7 +15798,7 @@ public class ChipClusters {
       BaseTLVType certificateTypetlvValue = new UIntType(certificateType);
       elements.add(new StructElement(certificateTypeFieldID, certificateTypetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -15772,7 +15813,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(certificate);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void CSRRequest(CSRResponseCallback callback, byte[] CSRNonce, Optional<Boolean> isForUpdateNOC) {
@@ -15791,7 +15832,7 @@ public class ChipClusters {
       BaseTLVType isForUpdateNOCtlvValue = isForUpdateNOC.<BaseTLVType>map((nonOptionalisForUpdateNOC) -> new BooleanType(nonOptionalisForUpdateNOC)).orElse(new EmptyType());
       elements.add(new StructElement(isForUpdateNOCFieldID, isForUpdateNOCtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -15813,7 +15854,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(NOCSRElements, attestationSignature);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addNOC(NOCResponseCallback callback, byte[] NOCValue, Optional<byte[]> ICACValue, byte[] IPKValue, Long caseAdminSubject, Integer adminVendorId) {
@@ -15844,7 +15885,7 @@ public class ChipClusters {
       BaseTLVType adminVendorIdtlvValue = new UIntType(adminVendorId);
       elements.add(new StructElement(adminVendorIdFieldID, adminVendorIdtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -15873,7 +15914,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(statusCode, fabricIndex, debugText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void updateNOC(NOCResponseCallback callback, byte[] NOCValue, Optional<byte[]> ICACValue) {
@@ -15892,7 +15933,7 @@ public class ChipClusters {
       BaseTLVType ICACValuetlvValue = ICACValue.<BaseTLVType>map((nonOptionalICACValue) -> new ByteArrayType(nonOptionalICACValue)).orElse(new EmptyType());
       elements.add(new StructElement(ICACValueFieldID, ICACValuetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -15921,7 +15962,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(statusCode, fabricIndex, debugText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void updateFabricLabel(NOCResponseCallback callback, String label) {
@@ -15936,7 +15977,7 @@ public class ChipClusters {
       BaseTLVType labeltlvValue = new StringType(label);
       elements.add(new StructElement(labelFieldID, labeltlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -15965,7 +16006,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(statusCode, fabricIndex, debugText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void removeFabric(NOCResponseCallback callback, Integer fabricIndex) {
@@ -15980,7 +16021,7 @@ public class ChipClusters {
       BaseTLVType fabricIndextlvValue = new UIntType(fabricIndex);
       elements.add(new StructElement(fabricIndexFieldID, fabricIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -16009,7 +16050,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(statusCode, fabricIndex, debugText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCACertificate) {
@@ -16024,12 +16065,12 @@ public class ChipClusters {
       BaseTLVType rootCACertificatetlvValue = new ByteArrayType(rootCACertificate);
       elements.add(new StructElement(rootCACertificateFieldID, rootCACertificatetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface AttestationResponseCallback extends BaseClusterCallback {
@@ -16423,12 +16464,12 @@ public class ChipClusters {
       BaseTLVType groupKeySettlvValue = groupKeySet.encodeTlv();
       elements.add(new StructElement(groupKeySetFieldID, groupKeySettlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void keySetRead(KeySetReadResponseCallback callback, Integer groupKeySetID) {
@@ -16443,7 +16484,7 @@ public class ChipClusters {
       BaseTLVType groupKeySetIDtlvValue = new UIntType(groupKeySetID);
       elements.add(new StructElement(groupKeySetIDFieldID, groupKeySetIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -16458,7 +16499,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(groupKeySet);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void keySetRemove(DefaultClusterCallback callback, Integer groupKeySetID) {
@@ -16473,12 +16514,12 @@ public class ChipClusters {
       BaseTLVType groupKeySetIDtlvValue = new UIntType(groupKeySetID);
       elements.add(new StructElement(groupKeySetIDFieldID, groupKeySetIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void keySetReadAllIndices(KeySetReadAllIndicesResponseCallback callback) {
@@ -16489,7 +16530,7 @@ public class ChipClusters {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -16504,7 +16545,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(groupKeySetIDs);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface KeySetReadResponseCallback extends BaseClusterCallback {
@@ -18079,7 +18120,7 @@ public class ChipClusters {
       BaseTLVType verificationKeytlvValue = verificationKey.<BaseTLVType>map((nonOptionalverificationKey) -> new ByteArrayType(nonOptionalverificationKey)).orElse(new EmptyType());
       elements.add(new StructElement(verificationKeyFieldID, verificationKeytlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -18094,7 +18135,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(ICDCounter);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void unregisterClient(DefaultClusterCallback callback, Long checkInNodeID, Optional<byte[]> verificationKey) {
@@ -18113,12 +18154,12 @@ public class ChipClusters {
       BaseTLVType verificationKeytlvValue = verificationKey.<BaseTLVType>map((nonOptionalverificationKey) -> new ByteArrayType(nonOptionalverificationKey)).orElse(new EmptyType());
       elements.add(new StructElement(verificationKeyFieldID, verificationKeytlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stayActiveRequest(StayActiveResponseCallback callback) {
@@ -18129,7 +18170,7 @@ public class ChipClusters {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -18144,7 +18185,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(promisedActiveDuration);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface RegisterClientResponseCallback extends BaseClusterCallback {
@@ -18591,12 +18632,12 @@ public class ChipClusters {
       BaseTLVType newTimetlvValue = new UIntType(newTime);
       elements.add(new StructElement(newTimeFieldID, newTimetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void resetTimer(DefaultClusterCallback callback) {
@@ -18607,12 +18648,12 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addTime(DefaultClusterCallback callback, Long additionalTime) {
@@ -18627,12 +18668,12 @@ public class ChipClusters {
       BaseTLVType additionalTimetlvValue = new UIntType(additionalTime);
       elements.add(new StructElement(additionalTimeFieldID, additionalTimetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void reduceTime(DefaultClusterCallback callback, Long timeReduction) {
@@ -18647,12 +18688,12 @@ public class ChipClusters {
       BaseTLVType timeReductiontlvValue = new UIntType(timeReduction);
       elements.add(new StructElement(timeReductionFieldID, timeReductiontlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -18931,7 +18972,7 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -18946,7 +18987,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stop(OperationalCommandResponseCallback callback) {
@@ -18957,7 +18998,7 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -18972,7 +19013,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void start(OperationalCommandResponseCallback callback) {
@@ -18983,7 +19024,7 @@ public class ChipClusters {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -18998,7 +19039,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void resume(OperationalCommandResponseCallback callback) {
@@ -19009,7 +19050,7 @@ public class ChipClusters {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -19024,7 +19065,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface OperationalCommandResponseCallback extends BaseClusterCallback {
@@ -19404,7 +19445,7 @@ public class ChipClusters {
       BaseTLVType newModetlvValue = new UIntType(newMode);
       elements.add(new StructElement(newModeFieldID, newModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -19426,7 +19467,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, statusText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChangeToModeResponseCallback extends BaseClusterCallback {
@@ -20024,12 +20065,12 @@ public class ChipClusters {
       BaseTLVType newModetlvValue = new UIntType(newMode);
       elements.add(new StructElement(newModeFieldID, newModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface StandardNamespaceAttributeCallback extends BaseAttributeCallback {
@@ -20419,7 +20460,7 @@ public class ChipClusters {
       BaseTLVType newModetlvValue = new UIntType(newMode);
       elements.add(new StructElement(newModeFieldID, newModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -20441,7 +20482,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, statusText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChangeToModeResponseCallback extends BaseClusterCallback {
@@ -20781,7 +20822,7 @@ public class ChipClusters {
       BaseTLVType newModetlvValue = new UIntType(newMode);
       elements.add(new StructElement(newModeFieldID, newModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -20803,7 +20844,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, statusText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChangeToModeResponseCallback extends BaseClusterCallback {
@@ -21462,7 +21503,7 @@ public class ChipClusters {
       BaseTLVType newModetlvValue = new UIntType(newMode);
       elements.add(new StructElement(newModeFieldID, newModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -21484,7 +21525,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, statusText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChangeToModeResponseCallback extends BaseClusterCallback {
@@ -21746,7 +21787,7 @@ public class ChipClusters {
       BaseTLVType newModetlvValue = new UIntType(newMode);
       elements.add(new StructElement(newModeFieldID, newModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -21768,7 +21809,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, statusText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChangeToModeResponseCallback extends BaseClusterCallback {
@@ -22038,12 +22079,12 @@ public class ChipClusters {
       BaseTLVType targetTemperatureLeveltlvValue = targetTemperatureLevel.<BaseTLVType>map((nonOptionaltargetTemperatureLevel) -> new UIntType(nonOptionaltargetTemperatureLevel)).orElse(new EmptyType());
       elements.add(new StructElement(targetTemperatureLevelFieldID, targetTemperatureLeveltlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface SupportedTemperatureLevelsAttributeCallback extends BaseAttributeCallback {
@@ -22668,7 +22709,7 @@ public class ChipClusters {
       BaseTLVType newModetlvValue = new UIntType(newMode);
       elements.add(new StructElement(newModeFieldID, newModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -22690,7 +22731,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, statusText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChangeToModeResponseCallback extends BaseClusterCallback {
@@ -23248,12 +23289,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -23793,12 +23834,12 @@ public class ChipClusters {
       BaseTLVType alarmstlvValue = new UIntType(alarms);
       elements.add(new StructElement(alarmsFieldID, alarmstlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void modifyEnabledAlarms(DefaultClusterCallback callback, Long mask) {
@@ -23813,12 +23854,12 @@ public class ChipClusters {
       BaseTLVType masktlvValue = new UIntType(mask);
       elements.add(new StructElement(maskFieldID, masktlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -24388,12 +24429,12 @@ public class ChipClusters {
       BaseTLVType startAfterSettingtlvValue = startAfterSetting.<BaseTLVType>map((nonOptionalstartAfterSetting) -> new BooleanType(nonOptionalstartAfterSetting)).orElse(new EmptyType());
       elements.add(new StructElement(startAfterSettingFieldID, startAfterSettingtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addMoreTime(DefaultClusterCallback callback, Long timeToAdd) {
@@ -24408,12 +24449,12 @@ public class ChipClusters {
       BaseTLVType timeToAddtlvValue = new UIntType(timeToAdd);
       elements.add(new StructElement(timeToAddFieldID, timeToAddtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface SupportedWattsAttributeCallback extends BaseAttributeCallback {
@@ -24846,7 +24887,7 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -24861,7 +24902,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stop(OperationalCommandResponseCallback callback) {
@@ -24872,7 +24913,7 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -24887,7 +24928,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void start(OperationalCommandResponseCallback callback) {
@@ -24898,7 +24939,7 @@ public class ChipClusters {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -24913,7 +24954,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void resume(OperationalCommandResponseCallback callback) {
@@ -24924,7 +24965,7 @@ public class ChipClusters {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -24939,7 +24980,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface OperationalCommandResponseCallback extends BaseClusterCallback {
@@ -25317,7 +25358,7 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -25332,7 +25373,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void resume(OperationalCommandResponseCallback callback) {
@@ -25343,7 +25384,7 @@ public class ChipClusters {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -25358,7 +25399,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void goHome(OperationalCommandResponseCallback callback) {
@@ -25369,7 +25410,7 @@ public class ChipClusters {
       final long commandId = 128L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -25384,7 +25425,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(commandResponseState);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface OperationalCommandResponseCallback extends BaseClusterCallback {
@@ -25779,7 +25820,7 @@ public class ChipClusters {
       BaseTLVType extensionFieldSetstlvValue = ArrayType.generateArrayType(extensionFieldSets, (elementextensionFieldSets) -> elementextensionFieldSets.encodeTlv());
       elements.add(new StructElement(extensionFieldSetsFieldID, extensionFieldSetstlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -25808,7 +25849,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, groupID, sceneID);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void viewScene(ViewSceneResponseCallback callback, Integer groupID, Integer sceneID) {
@@ -25827,7 +25868,7 @@ public class ChipClusters {
       BaseTLVType sceneIDtlvValue = new UIntType(sceneID);
       elements.add(new StructElement(sceneIDFieldID, sceneIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -25877,7 +25918,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, groupID, sceneID, transitionTime, sceneName, extensionFieldSets);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void removeScene(RemoveSceneResponseCallback callback, Integer groupID, Integer sceneID) {
@@ -25896,7 +25937,7 @@ public class ChipClusters {
       BaseTLVType sceneIDtlvValue = new UIntType(sceneID);
       elements.add(new StructElement(sceneIDFieldID, sceneIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -25925,7 +25966,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, groupID, sceneID);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void removeAllScenes(RemoveAllScenesResponseCallback callback, Integer groupID) {
@@ -25940,7 +25981,7 @@ public class ChipClusters {
       BaseTLVType groupIDtlvValue = new UIntType(groupID);
       elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -25962,7 +26003,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, groupID);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void storeScene(StoreSceneResponseCallback callback, Integer groupID, Integer sceneID) {
@@ -25981,7 +26022,7 @@ public class ChipClusters {
       BaseTLVType sceneIDtlvValue = new UIntType(sceneID);
       elements.add(new StructElement(sceneIDFieldID, sceneIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -26010,7 +26051,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, groupID, sceneID);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void recallScene(DefaultClusterCallback callback, Integer groupID, Integer sceneID, @Nullable Optional<Long> transitionTime) {
@@ -26033,12 +26074,12 @@ public class ChipClusters {
       BaseTLVType transitionTimetlvValue = transitionTime != null ? transitionTime.<BaseTLVType>map((nonOptionaltransitionTime) -> new UIntType(nonOptionaltransitionTime)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(transitionTimeFieldID, transitionTimetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getSceneMembership(GetSceneMembershipResponseCallback callback, Integer groupID) {
@@ -26053,7 +26094,7 @@ public class ChipClusters {
       BaseTLVType groupIDtlvValue = new UIntType(groupID);
       elements.add(new StructElement(groupIDFieldID, groupIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -26089,7 +26130,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, capacity, groupID, sceneList);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void copyScene(CopySceneResponseCallback callback, Integer mode, Integer groupIdentifierFrom, Integer sceneIdentifierFrom, Integer groupIdentifierTo, Integer sceneIdentifierTo) {
@@ -26120,7 +26161,7 @@ public class ChipClusters {
       BaseTLVType sceneIdentifierTotlvValue = new UIntType(sceneIdentifierTo);
       elements.add(new StructElement(sceneIdentifierToFieldID, sceneIdentifierTotlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -26149,7 +26190,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, groupIdentifierFrom, sceneIdentifierFrom);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface AddSceneResponseCallback extends BaseClusterCallback {
@@ -26469,12 +26510,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface LastChangedTimeAttributeCallback extends BaseAttributeCallback {
@@ -26845,12 +26886,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface LastChangedTimeAttributeCallback extends BaseAttributeCallback {
@@ -27227,12 +27268,12 @@ public class ChipClusters {
       BaseTLVType alarmsToSuppresstlvValue = new UIntType(alarmsToSuppress);
       elements.add(new StructElement(alarmsToSuppressFieldID, alarmsToSuppresstlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void enableDisableAlarm(DefaultClusterCallback callback, Integer alarmsToEnableDisable) {
@@ -27247,12 +27288,12 @@ public class ChipClusters {
       BaseTLVType alarmsToEnableDisabletlvValue = new UIntType(alarmsToEnableDisable);
       elements.add(new StructElement(alarmsToEnableDisableFieldID, alarmsToEnableDisabletlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -27678,12 +27719,12 @@ public class ChipClusters {
       BaseTLVType targetLeveltlvValue = targetLevel.<BaseTLVType>map((nonOptionaltargetLevel) -> new UIntType(nonOptionaltargetLevel)).orElse(new EmptyType());
       elements.add(new StructElement(targetLevelFieldID, targetLeveltlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void close(DefaultClusterCallback callback) {
@@ -27694,12 +27735,12 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface OpenDurationAttributeCallback extends BaseAttributeCallback {
@@ -29350,12 +29391,12 @@ public class ChipClusters {
       BaseTLVType loadControlProgramtlvValue = loadControlProgram.encodeTlv();
       elements.add(new StructElement(loadControlProgramFieldID, loadControlProgramtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void unregisterLoadControlProgramRequest(DefaultClusterCallback callback, byte[] loadControlProgramID) {
@@ -29370,12 +29411,12 @@ public class ChipClusters {
       BaseTLVType loadControlProgramIDtlvValue = new ByteArrayType(loadControlProgramID);
       elements.add(new StructElement(loadControlProgramIDFieldID, loadControlProgramIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addLoadControlEventRequest(DefaultClusterCallback callback, ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct event) {
@@ -29390,12 +29431,12 @@ public class ChipClusters {
       BaseTLVType eventtlvValue = event.encodeTlv();
       elements.add(new StructElement(eventFieldID, eventtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void removeLoadControlEventRequest(DefaultClusterCallback callback, byte[] eventID, Integer cancelControl) {
@@ -29414,12 +29455,12 @@ public class ChipClusters {
       BaseTLVType cancelControltlvValue = new UIntType(cancelControl);
       elements.add(new StructElement(cancelControlFieldID, cancelControltlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void clearLoadControlEventsRequest(DefaultClusterCallback callback) {
@@ -29430,12 +29471,12 @@ public class ChipClusters {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface LoadControlProgramsAttributeCallback extends BaseAttributeCallback {
@@ -29893,12 +29934,12 @@ public class ChipClusters {
       BaseTLVType responsestlvValue = responses.<BaseTLVType>map((nonOptionalresponses) -> ArrayType.generateArrayType(nonOptionalresponses, (elementnonOptionalresponses) -> elementnonOptionalresponses.encodeTlv())).orElse(new EmptyType());
       elements.add(new StructElement(responsesFieldID, responsestlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void cancelMessagesRequest(DefaultClusterCallback callback, ArrayList<byte[]> messageIDs) {
@@ -29913,12 +29954,12 @@ public class ChipClusters {
       BaseTLVType messageIDstlvValue = ArrayType.generateArrayType(messageIDs, (elementmessageIDs) -> new ByteArrayType(elementmessageIDs));
       elements.add(new StructElement(messageIDsFieldID, messageIDstlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface MessagesAttributeCallback extends BaseAttributeCallback {
@@ -30194,12 +30235,12 @@ public class ChipClusters {
       BaseTLVType causetlvValue = new UIntType(cause);
       elements.add(new StructElement(causeFieldID, causetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void cancelPowerAdjustRequest(DefaultClusterCallback callback) {
@@ -30210,12 +30251,12 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void startTimeAdjustRequest(DefaultClusterCallback callback, Long requestedStartTime, Integer cause) {
@@ -30234,12 +30275,12 @@ public class ChipClusters {
       BaseTLVType causetlvValue = new UIntType(cause);
       elements.add(new StructElement(causeFieldID, causetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void pauseRequest(DefaultClusterCallback callback, Long duration, Integer cause) {
@@ -30258,12 +30299,12 @@ public class ChipClusters {
       BaseTLVType causetlvValue = new UIntType(cause);
       elements.add(new StructElement(causeFieldID, causetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void resumeRequest(DefaultClusterCallback callback) {
@@ -30274,12 +30315,12 @@ public class ChipClusters {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastId, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause) {
@@ -30302,12 +30343,12 @@ public class ChipClusters {
       BaseTLVType causetlvValue = new UIntType(cause);
       elements.add(new StructElement(causeFieldID, causetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void requestConstraintBasedForecast(DefaultClusterCallback callback, ArrayList<ChipStructs.DeviceEnergyManagementClusterConstraintsStruct> constraints, Integer cause) {
@@ -30326,12 +30367,12 @@ public class ChipClusters {
       BaseTLVType causetlvValue = new UIntType(cause);
       elements.add(new StructElement(causeFieldID, causetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void cancelRequest(DefaultClusterCallback callback) {
@@ -30342,12 +30383,12 @@ public class ChipClusters {
       final long commandId = 7L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface PowerAdjustmentCapabilityAttributeCallback extends BaseAttributeCallback {
@@ -30773,12 +30814,12 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -30798,12 +30839,12 @@ public class ChipClusters {
       BaseTLVType maximumChargeCurrenttlvValue = new IntType(maximumChargeCurrent);
       elements.add(new StructElement(maximumChargeCurrentFieldID, maximumChargeCurrenttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -30819,12 +30860,12 @@ public class ChipClusters {
       BaseTLVType maximumDischargeCurrenttlvValue = new IntType(maximumDischargeCurrent);
       elements.add(new StructElement(maximumDischargeCurrentFieldID, maximumDischargeCurrenttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -30832,12 +30873,12 @@ public class ChipClusters {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -30849,12 +30890,12 @@ public class ChipClusters {
       BaseTLVType chargingTargetSchedulestlvValue = ArrayType.generateArrayType(chargingTargetSchedules, (elementchargingTargetSchedules) -> elementchargingTargetSchedules.encodeTlv());
       elements.add(new StructElement(chargingTargetSchedulesFieldID, chargingTargetSchedulestlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -30862,7 +30903,7 @@ public class ChipClusters {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -30877,7 +30918,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(chargingTargetSchedules);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -30885,12 +30926,12 @@ public class ChipClusters {
       final long commandId = 7L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GetTargetsResponseCallback extends BaseClusterCallback {
@@ -32356,7 +32397,7 @@ public class ChipClusters {
       BaseTLVType newModetlvValue = new UIntType(newMode);
       elements.add(new StructElement(newModeFieldID, newModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -32378,7 +32419,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, statusText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChangeToModeResponseCallback extends BaseClusterCallback {
@@ -32718,7 +32759,7 @@ public class ChipClusters {
       BaseTLVType newModetlvValue = new UIntType(newMode);
       elements.add(new StructElement(newModeFieldID, newModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -32740,7 +32781,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, statusText);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChangeToModeResponseCallback extends BaseClusterCallback {
@@ -33118,12 +33159,12 @@ public class ChipClusters {
       BaseTLVType PINCodetlvValue = PINCode.<BaseTLVType>map((nonOptionalPINCode) -> new ByteArrayType(nonOptionalPINCode)).orElse(new EmptyType());
       elements.add(new StructElement(PINCodeFieldID, PINCodetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -33135,12 +33176,12 @@ public class ChipClusters {
       BaseTLVType PINCodetlvValue = PINCode.<BaseTLVType>map((nonOptionalPINCode) -> new ByteArrayType(nonOptionalPINCode)).orElse(new EmptyType());
       elements.add(new StructElement(PINCodeFieldID, PINCodetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -33156,12 +33197,12 @@ public class ChipClusters {
       BaseTLVType PINCodetlvValue = PINCode.<BaseTLVType>map((nonOptionalPINCode) -> new ByteArrayType(nonOptionalPINCode)).orElse(new EmptyType());
       elements.add(new StructElement(PINCodeFieldID, PINCodetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setWeekDaySchedule(DefaultClusterCallback callback, Integer weekDayIndex, Integer userIndex, Integer daysMask, Integer startHour, Integer startMinute, Integer endHour, Integer endMinute) {
@@ -33200,12 +33241,12 @@ public class ChipClusters {
       BaseTLVType endMinutetlvValue = new UIntType(endMinute);
       elements.add(new StructElement(endMinuteFieldID, endMinutetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getWeekDaySchedule(GetWeekDayScheduleResponseCallback callback, Integer weekDayIndex, Integer userIndex) {
@@ -33224,7 +33265,7 @@ public class ChipClusters {
       BaseTLVType userIndextlvValue = new UIntType(userIndex);
       elements.add(new StructElement(userIndexFieldID, userIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -33288,7 +33329,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(weekDayIndex, userIndex, status, daysMask, startHour, startMinute, endHour, endMinute);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void clearWeekDaySchedule(DefaultClusterCallback callback, Integer weekDayIndex, Integer userIndex) {
@@ -33307,12 +33348,12 @@ public class ChipClusters {
       BaseTLVType userIndextlvValue = new UIntType(userIndex);
       elements.add(new StructElement(userIndexFieldID, userIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setYearDaySchedule(DefaultClusterCallback callback, Integer yearDayIndex, Integer userIndex, Long localStartTime, Long localEndTime) {
@@ -33339,12 +33380,12 @@ public class ChipClusters {
       BaseTLVType localEndTimetlvValue = new UIntType(localEndTime);
       elements.add(new StructElement(localEndTimeFieldID, localEndTimetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getYearDaySchedule(GetYearDayScheduleResponseCallback callback, Integer yearDayIndex, Integer userIndex) {
@@ -33363,7 +33404,7 @@ public class ChipClusters {
       BaseTLVType userIndextlvValue = new UIntType(userIndex);
       elements.add(new StructElement(userIndexFieldID, userIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -33406,7 +33447,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(yearDayIndex, userIndex, status, localStartTime, localEndTime);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void clearYearDaySchedule(DefaultClusterCallback callback, Integer yearDayIndex, Integer userIndex) {
@@ -33425,12 +33466,12 @@ public class ChipClusters {
       BaseTLVType userIndextlvValue = new UIntType(userIndex);
       elements.add(new StructElement(userIndexFieldID, userIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setHolidaySchedule(DefaultClusterCallback callback, Integer holidayIndex, Long localStartTime, Long localEndTime, Integer operatingMode) {
@@ -33457,12 +33498,12 @@ public class ChipClusters {
       BaseTLVType operatingModetlvValue = new UIntType(operatingMode);
       elements.add(new StructElement(operatingModeFieldID, operatingModetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getHolidaySchedule(GetHolidayScheduleResponseCallback callback, Integer holidayIndex) {
@@ -33477,7 +33518,7 @@ public class ChipClusters {
       BaseTLVType holidayIndextlvValue = new UIntType(holidayIndex);
       elements.add(new StructElement(holidayIndexFieldID, holidayIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -33520,7 +33561,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(holidayIndex, status, localStartTime, localEndTime, operatingMode);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void clearHolidaySchedule(DefaultClusterCallback callback, Integer holidayIndex) {
@@ -33535,12 +33576,12 @@ public class ChipClusters {
       BaseTLVType holidayIndextlvValue = new UIntType(holidayIndex);
       elements.add(new StructElement(holidayIndexFieldID, holidayIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -33576,12 +33617,12 @@ public class ChipClusters {
       BaseTLVType credentialRuletlvValue = credentialRule != null ? new UIntType(credentialRule) : new NullType();
       elements.add(new StructElement(credentialRuleFieldID, credentialRuletlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getUser(GetUserResponseCallback callback, Integer userIndex) {
@@ -33596,7 +33637,7 @@ public class ChipClusters {
       BaseTLVType userIndextlvValue = new UIntType(userIndex);
       elements.add(new StructElement(userIndexFieldID, userIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -33674,7 +33715,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(userIndex, userName, userUniqueID, userStatus, userType, credentialRule, credentials, creatorFabricIndex, lastModifiedFabricIndex, nextUserIndex);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -33686,12 +33727,12 @@ public class ChipClusters {
       BaseTLVType userIndextlvValue = new UIntType(userIndex);
       elements.add(new StructElement(userIndexFieldID, userIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -33723,7 +33764,7 @@ public class ChipClusters {
       BaseTLVType userTypetlvValue = userType != null ? new UIntType(userType) : new NullType();
       elements.add(new StructElement(userTypeFieldID, userTypetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -33752,7 +33793,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, userIndex, nextCredentialIndex);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getCredentialStatus(GetCredentialStatusResponseCallback callback, ChipStructs.DoorLockClusterCredentialStruct credential) {
@@ -33767,7 +33808,7 @@ public class ChipClusters {
       BaseTLVType credentialtlvValue = credential.encodeTlv();
       elements.add(new StructElement(credentialFieldID, credentialtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -33810,7 +33851,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(credentialExists, userIndex, creatorFabricIndex, lastModifiedFabricIndex, nextCredentialIndex);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -33822,12 +33863,12 @@ public class ChipClusters {
       BaseTLVType credentialtlvValue = credential != null ? credential.encodeTlv() : new NullType();
       elements.add(new StructElement(credentialFieldID, credentialtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -33839,12 +33880,12 @@ public class ChipClusters {
       BaseTLVType PINCodetlvValue = PINCode.<BaseTLVType>map((nonOptionalPINCode) -> new ByteArrayType(nonOptionalPINCode)).orElse(new EmptyType());
       elements.add(new StructElement(PINCodeFieldID, PINCodetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -33868,12 +33909,12 @@ public class ChipClusters {
       BaseTLVType groupResolvingKeytlvValue = groupResolvingKey.<BaseTLVType>map((nonOptionalgroupResolvingKey) -> new ByteArrayType(nonOptionalgroupResolvingKey)).orElse(new EmptyType());
       elements.add(new StructElement(groupResolvingKeyFieldID, groupResolvingKeytlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -33881,12 +33922,12 @@ public class ChipClusters {
       final long commandId = 41L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GetWeekDayScheduleResponseCallback extends BaseClusterCallback {
@@ -35445,12 +35486,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void downOrClose(DefaultClusterCallback callback) {
@@ -35461,12 +35502,12 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stopMotion(DefaultClusterCallback callback) {
@@ -35477,12 +35518,12 @@ public class ChipClusters {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void goToLiftValue(DefaultClusterCallback callback, Integer liftValue) {
@@ -35497,12 +35538,12 @@ public class ChipClusters {
       BaseTLVType liftValuetlvValue = new UIntType(liftValue);
       elements.add(new StructElement(liftValueFieldID, liftValuetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void goToLiftPercentage(DefaultClusterCallback callback, Integer liftPercent100thsValue) {
@@ -35517,12 +35558,12 @@ public class ChipClusters {
       BaseTLVType liftPercent100thsValuetlvValue = new UIntType(liftPercent100thsValue);
       elements.add(new StructElement(liftPercent100thsValueFieldID, liftPercent100thsValuetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void goToTiltValue(DefaultClusterCallback callback, Integer tiltValue) {
@@ -35537,12 +35578,12 @@ public class ChipClusters {
       BaseTLVType tiltValuetlvValue = new UIntType(tiltValue);
       elements.add(new StructElement(tiltValueFieldID, tiltValuetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void goToTiltPercentage(DefaultClusterCallback callback, Integer tiltPercent100thsValue) {
@@ -35557,12 +35598,12 @@ public class ChipClusters {
       BaseTLVType tiltPercent100thsValuetlvValue = new UIntType(tiltPercent100thsValue);
       elements.add(new StructElement(tiltPercent100thsValueFieldID, tiltPercent100thsValuetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface CurrentPositionLiftAttributeCallback extends BaseAttributeCallback {
@@ -36365,12 +36406,12 @@ public class ChipClusters {
       BaseTLVType percentOpentlvValue = new UIntType(percentOpen);
       elements.add(new StructElement(percentOpenFieldID, percentOpentlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void barrierControlStop(DefaultClusterCallback callback) {
@@ -36381,12 +36422,12 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -37852,12 +37893,12 @@ public class ChipClusters {
       BaseTLVType amounttlvValue = new IntType(amount);
       elements.add(new StructElement(amountFieldID, amounttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setWeeklySchedule(DefaultClusterCallback callback, Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions) {
@@ -37884,12 +37925,12 @@ public class ChipClusters {
       BaseTLVType transitionstlvValue = ArrayType.generateArrayType(transitions, (elementtransitions) -> elementtransitions.encodeTlv());
       elements.add(new StructElement(transitionsFieldID, transitionstlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getWeeklySchedule(GetWeeklyScheduleResponseCallback callback, Integer daysToReturn, Integer modeToReturn) {
@@ -37908,7 +37949,7 @@ public class ChipClusters {
       BaseTLVType modeToReturntlvValue = new UIntType(modeToReturn);
       elements.add(new StructElement(modeToReturnFieldID, modeToReturntlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -37944,7 +37985,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, transitions);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void clearWeeklySchedule(DefaultClusterCallback callback) {
@@ -37955,12 +37996,12 @@ public class ChipClusters {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setActiveScheduleRequest(DefaultClusterCallback callback, byte[] scheduleHandle) {
@@ -37975,12 +38016,12 @@ public class ChipClusters {
       BaseTLVType scheduleHandletlvValue = new ByteArrayType(scheduleHandle);
       elements.add(new StructElement(scheduleHandleFieldID, scheduleHandletlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setActivePresetRequest(DefaultClusterCallback callback, byte[] presetHandle, Optional<Integer> delayMinutes) {
@@ -37999,12 +38040,12 @@ public class ChipClusters {
       BaseTLVType delayMinutestlvValue = delayMinutes.<BaseTLVType>map((nonOptionaldelayMinutes) -> new UIntType(nonOptionaldelayMinutes)).orElse(new EmptyType());
       elements.add(new StructElement(delayMinutesFieldID, delayMinutestlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void startPresetsSchedulesEditRequest(DefaultClusterCallback callback, Integer timeoutSeconds) {
@@ -38019,12 +38060,12 @@ public class ChipClusters {
       BaseTLVType timeoutSecondstlvValue = new UIntType(timeoutSeconds);
       elements.add(new StructElement(timeoutSecondsFieldID, timeoutSecondstlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void cancelPresetsSchedulesEditRequest(DefaultClusterCallback callback) {
@@ -38035,12 +38076,12 @@ public class ChipClusters {
       final long commandId = 8L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void commitPresetsSchedulesRequest(DefaultClusterCallback callback) {
@@ -38051,12 +38092,12 @@ public class ChipClusters {
       final long commandId = 9L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void cancelSetActivePresetRequest(DefaultClusterCallback callback) {
@@ -38067,12 +38108,12 @@ public class ChipClusters {
       final long commandId = 10L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setTemperatureSetpointHoldPolicy(DefaultClusterCallback callback, Integer temperatureSetpointHoldPolicy) {
@@ -38087,12 +38128,12 @@ public class ChipClusters {
       BaseTLVType temperatureSetpointHoldPolicytlvValue = new UIntType(temperatureSetpointHoldPolicy);
       elements.add(new StructElement(temperatureSetpointHoldPolicyFieldID, temperatureSetpointHoldPolicytlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GetWeeklyScheduleResponseCallback extends BaseClusterCallback {
@@ -40234,12 +40275,12 @@ public class ChipClusters {
       BaseTLVType lowestOfftlvValue = lowestOff.<BaseTLVType>map((nonOptionallowestOff) -> new BooleanType(nonOptionallowestOff)).orElse(new EmptyType());
       elements.add(new StructElement(lowestOffFieldID, lowestOfftlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface PercentSettingAttributeCallback extends BaseAttributeCallback {
@@ -41163,12 +41204,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveHue(DefaultClusterCallback callback, Integer moveMode, Integer rate, Integer optionsMask, Integer optionsOverride) {
@@ -41195,12 +41236,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stepHue(DefaultClusterCallback callback, Integer stepMode, Integer stepSize, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41231,12 +41272,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveToSaturation(DefaultClusterCallback callback, Integer saturation, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41263,12 +41304,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveSaturation(DefaultClusterCallback callback, Integer moveMode, Integer rate, Integer optionsMask, Integer optionsOverride) {
@@ -41295,12 +41336,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stepSaturation(DefaultClusterCallback callback, Integer stepMode, Integer stepSize, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41331,12 +41372,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveToHueAndSaturation(DefaultClusterCallback callback, Integer hue, Integer saturation, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41367,12 +41408,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveToColor(DefaultClusterCallback callback, Integer colorX, Integer colorY, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41403,12 +41444,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveColor(DefaultClusterCallback callback, Integer rateX, Integer rateY, Integer optionsMask, Integer optionsOverride) {
@@ -41435,12 +41476,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stepColor(DefaultClusterCallback callback, Integer stepX, Integer stepY, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41471,12 +41512,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveToColorTemperature(DefaultClusterCallback callback, Integer colorTemperatureMireds, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41503,12 +41544,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void enhancedMoveToHue(DefaultClusterCallback callback, Integer enhancedHue, Integer direction, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41539,12 +41580,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void enhancedMoveHue(DefaultClusterCallback callback, Integer moveMode, Integer rate, Integer optionsMask, Integer optionsOverride) {
@@ -41571,12 +41612,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void enhancedStepHue(DefaultClusterCallback callback, Integer stepMode, Integer stepSize, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41607,12 +41648,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void enhancedMoveToHueAndSaturation(DefaultClusterCallback callback, Integer enhancedHue, Integer saturation, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
@@ -41643,12 +41684,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void colorLoopSet(DefaultClusterCallback callback, Integer updateFlags, Integer action, Integer direction, Integer time, Integer startHue, Integer optionsMask, Integer optionsOverride) {
@@ -41687,12 +41728,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stopMoveStep(DefaultClusterCallback callback, Integer optionsMask, Integer optionsOverride) {
@@ -41711,12 +41752,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void moveColorTemperature(DefaultClusterCallback callback, Integer moveMode, Integer rate, Integer colorTemperatureMinimumMireds, Integer colorTemperatureMaximumMireds, Integer optionsMask, Integer optionsOverride) {
@@ -41751,12 +41792,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stepColorTemperature(DefaultClusterCallback callback, Integer stepMode, Integer stepSize, Integer transitionTime, Integer colorTemperatureMinimumMireds, Integer colorTemperatureMaximumMireds, Integer optionsMask, Integer optionsOverride) {
@@ -41795,12 +41836,12 @@ public class ChipClusters {
       BaseTLVType optionsOverridetlvValue = new UIntType(optionsOverride);
       elements.add(new StructElement(optionsOverrideFieldID, optionsOverridetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface NumberOfPrimariesAttributeCallback extends BaseAttributeCallback {
@@ -51563,7 +51604,7 @@ public class ChipClusters {
       BaseTLVType matchtlvValue = new StringType(match);
       elements.add(new StructElement(matchFieldID, matchtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -51585,7 +51626,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void changeChannelByNumber(DefaultClusterCallback callback, Integer majorNumber, Integer minorNumber) {
@@ -51604,12 +51645,12 @@ public class ChipClusters {
       BaseTLVType minorNumbertlvValue = new UIntType(minorNumber);
       elements.add(new StructElement(minorNumberFieldID, minorNumbertlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void skipChannel(DefaultClusterCallback callback, Integer count) {
@@ -51624,12 +51665,12 @@ public class ChipClusters {
       BaseTLVType counttlvValue = new IntType(count);
       elements.add(new StructElement(countFieldID, counttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getProgramGuide(ProgramGuideResponseCallback callback, Optional<Long> startTime, Optional<Long> endTime, Optional<ArrayList<ChipStructs.ChannelClusterChannelInfoStruct>> channelList, Optional<ChipStructs.ChannelClusterPageTokenStruct> pageToken, Optional<Long> recordingFlag, Optional<ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct>> externalIDList, Optional<byte[]> data) {
@@ -51668,7 +51709,7 @@ public class ChipClusters {
       BaseTLVType datatlvValue = data.<BaseTLVType>map((nonOptionaldata) -> new ByteArrayType(nonOptionaldata)).orElse(new EmptyType());
       elements.add(new StructElement(dataFieldID, datatlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -51690,7 +51731,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(paging, programList);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void recordProgram(DefaultClusterCallback callback, String programIdentifier, Boolean shouldRecordSeries, ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct> externalIDList, byte[] data) {
@@ -51717,12 +51758,12 @@ public class ChipClusters {
       BaseTLVType datatlvValue = new ByteArrayType(data);
       elements.add(new StructElement(dataFieldID, datatlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void cancelRecordProgram(DefaultClusterCallback callback, String programIdentifier, Boolean shouldRecordSeries, ArrayList<ChipStructs.ChannelClusterAdditionalInfoStruct> externalIDList, byte[] data) {
@@ -51749,12 +51790,12 @@ public class ChipClusters {
       BaseTLVType datatlvValue = new ByteArrayType(data);
       elements.add(new StructElement(dataFieldID, datatlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ChangeChannelResponseCallback extends BaseClusterCallback {
@@ -52057,7 +52098,7 @@ public class ChipClusters {
       BaseTLVType datatlvValue = data.<BaseTLVType>map((nonOptionaldata) -> new StringType(nonOptionaldata)).orElse(new EmptyType());
       elements.add(new StructElement(dataFieldID, datatlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52079,7 +52120,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface NavigateTargetResponseCallback extends BaseClusterCallback {
@@ -52346,7 +52387,7 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52368,7 +52409,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void pause(PlaybackResponseCallback callback) {
@@ -52379,7 +52420,7 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52401,7 +52442,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stop(PlaybackResponseCallback callback) {
@@ -52412,7 +52453,7 @@ public class ChipClusters {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52434,7 +52475,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void startOver(PlaybackResponseCallback callback) {
@@ -52445,7 +52486,7 @@ public class ChipClusters {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52467,7 +52508,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void previous(PlaybackResponseCallback callback) {
@@ -52478,7 +52519,7 @@ public class ChipClusters {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52500,7 +52541,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void next(PlaybackResponseCallback callback) {
@@ -52511,7 +52552,7 @@ public class ChipClusters {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52533,7 +52574,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void rewind(PlaybackResponseCallback callback, Optional<Boolean> audioAdvanceUnmuted) {
@@ -52548,7 +52589,7 @@ public class ChipClusters {
       BaseTLVType audioAdvanceUnmutedtlvValue = audioAdvanceUnmuted.<BaseTLVType>map((nonOptionalaudioAdvanceUnmuted) -> new BooleanType(nonOptionalaudioAdvanceUnmuted)).orElse(new EmptyType());
       elements.add(new StructElement(audioAdvanceUnmutedFieldID, audioAdvanceUnmutedtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52570,7 +52611,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void fastForward(PlaybackResponseCallback callback, Optional<Boolean> audioAdvanceUnmuted) {
@@ -52585,7 +52626,7 @@ public class ChipClusters {
       BaseTLVType audioAdvanceUnmutedtlvValue = audioAdvanceUnmuted.<BaseTLVType>map((nonOptionalaudioAdvanceUnmuted) -> new BooleanType(nonOptionalaudioAdvanceUnmuted)).orElse(new EmptyType());
       elements.add(new StructElement(audioAdvanceUnmutedFieldID, audioAdvanceUnmutedtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52607,7 +52648,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void skipForward(PlaybackResponseCallback callback, Long deltaPositionMilliseconds) {
@@ -52622,7 +52663,7 @@ public class ChipClusters {
       BaseTLVType deltaPositionMillisecondstlvValue = new UIntType(deltaPositionMilliseconds);
       elements.add(new StructElement(deltaPositionMillisecondsFieldID, deltaPositionMillisecondstlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52644,7 +52685,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void skipBackward(PlaybackResponseCallback callback, Long deltaPositionMilliseconds) {
@@ -52659,7 +52700,7 @@ public class ChipClusters {
       BaseTLVType deltaPositionMillisecondstlvValue = new UIntType(deltaPositionMilliseconds);
       elements.add(new StructElement(deltaPositionMillisecondsFieldID, deltaPositionMillisecondstlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52681,7 +52722,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void seek(PlaybackResponseCallback callback, Long position) {
@@ -52696,7 +52737,7 @@ public class ChipClusters {
       BaseTLVType positiontlvValue = new UIntType(position);
       elements.add(new StructElement(positionFieldID, positiontlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -52718,7 +52759,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void activateAudioTrack(DefaultClusterCallback callback, String trackID, Integer audioOutputIndex) {
@@ -52737,12 +52778,12 @@ public class ChipClusters {
       BaseTLVType audioOutputIndextlvValue = new UIntType(audioOutputIndex);
       elements.add(new StructElement(audioOutputIndexFieldID, audioOutputIndextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void activateTextTrack(DefaultClusterCallback callback, String trackID) {
@@ -52757,12 +52798,12 @@ public class ChipClusters {
       BaseTLVType trackIDtlvValue = new StringType(trackID);
       elements.add(new StructElement(trackIDFieldID, trackIDtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void deactivateTextTrack(DefaultClusterCallback callback) {
@@ -52773,12 +52814,12 @@ public class ChipClusters {
       final long commandId = 14L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface PlaybackResponseCallback extends BaseClusterCallback {
@@ -53297,12 +53338,12 @@ public class ChipClusters {
       BaseTLVType indextlvValue = new UIntType(index);
       elements.add(new StructElement(indexFieldID, indextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void showInputStatus(DefaultClusterCallback callback) {
@@ -53313,12 +53354,12 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void hideInputStatus(DefaultClusterCallback callback) {
@@ -53329,12 +53370,12 @@ public class ChipClusters {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void renameInput(DefaultClusterCallback callback, Integer index, String name) {
@@ -53353,12 +53394,12 @@ public class ChipClusters {
       BaseTLVType nametlvValue = new StringType(name);
       elements.add(new StructElement(nameFieldID, nametlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface InputListAttributeCallback extends BaseAttributeCallback {
@@ -53610,12 +53651,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -53817,7 +53858,7 @@ public class ChipClusters {
       BaseTLVType keyCodetlvValue = new UIntType(keyCode);
       elements.add(new StructElement(keyCodeFieldID, keyCodetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -53832,7 +53873,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface SendKeyResponseCallback extends BaseClusterCallback {
@@ -54056,7 +54097,7 @@ public class ChipClusters {
       BaseTLVType useCurrentContexttlvValue = useCurrentContext.<BaseTLVType>map((nonOptionaluseCurrentContext) -> new BooleanType(nonOptionaluseCurrentContext)).orElse(new EmptyType());
       elements.add(new StructElement(useCurrentContextFieldID, useCurrentContexttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -54078,7 +54119,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void launchURL(LauncherResponseCallback callback, String contentURL, Optional<String> displayString, Optional<ChipStructs.ContentLauncherClusterBrandingInformationStruct> brandingInformation) {
@@ -54101,7 +54142,7 @@ public class ChipClusters {
       BaseTLVType brandingInformationtlvValue = brandingInformation.<BaseTLVType>map((nonOptionalbrandingInformation) -> nonOptionalbrandingInformation.encodeTlv()).orElse(new EmptyType());
       elements.add(new StructElement(brandingInformationFieldID, brandingInformationtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -54123,7 +54164,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface LauncherResponseCallback extends BaseClusterCallback {
@@ -54385,12 +54426,12 @@ public class ChipClusters {
       BaseTLVType indextlvValue = new UIntType(index);
       elements.add(new StructElement(indexFieldID, indextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void renameOutput(DefaultClusterCallback callback, Integer index, String name) {
@@ -54409,12 +54450,12 @@ public class ChipClusters {
       BaseTLVType nametlvValue = new StringType(name);
       elements.add(new StructElement(nameFieldID, nametlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface OutputListAttributeCallback extends BaseAttributeCallback {
@@ -54676,7 +54717,7 @@ public class ChipClusters {
       BaseTLVType datatlvValue = data.<BaseTLVType>map((nonOptionaldata) -> new ByteArrayType(nonOptionaldata)).orElse(new EmptyType());
       elements.add(new StructElement(dataFieldID, datatlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -54698,7 +54739,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void stopApp(LauncherResponseCallback callback, Optional<ChipStructs.ApplicationLauncherClusterApplicationStruct> application) {
@@ -54713,7 +54754,7 @@ public class ChipClusters {
       BaseTLVType applicationtlvValue = application.<BaseTLVType>map((nonOptionalapplication) -> nonOptionalapplication.encodeTlv()).orElse(new EmptyType());
       elements.add(new StructElement(applicationFieldID, applicationtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -54735,7 +54776,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void hideApp(LauncherResponseCallback callback, Optional<ChipStructs.ApplicationLauncherClusterApplicationStruct> application) {
@@ -54750,7 +54791,7 @@ public class ChipClusters {
       BaseTLVType applicationtlvValue = application.<BaseTLVType>map((nonOptionalapplication) -> nonOptionalapplication.encodeTlv()).orElse(new EmptyType());
       elements.add(new StructElement(applicationFieldID, applicationtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -54772,7 +54813,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface LauncherResponseCallback extends BaseClusterCallback {
@@ -55436,7 +55477,7 @@ public class ChipClusters {
       BaseTLVType tempAccountIdentifiertlvValue = new StringType(tempAccountIdentifier);
       elements.add(new StructElement(tempAccountIdentifierFieldID, tempAccountIdentifiertlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -55451,7 +55492,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(setupPIN);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -55471,12 +55512,12 @@ public class ChipClusters {
       BaseTLVType nodetlvValue = node.<BaseTLVType>map((nonOptionalnode) -> new UIntType(nonOptionalnode)).orElse(new EmptyType());
       elements.add(new StructElement(nodeFieldID, nodetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -55488,12 +55529,12 @@ public class ChipClusters {
       BaseTLVType nodetlvValue = node.<BaseTLVType>map((nonOptionalnode) -> new UIntType(nonOptionalnode)).orElse(new EmptyType());
       elements.add(new StructElement(nodeFieldID, nodetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GetSetupPINResponseCallback extends BaseClusterCallback {
@@ -55711,12 +55752,12 @@ public class ChipClusters {
       BaseTLVType newPINtlvValue = new StringType(newPIN);
       elements.add(new StructElement(newPINFieldID, newPINtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void resetPIN(ResetPINResponseCallback callback) {
@@ -55727,7 +55768,7 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -55742,7 +55783,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(PINCode);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void enable(DefaultClusterCallback callback) {
@@ -55753,12 +55794,12 @@ public class ChipClusters {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void disable(DefaultClusterCallback callback) {
@@ -55769,12 +55810,12 @@ public class ChipClusters {
       final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addBonusTime(DefaultClusterCallback callback, Optional<String> PINCode, Optional<Long> bonusTime) {
@@ -55793,12 +55834,12 @@ public class ChipClusters {
       BaseTLVType bonusTimetlvValue = bonusTime.<BaseTLVType>map((nonOptionalbonusTime) -> new UIntType(nonOptionalbonusTime)).orElse(new EmptyType());
       elements.add(new StructElement(bonusTimeFieldID, bonusTimetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setScreenDailyTime(DefaultClusterCallback callback, Long screenTime) {
@@ -55813,12 +55854,12 @@ public class ChipClusters {
       BaseTLVType screenTimetlvValue = new UIntType(screenTime);
       elements.add(new StructElement(screenTimeFieldID, screenTimetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void blockUnratedContent(DefaultClusterCallback callback) {
@@ -55829,12 +55870,12 @@ public class ChipClusters {
       final long commandId = 7L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void unblockUnratedContent(DefaultClusterCallback callback) {
@@ -55845,12 +55886,12 @@ public class ChipClusters {
       final long commandId = 8L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setOnDemandRatingThreshold(DefaultClusterCallback callback, String rating) {
@@ -55865,12 +55906,12 @@ public class ChipClusters {
       BaseTLVType ratingtlvValue = new StringType(rating);
       elements.add(new StructElement(ratingFieldID, ratingtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void setScheduledContentRatingThreshold(DefaultClusterCallback callback, String rating) {
@@ -55885,12 +55926,12 @@ public class ChipClusters {
       BaseTLVType ratingtlvValue = new StringType(rating);
       elements.add(new StructElement(ratingFieldID, ratingtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ResetPINResponseCallback extends BaseClusterCallback {
@@ -56308,7 +56349,7 @@ public class ChipClusters {
       BaseTLVType encodingHinttlvValue = new StringType(encodingHint);
       elements.add(new StructElement(encodingHintFieldID, encodingHinttlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -56337,7 +56378,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(status, data, encodingHint);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface ContentAppMessageResponseCallback extends BaseClusterCallback {
@@ -56667,12 +56708,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void getMeasurementProfileCommand(DefaultClusterCallback callback, Integer attributeId, Long startTime, Integer numberOfIntervals) {
@@ -56695,12 +56736,12 @@ public class ChipClusters {
       BaseTLVType numberOfIntervalstlvValue = new UIntType(numberOfIntervals);
       elements.add(new StructElement(numberOfIntervalsFieldID, numberOfIntervalstlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -60253,12 +60294,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testNotHandled(DefaultClusterCallback callback) {
@@ -60269,12 +60310,12 @@ public class ChipClusters {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testSpecific(TestSpecificResponseCallback callback) {
@@ -60285,7 +60326,7 @@ public class ChipClusters {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60300,7 +60341,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(returnValue);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testUnknownCommand(DefaultClusterCallback callback) {
@@ -60311,12 +60352,12 @@ public class ChipClusters {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testAddArguments(TestAddArgumentsResponseCallback callback, Integer arg1, Integer arg2) {
@@ -60335,7 +60376,7 @@ public class ChipClusters {
       BaseTLVType arg2tlvValue = new UIntType(arg2);
       elements.add(new StructElement(arg2FieldID, arg2tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60350,7 +60391,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(returnValue);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testSimpleArgumentRequest(TestSimpleArgumentResponseCallback callback, Boolean arg1) {
@@ -60365,7 +60406,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = new BooleanType(arg1);
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60380,7 +60421,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(returnValue);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testStructArrayArgumentRequest(TestStructArrayArgumentResponseCallback callback, ArrayList<ChipStructs.UnitTestingClusterNestedStructList> arg1, ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg2, ArrayList<Integer> arg3, ArrayList<Boolean> arg4, Integer arg5, Boolean arg6) {
@@ -60415,7 +60456,7 @@ public class ChipClusters {
       BaseTLVType arg6tlvValue = new BooleanType(arg6);
       elements.add(new StructElement(arg6FieldID, arg6tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60465,7 +60506,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(arg1, arg2, arg3, arg4, arg5, arg6);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testStructArgumentRequest(BooleanResponseCallback callback, ChipStructs.UnitTestingClusterSimpleStruct arg1) {
@@ -60480,7 +60521,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = arg1.encodeTlv();
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60495,7 +60536,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(value);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testNestedStructArgumentRequest(BooleanResponseCallback callback, ChipStructs.UnitTestingClusterNestedStruct arg1) {
@@ -60510,7 +60551,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = arg1.encodeTlv();
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60525,7 +60566,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(value);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testListStructArgumentRequest(BooleanResponseCallback callback, ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg1) {
@@ -60540,7 +60581,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = ArrayType.generateArrayType(arg1, (elementarg1) -> elementarg1.encodeTlv());
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60555,7 +60596,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(value);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testListInt8UArgumentRequest(BooleanResponseCallback callback, ArrayList<Integer> arg1) {
@@ -60570,7 +60611,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = ArrayType.generateArrayType(arg1, (elementarg1) -> new UIntType(elementarg1));
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60585,7 +60626,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(value);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testNestedStructListArgumentRequest(BooleanResponseCallback callback, ChipStructs.UnitTestingClusterNestedStructList arg1) {
@@ -60600,7 +60641,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = arg1.encodeTlv();
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60615,7 +60656,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(value);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testListNestedStructListArgumentRequest(BooleanResponseCallback callback, ArrayList<ChipStructs.UnitTestingClusterNestedStructList> arg1) {
@@ -60630,7 +60671,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = ArrayType.generateArrayType(arg1, (elementarg1) -> elementarg1.encodeTlv());
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60645,7 +60686,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(value);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testListInt8UReverseRequest(TestListInt8UReverseResponseCallback callback, ArrayList<Integer> arg1) {
@@ -60660,7 +60701,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = ArrayType.generateArrayType(arg1, (elementarg1) -> new UIntType(elementarg1));
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60675,7 +60716,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(arg1);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testEnumsRequest(TestEnumsResponseCallback callback, Integer arg1, Integer arg2) {
@@ -60694,7 +60735,7 @@ public class ChipClusters {
       BaseTLVType arg2tlvValue = new UIntType(arg2);
       elements.add(new StructElement(arg2FieldID, arg2tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60716,7 +60757,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(arg1, arg2);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testNullableOptionalRequest(TestNullableOptionalResponseCallback callback, @Nullable Optional<Integer> arg1) {
@@ -60731,7 +60772,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = arg1 != null ? arg1.<BaseTLVType>map((nonOptionalarg1) -> new UIntType(nonOptionalarg1)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -60767,7 +60808,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(wasPresent, wasNull, value, originalValue);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testComplexNullableOptionalRequest(TestComplexNullableOptionalResponseCallback callback, @Nullable Integer nullableInt, Optional<Integer> optionalInt, @Nullable Optional<Integer> nullableOptionalInt, @Nullable String nullableString, Optional<String> optionalString, @Nullable Optional<String> nullableOptionalString, @Nullable ChipStructs.UnitTestingClusterSimpleStruct nullableStruct, Optional<ChipStructs.UnitTestingClusterSimpleStruct> optionalStruct, @Nullable Optional<ChipStructs.UnitTestingClusterSimpleStruct> nullableOptionalStruct, @Nullable ArrayList<Integer> nullableList, Optional<ArrayList<Integer>> optionalList, @Nullable Optional<ArrayList<Integer>> nullableOptionalList) {
@@ -60826,7 +60867,7 @@ public class ChipClusters {
       BaseTLVType nullableOptionalListtlvValue = nullableOptionalList != null ? nullableOptionalList.<BaseTLVType>map((nonOptionalnullableOptionalList) -> ArrayType.generateArrayType(nonOptionalnullableOptionalList, (elementnonOptionalnullableOptionalList) -> new UIntType(elementnonOptionalnullableOptionalList))).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(nullableOptionalListFieldID, nullableOptionalListtlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -61030,7 +61071,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(nullableIntWasNull, nullableIntValue, optionalIntWasPresent, optionalIntValue, nullableOptionalIntWasPresent, nullableOptionalIntWasNull, nullableOptionalIntValue, nullableStringWasNull, nullableStringValue, optionalStringWasPresent, optionalStringValue, nullableOptionalStringWasPresent, nullableOptionalStringWasNull, nullableOptionalStringValue, nullableStructWasNull, nullableStructValue, optionalStructWasPresent, optionalStructValue, nullableOptionalStructWasPresent, nullableOptionalStructWasNull, nullableOptionalStructValue, nullableListWasNull, nullableListValue, optionalListWasPresent, optionalListValue, nullableOptionalListWasPresent, nullableOptionalListWasNull, nullableOptionalListValue);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void simpleStructEchoRequest(SimpleStructResponseCallback callback, ChipStructs.UnitTestingClusterSimpleStruct arg1) {
@@ -61045,7 +61086,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = arg1.encodeTlv();
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -61060,7 +61101,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(arg1);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
 
@@ -61068,12 +61109,12 @@ public class ChipClusters {
       final long commandId = 18L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testSimpleOptionalArgumentRequest(DefaultClusterCallback callback, Optional<Boolean> arg1) {
@@ -61088,12 +61129,12 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = arg1.<BaseTLVType>map((nonOptionalarg1) -> new BooleanType(nonOptionalarg1)).orElse(new EmptyType());
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testEmitTestEventRequest(TestEmitTestEventResponseCallback callback, Integer arg1, Integer arg2, Boolean arg3) {
@@ -61116,7 +61157,7 @@ public class ChipClusters {
       BaseTLVType arg3tlvValue = new BooleanType(arg3);
       elements.add(new StructElement(arg3FieldID, arg3tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -61131,7 +61172,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(value);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventResponseCallback callback, Integer arg1) {
@@ -61146,7 +61187,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = new UIntType(arg1);
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -61161,7 +61202,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(value);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testBatchHelperRequest(TestBatchHelperResponseCallback callback, Integer sleepBeforeResponseTimeMs, Integer sizeOfResponseBuffer, Integer fillCharacter) {
@@ -61184,7 +61225,7 @@ public class ChipClusters {
       BaseTLVType fillCharactertlvValue = new UIntType(fillCharacter);
       elements.add(new StructElement(fillCharacterFieldID, fillCharactertlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -61199,7 +61240,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(buffer);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testSecondBatchHelperRequest(TestBatchHelperResponseCallback callback, Integer sleepBeforeResponseTimeMs, Integer sizeOfResponseBuffer, Integer fillCharacter) {
@@ -61222,7 +61263,7 @@ public class ChipClusters {
       BaseTLVType fillCharactertlvValue = new UIntType(fillCharacter);
       elements.add(new StructElement(fillCharacterFieldID, fillCharactertlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -61237,7 +61278,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(buffer);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void testDifferentVendorMeiRequest(TestDifferentVendorMeiResponseCallback callback, Integer arg1) {
@@ -61252,7 +61293,7 @@ public class ChipClusters {
       BaseTLVType arg1tlvValue = new UIntType(arg1);
       elements.add(new StructElement(arg1FieldID, arg1tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -61274,7 +61315,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(arg1, eventNumber);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface TestSpecificResponseCallback extends BaseClusterCallback {
@@ -64531,12 +64572,12 @@ public class ChipClusters {
       BaseTLVType takeMutextlvValue = new BooleanType(takeMutex);
       elements.add(new StructElement(takeMutexFieldID, takeMutextlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void failRandomlyAtFault(DefaultClusterCallback callback, Integer type, Long id, Integer percentage) {
@@ -64559,12 +64600,12 @@ public class ChipClusters {
       BaseTLVType percentagetlvValue = new UIntType(percentage);
       elements.add(new StructElement(percentageFieldID, percentagetlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -64763,12 +64804,12 @@ public class ChipClusters {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public void addArguments(AddArgumentsResponseCallback callback, Integer arg1, Integer arg2) {
@@ -64787,7 +64828,7 @@ public class ChipClusters {
       BaseTLVType arg2tlvValue = new UIntType(arg2);
       elements.add(new StructElement(arg2FieldID, arg2tlvValue));
 
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -64802,7 +64843,7 @@ public class ChipClusters {
             }
           }
           callback.onSuccess(returnValue);
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
     public interface AddArgumentsResponseCallback extends BaseClusterCallback {
