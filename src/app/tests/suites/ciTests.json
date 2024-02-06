@@ -178,11 +178,6 @@
         "Test_TC_OO_2_4"
     ],
     "OperationalState": ["Test_TC_OPSTATE_1_1", "Test_TC_OPSTATE_2_4"],
-    "OvenCavityOperationalState": [
-        "Test_TC_OVENOPSTATE_1_1",
-        "Test_TC_OVENOPSTATE_2_2",
-        "Test_TC_OVENOPSTATE_2_4"
-    ],
     "PowerSource": ["Test_TC_PS_1_1", "Test_TC_PS_2_1"],
     "PressureMeasurement": [
         "Test_TC_PRS_1_1",
@@ -421,7 +416,6 @@
         "OccupancySensing",
         "OnOff",
         "OperationalState",
-        "OvenCavityOperationalState",
         "PowerSource",
         "PressureMeasurement",
         "PumpConfigurationControl",
