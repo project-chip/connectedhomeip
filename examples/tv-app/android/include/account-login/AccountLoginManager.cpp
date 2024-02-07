@@ -106,7 +106,7 @@ void AccountLoginManager::GetSetupPin(char * setupPin, size_t setupPinSize, cons
 
 uint16_t AccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return kClusterRevision;
     }

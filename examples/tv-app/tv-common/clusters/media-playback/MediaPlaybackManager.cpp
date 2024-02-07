@@ -329,7 +329,7 @@ uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 
 uint16_t MediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return kClusterRevision;
     }
