@@ -28,13 +28,9 @@ void MessagesManager::HandlePresentMessagesRequest(
     const chip::app::DataModel::Nullable<uint16_t> & duration, const chip::CharSpan & messageText,
     const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
 {
-    Message message {
+    Message message{
         // TODO: Enable id
-        chip::ByteSpan(),
-        priority,
-        messageControl,
-        startTime,
-        duration,
+        chip::ByteSpan(), priority, messageControl, startTime, duration,
         // TODO: Enable text
         chip::CharSpan()
         // TODO: Convert to  Optional<chip::app::DataModel::List<const
