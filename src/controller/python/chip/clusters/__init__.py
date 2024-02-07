@@ -38,7 +38,7 @@ from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilte
                       OccupancySensing, OnOff, OnOffSwitchConfiguration, OperationalCredentials, OperationalState,
                       OtaSoftwareUpdateProvider, OtaSoftwareUpdateRequestor, OvenCavityOperationalState, OvenMode,
                       OzoneConcentrationMeasurement, Pm1ConcentrationMeasurement, Pm10ConcentrationMeasurement,
-                      Pm25ConcentrationMeasurement, PowerSource, PowerSourceConfiguration, , PowerTopology, PressureMeasurement,
+                      Pm25ConcentrationMeasurement, PowerSource, PowerSourceConfiguration, PowerTopology, PressureMeasurement,
                       ProxyConfiguration, ProxyDiscovery, ProxyValid, PulseWidthModulation, PumpConfigurationAndControl,
                       RadonConcentrationMeasurement, RefrigeratorAlarm, RefrigeratorAndTemperatureControlledCabinetMode,
                       RelativeHumidityMeasurement, RvcCleanMode, RvcOperationalState, RvcRunMode, ScenesManagement, SmokeCoAlarm,
