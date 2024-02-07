@@ -27,7 +27,7 @@
 
 using namespace chip;
 
-static constexpr size_t kOnffManagerTableSize = EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT;
+static constexpr size_t kOnffManagerTableSize = MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT;
 
 namespace {
 
@@ -46,7 +46,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: OnOffManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::OnOff::Id,
-                                                       EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kOnffManagerTableSize,
                    ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d not found", endpoint));
 
@@ -68,7 +68,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id, MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kOnffManagerTableSize ? nullptr : gOnOffManagerTable[ep]);
 }
 
