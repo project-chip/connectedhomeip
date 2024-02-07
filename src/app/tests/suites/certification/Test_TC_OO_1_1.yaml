@@ -38,7 +38,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 5
+          value: 6
           constraints:
               type: int16u
 
@@ -70,6 +70,16 @@ tests:
           constraints:
               type: bitmap32
               hasMasksSet: [0x2]
+
+    - label:
+          "Step 3d: Given OO.S.F02(OFFONLY) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OO.S.F02
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x3]
 
     - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
@@ -127,6 +137,17 @@ tests:
           constraints:
               type: list
               contains: [64, 65, 66]
+
+    - label:
+          "Step 6c: TH reads the feature dependent(OO.S.F02) commands in
+          AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      PICS: OO.S.F02
+      response:
+          constraints:
+              type: list
+              contains: [1, 2]
 
     - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
