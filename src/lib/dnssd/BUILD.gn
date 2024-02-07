@@ -74,8 +74,6 @@ static_library("dnssd") {
     "Resolver.h",
     "ResolverProxy.cpp",
     "ResolverProxy.h",
-    "ServiceNaming.cpp",
-    "ServiceNaming.h",
     "TxtFields.cpp",
     "TxtFields.h",
   ]
