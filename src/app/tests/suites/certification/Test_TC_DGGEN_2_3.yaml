@@ -108,7 +108,7 @@ tests:
       response:
           - values:
                 - name: "Payload"
-                  value: "hex:0x1"
+                  value: "hex:01"
 
     - label:
           "Step 6: Invoke the PayloadTestRequest command with EnableKey field
@@ -118,7 +118,7 @@ tests:
       arguments:
           values:
               - name: "EnableKey"
-                value: "hex:0000000000000000"
+                value: "hex:00000000000000000000000000000000"
               - name: "Value"
                 value: 0x1
               - name: "Count"
