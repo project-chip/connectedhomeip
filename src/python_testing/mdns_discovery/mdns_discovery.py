@@ -79,6 +79,7 @@ class DummyServiceListener(ServiceListener):
     """
     A service listener required for the TXT record data to get populated and come back
     """
+    
     def add_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
         pass
 
@@ -174,13 +175,20 @@ class MdnsDiscovery:
             mdns_service_info = await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec)
         else:
             print(f"Looking for MDNS service type '{service_type}',  service name '{service_name}'")
+
+            # Adds service listener
             service_listener = DummyServiceListener()
             self._zc.add_service_listener(MdnsServiceType.OPERATIONAL.value, service_listener)
+
             # Adds delay so TXT record is able to get populated
             await asyncio.sleep(1)
+
+            # Get service info
             service_info = AsyncServiceInfo(service_type, service_name)
             is_discovered = await service_info.async_request(self._zc, 3000)
             self._zc.remove_service_listener(service_listener)
+
+            # Adds service to discovered services
             if is_discovered:
                 mdns_service_info = self._to_mdns_service_info_class(service_info)
             self._discovered_services = {}
