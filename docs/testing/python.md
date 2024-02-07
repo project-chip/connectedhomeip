@@ -86,310 +86,267 @@ The default_matter_test_main() function is used to run the test on the command
 line. These two lines should appear verbatim at the bottom of every python test
 file.
 
-# Cluster Codegen
+## Cluster Codegen
 
--   See Objects.py for codegen, ClusterObjects.py for classes
--   import chip.clusters as Clusters
--   Clusters (Cluster)
--   Clusters.<ClusterName>
-    -   id
-    -   descriptor
-    -   Enums
-    -   Bitmaps
-    -   Structs
-    -   Attributes
-    -   Commands
-    -   Events
+-   [Objects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/Objects.py)
+    for codegen,
+-   [ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/ClusterObjects.py)
+    for classes
 
-# Cluster Codegen - Attributes
+Common import used in test files: `import chip.clusters as Clusters`
 
--   Attributes (ClusterAttributeDescriptor)
--   Clusters.<ClusterName>.Attributes.<AttributeName>
-    -   cluster_id
-    -   attribute_id
-    -   attribute_type
-    -   value
--   ex:
+Each cluster is defined in the `Clusters.<ClusterName>` namespace and contains
+always:
+
+-   id
+-   descriptor
+
+Each `Clusters.<ClusterName>` will include the appropriate sub-classes (if
+defined for the cluster):
+
+-   Enums
+-   Bitmaps
+-   Structs
+-   Attributes
+-   Commands
+-   Events
+
+### Attributes
+
+Attributes derive from ClusterAttributeDescriptor
+
+Each `Clusters.<ClusterName>.Attributes.<AttributeName>` class has:
+
+-   cluster_id
+-   attribute_id
+-   attribute_type
+-   value
+
+Example:
+
 -   class - Clusters.OnOff.Attributes.OnTime
+    -   used for Read commands
 -   instance - Clusters.OnOff.Attributes.OnTime(5)
+    -   sets the value to 5
+    -   pass the instance to write commands to write the value
 
----
+### Commands
 
-pass the class to read, the instance to write
+Commands derive from ClusterCommand
 
-# Cluster Codegen - Commands
+Each `Clusters.<ClusterName>.Commands.<CommandName>` class has:
 
--   Commands (ClusterCommand)
--   Clusters.<ClusterName>.Commands.<CommandName>
-    -   cluster_id
-    -   command_id
-    -   is_client
-    -   response_type (None for status response)
-    -   descriptor
-    -   data members (if required)
--   Clusters.OnOff.Commands.OnWithTimedOff(
--   onOffControl=0, onTime=5, offWaitTime=8)
+-   cluster_id
+-   command_id
+-   is_client
+-   response_type (None for status response)
+-   descriptor
+-   data members (if required)
+
+Example:
+
+-   Clusters.OnOff.Commands.OnWithTimedOff(onOffControl=0, onTime=5,
+    offWaitTime=8)
 -   Clusters.OnOff.Commands.OnWithTimedOff()
+    -   command with no fields
 
-# Cluster Codegen - Events
+### Events
 
--   Events (ClusterEvent)
--   Clusters.<ClusterName>.Events.<EventName>
-    -   cluster_id
-    -   event_id
-    -   descriptor
-    -   data members if required
+Events derive from ClusterEvent
+
+Each `Clusters.<ClusterName>.Events.<EventName>` class has:
+
+-   cluster_id
+-   event_id
+-   descriptor
+-   data members if required
+
+Example:
+
 -   Clusters.AccessControl.Events.AccessControlEntryChanged.adminNodeID
 
-# Cluster Codegen - Enums
+### Enums
 
--   Enums (MatterIntEnum)
--   Clusters.<ClusterName>.Enum.<EnumName>
-    -   k<value>
-    -   kUnknownEnumValue (used for testing, do not transmit)
--   Clusters.AccessControl.Events.AccessControlEntryChanged.adminNodeID
+Enums derive from MatterIntEnum
 
-# Cluster Codegen - Bitmaps
+Each `Clusters.<ClusterName>.Enum.<EnumName>` has
 
--   Bitmaps (IntFlag)
--   Clusters.<ClusterName>.Bitmaps.<BitmapName>
-    -   k<value>
--   special class:
-    -   class Feature(IntFlag) - contains the feature map bitmaps
+-   k<value>
+-   kUnknownEnumValue (used for testing, do not transmit)
+
+Example:
+
+-   Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
+
+### Bitmaps
+
+Bitmaps derive from IntFlag
+
+Each `Clusters.<ClusterName>.Bitmaps.<BitmapName>` has: - k<value>
+
+Special class:
+
+-   class Feature(IntFlag) - contains the feature map bitmaps
+
+Example:
+
 -   Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin
 
-# Cluster Codegen - Structs
+### Structs
 
--   Structs(ClusterObject)
--   Clusters.<ClusterName>.Structs.<StructName>
-    -   descriptor
-    -   data members
+Structs derive from ClusterObject
+
+Each `Clusters.<ClusterName>.Structs.<StructName>` has:
+
+-   descriptor
+-   data members
+
+Example
+
 -   Clusters.BasicInformation.Structs.ProductAppearanceStruct(
 -   finish=Clusters.BasicInformation.Enums.ProductFinishEnum.kFabric,
 -   primaryColor=Clusters.BasicInformation.Enums.ColorEnum.kBlack)
 
-# Accessing Classes by ID
+## Accessing Clusters and Cluster Elements by ID
 
-chip.clusters.ClusterObjects.ALL_CLUSTERS
+[ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/ClusterObjects.py)
+has a set of objects that map ID to the codegen'd object.
 
-dict[int, Cluster] - maps cluster ID to Cluster class
+`chip.clusters.ClusterObjects.ALL_CLUSTERS`
 
-cluster = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+-   dict[int, Cluster] - maps cluster ID to Cluster class
+-   cluster = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
 
-chip.clusters.ClusterObjects.ALL_ATTRIBUTES
+`chip.clusters.ClusterObjects.ALL_ATTRIBUTES`
 
-dict[int, dict[int, ClusterAttributeDescriptor]] - maps cluster ID to a dict of
-attribute ID to attribute class
+-   dict[int, dict[int, ClusterAttributeDescriptor]] - maps cluster ID to a dict
+    of attribute ID to attribute class
+-   attr = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
 
-attr = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
+`chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS/ALL_GENERATED_COMMANDS`
 
-chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS/ALL_GENERATED_COMMANDS
+-   dict[int, dict[int, ClusterCommand]]
+-   cmd = chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][cmd_id]
 
-dict[int, dict[int, ClusterCommand]]
+## ChipDeviceCtrl API
 
-cmd = chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][cmd_id]
+The ChipDeviceCtrl API is implemented in
+[ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/ChipDeviceCtrl.py).
 
-# ChipDeviceCtrl API - Read
+The ChipDeviceCtrl implements a python-based controller that can be used to
+commission and control devices. The API is documented here in the
+[ChipDeviceCtrl API documentation](./ChipDeviceCtrlAPI.md)
 
--   Read
-    -   Read or subscribe to either events or attributes
--   ReadAttribute, ReadEvent
-    -   wrapper of read, easier to user
-    -   handle wildcard or concrete path
-    -   handle subscriptions and one-shot reads
--   All raise InteractionModelError on failure
+The API doc gives full descriptions of the APIs being used. The most commonly
+used functions are linked below
 
-# ChipDeviceCtrl API - ReadAttribute
+### [Read](./ChipDeviceCtrlAPI.md#read)
 
-async def ReadAttribute(self, nodeid: int, attributes: typing.List[typing.Union[
+-   Read both attributes and events
+-   Can handle wildcard or concrete path
 
-None, # Empty tuple, all wildcard
+### [ReadAttribute](./ChipDeviceCtrlAPI.md#readattribute)
 
-typing.Tuple[int], # Endpoint
+-   convenience wrapper for Read for attributes
 
-typing.Tuple[typing.Type[ClusterObjects.Cluster]], # Wildcard endpoint, Cluster
-id present
+Examples: Wildcard read (all clusters, all endpoints):
 
-typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]], # Wildcard
-endpoint, Attribute present
-
-typing.Tuple[int, typing.Type[ClusterObjects.Cluster]], # Wildcard cluster id
-
-typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]] #
-Concrete path
-
-]], dataVersionFilters: typing.List[typing.Tuple[int,
-typing.Type[ClusterObjects.Cluster], int]] = None,
-
-returnClusterObject: bool = False,
-
-reportInterval: typing.Tuple[int, int] = None,
-
-fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe:
-bool = True):
-
-for one-shot reads, set reportInterval to None (default)
-
-to start a subscription, set reportInterval + keepSubscriptions +
-autoResubscribe as required
-
-Wildcard read (all clusters, all endpoints)
-
-await dev_ctrl.ReadAttribute(node_id, [()])
+`await dev_ctrl.ReadAttribute(node_id, [()])`
 
 Wildcard read (single endpoint 0)
 
-await dev_ctrl.ReadAttribute(node_id, [(0)])
+`await dev_ctrl.ReadAttribute(node_id, [(0)])`
 
 Wildcard read (single cluster from single endpoint 0)
 
-await dev_ctrl.ReadAttribute(node_id, [(1, Clusters.OnOff)])
+`await dev_ctrl.ReadAttribute(node_id, [(1, Clusters.OnOff)])`
 
 Single attribute
 
-await dev_ctrl.ReadAttribute(node_id, [(1,
-
-Clusters.OnOff.Attributes.OnTime)])
+`await dev_ctrl.ReadAttribute(node_id, [(1, Clusters.OnOff.Attributes.OnTime)])`
 
 Multipath
 
-await dev_ctrl.ReadAttribute(node_id, [
+`await dev_ctrl.ReadAttribute(node_id, [(1, Clusters.OnOff.Attributes.OnTime),(1, Clusters.OnOff.Attributes.OnOff)])`
 
-(1, Clusters.OnOff.Attributes.OnTime)
+### [ReadEvent](./ChipDeviceCtrlAPI.md#readevent)
 
-(1, Clusters.OnOff.Attributes.OnOff)
+-   convenience wrapper for Read
+-   Similar to ReadAttribute, but the tuple includes urgency as the last number
 
-])
+Example:
 
-# ChipDeviceCtrl API - ReadEvent
-
-Basically the same as ReadAttribute, but the tuple includes urgency as the last
-member
-
-typing.Tuple[int,
-
-typing.Type[ClusterObjects.ClusterEvent], int]
-
-ex:
-
+```
 urgent = 1
 
 await dev_ctrl ReadEvent(node_id, [(1,
 Clusters.TimeSynchronization.Events.MissingTrustedTimeSource, urgent)])
+```
 
-# ChipDeviceCtrl API - ReadAttribute / ReadEvent
+### Subscriptions
 
--   One shot ReadAttribute return:
-    -   AsyncReadTransation.ReadResponse.attributes.
-    -   dict[int, List[Cluster]]
-    -   ret[endpoint_id][<Cluster class>][<Attribute class>]
-    -   Ex. To access the OnTime attribute from the OnOff cluster on EP 1
-        ret[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
--   One shot ReadEvent return:
-    -   List[ClusterEvent]
+Subscriptions are handled in the Read / ReadAttribute / ReadEvent APIs. To
+initiate a subscription, set the `reportInterval` tuple to set the floor and
+ceiling. The `keepSubscriptions` and `autoResubscribe` parameters also apply to
+subscriptions.
 
-# ChipDeviceCtrl API - Subscriptions
+Subscription return `ClusterAttribute.SubscriptionTransaction`. This can be used
+to set callbacks. The object is returned after the priming data read is
+complete, and the values there are used to populate the cache. The attribute
+callbacks are called on update.
 
--   Subscription return
-    -   ClusterAttribute.SubscriptionTransaction
-    -   SetAttributeUpdateCallback
-        -   Callable[[TypedAttributePath, SubscriptionTransaction], None]
-    -   SetEventUpdateCallback
-        -   Callable[[EventReadResult, SubscriptionTransaction], None]
-    -   await changes in the main loop using a trigger mechanism from the
-        callback.
+-   SetAttributeUpdateCallback
+    -   Callable[[TypedAttributePath, SubscriptionTransaction], None]
+-   SetEventUpdateCallback
+    -   Callable[[EventReadResult, SubscriptionTransaction], None]
+-   await changes in the main loop using a trigger mechanism from the callback.
 
+Example for setting callbacks:
+
+```
 q = queue.Queue()
-
 cb = SimpleEventCallback("cb", cluster_id, event_id, q)
 
 urgent = 1
-
-subscription = await
-
-dev_ctrl.ReadEvent(nodeid=1,
-
-events=[(1, event, urgent)], reportInterval=[1, 3])
-
+subscription = await dev_ctrl.ReadEvent(nodeid=1, events=[(1, event, urgent)], reportInterval=[1, 3])
 subscription.SetEventUpdateCallback(callback=cb)
 
 try:
-
-q.get(block=True, timeout=timeout)
-
+    q.get(block=True, timeout=timeout)
 except queue.Empty:
+    asserts.assert_fail(“Timeout on event”)
+```
 
-asserts.assert_fail(“Timeout on event”)
+### [WriteAttribute](./ChipDeviceCtrlAPI.md#writeattribute)
 
-# ChipDeviceCtrl API - Write
+Handles concrete paths only (per spec), can handle lists. Returns list of
+PyChipError
 
-async def WriteAttribute(self, nodeid: int,
+-   Instantiate the `ClusterAttributeDescriptor` class with the value you want
+    to send, tuple is (endpoint, attribute)
+    -   use timedRequestTimeoutMs for timed request actions
 
-attributes: typing.List[typing.Tuple[int,
-ClusterObjects.ClusterAttributeDescriptor]],
+Example:
 
-timedRequestTimeoutMs: typing.Union[None, int] = None,
-
-interactionTimeoutMs: typing.Union[None, int] = None,
-
-busyWaitMs: typing.Union[None, int] = None)
-
-Concrete paths only (can be a list)
-
-Returns list of PyChipError
-
-Instantiate the ClusterAttributeDescriptor class with the value you want to
-send, tuple is (endpoint, attribute)
-
-use timedRequestTimeoutMs for timed request actions
-
-res = await devCtrl.WriteAttribute(
-
-nodeid=0,
-
-attributes=[
-
-(0,Clusters.BasicInformation.Attributes.NodeLabel(
-
-"Test"))])
-
+```
+res = await devCtrl.WriteAttribute(nodeid=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
 asserts.assert_equal(ret[0].status, Status.Success, “write failed”)
+```
 
-# ChipDeviceCtrl API - Commands
+### [SendCommand](./ChipDeviceCtrlAPI.md#sendcommand)
 
-async def SendCommand(self, nodeid: int,
+-   Instantiate the command with the values you need to populate
+-   If there is a non-status return, it’s returned from the command
+-   If there is a pure status return it will return nothing
+-   Raises InteractionModelError on failure
 
-endpoint: int,
+Example:
 
-payload: ClusterObjects.ClusterCommand,
+```
+pai = await dev_ctrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
+```
 
-responseType=None,
-
-timedRequestTimeoutMs: typing.Union[None, int] = None,
-
-interactionTimeoutMs: typing.Union[None, int] = None,
-
-busyWaitMs: typing.Union[None, int] = None,
-
-suppressResponse: typing.Union[None, bool] = None)
-
-Raises InteractionModelError on error
-
-returns the command response (type as defined by command)
-
-Instantiate the command with the values you need to populate
-
-If there is a non-status return, it’s returned from the command
-
-If there is a pure status return it will return nothing
-
-Raises InteractionModelError on failure
-
-pai = await dev_ctrl.SendCommand(nodeid, 0,
-
-Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
-
-# MatterBaseTest helpers
+## MatterBaseTest helpers
 
 -   Because we tend to do a lot of single read / single commands in tests, we
     added a couple of helpers in MatterBaseTest that use some of the default
@@ -397,15 +354,27 @@ Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
     -   read_single_attribute_check_success
     -   read_single_attribute_expect_error
     -   send_single_cmd
--   print_step (updates coming with TH integration)
--   check_pics
+-   step() function to mark step progress for the test harness
+-   skip / skip_step / skip_remaning_steps functions for test harness
+    integration
+-   check_pics / pics_guard to handle pics
 
-# Mobly helpers
+## Mobly helpers
+
+The test system is based on mobly, and the
+[matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
+class provides some helpers for mobly integration
 
 -   default_matter_test_main
     -   Sets up commissioning and finds all tests, parses command arguments
--   if **name** == "**main**":
--   default_matter_test_main()
+
+use as:
+
+```
+if __name__ == "__main__":
+default_matter_test_main()
+```
+
 -   Mobly will run all functions starting with test\_ by default
     -   use --tests command line argument to specify
 -   Setup / teardown functions
@@ -413,14 +382,33 @@ Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
     -   setup_test / teardown_test
     -   Don’t forget to call the super() if you override these
 
-# test harness helpers
+## Test harness helpers
 
--   steps
--   desc
--   pics
+The python testing system also includes several functions for integrations with
+the test harness. To integrate with the test harness, you can define the
+following functions on your class to allow the test harness UI to properly work
+through your tests.
+
+All of these functions are demonstrated in the
+[hello_example.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/hello_test.py)
+reference.
+
+-   step enumeration
+    -   define a function called `steps_YourFunctionName` to allow the test
+        harness to display the steps
+    -   use the self.step(`<stepnum>`) function to walk through the steps
+-   test description
+    -   define a function called `desc_YourFunctionName` to send back a string
+        with the test description
+-   top level PICS
+    -   To guard your test on a top level PICS, define a function called
+        `pics_YourFunctionName` to send back a list of pics. If this function is
+        omitted, the test will be run for every endpoint on every device.
 -   overriding the default timeout
+    -   if the test is exceptionally long running, define a property function
+        `default_timeout` to adjust the timeout. The default is 90 seconds
 
-# Command line arguments
+## Command line arguments
 
 -   Use help to get a full list
 -   --commissioning-method
@@ -433,7 +421,7 @@ Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
     -   specify as key:value ex --bool-arg mybool:False
     -   used for custom arguments to scripts (PIXITs)
 
-# PICS and PIXITS
+## PICS and PIXITS
 
 -   PICS
     -   use --PICS on the command line to specify the PICS file
@@ -445,39 +433,36 @@ Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
         comments
 -   ret = self.user_params.get("pixit_name", default)
 
-# Support functions
+## Support functions
 
 To create a controller on a new fabric:
 
+```
 new_CA = self.certificate_authority_manager.NewCertificateAuthority()
 
 new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1,
 fabricId=self.matter_test_config.fabric_id + 1)
 
 TH2 = new_fabric_admin.NewController(nodeId=112233)
+```
 
-Open a commissioning window (ECW)
+Open a commissioning window (ECW):
 
-params = dev_ctrl.OpenCommissioningWindow(
-
-nodeid=self.dut_node_id, timeout=900, iteration=10000,
-
-discriminator=discriminator, option=1)
-
-discriminator - between 0 and 4095
-
-option 1 - ECW (the only Mandatory commissioning window)
+```
+params = self.OpenCommissioningWindow(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
+```
 
 To create a new controller on the SAME fabric, allocate a new controller from
 the fabric admin
 
 Fabric admin for default controller:
 
+```
 fa=self.certificate_authority_manager.activeCaList[0].adminList[0]
-
 second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
+```
 
-# other support functions
+## other support functions
 
 -   basic_composition_support
     -   wildcard read, whole device analysis
@@ -494,15 +479,7 @@ DUT
 ./scripts/tests/run_python_test.py is a convenient script to fire up an example
 DUT on the host, with factory reset support
 
-./scripts/tests/run_python_test.py
-
---factoryreset
-
---app <your_app> --app-args "whatever"
-
---script <your_script>
-
---script-args "whatever"
+`./scripts/tests/run_python_test.py --factoryreset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"`
 
 # Running tests in CI
 
@@ -511,7 +488,3 @@ DUT on the host, with factory reset support
 -   if there are things in your test that will fail on CI (ex. test vendor
     checks), gate them on the PICS_SDK_CI_ONLY
     -   is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-
-```
-
-```
