@@ -50,7 +50,7 @@ using StateChangedEvent = chip::app::Clusters::MediaPlayback::Events::StateChang
 using chip::app::LogEvent;
 
 static constexpr size_t kMediaPlaybackDelegateTableSize =
-    EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kMediaPlaybackDelegateTableSize <= kEmberInvalidEndpointIndex, "kMediaPlayback Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogError(Zcl, "MediaPlayback NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, MediaPlayback::Id, EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, MediaPlayback::Id, MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kMediaPlaybackDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -98,7 +98,7 @@ namespace MediaPlayback {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, MediaPlayback::Id, EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, MediaPlayback::Id, MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kMediaPlaybackDelegateTableSize)
     {

@@ -269,7 +269,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
     VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (index < ArraySize(mSceneInfoStructs))
     {

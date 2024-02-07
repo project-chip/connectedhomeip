@@ -32,7 +32,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 #include <app/clusters/identify-server/identify-server.h>
 #endif
 
@@ -81,7 +81,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
 }
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 void OnIdentifyStart(Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
