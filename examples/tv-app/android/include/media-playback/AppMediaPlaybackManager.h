@@ -114,8 +114,8 @@ private:
     EndpointId mEndpointId;
 
     // TODO: set this based upon meta data from app
-    static constexpr uint32_t kEndpointFeatureMap        = 3;
-    static constexpr uint16_t kClusterRevision = 2;
+    static constexpr uint32_t kEndpointFeatureMap = 3;
+    static constexpr uint16_t kClusterRevision    = 2;
 
     ContentAppAttributeDelegate * mAttributeDelegate;
 };
