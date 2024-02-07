@@ -51,7 +51,7 @@ static constexpr uint8_t DOOR_LOCK_ALIRO_CREDENTIAL_SIZE = 65;
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
 
 static constexpr size_t kDoorLockDelegateTableSize =
-    EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static_assert(kDoorLockDelegateTableSize <= kEmberInvalidEndpointIndex, "Door Lock Delegate table size error");
 
@@ -64,13 +64,13 @@ Delegate * gDelegateTable[kDoorLockDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kDoorLockDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < ArraySize(gDelegateTable))
     {
@@ -3424,7 +3424,7 @@ void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
 
 EmberAfDoorLockEndpointContext * DoorLockServer::getContext(chip::EndpointId endpointId)
 {
-    auto index = emberAfGetClusterServerEndpointIndex(endpointId, ::Id, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
+    auto index = emberAfGetClusterServerEndpointIndex(endpointId, ::Id, MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (index < kDoorLockClusterServerMaxEndpointCount)
     {
         return &mEndpointCtx[index];
