@@ -27,7 +27,7 @@
 
 using namespace chip;
 
-static constexpr size_t kLevelManagerTableSize = EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
+static constexpr size_t kLevelManagerTableSize = MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
 
 namespace {
 
@@ -46,7 +46,7 @@ void LevelManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: LevelManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::LevelControl::Id,
-                                                       EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kLevelManagerTableSize,
                    ChipLogError(Zcl, "TV Android App::Level::NewManager: endpoint %d not found", endpoint));
 
@@ -68,7 +68,7 @@ void LevelManager::NewManager(jint endpoint, jobject manager)
 LevelManager * GetLevelManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::LevelControl::Id,
-                                                       EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return ((ep >= kLevelManagerTableSize) ? nullptr : gLevelManagerTable[ep]);
 }
 

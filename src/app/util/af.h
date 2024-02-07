@@ -176,7 +176,7 @@ uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId end
  * @param endpoint Endpoint number
  * @param cluster Id the of the Cluster server you are interrested on
  * @param fixedClusterServerEndpointCount The number of fixed endpoints containing this cluster server.  Typically one of the
- EMBER_AF_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
+ MATTER_DM_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
  */
 uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                               uint16_t fixedClusterServerEndpointCount);

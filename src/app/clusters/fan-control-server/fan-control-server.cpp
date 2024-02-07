@@ -45,7 +45,7 @@ using namespace chip::app::Clusters::FanControl::Attributes;
 namespace {
 
 constexpr size_t kFanControlDelegateTableSize =
-    EMBER_AF_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static_assert(kFanControlDelegateTableSize <= kEmberInvalidEndpointIndex, "FanControl Delegate table size error");
 
@@ -61,14 +61,14 @@ namespace FanControl {
 Delegate * GetDelegate(EndpointId aEndpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, EMBER_AF_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kFanControlDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, EMBER_AF_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kFanControlDelegateTableSize)
     {
