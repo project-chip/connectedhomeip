@@ -88,6 +88,11 @@ tests:
       attribute: "ICDCounter"
       response:
           value: beforeRebootICDCounter + 101
+    - label: "Verify the ICD is operating as a LIT ICDCounter"
+      command: "readAttribute"
+      attribute: OperatingMode
+      response:
+          value: 1
 
     - label: "Unregister Client Registered During Commissioning"
       command: "UnregisterClient"
@@ -95,6 +100,12 @@ tests:
           values:
               - name: "CheckInNodeID"
                 value: commissionerNodeId
+
+    - label: "Verify the ICD is operating as a LIT ICDCounter"
+      command: "readAttribute"
+      attribute: OperatingMode
+      response:
+          value: 0
 
     - label: "Read Feature Map"
       command: "readAttribute"
