@@ -118,30 +118,27 @@ CHIP_ERROR MessagesAttrAccess::Read(const app::ConcreteReadAttributePath & aPath
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::Messages::Attributes::Messages::Id: {
+    case app::Clusters::Messages::Attributes::Messages::Id:
         if (isDelegateNull(delegate, endpoint))
         {
             return aEncoder.EncodeEmptyList();
         }
 
         return ReadMessages(aEncoder, delegate);
-    }
-    case app::Clusters::Messages::Attributes::ActiveMessageIDs::Id: {
+    case app::Clusters::Messages::Attributes::ActiveMessageIDs::Id:
         if (isDelegateNull(delegate, endpoint))
         {
-            return CHIP_NO_ERROR;
+            return aEncoder.EncodeEmptyList();
         }
 
         return ReadActiveMessageIds(aEncoder, delegate);
-    }
-    case app::Clusters::Messages::Attributes::FeatureMap::Id: {
+    case app::Clusters::Messages::Attributes::FeatureMap::Id:
         if (isDelegateNull(delegate, endpoint))
         {
             return CHIP_NO_ERROR;
         }
 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
-    }
     default:
         break;
     }
