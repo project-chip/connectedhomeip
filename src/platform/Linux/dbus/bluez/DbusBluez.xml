@@ -187,9 +187,11 @@
     <property name="Includes" type="as" access="read"/>
     <property name="LocalName" type="s" access="read"/>
     <property name="Appearance" type="q" access="read"/>
-    <property name="Duration" type="q" access="read"/>
-    <property name="Timeout" type="q" access="read"/>
+    <!-- <property name="Duration" type="q" access="read"/> -->
+    <!-- <property name="Timeout" type="q" access="read"/> -->
     <!-- <property name="SecondaryChannel" type="s" access="read"/> -->
+    <property name="MinInterval" type="u" access="read"/>
+    <property name="MaxInterval" type="u" access="read"/>
   </interface>
 
   <interface name="org.bluez.LEAdvertisingManager1">

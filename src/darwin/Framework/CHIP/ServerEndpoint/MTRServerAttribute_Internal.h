@@ -21,15 +21,19 @@
 
 #include <app/ConcreteClusterPath.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MTRServerAttribute ()
 
 /**
- * Mark this attribute as associated with a particular controller.
+ * Mark this attribute as associated with a particular controller.  The
+ * controller can be nil to indicate that the endpoint is not associated with a
+ * specific controller but rather with the controller factory.
  */
-- (BOOL)associateWithController:(MTRDeviceController *)controller;
+- (BOOL)associateWithController:(nullable MTRDeviceController *)controller;
 
 /**
- * Mark this attribute as part of an Defunct-state endpoint.
+ * Mark this attribute as part of an endpoint that is no longer being used.
  */
 - (void)invalidate;
 
@@ -46,3 +50,5 @@
 @property (nonatomic, assign) chip::app::ConcreteClusterPath parentCluster;
 
 @end
+
+NS_ASSUME_NONNULL_END

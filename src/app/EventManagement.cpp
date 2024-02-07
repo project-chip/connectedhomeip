@@ -413,6 +413,7 @@ void EventManagement::VendEventNumber()
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
                                      EventNumber & aEventNumber)
 {
+    assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mState != EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
     return LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
 }
