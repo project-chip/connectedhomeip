@@ -342,9 +342,7 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
 
 #endif /* EMBER_AF_PLUGIN_DOOR_LOCK_SERVER */
 
-
 void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}
-
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
