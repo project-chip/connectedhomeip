@@ -91,8 +91,9 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Step 5: Invoke the PayloadTestRequest command with EnableKey field set
-          to PIXIT.DGGEN.ENABLEKEY, Value field set to 0x1 and Count set to 1."
+          "Step 5: Invoke the PayloadTestRequest command with EnableKey field
+          set to PIXIT.DGGEN.ENABLEKEY, Value field set to 0x1 and Count set to
+          1."
       runIf: IsExpectedValue
       PICS: DGGEN.S.C03.Rsp
       command: "PayloadTestRequest"
@@ -106,12 +107,12 @@ tests:
                 value: 1
       response:
           - values:
-              - name: "Payload"
-                value: "hex:0x1"
+                - name: "Payload"
+                  value: "hex:0x1"
 
     - label:
-          "Step 6: Invoke the PayloadTestRequest command with EnableKey field set
-          to all zeros, Value field set to 0x1 and Count set to 1."
+          "Step 6: Invoke the PayloadTestRequest command with EnableKey field
+          set to all zeros, Value field set to 0x1 and Count set to 1."
       PICS: DGGEN.S.C03.Rsp
       command: "PayloadTestRequest"
       arguments:

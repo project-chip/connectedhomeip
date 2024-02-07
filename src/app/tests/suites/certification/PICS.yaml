@@ -3631,9 +3631,9 @@ PICS:
     #
     # server / features
     #
-    - label: "Support specific commands needed for extended Data Model features."
+    - label:
+          "Support specific commands needed for extended Data Model features."
       id: DGGEN.S.F00
-
 
     #
     # client / attributes
