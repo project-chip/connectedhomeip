@@ -38,6 +38,7 @@ CHIP_REPO = os.path.join(os.path.abspath(
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_DISCRIMINATOR2 = 3584
+TEST_DISCOVERY_TYPE = [0, 1, 2]
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
 DEVICE_CONFIG = {
@@ -127,18 +128,22 @@ class TestCommissioner(CHIPVirtualHome):
         self.assertEqual(ret['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
-                   "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {}").format(
-            os.path.join(
-                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
-            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-            servers[1]['discriminator'],
-            "33331712336",
-            servers[1]['nodeid'])
-        ret = self.execute_device_cmd(req_device_id, command)
+        for discovery_type in TEST_DISCOVERY_TYPE:
+            self.reset_thread_devices([servers[1]['id']])
 
-        self.assertEqual(ret['return_code'], '0',
-                         "Test failed: non-zero return code")
+            command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
+                       "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
+                os.path.join(
+                    CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+                os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+                servers[1]['discriminator'],
+                "33331712336",
+                servers[1]['nodeid'],
+                discovery_type)
+            ret = self.execute_device_cmd(req_device_id, command)
+
+            self.assertEqual(ret['return_code'], '0',
+                             "Test failed: non-zero return code")
 
 
 if __name__ == "__main__":
