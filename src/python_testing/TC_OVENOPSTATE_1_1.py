@@ -20,7 +20,7 @@ import logging
 import chip.clusters as Clusters
 from matter_testing_support import TestStep, MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
-from TC_OpstateCommon import TC_OVENOPSTATE_BASE, TestInfo, TestPlanConfig
+from TC_OpstateCommon import TC_OVENOPSTATE_BASE, TestInfo
 
 
 class TC_OVENOPSTATE_1_1(MatterBaseTest):
@@ -28,21 +28,13 @@ class TC_OVENOPSTATE_1_1(MatterBaseTest):
         super().__init__(*args)
 
         test_info = TestInfo(
-            pics_name="OVENOPSTATE",
+            pics_code="OVENOPSTATE",
             cluster=Clusters.OvenCavityOperationalState
-        )
-
-        test_plan_config = TestPlanConfig(
-            cluster_revision=1,
-            feature_map=0
         )
 
         self.TC_BASE = TC_OVENOPSTATE_BASE(
                             implementer=self,
-                            test_info=test_info,
-                            test_plan_config=test_plan_config)
-        self.endpoint = 0
-
+                            test_info=test_info)
 
     def steps_TC_OVENOPSTATE_1_1(self) -> list[TestStep]:
         return self.TC_BASE.steps_TC_OPSTATE_BASE_1_1()
@@ -52,8 +44,13 @@ class TC_OVENOPSTATE_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OVENOPSTATE_1_1(self):
-        self.endpoint = self.matter_test_config.endpoint
-        tc_result = await self.TC_BASE.test_TC_OPSTATE_BASE_1_1(self.endpoint)
+        endpoint = self.matter_test_config.endpoint
+        cluster_revision = 1
+        feature_map=0
+
+        await self.TC_BASE.test_TC_OPSTATE_BASE_1_1(endpoint=endpoint,
+                                                    cluster_revision=cluster_revision,
+                                                    feature_map=feature_map)
 
 
 if __name__ == "__main__":
