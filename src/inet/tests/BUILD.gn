@@ -33,6 +33,7 @@ static_library("helpers") {
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
     "TestInetCommonPosix.cpp",
+    "TestInetLayerCommon.hpp",
     "TestInetLayerCommon.cpp",
     "TestSetupSignalling.h",
     "TestSetupSignallingPosix.cpp",

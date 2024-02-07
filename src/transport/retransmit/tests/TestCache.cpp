@@ -271,7 +271,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestCache(void)
+int TestCache()
 {
     nlTestSuite theSuite = { "Retransmit-Cache", &sTests[0], nullptr, nullptr };
     gPayloadTracker.Init(&theSuite);
