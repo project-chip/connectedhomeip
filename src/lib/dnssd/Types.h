@@ -317,5 +317,22 @@ struct DiscoveredNodeData
     }
 };
 
+/// Callbacks for discovering nodes advertising non-operational status:
+///   - Commissioners
+///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
+///     connected to thread/wifi or devices with a commissioning window open)
+class CommissioningResolveDelegate
+{
+public:
+    virtual ~CommissioningResolveDelegate() = default;
+
+    /// Called within the CHIP event loop once a node is discovered.
+    ///
+    /// May be called multiple times as more nodes send their answer to a
+    /// multicast discovery query
+    virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
+};
+
+
 } // namespace Dnssd
 } // namespace chip
