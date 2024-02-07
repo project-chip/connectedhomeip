@@ -88,7 +88,7 @@ root@docker:/matter$ cd silabs_examples/unify-matter-pc/linux/
 
 root@docker:/matter/silabs_examples/unify-matter-pc/linux$ gn gen out/arm64 --args='target_cpu="arm64"'
 
-root@docker:/matter/silabs_examples/unify-matter-pc/linux$ ninja -C out/arm64
+root@docker:/matter/silabs_examples/unify-matter-pc/linux$ ninja -C out/arm64 unify-matter-pc
 ```
 
 After building, the `unify-matter-pc` binary is located at

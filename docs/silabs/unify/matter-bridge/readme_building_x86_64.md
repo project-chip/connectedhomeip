@@ -95,7 +95,7 @@ root@docker:/matter$ source ./scripts/activate.sh
 ```bash
 root@docker:/matter$ cd silabs_examples/unify-matter-bridge/linux/
 root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ gn gen out/host
-root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ ninja -C out/host
+root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ ninja -C out/host unify-matter-bridge
 ```
 
 > 🔴 After building, the `unify-matter-bridge` binary is located at `/matter/silabs_examples/unify-matter-bridge/linux/out/host/obj/bin/unify-matter-bridge`.
