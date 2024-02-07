@@ -125,7 +125,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
                                 const SessionHandle & sessionHandle) override
     {
         // read current binding list
-        chip::Controller::BindingCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+        chip::Controller::BaseCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
         cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
 
