@@ -333,6 +333,5 @@ public:
     virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
 };
 
-
 } // namespace Dnssd
 } // namespace chip
