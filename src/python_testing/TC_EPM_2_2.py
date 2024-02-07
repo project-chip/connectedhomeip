@@ -43,17 +43,16 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
-            # TestStep("3", "TH subscribes to ElectricalPowerMeasurement cluster with reportingInterval (min=1,max=60)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EPM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EPM.TEST_EVENT_TRIGGER for Start Fake Load Test 1kW Event"),
             TestStep("4", "Wait 3 seconds"),
             TestStep("4a", "TH reads from the DUT the ActivePower attribute. Verify the read is successful and that the value is between 980'000 and 1'020'000 mW. Note the value read."),
             TestStep("4b", "TH reads from the DUT the ActiveCurrent attribute. Verify the read is successful and that the value is between 3'848 and 4'848 mA. Note the value read."),
             TestStep("4c", "TH reads from the DUT the Voltage attribute. Verify the read is successful and that the value is between 229'000 and 231'000 mV. Note the value read."),
             TestStep("5", "Wait 3 seconds"),
-            TestStep("5a", "TH reads from the DUT the ActivePower attribute. Verify the read is successful, that the value is between 0'980'000 and 1'020'000 mW, and the value is different from the value read in step 3a."),
-            TestStep("5b", "TH reads from the DUT the ActiveCurrent attribute. Verify the read is successful, that the value is between 3'848 and 4'848 mA, and the value is different from the value read in step 3b."),
-            TestStep("5c", "TH reads from the DUT the Voltage attribute. Verify the read is successful, that the value is between 229'000 and 231'000 mV, and the value is different from the value read in step 3c."),
-            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EPM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EPM.TEST_EVENT_TRIGGER for Stop Fake Load Test Event."),
+            TestStep("5a", "TH reads from the DUT the ActivePower attribute. Verify the read is successful, that the value is between 0'980'000 and 1'020'000 mW, and the value is different from the value read in step 4a."),
+            TestStep("5b", "TH reads from the DUT the ActiveCurrent attribute. Verify the read is successful, that the value is between 3'848 and 4'848 mA, and the value is different from the value read in step 4b."),
+            TestStep("5c", "TH reads from the DUT the Voltage attribute. Verify the read is successful, that the value is between 229'000 and 231'000 mV, and the value is different from the value read in step 4c."),
+            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EPM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EPM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
         ]
 
         return steps

@@ -36,11 +36,11 @@ class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Start Fake Load Test 1kW Event"),
-            TestStep("4", "Wait 3 seconds"),
+            TestStep("4", "Wait 4 seconds"),
             TestStep("4a", "TH reads from the DUT the CumulativeEnergyImported attribute. Verify the read is successful and note the value read."),
-            TestStep("5", "Wait 3 seconds"),
+            TestStep("5", "Wait 4 seconds"),
             TestStep("5a", "TH reads from the DUT the CumulativeEnergyImported attribute. Verify the read is successful and that the value is greater than the value measured in step 4a."),
-            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Load Test Event."),
+            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
         ]
 
         return steps
@@ -58,13 +58,13 @@ class TC_EEM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
         await self.send_test_event_trigger_start_fake_1kw_load_2s()
 
         self.step("4")
-        time.sleep(3)
+        time.sleep(4)
 
         self.step("4a")
         cumulative_energy_imported = await self.read_eem_attribute_expect_success("CumulativeEnergyImported")
 
         self.step("5")
-        time.sleep(3)
+        time.sleep(4)
 
         self.step("5a")
         cumulative_energy_imported_2 = await self.read_eem_attribute_expect_success("CumulativeEnergyImported")

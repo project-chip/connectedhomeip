@@ -35,12 +35,12 @@ class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Start Fake Load Test 1kW Event"),
-            TestStep("4", "Wait 5 seconds"),
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Start Fake Generator Test 3kW Event"),
+            TestStep("4", "Wait 6 seconds"),
             TestStep("4a", "TH reads from the DUT the PeriodicEnergyExported attribute. Verify the read is successful and note the value read."),
-            TestStep("5", "Wait 5 seconds"),
+            TestStep("5", "Wait 6 seconds"),
             TestStep("5a", "TH reads from the DUT the PeriodicEnergyExported attribute. Verify the read is successful and that the value read has to be different from value measure in step 4a."),
-            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Load Test Event."),
+            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
         ]
 
         return steps
@@ -58,13 +58,13 @@ class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
         await self.send_test_event_trigger_start_fake_3kw_generator_5s()
 
         self.step("4")
-        time.sleep(5)
+        time.sleep(6)
 
         self.step("4a")
         periodic_energy_exported = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
 
         self.step("5")
-        time.sleep(5)
+        time.sleep(6)
 
         self.step("5a")
         periodic_energy_exported_2 = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
