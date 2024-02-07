@@ -104,7 +104,7 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
 };
 } // namespace
 
-#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+#ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
 extern void MatterDishwasherAlarmServerInit();
 #endif
 
@@ -225,7 +225,7 @@ void ApplicationInit()
         SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
 
-#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+#ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
     MatterDishwasherAlarmServerInit();
 #endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);

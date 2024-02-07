@@ -306,6 +306,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/Pm25ConcentrationMeasurementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/PowerSourceCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/PowerSourceConfigurationCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/PowerTopologyCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/PressureMeasurementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ProxyConfigurationCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ProxyDiscoveryCluster.kt",

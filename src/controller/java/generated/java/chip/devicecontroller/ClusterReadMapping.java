@@ -10158,6 +10158,98 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readPowerTopologyInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readPowerTopologyAvailableEndpointsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyAvailableEndpointsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readAvailableEndpointsAttribute(
+              (ChipClusters.PowerTopologyCluster.AvailableEndpointsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPowerTopologyClusterAvailableEndpointsAttributeCallback(),
+          readPowerTopologyAvailableEndpointsCommandParams
+        );
+        result.put("readAvailableEndpointsAttribute", readPowerTopologyAvailableEndpointsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerTopologyActiveEndpointsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyActiveEndpointsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readActiveEndpointsAttribute(
+              (ChipClusters.PowerTopologyCluster.ActiveEndpointsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPowerTopologyClusterActiveEndpointsAttributeCallback(),
+          readPowerTopologyActiveEndpointsCommandParams
+        );
+        result.put("readActiveEndpointsAttribute", readPowerTopologyActiveEndpointsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerTopologyGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.PowerTopologyCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPowerTopologyClusterGeneratedCommandListAttributeCallback(),
+          readPowerTopologyGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readPowerTopologyGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerTopologyAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.PowerTopologyCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPowerTopologyClusterAcceptedCommandListAttributeCallback(),
+          readPowerTopologyAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readPowerTopologyAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerTopologyEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readEventListAttribute(
+              (ChipClusters.PowerTopologyCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPowerTopologyClusterEventListAttributeCallback(),
+          readPowerTopologyEventListCommandParams
+        );
+        result.put("readEventListAttribute", readPowerTopologyEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerTopologyAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.PowerTopologyCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedPowerTopologyClusterAttributeListAttributeCallback(),
+          readPowerTopologyAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readPowerTopologyAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerTopologyFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readPowerTopologyFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readPowerTopologyFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readPowerTopologyClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readPowerTopologyClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.PowerTopologyCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readPowerTopologyClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readPowerTopologyClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readEnergyEvseModeInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readEnergyEvseModeSupportedModesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readEnergyEvseModeSupportedModesAttributeInteractionInfo = new InteractionInfo(
@@ -20468,6 +20560,7 @@ public class ClusterReadMapping {
             put("deviceEnergyManagement", readDeviceEnergyManagementInteractionInfo());
             put("energyEvse", readEnergyEvseInteractionInfo());
             put("energyPreference", readEnergyPreferenceInteractionInfo());
+            put("powerTopology", readPowerTopologyInteractionInfo());
             put("energyEvseMode", readEnergyEvseModeInteractionInfo());
             put("deviceEnergyManagementMode", readDeviceEnergyManagementModeInteractionInfo());
             put("doorLock", readDoorLockInteractionInfo());

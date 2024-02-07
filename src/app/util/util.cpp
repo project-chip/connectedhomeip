@@ -28,9 +28,9 @@
 // TODO: figure out a clear path for compile-time codegen
 #include <app/PluginApplicationCallbacks.h>
 
-#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
+#ifdef MATTER_DM_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
-#endif // EMBER_AF_PLUGIN_GROUPS_SERVER
+#endif // MATTER_DM_PLUGIN_GROUPS_SERVER
 
 using namespace chip;
 
@@ -45,8 +45,8 @@ const EmberAfClusterName zclClusterNames[] = {
     { kInvalidClusterId, nullptr }, // terminator
 };
 
-#ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
-EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
+#ifdef MATTER_DM_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
+MATTER_DM_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 #endif
 
 //------------------------------------------------------------------------------
