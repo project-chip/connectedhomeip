@@ -94,7 +94,7 @@ void ContentController::HandleSetScheduledContentRatingThreshold(chip::CharSpan 
 
 uint32_t ContentController::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CONTENT_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return mDynamicEndpointFeatureMap;
     }
