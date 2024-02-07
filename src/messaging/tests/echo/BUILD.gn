@@ -21,8 +21,8 @@ assert(chip_build_tools)
 
 source_set("common") {
   sources = [
-    "common.h",
     "common.cpp",
+    "common.h",
   ]
 
   public_deps = [
@@ -38,9 +38,7 @@ source_set("common") {
 }
 
 executable("chip-echo-requester") {
-  sources = [
-    "echo_requester.cpp",
-  ]
+  sources = [ "echo_requester.cpp" ]
 
   public_deps = [
     ":common",
@@ -55,9 +53,7 @@ executable("chip-echo-requester") {
 }
 
 executable("chip-echo-responder") {
-  sources = [
-    "echo_responder.cpp",
-  ]
+  sources = [ "echo_responder.cpp" ]
 
   public_deps = [
     ":common",
