@@ -31,9 +31,6 @@ namespace Messages {
 
 using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type;
 
-/** @brief
- *    Defines methods for implementing application-specific logic for the Content Launcher Cluster.
- */
 class Delegate
 {
 public:

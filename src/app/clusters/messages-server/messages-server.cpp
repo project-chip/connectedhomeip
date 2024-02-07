@@ -15,13 +15,6 @@
  *    limitations under the License.
  */
 
-/****************************************************************************
- * @file
- * @brief Routines for the Media Playback plugin, the
- *server implementation of the Media Playback cluster.
- *******************************************************************************
- ******************************************************************************/
-
 #include <app/clusters/messages-server/messages-delegate.h>
 #include <app/clusters/messages-server/messages-server.h>
 
@@ -43,7 +36,7 @@ using chip::app::LogEvent;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kMessagesDelegateTableSize =
-    EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kMessagesDelegateTableSize <= kEmberInvalidEndpointIndex, "Messages Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -57,7 +50,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "MessagesCluster NOT returning delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Messages::Id, EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Messages::Id, MATTER_DM_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kMessagesDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -79,14 +72,11 @@ namespace Messages {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Messages::Id, EMBER_AF_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Messages::Id, MATTER_DM_MESSAGES_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kMessagesDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
-    }
-    else
-    {
     }
 }
 
@@ -196,9 +186,8 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-    {
-        delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses);
-    }
+    
+    delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -226,9 +215,8 @@ bool emberAfMessagesClusterCancelMessagesRequestCallback(
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-    {
-        delegate->HandleCancelMessagesRequest(messageIds);
-    }
+
+    delegate->HandleCancelMessagesRequest(messageIds);
 
 exit:
     if (err != CHIP_NO_ERROR)

@@ -17,9 +17,12 @@
 
 #include "MessagesManager.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+
 using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters::Messages;
+using Message = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
 
 // Commands
 void MessagesManager::HandlePresentMessagesRequest(
@@ -72,5 +75,7 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(chip::app::AttributeValueE
 // Global Attributes
 uint32_t MessagesManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    return 1;
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }
