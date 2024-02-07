@@ -904,6 +904,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def pics_guard(self, pics_condition: bool):
         if not pics_condition:
             self.mark_current_step_skipped()
+        return pics_condition
 
     def mark_current_step_skipped(self):
         try:
