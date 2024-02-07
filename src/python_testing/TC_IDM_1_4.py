@@ -16,19 +16,16 @@
 #
 
 import logging
-from dataclasses import dataclass
 
 import chip.clusters as Clusters
-from chip import ChipUtility
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-# If DUT is a device that supports `MaxPathsPerInvoke > 1` additional command line arguments
+# If DUT supports `MaxPathsPerInvoke > 1`, additional command line argument
 # run with
-# --int-arg PIXIT.ACE.ENDPOINT:<endpoint> PIXIT.ACE.APPDEVTYPE:<device_type_id>
-# --string-arg PIXIT.ACE.APPCLUSTER:<cluster_name> PIXIT.ACE.APPATTRIBUTE:<attribute_name>
+# --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:<key>
 
 
 class TC_IDM_1_4(MatterBaseTest):
@@ -118,6 +115,11 @@ class TC_IDM_1_4(MatterBaseTest):
         if max_paths_per_invoke == 1:
             self.skip_all_remaining_steps(3)
         else:
+            asserts.assert_true('PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
+                                "PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY must be included on the command line in "
+                                "the --hex-arg flag as PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:<key>, "
+                                "e.g. --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
+
             await self.remaining_batch_commands_test_steps(False)
 
     async def remaining_batch_commands_test_steps(self, dummy_value):
@@ -270,13 +272,9 @@ class TC_IDM_1_4(MatterBaseTest):
             )
         except InteractionModelError:
             asserts.fail("DUT failed to respond reading TestEventTriggersEnabled attribute")
-        asserts.assert_true(test_event_triggers_enabled, "Test Event Triggers are NOT Enabled on DUT")
+        asserts.assert_true(test_event_triggers_enabled, "Test Event Triggers must be enabled on DUT")
 
         self.step(11)
-        asserts.assert_true('PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
-                            "PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY must be included on the command line in "
-                            "the --hex-arg flag as PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:<key>, "
-                            "e.g. --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
         enable_key = self.matter_test_config.global_test_params['PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY']
         endpoint = 0
         command = Clusters.GeneralDiagnostics.Commands.PayloadTestRequest(
@@ -293,9 +291,10 @@ class TC_IDM_1_4(MatterBaseTest):
         try:
             result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
         except InteractionModelError:
-            asserts.fail("DUT failed to respond to")
+            asserts.fail("DUT failed to respond to batch commands, where response is expected to be too large to fit in a single ResponseMessage")
 
         responses = result.Responses
+        # This check is validating the number of InvokeResponses we got
         asserts.assert_equal(len(responses), 2, "Unexpected number of InvokeResponses sent back from DUT")
         asserts.assert_true(type_matches(
             responses[0], Clusters.GeneralDiagnostics.Commands.PayloadTestResponse), "Unexpected return type for first InvokeRequest")
@@ -304,7 +303,10 @@ class TC_IDM_1_4(MatterBaseTest):
         logging.info("DUT successfully responded to a InvokeRequest action with two valid commands")
 
         asserts.assert_equal(responses[0].payload, b'A' * 800, "Expect response to match for count == 800")
-        # If this assert fails then some assumptions we were relying on are now no longer true.
+        # If this assert below fails then some assumptions we were relying on are now no longer true.
+        # This check is validating the number of InvokeResponsesMessages we got. This is different then the earlier
+        # `len(responses)` check as you can have multiple InvokeResponses in a single message. But this test step
+        # is explicitly making sure that we recieved multiple ResponseMessages.
         asserts.assert_greater_equal(result.ResponseMessageCount, 2, "DUT was expected to send multiple InvokeResponseMessages")
 
 
