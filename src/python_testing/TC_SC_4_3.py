@@ -17,7 +17,6 @@
 
 import ipaddress
 import logging
-import re
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
@@ -93,7 +92,7 @@ class TC_SC_4_3(MatterBaseTest):
             if input_int <= max_value:
                 return (True, f"Input ({input_value}) is valid.")
             else:
-                return (False, f"Input ({input_value}) exceeds the allowed value {comparison_value}.")
+                return (False, f"Input ({input_value}) exceeds the allowed value {max_value}.")
         except ValueError:
             return (False, f"Input ({input_value}) is not a valid decimal number.")
 
