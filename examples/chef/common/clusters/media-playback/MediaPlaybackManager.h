@@ -101,7 +101,7 @@ protected:
                 chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName2", 12)) }) }) }
     };
-    float mPlaybackSpeed = 0;
+    float mPlaybackSpeed = 1.0;
     uint64_t mStartTime  = 0;
     // Magic number for testing.
     uint64_t mDuration      = 80000;
