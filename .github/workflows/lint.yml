@@ -169,7 +169,6 @@ jobs:
                      --known-failure lib/dnssd/minimal_mdns/ListenIterator.h \
                      --known-failure lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h \
                      --known-failure lib/dnssd/platform/DnssdBrowseDelegate.h \
-                     --known-failure messaging/tests/echo/common.h \
                      --known-failure platform/DeviceSafeQueue.cpp \
                      --known-failure platform/DeviceSafeQueue.h \
                      --known-failure platform/GLibTypeDeleter.h \
