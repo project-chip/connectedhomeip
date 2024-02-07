@@ -1122,7 +1122,7 @@ void BLEManagerImpl::CancelBleSendIndicationTimeoutTimer(void)
 {
     if (xTimerStop(sbleSendIndicationTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
-        ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
+        ChipLogError(DeviceLayer, "Failed to cancel send indication timeout timer");
     }
 }
 
