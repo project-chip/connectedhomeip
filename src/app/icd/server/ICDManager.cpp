@@ -37,8 +37,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 using namespace System::Clock;
 
-#define TOGGLE_STATE(state) ((state == OperationalState::IdleMode) ? OperationalState::ActiveMode : OperationalState::IdleMode)
-
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
