@@ -30,21 +30,21 @@ namespace PowerTopology {
 class PowerTopologyDelegate : public Delegate
 {
 public:
-    const std::vector<EndpointId> GetAvailableEndpoints() override;
-    const std::vector<EndpointId> GetActiveEndpoints() override;
-
     PowerTopologyDelegate(EndpointId aEndpointId) : Delegate(aEndpointId) {}
     ~PowerTopologyDelegate() = default;
+
+    const CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override;
+    const CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override;
 };
 
-const std::vector<EndpointId> PowerTopologyDelegate::GetAvailableEndpoints()
+const CHIP_ERROR PowerTopologyDelegate::GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId)
 {
-    return {};
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-const std::vector<EndpointId> PowerTopologyDelegate::GetActiveEndpoints()
+const CHIP_ERROR PowerTopologyDelegate::GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId)
 {
-    return {};
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
 } // namespace PowerTopology

@@ -81,26 +81,22 @@ CHIP_ERROR Instance::ReadAvailableEndpoints(AttributeValueEncoder & aEncoder)
     {
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
-    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(HasFeature(Feature::kSetTopology), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                         ChipLogError(Zcl, "Power Topology: can not get AvailableEndpoints, feature is not supported"));
 
-    const std::vector<EndpointId> availableEndpoints = mDelegate.GetAvailableEndpoints();
-    if (availableEndpoints.empty())
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([availableEndpoints](const auto & encoder) -> CHIP_ERROR {
-            for (auto id : availableEndpoints)
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (uint8_t i = 0; true; i++)
+        {
+            EndpointId endpointId;
+            auto err = mDelegate.GetAvailableEndpointAtIndex(i, endpointId);
+            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
             {
-                ReturnErrorOnFailure(encoder.Encode(id));
+                return CHIP_NO_ERROR;
             }
-            return CHIP_NO_ERROR;
-        });
-    }
-    return err;
+            ReturnErrorOnFailure(err);
+            ReturnErrorOnFailure(encoder.Encode(endpointId));
+        }
+    });
 }
 
 CHIP_ERROR Instance::ReadActiveEndpoints(AttributeValueEncoder & aEncoder)
@@ -109,26 +105,22 @@ CHIP_ERROR Instance::ReadActiveEndpoints(AttributeValueEncoder & aEncoder)
     {
         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
-    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(HasFeature(Feature::kDynamicPowerFlow), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
                         ChipLogError(Zcl, "Power Topology: can not get ActiveEndpoints, feature is not supported"));
 
-    const std::vector<EndpointId> activeEndpoints = mDelegate.GetActiveEndpoints();
-    if (activeEndpoints.empty())
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([activeEndpoints](const auto & encoder) -> CHIP_ERROR {
-            for (auto id : activeEndpoints)
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (uint8_t i = 0; true; i++)
+        {
+            EndpointId endpointId;
+            auto err = mDelegate.GetActiveEndpointAtIndex(i, endpointId);
+            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
             {
-                ReturnErrorOnFailure(encoder.Encode(id));
+                return CHIP_NO_ERROR;
             }
-            return CHIP_NO_ERROR;
-        });
-    }
-    return err;
+            ReturnErrorOnFailure(err);
+            ReturnErrorOnFailure(encoder.Encode(endpointId));
+        }
+    });
 }
 
 } // namespace PowerTopology

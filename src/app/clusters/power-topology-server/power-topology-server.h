@@ -38,8 +38,8 @@ public:
     Delegate(EndpointId aEndpointId) : mEndpointId(aEndpointId) {}
     virtual ~Delegate() = default;
 
-    virtual const std::vector<EndpointId> GetAvailableEndpoints() = 0;
-    virtual const std::vector<EndpointId> GetActiveEndpoints()    = 0;
+    virtual CHIP_ERROR const GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) = 0;
+    virtual CHIP_ERROR const GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId)    = 0;
 
 protected:
     EndpointId mEndpointId = 0;
