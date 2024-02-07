@@ -22,7 +22,7 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Dict, List, Optional
 
-from zeroconf import IPVersion, ServiceStateChange, Zeroconf
+from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
 
 
@@ -73,6 +73,20 @@ class MdnsServiceType(Enum):
     COMMISSIONABLE = "_matterc._udp.local."
     OPERATIONAL = "_matter._tcp.local."
     BORDER_ROUTER = "_meshcop._udp.local."
+
+
+class DummyServiceListener(ServiceListener):
+    """
+    A service listener required for the TXT record data to get populated and come back
+    """
+    def add_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
+        pass
+
+    def remove_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
+        pass
+
+    def update_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
+        pass
 
 
 class MdnsDiscovery:
@@ -160,10 +174,13 @@ class MdnsDiscovery:
             mdns_service_info = await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec)
         else:
             print(f"Looking for MDNS service type '{service_type}',  service name '{service_name}'")
-
-            # Get service info
+            service_listener = DummyServiceListener()
+            self._zc.add_service_listener(MdnsServiceType.OPERATIONAL.value, service_listener)
+            # Adds delay so TXT record is able to get populated
+            await asyncio.sleep(1)
             service_info = AsyncServiceInfo(service_type, service_name)
             is_discovered = await service_info.async_request(self._zc, 3000)
+            self._zc.remove_service_listener(service_listener)
             if is_discovered:
                 mdns_service_info = self._to_mdns_service_info_class(service_info)
             self._discovered_services = {}
