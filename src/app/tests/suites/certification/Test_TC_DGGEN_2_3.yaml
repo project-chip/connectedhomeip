@@ -117,7 +117,7 @@ tests:
       arguments:
           values:
               - name: "EnableKey"
-                value: PIXIT.DGGEN.ENABLEKEY
+                value: "hex:0000000000000000"
               - name: "Value"
                 value: 0x1
               - name: "Count"
