@@ -64,7 +64,7 @@ void emberAfPowerTopologyClusterInitCallback(chip::EndpointId endpointId)
     if (gDelegate)
     {
         gInstance = std::make_unique<Instance>(
-            endpointId, *gDelegate, BitMask<Feature, uint32_t>(Feature::kSetTopology),
+            endpointId, *gDelegate, BitMask<Feature, uint32_t>(Feature::kSetTopology, Feature::kDynamicPowerFlow),
             BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kOptionalAttributeAvailableEndpoints,
                                                   OptionalAttributes::kOptionalAttributeActiveEndpoints));
 
