@@ -14,12 +14,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
+import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
+
+logger = logging.getLogger(__name__)
 
 
 class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
@@ -53,30 +55,30 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         self.step("2")
         accuracy = await self.read_eem_attribute_expect_success("Accuracy")
-        print(accuracy)
+        logger.info(f"Rx'd Accuracy: {accuracy}")
         asserts.assert_not_equal(accuracy, NullValue, "Accuracy is not allowed to be null")
         asserts.assert_equal(accuracy.measurementType, Clusters.ElectricalEnergyMeasurement.Enums.MeasurementTypeEnum.kElectricalEnergy,
                              "Accuracy measurementType must be ElectricalEnergy")
 
         self.step("3")
         cumulativeEnergyImported = await self.read_eem_attribute_expect_success("CumulativeEnergyImported")
-        print(cumulativeEnergyImported)
+        logger.info(f"Rx'd CumulativeEnergyImported: {cumulativeEnergyImported}")
 
         self.step("4")
         cumulativeEnergyExported = await self.read_eem_attribute_expect_success("CumulativeEnergyExported")
-        print(cumulativeEnergyExported)
+        logger.info(f"Rx'd CumulativeEnergyExported: {cumulativeEnergyExported}")
 
         self.step("5")
         periodicEnergyImported = await self.read_eem_attribute_expect_success("PeriodicEnergyImported")
-        print(periodicEnergyImported)
+        logger.info(f"Rx'd PeriodicEnergyImported: {periodicEnergyImported}")
 
         self.step("6")
         periodicEnergyExported = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
-        print(periodicEnergyExported)
+        logger.info(f"Rx'd PeriodicEnergyExported: {periodicEnergyExported}")
 
         self.step("7")
         cumulativeEnergyReset = await self.read_eem_attribute_expect_success("CumulativeEnergyReset")
-        print(cumulativeEnergyReset)
+        logger.info(f"Rx'd CumulativeEnergyReset: {cumulativeEnergyReset}")
 
 
 if __name__ == "__main__":

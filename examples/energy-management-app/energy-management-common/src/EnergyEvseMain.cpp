@@ -37,6 +37,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
@@ -374,8 +375,37 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
         BitMask<ElectricalEnergyMeasurement::OptionalAttributes, uint32_t>(
             ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
 
+    // Create an accuracy entry which is between +/-0.5 and +/- 5% across the range of all possible energy readings
+    ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type energyAccuracyRanges[] = {
+        { .rangeMin   = 0,
+          .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
+          .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
+          .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
+    };
+
+    ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type accuracy = {
+        .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
+        .measured         = true,
+        .minMeasuredValue = 0,
+        .maxMeasuredValue = 1'000'000'000'000'000, // 1 million Mwh
+        .accuracyRanges =
+            DataModel::List<const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type>(energyAccuracyRanges)
+    };
+
+    // Example of setting CumulativeEnergyReset structure - for now set these to 0
+    // but the manufacturer may want to store these in non volatile storage for timestamp (based on epoch_s)
+    ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type resetStruct = {
+        .importedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
+        .exportedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
+        .importedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
+        .exportedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
+    };
+
     if (gEEMAttrAccess)
     {
         gEEMAttrAccess->Init();
+
+        SetMeasurementAccuracy(endpointId, accuracy);
+        SetCumulativeReset(endpointId, MakeOptional(resetStruct));
     }
 }
