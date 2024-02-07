@@ -307,7 +307,8 @@ class TC_IDM_1_4(MatterBaseTest):
         # This check is validating the number of InvokeResponsesMessages we got. This is different then the earlier
         # `len(responses)` check as you can have multiple InvokeResponses in a single message. But this test step
         # is explicitly making sure that we recieved multiple ResponseMessages.
-        asserts.assert_greater_equal(test_only_result.ResponseMessageCount, 2, "DUT was expected to send multiple InvokeResponseMessages")
+        asserts.assert_greater_equal(test_only_result.ResponseMessageCount, 2,
+                                     "DUT was expected to send multiple InvokeResponseMessages")
 
 
 if __name__ == "__main__":
