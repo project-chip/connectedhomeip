@@ -21,7 +21,6 @@ import re
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
-
 from mobly import asserts
 
 '''
