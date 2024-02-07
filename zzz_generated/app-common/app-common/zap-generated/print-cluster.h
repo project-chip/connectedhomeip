@@ -443,6 +443,13 @@
 #define CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_ELECTRICAL_POWER_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_ELECTRICAL_POWER_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ELECTRICAL_POWER_MEASUREMENT_CLUSTER                                                                     \
+    { chip::app::Clusters::ElectricalPowerMeasurement::Id, "Electrical Power Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_ELECTRICAL_POWER_MEASUREMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER) ||                                                             \
     defined(ZCL_USING_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER                                                                    \
@@ -481,6 +488,12 @@
 #define CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER { chip::app::Clusters::EnergyPreference::Id, "Energy Preference" },
 #else
 #define CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_POWER_TOPOLOGY_CLUSTER_SERVER) || defined(ZCL_USING_POWER_TOPOLOGY_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_POWER_TOPOLOGY_CLUSTER { chip::app::Clusters::PowerTopology::Id, "Power Topology" },
+#else
+#define CHIP_PRINTCLUSTER_POWER_TOPOLOGY_CLUSTER
 #endif
 
 #if defined(ZCL_USING_ENERGY_EVSE_MODE_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_EVSE_MODE_CLUSTER_CLIENT)
@@ -851,12 +864,14 @@
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CONFIGURATION_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER                                                                      \
+    CHIP_PRINTCLUSTER_ELECTRICAL_POWER_MEASUREMENT_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_MESSAGES_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_POWER_TOPOLOGY_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_ENERGY_EVSE_MODE_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \

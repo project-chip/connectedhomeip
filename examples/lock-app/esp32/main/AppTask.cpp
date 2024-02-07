@@ -322,7 +322,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
     else
     {
-        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
+        // If the button was released before factory reset got initiated, start BLE advertisement in fast mode
         if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
             sAppTask.CancelTimer();
@@ -336,7 +336,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             }
             else
             {
-                ESP_LOGI(TAG, "Network is already provisioned, Ble advertissement not enabled");
+                ESP_LOGI(TAG, "Network is already provisioned, Ble advertisement not enabled");
             }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)

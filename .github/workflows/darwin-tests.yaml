@@ -106,6 +106,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
+                     --runner darwin_framework_tool_python \
                      --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
                      --target-skip-glob '{TestAccessControlConstraints}' \
                      run \

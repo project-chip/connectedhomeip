@@ -4,9 +4,10 @@ An example showing the use of CHIP on the Linux. The document will describe how
 to build and run CHIP Air Purifier Example on A Linux System. This doc is tested
 on **Ubuntu 20.04 LTS**.
 
-The Air Purifier is a composed device with Endpoint 1 being the Air Purifier.
-Endpoint 2 is an Air Quality Sensor, Endpoint 3 is a Relative Humidity Sensor
-and endpoint 4 is a Temperature Sensor.
+The Air Purifier example demonstrates a fully functional Matter Air Purifier
+which is a composed device with Endpoint 1 being the Air Purifier. Endpoint 2 is
+an Air Quality Sensor, Endpoint 3 is a Relative Humidity Sensor, Endpoint 4 is a
+Temperature Sensor and Endpoint 5 is a Thermostat.
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
@@ -99,11 +100,11 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
                       RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
                       TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
 
-        -   Run Linux Lighting Example App
+        -   Run Linux Air Purifier Example App
 
-                  $ cd ~/connectedhomeip/examples/lighting-app/linux
-                  $ sudo out/debug/chip-lighting-app --ble-device [bluetooth device number]
+                  $ cd ~/connectedhomeip/examples/air-purifier-app/linux
+                  $ sudo out/debug/chip-air-purifier-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-lighting-app --ble-device 1
+                  $ sudo out/debug/chip-air-purifier-app --ble-device 1
 
         -   Test the device using ChipTool on your laptop / workstation etc.
