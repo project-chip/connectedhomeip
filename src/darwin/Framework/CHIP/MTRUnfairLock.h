@@ -20,27 +20,18 @@
 
 #import <os/lock.h>
 
-class MTRAutoUnfairLock;
+#include <mutex>
 
-class MTRUnfairLock
+template <>
+class std::lock_guard<os_unfair_lock>
 {
 public:
-    MTRUnfairLock() { mOSLock = OS_UNFAIR_LOCK_INIT; }
+    explicit lock_guard(os_unfair_lock & lock) : mLock(lock) { os_unfair_lock_lock(&mLock); }
+    ~lock_guard() { os_unfair_lock_unlock(&mLock); }
 
-    void AssertOwner() { os_unfair_lock_assert_owner(&mOSLock); }
-
-private:
-    friend class MTRAutoUnfairLock;
-    os_unfair_lock mOSLock;
-};
-
-class MTRAutoUnfairLock
-{
-public:
-    MTRAutoUnfairLock(MTRUnfairLock & aLock) : mLock(aLock) { os_unfair_lock_lock(&mLock.mOSLock); }
-
-    ~MTRAutoUnfairLock() { os_unfair_lock_unlock(&mLock.mOSLock); }
+    lock_guard(const lock_guard &)     = delete;
+    void operator=(const lock_guard &) = delete;
 
 private:
-    MTRUnfairLock & mLock;
+    os_unfair_lock & mLock;
 };

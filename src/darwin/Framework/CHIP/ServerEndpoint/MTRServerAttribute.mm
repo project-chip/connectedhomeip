@@ -34,11 +34,11 @@ using namespace chip;
 
 MTR_DIRECT_MEMBERS
 @implementation MTRServerAttribute {
-    // _lock always protects access to _deviceController, _value, and _parentCluster.
-    // _serializedValue is protected when we are modifying it directly while we
-    // have no _deviceController.  Once we have one, _serializedValue is only
-    // modified on the Matter thread.
-    MTRUnfairLock _lock;
+    // _lock always protects access to _deviceController, _value, and
+    // _parentCluster.  _serializedValue is protected when we are modifying it
+    // directly while we have no _deviceController.  Once we have one,
+    // _serializedValue is only modified on the Matter thread.
+    os_unfair_lock _lock;
     MTRDeviceController * __weak _deviceController;
     NSDictionary<NSString *, id> * _value;
     app::ConcreteClusterPath _parentCluster;
@@ -75,6 +75,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
+    _lock = OS_UNFAIR_LOCK_INIT;
     _attributeID = attributeID;
     _requiredReadPrivilege = requiredReadPrivilege;
     _writable = writable;
@@ -132,7 +133,7 @@ MTR_DIRECT_MEMBERS
 
     // We serialized properly, so should be good to go on the value.  Lock
     // around our ivar accesses.
-    MTRAutoUnfairLock lock(_lock);
+    std::lock_guard lock(_lock);
 
     _value = [value copy];
 
@@ -161,13 +162,13 @@ MTR_DIRECT_MEMBERS
 
 - (NSDictionary<NSString *, id> *)value
 {
-    MTRAutoUnfairLock lock(_lock);
+    std::lock_guard lock(_lock);
     return [_value copy];
 }
 
 - (BOOL)associateWithController:(nullable MTRDeviceController *)controller
 {
-    MTRAutoUnfairLock lock(_lock);
+    std::lock_guard lock(_lock);
 
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
@@ -187,14 +188,14 @@ MTR_DIRECT_MEMBERS
 
 - (void)invalidate
 {
-    MTRAutoUnfairLock lock(_lock);
+    std::lock_guard lock(_lock);
 
     _deviceController = nil;
 }
 
 - (BOOL)addToCluster:(const app::ConcreteClusterPath &)cluster
 {
-    MTRAutoUnfairLock lock(_lock);
+    std::lock_guard lock(_lock);
 
     if (_parentCluster.mClusterId != kInvalidClusterId) {
         MTR_LOG_ERROR("Cannot add attribute to cluster " ChipLogFormatMEI "; already added to cluster " ChipLogFormatMEI, ChipLogValueMEI(cluster.mClusterId), ChipLogValueMEI(_parentCluster.mClusterId));
@@ -207,13 +208,13 @@ MTR_DIRECT_MEMBERS
 
 - (void)updateParentCluster:(const app::ConcreteClusterPath &)cluster
 {
-    MTRAutoUnfairLock lock(_lock);
+    std::lock_guard lock(_lock);
     _parentCluster = cluster;
 }
 
 - (const chip::app::ConcreteClusterPath &)parentCluster
 {
-    MTRAutoUnfairLock lock(_lock);
+    std::lock_guard lock(_lock);
     return _parentCluster;
 }
 
