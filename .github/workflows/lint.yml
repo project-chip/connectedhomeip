@@ -126,7 +126,6 @@ jobs:
                      --known-failure app/reporting/tests/MockReportScheduler.h \
                      --known-failure app/server/AppDelegate.h \
                      --known-failure app/TestEventTriggerDelegate.h \
-                     --known-failure app/tests/integration/MockEvents.h \
                      --known-failure app/tests/suites/credentials/TestHarnessDACProvider.h \
                      --known-failure app/tests/TestOperationalDeviceProxy.cpp \
                      --known-failure app/util/af-enums.h \

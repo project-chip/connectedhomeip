@@ -59,6 +59,7 @@ executable("chip-im-initiator") {
 executable("chip-im-responder") {
   sources = [
     "${chip_root}/src/app/reporting/tests/MockReportScheduler.cpp",
+    "MockEvents.h",
     "MockEvents.cpp",
     "RequiredPrivilegeStubs.cpp",
     "chip_im_responder.cpp",
@@ -70,6 +71,7 @@ executable("chip-im-responder") {
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
