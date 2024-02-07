@@ -629,9 +629,7 @@
             "FeatureMap"
         ],
         "Power Topology": [
-            "FeatureMap",
-            "AvailableEndpoints",
-            "ActiveEndpoints"
+            "FeatureMap"
         ],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"]
