@@ -694,8 +694,6 @@ void BluezEndpoint::Shutdown()
                 g_object_unref(self->mpObjMgr);
             if (self->mpAdapter != nullptr)
                 g_object_unref(self->mpAdapter);
-            if (self->mpDevice != nullptr)
-                g_object_unref(self->mpDevice);
             if (self->mpRoot != nullptr)
                 g_object_unref(self->mpRoot);
             if (self->mpService != nullptr)
