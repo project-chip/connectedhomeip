@@ -123,3 +123,6 @@
  * 30000 (30 secondes).
  */
 #define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT (30 * 1000)
+
+// Enable unit-test only features
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1

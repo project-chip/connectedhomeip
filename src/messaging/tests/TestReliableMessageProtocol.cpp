@@ -46,7 +46,7 @@
 #include <messaging/tests/MessagingContext.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDConfigurationData.h> // nogncheck
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
 namespace {

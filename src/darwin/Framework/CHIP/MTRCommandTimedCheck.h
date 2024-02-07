@@ -15,9 +15,7 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

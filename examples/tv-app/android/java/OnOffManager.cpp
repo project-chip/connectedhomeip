@@ -27,7 +27,7 @@
 
 using namespace chip;
 
-static constexpr size_t kOnffManagerTableSize = EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT;
+static constexpr size_t kOnffManagerTableSize = MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT;
 
 namespace {
 
@@ -46,7 +46,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: OnOffManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::OnOff::Id,
-                                                       EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kOnffManagerTableSize,
                    ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d not found", endpoint));
 
@@ -68,7 +68,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id, MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kOnffManagerTableSize ? nullptr : gOnOffManagerTable[ep]);
 }
 
@@ -91,7 +91,8 @@ jboolean OnOffManager::SetOnOff(jint endpoint, bool value)
 CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
 
     mOnOffManagerObject = env->NewGlobalRef(managerObject);
     VerifyOrReturnLogError(mOnOffManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -115,7 +116,9 @@ void OnOffManager::HandleOnOffChanged(bool value)
     ChipLogProgress(Zcl, "OnOffManager::HandleOnOffChanged");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
+
     VerifyOrReturn(mOnOffManagerObject != nullptr, ChipLogProgress(Zcl, "mOnOffManagerObject null"));
     VerifyOrReturn(mHandleOnOffChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleOnOffChangedMethod null"));
 

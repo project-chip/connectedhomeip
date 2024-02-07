@@ -141,6 +141,17 @@ pw_proto_library(attributes_service
     pw_protobuf.common_proto
 )
 
+pw_proto_library(boolean_state_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/boolean_state_service.proto
+  PREFIX
+    boolean_state_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
 pw_proto_library(button_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/button_service.proto
@@ -191,6 +202,7 @@ pw_proto_library(wifi_service
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC
   attributes_service.nanopb_rpc
+  boolean_state_service.nanopb_rpc
   button_service.nanopb_rpc
   descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
@@ -215,6 +227,7 @@ target_link_options(${COMPONENT_LIB}
 
 target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BOOLEAN_STATE_SERVICE=1"
                        "-DPW_RPC_BUTTON_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"

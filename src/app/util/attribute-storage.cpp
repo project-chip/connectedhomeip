@@ -123,22 +123,16 @@ constexpr const chip::EventId generatedEvents[] = GENERATED_EVENTS;
 constexpr const EmberAfAttributeMetadata generatedAttributes[] = GENERATED_ATTRIBUTES;
 #define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
+#ifdef GENERATED_CLUSTERS
 constexpr const EmberAfCluster generatedClusters[] = GENERATED_CLUSTERS;
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
+#endif
 
 constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
 constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVICE_TYPES;
 
 // Not const, because these need to mutate.
 DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
-
-#if !defined(EMBER_SCRIPTED_TEST)
-#define endpointNumber(x) fixedEndpoints[x]
-#define endpointDeviceTypeList(x)                                                                                                  \
-    Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[x]], fixedDeviceTypeListLengths[x])
-// Added 'Macro' to silence MISRA warning about conflict with synonymous vars.
-#define endpointTypeMacro(x) (&(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]]))
-#endif
 
 AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 
@@ -186,12 +180,10 @@ void emberAfEndpointConfigure()
     static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
                   "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
 
-#if !defined(EMBER_SCRIPTED_TEST)
     uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
     uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
     uint16_t fixedDeviceTypeListOffsets[] = FIXED_DEVICE_TYPE_OFFSETS;
     uint8_t fixedEmberAfEndpointTypes[]   = FIXED_ENDPOINT_TYPES;
-#endif
 
 #if ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
     // Initialize our data version storage.  If
@@ -210,10 +202,11 @@ void emberAfEndpointConfigure()
     DataVersion * currentDataVersions = fixedEndpointDataVersions;
     for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)
     {
-        emAfEndpoints[ep].endpoint       = endpointNumber(ep);
-        emAfEndpoints[ep].deviceTypeList = endpointDeviceTypeList(ep);
-        emAfEndpoints[ep].endpointType   = endpointTypeMacro(ep);
-        emAfEndpoints[ep].dataVersions   = currentDataVersions;
+        emAfEndpoints[ep].endpoint = fixedEndpoints[ep];
+        emAfEndpoints[ep].deviceTypeList =
+            Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[ep]], fixedDeviceTypeListLengths[ep]);
+        emAfEndpoints[ep].endpointType = &generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[ep]];
+        emAfEndpoints[ep].dataVersions = currentDataVersions;
 
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
@@ -918,10 +911,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
 
 bool emberAfEndpointIsEnabled(EndpointId endpoint)
 {
-    uint16_t index = findIndexFromEndpoint(endpoint,
-                                           false); // ignore disabled endpoints?
-
-    EMBER_TEST_ASSERT(kEmberInvalidEndpointIndex != index);
+    uint16_t index = findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 
     if (kEmberInvalidEndpointIndex == index)
     {
@@ -933,8 +923,7 @@ bool emberAfEndpointIsEnabled(EndpointId endpoint)
 
 bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 {
-    uint16_t index = findIndexFromEndpoint(endpoint,
-                                           false); // ignore disabled endpoints?
+    uint16_t index = findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
     bool currentlyEnabled;
 
     if (kEmberInvalidEndpointIndex == index)
@@ -948,10 +937,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
     {
         emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isEnabled);
     }
-
-#if defined(EZSP_HOST)
-    ezspSetEndpointFlags(endpoint, (enable ? EZSP_ENDPOINT_ENABLED : EZSP_ENDPOINT_DISABLED));
-#endif
 
     if (currentlyEnabled != enable)
     {
@@ -990,15 +975,13 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 // Returns the index of a given endpoint.  Does not consider disabled endpoints.
 uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
 {
-    return findIndexFromEndpoint(endpoint,
-                                 true); // ignore disabled endpoints?
+    return findIndexFromEndpoint(endpoint, true /* ignoreDisabledEndpoints */);
 }
 
 // Returns the index of a given endpoint.  Considers disabled endpoints.
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
 {
-    return findIndexFromEndpoint(endpoint,
-                                 false); // ignore disabled endpoints?
+    return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 }
 
 EndpointId emberAfEndpointFromIndex(uint16_t index)

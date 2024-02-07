@@ -55,6 +55,22 @@ public:
         return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value);
     }
 
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                           chip::CommandId commandId,
+                           const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type & value)
+    {
+        ReturnErrorOnFailure(InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value));
+
+        if (value.transferFileDesignator.HasValue() &&
+            value.requestedProtocol == chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum::kBdx)
+        {
+            auto sender         = mCommandSender.back().get();
+            auto fileDesignator = value.transferFileDesignator.Value();
+            BDXDiagnosticLogsServerDelegate::GetInstance().AddFileDesignator(sender, fileDesignator);
+        }
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         return InteractionModelCommands::SendGroupCommand(groupId, fabricIndex, mClusterId, mCommandId, mPayload);
@@ -119,6 +135,8 @@ public:
             mRepeatCount.SetValue(static_cast<uint16_t>(mRepeatCount.Value() - 1));
             shouldStop = mRepeatCount.Value() == 0;
         }
+
+        BDXDiagnosticLogsServerDelegate::GetInstance().RemoveFileDesignator(client);
 
         if (shouldStop)
         {

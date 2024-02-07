@@ -35,9 +35,11 @@
     <string name="address_commissioning_title_text">Commission with IP address</string>
     <string name="default_discriminator">3840</string>
     <string name="default_pincode">20202021</string>
+    <string name="default_port">5540</string>
     <string name="enter_device_address_label_text">Device address</string>
     <string name="enter_discriminator_label_text">Discriminator</string>
     <string name="enter_pincode_label_text">Pincode</string>
+    <string name="enter_port_label_text">Port</string>
     <string name="commission_btn_text">Commission</string>
     <string name="dns_discover_btn_text">Discover</string>
     <string name="wifi_scan_btn_text">Wi-Fi Scan</string>

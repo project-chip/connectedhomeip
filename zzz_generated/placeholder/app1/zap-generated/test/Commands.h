@@ -21,7 +21,7 @@
 
 #include "TestCommand.h"
 
-#include <lib/support/CHIPListUtils.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
 
 class Test_TC_WNCV_5_1_SimulatedSuite : public TestCommand
 {

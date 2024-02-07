@@ -32,7 +32,7 @@ CHIP_ERROR convertJAppParametersToCppAppParams(jobject appParameters, AppParams 
 
     jclass jAppParametersClass;
     ReturnErrorOnFailure(
-        chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/AppParameters", jAppParametersClass));
+        chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/AppParameters", jAppParametersClass));
 
     jmethodID getRotatingDeviceIdUniqueIdMethod = env->GetMethodID(jAppParametersClass, "getRotatingDeviceIdUniqueId", "()[B");
     if (getRotatingDeviceIdUniqueIdMethod == nullptr)
@@ -67,7 +67,7 @@ CHIP_ERROR convertJContentAppToTargetEndpointInfo(jobject contentApp, TargetEndp
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jContentAppClass;
-    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
+    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
 
     jfieldID jEndpointIdField = env->GetFieldID(jContentAppClass, "endpointId", "S");
     jshort jEndpointId        = env->GetShortField(contentApp, jEndpointIdField);
@@ -104,7 +104,8 @@ CHIP_ERROR convertTargetEndpointInfoToJContentApp(TargetEndpointInfo * targetEnd
         JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
         jclass jContentAppClass;
-        ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
+        ReturnErrorOnFailure(
+            chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
         jmethodID jContentAppConstructor = env->GetMethodID(jContentAppClass, "<init>", "(SLjava/util/List;)V");
         chip::ClusterId * clusters       = targetEndpointInfo->GetClusters();
         jobject jClustersArrayList       = nullptr;
@@ -132,7 +133,8 @@ CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, Targe
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jclass jVideoPlayerClass;
-    ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
+    ReturnErrorOnFailure(
+        chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
 
     jfieldID jNodeIdField = env->GetFieldID(jVideoPlayerClass, "nodeId", "J");
     chip::NodeId nodeId   = static_cast<chip::NodeId>(env->GetLongField(videoPlayer, jNodeIdField));
@@ -206,7 +208,8 @@ CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, Targe
         jobject jContentApp = env->CallObjectMethod(jIterator, jNextMid);
 
         jclass jContentAppClass;
-        ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
+        ReturnErrorOnFailure(
+            chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/ContentApp", jContentAppClass));
         jfieldID jEndpointIdField     = env->GetFieldID(jContentAppClass, "endpointId", "S");
         chip::EndpointId endpointId   = static_cast<chip::EndpointId>(env->GetShortField(jContentApp, jEndpointIdField));
         TargetEndpointInfo * endpoint = outTargetVideoPlayerInfo.GetOrAddEndpoint(endpointId);
@@ -226,7 +229,7 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
 
         jclass jVideoPlayerClass;
         ReturnErrorOnFailure(
-            chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
+            chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
         jmethodID jVideoPlayerConstructor = env->GetMethodID(jVideoPlayerClass, "<init>",
                                                              "(JBLjava/lang/String;IIILjava/util/List;ILjava/util/List;Ljava/lang/"
                                                              "String;Ljava/lang/String;IJLjava/lang/String;ZZ)V");
@@ -277,7 +280,8 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
                 jstring jIPAddressStr = env->NewStringUTF(addrCString);
 
                 jclass jIPAddressClass;
-                ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "java/net/InetAddress", jIPAddressClass));
+                ReturnErrorOnFailure(
+                    chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/net/InetAddress", jIPAddressClass));
                 jmethodID jGetByNameMid =
                     env->GetStaticMethodID(jIPAddressClass, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
                 jobject jIPAddress = env->CallStaticObjectMethod(jIPAddressClass, jGetByNameMid, jIPAddressStr);
@@ -306,7 +310,7 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
 
     jclass jDiscoveredNodeDataClass;
     ReturnErrorOnFailure(
-        chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/DiscoveredNodeData", jDiscoveredNodeDataClass));
+        chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/DiscoveredNodeData", jDiscoveredNodeDataClass));
 
     jfieldID getHostNameField = env->GetFieldID(jDiscoveredNodeDataClass, "hostName", "Ljava/lang/String;");
     jstring jHostName         = static_cast<jstring>(env->GetObjectField(jDiscoveredNodeData, getHostNameField));
@@ -392,7 +396,7 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
     {
         jobject jIPAddress = env->CallObjectMethod(jIterator, jNextMid);
         jclass jIPAddressClass;
-        ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetClassRef(env, "java/net/InetAddress", jIPAddressClass));
+        ReturnErrorOnFailure(chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/net/InetAddress", jIPAddressClass));
         jmethodID jGetHostAddressMid = env->GetMethodID(jIPAddressClass, "getHostAddress", "()Ljava/lang/String;");
         jstring jIPAddressStr        = static_cast<jstring>(env->CallObjectMethod(jIPAddress, jGetHostAddressMid));
 

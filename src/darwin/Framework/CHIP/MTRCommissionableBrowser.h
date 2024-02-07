@@ -23,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTRCommissionableBrowserDelegate;
 @class MTRDeviceController;
 
-MTR_HIDDEN
 @interface MTRCommissionableBrowser : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
