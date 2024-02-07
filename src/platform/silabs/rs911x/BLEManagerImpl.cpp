@@ -938,17 +938,6 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
 }
 
 
-void BLEManagerImpl::HandleSoftTimerEvent(void)
-{
-    uint8_t connHandle = 1;
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
-    ChipDeviceEvent event;
-    event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
-    event.CHIPoBLEConnectionError.ConId                          = connHandle;
-    event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
-    PlatformMgr().PostEventOrDie(&event);
-}
-
 bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
 {
     CHIPoBLEConState * bleConnState = GetConnectionState(connectionHandle, true);
@@ -1120,7 +1109,13 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 
 void BLEManagerImpl::BleSendIndicationTimeoutHandler(TimerHandle_t xTimer)
 {
-        sInstance.HandleSoftTimerEvent();
+    uint8_t connHandle = 1;
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
+    ChipDeviceEvent event;
+    event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
+    event.CHIPoBLEConnectionError.ConId                          = connHandle;
+    event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::CancelBleSendIndicationTimeoutTimer(void)

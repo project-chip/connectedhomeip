@@ -31,7 +31,7 @@
 #define BLE_SLAVE_LATENCY_MS 0
 #define BLE_TIMEOUT_MS 400
 #define BLE_DEFAULT_TIMER_PERIOD_MS (1)
-#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (400) // Time kept to support all WiFi chips BLE (RS9116/ SiWx917 NCP/SOC)
+#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (5000) // Time kept to support all WiFi chips BLE (RS9116/ SiWx917 NCP/SOC)
 #endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #include "FreeRTOS.h"
 #include "timers.h"
@@ -73,7 +73,6 @@ public:
     void UpdateMtu(rsi_ble_event_mtu_t evt);
     void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
     void HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt);
-    void HandleSoftTimerEvent(void);
     int32_t SendBLEAdvertisementCommand(void);
 #else
     void HandleConnectEvent(volatile sl_bt_msg_t * evt);
