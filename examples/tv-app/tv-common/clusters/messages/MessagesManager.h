@@ -31,7 +31,7 @@ using Message               = chip::app::Clusters::Messages::Structs::MessageStr
 class MessagesManager : public MessagesDelegate
 {
 public:
-    MessagesManager();
+    MessagesManager() : MessagesDelegate(){};
     // Commands
     void HandlePresentMessagesRequest(
         const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
