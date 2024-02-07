@@ -40,8 +40,7 @@ void MessagesManager::HandlePresentMessagesRequest(
     // TODO: Convert to  Optional<chip::app::DataModel::List<const
     // chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> message.responses = responses;
 
-    // mMessages.push_back(message);
-    mMessages.push_back({nullptr, priority, messageControl, startTime, duration, nullptr});
+    mMessages.push_back(message);
     // Add your code to present Message
 }
 

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/clusters/messages-server/messages-server.h>
+#include <list>
 
 class MessagesManager : public chip::app::Clusters::Messages::Delegate
 {

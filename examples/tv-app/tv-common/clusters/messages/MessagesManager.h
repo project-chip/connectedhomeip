@@ -20,7 +20,7 @@
 #include <app/clusters/messages-server/messages-server.h>
 
 #include <iostream>
-#include <map>
+#include <list>
 
 using MessagesDelegate      = chip::app::Clusters::Messages::Delegate;
 using MessagePriorityEnum   = chip::app::Clusters::Messages::MessagePriorityEnum;
