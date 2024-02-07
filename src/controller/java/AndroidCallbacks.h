@@ -49,7 +49,7 @@ struct GetConnectedDeviceCallback
     JniGlobalReference mJavaCallbackRef;
 
 private:
-    const char * mCallbackClassSignature;
+    const char * mCallbackClassSignature = nullptr;
 };
 
 struct ReportCallback : public app::ClusterStateCache::Callback
