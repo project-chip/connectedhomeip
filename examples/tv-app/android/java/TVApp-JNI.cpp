@@ -41,7 +41,6 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <zap-generated/CHIPClusters.h>
 
 using namespace chip;
 using namespace chip::app;
