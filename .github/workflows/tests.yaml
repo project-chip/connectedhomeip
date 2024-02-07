@@ -47,7 +47,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:32
+            image: ghcr.io/project-chip/chip-build:35
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -155,6 +155,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/operational-state-oven-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/operational-state-rvc-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/oven-mode-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/power-topology-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/power-source-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/power-source-configuration-cluster.xml \

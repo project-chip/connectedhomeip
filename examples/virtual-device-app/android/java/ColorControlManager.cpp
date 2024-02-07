@@ -26,7 +26,7 @@
 
 using namespace chip;
 
-static constexpr size_t kColorControlManagerTableSize = EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
+static constexpr size_t kColorControlManagerTableSize = MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
 
 namespace {
 
@@ -45,7 +45,7 @@ void ColorControlManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "Device App: ColorControlManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::ColorControl::Id,
-                                                       EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kColorControlManagerTableSize,
                    ChipLogError(Zcl, "Device App::ColorControl::NewManager: endpoint %d not found", endpoint));
 
@@ -67,7 +67,7 @@ void ColorControlManager::NewManager(jint endpoint, jobject manager)
 static ColorControlManager * GetColorControlManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::ColorControl::Id,
-                                                       EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kColorControlManagerTableSize ? nullptr : gColorControlManagerTable[ep]);
 }
 

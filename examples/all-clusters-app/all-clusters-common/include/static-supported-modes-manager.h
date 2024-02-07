@@ -50,7 +50,7 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
     };
 
     static storage_value_type coffeeOptions[];
-    static const EndpointSpanPair supportedOptionsByEndpoints[EMBER_AF_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT];
+    static const EndpointSpanPair supportedOptionsByEndpoints[MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 public:
     static const StaticSupportedModesManager instance;

@@ -42,7 +42,7 @@ using namespace chip::app::Clusters::LaundryWasherControls::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kLaundryWasherControlsDelegateTableSize =
-    EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -55,7 +55,7 @@ namespace {
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
-                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kLaundryWasherControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -69,7 +69,7 @@ LaundryWasherControlsServer LaundryWasherControlsServer::sInstance;
 void LaundryWasherControlsServer::SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
-                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kLaundryWasherControlsDelegateTableSize)
     {

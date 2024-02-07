@@ -94,7 +94,7 @@ JavaVM * sJVM;
 
 pthread_t sIOThread = PTHREAD_NULL;
 
-jclass sChipDeviceControllerExceptionCls = NULL;
+jclass sChipDeviceControllerExceptionCls = nullptr;
 
 } // namespace
 
@@ -119,7 +119,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 
     // Get a JNI environment object.
     env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+    VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     ChipLogProgress(Controller, "Loading Java class references.");
 
@@ -159,7 +159,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     //             should be stopped before the library is unloaded.
     StopIOThread();
 
-    sJVM = NULL;
+    sJVM = nullptr;
 
     chip::Platform::MemoryShutdown();
 }
@@ -268,7 +268,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
-    AndroidDeviceControllerWrapper * wrapper = NULL;
+    AndroidDeviceControllerWrapper * wrapper = nullptr;
     jlong result                             = 0;
 
     ChipLogProgress(Controller, "newDeviceController() called");
@@ -466,7 +466,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     // Create and start the IO thread. Must be called after Controller()->Init
     if (sIOThread == PTHREAD_NULL)
     {
-        int pthreadErr = pthread_create(&sIOThread, NULL, IOThreadMain, NULL);
+        int pthreadErr = pthread_create(&sIOThread, nullptr, IOThreadMain, nullptr);
         VerifyOrExit(pthreadErr == 0, err = CHIP_ERROR_POSIX(pthreadErr));
     }
 
@@ -475,7 +475,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (wrapper != NULL)
+        if (wrapper != nullptr)
         {
             delete wrapper;
         }
@@ -1379,7 +1379,7 @@ JNI_METHOD(void, releaseOperationalDevicePointer)(JNIEnv * env, jobject self, jl
 {
     chip::DeviceLayer::StackLock lock;
     OperationalDeviceProxy * device = reinterpret_cast<OperationalDeviceProxy *>(devicePtr);
-    if (device != NULL)
+    if (device != nullptr)
     {
         delete device;
     }
@@ -1410,7 +1410,7 @@ JNI_METHOD(void, releaseGroupDevicePointer)(JNIEnv * env, jobject self, jlong de
 {
     chip::DeviceLayer::StackLock lock;
     GroupDeviceProxy * device = reinterpret_cast<GroupDeviceProxy *>(devicePtr);
-    if (device != NULL)
+    if (device != nullptr)
     {
         delete device;
     }
@@ -1898,6 +1898,7 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
 
     if (data == nullptr)
     {
+        ChipLogError(Controller, "GetDiscoveredDevice - not found");
         return nullptr;
     }
 
@@ -1906,6 +1907,7 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
 
     jfieldID discrminatorID = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");
     jfieldID ipAddressID    = env->GetFieldID(discoveredDeviceCls, "ipAddress", "Ljava/lang/String;");
+    jfieldID portID         = env->GetFieldID(discoveredDeviceCls, "port", "I");
 
     jobject discoveredObj = env->NewObject(discoveredDeviceCls, constructor);
 
@@ -1914,12 +1916,10 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     char ipAddress[100];
     data->resolutionData.ipAddress[0].ToString(ipAddress, 100);
     jstring jniipAdress = env->NewStringUTF(ipAddress);
-    env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
 
-    if (data == nullptr)
-    {
-        ChipLogError(Controller, "GetDiscoveredDevice - not found");
-    }
+    env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
+    env->SetIntField(discoveredObj, portID, static_cast<jint>(data->resolutionData.port));
+
     return discoveredObj;
 }
 
@@ -2105,7 +2105,7 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
 
     ChipLogProgress(Controller, "deleteDeviceController() called");
 
-    if (wrapper != NULL)
+    if (wrapper != nullptr)
     {
         delete wrapper;
     }
@@ -2302,7 +2302,7 @@ void * IOThreadMain(void * arg)
     // This allows the JVM to shutdown without waiting for this thread to exit.
     attachArgs.version = JNI_VERSION_1_6;
     attachArgs.name    = (char *) "CHIP Device Controller IO Thread";
-    attachArgs.group   = NULL;
+    attachArgs.group   = nullptr;
 #ifdef __ANDROID__
     sJVM->AttachCurrentThreadAsDaemon(&env, (void *) &attachArgs);
 #else
@@ -2316,7 +2316,7 @@ void * IOThreadMain(void * arg)
     // Detach the thread from the JVM.
     sJVM->DetachCurrentThread();
 
-    return NULL;
+    return nullptr;
 }
 
 // NOTE: This function SHALL be called with the stack lock held.
@@ -2329,7 +2329,7 @@ CHIP_ERROR StopIOThread()
 
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
-        pthread_join(sIOThread, NULL);
+        pthread_join(sIOThread, nullptr);
         sIOThread = PTHREAD_NULL;
     }
 

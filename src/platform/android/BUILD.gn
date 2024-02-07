@@ -84,7 +84,10 @@ static_library("android") {
 
 source_set("inet") {
   sources = [ "InetInterfaceImpl.cpp" ]
-  deps = [ "${chip_root}/src/lib/support" ]
+  deps = [
+    "${chip_root}/src/inet:impl_header",
+    "${chip_root}/src/lib/support",
+  ]
 }
 
 android_library("java") {

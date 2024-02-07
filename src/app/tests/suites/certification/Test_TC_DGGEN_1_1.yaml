@@ -43,7 +43,6 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
           constraints:
               type: bitmap32
 
@@ -178,6 +177,6 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [2]
           constraints:
               type: list
+              contains: [2]

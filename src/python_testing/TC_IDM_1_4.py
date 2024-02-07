@@ -146,7 +146,7 @@ class TC_IDM_1_4(MatterBaseTest):
         invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
         commandRefsOverride = [1, 1]
         try:
-            result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], commandRefsOverride=commandRefsOverride)
+            await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], commandRefsOverride=commandRefsOverride)
             asserts.fail("Unexpected success return after sending two unique commands with identical CommandRef in the InvokeRequest")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidAction,
@@ -216,7 +216,7 @@ class TC_IDM_1_4(MatterBaseTest):
         # receiving a path-specific response to the same command, with the TimedRequestMessage sent before
         # the InvokeRequestMessage.
         try:
-            result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], suppressTimedRequestMessage=True)
+            await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], suppressTimedRequestMessage=True)
             asserts.fail("Unexpected success call to sending Batch command when non-path specific error expected")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.TimedRequestMismatch,
