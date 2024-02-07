@@ -595,7 +595,7 @@ uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return mDynamicEndpointFeatureMap;
+        return kEndpointFeatureMap;
     }
 
     uint32_t featureMap = 0;
