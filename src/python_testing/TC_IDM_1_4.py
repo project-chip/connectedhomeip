@@ -289,11 +289,11 @@ class TC_IDM_1_4(MatterBaseTest):
         invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
 
         try:
-            result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
+            test_only_result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
         except InteractionModelError:
             asserts.fail("DUT failed to respond to batch commands, where response is expected to be too large to fit in a single ResponseMessage")
 
-        responses = result.Responses
+        responses = test_only_result.Responses
         # This check is validating the number of InvokeResponses we got
         asserts.assert_equal(len(responses), 2, "Unexpected number of InvokeResponses sent back from DUT")
         asserts.assert_true(type_matches(
@@ -307,7 +307,7 @@ class TC_IDM_1_4(MatterBaseTest):
         # This check is validating the number of InvokeResponsesMessages we got. This is different then the earlier
         # `len(responses)` check as you can have multiple InvokeResponses in a single message. But this test step
         # is explicitly making sure that we recieved multiple ResponseMessages.
-        asserts.assert_greater_equal(result.ResponseMessageCount, 2, "DUT was expected to send multiple InvokeResponseMessages")
+        asserts.assert_greater_equal(test_only_result.ResponseMessageCount, 2, "DUT was expected to send multiple InvokeResponseMessages")
 
 
 if __name__ == "__main__":
