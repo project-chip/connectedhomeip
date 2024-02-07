@@ -23,10 +23,6 @@ chip_test_suite_using_nltest("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  sources = [
-    "TestRetransmit.h",
-  ]
-
   test_sources = [
     "TestCache.cpp",
   ]
