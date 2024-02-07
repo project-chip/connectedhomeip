@@ -146,6 +146,7 @@ chip_test_suite_using_nltest("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestOperationalDeviceProxy.cpp",
     "TestOperationalStateClusterObjects.cpp",
     "TestPendingNotificationMap.cpp",
     "TestPowerSourceCluster.cpp",
