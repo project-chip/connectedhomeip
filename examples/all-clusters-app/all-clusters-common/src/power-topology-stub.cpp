@@ -33,6 +33,7 @@ public:
     const std::vector<EndpointId> GetAvailableEndpoints() override;
     const std::vector<EndpointId> GetActiveEndpoints() override;
 
+    PowerTopologyDelegate(EndpointId aEndpointId) : Delegate(aEndpointId) {}
     ~PowerTopologyDelegate() = default;
 };
 
@@ -59,7 +60,7 @@ void emberAfPowerTopologyClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(!gInstance);
 
-    gDelegate = std::make_unique<PowerTopologyDelegate>();
+    gDelegate = std::make_unique<PowerTopologyDelegate>(endpointId);
     if (gDelegate)
     {
         gInstance = std::make_unique<Instance>(

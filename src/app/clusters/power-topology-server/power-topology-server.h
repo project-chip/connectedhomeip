@@ -35,9 +35,8 @@ using chip::Protocols::InteractionModel::Status;
 class Delegate
 {
 public:
+    Delegate(EndpointId aEndpointId) : mEndpointId(aEndpointId) {}
     virtual ~Delegate() = default;
-
-    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
     virtual const std::vector<EndpointId> GetAvailableEndpoints() = 0;
     virtual const std::vector<EndpointId> GetActiveEndpoints()    = 0;
@@ -57,12 +56,9 @@ class Instance : public AttributeAccessInterface
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
              BitMask<OptionalAttributes> aOptionalAttributes) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
-        mOptionalAttrs(aOptionalAttributes)
-    {
-        /* set the base class delegates endpointId */
-        mDelegate.SetEndpointId(aEndpointId);
-    }
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
+        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes)
+    {}
     ~Instance() { Shutdown(); }
 
     CHIP_ERROR Init();
