@@ -43,8 +43,8 @@ tests:
       PICS: "!DGGEN.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
-      value: 0
       response:
+          value: 0
           constraints:
               type: bitmap32
 
@@ -52,8 +52,8 @@ tests:
       PICS: DGGEN.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
-      value: 1
       response:
+          value: 1
           constraints:
               type: bitmap32
 
