@@ -89,7 +89,6 @@ tests:
       response:
           value: beforeRebootICDCounter + 101
 
-
     - label: "Unregister Client Registered During Commissioning"
       command: "UnregisterClient"
       arguments:
