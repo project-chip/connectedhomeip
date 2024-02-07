@@ -186,7 +186,7 @@ class TestCommissioner(CHIPVirtualHome):
                 CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[3]['discriminator'],
-            "2145",
+            "20054912334",
             servers[3]['nodeid'],
             TEST_DISCOVERY_TYPE[1])
         ret = self.execute_device_cmd(req_device_id, command)
