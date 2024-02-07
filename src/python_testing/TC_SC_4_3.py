@@ -197,7 +197,7 @@ class TC_SC_4_3(MatterBaseTest):
         if supports_icd and not supports_lit:
             sit_mode = True
 
-        if supports_lit and supports_lit:
+        if supports_icd and supports_lit:
             if icd_value == 0:
                 sit_mode = True
             else:
