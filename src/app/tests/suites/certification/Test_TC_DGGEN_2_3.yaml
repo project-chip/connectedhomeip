@@ -122,6 +122,5 @@ tests:
                 value: 0x1
               - name: "Count"
                 value: 1
-      command: "TestEventTrigger"
       response:
           error: CONSTRAINT_ERROR
