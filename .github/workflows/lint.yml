@@ -127,7 +127,6 @@ jobs:
                      --known-failure app/server/AppDelegate.h \
                      --known-failure app/TestEventTriggerDelegate.h \
                      --known-failure app/tests/suites/credentials/TestHarnessDACProvider.h \
-                     --known-failure app/tests/TestOperationalDeviceProxy.cpp \
                      --known-failure app/util/af-enums.h \
                      --known-failure app/util/af.h \
                      --known-failure app/util/af-types.h \
