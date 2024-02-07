@@ -1,17 +1,5 @@
 # Python framework tests
 
-This file is a placeholder for python framework test information.
-
-NOTE: be sure to include information about how you need to commission with the
-python controller, not chip-tool and how to do that in the scripts
-
-Note - go through the docs in the readme and move them over here, and take out
-the deprecated stuff
-
-Note - add notes about record error and fail test vs. asserts
-
----
-
 The python test framework is built on top of the ChipDeviceCtrl.py python
 controller API and the mobly test framework. Python tests are interaction tests,
 and can be used for certification testing, and / or integration testing in the
@@ -25,7 +13,7 @@ Python tests located in src/python_testing
     sample test showing test setup and test harness integration
 -   [https://github.com/google/mobly/blob/master/docs/tutorial.md](https://github.com/google/mobly/blob/master/docs/tutorial.md)
 -   [ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/ChipDeviceCtrl.py) -
-    Controller implementation with API documentation
+    Controller implementation ([API documentation](./ChipDeviceCtrlAPI.md))
 -   [scripts/tests/run_python_test.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/run_python_test.py)
     to easily set up app and script for testing - used in CI
 
@@ -408,6 +396,25 @@ reference.
     -   if the test is exceptionally long running, define a property function
         `default_timeout` to adjust the timeout. The default is 90 seconds
 
+Deferred failures: For some tests, it makes sense to perform the entire test
+before failing and collect all the errors so the developers can address all the
+failures without needing to re-run the test multiple times. For example, tests
+that look at every attribute on the cluster and perform independent operations
+on them etc.
+
+For such tests, use the ProblemNotice format and the convenience functions:
+
+-   self.record_error
+-   self.record_warning
+
+These functions keep track of the problems, and will print them at the end of
+the test. The test will not be failed until the assert is called.
+
+A good example of this type of test can be found in the device basic composition
+tests, where all the test steps are independent and performed on a single read.
+See
+[Device Basic Composition tests](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceBasicComposition.py)
+
 ## Command line arguments
 
 -   Use help to get a full list
@@ -476,10 +483,13 @@ second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
 You can run the python script as-is for local testing against an already-running
 DUT
 
-./scripts/tests/run_python_test.py is a convenient script to fire up an example
-DUT on the host, with factory reset support
+`./scripts/tests/run_python_test.py` is a convenient script to fire up an
+example DUT on the host, with factory reset support
 
 `./scripts/tests/run_python_test.py --factoryreset --app <your_app> --app-args "whatever" --script <your_script> --script-args "whatever"`
+
+Note that devices must be commissioned by the python test harness to run tests.
+chip-tool and the python test harness DO NOT share a fabric.
 
 # Running tests in CI
 
