@@ -232,6 +232,29 @@ class MdnsDiscovery:
 
         return self._discovered_services
 
+    async def get_service_types(self, log_output: bool = False) -> List[str]:
+        """
+        Asynchronously discovers all available mDNS services within the network and returns a list
+        of the service types discovered. This method utilizes the AsyncZeroconfServiceTypes.async_find()
+        function to perform the network scan for mDNS services.
+
+        Args:
+            log_output (bool): If set to True, the discovered service types are logged to the console.
+                            This can be useful for debugging or informational purposes. Defaults to False.
+
+        Returns:
+            List[str]: A list containing the service types (str) of the discovered mDNS services. Each
+                    element in the list is a string representing a unique type of service found during
+                    the discovery process.
+        """
+        
+        discovered_services = list(await AsyncZeroconfServiceTypes.async_find())
+        
+        if log_output:
+            print(f"MDNS discovered service types: {discovered_services}")
+
+        return discovered_services
+
     # Private methods
     async def _discover(self,
                         discovery_timeout_sec: float,
