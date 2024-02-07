@@ -247,9 +247,9 @@ class MdnsDiscovery:
                     element in the list is a string representing a unique type of service found during
                     the discovery process.
         """
-        
+
         discovered_services = list(await AsyncZeroconfServiceTypes.async_find())
-        
+
         if log_output:
             print(f"MDNS discovered service types: {discovered_services}")
 
