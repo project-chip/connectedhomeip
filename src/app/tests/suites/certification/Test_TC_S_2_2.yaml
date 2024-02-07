@@ -344,7 +344,6 @@ tests:
               type: int16u
 
     - label: "Step 3d: TH reads attribute FabricSceneInfo from DUT"
-      PICS: PICS_SDK_CI_ONLY
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
@@ -753,7 +752,7 @@ tests:
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 70 000 000 (70 000s) and no extension field sets. This should fail
           and return a status of 0x85 (INVALID_COMMAND)."
-      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
+      PICS: S.S.C00.Rsp
       command: "AddScene"
       arguments:
           values:
@@ -781,7 +780,7 @@ tests:
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 60 000 001 (60 000.001s) and no extension field sets. This should
           fail and return a status of 0x85 (INVALID_COMMAND)."
-      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
+      PICS: S.S.C00.Rsp
       command: "AddScene"
       arguments:
           values:
