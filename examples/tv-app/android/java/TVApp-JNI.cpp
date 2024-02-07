@@ -34,6 +34,7 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <controller/CHIPCluster.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
@@ -215,7 +216,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
                                 const SessionHandle & sessionHandle) override
     {
         // read current binding list
-        chip::Controller::BaseCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+        chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
         cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
 
