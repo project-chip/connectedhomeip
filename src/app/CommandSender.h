@@ -233,6 +233,8 @@ public:
         // Currently, provided commandRefs for the first request must start at 0 and increment by one
         // for each subsequent request. This requirement can be relaxed in the future if a compelling
         // need arises.
+        // TODO(#30453): After introducing Request/Response tracking, remove statement above about
+        // this currently enforced requirement on commandRefs.
         Optional<uint16_t> commandRef;
         // If the InvokeRequest needs to be in a state with a started data TLV struct container
         bool startDataStruct = false;
@@ -268,7 +270,8 @@ public:
         // invoke. CommandSender will use the minimum of all provided timeouts for execution.
         const Optional<uint16_t> timedInvokeTimeoutMs;
         // The command reference is required when sending multiple commands. It allows the caller
-        // to associate this request with its corresponding response.
+        // to associate this request with its corresponding response. This value must be
+        // the same as the one provided in PrepareCommandParameters when calling PrepareCommand.
         Optional<uint16_t> commandRef;
         // If InvokeRequest is in a state where the data TLV struct container is currently open
         // and FinishCommand should close it.
