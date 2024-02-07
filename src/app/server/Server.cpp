@@ -439,7 +439,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // Only Trigger Check-In messages if we are not in the middle of a commissioning.
         // This check is only necessary for the first commissioiner since the kServerReady event
-        // is called once we join the network.
+        // is triggered once we join the network.
         // We trigger Check-In messages before resuming subscriptions to avoid doing both.
         if (!mFailSafeContext.IsFailSafeArmed())
         {

@@ -550,9 +550,9 @@ void ICDManager::TriggerCheckInMessages()
 {
     VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
 
-    // Check if we have any Check-In messages to send
-    // We have Check-In messages to send. Transition the device to active mode.
-    // We don't have any Check-In messages to send. Transition the device to idle mode.
+    // Check if we have any Check-In messages to send.
+    // If we have Check-In messages to send, transition the device to active mode.
+    // If we don't have any Check-In messages to send, leave the device in or transition it to idle mode.
     mOperationalState = CheckInMessagesWouldBeSent() ? OperationalState::IdleMode : OperationalState::ActiveMode;
     UpdateOperationState(TOGGLE_STATE(mOperationalState));
 }
