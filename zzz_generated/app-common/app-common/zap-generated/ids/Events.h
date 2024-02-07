@@ -407,6 +407,16 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace ValveConfigurationAndControl
 
+namespace ElectricalPowerMeasurement {
+namespace Events {
+
+namespace MeasurementPeriodRanges {
+static constexpr EventId Id = 0x00000000;
+} // namespace MeasurementPeriodRanges
+
+} // namespace Events
+} // namespace ElectricalPowerMeasurement
+
 namespace ElectricalEnergyMeasurement {
 namespace Events {
 

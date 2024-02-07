@@ -85,6 +85,7 @@ ti_simplelink_executable("air-purifier_app") {
     "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-purifier-manager.cpp",
     "${chip_root}/examples/air-purifier-app/air-purifier-common/src/air-quality-sensor-manager.cpp",
     "${chip_root}/examples/air-purifier-app/air-purifier-common/src/filter-delegates.cpp",
+    "${chip_root}/examples/air-purifier-app/air-purifier-common/src/thermostat-manager.cpp",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/CHIPDeviceManager.cpp",
     "${project_dir}/main/CXXExceptionStubs.cpp",

@@ -86,6 +86,10 @@ if [ "$#" == "0" ]; then
         chip_enable_icd_server
             Configure has a Intermitently connected device. (Default false)
             Must also set chip_openthread_ftd=false
+        enable_synchronized_sed
+            Enable Synchronized Sleepy end device. (Default false)
+            Must also set chip_enable_icd_server=true chip_openthread_ftd=false
+            --icd can be used to configure both arguments
         use_rs9116
             Build wifi example with extension board rs9116. (Default false)
         use_SiWx917

@@ -183,6 +183,7 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
     MATTER_TRACE_SCOPE("OnSessionEstablishmentError", "CASEServer");
     ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
 
+    MATTER_TRACE_SCOPE("CASEFail", "CASESession");
     PrepareForSessionEstablishment();
 }
 
