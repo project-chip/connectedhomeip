@@ -49,7 +49,7 @@ using chip::Protocols::InteractionModel::Status;
 using LoggedOutEvent = chip::app::Clusters::AccountLogin::Events::LoggedOut::Type;
 
 static constexpr size_t kAccountLoginDeletageTableSize =
-    EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kAccountLoginDeletageTableSize <= kEmberInvalidEndpointIndex, "AccountLogin Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogProgress(Zcl, "AccountLogin NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, AccountLogin::Id, EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, AccountLogin::Id, MATTER_DM_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kAccountLoginDeletageTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -95,7 +95,7 @@ namespace AccountLogin {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, AccountLogin::Id, EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, AccountLogin::Id, MATTER_DM_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kAccountLoginDeletageTableSize)
     {
