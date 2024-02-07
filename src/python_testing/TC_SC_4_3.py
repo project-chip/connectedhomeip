@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import ipaddress
 import logging
 import re
 
@@ -78,7 +79,7 @@ class TC_SC_4_3(MatterBaseTest):
         return service_name
 
     @staticmethod
-    def verify_decimal_value(input_value, comparison_value: int):
+    def verify_decimal_value(input_value, max_value: int):
         try:
             input_float = float(input_value)
             input_int = int(input_float)
@@ -89,7 +90,7 @@ class TC_SC_4_3(MatterBaseTest):
             if input_float != input_int:
                 return (False, f"Input ({input_value}) is not an integer.")
 
-            if input_int <= comparison_value:
+            if input_int <= max_value:
                 return (True, f"Input ({input_value}) is valid.")
             else:
                 return (False, f"Input ({input_value}) exceeds the allowed value {comparison_value}.")
@@ -117,13 +118,15 @@ class TC_SC_4_3(MatterBaseTest):
 
     @staticmethod
     def contains_ipv6_address(addresses):
-        # IPv6 pattern for basic validation
-        ipv6_pattern = re.compile(r'(?:(?:[0-9a-fA-F]{1,4}:){7}(?:[0-9a-fA-F]{1,4}|:))|(?:[0-9a-fA-F]{1,4}:){6}(?::[0-9a-fA-F]{1,4}|(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|:)|(?:[0-9a-fA-F]{1,4}:){5}(?:(?::[0-9a-fA-F]{1,4}){1,2}|:((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|:)|(?:[0-9a-fA-F]{1,4}:){4}(?:(?::[0-9a-fA-F]{1,4}){1,3}|:((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|:)|(?:[0-9a-fA-F]{1,4}:){3}(?:(?::[0-9a-fA-F]{1,4}){1,4}|:((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|:)|(?:[0-9a-fA-F]{1,4}:){2}(?:(?::[0-9a-fA-F]{1,4}){1,5}|:((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|:)|(?:[0-9a-fA-F]{1,4}:){1}(?:(?::[0-9a-fA-F]{1,4}){1,6}|:((?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|:)|(?::(?::[0-9a-fA-F]{1,4}){1,7}|:)', re.VERBOSE)
-
         for address in addresses:
-            if ipv6_pattern.match(address):
+            try:
+                # Attempt to create an IPv6 address object. If successful, this is an IPv6 address.
+                ipaddress.IPv6Address(address)
                 return True, "At least one IPv6 address is present."
-
+            except ipaddress.AddressValueError:
+                # If an AddressValueError is raised, the current address is not a valid IPv6 address.
+                # The loop will continue to the next address.
+                continue
         return False, "No IPv6 addresses found."
 
     @async_test_body
