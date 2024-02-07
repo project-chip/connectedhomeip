@@ -27,9 +27,11 @@ using MessagePriorityEnum   = chip::app::Clusters::Messages::MessagePriorityEnum
 using MessageControlBitmap  = chip::app::Clusters::Messages::MessageControlBitmap;
 using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type;
 using Message               = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
+
 class MessagesManager : public MessagesDelegate
 {
 public:
+    MessagesManager();
     // Commands
     void HandlePresentMessagesRequest(
         const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
