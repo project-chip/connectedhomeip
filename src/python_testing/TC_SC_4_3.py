@@ -20,9 +20,9 @@ import re
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 
+from mobly import asserts
 
 '''
 Category
@@ -35,6 +35,7 @@ and can advertise its services in a Matter network.
 Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#343-tc-sc-43-discovery-dut_commissionee
 '''
+
 
 class TC_SC_4_3(MatterBaseTest):
 
@@ -49,6 +50,7 @@ class TC_SC_4_3(MatterBaseTest):
             cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.ServerList
         )
+
     async def get_idle_mode_threshhold_ms(self):
         return await self.read_single_attribute_check_success(
             endpoint=0,
@@ -56,6 +58,7 @@ class TC_SC_4_3(MatterBaseTest):
             cluster=Clusters.IcdManagement,
             attribute=Clusters.IcdManagement.Attributes.ActiveModeThreshold
         )
+
     async def get_icd_feature_map(self):
         return await self.read_single_attribute_check_success(
             endpoint=0,
@@ -63,15 +66,18 @@ class TC_SC_4_3(MatterBaseTest):
             cluster=Clusters.IcdManagement,
             attribute=Clusters.IcdManagement.Attributes.FeatureMap
         )
+
     def get_dut_instance_name(self) -> str:
         node_id = self.dut_node_id
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
         return instance_name
+
     def get_operational_subtype(self) -> str:
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         service_name = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
         return service_name
+
     @staticmethod
     def verify_decimal_value(input_value, comparison_value: int):
         try:
@@ -90,6 +96,7 @@ class TC_SC_4_3(MatterBaseTest):
                 return (False, f"Input ({input_value}) exceeds the allowed value {comparison_value}.")
         except ValueError:
             return (False, f"Input ({input_value}) is not a valid decimal number.")
+
     def verify_t_value(self, t_value):
         # Verify t_value is a decimal number without leading zeros and less than or equal to 6
         try:
@@ -100,7 +107,7 @@ class TC_SC_4_3(MatterBaseTest):
                 return False, f"T value ({t_value}) has leading zeros."
             if T_int != float(t_value):
                 return False, f"T value ({t_value}) is not an integer."
-            
+
             # Convert to bitmap and verify bit 0 is clear
             if T_int & 1 == 0:
                 return True, f"T value ({t_value}) is valid and bit 0 is clear."
@@ -108,6 +115,7 @@ class TC_SC_4_3(MatterBaseTest):
                 return False, f"Bit 0 is not clear. T value ({t_value})"
         except ValueError:
             return False, "T value ({t_value}) is not a valid decimal number."
+
     @staticmethod
     def contains_ipv6_address(addresses):
         # IPv6 pattern for basic validation
@@ -118,7 +126,7 @@ class TC_SC_4_3(MatterBaseTest):
                 return True, "At least one IPv6 address is present."
 
         return False, "No IPv6 addresses found."
-    
+
     @async_test_body
     async def test_TC_SC_4_3(self):
         print(f"\n"*10)
@@ -132,7 +140,7 @@ class TC_SC_4_3(MatterBaseTest):
 
         # *** STEP 1 ***
         self.print_step("1", "DUT is commissioned on the same fabric as TH.")
-        
+
         # *** STEP 2 ***
         self.print_step("2", "TH reads ServerList attribute from the Descriptor cluster on EP0. If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to true, otherwise set supports_icd to false.")
         ep0_servers = await self.get_descriptor_server_list()
@@ -142,7 +150,8 @@ class TC_SC_4_3(MatterBaseTest):
         logging.info(f"\n\n\tsupports_icd: {supports_icd}\n\n")
 
         # *** STEP 3 ***
-        self.print_step("3", "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.")
+        self.print_step(
+            "3", "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.")
         if supports_icd:
             active_mode_threshold_ms = await self.get_idle_mode_threshhold_ms()
         logging.info(f"\n\n\tactive_mode_threshold_ms: {active_mode_threshold_ms}\n\n")
@@ -159,10 +168,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.print_step("5", "TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.")
         instance_name = self.get_dut_instance_name()
 
-
-
         # PENDING STEPS 6-8
-
 
         mdns = MdnsDiscovery()
         operational = await mdns.get_operational_service(
@@ -222,7 +228,8 @@ class TC_SC_4_3(MatterBaseTest):
 
         # SAT TXT KEY
         if 'SAT' in operational.txt_record:
-            logging.info(f"SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
+            logging.info(
+                f"SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
             sat_value = operational.txt_record['SAT']
             result, message = self.verify_decimal_value(sat_value, self.MAX_SAT_VALUE)
             asserts.assert_true(result, message)
