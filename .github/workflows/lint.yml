@@ -42,6 +42,166 @@ jobs:
               with:
                 platform: linux
 
+            - name: Check for orphaned gn files
+              if: always()
+              # We should enforce that ALL new files are referenced in our build scripts.
+              # Several things do not have a clear fix path:
+              #   - various platform implementations (including darwin-specific files as they
+              #     are not using GN)
+              #   - app/clusters (they are fetched dynamically - this should probably be fixed)
+              #
+              # All the rest of the exceptions should be driven down to 0: chip should fully
+              # be defined in build rules.
+              #
+              # This check enforces that for any newly added file, it must be part of some
+              # BUILD.gn file
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/tools/not_known_to_gn.py \
+                     src \
+                     --skip-dir app/clusters \
+                     --skip-dir darwin \
+                     --skip-dir include \
+                     --skip-dir platform/Ameba \
+                     --skip-dir platform/android \
+                     --skip-dir platform/ASR \
+                     --skip-dir platform/Beken \
+                     --skip-dir platform/bouffalolab \
+                     --skip-dir platform/cc13xx_26xx \
+                     --skip-dir platform/cc32xx \
+                     --skip-dir platform/Darwin \
+                     --skip-dir platform/ESP32 \
+                     --skip-dir platform/fake \
+                     --skip-dir platform/FreeRTOS \
+                     --skip-dir platform/Infineon \
+                     --skip-dir platform/Linux \
+                     --skip-dir platform/mbed \
+                     --skip-dir platform/mt793x \
+                     --skip-dir platform/nxp \
+                     --skip-dir platform/OpenThread \
+                     --skip-dir platform/qpg \
+                     --skip-dir platform/silabs \
+                     --skip-dir platform/telink \
+                     --skip-dir platform/webos \
+                     --skip-dir platform/Zephyr \
+                     --skip-dir test_driver \
+                     --known-failure app/app-platform/ContentApp.cpp \
+                     --known-failure app/app-platform/ContentApp.h \
+                     --known-failure app/app-platform/ContentAppPlatform.cpp \
+                     --known-failure app/app-platform/ContentAppPlatform.h \
+                     --known-failure controller/ExamplePersistentStorage.cpp \
+                     --known-failure controller/ExamplePersistentStorage.h \
+                     --known-failure controller/java/GroupDeviceProxy.h \
+                     --known-failure controller/java/CHIPEventTLVValueDecoder.h \
+                     --known-failure controller/python/chip/credentials/cert.h \
+                     --known-failure controller/python/chip/server/Options.h \
+                     --known-failure controller/python/chip/crypto/p256keypair.h \
+                     --known-failure controller/python/chip/commissioning/PlaceholderOperationalCredentialsIssuer.h \
+                     --known-failure controller/python/chip/native/PyChipError.h \
+                     --known-failure app/AttributeAccessInterface.h \
+                     --known-failure app/AttributeAccessToken.h \
+                     --known-failure app/att-storage.h \
+                     --known-failure app/BufferedReadCallback.h \
+                     --known-failure app/CommandHandler.h \
+                     --known-failure app/CommandHandlerInterface.h \
+                     --known-failure app/CommandPathParams.h \
+                     --known-failure app/CommandPathRegistry.h \
+                     --known-failure app/CommandResponseSender.h \
+                     --known-failure app/CommandSender.h \
+                     --known-failure app/CommandSenderLegacyCallback.h \
+                     --known-failure app/CompatEnumNames.h \
+                     --known-failure app/ConcreteAttributePath.h \
+                     --known-failure app/ConcreteCommandPath.h \
+                     --known-failure app/data-model/ListLargeSystemExtensions.h \
+                     --known-failure app/EventHeader.h \
+                     --known-failure app/EventLoggingDelegate.h \
+                     --known-failure app/EventLogging.h \
+                     --known-failure app/EventLoggingTypes.h \
+                     --known-failure app/EventManagement.h \
+                     --known-failure app/InteractionModelHelper.h \
+                     --known-failure app/MessageDef/ArrayBuilder.h \
+                     --known-failure app/MessageDef/ArrayParser.h \
+                     --known-failure app/MessageDef/CommandDataIB.h \
+                     --known-failure app/MessageDef/CommandPathIB.h \
+                     --known-failure app/MessageDef/CommandStatusIB.h \
+                     --known-failure app/MessageDef/EventFilterIB.h \
+                     --known-failure app/MessageDef/EventFilterIBs.h \
+                     --known-failure app/MessageDef/InvokeRequestMessage.h \
+                     --known-failure app/MessageDef/InvokeRequests.h \
+                     --known-failure app/MessageDef/InvokeResponseIB.h \
+                     --known-failure app/MessageDef/InvokeResponseIBs.h \
+                     --known-failure app/MessageDef/InvokeResponseMessage.h \
+                     --known-failure app/MessageDef/ListBuilder.h \
+                     --known-failure app/MessageDef/ListParser.h \
+                     --known-failure app/MessageDef/StatusResponseMessage.h \
+                     --known-failure app/MessageDef/StructBuilder.h \
+                     --known-failure app/MessageDef/StructParser.h \
+                     --known-failure app/MessageDef/SubscribeRequestMessage.h \
+                     --known-failure app/MessageDef/SubscribeResponseMessage.h \
+                     --known-failure app/MessageDef/TimedRequestMessage.h \
+                     --known-failure app/MessageDef/WriteRequestMessage.h \
+                     --known-failure app/MessageDef/WriteResponseMessage.h \
+                     --known-failure app/ObjectList.h \
+                     --known-failure app/ReadClient.h \
+                     --known-failure app/ReadHandler.h \
+                     --known-failure app/ReadPrepareParams.h \
+                     --known-failure app/reporting/tests/MockReportScheduler.cpp \
+                     --known-failure app/reporting/tests/MockReportScheduler.h \
+                     --known-failure app/server/AppDelegate.h \
+                     --known-failure app/TestEventTriggerDelegate.h \
+                     --known-failure app/tests/integration/common.h \
+                     --known-failure app/tests/integration/MockEvents.h \
+                     --known-failure app/tests/suites/credentials/TestHarnessDACProvider.h \
+                     --known-failure app/tests/TestOperationalDeviceProxy.cpp \
+                     --known-failure app/util/af-enums.h \
+                     --known-failure app/util/af.h \
+                     --known-failure app/util/af-types.h \
+                     --known-failure app/util/attribute-metadata.h \
+                     --known-failure app/util/attribute-storage.cpp \
+                     --known-failure app/util/attribute-storage.h \
+                     --known-failure app/util/attribute-storage-null-handling.h \
+                     --known-failure app/util/attribute-table.cpp \
+                     --known-failure app/util/attribute-table.h \
+                     --known-failure app/util/binding-table.cpp \
+                     --known-failure app/util/binding-table.h \
+                     --known-failure app/util/common.h \
+                     --known-failure app/util/config.h \
+                     --known-failure app/util/DataModelHandler.cpp \
+                     --known-failure app/util/DataModelHandler.h \
+                     --known-failure app/util/ember-compatibility-functions.cpp \
+                     --known-failure app/util/endpoint-config-api.h \
+                     --known-failure app/util/endpoint-config-defines.h \
+                     --known-failure app/util/error-mapping.h \
+                     --known-failure app/util/generic-callbacks.h \
+                     --known-failure app/util/generic-callback-stubs.cpp \
+                     --known-failure app/util/im-client-callbacks.h \
+                     --known-failure app/util/MatterCallbacks.h \
+                     --known-failure app/util/message.cpp \
+                     --known-failure app/util/mock/Constants.h \
+                     --known-failure app/util/mock/Functions.h \
+                     --known-failure app/util/mock/MockNodeConfig.h \
+                     --known-failure app/util/odd-sized-integers.h \
+                     --known-failure app/util/types_stub.h \
+                     --known-failure app/util/util.cpp \
+                     --known-failure app/util/util.h \
+                     --known-failure app/WriteClient.h \
+                     --known-failure app/WriteHandler.h \
+                     --known-failure inet/tests/TestInetLayerCommon.hpp \
+                     --known-failure lib/core/CHIPVendorIdentifiers.hpp \
+                     --known-failure lib/dnssd/Constants.h \
+                     --known-failure lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h \
+                     --known-failure lib/dnssd/minimal_mdns/core/HeapQName.h \
+                     --known-failure lib/dnssd/minimal_mdns/ListenIterator.h \
+                     --known-failure lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h \
+                     --known-failure lib/dnssd/platform/DnssdBrowseDelegate.h \
+                     --known-failure lib/support/CHIPArgParser.hpp \
+                     --known-failure messaging/tests/echo/common.h \
+                     --known-failure platform/DeviceSafeQueue.cpp \
+                     --known-failure platform/DeviceSafeQueue.h \
+                     --known-failure platform/GLibTypeDeleter.h \
+                     --known-failure platform/SingletonConfigurationManager.cpp \
+                     --known-failure transport/retransmit/tests/TestCacheDriver.cpp \
+                  "
+
             - name: Check for matter lint errors
               if: always()
               run: |
