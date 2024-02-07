@@ -79,7 +79,7 @@ class DummyServiceListener(ServiceListener):
     """
     A service listener required for the TXT record data to get populated and come back
     """
-    
+
     def add_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
         pass
 
