@@ -113,7 +113,7 @@ class TC_SC_4_3(MatterBaseTest):
             else:
                 return False, f"Bit 0 is not clear. T value ({t_value})"
         except ValueError:
-            return False, "T value ({t_value}) is not a valid decimal number."
+            return False, f"T value ({t_value}) is not a valid decimal number."
 
     @staticmethod
     def contains_ipv6_address(addresses):
@@ -128,7 +128,7 @@ class TC_SC_4_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_4_3(self):
-        print(f"\n"*10)
+        print("\n"*10)
 
         supports_icd = None
         supports_lit = None
@@ -181,7 +181,7 @@ class TC_SC_4_3(MatterBaseTest):
 
         # ICD TXT KEY
         if supports_lit:
-            logging.info(f"supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII).")
+            logging.info("supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII).")
 
             # Verify the ICD key IS present
             asserts.assert_in('ICD', operational.txt_record, "ICD key is NOT present in the TXT record.")
@@ -190,7 +190,7 @@ class TC_SC_4_3(MatterBaseTest):
             icd_value = int(operational.txt_record['ICD'])
             asserts.assert_true(icd_value == 0 or icd_value == 1, "ICD value is different than 0 or 1 (ASCII).")
         else:
-            logging.info(f"supports_lit is false, verify that the ICD key is NOT present in the TXT record.")
+            logging.info("supports_lit is false, verify that the ICD key is NOT present in the TXT record.")
             asserts.assert_not_in('ICD', operational.txt_record, "ICD key is present in the TXT record.")
 
         # SII TXT KEY
@@ -207,20 +207,20 @@ class TC_SC_4_3(MatterBaseTest):
             sit_mode = False
 
         if sit_mode:
-            logging.info(f"sit_mode is True, verify the SII key IS present.")
+            logging.info("sit_mode is True, verify the SII key IS present.")
             asserts.assert_in('SII', operational.txt_record, "SII key is NOT present in the TXT record.")
 
-            logging.info(f"Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
+            logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             sii_value = operational.txt_record['SII']
             result, message = self.verify_decimal_value(sii_value, self.ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
 
         # SAI TXT KEY
         if supports_icd:
-            logging.info(f"supports_icd is True, verify the SAI key IS present.")
+            logging.info("supports_icd is True, verify the SAI key IS present.")
             asserts.assert_in('SAI', operational.txt_record, "SAI key is NOT present in the TXT record.")
 
-            logging.info(f"Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
+            logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
             sai_value = operational.txt_record['SAI']
             result, message = self.verify_decimal_value(sai_value, self.ONE_HOUR_IN_MS)
             asserts.assert_true(result, message)
@@ -228,13 +228,13 @@ class TC_SC_4_3(MatterBaseTest):
         # SAT TXT KEY
         if 'SAT' in operational.txt_record:
             logging.info(
-                f"SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
+                "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
             sat_value = operational.txt_record['SAT']
             result, message = self.verify_decimal_value(sat_value, self.MAX_SAT_VALUE)
             asserts.assert_true(result, message)
 
             if supports_icd:
-                logging.info(f"supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
+                logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
                 asserts.assert_equal(int(sat_value), active_mode_threshold_ms)
 
         # # T TXT KEY
@@ -245,7 +245,7 @@ class TC_SC_4_3(MatterBaseTest):
         #     asserts.assert_true(result, message)
 
         # AAAA
-        logging.info(f"Verify the AAAA record contains at least one IPv6 address")
+        logging.info("Verify the AAAA record contains at least one IPv6 address")
         result, message = self.contains_ipv6_address(operational.addresses)
         asserts.assert_true(result, message)
 
@@ -255,7 +255,7 @@ class TC_SC_4_3(MatterBaseTest):
         op_sub_type = self.get_operational_subtype()
         asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}'")
 
-        print(f"\n"*10)
+        print("\n"*10)
 
 
 if __name__ == "__main__":
