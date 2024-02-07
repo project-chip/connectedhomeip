@@ -130,6 +130,13 @@ menu "CHIP Core"
             help
                 Some device types don't require the read client. Enabling this option may save some flash/ram.
 
+        config ENABLE_PERSIST_SUBSCRIPTIONS
+            bool "Enable persist subscriptions"
+            default y
+            help
+                Enable persist subscriptions to make the device resume the subscriptions from the persist
+                subscriptions information after reboot.
+
         config BUILD_CHIP_TESTS
             bool "Build CHIP tests"
             default n
@@ -201,6 +208,13 @@ menu "CHIP Core"
             default y
             help
                 Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
+
+        config ENABLE_ENDPOINT_QUEUE_FILTER
+            bool "Enable UDP Endpoint queue filter for mDNS Broadcast packets"
+            depends on USE_MINIMAL_MDNS
+            default y
+            help
+                Enable this option to start a UDP Endpoint queue filter for mDNS Broadcast packets
 
         config ENABLE_LWIP_THREAD_SAFETY
             bool "Enable LwIP Thread safety options"
@@ -1037,6 +1051,12 @@ menu "CHIP Device Layer"
 	     (Component config --> Log output --> Default log verbosity --> Debug)
 
     endmenu
+
+    config CHIP_ENABLE_BDX_LOG_TRANSFER
+        bool "Enable BDX log transfer"
+        default n
+        help
+            Enables the BDX protocol for diagnostics log transfer
 
     menu "Matter OTA Image"
 

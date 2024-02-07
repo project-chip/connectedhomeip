@@ -590,6 +590,15 @@ static BOOL CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(Attribu
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInElectricalPowerMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalPowerMeasurement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalEnergyMeasurement;
@@ -602,6 +611,15 @@ static BOOL CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(Attribut
 static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInMessagesCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Messages;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1296,11 +1314,17 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ValveConfigurationAndControl::Id: {
         return CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(commandID);
     }
+    case Clusters::ElectricalPowerMeasurement::Id: {
+        return CommandNeedsTimedInvokeInElectricalPowerMeasurementCluster(commandID);
+    }
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(commandID);
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
+    }
+    case Clusters::Messages::Id: {
+        return CommandNeedsTimedInvokeInMessagesCluster(commandID);
     }
     case Clusters::DeviceEnergyManagement::Id: {
         return CommandNeedsTimedInvokeInDeviceEnergyManagementCluster(commandID);

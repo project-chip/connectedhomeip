@@ -54,6 +54,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
 #include "BluezConnection.h"
@@ -69,11 +70,11 @@ public:
     BluezEndpoint()  = default;
     ~BluezEndpoint() = default;
 
-    CHIP_ERROR Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName);
+    CHIP_ERROR Init(bool aIsCentral, uint32_t aAdapterId);
+    CHIP_ERROR Init(bool aIsCentral, const char * apBleAddr);
     void Shutdown();
 
     BluezAdapter1 * GetAdapter() const { return mpAdapter; }
-    const char * GetAdapterName() const { return mpAdapterName; }
 
     CHIP_ERROR RegisterGattApplication();
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mpRoot; }
@@ -127,12 +128,8 @@ private:
     bool mIsCentral     = false;
     bool mIsInitialized = false;
 
-    // Bus owning name
-    char * mpOwningName = nullptr;
-
     // Adapter properties
     uint32_t mAdapterId  = 0;
-    char * mpAdapterName = nullptr;
     char * mpAdapterAddr = nullptr;
 
     // Paths for objects published by this service
@@ -153,8 +150,8 @@ private:
     BluezGattCharacteristic1 * mpC3 = nullptr;
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
-    GCancellable * mpConnectCancellable = nullptr;
-    char * mpPeerDevicePath             = nullptr;
+    GAutoPtr<GCancellable> mConnectCancellable;
+    char * mpPeerDevicePath = nullptr;
 
     // Allow BluezConnection to access our private members
     friend class BluezConnection;

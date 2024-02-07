@@ -10,7 +10,7 @@ This example demonstrates the Matter air purifier application on Ameba platform.
     -   [Commissioning](#commissioning)
         -   [BLE mode](#ble-mode)
         -   [IP mode](#ip-mode)
-    -   [Cluster control](#cluster-control)
+    -   [Cluster Control](#cluster-control)
 
 ---
 
@@ -106,6 +106,7 @@ follows:
 -   Air quality sensor on endpoint 2
 -   Temperature sensor on endpoint 3
 -   Relative humidity sensor on endpoint 4
+-   Thermostat on endpoint 5
 
 Example commands using the chip tool:
 

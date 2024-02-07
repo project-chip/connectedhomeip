@@ -29,6 +29,7 @@ static_library("discovery") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/common:simulated",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
   ]

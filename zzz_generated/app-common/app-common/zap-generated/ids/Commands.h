@@ -368,6 +368,14 @@ namespace TimeSnapshotResponse {
 static constexpr CommandId Id = 0x00000002;
 } // namespace TimeSnapshotResponse
 
+namespace PayloadTestRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace PayloadTestRequest
+
+namespace PayloadTestResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace PayloadTestResponse
+
 } // namespace Commands
 } // namespace GeneralDiagnostics
 
@@ -792,14 +800,6 @@ namespace Pause {
 static constexpr CommandId Id = 0x00000000;
 } // namespace Pause
 
-namespace Stop {
-static constexpr CommandId Id = 0x00000001;
-} // namespace Stop
-
-namespace Start {
-static constexpr CommandId Id = 0x00000002;
-} // namespace Start
-
 namespace Resume {
 static constexpr CommandId Id = 0x00000003;
 } // namespace Resume
@@ -954,6 +954,20 @@ static constexpr CommandId Id = 0x00000004;
 
 } // namespace Commands
 } // namespace DemandResponseLoadControl
+
+namespace Messages {
+namespace Commands {
+
+namespace PresentMessagesRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace PresentMessagesRequest
+
+namespace CancelMessagesRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace CancelMessagesRequest
+
+} // namespace Commands
+} // namespace Messages
 
 namespace DeviceEnergyManagement {
 namespace Commands {

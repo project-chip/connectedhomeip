@@ -82,7 +82,8 @@ endif (CONFIG_ENABLE_PW_RPC)
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST}
-                       PRIV_REQUIRES ${PRIV_REQUIRES_LIST})
+                       PRIV_REQUIRES ${PRIV_REQUIRES_LIST}
+                       EMBED_FILES diagnostic_logs/end_user_support.log diagnostic_logs/network_diag.log diagnostic_logs/crash.log)
 
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
 chip_app_component_codegen("${CHIP_ROOT}/examples/temperature-measurement-app/temperature-measurement-common/temperature-measurement.matter")

@@ -59,7 +59,7 @@ typedef void (*EmberAfGenericClusterFunction)(void);
  * @brief A distinguished manufacturer code that is used to indicate the
  * absence of a manufacturer-specific cluster, command, or attribute.
  */
-#define EMBER_AF_NULL_MANUFACTURER_CODE 0x0000
+#define MATTER_DM_NULL_MANUFACTURER_CODE 0x0000
 
 /**
  * @brief Struct describing cluster
@@ -234,12 +234,12 @@ struct EmberAfDefinedEndpoint
 /**
  * @brief Indicates the absence of a Scene table entry.
  */
-#define EMBER_AF_SCENE_TABLE_NULL_INDEX 0xFF
+#define MATTER_DM_SCENE_TABLE_NULL_INDEX 0xFF
 /**
  * @brief Value used when setting or getting the endpoint in a Scene table
  * entry.  It indicates that the entry is not in use.
  */
-#define EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID 0x00
+#define MATTER_DM_SCENE_TABLE_UNUSED_ENDPOINT_ID 0x00
 /**
  * @brief Maximum length of Scene names, not including the length byte.
  */

@@ -121,6 +121,11 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants.h"
         },
         {
+            "path": "MTRClusterNames-src.zapt",
+            "name": "Objc Cluster Names API",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterNames.mm"
+        },
+        {
             "path": "MTRAttributeSpecifiedCheck-src.zapt",
             "name": "Function to check if attribute is specified",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck.mm"

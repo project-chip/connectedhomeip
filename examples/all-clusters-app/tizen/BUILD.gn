@@ -28,6 +28,8 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/electrical-energy-measurement-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/electrical-power-measurement-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
