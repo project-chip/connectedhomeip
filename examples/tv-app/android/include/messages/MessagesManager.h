@@ -25,12 +25,12 @@ class MessagesManager : public chip::app::Clusters::Messages::Delegate
 public:
     // Commands
     void HandlePresentMessagesRequest(
-        const chip::ByteSpan & messageId,
-        const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
+        const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
         const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
-        const chip::app::DataModel::Nullable<uint32_t> & startTime,
-        const chip::app::DataModel::Nullable<uint16_t> & duration, const chip::CharSpan & messageText,
-        const chip::Optional<chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::DecodableType>> & responses) override;
+        const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint16_t> & duration,
+        const chip::CharSpan & messageText,
+        const chip::Optional<chip::app::DataModel::DecodableList<
+            chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::DecodableType>> & responses) override;
     void HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes
