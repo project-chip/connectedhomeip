@@ -33,7 +33,7 @@ void MessagesManager::HandlePresentMessagesRequest(
         chip::ByteSpan(), priority, messageControl, startTime, duration,
         // TODO: Enable text
         chip::CharSpan()
-        // TODO: Convert to  Optional<chip::app::DataModel::List<const
+        // TODO: Convert responses to Optional<chip::app::DataModel::List<const
         // chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> message.responses = responses;
     };
 
