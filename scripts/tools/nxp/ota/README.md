@@ -3,7 +3,6 @@ orphan: true
 ---
 
 # NXP OTA image tool
-
 ## Overview
 
 This tool can generate an OTA image in the `|OTA standard header|TLV1|...|TLVn|`
@@ -24,8 +23,7 @@ are also available here:
 ```
 python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256
 ```
-
-followed by \*_custom options_- and a positional argument (should be last) that
+followed by **custom options**- and a positional argument (should be last) that
 specifies the output file. Please see the `create_ota_images.sh` for some
 reference commands.
 

@@ -30,7 +30,6 @@ from one of the default classes.
 import base64
 import logging
 
-
 class InputArgument:
     '''Base class for any input argument that will be added to KLV.
 
@@ -87,7 +86,6 @@ class IntArgument(InputArgument):
     def encode(self):
         return self.val.to_bytes(self.length(), "little")
 
-
 class Base64Argument(InputArgument):
 
     def __init__(self, arg):
@@ -99,7 +97,6 @@ class Base64Argument(InputArgument):
 
     def encode(self):
         return base64.b64encode(self.val)
-
 
 class StrArgument(InputArgument):
 
@@ -115,7 +112,6 @@ class StrArgument(InputArgument):
 
     def max_length(self):
         return 32
-
 
 class FileArgument(InputArgument):
 

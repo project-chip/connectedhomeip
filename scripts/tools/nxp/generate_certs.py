@@ -16,12 +16,12 @@
 #
 
 import argparse
+import base64
 import logging as log
 import os
 import subprocess
 
-MATTER_ROOT = os.path.dirname(os.path.realpath(f"{__file__}/../../../"))
-
+MATTER_ROOT = os.path.dirname(os.path.realpath(__file__))[:-len("/scripts/tools/nxp")]
 
 def gen_test_certs(chip_cert_exe: str,
                    output: str,
@@ -148,7 +148,6 @@ def gen_test_certs(chip_cert_exe: str,
         ]
         subprocess.run(cmd)
 
-
 def main():
     parser = argparse.ArgumentParser(description="NXP CHIP Certificates generator")
 
@@ -156,8 +155,8 @@ def main():
 
     parser.add_argument("--chip_cert_path", type=str, required=True,
                         help=("This tool requires a path to chip-cert executable. "
-                              "By default you can find chip-cert in connectedhomeip/src/tools/chip-cert directory "
-                              "and build it there."))
+                                "By default you can find chip-cert in connectedhomeip/src/tools/chip-cert directory "
+                                "and build it there."))
     parser.add_argument("-o", "--output", type=str, required=True,
                         help="Output path to store certificates, e.g. /path/to/my/dir")
     parser.add_argument("--vendor_id", type=allow_any_int, required=True,
@@ -170,23 +169,23 @@ def main():
                         help="[string] provide human-readable product name")
     parser.add_argument("--gen_cd", action="store_true", default=False,
                         help=("Generate a new Certificate Declaration in .der format according to used Vendor ID "
-                              "and Product ID."))
+                                "and Product ID."))
     parser.add_argument("--cd_type", type=int, default=1,
                         help=("[int] Type of generated Certification Declaration: "
-                              "0 - development, 1 - provisional, 2 - official"))
+                                "0 - development, 1 - provisional, 2 - official"))
     parser.add_argument("--device_type", type=int, default=0,
                         help=("[int] Provides the primary device type implemented by the node. "
-                              "This must be one of the device type identifiers defined in the Matter Device Library "
-                              "specification."))
+                                "This must be one of the device type identifiers defined in the Matter Device Library "
+	                            "specification."))
     parser.add_argument("--paa_cert", type=str,
                         help=("Provide a path to the Product Attestation Authority (PAA) certificate to generate "
-                              "the PAI certificate. Without providing it, a testing PAA certificate will be generated."))
+                                "the PAI certificate. Without providing it, a testing PAA certificate will be generated."))
     parser.add_argument("--paa_key", type=str,
                         help=("Provide a path to the Product Attestation Authority (PAA) key to generate "
-                              "the PAI certificate. Without providing it, a testing PAA key will be generated."))
+                                "the PAI certificate. Without providing it, a testing PAA key will be generated."))
     parser.add_argument("--valid_from", type=str, default="2023-01-01 00:00:00",
                         help=("The start date for the certificate's validity period in"
-                              "<YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ] format. Default to 2023-01-01 00:00:00"))
+                                "<YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ] format. Default to 2023-01-01 00:00:00"))
     parser.add_argument("--lifetime", type=str, default="7305",
                         help=("The lifetime for the new certificate, in whole days. Default to 7305 days."))
     args = parser.parse_args()
@@ -194,18 +193,17 @@ def main():
     log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
 
     gen_test_certs(args.chip_cert_path,
-                   args.output,
-                   args.vendor_id,
-                   args.product_id,
-                   args.vendor_name + " " + args.product_name,
-                   args.gen_cd,
-                   args.cd_type,
-                   args.device_type,
-                   args.paa_cert,
-                   args.paa_key,
-                   args.valid_from,
-                   args.lifetime)
-
+                    args.output,
+                    args.vendor_id,
+                    args.product_id,
+                    args.vendor_name + " " + args.product_name,
+                    args.gen_cd,
+                    args.cd_type,
+                    args.device_type,
+                    args.paa_cert,
+                    args.paa_key,
+                    args.valid_from,
+                    args.lifetime)
 
 if __name__ == "__main__":
     main()
