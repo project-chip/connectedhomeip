@@ -20,53 +20,53 @@
  */
 #pragma once
 
+#include <protocols/interaction_model/Constants.h>
 #include <stdint.h>
 
-enum EmberAfStatus : uint8_t
-{
-    EMBER_ZCL_STATUS_SUCCESS                  = 0x00,
-    EMBER_ZCL_STATUS_FAILURE                  = 0x01,
-    EMBER_ZCL_STATUS_INVALID_SUBSCRIPTION     = 0x7D,
-    EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS       = 0x7E,
-    EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT     = 0x7F,
-    EMBER_ZCL_STATUS_MALFORMED_COMMAND        = 0x80,
-    EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND      = 0x81,
-    EMBER_ZCL_STATUS_DEPRECATED82             = 0x82,
-    EMBER_ZCL_STATUS_DEPRECATED83             = 0x83,
-    EMBER_ZCL_STATUS_DEPRECATED84             = 0x84,
-    EMBER_ZCL_STATUS_INVALID_COMMAND          = 0x85,
-    EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE    = 0x86,
-    EMBER_ZCL_STATUS_CONSTRAINT_ERROR         = 0x87,
-    EMBER_ZCL_STATUS_UNSUPPORTED_WRITE        = 0x88,
-    EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED       = 0x89,
-    EMBER_ZCL_STATUS_NOT_FOUND                = 0x8B,
-    EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE   = 0x8C,
-    EMBER_ZCL_STATUS_INVALID_DATA_TYPE        = 0x8D,
-    EMBER_ZCL_STATUS_DEPRECATED8E             = 0x8E,
-    EMBER_ZCL_STATUS_UNSUPPORTED_READ         = 0x8F,
-    EMBER_ZCL_STATUS_DEPRECATED90             = 0x90,
-    EMBER_ZCL_STATUS_DEPRECATED91             = 0x91,
-    EMBER_ZCL_STATUS_DATA_VERSION_MISMATCH    = 0x92,
-    EMBER_ZCL_STATUS_DEPRECATED93             = 0x93,
-    EMBER_ZCL_STATUS_TIMEOUT                  = 0x94,
-    EMBER_ZCL_STATUS_RESERVED95               = 0x95,
-    EMBER_ZCL_STATUS_RESERVED96               = 0x96,
-    EMBER_ZCL_STATUS_RESERVED97               = 0x97,
-    EMBER_ZCL_STATUS_RESERVED98               = 0x98,
-    EMBER_ZCL_STATUS_RESERVED99               = 0x99,
-    EMBER_ZCL_STATUS_RESERVED9A               = 0x9A,
-    EMBER_ZCL_STATUS_BUSY                     = 0x9C,
-    EMBER_ZCL_STATUS_DEPRECATEDC0             = 0xC0,
-    EMBER_ZCL_STATUS_DEPRECATEDC1             = 0xC1,
-    EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER      = 0xC3,
-    EMBER_ZCL_STATUS_DEPRECATEDC4             = 0xC4,
-    EMBER_ZCL_STATUS_NO_UPSTREAM_SUBSCRIPTION = 0xC5,
-    EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION  = 0xC6,
-    EMBER_ZCL_STATUS_UNSUPPORTED_EVENT        = 0xC7,
-    EMBER_ZCL_STATUS_PATHS_EXHAUSTED          = 0xC8,
-    EMBER_ZCL_STATUS_TIMED_REQUEST_MISMATCH   = 0xC9,
-    EMBER_ZCL_STATUS_FAILSAFE_REQUIRED        = 0xCA,
-    EMBER_ZCL_STATUS_INVALID_IN_STATE         = 0xCB,
-    EMBER_ZCL_STATUS_NO_COMMAND_RESPONSE      = 0xCC,
-    EMBER_ZCL_STATUS_WRITE_IGNORED            = 0xF0, // NOT SPEC COMPLIANT FOR TEST ONLY
-};
+typedef chip::Protocols::InteractionModel::Status EmberAfStatus;
+
+#define EMBER_ZCL_STATUS_SUCCESS chip::Protocols::InteractionModel::Status::Success
+#define EMBER_ZCL_STATUS_FAILURE chip::Protocols::InteractionModel::Status::Failure
+#define EMBER_ZCL_STATUS_INVALID_SUBSCRIPTION chip::Protocols::InteractionModel::Status::InvalidSubscription
+#define EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS chip::Protocols::InteractionModel::Status::UnsupportedAccess
+#define EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT chip::Protocols::InteractionModel::Status::UnsupportedEndpoint
+#define EMBER_ZCL_STATUS_MALFORMED_COMMAND chip::Protocols::InteractionModel::Status::InvalidAction
+#define EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND chip::Protocols::InteractionModel::Status::UnsupportedCommand
+#define EMBER_ZCL_STATUS_DEPRECATED82 chip::Protocols::InteractionModel::Status::Deprecated82
+#define EMBER_ZCL_STATUS_DEPRECATED83 chip::Protocols::InteractionModel::Status::Deprecated83
+#define EMBER_ZCL_STATUS_DEPRECATED84 chip::Protocols::InteractionModel::Status::Deprecated84
+#define EMBER_ZCL_STATUS_INVALID_COMMAND chip::Protocols::InteractionModel::Status::InvalidCommand
+#define EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE chip::Protocols::InteractionModel::Status::UnsupportedAttribute
+#define EMBER_ZCL_STATUS_CONSTRAINT_ERROR chip::Protocols::InteractionModel::Status::ConstraintError
+#define EMBER_ZCL_STATUS_UNSUPPORTED_WRITE chip::Protocols::InteractionModel::Status::UnsupportedWrite
+#define EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED chip::Protocols::InteractionModel::Status::ResourceExhausted
+#define EMBER_ZCL_STATUS_NOT_FOUND chip::Protocols::InteractionModel::Status::NotFound
+#define EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE chip::Protocols::InteractionModel::Status::UnreportableAttribute
+#define EMBER_ZCL_STATUS_INVALID_DATA_TYPE chip::Protocols::InteractionModel::Status::InvalidDataType
+#define EMBER_ZCL_STATUS_DEPRECATED8E chip::Protocols::InteractionModel::Status::Deprecated8e
+#define EMBER_ZCL_STATUS_UNSUPPORTED_READ chip::Protocols::InteractionModel::Status::UnsupportedRead
+#define EMBER_ZCL_STATUS_DEPRECATED90 chip::Protocols::InteractionModel::Status::Deprecated90
+#define EMBER_ZCL_STATUS_DEPRECATED91 chip::Protocols::InteractionModel::Status::Deprecated91
+#define EMBER_ZCL_STATUS_DATA_VERSION_MISMATCH chip::Protocols::InteractionModel::Status::DataVersionMismatch
+#define EMBER_ZCL_STATUS_DEPRECATED93 chip::Protocols::InteractionModel::Status::Deprecated93
+#define EMBER_ZCL_STATUS_TIMEOUT chip::Protocols::InteractionModel::Status::Timeout
+#define EMBER_ZCL_STATUS_RESERVED95 chip::Protocols::InteractionModel::Status::Reserved95
+#define EMBER_ZCL_STATUS_RESERVED96 chip::Protocols::InteractionModel::Status::Reserved96
+#define EMBER_ZCL_STATUS_RESERVED97 chip::Protocols::InteractionModel::Status::Reserved97
+#define EMBER_ZCL_STATUS_RESERVED98 chip::Protocols::InteractionModel::Status::Reserved98
+#define EMBER_ZCL_STATUS_RESERVED99 chip::Protocols::InteractionModel::Status::Reserved99
+#define EMBER_ZCL_STATUS_RESERVED9A chip::Protocols::InteractionModel::Status::Reserved9a
+#define EMBER_ZCL_STATUS_BUSY chip::Protocols::InteractionModel::Status::Busy
+#define EMBER_ZCL_STATUS_DEPRECATEDC0 chip::Protocols::InteractionModel::Status::Deprecatedc0
+#define EMBER_ZCL_STATUS_DEPRECATEDC1 chip::Protocols::InteractionModel::Status::Deprecatedc1
+#define EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER chip::Protocols::InteractionModel::Status::UnsupportedCluster
+#define EMBER_ZCL_STATUS_DEPRECATEDC4 chip::Protocols::InteractionModel::Status::Deprecatedc4
+#define EMBER_ZCL_STATUS_NO_UPSTREAM_SUBSCRIPTION chip::Protocols::InteractionModel::Status::NoUpstreamSubscription
+#define EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION chip::Protocols::InteractionModel::Status::NeedsTimedInteraction
+#define EMBER_ZCL_STATUS_UNSUPPORTED_EVENT chip::Protocols::InteractionModel::Status::UnsupportedEvent
+#define EMBER_ZCL_STATUS_PATHS_EXHAUSTED chip::Protocols::InteractionModel::Status::PathsExhausted
+#define EMBER_ZCL_STATUS_TIMED_REQUEST_MISMATCH chip::Protocols::InteractionModel::Status::TimedRequestMismatch
+#define EMBER_ZCL_STATUS_FAILSAFE_REQUIRED chip::Protocols::InteractionModel::Status::FailsafeRequired
+#define EMBER_ZCL_STATUS_INVALID_IN_STATE chip::Protocols::InteractionModel::Status::InvalidInState
+#define EMBER_ZCL_STATUS_NO_COMMAND_RESPONSE chip::Protocols::InteractionModel::Status::NoCommandResponse
+#define EMBER_ZCL_STATUS_WRITE_IGNORED chip::Protocols::InteractionModel::Status::WriteIgnored // NOT SPEC COMPLIANT FOR TEST ONLY

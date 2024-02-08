@@ -11,10 +11,13 @@
 #include <app/util/af-types.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+using namespace Protocols;
 
 {{#zcl_clusters}}
 {{#zcl_attributes_server}}
@@ -25,11 +28,11 @@ namespace Attributes {
 {{/first}}
 {{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
 namespace {{asUpperCamelCase label}} {
-EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}}
-EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value);
+InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}}
+InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value);
 {{#if isNullable}}
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value);
+InteractionModel::Status SetNull(chip::EndpointId endpoint);
+InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value);
 {{/if}}
 } // namespace {{asUpperCamelCase label}}
 

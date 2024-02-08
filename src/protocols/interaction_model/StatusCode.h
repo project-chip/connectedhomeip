@@ -38,7 +38,7 @@ namespace Protocols {
 namespace InteractionModel {
 
 // This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
-enum class Status : uint8_t
+enum Status : uint8_t
 {
 #define CHIP_IM_STATUS_CODE(name, spec_name, value) name = value,
 #include <protocols/interaction_model/StatusCodeList.h>
