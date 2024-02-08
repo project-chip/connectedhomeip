@@ -20,7 +20,7 @@
  */
 #pragma once
 
-#include <protocols/interaction_model/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <stdint.h>
 
 typedef chip::Protocols::InteractionModel::Status EmberAfStatus;
