@@ -409,9 +409,11 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define TCP_QUEUE_OOSEQ 0
 #define ARP_QUEUEING (0)
 
-// TODO: seems like this is unnecessary on Thread-only platforms
+// For Thread-only platforms this is unnecessary but Border router config needs to redefine to larger value
 #define LWIP_RAW 1
+#ifndef MEMP_NUM_RAW_PCB
 #define MEMP_NUM_RAW_PCB (1)
+#endif
 
 // TODO: verify count
 
@@ -469,11 +471,17 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define PBUF_LINK_HLEN (14)
 
 #if LWIP_IPV6
+#ifndef LWIP_IPV6_NUM_ADDRESSES
 #define LWIP_IPV6_NUM_ADDRESSES 5
+#endif
 
 #define LWIP_IPV6_MLD 1
 #define LWIP_ND6_QUEUEING 0
+
+#ifndef LWIP_IPV6_SCOPES
 #define LWIP_IPV6_SCOPES 0
+#endif
+
 #endif /* LWIP_IPV6 */
 
 #define LWIP_MULTICAST_PING 0

@@ -102,6 +102,7 @@ template("mbedtls_target") {
       "${_mbedtls_root}/library/ssl_srv.c",
       "${_mbedtls_root}/library/ssl_ticket.c",
       "${_mbedtls_root}/library/ssl_tls.c",
+      "${_mbedtls_root}/library/ssl_msg.c",
       "${_mbedtls_root}/library/threading.c",
       "${_mbedtls_root}/library/version.c",
       "${_mbedtls_root}/library/version_features.c",
@@ -113,6 +114,8 @@ template("mbedtls_target") {
       "${_mbedtls_root}/library/x509write_crt.c",
       "${_mbedtls_root}/library/x509write_csr.c",
       "${_mbedtls_root}/library/xtea.c",
+      "${_mbedtls_root}/library/nist_kw.c",
+      "${_mbedtls_root}/library/psa_crypto_client.c",
     ]
 
     if (current_os != "freertos") {
