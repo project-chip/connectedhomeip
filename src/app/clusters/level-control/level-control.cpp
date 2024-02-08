@@ -470,7 +470,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
         // This is done to ensure that the attribute, in tenths of a second, only
         // goes to zero when the remaining time in milliseconds is actually zero.
         uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
-        EmberStatus status       = LevelControl::Attributes::RemainingTime::Set(endpoint, remainingTimeDs);
+        EmberAfStatus status     = LevelControl::Attributes::RemainingTime::Set(endpoint, remainingTimeDs);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             ChipLogProgress(Zcl, "ERR: writing remaining time %x", status);
