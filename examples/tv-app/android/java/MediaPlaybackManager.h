@@ -21,6 +21,7 @@
 #include <app/clusters/media-playback-server/media-playback-server.h>
 #include <cstdint>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 #include <vector>
 
 enum MediaPlaybackRequestAttribute : uint8_t
@@ -105,7 +106,7 @@ public:
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
 private:
-    jobject mMediaPlaybackManagerObject  = nullptr;
+    chip::JniGlobalReference mMediaPlaybackManagerObject;
     jmethodID mRequestMethod             = nullptr;
     jmethodID mGetAttributeMethod        = nullptr;
     jmethodID mGetPositionMethod         = nullptr;

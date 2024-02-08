@@ -101,13 +101,9 @@ static CHIP_ERROR ParseDataVersionFilterList(jobject dataVersionFilterList,
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
 
 namespace {
-
-JavaVM * sJVM;
-
+JavaVM * sJVM       = nullptr;
 pthread_t sIOThread = PTHREAD_NULL;
-
-jclass sChipDeviceControllerExceptionCls = nullptr;
-
+chip::JniGlobalReference sChipDeviceControllerExceptionCls;
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -136,9 +132,11 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(Controller, "Loading Java class references.");
 
     // Get various class references need by the API.
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
-                                                   sChipDeviceControllerExceptionCls);
-    SuccessOrExit(err);
+    jclass controllerExceptionCls;
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
+                                                        controllerExceptionCls);
+    SuccessOrExit(err = sChipDeviceControllerExceptionCls.Init(controllerExceptionCls));
+
     ChipLogProgress(Controller, "Java class references loaded.");
 
 #ifndef JAVA_MATTER_CONTROLLER_TEST
@@ -514,11 +512,8 @@ JNI_METHOD(void, setDeviceAttestationDelegate)
         chip::Optional<uint16_t> timeoutSecs  = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeoutSecs));
         bool shouldWaitAfterDeviceAttestation = false;
         jclass deviceAttestationDelegateCls   = nullptr;
-        jobject deviceAttestationDelegateRef  = env->NewGlobalRef(deviceAttestationDelegate);
-
-        VerifyOrExit(deviceAttestationDelegateRef != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
-        JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
-                                                 deviceAttestationDelegateCls);
+        JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
+                                                      deviceAttestationDelegateCls);
         VerifyOrExit(deviceAttestationDelegateCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
         if (env->IsInstanceOf(deviceAttestationDelegate, deviceAttestationDelegateCls))
@@ -526,9 +521,8 @@ JNI_METHOD(void, setDeviceAttestationDelegate)
             shouldWaitAfterDeviceAttestation = true;
         }
 
-        err = wrapper->UpdateDeviceAttestationDelegateBridge(deviceAttestationDelegateRef, timeoutSecs,
+        err = wrapper->UpdateDeviceAttestationDelegateBridge(deviceAttestationDelegate, timeoutSecs,
                                                              shouldWaitAfterDeviceAttestation);
-        SuccessOrExit(err);
     }
 
 exit:
@@ -550,8 +544,7 @@ JNI_METHOD(void, setAttestationTrustStoreDelegate)
 
     if (attestationTrustStoreDelegate != nullptr)
     {
-        jobject attestationTrustStoreDelegateRef = env->NewGlobalRef(attestationTrustStoreDelegate);
-        err = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef, cdTrustKeys);
+        err = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegate, cdTrustKeys);
         SuccessOrExit(err);
     }
 

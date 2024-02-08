@@ -108,11 +108,11 @@ CHIP_ERROR MediaPlaybackManager::HandleGetActiveTrack(bool audio, AttributeValue
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleGetActiveAudioTrack");
-    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetActiveTrackMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     env->ExceptionClear();
-    trackObj = env->CallObjectMethod(mMediaPlaybackManagerObject, mGetActiveTrackMethod, static_cast<jboolean>(audio));
+    trackObj = env->CallObjectMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetActiveTrackMethod, static_cast<jboolean>(audio));
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in MediaPlaybackManager::HandleGetActiveAudioTrack");
@@ -176,12 +176,12 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTracks(bool audio, AttributeV
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleGetAvailableAudioTracks");
-    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAvailableTracksMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     return aEncoder.EncodeList([this, env, audio](const auto & encoder) -> CHIP_ERROR {
-        jobjectArray trackList = (jobjectArray) env->CallObjectMethod(mMediaPlaybackManagerObject, mGetAvailableTracksMethod,
-                                                                      static_cast<jboolean>(audio));
+        jobjectArray trackList = (jobjectArray) env->CallObjectMethod(mMediaPlaybackManagerObject.ObjectRef(),
+                                                                      mGetAvailableTracksMethod, static_cast<jboolean>(audio));
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in MediaPlaybackManager::HandleGetAvailableAudioTracks");
@@ -326,12 +326,13 @@ bool MediaPlaybackManager::HandleActivateTrack(bool audio, const chip::CharSpan 
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleActivateAudioTrack");
-    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mActivateTrackMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     {
         UtfString jniid(env, id.c_str());
         env->ExceptionClear();
-        ret = env->CallIntMethod(mMediaPlaybackManagerObject, mActivateTrackMethod, static_cast<jboolean>(audio), jniid.jniValue());
+        ret = env->CallIntMethod(mMediaPlaybackManagerObject.ObjectRef(), mActivateTrackMethod, static_cast<jboolean>(audio),
+                                 jniid.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(AppServer, "Java exception in MediaPlaybackManager::HandleActivateTrack %s", id.c_str());
@@ -357,11 +358,11 @@ bool MediaPlaybackManager::HandleDeactivateTextTrack()
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleDeactivateTextTrack");
-    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeactivateTextTrackMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     env->ExceptionClear();
-    ret = env->CallIntMethod(mMediaPlaybackManagerObject, mDeactivateTextTrackMethod);
+    ret = env->CallIntMethod(mMediaPlaybackManagerObject.ObjectRef(), mDeactivateTextTrackMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in MediaPlaybackManager::HandleDeactivateTextTrack");
@@ -377,8 +378,8 @@ void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for MediaPlaybackManager"));
 
-    mMediaPlaybackManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturn(mMediaPlaybackManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef MediaPlaybackManager"));
+    VerifyOrReturn(mMediaPlaybackManagerObject.Init(managerObject) == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Failed to init mMediaPlaybackManagerObject"));
 
     jclass mMediaPlaybackManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(mMediaPlaybackManagerClass != nullptr, ChipLogError(Zcl, "Failed to get MediaPlaybackManager Java class"));
@@ -446,10 +447,11 @@ uint64_t MediaPlaybackManager::HandleMediaRequestGetAttribute(MediaPlaybackReque
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetAttribute:%d", attribute);
-    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    jAttributeValue = env->CallLongMethod(mMediaPlaybackManagerObject, mGetAttributeMethod, static_cast<jint>(attribute));
+    jAttributeValue =
+        env->CallLongMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetAttributeMethod, static_cast<jint>(attribute));
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in MediaPlaybackManager::GetAttribute");
@@ -486,10 +488,11 @@ long MediaPlaybackManager::HandleMediaRequestGetLongAttribute(MediaPlaybackReque
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetLongAttribute:%d", attribute);
-    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    jAttributeValue = env->CallLongMethod(mMediaPlaybackManagerObject, mGetAttributeMethod, static_cast<jint>(attribute));
+    jAttributeValue =
+        env->CallLongMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetAttributeMethod, static_cast<jint>(attribute));
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in MediaPlaybackManager::GetAttribute");
@@ -523,11 +526,11 @@ Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaP
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::Request %d-%ld", mediaPlaybackRequest,
                     static_cast<long>(deltaPositionMilliseconds));
-    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mRequestMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     env->ExceptionClear();
-    ret = env->CallIntMethod(mMediaPlaybackManagerObject, mRequestMethod, static_cast<jint>(mediaPlaybackRequest),
+    ret = env->CallIntMethod(mMediaPlaybackManagerObject.ObjectRef(), mRequestMethod, static_cast<jint>(mediaPlaybackRequest),
                              static_cast<jlong>(deltaPositionMilliseconds));
     if (env->ExceptionCheck())
     {
@@ -561,11 +564,11 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleGetSampledPosition");
-    VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetPositionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     env->ExceptionClear();
-    positionObj = env->CallObjectMethod(mMediaPlaybackManagerObject, mGetPositionMethod);
+    positionObj = env->CallObjectMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetPositionMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in MediaPlaybackManager::HandleGetSampledPosition");
