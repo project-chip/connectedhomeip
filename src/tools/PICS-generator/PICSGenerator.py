@@ -69,7 +69,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     elif "Boolean State" == clusterName:
         clusterName = "Boolean State Cluster"
 
-    if "Access Control" in clusterName:
+    if "AccessControl" in clusterName:
         clusterName = "Access Control cluster"
 
     # Determine if file has already been handled and use this file
