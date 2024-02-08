@@ -41,7 +41,7 @@ using chip::app::Clusters::BooleanStateConfiguration::Delegate;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kBooleanStateConfigurationDelegateTableSize =
-    EMBER_AF_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static_assert(kBooleanStateConfigurationDelegateTableSize <= kEmberInvalidEndpointIndex,
               "BooleanStateConfiguration Delegate table size error");
@@ -57,7 +57,7 @@ Delegate * gDelegateTable[kBooleanStateConfigurationDelegateTableSize] = { nullp
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanStateConfiguration::Id,
-                                                       EMBER_AF_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kBooleanStateConfigurationDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -234,7 +234,7 @@ namespace BooleanStateConfiguration {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanStateConfiguration::Id,
-                                                       EMBER_AF_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kBooleanStateConfigurationDelegateTableSize)
     {

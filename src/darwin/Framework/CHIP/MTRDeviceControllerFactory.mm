@@ -25,6 +25,9 @@
 #import "MTRDeviceControllerParameters_Wrapper.h"
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
+#import <Matter/MTRClusterConstants.h>
+#import <Matter/MTRServerCluster.h>
+
 #import "MTRCertificates.h"
 #import "MTRDemuxingStorage.h"
 #import "MTRDeviceController.h"
@@ -40,12 +43,15 @@
 #import "MTROperationalBrowser.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
+#import "MTRServerAccessControl.h"
+#import "MTRServerCluster_Internal.h"
+#import "MTRServerEndpoint_Internal.h"
 #import "MTRSessionResumptionStorageBridge.h"
 #import "NSDataSpanConversion.h"
 
 #import <os/lock.h>
 
-#include <app/dynamic_server/AccessControl.h>
+#include <app/util/af.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
@@ -75,12 +81,14 @@ static NSString * const kErrorSessionKeystoreInit = @"Init failure while initial
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory]; }
 
-@interface MTRDeviceControllerFactory ()
+@interface MTRDeviceControllerFactory () {
+    MTRServerEndpoint * _otaProviderEndpoint;
+    std::unique_ptr<MTROTAProviderDelegateBridge> _otaProviderDelegateBridge;
+}
 
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 @property (readonly) DeviceControllerFactory * controllerFactory;
 @property (readonly) PersistentStorageDelegate * persistentStorageDelegate;
-@property (readonly) MTROTAProviderDelegateBridge * otaProviderDelegateBridge;
 @property (readonly) Crypto::RawKeySessionKeystore * sessionKeystore;
 // We use TestPersistentStorageDelegate just to get an in-memory store to back
 // our group data provider impl.  We initialize this store correctly on every
@@ -170,6 +178,11 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     // is only accessed on the Matter queue or after the Matter queue has shut
     // down.
     FabricIndex _nextAvailableFabricIndex;
+
+    // Array of all server endpoints across all controllers, used to ensure
+    // in an atomic way that endpoint IDs are unique.
+    NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
+    os_unfair_lock _serverEndpointsLock; // Protects access to _serverEndpoints.
 }
 
 + (void)initialize
@@ -231,6 +244,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     if ([self checkForInitError:(_certificateValidityPolicy != nil) logMsg:kErrorCertificateValidityPolicyInit]) {
         return nil;
     }
+
+    _serverEndpoints = [[NSMutableArray alloc] init];
+    _serverEndpointsLock = OS_UNFAIR_LOCK_INIT;
 
     return self;
 }
@@ -319,10 +335,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         _keystore = nullptr;
     }
 
-    if (_otaProviderDelegateBridge) {
-        delete _otaProviderDelegateBridge;
-        _otaProviderDelegateBridge = nullptr;
-    }
     _otaProviderDelegateQueue = nil;
     _otaProviderDelegate = nil;
 
@@ -410,7 +422,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        app::dynamic_server::InitAccessControl();
+        InitializeServerAccessControl();
 
         if (startupParams.hasStorage) {
             _persistentStorageDelegate = new (std::nothrow) MTRPersistentStorageDelegateBridge(startupParams.storage);
@@ -439,7 +451,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             _otaProviderDelegateQueue = dispatch_queue_create(
                 "org.csa-iot.matter.framework.otaprovider.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         }
-        _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge();
 
         // TODO: Allow passing a different keystore implementation via startupParams.
         _keystore = new PersistentStorageOperationalKeystore();
@@ -900,11 +911,44 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    VerifyOrReturnValue(_otaProviderDelegateBridge != nil, controller);
     VerifyOrReturnValue([_controllers count] == 1, controller);
+
+    _otaProviderEndpoint = [MTRServerEndpoint rootNodeEndpoint];
+
+    // TODO: Have the OTA Provider cluster revision accessible somewhere?
+    auto * otaProviderCluster = [[MTRServerCluster alloc] initWithClusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID) revision:@(1)];
+    otaProviderCluster.acceptedCommands = @[
+        @(MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageID),
+        @(MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateRequestID),
+        @(MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandNotifyUpdateAppliedID),
+    ];
+    otaProviderCluster.generatedCommands = @[
+        @(MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageResponseID),
+        @(MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateResponseID),
+    ];
+    [otaProviderCluster addAccessGrant:[MTRAccessGrant accessGrantForAllNodesWithPrivilege:MTRAccessControlEntryPrivilegeOperate]];
+
+    // Not expected to fail, since we are following the rules for clusters here.
+    [_otaProviderEndpoint addServerCluster:otaProviderCluster];
+
+    if (![self addServerEndpoint:_otaProviderEndpoint]) {
+        MTR_LOG_ERROR("Failed to add OTA endpoint on factory.  Why?");
+        [controller shutdown];
+        return nil;
+    }
+
+    // This endpoint is not actually associated with a specific controller; we
+    // just need to have a working Matter event loop to bring it up.
+    [_otaProviderEndpoint associateWithController:nil];
 
     __block CHIP_ERROR err;
     dispatch_sync(_chipWorkQueue, ^{
+        [self->_otaProviderEndpoint registerMatterEndpoint];
+
+        // Now that our endpoint exists, go ahead and create the OTA delegate
+        // bridge.  Its constructor relies on the endpoint existing.
+        _otaProviderDelegateBridge = std::make_unique<MTROTAProviderDelegateBridge>();
+
         auto systemState = _controllerFactory->GetSystemState();
         err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
     });
@@ -982,6 +1026,16 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
         if (_otaProviderDelegateBridge) {
             _otaProviderDelegateBridge->Shutdown();
+            _otaProviderDelegateBridge.reset();
+        }
+
+        if (_otaProviderEndpoint != nil) {
+            [_otaProviderEndpoint unregisterMatterEndpoint];
+            [_otaProviderEndpoint invalidate];
+
+            [self removeServerEndpoint:_otaProviderEndpoint];
+
+            _otaProviderEndpoint = nil;
         }
 
         sharedCleanupBlock();
@@ -1069,6 +1123,94 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
 {
     return [self runningControllerForFabricIndex:fabricIndex includeControllerStartingUp:YES includeControllerShuttingDown:YES];
+}
+
+- (BOOL)addServerEndpoint:(MTRServerEndpoint *)endpoint
+{
+    os_unfair_lock_lock(&_serverEndpointsLock);
+    if (_serverEndpoints.count == CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) {
+        os_unfair_lock_unlock(&_serverEndpointsLock);
+
+        MTR_LOG_ERROR("Can't add a server endpoint with endpoint ID %u, because we already have %u endpoints defined", static_cast<EndpointId>(endpoint.endpointID.unsignedLongLongValue), CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT);
+
+        return NO;
+    }
+
+    BOOL haveExisting = NO;
+    for (MTRServerEndpoint * existing in _serverEndpoints) {
+        if ([endpoint.endpointID isEqual:existing.endpointID]) {
+            haveExisting = YES;
+            break;
+        }
+    }
+
+    if (!haveExisting) {
+        [_serverEndpoints addObject:endpoint];
+    }
+    os_unfair_lock_unlock(&_serverEndpointsLock);
+
+    if (haveExisting) {
+        MTR_LOG_ERROR("Trying to add a server endpoint with endpoint ID %u, which already exists", static_cast<EndpointId>(endpoint.endpointID.unsignedLongLongValue));
+    }
+
+    return !haveExisting;
+}
+
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint
+{
+    os_unfair_lock_lock(&_serverEndpointsLock);
+    [_serverEndpoints removeObject:endpoint];
+    os_unfair_lock_unlock(&_serverEndpointsLock);
+}
+
+- (NSArray<MTRAccessGrant *> *)accessGrantsForFabricIndex:(chip::FabricIndex)fabricIndex clusterPath:(MTRClusterPath *)clusterPath
+{
+    assertChipStackLockedByCurrentThread();
+
+    if ([clusterPath.endpoint isEqual:_otaProviderEndpoint.endpointID]) {
+        return [_otaProviderEndpoint matterAccessGrantsForCluster:clusterPath.cluster];
+    }
+
+    // We do not want to use _serverEndpoints here, because that might contain
+    // endpoints that are still being set up and whatnot.  Ask the controller
+    // for the relevant fabric index what the relevant access grants are.
+
+    // Include controllers that are shutting down, since this may be an accesss
+    // check for event reports they emit as they shut down.
+    auto * controller = [self runningControllerForFabricIndex:fabricIndex includeControllerStartingUp:NO includeControllerShuttingDown:YES];
+    if (controller == nil) {
+        return @[];
+    }
+
+    return [controller accessGrantsForClusterPath:clusterPath];
+}
+
+- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
+{
+    assertChipStackLockedByCurrentThread();
+
+    for (MTRServerCluster * cluster in _otaProviderEndpoint.serverClusters) {
+        if (![cluster.clusterID isEqual:clusterID]) {
+            continue;
+        }
+
+        for (MTRServerAttribute * attr in cluster.attributes) {
+            if (![attr.attributeID isEqual:attributeID]) {
+                continue;
+            }
+
+            return @(attr.requiredReadPrivilege);
+        }
+    }
+
+    for (MTRDeviceController * controller in [self getRunningControllers]) {
+        NSNumber * _Nullable neededPrivilege = [controller neededReadPrivilegeForClusterID:clusterID attributeID:attributeID];
+        if (neededPrivilege != nil) {
+            return neededPrivilege;
+        }
+    }
+
+    return nil;
 }
 
 - (void)downloadLogFromNodeWithID:(NSNumber *)nodeID

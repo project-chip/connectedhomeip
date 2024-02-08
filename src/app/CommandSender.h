@@ -376,6 +376,14 @@ public:
         return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
+    /**
+     * @brief Returns the number of InvokeResponseMessages received.
+     *
+     * Responses to multiple requests might be split across several InvokeResponseMessages.
+     * This function helps track the total count. Primarily for test validation purposes.
+     */
+    size_t GetInvokeResponseMessageCount();
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
      * Version of AddRequestData that allows sending a message that is
@@ -571,8 +579,10 @@ private:
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
-    uint16_t mFinishedCommandCount    = 0;
-    uint16_t mRemoteMaxPathsPerInvoke = 1;
+
+    uint16_t mInvokeResponseMessageCount = 0;
+    uint16_t mFinishedCommandCount       = 0;
+    uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
     State mState                = State::Idle;
     bool mSuppressResponse      = false;

@@ -224,6 +224,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     {
         err = ProcessInvokeResponse(std::move(aPayload), moreChunkedMessages);
         SuccessOrExit(err);
+        mInvokeResponseMessageCount++;
         if (moreChunkedMessages)
         {
             StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);
@@ -541,6 +542,11 @@ void CommandSender::SetTimedInvokeTimeoutMs(const Optional<uint16_t> & aTimedInv
         uint16_t newValue = std::min(mTimedInvokeTimeoutMs.Value(), aTimedInvokeTimeoutMs.Value());
         mTimedInvokeTimeoutMs.SetValue(newValue);
     }
+}
+
+size_t CommandSender::GetInvokeResponseMessageCount()
+{
+    return static_cast<size_t>(mInvokeResponseMessageCount);
 }
 
 CHIP_ERROR CommandSender::Finalize(System::PacketBufferHandle & commandPacket)

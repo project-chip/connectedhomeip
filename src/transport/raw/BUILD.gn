@@ -44,6 +44,7 @@ static_library("raw") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:type-traits",
     "${chip_root}/src/platform",
   ]
 }
