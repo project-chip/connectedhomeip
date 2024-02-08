@@ -92,7 +92,7 @@ rsError ramStorageSet(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_
 rsError ramStorageAdd(ramBufferDescriptor * pBuffer, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
 
 /* search RAM Buffer for aKey (with aIndex) and delete it:
- * - if aIndex is -1 then all the  occurrences of aKey are deleted
+ * - if aIndex is -1 then all the  occurences of aKey are deleted
  */
 rsError ramStorageDelete(ramBufferDescriptor * pBuffer, uint16_t aKey, int aIndex);
 

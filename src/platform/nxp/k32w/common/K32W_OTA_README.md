@@ -48,7 +48,6 @@ public:
 
     CHIP_ERROR Process(ByteSpan & block);
     void RegisterDescriptorCallback(ProcessDescriptor callback);
-
 protected:
     virtual CHIP_ERROR ProcessInternal(ByteSpan & block) = 0;
 };
@@ -124,9 +123,9 @@ implementation. The OTA image should be generated with the
 Prior to factory data update, the old factory data is backed up in external
 flash. If anything interrupts the update (e.g. power loss), there is a slight
 chance the internal flash factory data section is erased and has to be restored
-at next boot. The `FactoryDataProvider` offers a default restore mechanism and
-support for registering additional restore mechanisms or overwriting the default
-one.
+at next boot. The `FactoryDataProvider` offers a default restore mechanism
+and support for registering additional restore mechanisms or overwriting the
+default one.
 
 Prior to factory data update, the old factory data is backed up in external
 flash. If anything interrupts the update (e.g. power loss), there is a slight

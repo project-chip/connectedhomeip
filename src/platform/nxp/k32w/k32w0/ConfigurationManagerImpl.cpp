@@ -70,6 +70,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     SuccessOrExit(err = DetermineBootReason(rebootCause));
 
+    rebootCause = POWER_GetResetCause();
+
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<K32WConfig>::Init();
     SuccessOrExit(err);
