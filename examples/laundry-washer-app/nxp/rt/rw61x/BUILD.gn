@@ -56,7 +56,8 @@ if ((tcp_download == true) && (wifi_connect == true)){
   assert("Cannot enable tcp_download and wifi_connect at the same time!")
 }
 
-app_common_folder = "all-clusters-app/all-clusters-common"
+# Use NXP custom zap files for laundry-washer device-type
+app_common_folder = "laundry-washer-app/nxp/zap"
 
 # Create here the SDK instance.
 # Particular sources/defines/includes could be added/changed depending on the target application.
@@ -100,7 +101,7 @@ rt_sdk("sdk") {
   defines += [
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
-
+  
 }
 
 # Create the SDK driver instance.
@@ -108,8 +109,8 @@ rt_sdk("sdk") {
 rw61x_sdk_drivers("sdk_driver") {
 }
 
-rt_executable("all_cluster_app") {
-  output_name = "chip-rw61x-all-cluster-example"
+rt_executable("laundry-washer") {
+  output_name = "chip-rw61x-laundry-washer-example"
 
   defines = [ "CONFIG_RENDEZVOUS_MODE=7",
               "CONFIG_APP_FREERTOS_OS=1", ]
@@ -168,9 +169,13 @@ rt_executable("all_cluster_app") {
   deps = [ "${chip_root}/examples/${app_common_folder}" ]
 
   sources += [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+    "../../common/main/operational-state-delegate-impl.cpp",
   ]
 
   if (chip_enable_matter_cli) {
@@ -272,7 +277,7 @@ rt_executable("all_cluster_app") {
 }
 
 group("rw61x") {
-  deps = [ ":all_cluster_app" ]
+  deps = [ ":laundry-washer" ]
 }
 
 group("default") {

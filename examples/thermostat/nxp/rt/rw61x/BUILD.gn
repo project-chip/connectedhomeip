@@ -56,7 +56,8 @@ if ((tcp_download == true) && (wifi_connect == true)){
   assert("Cannot enable tcp_download and wifi_connect at the same time!")
 }
 
-app_common_folder = "all-clusters-app/all-clusters-common"
+# Use NXP custom zap files for thermostatdevice-types
+app_common_folder = "thermostat/nxp/zap"
 
 # Create here the SDK instance.
 # Particular sources/defines/includes could be added/changed depending on the target application.
@@ -96,11 +97,6 @@ rt_sdk("sdk") {
   {
     defines += [ "configTOTAL_HEAP_SIZE=(size_t)(160 * 1024)" ]
   }
-
-  defines += [
-    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
-  ]
-
 }
 
 # Create the SDK driver instance.
@@ -108,8 +104,8 @@ rt_sdk("sdk") {
 rw61x_sdk_drivers("sdk_driver") {
 }
 
-rt_executable("all_cluster_app") {
-  output_name = "chip-rw61x-all-cluster-example"
+rt_executable("thermostat") {
+  output_name = "chip-rw61x-thermostat-example"
 
   defines = [ "CONFIG_RENDEZVOUS_MODE=7",
               "CONFIG_APP_FREERTOS_OS=1", ]
@@ -166,12 +162,6 @@ rt_executable("all_cluster_app") {
   ]
   
   deps = [ "${chip_root}/examples/${app_common_folder}" ]
-
-  sources += [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
-  ]
 
   if (chip_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
@@ -266,13 +256,18 @@ rt_executable("all_cluster_app") {
       # Consequently, some sections will need to be shifted
       ldflags += [ "-Wl,--defsym=__m_mcuboot_size__=0x20000" ]
     }
+
+    defines += [
+      "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+    ]
+    
   }
 
   output_dir = root_out_dir
 }
 
 group("rw61x") {
-  deps = [ ":all_cluster_app" ]
+  deps = [ ":thermostat" ]
 }
 
 group("default") {

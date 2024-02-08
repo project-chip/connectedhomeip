@@ -32,6 +32,7 @@ The example supports:
 
 -   Matter over Wi-Fi
 -   Matter over Openthread
+-   Matter over Wi-Fi with OpenThead Border Router support.
 
 ### Hardware requirements
 
@@ -46,6 +47,12 @@ For Matter over WiFi configuration :
 -   BLE antenna (to plug in Ant1)
 -   Wi-Fi antenna (to plug in Ant2)
 
+For Matter over Wi-Fi with OpenThead Border Router :
+
+-   [`NXP RD-RW612-BGA`] board
+-   BLE/15.4 antenna (to plug in Ant1)
+-   Wi-Fi antenna (to plug in Ant2)
+
 <a name="building"></a>
 
 ## Building
@@ -56,17 +63,27 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 -   Follow instruction in [BUILDING.md](../../../../../docs/guides/BUILDING.md)
     to setup the environment to be able to build Matter.
 
--   Download [RD-RW612 SDK v2.13.1](https://mcuxpresso.nxp.com/en/select).
+-   Download
+    [RD-RW612 SDK for Project CHIP](https://mcuxpresso.nxp.com/en/select).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
     SDK. The SDK Builder UI selection should be similar with the one from the
-    image below. In case you do not have access to the SDK, please ask your NXP
-    representative.
+    image below.
 
     ![MCUXpresso SDK Download](../../../../platform/nxp/rt/rw61x/doc/images/mcux-sdk-download.PNG)
 
     (Note: All SDK components should be selected. If size is an issue Azure RTOS
     component can be omitted.)
+
+    Please refer to Matter release notes for getting the latest released SDK.
+
+    > **_NOTE:_** When using the SDK version 2.13.2 to build and run the
+    > OpenThread RW612 OTBR examples the LWIP component must be downloaded from
+    > the
+    > [LWIP NXP GitHub](https://github.com/nxp-mcuxpresso/lwip/tree/mcux_release_2.13.3_rw610_rfp2).
+    > Take the latest commit from the indicated branch and copy to SDK location
+    > `.../middleware/lwip` . The lwip folder in `.../middleware/` must be
+    > completely overwritten by the contents downloaded from GitHub.
 
 -   Start building the application.
 
@@ -87,11 +104,24 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x
 
 #### Building with Matter over Thread configuration on RW612
 
--   Build the Openthread configuration with BLE commissioning.
+-   Build Matter-over-Thread configuration with BLE commissioning.
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true" out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
+```
+
+#### Building with Matter over Wifi + OpenThread Border Router configuration on RW612
+
+This configuration requires enabling the Matter CLI in order to control the
+Thread network on the Border Router.
+
+-   Build Matter with Border Router configuration with BLE commissioning
+    (ble-wifi) :
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ gn gen --args="chip_enable_wifi=true chip_enable_openthread=true chip_enable_matter_cli=true is_sdk_package=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw610$ ninja -C out/debug
 ```
 
 #### General information
@@ -105,11 +135,13 @@ Optional GN options that can be added when building an application:
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
     the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
     command.
+-   To switch the device type to thermostat `nxp_device_type=\"thermostat\"`
+    must be added to the _gn gen_ command.
 -   To switch the SDK type used, the argument `is_<sdk_type>=true` must be added
     to the _gn gen_ command (with <sdk_type> being either sdk_package or
     sdk_internal).
--   By default, the RW612 A1 board revision will be chosen. To switch to an A0
-    revision, the argument `board_version=\"A0\"` must be added to the _gn gen_
+-   By default, the RW612 A1 board revision will be chosen. To switch to an A2
+    revision, the argument `board_version=\"A2\"` must be added to the _gn gen_
     command.
 -   To build the application in debug mode, the argument
     `is_debug=true optimize_debug=false` must be added to the _gn gen_ command.
@@ -120,7 +152,7 @@ Optional GN options that can be added when building an application:
 -   To build the application with the OTA Requestor enabled, the arguments
     `chip_enable_ota_requestor=true no_mcuboot=false` must be added to the _gn
     gen_ command. (More information about the OTA Requestor feature in
-    [OTA Requestor README](README_OTA_Requestor.md)))
+    [OTA Requestor README](../../../../../docs/guides/nxp_rw61x_ota_software_update.md)))
 
 ## Manufacturing data
 
@@ -132,6 +164,21 @@ Other comments:
 The all cluster app demonstrates the usage of encrypted Matter manufacturing
 data storage. Matter manufacturing data should be encrypted using an AES 128
 software key before flashing them to the device flash.
+
+Using DAC private key secure usage: Experimental feature, contain some
+limitation: potential concurrent access issue during sign with dac key operation
+due to the lack of protection between multiple access to ELS crypto module. The
+argument `chip_enable_secure_dac_private_key_storage=1` must be added to the _gn
+gen_ command to enable secure privte DAC key usage with S50.
+`chip_with_factory_data=1` must have been added to the _gn gen_ command
+
+DAC private key generation: The argument `chip_convert_dac_private_key=1` must
+be added to the _gn gen_ command to enable DAC private plain key convertion to
+blob with S50. `chip_enable_secure_dac_private_key_storage=1` must have been
+added to the _gn gen_ command
+
+ELS contain concurrent access risks. They must be fixed before default
+enablement.
 
 <a name="flashing-and-debugging"></a>
 
@@ -213,6 +260,16 @@ The "ble-wifi" pairing method can be used in order to commission the device.
 
 The "ble-thread" pairing method can be used in order to commission the device.
 
+#### Matter over wifi with openthread border router configuration :
+
+In order to create or join a Thread network on the Matter Border Router, the
+`otcli` commands from the matter CLI can be used. For more information about
+using the matter shell, follow instructions from
+['Testing the all-clusters application with Matter CLI'](#testing-the-all-clusters-application-with-matter-cli-enabled).
+
+In this configuration, the device can be commissioned over Wi-Fi with the
+'ble-wifi' pairing method.
+
 ### Testing the all-clusters application without Matter CLI:
 
 1. Prepare the board with the flashed `All-cluster application` (as shown
@@ -283,6 +340,41 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
 4. On the client side, start sending commands using the chip-tool application as
    it is described
    [here](../../../../chip-tool/README.md#using-the-client-to-send-matter-commands).
+
+For Matter with OpenThread Border Router support, the matter CLI can be used to
+start/join the Thread network, using the following ot-cli commands. (Note that
+setting channel, panid, and network key is not enough anymore because of an Open
+Thread stack update. We first need to initialize a new dataset.)
+
+```
+> otcli dataset init new
+Done
+> otcli dataset
+Active Timestamp: 1
+Channel: 25
+Channel Mask: 0x07fff800
+Ext PAN ID: 42af793f623aab54
+Mesh Local Prefix: fd6e:c358:7078:5a8d::/64
+Network Key: f824658f79d8ca033fbb85ecc3ca91cc
+Network Name: OpenThread-b870
+PAN ID: 0xb870
+PSKc: f438a194a5e968cc43cc4b3a6f560ca4
+Security Policy: 672 onrc 0
+Done
+> otcli dataset panid 0xabcd
+Done
+> otcli dataset channel 25
+Done
+> otcli dataset commit active
+Done
+> otcli ifconfig up
+Done
+> otcli thread start
+Done
+> otcli state
+leader
+Done
+```
 
 <a name="ota-software-update"></a>
 
