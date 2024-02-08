@@ -123,7 +123,6 @@ function(chip_configure_data_model APP_TARGET)
         GENERATOR "app-templates"
         OUTPUTS
         "zap-generated/access.h"
-        "zap-generated/CHIPClusters.h"
         "zap-generated/endpoint_config.h"
         "zap-generated/gen_config.h"
         "zap-generated/IMClusterCommandHandler.cpp"

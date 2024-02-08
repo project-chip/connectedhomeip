@@ -20,6 +20,7 @@
 #include <lib/core/Optional.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <protocols/secure_channel/CheckInCounter.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -44,7 +45,7 @@ class TestICDManager;
 class ICDConfigurationData
 {
 public:
-    static constexpr uint32_t ICD_CHECK_IN_COUNTER_MIN_INCREMENT = 100;
+    static constexpr uint32_t kICDCounterPersistenceIncrement = 100;
 
     enum class ICDMode : uint8_t
     {
@@ -60,7 +61,7 @@ public:
 
     System::Clock::Milliseconds16 GetActiveModeThreshold() { return mActiveThreshold; }
 
-    uint32_t GetICDCounter() { return mICDCounter; }
+    Protocols::SecureChannel::CheckInCounter & GetICDCounter() { return mICDCounter; }
 
     uint16_t GetClientsSupportedPerFabric() { return mFabricClientsSupported; }
 
@@ -99,7 +100,6 @@ private:
     friend class chip::app::TestICDManager;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
-    void SetICDCounter(uint32_t count) { mICDCounter = count; }
     void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };
     void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
 
@@ -137,7 +137,7 @@ private:
 
     System::Clock::Milliseconds16 mActiveThreshold = System::Clock::Milliseconds16(CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS);
 
-    uint32_t mICDCounter = 0;
+    Protocols::SecureChannel::CheckInCounter mICDCounter;
 
     static_assert((CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC) >= 1,
                   "Spec requires the minimum of supported clients per fabric be equal or greater to 1.");

@@ -149,7 +149,7 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.Encode(mICDConfigurationData->GetICDCounter());
+    return encoder.Encode(mICDConfigurationData->GetICDCounter().GetValue());
 }
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder)
@@ -292,7 +292,7 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
         TriggerICDMTableUpdatedEvent();
     }
 
-    icdCounter = mICDConfigurationData->GetICDCounter();
+    icdCounter = mICDConfigurationData->GetICDCounter().GetValue();
     return InteractionModel::Status::Success;
 }
 
