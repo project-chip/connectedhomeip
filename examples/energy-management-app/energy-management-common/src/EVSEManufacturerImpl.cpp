@@ -106,6 +106,7 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
 
     // Set power mode to AC
     ReturnErrorOnFailure(dg->SetPowerMode(PowerModeEnum::kAc));
+    ReturnErrorOnFailure(dg->SetNumberOfMeasurementTypes(3)); // ActivePower, ActiveCurrent, Voltage
 
 #if 0
     Structs::MeasurementAccuracyRangeStruct::Type activeCurrentAccuracyRanges[] = { { .rangeMin = 500, .rangeMax = 1000 } };
