@@ -50,7 +50,7 @@ using chip::app::Clusters::ValveConfigurationAndControl::Delegate;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kValveConfigurationAndControlDelegateTableSize =
-    EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static_assert(kValveConfigurationAndControlDelegateTableSize <= kEmberInvalidEndpointIndex,
               "ValveConfigurationAndControl Delegate table size error");
@@ -69,7 +69,7 @@ Delegate * gDelegateTable[kValveConfigurationAndControlDelegateTableSize] = { nu
 bool GetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> & duration)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturnValue(epIdx < kValveConfigurationAndControlDelegateTableSize, false);
     duration = gRemainingDuration[epIdx].remainingDuration;
     return true;
@@ -78,7 +78,7 @@ bool GetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> & d
 void SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> duration)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (epIdx < kValveConfigurationAndControlDelegateTableSize)
     {
         gRemainingDuration[epIdx].endpoint          = endpoint;
@@ -89,7 +89,7 @@ void SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> dur
 void SetRemainingDurationNull(EndpointId endpoint)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (epIdx < kValveConfigurationAndControlDelegateTableSize)
     {
         if (!gRemainingDuration[epIdx].remainingDuration.IsNull())
@@ -103,7 +103,7 @@ void SetRemainingDurationNull(EndpointId endpoint)
 RemainingDurationTable * GetRemainingDurationItem(EndpointId endpoint)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (epIdx < kValveConfigurationAndControlDelegateTableSize)
     {
         return &gRemainingDuration[epIdx];
@@ -114,7 +114,7 @@ RemainingDurationTable * GetRemainingDurationItem(EndpointId endpoint)
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (epIdx >= kValveConfigurationAndControlDelegateTableSize ? nullptr : gDelegateTable[epIdx]);
 }
 
@@ -261,7 +261,7 @@ namespace ValveConfigurationAndControl {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                       EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kValveConfigurationAndControlDelegateTableSize)
     {

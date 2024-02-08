@@ -49,7 +49,7 @@ using chip::Protocols::InteractionModel::Status;
 using TargetUpdatedEvent = chip::app::Clusters::TargetNavigator::Events::TargetUpdated::Type;
 
 static constexpr size_t kTargetNavigatorDelegateTableSize =
-    EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kTargetNavigatorDelegateTableSize <= kEmberInvalidEndpointIndex, "TargetNavigator Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogProgress(Zcl, "TargetNavigator NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
-                                                       EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kTargetNavigatorDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -97,7 +97,7 @@ namespace TargetNavigator {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
-                                                       EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kTargetNavigatorDelegateTableSize)
     {

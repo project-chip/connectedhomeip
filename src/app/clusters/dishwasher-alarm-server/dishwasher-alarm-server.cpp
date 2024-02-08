@@ -36,7 +36,7 @@ using chip::Protocols::InteractionModel::Status;
 using namespace std;
 
 static constexpr size_t kDishwasherAlarmDelegateTableSize =
-    EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static_assert(kDishwasherAlarmDelegateTableSize <= kEmberInvalidEndpointIndex, "Dishwasher Alarm Delegate table size error");
 
@@ -50,14 +50,14 @@ Delegate * gDelegateTable[kDishwasherAlarmDelegateTableSize] = { nullptr };
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id,
-                                                       EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kDishwasherAlarmDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DishwasherAlarm::Id,
-                                                       EMBER_AF_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_DISHWASHER_ALARM_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kDishwasherAlarmDelegateTableSize)
     {
