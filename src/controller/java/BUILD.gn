@@ -60,8 +60,10 @@ shared_library("jni") {
     "BaseCHIPCluster-JNI.cpp",
     "CHIPAttributeTLVValueDecoder.h",
     "CHIPDeviceController-JNI.cpp",
+    "CHIPEventTLVValueDecoder.h",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
+    "GroupDeviceProxy.h",
   ]
 
   deps = [

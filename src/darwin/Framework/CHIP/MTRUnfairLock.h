@@ -1,6 +1,5 @@
-/*
- *
- *    Copyright (c) 2020 Project CHIP Authors
+/**
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +14,24 @@
  *    limitations under the License.
  */
 
-#include "TestRetransmit.h"
-#include <nlunit-test.h>
+/**
+ * RAII wrapper around os_unfair_lock.
+ */
 
-int main()
+#import <os/lock.h>
+
+#include <mutex>
+
+template <>
+class std::lock_guard<os_unfair_lock>
 {
-    nlTestSetOutputStyle(OUTPUT_CSV);
-    return (TestCache());
-}
+public:
+    explicit lock_guard(os_unfair_lock & lock) : mLock(lock) { os_unfair_lock_lock(&mLock); }
+    ~lock_guard() { os_unfair_lock_unlock(&mLock); }
+
+    lock_guard(const lock_guard &)     = delete;
+    void operator=(const lock_guard &) = delete;
+
+private:
+    os_unfair_lock & mLock;
+};
