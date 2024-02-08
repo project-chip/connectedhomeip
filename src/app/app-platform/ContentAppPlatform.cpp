@@ -136,13 +136,13 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             index++;
             continue;
         }
-        EmberAfStatus ret;
+        CHIP_ERROR err;
         EndpointId initEndpointId = mCurrentEndpointId;
 
         do
         {
-            ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
-            if (ret == EMBER_ZCL_STATUS_SUCCESS)
+            err = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
+            if (err == CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
                                 mCurrentEndpointId, index);
@@ -151,9 +151,9 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
                 IncrementCurrentEndpointID();
                 return app->GetEndpointId();
             }
-            else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+            else if (err != CHIP_ERROR_ENDPOINT_EXISTS)
             {
-                ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
+                ChipLogError(DeviceLayer, "Adding ContentApp error=%s", ErrorStr(err));
                 return kNoCurrentEndpointId;
             }
             IncrementCurrentEndpointID();
@@ -202,10 +202,10 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             index++;
             continue;
         }
-        EmberAfStatus ret = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
-        if (ret != EMBER_ZCL_STATUS_SUCCESS)
+        CHIP_ERROR err = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
+        if (err != EMBER_ZCL_STATUS_SUCCESS)
         {
-            ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
+            ChipLogError(DeviceLayer, "Adding ContentApp error : %s", ErrorStr(err));
             return kNoCurrentEndpointId;
         }
         ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
