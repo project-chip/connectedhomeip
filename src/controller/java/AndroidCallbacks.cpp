@@ -98,13 +98,15 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context,
     JniLocalReferenceScope scope(env);
 
     jclass getConnectedDeviceCallbackCls = nullptr;
-    CHIP_ERROR err = JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
+    CHIP_ERROR err =
+        JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "GetLocalClassRef Error! : %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
                    ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
 
     jmethodID failureMethod;
-    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onConnectionFailure", "(JLjava/lang/Exception;)V", &failureMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onConnectionFailure", "(JLjava/lang/Exception;)V",
+                                                  &failureMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "FindMethod Error! : %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrReturn(failureMethod != nullptr, ChipLogError(Controller, "Could not find onConnectionFailure method"));
 
