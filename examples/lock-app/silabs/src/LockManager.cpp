@@ -297,6 +297,10 @@ bool LockManager::Lock(chip::EndpointId endpointId, const Nullable<chip::FabricI
 bool LockManager::Unlock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
                          const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
+    if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
+    {
+        return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlatched, pin, err);
+    }
     return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pin, err);
 }
 
