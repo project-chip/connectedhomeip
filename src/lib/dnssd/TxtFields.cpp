@@ -38,6 +38,9 @@ namespace Dnssd {
 
 namespace Internal {
 
+constexpr uint8_t kTCPClient = 1;
+constexpr uint8_t kTCPServer = 2;
+
 namespace {
 
 char SafeToLower(uint8_t ch)
@@ -98,11 +101,6 @@ uint8_t MakeU8FromAsciiDecimal(const ByteSpan & val)
 {
     const uint32_t num = MakeU32FromAsciiDecimal(val);
     return CanCastTo<uint8_t>(num) ? static_cast<uint8_t>(num) : 0;
-}
-
-bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
-{
-    return val.size() == 1 && static_cast<char>(*val.data()) == '1';
 }
 
 Optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
@@ -276,9 +274,13 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonRes
     case TxtFieldKey::kSessionActiveThreshold:
         nodeData.mrpRetryActiveThreshold = Internal::GetRetryActiveThreshold(value);
         break;
-    case TxtFieldKey::kTcpSupported:
-        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+    case TxtFieldKey::kTcpSupported: {
+        // bit 0 is reserved and deprecated
+        uint8_t support            = Internal::MakeU8FromAsciiDecimal(value);
+        nodeData.supportsTcpClient = (support & (1 << Internal::kTCPClient)) != 0;
+        nodeData.supportsTcpServer = (support & (1 << Internal::kTCPServer)) != 0;
         break;
+    }
     case TxtFieldKey::kLongIdleTimeICD:
         nodeData.isICDOperatingAsLIT = Internal::MakeOptionalBoolFromAsciiDecimal(value);
         break;

@@ -309,7 +309,7 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
         node.commissionData.rotatingIdLen != 0 || node.commissionData.pairingHint != 0 ||
         node.resolutionData.mrpRetryIntervalIdle.HasValue() || node.resolutionData.mrpRetryIntervalActive.HasValue() ||
         node.resolutionData.mrpRetryActiveThreshold.HasValue() || node.resolutionData.isICDOperatingAsLIT.HasValue() ||
-        node.resolutionData.supportsTcp || node.commissionData.commissionerPasscode != 0)
+        node.resolutionData.supportsTcpServer || node.resolutionData.supportsTcpClient || node.commissionData.commissionerPasscode != 0)
     {
         return false;
     }
@@ -416,8 +416,8 @@ bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 {
     return nodeData.operationalData.peerId == PeerId{} && nodeData.resolutionData.numIPs == 0 &&
         nodeData.resolutionData.port == 0 && !nodeData.resolutionData.mrpRetryIntervalIdle.HasValue() &&
-        !nodeData.resolutionData.mrpRetryIntervalActive.HasValue() && !nodeData.resolutionData.supportsTcp &&
-        !nodeData.resolutionData.isICDOperatingAsLIT.HasValue();
+        !nodeData.resolutionData.mrpRetryIntervalActive.HasValue() && !nodeData.resolutionData.supportsTcpServer &&
+        !nodeData.resolutionData.supportsTcpClient && !nodeData.resolutionData.isICDOperatingAsLIT.HasValue();
 }
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
@@ -647,27 +647,52 @@ void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
     char val[8];
     NodeData nodeData;
 
-    // True
+    // Disable TCP Client and server (1st bit is deprecated)
     strcpy(key, "T");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcpServer);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcpClient);
 
-    // Test no other fields were populated
-    nodeData.resolutionData.supportsTcp = false;
-    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
-
-    // False
+    // Disable TCP Client and server (1st bit is deprecated)
     strcpy(key, "T");
     strcpy(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp == false);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcpServer);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcpClient);
+
+    // Enabling TCP Client
+    strcpy(key, "T");
+    strcpy(val, "2");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcpServer);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcpClient);
+
+    // Enabling TCP Server
+    strcpy(key, "T");
+    strcpy(val, "4");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcpServer);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcpClient);
+
+    // Enabling TCP Server & Client
+    strcpy(key, "T");
+    strcpy(val, "6");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcpServer);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcpClient);
+
+    // Test no other fields were populated
+    nodeData.resolutionData.supportsTcpClient = false;
+    nodeData.resolutionData.supportsTcpServer = false;
+    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
     // Invalid value, stil false
     strcpy(key, "T");
     strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
-    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp == false);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcpClient == false);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcpServer == false);
 }
 
 // Test ICD (ICD operation Mode)
