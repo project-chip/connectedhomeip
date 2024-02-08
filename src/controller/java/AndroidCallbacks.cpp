@@ -70,12 +70,14 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
     JniGlobalReference globalRef(std::move(self->mWrapperCallbackRef));
 
     jclass getConnectedDeviceCallbackCls = nullptr;
-    JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
+    CHIP_ERROR err = JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "GetLocalClassRef Error! : %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
                    ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
 
     jmethodID successMethod;
-    JniReferences::GetInstance().FindMethod(env, javaCallback, "onDeviceConnected", "(J)V", &successMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onDeviceConnected", "(J)V", &successMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "FindMethod Error! : %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrReturn(successMethod != nullptr, ChipLogError(Controller, "Could not find onDeviceConnected method"));
 
     static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
@@ -482,7 +484,8 @@ void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
     DeviceLayer::StackUnlock unlock;
     VerifyOrReturn(mSubscriptionEstablishedCallbackRef.HasValidObjectRef(),
                    ChipLogError(Controller, " mSubscriptionEstablishedCallbackRef is not valid in %s", __func__));
-    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef.ObjectRef(), aSubscriptionId);
+    CHIP_ERROR err = JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef.ObjectRef(), aSubscriptionId);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "CallSubscriptionEstablished error! : %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
 CHIP_ERROR ReportCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
