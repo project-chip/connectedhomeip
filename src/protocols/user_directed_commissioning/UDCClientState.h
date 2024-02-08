@@ -43,6 +43,14 @@ enum class UDCClientProcessingState : uint8_t
 
 using PeerAddress = ::chip::Transport::PeerAddress;
 
+enum class TargetAppCheckState : uint8_t
+{
+    kNotInitialized,
+    kAppNotFound,
+    kAppFoundPasscodeReturned,
+    kAppFoundNoPasscode,
+};
+
 /**
  * Represents information in the TargetAppList of the Identification Declaration message
  */
@@ -50,6 +58,7 @@ struct TargetAppInfo
 {
     uint16_t vendorId  = 0;
     uint16_t productId = 0;
+    TargetAppCheckState checkState = TargetAppCheckState::kNotInitialized;
 };
 
 /**
@@ -114,9 +123,17 @@ public:
         {
             info.vendorId  = mTargetAppInfos[index].vendorId;
             info.productId = mTargetAppInfos[index].productId;
+            info.checkState = mTargetAppInfos[index].checkState;
             return true;
         }
         return false;
+    }
+    void SetTargetAppInfoState(uint8_t index, TargetAppCheckState checkState)
+    {
+        if (index < mNumTargetAppInfos)
+        {
+            mTargetAppInfos[index].checkState = checkState;
+        }
     }
     uint8_t GetNumTargetAppInfos() const { return mNumTargetAppInfos; }
 
@@ -129,6 +146,7 @@ public:
         }
         mTargetAppInfos[mNumTargetAppInfos].vendorId  = vid.vendorId;
         mTargetAppInfos[mNumTargetAppInfos].productId = vid.productId;
+        mTargetAppInfos[mNumTargetAppInfos].checkState = TargetAppCheckState::kNotInitialized;
         mNumTargetAppInfos++;
         return true;
     }
@@ -185,6 +203,7 @@ public:
         mExpirationTime             = System::Clock::kZero;
         mUDCClientProcessingState   = UDCClientProcessingState::kNotInitialized;
         mCachedCommissionerPasscode = 0;
+        mNumTargetAppInfos          = 0;
     }
 
 private:

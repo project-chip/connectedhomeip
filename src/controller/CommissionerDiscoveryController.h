@@ -153,7 +153,6 @@ public:
     virtual ~UserPrompter() = default;
 };
 
-// TODO: rename this to Passcode?
 class DLL_EXPORT PasscodeService
 {
 public:
@@ -162,15 +161,16 @@ public:
      *   Called to determine if the given target app is available to the commissionee with the given given
      * vendorId/productId, and if so, return the passcode.
      *
+     * After lookup and attempting to obtain the passcode, implementor should call HandleContentAppCheck();
+     *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    info               App info to look for.
-     *  @param[in]    passcode           Passcode for the given commissionee, or 0 if passcode cannot be obtained.
      *
      */
-    virtual bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
-                                     chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode) = 0;
+    virtual void LookupTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                                        chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info) = 0;
 
     /**
      * @brief
@@ -186,18 +186,16 @@ public:
 
     /**
      * @brief
-     *   Called to get the setup passcode from the content app corresponding to the given vendorId/productId
-     * Returns 0 if passcode cannot be obtained
+     *   Called to get the setup passcode from the content app corresponding to the given vendorId/productId.
      *
-     * If user responds with OK then implementor should call CommissionerRespondOk();
-     * If user responds with Cancel then implementor should call CommissionerRespondCancel();
+     * After attempting to obtain the passcode, implementor should call HandleContentAppPasscodeResponse();
      *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
      *
      */
-    virtual uint32_t FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
+    virtual void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
 
     virtual ~PasscodeService() = default;
 };
@@ -279,6 +277,26 @@ public:
      * indicated in the UserPrompter's PromptForCommissionOKPermission callback
      */
     void Cancel();
+
+    /**
+     * @brief
+     *   Called with the result of attempting to obtain the passcode from the content app corresponding to the given
+     * vendorId/productId.
+     *
+     *  @param[in]    passcode           Passcode for the given commissionee, or 0 if passcode cannot be obtained.
+     *
+     */
+    void HandleContentAppPasscodeResponse(uint32_t passcode);
+
+    /**
+     * @brief
+     *   Called with the result of attempting to lookup and obtain the passcode from the content app corresponding to the given
+     * target.
+     *
+     *  @param[in]    passcode           Passcode for the given commissionee, or 0 if passcode cannot be obtained.
+     *
+     */
+    void HandleTargetContentAppCheck(chip::Protocols::UserDirectedCommissioning::TargetAppInfo target, uint32_t passcode);
 
     /**
      * This method should be called with the passcode for the client

@@ -94,15 +94,15 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     mReady = false;
     Platform::CopyString(mCurrentInstance, state.GetInstanceName());
     mPendingConsent = true;
-    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
-    Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingDeviceIdHexBuffer,
-                                        RotatingDeviceId::kHexMaxLength);
+    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
+    Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingIdString,
+                                        sizeof(rotatingIdString));
 
     ChipLogDetail(Controller,
                   "------PROMPT USER: %s is requesting permission to cast to this TV, approve? [" ChipLogFormatMEI
                   "," ChipLogFormatMEI ",%s,%s]",
                   state.GetDeviceName(), ChipLogValueMEI(state.GetVendorId()), ChipLogValueMEI(state.GetProductId()),
-                  state.GetInstanceName(), rotatingDeviceIdHexBuffer);
+                  state.GetInstanceName(), rotatingIdString);
     if (mUserPrompter != nullptr)
     {
         mUserPrompter->PromptForCommissionOKPermission(state.GetVendorId(), state.GetProductId(), state.GetDeviceName());
@@ -112,6 +112,8 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
 
 void CommissionerDiscoveryController::Ok()
 {
+    chip::DeviceLayer::StackLock lock;
+
     if (!mPendingConsent)
     {
         ChipLogError(AppServer, "UX Ok: no current instance");
@@ -135,55 +137,163 @@ void CommissionerDiscoveryController::Ok()
     }
     client->SetUDCClientProcessingState(UDCClientProcessingState::kObtainingOnboardingPayload);
 
-    if (mPasscodeService != nullptr)
+    if (mPasscodeService == nullptr)
     {
-        char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
-                                            sizeof(rotatingIdString));
-        // Encoding::BytesToUppercaseHexString(client->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
-        //                                     sizeof(rotatingIdString));
+        HandleContentAppPasscodeResponse(0);
+        return;
+    }
 
-        CharSpan rotatingIdSpan = chip::CharSpan(rotatingIdString, sizeof(rotatingIdString));
-        uint32_t passcode       = 0;
-        uint8_t targetAppCount  = client->GetNumTargetAppInfos();
-        if (targetAppCount > 0)
+    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+    Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
+                                        sizeof(rotatingIdString));
+    CharSpan rotatingIdSpan = chip::CharSpan(rotatingIdString, sizeof(rotatingIdString));
+
+    uint8_t targetAppCount = client->GetNumTargetAppInfos();
+    if (targetAppCount > 0)
+    {
+        for (uint8_t i = 0; i < targetAppCount; i++)
         {
-            bool hasTargetApp = false;
-            for (uint8_t i = 0; i < targetAppCount; i++)
+            TargetAppInfo info;
+            if (client->GetTargetAppInfo(i, info))
             {
-                TargetAppInfo info;
-                if (client->GetTargetAppInfo(i, info))
-                {
-                    if (mPasscodeService->HasTargetContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan, info,
-                                                              passcode))
-                    {
-                        // found one
-                        hasTargetApp = true;
-                    }
-                }
+                mPasscodeService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan, info);
             }
-            // handle NoAppsFound CDC case
-            if (!hasTargetApp)
+        }
+        return;
+    }
+
+    mPasscodeService->FetchCommissionPasscodeFromContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
+    return;
+}
+
+void CommissionerDiscoveryController::HandleTargetContentAppCheck(TargetAppInfo target, uint32_t passcode)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    bool foundTargetApp      = false;
+    bool foundPendingTargets = false;
+
+    /**
+     * Update our target app list with the status from this target.
+     *
+     * If we are the first callback to receive a passcode,
+     *  then complete commissioning with it.
+     * If we are the last expected callback and none has completed commissioning,
+     *  then advance to the next step for trying to obtain a passcode.
+     * When iterating through the list of targets, keep track of whether any apps have been found,
+     *  so that if we advance we can do so with that information (may need to send a CDC).
+     */
+
+    if (mUdcServer == nullptr)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: no udc server");
+        return;
+    }
+    UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+    if (client == nullptr)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: could not find instance=%s", mCurrentInstance);
+        return;
+    }
+    if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kObtainingOnboardingPayload)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: invalid state for HandleContentAppPasscodeResponse");
+        return;
+    }
+
+    uint8_t targetAppCount = client->GetNumTargetAppInfos();
+    for (uint8_t i = 0; i < targetAppCount; i++)
+    {
+        TargetAppInfo info;
+        if (client->GetTargetAppInfo(i, info))
+        {
+            if (info.checkState == TargetAppCheckState::kAppFoundPasscodeReturned)
             {
-                ChipLogError(AppServer, "UX Ok: target apps specified but none found, sending CDC");
-                CommissionerDeclaration cd;
-                cd.SetNoAppsFound(true);
-                mUdcServer->SendCDCMessage(
-                    cd, chip::Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+                // nothing else to do, complete commissioning has been called
                 return;
             }
+            else if (info.checkState == TargetAppCheckState::kAppFoundNoPasscode)
+            {
+                foundTargetApp = true;
+            }
+            else if (info.checkState == TargetAppCheckState::kNotInitialized)
+            {
+                if (target.vendorId == info.vendorId && target.productId == info.productId)
+                {
+                    client->SetTargetAppInfoState(i, target.checkState);
+                    if (target.checkState != TargetAppCheckState::kAppNotFound)
+                    {
+                        foundTargetApp = true;
+                    }
+                }
+                else
+                {
+                    foundPendingTargets = true;
+                }
+            }
         }
-        else
-        {
-            passcode = mPasscodeService->FetchCommissionPasscodeFromContentApp(client->GetVendorId(), client->GetProductId(),
-                                                                               rotatingIdSpan);
-        }
+    }
+    if (passcode != 0)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: found a passcode");
+        // we found a passcode and complete commissioning has not been called
+        CommissionWithPasscode(passcode);
+        return;
+    }
+    if (foundPendingTargets)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: have not heard from all apps");
+        // have not heard from all targets so don't do anything
+        return;
+    }
+    if (!foundTargetApp)
+    {
+        // finished iterating through all apps and found none, send CDC
+        ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: target apps specified but none found, sending CDC");
+        CommissionerDeclaration cd;
+        cd.SetNoAppsFound(true);
+        mUdcServer->SendCDCMessage(cd,
+                                   chip::Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+    }
+    ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: advancing");
+    // otherwise, advance to the next step for trying to obtain a passcode.
+    HandleContentAppPasscodeResponse(0);
+    return;
+}
 
+void CommissionerDiscoveryController::HandleContentAppPasscodeResponse(uint32_t passcode)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    if (mUdcServer == nullptr)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: no udc server");
+        return;
+    }
+    UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+    if (client == nullptr)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: could not find instance=%s", mCurrentInstance);
+        return;
+    }
+    if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kObtainingOnboardingPayload)
+    {
+        ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: invalid state for HandleContentAppPasscodeResponse");
+        return;
+    }
+
+    if (mPasscodeService != nullptr)
+    {
         // if CommissionerPasscode
         //    - if CommissionerPasscodeReady, then start commissioning
         //    - if CommissionerPasscode, then call new UX method to show passcode, send CDC
         if (passcode == 0 && client->GetCommissionerPasscode() && client->GetCdPort() != 0)
         {
+            char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+            Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
+                                                sizeof(rotatingIdString));
+            CharSpan rotatingIdSpan = chip::CharSpan(rotatingIdString, sizeof(rotatingIdString));
+
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
             // generate a passcode
@@ -261,6 +371,8 @@ void CommissionerDiscoveryController::Ok()
 
 void CommissionerDiscoveryController::CommissionWithPasscode(uint32_t passcode)
 {
+    chip::DeviceLayer::StackLock lock;
+
     if (!mPendingConsent)
     {
         ChipLogError(AppServer, "UX Cancel: no current instance");
@@ -298,6 +410,8 @@ void CommissionerDiscoveryController::CommissionWithPasscode(uint32_t passcode)
 
 void CommissionerDiscoveryController::Cancel()
 {
+    chip::DeviceLayer::StackLock lock;
+
     if (!mPendingConsent)
     {
         ChipLogError(AppServer, "UX Cancel: no current instance");
