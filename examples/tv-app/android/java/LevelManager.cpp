@@ -94,8 +94,7 @@ CHIP_ERROR LevelManager::InitializeWithObjects(jobject managerObject)
     VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
     JniLocalReferenceScope scope(env);
 
-    mLevelManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mLevelManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mLevelManagerObject.Init(managerObject));
 
     jclass LevelManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(LevelManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -119,11 +118,11 @@ void LevelManager::HandleLevelChanged(uint8_t value)
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
-    VerifyOrReturn(mLevelManagerObject != nullptr, ChipLogProgress(Zcl, "mLevelManagerObject null"));
+    VerifyOrReturn(mLevelManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mLevelManagerObject is not valid"));
     VerifyOrReturn(mHandleLevelChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleLevelChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mLevelManagerObject, mHandleLevelChangedMethod, static_cast<jint>(value));
+    env->CallVoidMethod(mLevelManagerObject.ObjectRef(), mHandleLevelChangedMethod, static_cast<jint>(value));
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in LevelManager::HandleLevelChanged");

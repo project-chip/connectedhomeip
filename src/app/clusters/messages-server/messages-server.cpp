@@ -26,6 +26,7 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
 {
     return true;
 }
+
 /**
  * @brief Messages Cluster CancelMessagesRequest Command callback (from client)
  */

@@ -72,7 +72,7 @@ MTR_DIRECT_MEMBERS
     _parentCluster = app::ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 
     // Now call setValue to store the value and its serialization.
-    if ([self setValue:value] == NO) {
+    if ([self setValueInternal:value logIfNotAssociated:NO] == NO) {
         return nil;
     }
 
@@ -80,6 +80,11 @@ MTR_DIRECT_MEMBERS
 }
 
 - (BOOL)setValue:(NSDictionary<NSString *, id> *)value
+{
+    return [self setValueInternal:value logIfNotAssociated:YES];
+}
+
+- (BOOL)setValueInternal:(NSDictionary<NSString *, id> *)value logIfNotAssociated:(BOOL)logIfNotAssociated
 {
     id serializedValue;
     id dataType = value[MTRTypeKey];
@@ -121,7 +126,12 @@ MTR_DIRECT_MEMBERS
 
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController == nil) {
-        // We're not bound to a controller, so safe to directly update _serializedValue.
+        // We're not bound to a controller, so safe to directly update
+        // _serializedValue.
+        if (logIfNotAssociated) {
+            MTR_LOG_DEFAULT("Not publishing value for attribute " ChipLogFormatMEI "; not bound to a controller",
+                ChipLogValueMEI(static_cast<AttributeId>(_attributeID.unsignedLongLongValue)));
+        }
         _serializedValue = serializedValue;
     } else {
         [deviceController asyncDispatchToMatterQueue:^{
