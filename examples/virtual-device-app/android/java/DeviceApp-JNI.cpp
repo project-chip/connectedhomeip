@@ -56,10 +56,9 @@ void DeviceAppJNI::InitializeWithObjects(jobject app)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for DeviceAppJNI"));
 
-    mDeviceAppObject = env->NewGlobalRef(app);
-    VerifyOrReturn(mDeviceAppObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef DeviceAppJNI"));
+    VerifyOrReturn(mDeviceAppObject.Init(app) == CHIP_NO_ERROR, ChipLogError(Zcl, "Failed to init mDeviceAppObject"));
 
-    jclass managerClass = env->GetObjectClass(mDeviceAppObject);
+    jclass managerClass = env->GetObjectClass(app);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get DeviceAppJNI Java class"));
 
     mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(JI)V");
@@ -81,10 +80,11 @@ void DeviceAppJNI::PostClusterInit(int clusterId, int endpoint)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for DeviceAppJNI::PostClusterInit"));
-    VerifyOrReturn(mDeviceAppObject != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mDeviceAppObject null"));
+    VerifyOrReturn(mDeviceAppObject.HasValidObjectRef(), ChipLogError(Zcl, "DeviceAppJNI::mDeviceAppObject null"));
     VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mPostClusterInitMethod null"));
 
-    env->CallVoidMethod(mDeviceAppObject, mPostClusterInitMethod, static_cast<jlong>(clusterId), static_cast<jint>(endpoint));
+    env->CallVoidMethod(mDeviceAppObject.ObjectRef(), mPostClusterInitMethod, static_cast<jlong>(clusterId),
+                        static_cast<jint>(endpoint));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call DeviceAppJNI 'postClusterInit' method");
@@ -96,10 +96,10 @@ void DeviceAppJNI::PostEvent(int event)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for DeviceAppJNI::PostEvent"));
-    VerifyOrReturn(mDeviceAppObject != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mDeviceAppObject null"));
+    VerifyOrReturn(mDeviceAppObject.HasValidObjectRef(), ChipLogError(Zcl, "DeviceAppJNI::mDeviceAppObject null"));
     VerifyOrReturn(mPostEventMethod != nullptr, ChipLogError(Zcl, "DeviceAppJNI::mPostEventMethod null"));
 
-    env->CallVoidMethod(mDeviceAppObject, mPostEventMethod, static_cast<jlong>(event));
+    env->CallVoidMethod(mDeviceAppObject.ObjectRef(), mPostEventMethod, static_cast<jlong>(event));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call DeviceAppJNI 'postEventMethod' method");
