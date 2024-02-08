@@ -153,7 +153,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             }
             else if (err != CHIP_ERROR_ENDPOINT_EXISTS)
             {
-                ChipLogError(DeviceLayer, "Adding ContentApp error=%s", ErrorStr(err));
+                ChipLogError(DeviceLayer, "Adding ContentApp error=%" CHIP_ERROR_FORMAT, err.Format());
                 return kNoCurrentEndpointId;
             }
             IncrementCurrentEndpointID();
@@ -203,9 +203,9 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             continue;
         }
         CHIP_ERROR err = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
-        if (err != EMBER_ZCL_STATUS_SUCCESS)
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Adding ContentApp error : %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "Adding ContentApp error : %" CHIP_ERROR_FORMAT, err.Format());
             return kNoCurrentEndpointId;
         }
         ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,

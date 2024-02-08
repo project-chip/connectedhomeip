@@ -259,7 +259,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
         if (nullptr == gDevices[index])
         {
             gDevices[index] = dev;
-            CHIP_ERRO err;
+            CHIP_ERROR err;
             while (true)
             {
                 // Todo: Update this to schedule the work rather than use this lock
