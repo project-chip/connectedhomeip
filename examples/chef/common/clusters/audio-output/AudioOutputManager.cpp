@@ -26,9 +26,9 @@ using namespace chip::app::Clusters::AudioOutput;
 
 AudioOutputManager::AudioOutputManager()
 {
-    mCurrentOutput = 1;
+    const int totalOutput = 4;
 
-    for (int i = 1; i < 4; ++i)
+    for (int i = 1; i < totalOutput; ++i)
     {
         OutputInfoType outputInfo;
         outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;

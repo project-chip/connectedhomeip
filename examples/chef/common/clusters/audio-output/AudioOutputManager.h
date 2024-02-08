@@ -37,7 +37,7 @@ public:
     char * Data(uint8_t index) { return mCharDataBuffer[index]; }
 
 protected:
-    uint8_t mCurrentOutput;
+    uint8_t mCurrentOutput = 1;
     std::vector<OutputInfoType> mOutputs;
     // Magic numbers are here on purpose, please allocate memory
     static constexpr size_t mBufMax = 32;
