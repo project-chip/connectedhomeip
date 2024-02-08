@@ -1159,7 +1159,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 
         static constexpr char kNAIDomain[] = ".pdc.csa-iot.org";
         static constexpr auto keyIdHexSize = keyId.size() * 2;
-        char identityStr[1 + keyIdHexSize + sizeof(kNAIDomain)];
+        char identityStr[1 + keyIdHexSize + sizeof(kNAIDomain)]; // sizeof(kNAIDomain) includes null terminator
 
         identityStr[0] = '@';
         ReturnErrorOnFailure(Encoding::BytesToUppercaseHexBuffer(keyId.data(), keyId.size(), &identityStr[1], keyIdHexSize));

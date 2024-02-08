@@ -165,7 +165,7 @@ Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, 
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    VerifyOrReturnError(mStagingNetwork.Empty() || mStagingNetwork.Match(ssid), Status::kBoundsExceeded);
+    VerifyOrReturnError(mStagingNetwork.Empty() || mStagingNetwork.Matches(ssid), Status::kBoundsExceeded);
 
     // Do the check before setting the values, so the data is not updated on error.
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
@@ -190,7 +190,7 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    VerifyOrReturnError(mStagingNetwork.Match(networkId), Status::kNetworkIDNotFound);
+    VerifyOrReturnError(mStagingNetwork.Matches(networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
     mStagingNetwork.ssidLen = 0;
@@ -200,7 +200,7 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
 Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
     outDebugText.reduce_size(0);
-    VerifyOrReturnError(mStagingNetwork.Match(networkId), Status::kNetworkIDNotFound);
+    VerifyOrReturnError(mStagingNetwork.Matches(networkId), Status::kNetworkIDNotFound);
     VerifyOrReturnError(index == 0, Status::kOutOfRange);
     // We only support one network, so reorder is actually no-op.
     return Status::kSuccess;
@@ -212,7 +212,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     Status networkingStatus = Status::kSuccess;
 
     const auto & network = mStagingNetwork;
-    VerifyOrExit(network.Match(networkId), networkingStatus = Status::kNetworkIDNotFound);
+    VerifyOrExit(network.Matches(networkId), networkingStatus = Status::kNetworkIDNotFound);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     if (network.UsingPDC())
@@ -291,7 +291,7 @@ CHIP_ERROR LinuxWiFiDriver::AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan ne
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     outStatus      = Status::kUnknownError;
-    VerifyOrExit(mStagingNetwork.Empty() || mStagingNetwork.Match(ssid), outStatus = Status::kBoundsExceeded);
+    VerifyOrExit(mStagingNetwork.Empty() || mStagingNetwork.Matches(ssid), outStatus = Status::kBoundsExceeded);
 
     VerifyOrExit(!ssid.empty() && ssid.size() <= sizeof(WiFiNetwork::ssid), outStatus = Status::kOutOfRange);
     VerifyOrExit(!networkIdentity.empty() && networkIdentity.size() <= sizeof(WiFiNetwork::networkIdentity),

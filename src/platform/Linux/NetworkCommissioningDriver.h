@@ -123,7 +123,7 @@ private:
     struct WiFiNetwork
     {
         bool Empty() const { return ssidLen == 0; }
-        bool Match(ByteSpan aSsid) const { return !Empty() && ByteSpan(ssid, ssidLen).data_equal(aSsid); }
+        bool Matches(ByteSpan aSsid) const { return !Empty() && ByteSpan(ssid, ssidLen).data_equal(aSsid); }
 
         uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
         uint8_t ssidLen = 0;
