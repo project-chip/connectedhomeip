@@ -41,10 +41,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     console.print(f"Handling PICS for {clusterName}")
 
     # Map clusters to common XML template if needed
-    if "AccessControl" in clusterName:
-        clusterName = "Access Control"
-
-    elif "OTA Software Update Provider" in clusterName or "OTA Software Update Requestor" in clusterName:
+    if "OTA Software Update Provider" in clusterName or "OTA Software Update Requestor" in clusterName:
         clusterName = "OTA Software Update"
 
     elif "On/Off" == clusterName:
@@ -71,6 +68,9 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
     elif "Boolean State" == clusterName:
         clusterName = "Boolean State Cluster"
+
+    if "Access Control" in clusterName:
+        clusterName = "Access Control cluster"
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
