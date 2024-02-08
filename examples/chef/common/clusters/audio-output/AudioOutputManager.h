@@ -21,17 +21,14 @@
 #include <app/clusters/audio-output-server/audio-output-server.h>
 #include <vector>
 
-using chip::app::AttributeValueEncoder;
-using AudioOutputDelegate = chip::app::Clusters::AudioOutput::Delegate;
-using OutputInfoType      = chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type;
-
-class AudioOutputManager : public AudioOutputDelegate
+class AudioOutputManager : public chip::app::Clusters::AudioOutput::Delegate
 {
+    using OutputInfoType      = chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type;
 public:
     AudioOutputManager();
 
     uint8_t HandleGetCurrentOutput() override;
-    CHIP_ERROR HandleGetOutputList(AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetOutputList(chip::app::AttributeValueEncoder & aEncoder) override;
     bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) override;
     bool HandleSelectOutput(const uint8_t & index) override;
     char * Data(uint8_t index) { return mCharDataBuffer[index]; }
