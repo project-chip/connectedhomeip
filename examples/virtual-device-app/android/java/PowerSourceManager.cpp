@@ -96,9 +96,7 @@ CHIP_ERROR PowerSourceManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    mPowerSourceManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mPowerSourceManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mPowerSourceManagerObject.Init(managerObject));
 
     jclass PowerSourceManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(PowerSourceManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

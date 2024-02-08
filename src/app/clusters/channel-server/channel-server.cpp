@@ -124,6 +124,7 @@ private:
     CHIP_ERROR ReadLineupAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadCurrentChannelAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 ChannelAttrAccess gChannelAttrAccess;
@@ -167,9 +168,10 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
-    default: {
+    case app::Clusters::Channel::Attributes::ClusterRevision::Id:
+        return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    default:
         break;
-    }
     }
 
     return CHIP_NO_ERROR;
@@ -195,6 +197,12 @@ CHIP_ERROR ChannelAttrAccess::ReadLineupAttribute(app::AttributeValueEncoder & a
 CHIP_ERROR ChannelAttrAccess::ReadCurrentChannelAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     return delegate->HandleGetCurrentChannel(aEncoder);
+}
+
+CHIP_ERROR ChannelAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
+    return aEncoder.Encode(clusterRevision);
 }
 
 } // anonymous namespace

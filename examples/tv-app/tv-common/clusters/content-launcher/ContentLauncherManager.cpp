@@ -198,10 +198,26 @@ uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return mDynamicEndpointFeatureMap;
+        return kEndpointFeatureMap;
     }
 
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
+}
+
+uint16_t ContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success             = (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == EMBER_ZCL_STATUS_SUCCESS);
+    if (!success)
+    {
+        ChipLogError(Zcl, "ContentLauncherManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }
