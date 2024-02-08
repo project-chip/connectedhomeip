@@ -20,7 +20,9 @@
 #import "MTRLogging_Internal.h"
 #import "MTRServerAttribute_Internal.h"
 #import "MTRServerEndpoint_Internal.h"
+#import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
+
 #import <Matter/MTRServerAttribute.h>
 
 #include <app/reporting/reporting.h>
@@ -32,7 +34,14 @@ using namespace chip;
 
 MTR_DIRECT_MEMBERS
 @implementation MTRServerAttribute {
+    // _lock always protects access to _deviceController, _value, and
+    // _parentCluster.  _serializedValue is protected when we are modifying it
+    // directly while we have no _deviceController.  Once we have one,
+    // _serializedValue is only modified on the Matter thread.
+    os_unfair_lock _lock;
     MTRDeviceController * __weak _deviceController;
+    NSDictionary<NSString *, id> * _value;
+    app::ConcreteClusterPath _parentCluster;
 }
 
 - (nullable instancetype)initAttributeWithID:(NSNumber *)attributeID initialValue:(NSDictionary<NSString *, id> *)value requiredReadPrivilege:(MTRAccessControlEntryPrivilege)requiredReadPrivilege writable:(BOOL)writable
@@ -66,6 +75,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
+    _lock = OS_UNFAIR_LOCK_INIT;
     _attributeID = attributeID;
     _requiredReadPrivilege = requiredReadPrivilege;
     _writable = writable;
@@ -121,7 +131,10 @@ MTR_DIRECT_MEMBERS
         }
     }
 
-    // We serialized properly, so should be good to go on the value.
+    // We serialized properly, so should be good to go on the value.  Lock
+    // around our ivar accesses.
+    std::lock_guard lock(_lock);
+
     _value = [value copy];
 
     MTRDeviceController * deviceController = _deviceController;
@@ -147,8 +160,16 @@ MTR_DIRECT_MEMBERS
     return YES;
 }
 
+- (NSDictionary<NSString *, id> *)value
+{
+    std::lock_guard lock(_lock);
+    return [_value copy];
+}
+
 - (BOOL)associateWithController:(nullable MTRDeviceController *)controller
 {
+    std::lock_guard lock(_lock);
+
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
@@ -167,7 +188,34 @@ MTR_DIRECT_MEMBERS
 
 - (void)invalidate
 {
+    std::lock_guard lock(_lock);
+
     _deviceController = nil;
+}
+
+- (BOOL)addToCluster:(const app::ConcreteClusterPath &)cluster
+{
+    std::lock_guard lock(_lock);
+
+    if (_parentCluster.mClusterId != kInvalidClusterId) {
+        MTR_LOG_ERROR("Cannot add attribute to cluster " ChipLogFormatMEI "; already added to cluster " ChipLogFormatMEI, ChipLogValueMEI(cluster.mClusterId), ChipLogValueMEI(_parentCluster.mClusterId));
+        return NO;
+    }
+
+    _parentCluster = cluster;
+    return YES;
+}
+
+- (void)updateParentCluster:(const app::ConcreteClusterPath &)cluster
+{
+    std::lock_guard lock(_lock);
+    _parentCluster = cluster;
+}
+
+- (const chip::app::ConcreteClusterPath &)parentCluster
+{
+    std::lock_guard lock(_lock);
+    return _parentCluster;
 }
 
 @end
