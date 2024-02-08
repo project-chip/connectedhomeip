@@ -98,16 +98,18 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context,
     JniLocalReferenceScope scope(env);
 
     jclass getConnectedDeviceCallbackCls = nullptr;
-    JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
+    CHIP_ERROR err = JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "GetLocalClassRef Error! : %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
                    ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
 
     jmethodID failureMethod;
-    JniReferences::GetInstance().FindMethod(env, javaCallback, "onConnectionFailure", "(JLjava/lang/Exception;)V", &failureMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onConnectionFailure", "(JLjava/lang/Exception;)V", &failureMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "FindMethod Error! : %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrReturn(failureMethod != nullptr, ChipLogError(Controller, "Could not find onConnectionFailure method"));
 
     jthrowable exception;
-    CHIP_ERROR err = AndroidConnectionFailureExceptions::GetInstance().CreateAndroidConnectionFailureException(
+    err = AndroidConnectionFailureExceptions::GetInstance().CreateAndroidConnectionFailureException(
         env, failureInfo.error.Format(), failureInfo.error.AsInteger(), failureInfo.sessionStage, exception);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
@@ -151,8 +153,6 @@ ReportCallback::~ReportCallback()
 
 void ReportCallback::OnReportBegin()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
 
@@ -162,7 +162,7 @@ void ReportCallback::OnReportBegin()
                    ChipLogError(Controller, "mReportCallbackRef is not valid in %s", __func__));
     jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
     jmethodID onReportBeginMethod;
-    err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "onReportBegin", "()V", &onReportBeginMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "onReportBegin", "()V", &onReportBeginMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onReportBegin method"));
 
     DeviceLayer::StackUnlock unlock;
