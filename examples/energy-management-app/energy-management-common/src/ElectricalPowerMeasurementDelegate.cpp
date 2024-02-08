@@ -36,39 +36,6 @@ void ElectricalPowerMeasurementInstance::Shutdown()
 {
     Instance::Shutdown();
 }
-#if 0
-DataModel::List<const Structs::MeasurementAccuracyStruct::Type> ElectricalPowerMeasurementDelegate::GetAccuracy()
-{
-
-    Structs::MeasurementAccuracyRangeStruct::Type activeCurrentAccuracyRanges[] = { { .rangeMin = 500, .rangeMax = 1000 } };
-    Structs::MeasurementAccuracyStruct::Type accuracies[]                       = {
-        { .measurementType  = MeasurementTypeEnum::kActiveCurrent,
-                                .measured         = true,
-                                .minMeasuredValue = -10000000,
-                                .maxMeasuredValue = 10000000,
-                                .accuracyRanges   = DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type>(activeCurrentAccuracyRanges) }
-    };
-
-    return DataModel::List<const Structs::MeasurementAccuracyStruct::Type>(accuracies);
-}
-
-DataModel::List<const Structs::MeasurementRangeStruct::Type> ElectricalPowerMeasurementDelegate::GetRanges()
-{
-    return DataModel::List<const Structs::MeasurementRangeStruct::Type>();
-}
-
-DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>>
-ElectricalPowerMeasurementDelegate::GetHarmonicCurrents()
-{
-    return {};
-}
-
-DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>>
-ElectricalPowerMeasurementDelegate::GetHarmonicPhases()
-{
-    return {};
-}
-#endif
 
 // --------------- Internal Attribute Set APIs
 CHIP_ERROR ElectricalPowerMeasurementDelegate::SetPowerMode(PowerModeEnum newValue)

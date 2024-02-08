@@ -45,6 +45,8 @@ CHIP_ERROR EVSEManufacturer::Init()
 
     dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(this));
 
+    ReturnErrorOnFailure(InitializePowerMeasurementCluster());
+
     /*
      * This is an example implementation for manufacturers to consider
      *
@@ -88,6 +90,35 @@ CHIP_ERROR EVSEManufacturer::Init()
 
 CHIP_ERROR EVSEManufacturer::Shutdown()
 {
+    return CHIP_NO_ERROR;
+}
+
+/**
+ * @brief   Allows a client application to initialise the Accuracy, Measurement types etc
+ */
+CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
+{
+    EVSEManufacturer * mn = GetEvseManufacturer();
+    VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    ElectricalPowerMeasurementDelegate * dg = mn->GetEPMDelegate();
+    VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    // Set power mode to AC
+    ReturnErrorOnFailure(dg->SetPowerMode(PowerModeEnum::kAc));
+
+#if 0
+    Structs::MeasurementAccuracyRangeStruct::Type activeCurrentAccuracyRanges[] = { { .rangeMin = 500, .rangeMax = 1000 } };
+    Structs::MeasurementAccuracyStruct::Type accuracies[]                       = {
+        { .measurementType  = MeasurementTypeEnum::kActiveCurrent,
+                                .measured         = true,
+                                .minMeasuredValue = -10000000,
+                                .maxMeasuredValue = 10000000,
+                                .accuracyRanges   = DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type>(activeCurrentAccuracyRanges) }
+    };
+
+    return DataModel::List<const Structs::MeasurementAccuracyStruct::Type>(accuracies);
+#endif
     return CHIP_NO_ERROR;
 }
 

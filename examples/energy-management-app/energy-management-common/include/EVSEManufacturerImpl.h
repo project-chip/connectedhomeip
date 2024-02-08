@@ -78,6 +78,11 @@ public:
     static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
 
     /**
+     * @brief   Allows a client application to initialise the Accuracy, Measurement types etc
+     */
+    CHIP_ERROR InitializePowerMeasurementCluster();
+
+    /**
      * @brief   Allows a client application to send in power readings into the system
      *
      * @param[in]  aEndpointId       - Endpoint to send to EPM Cluster
