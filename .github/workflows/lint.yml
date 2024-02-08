@@ -243,7 +243,7 @@ jobs:
             - name: Check for use of %zu, which are not supported on some libcs.
               if: always()
               run: |
-                  git grep -n "%zu" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+                  git grep -I -n "%zu" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # Comments like '{{! ... }}' should be used in zap files
             - name: Do not allow TODO in generated files
