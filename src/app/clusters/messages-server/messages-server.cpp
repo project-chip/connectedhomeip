@@ -196,6 +196,7 @@ exit:
     commandObj->AddStatus(commandPath, status);
     return true;
 }
+
 /**
  * @brief Messages Cluster CancelMessagesRequest Command callback (from client)
  */

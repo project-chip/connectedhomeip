@@ -139,6 +139,7 @@ private:
     CHIP_ERROR ReadActiveTextTrackAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadAvailableTextTracksAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 MediaPlaybackAttrAccess gMediaPlaybackAttrAccess;
@@ -169,45 +170,34 @@ CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & 
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::MediaPlayback::Attributes::CurrentState::Id: {
+    case app::Clusters::MediaPlayback::Attributes::CurrentState::Id:
         return ReadCurrentStateAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::StartTime::Id: {
+    case app::Clusters::MediaPlayback::Attributes::StartTime::Id:
         return ReadStartTimeAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::Duration::Id: {
+    case app::Clusters::MediaPlayback::Attributes::Duration::Id:
         return ReadDurationAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::SampledPosition::Id: {
+    case app::Clusters::MediaPlayback::Attributes::SampledPosition::Id:
         return ReadSampledPositionAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::Id: {
+    case app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::Id:
         return ReadPlaybackSpeedAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::SeekRangeStart::Id: {
+    case app::Clusters::MediaPlayback::Attributes::SeekRangeStart::Id:
         return ReadSeekRangeStartAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id: {
+    case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id:
         return ReadSeekRangeEndAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::Id: {
+    case app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::Id:
         return ReadActiveAudioTrackAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::Id: {
+    case app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::Id:
         return ReadAvailableAudioTracksAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::Id: {
+    case app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::Id:
         return ReadActiveTextTrackAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id: {
+    case app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id:
         return ReadAvailableTextTracksAttribute(aEncoder, delegate);
-    }
-    case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id: {
+    case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id:
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
-    }
-    default: {
+    case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id:
+        return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    default:
         break;
-    }
     }
 
     return CHIP_NO_ERROR;
@@ -218,6 +208,13 @@ CHIP_ERROR MediaPlaybackAttrAccess::ReadFeatureFlagAttribute(EndpointId endpoint
 {
     uint32_t featureFlag = delegate->GetFeatureMap(endpoint);
     return aEncoder.Encode(featureFlag);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                          Delegate * delegate)
+{
+    uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
+    return aEncoder.Encode(clusterRevision);
 }
 
 CHIP_ERROR MediaPlaybackAttrAccess::ReadCurrentStateAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
