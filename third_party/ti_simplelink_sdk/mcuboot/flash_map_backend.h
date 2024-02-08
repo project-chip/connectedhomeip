@@ -32,7 +32,7 @@
 
 #include <mcuboot_config/mcuboot_config.h>
 #define FLASH_DEVICE_INDEX_MASK (0x7F)
-#define FLASH_DEVICE_GET_EXT_INDEX(n) ((n) &FLASH_DEVICE_INDEX_MASK)
+#define FLASH_DEVICE_GET_EXT_INDEX(n) ((n) & FLASH_DEVICE_INDEX_MASK)
 #define FLASH_DEVICE_EXTERNAL_FLAG (0x80)
 #define FLASH_DEVICE_INTERNAL_FLASH (0x7F)
 #define FLASH_DEVICE_EXTERNAL_FLASH(index) (FLASH_DEVICE_EXTERNAL_FLAG | index)
@@ -55,7 +55,7 @@
 #error "This file must be used with TI_BOOT_USE_EXTERNAL_FLASH enabled"
 #endif
 
-#ifdef DeviceFamily_CC13X4
+#if defined(DeviceFamily_CC13X4) || defined(DeviceFamily_CC26X4)
 #if (MCUBOOT_IMAGE_NUMBER == 2)
 #define BOOT_SLOT_1_SIZE 0x0002B000
 #define BOOT_SLOT_2_SIZE 0x000CC800
