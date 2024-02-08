@@ -21,8 +21,6 @@ import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-wait_time = 0.5
-
 # This test requires several additional command line arguments.
 # Run the test with
 # --int-arg PIXIT.RVCRUNM.MODE_A:<mode id> PIXIT.RVCRUNM.MODE_B:<mode id>
@@ -128,7 +126,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         # Ensure that the device is in the correct state
         if self.is_ci:
             self.write_to_app_pipe('{"Name": "Reset"}')
-            sleep(wait_time)
 
         self.print_step(2, "Manually put the device in a RVC Run Mode cluster mode with "
                            "the Idle(0x4000) mode tag and in a device state that allows changing to either "

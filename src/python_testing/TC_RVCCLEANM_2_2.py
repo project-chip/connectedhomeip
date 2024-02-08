@@ -21,8 +21,6 @@ import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-wait_time = 0.5
-
 
 class TC_RVCCLEANM_2_2(MatterBaseTest):
 
@@ -94,13 +92,11 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         # Ensure that the device is in the correct state
         if self.is_ci:
             self.write_to_app_pipe('{"Name": "Reset"}')
-            sleep(wait_time)
 
         self.print_step(
             2, "Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag.")
         if self.is_ci:
             await self.send_run_change_to_mode_cmd(1)
-            sleep(wait_time)
         else:
             input("Press Enter when done.\n")
 

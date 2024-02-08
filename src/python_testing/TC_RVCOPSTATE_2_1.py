@@ -23,8 +23,6 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-wait_time = 0.5
-
 
 class TC_RVCOPSTATE_2_1(MatterBaseTest):
     def __init__(self, *args):
@@ -88,7 +86,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
         # Ensure that the device is in the correct state
         if self.is_ci:
             self.write_to_app_pipe('{"Name": "Reset"}')
-            sleep(wait_time)
 
         if self.check_pics("RVCOPSTATE.S.A0000"):
             self.print_step(2, "Read PhaseList attribute")
@@ -166,7 +163,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("6c", "Manually put the device in the running state")
                 if self.is_ci:
                     await self.send_run_change_to_mode_cmd(1)
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6d", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kRunning)
@@ -174,7 +170,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("6e", "Manually put the device in the paused state")
                 if self.is_ci:
                     await self.send_pause_cmd()
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6f", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kPaused)
@@ -182,7 +177,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("6g", "Manually put the device in the error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "UnableToStartOrResume"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6h", expected_state=Clusters.OperationalState.Enums.OperationalStateEnum.kError)
@@ -190,11 +184,8 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("6i", "Manually put the device in the seeking charger state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "Reset"}')
-                    sleep(wait_time)
                     await self.send_run_change_to_mode_cmd(1)
-                    sleep(wait_time)
                     await self.send_run_change_to_mode_cmd(0)
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6j", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger)
@@ -202,7 +193,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("6k", "Manually put the device in the charging state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ChargerFound"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6l", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCharging)
@@ -210,7 +200,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("6m", "Manually put the device in the docked state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "Charged"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_opstate(step="6n", expected_state=Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked)
@@ -242,7 +231,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7c", "Manually put the device in the unable to start or resume error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "UnableToStartOrResume"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7d", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume)
@@ -250,7 +238,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7e", "Manually put the device in the unable to complete operation error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "UnableToCompleteOperation"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7f", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation)
@@ -258,7 +245,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7g", "Manually put the device in the command invalid error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "CommandInvalidInState"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7h", expected_error=Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState)
@@ -266,7 +252,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7i", "Manually put the device in the failed to find dock error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "FailedToFindChargingDock"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7j", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kFailedToFindChargingDock)
@@ -274,7 +259,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7k", "Manually put the device in the stuck error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "Stuck"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7l", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kStuck)
@@ -282,7 +266,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7m", "Manually put the device in the dust bin missing error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "DustBinMissing"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7n", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinMissing)
@@ -290,7 +273,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7o", "Manually put the device in the dust bin full error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "DustBinFull"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7p", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinFull)
@@ -298,7 +280,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7q", "Manually put the device in the water tank empty error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "WaterTankEmpty"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7r", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankEmpty)
@@ -306,7 +287,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7s", "Manually put the device in the water tank missing error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "WaterTankMissing"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7t", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankMissing)
@@ -314,7 +294,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7u", "Manually put the device in the water tank lid open error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "WaterTankLidOpen"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7v", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankLidOpen)
@@ -322,7 +301,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
                 self.print_step("7w", "Manually put the device in the mop cleaning pad missing error state")
                 if self.is_ci:
                     self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "MopCleaningPadMissing"}')
-                    sleep(wait_time)
                 else:
                     input("Press Enter when done.\n")
                 await self.read_and_validate_operror(step="7x", expected_error=Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing)

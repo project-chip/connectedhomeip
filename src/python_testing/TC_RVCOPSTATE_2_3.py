@@ -23,8 +23,6 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-wait_time = 0.5
-
 
 # Takes an OpState or RvcOpState state enum and returns a string representation
 def state_enum_to_text(state_enum):
@@ -170,12 +168,10 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         # Ensure that the device is in the correct state
         if self.is_ci:
             self.write_to_app_pipe('{"Name": "Reset"}')
-            sleep(wait_time)
 
         self.print_step(2, "Manually put the device in a state where it can receive a Pause command")
         if self.is_ci:
             await self.send_run_change_to_mode_cmd(1)
-            sleep(wait_time)
         else:
             input("Press Enter when done.\n")
 
@@ -257,7 +253,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             self.print_step(24, "Manually put the device in the Stopped(0x00) operational state")
             if self.is_ci:
                 self.write_to_app_pipe('{"Name": "Reset"}')
-                sleep(wait_time)
             else:
                 input("Press Enter when done.\n")
 
@@ -271,7 +266,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             self.print_step(28, "Manually put the device in the Error(0x03) operational state")
             if self.is_ci:
                 self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "Stuck"}')
-                sleep(wait_time)
             else:
                 input("Press Enter when done.\n")
 
@@ -285,13 +279,9 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             self.print_step(32, "Manually put the device in the Charging(0x41) operational state")
             if self.is_ci:
                 self.write_to_app_pipe('{"Name": "Reset"}')
-                sleep(wait_time)
                 await self.send_run_change_to_mode_cmd(1)
-                sleep(wait_time)
                 await self.send_run_change_to_mode_cmd(0)
-                sleep(wait_time)
                 self.write_to_app_pipe('{"Name": "ChargerFound"}')
-                sleep(wait_time)
             else:
                 input("Press Enter when done.\n")
 
@@ -312,7 +302,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             self.print_step(38, "Manually put the device in the Docked(0x42) operational state")
             if self.is_ci:
                 self.write_to_app_pipe('{"Name": "Charged"}')
-                sleep(wait_time)
             else:
                 input("Press Enter when done.\n")
 
@@ -331,9 +320,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             self.print_step(43, "Manually put the device in the SeekingCharger(0x40) operational state")
             if self.is_ci:
                 await self.send_run_change_to_mode_cmd(1)
-                sleep(wait_time)
                 await self.send_run_change_to_mode_cmd(0)
-                sleep(wait_time)
             else:
                 input("Press Enter when done.\n")
 
