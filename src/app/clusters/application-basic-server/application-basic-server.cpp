@@ -170,30 +170,22 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
 
     switch (aPath.mAttributeId)
     {
-    case chip::app::Clusters::ApplicationBasic::Attributes::VendorName::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorName::Id:
         return ReadVendorNameAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id:
         return ReadVendorIdAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::Id:
         return ReadApplicationNameAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ProductID::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ProductID::Id:
         return ReadProductIdAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::Application::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Application::Id:
         return ReadApplicationAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::Status::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::Status::Id:
         return ReadStatusAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::Id:
         return ReadApplicationVersionAttribute(aEncoder, delegate);
-    }
-    case chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::Id: {
+    case chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::Id:
         return ReadAllowedVendorListAttribute(aEncoder, delegate);
-    }
     default: {
         break;
     }
