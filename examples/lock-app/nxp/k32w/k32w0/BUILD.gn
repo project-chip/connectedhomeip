@@ -13,19 +13,23 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
-import("${k32w0_sdk_build_root}/k32w0_executable.gni")
-import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
 declare_args() {
   chip_software_version = 0
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
 }
 
 if (chip_pw_tokenizer_logging) {
@@ -69,6 +73,10 @@ k32w0_sdk("sdk") {
       "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
     ]
   }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
 }
 
 k32w0_executable("lock_app") {
@@ -92,11 +100,12 @@ k32w0_executable("lock_app") {
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
     ]
 
-    defines = [ "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1" ]
+    defines = [
+      "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
+    ]
   }
 
   deps = [
-    ":sdk",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/nxp/zap/",
     "${chip_root}/examples/providers:device_info_provider",

@@ -92,8 +92,13 @@
 #else
 
 // Use a default setup PIN code if one hasn't been provisioned in flash.
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
@@ -175,8 +180,6 @@
  *    its own access control lists.
  */
 #define CHIP_CONFIG_MAX_FABRICS 5 // 5 is the minimum number of supported fabrics
-
-#define CHIP_DEVICE_CONFIG_ENABLE_SED 1
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE

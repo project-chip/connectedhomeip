@@ -40,14 +40,21 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             return;
         }
 
-        LightingMgr().InitiateAction(0, *value ? LightingManager::TURNON_ACTION : LightingManager::TURNOFF_ACTION);
+        LightingMgr().InitiateAction(0, *value ? LightingManager::TURNON_ACTION : LightingManager::TURNOFF_ACTION, *value);
     }
     else if (path.mClusterId == LevelControl::Id)
     {
-        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(path.mAttributeId), type, *value, size);
+        if (path.mAttributeId != LevelControl::Attributes::CurrentLevel::Id)
+        {
+            ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mAttributeId));
+            return;
+        }
 
-        // WIP Apply attribute change to Light
+        if (*value > 1 && *value < 254)
+        {
+            ChipLogProgress(Zcl, "Setting value: %d", *value);
+            LightingMgr().InitiateAction(0, LightingManager::DIM_ACTION, *value);
+        }
     }
     else if (path.mClusterId == ColorControl::Id)
     {

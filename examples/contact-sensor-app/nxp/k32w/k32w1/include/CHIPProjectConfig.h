@@ -94,8 +94,13 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
 
 // Use a default setup PIN code if one hasn't been provisioned in flash.
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
@@ -186,8 +191,6 @@
 #define CHIP_CONFIG_MAX_FABRICS 5 // 5 is the minimum number of supported fabrics
 
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 1
-#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL 1000_ms32
-#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL 100_ms32
 
 /**
  * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER

@@ -13,13 +13,19 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
-import("${k32w0_sdk_build_root}/k32w0_executable.gni")
-import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+declare_args() {
+  # Setup discriminator as argument
+  setup_discriminator = 3840
+}
 
 assert(current_os == "freertos")
 
@@ -50,6 +56,10 @@ k32w0_sdk("sdk") {
   } else {
     defines += [ "BUILD_RELEASE=1" ]
   }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
 }
 
 k32w0_executable("shell_app") {

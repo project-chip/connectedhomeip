@@ -48,13 +48,13 @@ using namespace ::chip::Logging;
 
 #if defined(chip_with_low_power) && (chip_with_low_power == 1)
 #include "Keyboard.h"
-#include "OtaSupport.h"
 #include "PWR_Configuration.h"
 #include "PWR_Interface.h"
 #include "RNG_Interface.h"
 #include "app_dual_mode_low_power.h"
 #include "app_dual_mode_switch.h"
 #include "radio.h"
+#include "OtaSupport.h"
 #endif
 
 #include "MacSched.h"
@@ -164,6 +164,7 @@ extern "C" void main_task(void const * argument)
 exit:
     return;
 }
+
 
 /**
  * Glue function called directly by the OpenThread stack
