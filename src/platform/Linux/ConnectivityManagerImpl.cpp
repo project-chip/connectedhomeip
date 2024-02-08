@@ -1094,6 +1094,7 @@ static CHIP_ERROR AddOrReplaceBlob(WpaFiW1Wpa_supplicant1Interface * iface, cons
             ChipLogError(DeviceLayer, "wpa_supplicant: failed to remove blob: %s", err ? err->message : "unknown error");
             return CHIP_ERROR_INTERNAL;
         }
+        err.reset();
     }
     if (!wpa_fi_w1_wpa_supplicant1_interface_call_add_blob_sync(
             iface, name, g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, data.data(), data.size(), 1), nullptr,
