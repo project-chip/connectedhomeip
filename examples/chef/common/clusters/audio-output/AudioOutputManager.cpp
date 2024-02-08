@@ -28,13 +28,13 @@ AudioOutputManager::AudioOutputManager()
 {
     const int totalOutput = 4;
 
-    for (int i = 1; i < totalOutput; ++i)
+    for (uint8_t i = 1; i < totalOutput; ++i)
     {
         OutputInfoType outputInfo;
         outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
         // note: safe only because of use of string literal
         outputInfo.name  = chip::CharSpan::fromCharString("HDMI");
-        outputInfo.index = static_cast<uint8_t>(i);
+        outputInfo.index = i;
         mOutputs.push_back(outputInfo);
     }
 }
