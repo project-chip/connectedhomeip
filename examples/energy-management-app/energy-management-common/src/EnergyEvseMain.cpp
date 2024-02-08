@@ -20,7 +20,6 @@
 #include <EVSEManufacturerImpl.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseManager.h>
-#include <EnergyManagementManager.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>
 
