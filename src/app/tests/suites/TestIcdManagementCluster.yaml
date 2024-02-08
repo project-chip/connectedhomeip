@@ -88,7 +88,8 @@ tests:
       attribute: "ICDCounter"
       response:
           value: beforeRebootICDCounter + 101
-    - label: "Verify the ICD is operating as a LIT ICDCounter"
+
+    - label: "Verify the ICD is operating as a LIT ICD"
       command: "readAttribute"
       attribute: OperatingMode
       response:
@@ -101,7 +102,7 @@ tests:
               - name: "CheckInNodeID"
                 value: commissionerNodeId
 
-    - label: "Verify the ICD is operating as a LIT ICDCounter"
+    - label: "Verify the ICD is operating as a SIT ICD"
       command: "readAttribute"
       attribute: OperatingMode
       response:
