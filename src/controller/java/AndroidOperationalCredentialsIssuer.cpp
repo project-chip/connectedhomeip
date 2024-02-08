@@ -127,14 +127,16 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
                                                                  const ByteSpan & PAI,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    JniLocalReferenceScope scope(env);
+
     if (mUseJavaCallbackForNOCRequest)
     {
         return CallbackGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
     }
-    else
-    {
-        return LocalGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
-    }
+
+    return LocalGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
 }
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
@@ -464,8 +466,7 @@ CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyt
     jmethodID constructor;
     jclass infoClass;
 
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/CSRInfo", infoClass);
-    JniClass attestationInfoClass(infoClass);
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/CSRInfo", infoClass);
     SuccessOrExit(err);
 
     env->ExceptionClear();
@@ -487,8 +488,7 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray no
     jmethodID constructor;
     jclass infoClass;
 
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/AttestationInfo", infoClass);
-    JniClass attestationInfoClass(infoClass);
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/AttestationInfo", infoClass);
     SuccessOrExit(err);
 
     env->ExceptionClear();

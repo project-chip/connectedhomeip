@@ -181,29 +181,101 @@ public:
         uint16_t remoteMaxPathsPerInvoke = 1;
     };
 
-    // PrepareCommand and FinishCommand are public SDK APIs, so we cannot break source
-    // compatibility for them. By having parameters to those APIs use this struct instead
-    // of individual function arguments, we centralize required changes to one file
-    // when adding new functionality.
-    struct AdditionalCommandParameters
+    // AddRequestData is a public SDK API, so we must maintain source compatibility.
+    // Using this struct for API parameters instead of individual parameters allows us
+    // to make necessary changes for new functionality in a single location.
+    struct AddRequestDataParameters
     {
         // gcc bug requires us to have the constructor below
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
-        AdditionalCommandParameters() {}
+        AddRequestDataParameters() {}
 
-        AdditionalCommandParameters & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
+        AddRequestDataParameters(const Optional<uint16_t> & aTimedInvokeTimeoutMs) : timedInvokeTimeoutMs(aTimedInvokeTimeoutMs) {}
+
+        // When a value is provided for timedInvokeTimeoutMs, this invoke becomes a timed
+        // invoke. CommandSender will use the minimum of all provided timeouts for execution.
+        const Optional<uint16_t> timedInvokeTimeoutMs;
+        // The command reference is required when sending multiple commands. It allows the caller
+        // to associate this request with its corresponding response.
+        Optional<uint16_t> commandRef;
+    };
+
+    // PrepareCommand is a public SDK API, so we must maintain source compatibility.
+    // Using this struct for API parameters instead of individual parameters allows us
+    // to make necessary changes for new functionality in a single location.
+    struct PrepareCommandParameters
+    {
+        // gcc bug requires us to have the constructor below
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
+        PrepareCommandParameters() {}
+
+        PrepareCommandParameters(const AddRequestDataParameters & aAddRequestDataParam) :
+            commandRef(aAddRequestDataParam.commandRef)
+        {}
+
+        PrepareCommandParameters & SetStartDataStruct(bool aStartDataStruct)
         {
-            startOrEndDataStruct = aStartOrEndDataStruct;
+            startDataStruct = aStartDataStruct;
             return *this;
         }
 
-        // From the perspective of `PrepareCommand`, this is an out parameter. This value will be
-        // set by `PrepareCommand` and is expected to be unchanged by caller until it is provided
-        // to `FinishCommand`.
+        PrepareCommandParameters & SetCommandRef(uint16_t aCommandRef)
+        {
+            commandRef.SetValue(aCommandRef);
+            return *this;
+        }
+        // The command reference is required when sending multiple commands. It allows the caller
+        // to associate this request with its corresponding response. We validate the reference
+        // early in PrepareCommand, even though it's not used until FinishCommand. This proactive
+        // validation helps prevent unnecessary writing an InvokeRequest into the packet that later
+        // needs to be undone.
+        //
+        // Currently, provided commandRefs for the first request must start at 0 and increment by one
+        // for each subsequent request. This requirement can be relaxed in the future if a compelling
+        // need arises.
+        // TODO(#30453): After introducing Request/Response tracking, remove statement above about
+        // this currently enforced requirement on commandRefs.
         Optional<uint16_t> commandRef;
-        // For both `PrepareCommand` and `FinishCommand` this is an in parameter. It must have
-        // the same value when calling `PrepareCommand` and `FinishCommand` for a given command.
-        bool startOrEndDataStruct = false;
+        // If the InvokeRequest needs to be in a state with a started data TLV struct container
+        bool startDataStruct = false;
+    };
+
+    // FinishCommand is a public SDK API, so we must maintain source compatibility.
+    // Using this struct for API parameters instead of individual parameters allows us
+    // to make necessary changes for new functionality in a single location.
+    struct FinishCommandParameters
+    {
+        // gcc bug requires us to have the constructor below
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
+        FinishCommandParameters() {}
+
+        FinishCommandParameters(const Optional<uint16_t> & aTimedInvokeTimeoutMs) : timedInvokeTimeoutMs(aTimedInvokeTimeoutMs) {}
+        FinishCommandParameters(const AddRequestDataParameters & aAddRequestDataParam) :
+            timedInvokeTimeoutMs(aAddRequestDataParam.timedInvokeTimeoutMs), commandRef(aAddRequestDataParam.commandRef)
+        {}
+
+        FinishCommandParameters & SetEndDataStruct(bool aEndDataStruct)
+        {
+            endDataStruct = aEndDataStruct;
+            return *this;
+        }
+
+        FinishCommandParameters & SetCommandRef(uint16_t aCommandRef)
+        {
+            commandRef.SetValue(aCommandRef);
+            return *this;
+        }
+
+        // When a value is provided for timedInvokeTimeoutMs, this invoke becomes a timed
+        // invoke. CommandSender will use the minimum of all provided timeouts for execution.
+        const Optional<uint16_t> timedInvokeTimeoutMs;
+        // The command reference is required when sending multiple commands. It allows the caller
+        // to associate this request with its corresponding response. This value must be
+        // the same as the one provided in PrepareCommandParameters when calling PrepareCommand.
+        Optional<uint16_t> commandRef;
+        // If InvokeRequest is in a state where the data TLV struct container is currently open
+        // and FinishCommand should close it.
+        bool endDataStruct = false;
     };
 
     /*
@@ -243,24 +315,30 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, PrepareCommandParameters & aPrepareCommandParams);
 
-    [[deprecated("PrepareCommand should migrate to calling PrepareCommand with AdditionalCommandParameters")]] CHIP_ERROR
+    [[deprecated("PrepareCommand should migrate to calling PrepareCommand with PrepareCommandParameters")]] CHIP_ERROR
     PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true)
     {
-        AdditionalCommandParameters optionalArgs;
-        optionalArgs.SetStartOrEndDataStruct(aStartDataStruct);
-        return PrepareCommand(aCommandPathParams, optionalArgs);
+        PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.SetStartDataStruct(aStartDataStruct);
+        return PrepareCommand(aCommandPathParams, prepareCommandParams);
     }
 
-    CHIP_ERROR FinishCommand(const AdditionalCommandParameters & aOptionalArgs);
+    CHIP_ERROR FinishCommand(FinishCommandParameters & aFinishCommandParams);
 
-    [[deprecated("FinishCommand should migrate to calling FinishCommand with AdditionalCommandParameters")]] CHIP_ERROR
+    [[deprecated("FinishCommand should migrate to calling FinishCommand with FinishCommandParameters")]] CHIP_ERROR
     FinishCommand(bool aEndDataStruct = true)
     {
-        AdditionalCommandParameters optionalArgs;
-        optionalArgs.SetStartOrEndDataStruct(aEndDataStruct);
-        return FinishCommand(optionalArgs);
+        FinishCommandParameters finishCommandParams;
+        finishCommandParams.SetEndDataStruct(aEndDataStruct);
+        return FinishCommand(finishCommandParams);
+    }
+    [[deprecated("FinishCommand should migrate to calling FinishCommand with FinishCommandParameters")]] CHIP_ERROR
+    FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    {
+        FinishCommandParameters finishCommandParams(aTimedInvokeTimeoutMs);
+        return FinishCommand(finishCommandParams);
     }
 
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
@@ -275,48 +353,36 @@ public:
      * @param [in] aData         The data for the request.
      */
     template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
-    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                              AdditionalCommandParameters & aOptionalArgs)
-    {
-        return AddRequestData(aCommandPath, aData, NullOptional, aOptionalArgs);
-    }
-    template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
     {
-        AdditionalCommandParameters optionalArgs;
-        return AddRequestData(aCommandPath, aData, optionalArgs);
+        AddRequestDataParameters addRequestDataParams;
+        return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
-    /**
-     * API for adding a data request that allows caller to provide a timed
-     * invoke timeout.  If provided, this invoke will be a timed invoke, using
-     * the minimum of the provided timeouts.
-     */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                              const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters & aOptionalArgs)
+                              AddRequestDataParameters & aAddRequestDataParams)
     {
-        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-        // AddRequestDataInternal encodes the data and requires startOrEndDataStruct to be false.
-        VerifyOrReturnError(aOptionalArgs.startOrEndDataStruct == false, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aAddRequestDataParams.timedInvokeTimeoutMs.HasValue(),
+                            CHIP_ERROR_INVALID_ARGUMENT);
 
-        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
+        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
     }
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs)
     {
-        AdditionalCommandParameters optionalArgs;
-        return AddRequestData(aCommandPath, aData, aTimedInvokeTimeoutMs, optionalArgs);
+        AddRequestDataParameters addRequestDataParams(aTimedInvokeTimeoutMs);
+        return AddRequestData(aCommandPath, aData, addRequestDataParams);
     }
 
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs, const AdditionalCommandParameters & aOptionalArgs);
-
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
-    {
-        AdditionalCommandParameters optionalArgs;
-        return FinishCommand(aTimedInvokeTimeoutMs, optionalArgs);
-    }
+    /**
+     * @brief Returns the number of InvokeResponseMessages received.
+     *
+     * Responses to multiple requests might be split across several InvokeResponseMessages.
+     * This function helps track the total count. Primarily for test validation purposes.
+     */
+    size_t GetInvokeResponseMessageCount();
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
@@ -325,19 +391,19 @@ public:
      * timeout parameter.  For use in tests only.
      */
     template <typename CommandDataT>
-    CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                          AdditionalCommandParameters & aOptionalArgs)
+    CHIP_ERROR TestOnlyAddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                                                  AddRequestDataParameters & aAddRequestDataParams)
     {
-        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
+        return AddRequestDataInternal(aCommandPath, aData, aAddRequestDataParams);
     }
 
-    template <typename CommandDataT>
-    CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    CHIP_ERROR TestOnlyFinishCommand(FinishCommandParameters & aFinishCommandParams)
     {
-        AdditionalCommandParameters optionalArgs;
-        return AddRequestDataNoTimedCheck(aCommandPath, aData, aTimedInvokeTimeoutMs, optionalArgs);
+        if (mBatchCommandsEnabled)
+        {
+            VerifyOrReturnError(aFinishCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        return FinishCommandInternal(aFinishCommandParams);
     }
 
     /**
@@ -352,14 +418,18 @@ public:
 private:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters & aOptionalArgs)
+                                      AddRequestDataParameters & aAddRequestDataParams)
     {
-        ReturnErrorOnFailure(PrepareCommand(aCommandPath, aOptionalArgs));
+        PrepareCommandParameters prepareCommandParams(aAddRequestDataParams);
+        ReturnErrorOnFailure(PrepareCommand(aCommandPath, prepareCommandParams));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
-        return FinishCommand(aTimedInvokeTimeoutMs, aOptionalArgs);
+        FinishCommandParameters finishCommandParams(aAddRequestDataParams);
+        return FinishCommand(finishCommandParams);
     }
+
+    CHIP_ERROR FinishCommandInternal(FinishCommandParameters & aFinishCommandParams);
 
 public:
     // Sends a queued up command request to the target encapsulated by the secureSession handle.
@@ -445,6 +515,8 @@ private:
     CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload, bool & moreChunkedMessages);
     CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
 
+    void SetTimedInvokeTimeoutMs(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
+
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready
     // and mPendingInvokeData is populated.
     CHIP_ERROR SendInvokeRequest();
@@ -507,8 +579,10 @@ private:
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
-    uint16_t mFinishedCommandCount    = 0;
-    uint16_t mRemoteMaxPathsPerInvoke = 1;
+
+    uint16_t mInvokeResponseMessageCount = 0;
+    uint16_t mFinishedCommandCount       = 0;
+    uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
     State mState                = State::Idle;
     bool mSuppressResponse      = false;

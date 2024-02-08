@@ -25,7 +25,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-#ifdef EMBER_AF_PLUGIN_AIR_QUALITY_SERVER
+#ifdef MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
 #include <app/clusters/air-quality-server/air-quality-server.h>
 using namespace chip::app::Clusters::AirQuality;
 

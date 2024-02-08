@@ -161,7 +161,6 @@ public class ChipClusters {
 
     @Deprecated
     public void deleteCluster(long chipClusterPtr) {}
-    
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
       super.finalize();

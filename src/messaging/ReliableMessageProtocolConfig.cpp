@@ -30,7 +30,7 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDConfigurationData.h> // nogncheck
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
 namespace chip {
@@ -76,7 +76,7 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
     // which the device can be at sleep and not be able to receive any messages).
     config.mIdleRetransTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
     config.mActiveRetransTimeout += ICDConfigurationData::GetInstance().GetFastPollingInterval();
-    config.mActiveThresholdTime = System::Clock::Milliseconds16(ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
+    config.mActiveThresholdTime = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
 #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

@@ -4,7 +4,7 @@
 
 #include "TestCommand.h"
 
-#include <lib/support/CHIPListUtils.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
 
 {{>test_cluster tests="../linux/apps/app1/ciTests.json" credsIssuerConfigArg=false needsWaitDuration=false}}
 
