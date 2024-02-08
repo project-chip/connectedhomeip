@@ -245,6 +245,9 @@ class HostApp(Enum):
         elif self == HostApp.ENERGY_MANAGEMENT:
             yield 'chip-energy-management-app'
             yield 'chip-energy-management-app.map'
+        elif self == HostApp.AIR_QUALITY_SENSOR:
+            yield 'air-quality-sensor-app'
+            yield 'air-quality-sensor-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
