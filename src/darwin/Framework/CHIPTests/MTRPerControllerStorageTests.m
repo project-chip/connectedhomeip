@@ -1254,6 +1254,10 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     }
     XCTAssertTrue(storedAttributeDifferFromMTRDevice);
 
+    // Reset our commissionee.
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 }
