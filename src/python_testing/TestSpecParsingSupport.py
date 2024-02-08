@@ -21,7 +21,8 @@ import chip.clusters as Clusters
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import MatterBaseTest, default_matter_test_main
 from mobly import asserts
-from spec_parsing_support import ClusterParser, XmlCluster, add_cluster_data_from_xml, combine_derived_clusters_with_base
+from spec_parsing_support import (ClusterParser, XmlCluster, add_cluster_data_from_xml, check_clusters_for_unknown_commands,
+                                  combine_derived_clusters_with_base)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
@@ -175,6 +176,21 @@ DERIVED_CLUSTER_XML_STR = (
     '</cluster>'
 )
 
+CLUSTER_WITH_UNKNOWN_COMMAND = (
+    '<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0xFFFE" name="Test Unknown Command" revision="1">'
+    '  <revisionHistory>'
+    '    <revision revision="1" summary="Initial version"/>'
+    '  </revisionHistory>'
+    '  <classification hierarchy="base" role="application" picsCode="BASE" scope="Endpoint"/>'
+    '  <commands>'
+    '    <command id="0x00" name="ChangeToMode" direction="commandToClient">'
+    '      <access invokePrivilege="operate"/>'
+    '      <mandatoryConform/>'
+    '    </command>'
+    '  </commands>'
+    '</cluster>'
+)
+
 
 class TestSpecParsingSupport(MatterBaseTest):
     def test_spec_parsing_access(self):
@@ -236,6 +252,14 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(set(derived_clusters["Test Base"].accepted_commands.keys()), set([0]), "Unexpected accepted commands")
         asserts.assert_equal(set(derived_clusters["Test Base"].generated_commands.keys()),
                              set([1]), "Unexpected generated commands")
+        asserts.assert_equal(str(derived_clusters["Test Base"].accepted_commands[0].conformance),
+                             "M", "Unexpected conformance on base accepted command")
+        asserts.assert_equal(str(derived_clusters["Test Base"].generated_commands[1].conformance),
+                             "M", "Unexpected conformance on base generated command")
+
+        asserts.assert_equal(len(derived_clusters["Test Base"].unknown_commands),
+                             0, "Unexpected number of unknown commands in base")
+        asserts.assert_equal(len(clusters[0xFFFF].unknown_commands), 2, "Unexpected number of unknown commands in derived cluster")
 
         combine_derived_clusters_with_base(clusters, derived_clusters, ids_by_name)
         # Ensure the base-only attribute (1) was added to the derived cluster
@@ -247,8 +271,29 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(str(clusters[0xFFFF].attributes[2].conformance), "X", "Unexpected conformance on attribute 1")
         asserts.assert_equal(str(clusters[0xFFFF].attributes[3].conformance), "X", "Unexpected conformance on attribute 1")
 
+        # Ensure both the accepted and generated command overrides work
+        asserts.assert_true(set(clusters[0xFFFF].accepted_commands.keys()),
+                            set([0]), "Unexpected accepted command list after merge")
+        asserts.assert_true(set(clusters[0xFFFF].generated_commands.keys()), set([1]),
+                            "Unexpected generated command list after merge")
+        asserts.assert_equal(str(clusters[0xFFFF].accepted_commands[0].conformance),
+                             "X", "Unexpected conformance on accepted commands")
+        asserts.assert_equal(str(clusters[0xFFFF].generated_commands[1].conformance),
+                             "X", "Unexpected conformance on generated commands")
+        asserts.assert_equal(len(clusters[0xFFFF].unknown_commands), 0, "Unexpected number of unknown commands after merge")
+
     def test_missing_command_direction(self):
-        pass
+        clusters: dict[int, XmlCluster] = {}
+        derived_clusters: dict[str, XmlCluster] = {}
+        ids_by_name: dict[str, int] = {}
+        problems: list[ProblemNotice] = []
+        cluster_xml = ElementTree.fromstring(CLUSTER_WITH_UNKNOWN_COMMAND)
+
+        add_cluster_data_from_xml(cluster_xml, clusters, derived_clusters, ids_by_name, problems)
+        check_clusters_for_unknown_commands(clusters, problems)
+        asserts.assert_equal(len(problems), 1, "Unexpected number of problems found")
+        asserts.assert_equal(problems[0].location.cluster_id, 0xFFFE, "Unexpected problem location (cluster id)")
+        asserts.assert_equal(problems[0].location.command_id, 0, "Unexpected problem location (command id)")
 
 
 if __name__ == "__main__":

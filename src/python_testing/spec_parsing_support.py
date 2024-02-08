@@ -76,6 +76,7 @@ class XmlAttribute:
 
 @dataclass
 class XmlCommand:
+    id: int
     name: str
     conformance: Callable[[uint], ConformanceDecision]
 
@@ -100,6 +101,7 @@ class XmlCluster:
     attributes: dict[uint, XmlAttribute]
     accepted_commands: dict[uint, XmlCommand]
     generated_commands: dict[uint, XmlCommand]
+    unknown_commands: list[XmlCommand]
     events: dict[uint, XmlEvent]
     pics: str
 
@@ -346,19 +348,29 @@ class ClusterParser:
             ), read_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView, write_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue, write_optional=False)
         return attributes
 
-    def parse_commands(self, command_type: CommandType) -> dict[uint, XmlAttribute]:
+    def get_command_direction(self, element: ElementTree.Element) -> CommandType:
+        try:
+            if element.attrib['direction'].lower() == 'responsefromserver':
+                return CommandType.GENERATED
+            if element.attrib['direction'].lower() == 'commandtoclient':
+                return CommandType.UNKNOWN
+        except KeyError:
+            return CommandType.ACCEPTED
+
+    def parse_unknown_commands(self) -> list[XmlCommand]:
+        commands = []
+        for element, conformance_xml, access_xml in self.command_elements:
+            if self.get_command_direction(element) != CommandType.UNKNOWN:
+                continue
+            code = int(element.attrib['id'], 0)
+            conformance = self.parse_conformance(conformance_xml)
+            commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance))
+        return commands
+
+    def parse_commands(self, command_type: CommandType) -> dict[uint, XmlCommand]:
         commands = {}
         for element, conformance_xml, access_xml in self.command_elements:
-            code = int(element.attrib['id'], 0)
-            dir = CommandType.ACCEPTED
-            try:
-                if element.attrib['direction'].lower() == 'responsefromserver':
-                    dir = CommandType.GENERATED
-                if element.attrib['direction'].lower() == 'commandtoclient':
-                    dir = CommandType.UNKNOWN
-            except KeyError:
-                pass
-            if dir != command_type:
+            if self.get_command_direction(element) != command_type:
                 continue
             code = int(element.attrib['id'], 0)
             conformance = self.parse_conformance(conformance_xml)
@@ -366,7 +378,7 @@ class ClusterParser:
                 continue
             if code in commands:
                 conformance = or_operation([conformance, commands[code].conformance])
-            commands[code] = XmlCommand(name=element.attrib['name'], conformance=conformance)
+            commands[code] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance)
         return commands
 
     def parse_events(self) -> dict[uint, XmlAttribute]:
@@ -393,6 +405,7 @@ class ClusterParser:
                           attributes=self.parse_attributes(),
                           accepted_commands=self.parse_commands(CommandType.ACCEPTED),
                           generated_commands=self.parse_commands(CommandType.GENERATED),
+                          unknown_commands=self.parse_unknown_commands(),
                           events=self.parse_events(), pics=self._pics)
 
     def get_problems(self) -> list[ProblemNotice]:
@@ -421,6 +434,13 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlC
             clusters[cluster_id] = new
         else:
             derived_clusters[name] = new
+
+
+def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problems: list[ProblemNotice]):
+    for id, cluster in clusters.items():
+        for cmd in cluster.unknown_commands:
+            problems.append(ProblemNotice(test_name="Spec XML parsing", location=CommandPathLocation(
+                endpoint_id=0, cluster_id=id, command_id=cmd.id), severity=ProblemSeverity.WARNING, problem="Command with unknown direction"))
 
 
 def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
@@ -489,6 +509,8 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     clusters[acl_id].attributes[Clusters.AccessControl.Attributes.Acl.attribute_id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
     clusters[acl_id].attributes[Clusters.AccessControl.Attributes.Extension.attribute_id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
 
+    check_clusters_for_unknown_commands(clusters, problems)
+
     return clusters, problems
 
 
@@ -522,7 +544,6 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], deri
     for id, c in xml_clusters.items():
         if c.derived:
             base_name = c.derived
-            print(f"fixing cluster {base_name}")
             if base_name in ids_by_name:
                 base = xml_clusters[ids_by_name[c.derived]]
             else:
@@ -543,9 +564,17 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], deri
             generated_commands.update(c.generated_commands)
             events = deepcopy(base.events)
             events.update(c.events)
+            unknown_commands = deepcopy(base.unknown_commands)
+            for cmd in c.unknown_commands:
+                if cmd.id in accepted_commands.keys() and cmd.name == accepted_commands[cmd.id].name:
+                    accepted_commands[cmd.id].conformance = cmd.conformance
+                elif cmd.id in generated_commands.keys() and cmd.name == generated_commands[cmd.id].name:
+                    generated_commands[cmd.id].conformance = cmd.conformance
+                else:
+                    unknown_commands.append(cmd)
+
             new = XmlCluster(revision=c.revision, derived=c.derived, name=c.name,
                              feature_map=feature_map, attribute_map=attribute_map, command_map=command_map,
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
-                             generated_commands=generated_commands, events=events, pics=c.pics)
-            print(new)
+                             generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, pics=c.pics)
             xml_clusters[id] = new
