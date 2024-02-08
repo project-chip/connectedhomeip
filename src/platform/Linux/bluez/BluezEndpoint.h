@@ -83,16 +83,6 @@ public:
     void CancelConnect();
 
 private:
-    struct ConnectParams
-    {
-        ConnectParams(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice) : mEndpoint(aEndpoint), mpDevice(apDevice) {}
-        ~ConnectParams() = default;
-
-        const BluezEndpoint & mEndpoint;
-        BluezDevice1 * mpDevice;
-        uint16_t mNumRetries = 0;
-    };
-
     CHIP_ERROR StartupEndpointBindings();
 
     void SetupAdapter();
