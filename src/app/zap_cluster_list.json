@@ -38,6 +38,7 @@
         "DOOR_LOCK_CLUSTER": [],
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
+        "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [],
         "ENERGY_EVSE_CLUSTER": [],
         "ENERGY_EVSE_MODE_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -67,6 +68,7 @@
         "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "POWER_TOPOLOGY_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
@@ -182,6 +184,9 @@
             "electrical-energy-measurement-server"
         ],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
+        "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [
+            "electrical-power-measurement-server"
+        ],
         "ENERGY_EVSE_CLUSTER": ["energy-evse-server"],
         "ENERGY_EVSE_MODE_CLUSTER": ["mode-base-server"],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
@@ -223,6 +228,7 @@
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
+        "POWER_TOPOLOGY_CLUSTER": [],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": ["operational-credentials-server"],
         "OPERATIONAL_STATE_CLUSTER": ["operational-state-server"],

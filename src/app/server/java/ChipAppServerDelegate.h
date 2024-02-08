@@ -20,6 +20,7 @@
 #include <app/server/AppDelegate.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/JniReferences.h>
 
 class ChipAppServerDelegate : public AppDelegate
 {
@@ -34,7 +35,7 @@ public:
     CHIP_ERROR InitializeWithObjects(jobject appDelegateObject);
 
 private:
-    jobject mChipAppServerDelegateObject                        = nullptr;
+    chip::JniGlobalReference mChipAppServerDelegateObject;
     jmethodID mOnCommissioningSessionEstablishmentStartedMethod = nullptr;
     jmethodID mOnCommissioningSessionStartedMethod              = nullptr;
     jmethodID mOnCommissioningSessionEstablishmentErrorMethod   = nullptr;

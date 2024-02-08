@@ -590,6 +590,15 @@ static BOOL CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(Attribu
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInElectricalPowerMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalPowerMeasurement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalEnergyMeasurement;
@@ -659,6 +668,15 @@ static BOOL CommandNeedsTimedInvokeInEnergyEVSECluster(AttributeId aAttributeId)
 static BOOL CommandNeedsTimedInvokeInEnergyPreferenceCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EnergyPreference;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInPowerTopologyCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::PowerTopology;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1296,6 +1314,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ValveConfigurationAndControl::Id: {
         return CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(commandID);
     }
+    case Clusters::ElectricalPowerMeasurement::Id: {
+        return CommandNeedsTimedInvokeInElectricalPowerMeasurementCluster(commandID);
+    }
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return CommandNeedsTimedInvokeInElectricalEnergyMeasurementCluster(commandID);
     }
@@ -1313,6 +1334,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::EnergyPreference::Id: {
         return CommandNeedsTimedInvokeInEnergyPreferenceCluster(commandID);
+    }
+    case Clusters::PowerTopology::Id: {
+        return CommandNeedsTimedInvokeInPowerTopologyCluster(commandID);
     }
     case Clusters::EnergyEvseMode::Id: {
         return CommandNeedsTimedInvokeInEnergyEVSEModeCluster(commandID);

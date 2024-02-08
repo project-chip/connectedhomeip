@@ -36,7 +36,7 @@ using namespace chip::app::Clusters::DoorLock;
 using namespace chip::DeviceLayer;
 
 static constexpr size_t kDoorLockManagerTableSize =
-    EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 namespace {
 
@@ -76,7 +76,7 @@ void DoorLockManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "Device App: DoorLockManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::DoorLock::Id,
-                                                       EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kDoorLockManagerTableSize,
                    ChipLogError(Zcl, "Device App::DoorLock::NewManager: endpoint %d not found", endpoint));
 
@@ -98,7 +98,7 @@ void DoorLockManager::NewManager(jint endpoint, jobject manager)
 DoorLockManager * GetDoorLockManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::DoorLock::Id,
-                                                       EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
     return ((ep >= kDoorLockManagerTableSize) ? nullptr : gDoorLockManagerTable[ep]);
 }
 
@@ -158,8 +158,7 @@ CHIP_ERROR DoorLockManager::InitializeWithObjects(jobject managerObject)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mDoorLockManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mDoorLockManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mDoorLockManagerObject.Init(managerObject));
 
     jclass DoorLockManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(DoorLockManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -181,11 +180,11 @@ void DoorLockManager::HandleLockStateChanged(jint endpoint, jint value)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
-    VerifyOrReturn(mDoorLockManagerObject != nullptr, ChipLogProgress(Zcl, "mDoorLockManagerObject null"));
+    VerifyOrReturn(mDoorLockManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mDoorLockManagerObject null"));
     VerifyOrReturn(mHandleLockStateChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleLockStateChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mDoorLockManagerObject, mHandleLockStateChangedMethod, value);
+    env->CallVoidMethod(mDoorLockManagerObject.ObjectRef(), mHandleLockStateChangedMethod, value);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in DoorLockManager::HandleLockStateChanged");

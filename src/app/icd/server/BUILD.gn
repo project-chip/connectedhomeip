@@ -115,5 +115,6 @@ source_set("configuration-data") {
     ":icd-server-config",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/secure_channel:check-in-counter",
   ]
 }

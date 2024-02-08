@@ -213,6 +213,7 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/lib/support:testing_nlunit",
     "${nlunit_test_root}:nlunit-test",
   ]

@@ -17,6 +17,7 @@
  */
 
 #include "AppTask.h"
+#include "ButtonManager.h"
 #include <LockManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model/Nullable.h>
@@ -39,12 +40,20 @@ LEDWidget sLockLED;
 } // namespace
 
 AppTask AppTask::sAppTask;
+static const struct gpio_dt_spec sLockJammedInputDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_5), gpios);
+static const struct gpio_dt_spec sLockStatusInputDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_6), gpios);
+Button sLockJammedAction;
+Button sLockStatusChangedAction;
 
 CHIP_ERROR AppTask::Init(void)
 {
 #if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(LockActionEventHandler);
 #endif
+    sLockJammedAction.Configure(&sLockJammedInputDt, LockJammedEventHandler);
+    sLockStatusChangedAction.Configure(&sLockStatusInputDt, LockStateEventHandler);
+    ButtonManagerInst().AddButton(sLockJammedAction);
+    ButtonManagerInst().AddButton(sLockStatusChangedAction);
     InitCommonParts();
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
@@ -199,4 +208,52 @@ void AppTask::LockStateChanged(LockManager::State_t state)
 #endif
         break;
     }
+}
+
+void AppTask::LockJammedEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = LockJammedActionHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTask::LockJammedActionHandler(AppEvent * aEvent)
+{
+    LOG_INF("Sending a lock jammed event");
+
+    /* Generating Door Lock Jammed event */
+    DoorLockServer::Instance().SendLockAlarmEvent(kExampleEndpointId, AlarmCodeEnum::kLockJammed);
+}
+
+void AppTask::LockStateEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = LockStateActionHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTask::LockStateActionHandler(AppEvent * aEvent)
+{
+    LOG_INF("Sending a lock state event");
+
+    // This code was written for testing purpose only
+    // For real door status the level detection may be used instead of pulse
+    static DoorStateEnum mDoorState = DoorStateEnum::kDoorOpen;
+    if (mDoorState == DoorStateEnum::kDoorOpen)
+    {
+        mDoorState = DoorStateEnum::kDoorClosed;
+    }
+    else
+    {
+        mDoorState = DoorStateEnum::kDoorOpen;
+    }
+
+    /* Generating Door Lock Status event */
+    DoorLockServer::Instance().SetDoorState(kExampleEndpointId, mDoorState);
 }

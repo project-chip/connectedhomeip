@@ -61,7 +61,15 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 {
     if (CHIP_NO_ERROR != err)
     {
-        resp.status = to_underlying(StatusIB(err).mStatus);
+        // TODO : Properly fix mapping between error types (issue https://github.com/project-chip/connectedhomeip/issues/26885)
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            resp.status = to_underlying(Protocols::InteractionModel::Status::NotFound);
+        }
+        else
+        {
+            resp.status = to_underlying(StatusIB(err).mStatus);
+        }
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
     }
     return err;
@@ -261,7 +269,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
     VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (index < ArraySize(mSceneInfoStructs))
     {

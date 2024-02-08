@@ -110,7 +110,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    chip::JniLocalReferenceManager manager(env);
+    chip::JniLocalReferenceScope scope(env);
 
     jobject otaProviderDelegate      = nullptr;
     jmethodID handleQueryImageMethod = nullptr;
@@ -375,7 +375,7 @@ void OTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * comman
     jmethodID getActionMethod;
     jmethodID getDelayedActionTimeMethod;
 
-    chip::JniLocalReferenceManager manager(env);
+    chip::JniLocalReferenceScope scope(env);
 
     Commands::ApplyUpdateResponse::Type response;
     Commands::ApplyUpdateResponse::Type errorResponse;
