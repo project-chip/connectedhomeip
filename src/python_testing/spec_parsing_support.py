@@ -107,6 +107,35 @@ class XmlCluster:
 class CommandType(Enum):
     ACCEPTED = auto()
     GENERATED = auto()
+    # This will happen for derived clusters, where the direction isn't noted. On normal clusters, this is a problem.
+    UNKNOWN = auto()
+
+
+# workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
+CONC_CLUSTERS = {0x040C: ('Carbon Monoxide Concentration Measurement', 'CMOCONC'),
+                 0x040D: ('Carbon Dioxide Concentration Measurement', 'CDOCONC'),
+                 0x0413: ('Nitrogen Dioxide Concentration Measurement', 'NDOCONC'),
+                 0x0415: ('Ozone Concentration Measurement', 'OZCONC'),
+                 0x042A: ('PM2.5 Concentration Measurement', 'PMICONC'),
+                 0x042B: ('Formaldehyde Concentration Measurement', 'FLDCONC'),
+                 0x042C: ('PM1 Concentration Measurement', 'PMHCONC'),
+                 0x042D: ('PM10 Concentration Measurement', 'PMKCONC'),
+                 0x042E: ('Total Volatile Organic Compounds Concentration Measurement', 'TVOCCONC'),
+                 0x042F: ('Radon Concentration Measurement', 'RNCONC')}
+CONC_BASE_NAME = 'Concentration Measurement Clusters'
+RESOURCE_CLUSTERS = {0x0071: ('HEPA Filter Monitoring', 'HEPAFREMON'),
+                     0x0072: ('Activated Carbon Filter Monitoring', 'ACFREMON')}
+RESOURCE_BASE_NAME = 'Resource Monitoring Clusters'
+WATER_CLUSTER = {0x0405: ('Relative Humidity Measurement', 'RH')}
+WATER_BASE_NAME = 'Water Content Measurement Clusters'
+CLUSTER_ALIASES = {CONC_BASE_NAME: CONC_CLUSTERS, RESOURCE_BASE_NAME: RESOURCE_CLUSTERS, WATER_BASE_NAME: WATER_CLUSTER}
+
+
+def is_alias(id: uint):
+    for base, alias in CLUSTER_ALIASES.items():
+        if id in alias:
+            return True
+    return False
 
 
 class ClusterParser:
@@ -325,6 +354,8 @@ class ClusterParser:
             try:
                 if element.attrib['direction'].lower() == 'responsefromserver':
                     dir = CommandType.GENERATED
+                if element.attrib['direction'].lower() == 'commandtoclient':
+                    dir = CommandType.UNKNOWN
             except KeyError:
                 pass
             if dir != command_type:
@@ -368,90 +399,48 @@ class ClusterParser:
         return self._problems
 
 
+def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlCluster], derived_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int], problems: list[ProblemNotice]) -> None:
+    cluster = xml.iter('cluster')
+    for c in cluster:
+        name = c.attrib['name']
+        if not c.attrib['id']:
+            # Fully derived clusters have no id, but also shouldn't appear on a device.
+            # We do need to keep them, though, because we need to update the derived
+            # clusters. We keep them in a special dict by name, so they can be thrown
+            # away later.
+            cluster_id = None
+        else:
+            cluster_id = int(c.attrib['id'], 0)
+            ids_by_name[name] = cluster_id
+
+        parser = ClusterParser(c, cluster_id, name, is_alias(cluster_id))
+        new = parser.create_cluster()
+        problems = problems + parser.get_problems()
+
+        if cluster_id:
+            clusters[cluster_id] = new
+        else:
+            derived_clusters[name] = new
+
+
 def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
-    # workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
-    conc_clusters = {0x040C: ('Carbon Monoxide Concentration Measurement', 'CMOCONC'),
-                     0x040D: ('Carbon Dioxide Concentration Measurement', 'CDOCONC'),
-                     0x0413: ('Nitrogen Dioxide Concentration Measurement', 'NDOCONC'),
-                     0x0415: ('Ozone Concentration Measurement', 'OZCONC'),
-                     0x042A: ('PM2.5 Concentration Measurement', 'PMICONC'),
-                     0x042B: ('Formaldehyde Concentration Measurement', 'FLDCONC'),
-                     0x042C: ('PM1 Concentration Measurement', 'PMHCONC'),
-                     0x042D: ('PM10 Concentration Measurement', 'PMKCONC'),
-                     0x042E: ('Total Volatile Organic Compounds Concentration Measurement', 'TVOCCONC'),
-                     0x042F: ('Radon Concentration Measurement', 'RNCONC')}
-    conc_base_name = 'Concentration Measurement Clusters'
-    resource_clusters = {0x0071: ('HEPA Filter Monitoring', 'HEPAFREMON'),
-                         0x0072: ('Activated Carbon Filter Monitoring', 'ACFREMON')}
-    resource_base_name = 'Resource Monitoring Clusters'
-    water_clusters = {0x0405: ('Relative Humidity Measurement', 'RH')}
-    water_base_name = 'Water Content Measurement Clusters'
-    aliases = {conc_base_name: conc_clusters, resource_base_name: resource_clusters, water_base_name: water_clusters}
-
-    def is_alias(id: uint):
-        for base, alias in aliases.items():
-            if id in alias:
-                return True
-        return False
-
-    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint) -> dict[uint, XmlAttribute]:
-        ret = deepcopy(base)
-        extras = {k: v for k, v in derived.items() if k not in base.keys()}
-        overrides = {k: v for k, v in derived.items() if k in base.keys()}
-        ret.update(extras)
-        for id, override in overrides.items():
-            if override.conformance:
-                ret[id].conformance = override.conformance
-            if override.read_access:
-                ret[id].read_access = override.read_access
-            if override.write_access:
-                ret[id].write_access = override.write_access
-            if ret[id].read_access is None and ret[id].write_access is None:
-                location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=id)
-                problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
-                                              severity=ProblemSeverity.WARNING, problem='Unable to find access element'))
-            if ret[id].read_access is None:
-                ret[id].read_access == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
-            if ret[id].write_access is None:
-                ret[id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
-        return ret
-
     dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'clusters')
     clusters: dict[int, XmlCluster] = {}
     derived_clusters: dict[str, XmlCluster] = {}
-    ids_by_name = {}
-    problems = []
+    ids_by_name: dict[str, int] = {}
+    problems: list[ProblemNotice] = []
     for xml in glob.glob(f"{dir}/*.xml"):
         logging.info(f'Parsing file {xml}')
         tree = ElementTree.parse(f'{xml}')
         root = tree.getroot()
-        cluster = root.iter('cluster')
-        for c in cluster:
-            name = c.attrib['name']
-            if not c.attrib['id']:
-                # Fully derived clusters have no id, but also shouldn't appear on a device.
-                # We do need to keep them, though, because we need to update the derived
-                # clusters. We keep them in a special dict by name, so they can be thrown
-                # away later.
-                cluster_id = None
-            else:
-                cluster_id = int(c.attrib['id'], 0)
-                ids_by_name[name] = cluster_id
-
-            parser = ClusterParser(c, cluster_id, name, is_alias(cluster_id))
-            new = parser.create_cluster()
-            problems = problems + parser.get_problems()
-
-            if cluster_id:
-                clusters[cluster_id] = new
-            else:
-                derived_clusters[name] = new
+        add_cluster_data_from_xml(root, clusters, derived_clusters, ids_by_name, problems)
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
     # Descriptor - TagList feature - this feature is mandated when the duplicate condition holds for the endpoint. It is tested in DESC-2.2
     # Actions cluster - all commands - these need to be listed in the ActionsList attribute to be supported.
     #                                  We do not currently have a test for this. Please see https://github.com/CHIP-Specifications/chip-test-plans/issues/3646.
+
     def remove_problem(location: typing.Union[CommandPathLocation, FeaturePathLocation]):
         nonlocal problems
         problems = [p for p in problems if p.location != location]
@@ -466,38 +455,9 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
         clusters[action_id].accepted_commands[c].conformance = optional()
         remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
 
-    # We have the information now about which clusters are derived, so we need to fix them up. Apply first the base cluster,
-    # then add the specific cluster overtop
-    for id, c in clusters.items():
-        if c.derived:
-            base_name = c.derived
-            if base_name in ids_by_name:
-                base = clusters[ids_by_name[c.derived]]
-            else:
-                base = derived_clusters[base_name]
+    combine_derived_clusters_with_base(clusters, derived_clusters, ids_by_name)
 
-            feature_map = deepcopy(base.feature_map)
-            feature_map.update(c.feature_map)
-            attribute_map = deepcopy(base.attribute_map)
-            attribute_map.update(c.attribute_map)
-            command_map = deepcopy(base.command_map)
-            command_map.update(c.command_map)
-            features = deepcopy(base.features)
-            features.update(c.features)
-            attributes = combine_attributes(base.attributes, c.attributes, id)
-            accepted_commands = deepcopy(base.accepted_commands)
-            accepted_commands.update(c.accepted_commands)
-            generated_commands = deepcopy(base.generated_commands)
-            generated_commands.update(c.generated_commands)
-            events = deepcopy(base.events)
-            events.update(c.events)
-            new = XmlCluster(revision=c.revision, derived=c.derived, name=c.name,
-                             feature_map=feature_map, attribute_map=attribute_map, command_map=command_map,
-                             features=features, attributes=attributes, accepted_commands=accepted_commands,
-                             generated_commands=generated_commands, events=events, pics=c.pics)
-            clusters[id] = new
-
-    for alias_base_name, aliased_clusters in aliases.items():
+    for alias_base_name, aliased_clusters in CLUSTER_ALIASES.items():
         for id, (alias_name, pics) in aliased_clusters.items():
             base = derived_clusters[alias_base_name]
             new = deepcopy(base)
@@ -530,3 +490,62 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     clusters[acl_id].attributes[Clusters.AccessControl.Attributes.Extension.attribute_id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
 
     return clusters, problems
+
+
+def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], derived_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int]) -> None:
+    ''' Overrides base elements with the derived cluster values for derived clusters. '''
+
+    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint) -> dict[uint, XmlAttribute]:
+        ret = deepcopy(base)
+        extras = {k: v for k, v in derived.items() if k not in base.keys()}
+        overrides = {k: v for k, v in derived.items() if k in base.keys()}
+        ret.update(extras)
+        for id, override in overrides.items():
+            if override.conformance:
+                ret[id].conformance = override.conformance
+            if override.read_access:
+                ret[id].read_access = override.read_access
+            if override.write_access:
+                ret[id].write_access = override.write_access
+            if ret[id].read_access is None and ret[id].write_access is None:
+                location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=id)
+                problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                              severity=ProblemSeverity.WARNING, problem='Unable to find access element'))
+            if ret[id].read_access is None:
+                ret[id].read_access == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
+            if ret[id].write_access is None:
+                ret[id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
+        return ret
+
+    # We have the information now about which clusters are derived, so we need to fix them up. Apply first the base cluster,
+    # then add the specific cluster overtop
+    for id, c in xml_clusters.items():
+        if c.derived:
+            base_name = c.derived
+            print(f"fixing cluster {base_name}")
+            if base_name in ids_by_name:
+                base = xml_clusters[ids_by_name[c.derived]]
+            else:
+                base = derived_clusters[base_name]
+
+            feature_map = deepcopy(base.feature_map)
+            feature_map.update(c.feature_map)
+            attribute_map = deepcopy(base.attribute_map)
+            attribute_map.update(c.attribute_map)
+            command_map = deepcopy(base.command_map)
+            command_map.update(c.command_map)
+            features = deepcopy(base.features)
+            features.update(c.features)
+            attributes = combine_attributes(base.attributes, c.attributes, id)
+            accepted_commands = deepcopy(base.accepted_commands)
+            accepted_commands.update(c.accepted_commands)
+            generated_commands = deepcopy(base.generated_commands)
+            generated_commands.update(c.generated_commands)
+            events = deepcopy(base.events)
+            events.update(c.events)
+            new = XmlCluster(revision=c.revision, derived=c.derived, name=c.name,
+                             feature_map=feature_map, attribute_map=attribute_map, command_map=command_map,
+                             features=features, attributes=attributes, accepted_commands=accepted_commands,
+                             generated_commands=generated_commands, events=events, pics=c.pics)
+            print(new)
+            xml_clusters[id] = new
