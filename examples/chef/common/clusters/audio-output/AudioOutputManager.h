@@ -40,5 +40,6 @@ protected:
     uint8_t mCurrentOutput;
     std::vector<OutputInfoType> mOutputs;
     // Magic numbers are here on purpose, please allocate memory
-    char mCharDataBuffer[10][32];
+    static constexpr size_t mBufMax = 32;
+    char mCharDataBuffer[10][mBufMax];
 };

@@ -46,7 +46,6 @@ uint8_t AudioOutputManager::HandleGetCurrentOutput()
 
 CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (auto const & outputInfo : this->mOutputs)
         {
@@ -58,7 +57,6 @@ CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEnco
 
 bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)
 {
-    // TODO: Insert code here
     bool audioOutputRenamed = false;
 
     for (OutputInfoType & output : mOutputs)
@@ -66,8 +64,9 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
         if (output.index == index)
         {
             audioOutputRenamed = true;
-            memcpy(this->Data(index), name.data(), name.size());
-            output.name = chip::CharSpan(this->Data(index), name.size());
+	    const size_t len = std::min(mBufMax, name.size());
+            memcpy(this->Data(index), name.data(), len);
+            output.name = chip::CharSpan(this->Data(index), len);
         }
     }
 
@@ -76,7 +75,6 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
 
 bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
 {
-    // TODO: Insert code here
     bool audioOutputSelected = false;
     for (OutputInfoType & output : mOutputs)
     {
