@@ -94,8 +94,7 @@ CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
-    mOnOffManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mOnOffManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mOnOffManagerObject.Init(managerObject));
 
     jclass OnOffManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(OnOffManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -119,11 +118,11 @@ void OnOffManager::HandleOnOffChanged(bool value)
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
-    VerifyOrReturn(mOnOffManagerObject != nullptr, ChipLogProgress(Zcl, "mOnOffManagerObject null"));
+    VerifyOrReturn(mOnOffManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mOnOffManagerObject null"));
     VerifyOrReturn(mHandleOnOffChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleOnOffChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mOnOffManagerObject, mHandleOnOffChangedMethod, static_cast<jboolean>(value));
+    env->CallVoidMethod(mOnOffManagerObject.ObjectRef(), mHandleOnOffChangedMethod, static_cast<jboolean>(value));
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in OnOffManager::HandleOnOffChanged");

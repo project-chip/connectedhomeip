@@ -58,10 +58,9 @@ void TvAppJNI::InitializeWithObjects(jobject app)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for TvAppJNI"));
 
-    mTvAppObject = env->NewGlobalRef(app);
-    VerifyOrReturn(mTvAppObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef TvAppJNI"));
+    VerifyOrReturn(mTvAppObject.Init(app) == CHIP_NO_ERROR, ChipLogError(Zcl, "Failed to init mTvAppObject"));
 
-    jclass managerClass = env->GetObjectClass(mTvAppObject);
+    jclass managerClass = env->GetObjectClass(app);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get TvAppJNI Java class"));
 
     mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(JI)V");
@@ -76,10 +75,11 @@ void TvAppJNI::PostClusterInit(int clusterId, int endpoint)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for TvAppJNI::PostClusterInit"));
-    VerifyOrReturn(mTvAppObject != nullptr, ChipLogError(Zcl, "TvAppJNI::mTvAppObject null"));
+    VerifyOrReturn(mTvAppObject.HasValidObjectRef(), ChipLogError(Zcl, "TvAppJNI::mTvAppObject is not valid"));
     VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(Zcl, "TvAppJNI::mPostClusterInitMethod null"));
 
-    env->CallVoidMethod(mTvAppObject, mPostClusterInitMethod, static_cast<jlong>(clusterId), static_cast<jint>(endpoint));
+    env->CallVoidMethod(mTvAppObject.ObjectRef(), mPostClusterInitMethod, static_cast<jlong>(clusterId),
+                        static_cast<jint>(endpoint));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call TvAppJNI 'postClusterInit' method");

@@ -69,12 +69,16 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
         std::string payload = JsonToString(value);
         UtfString jsonString(env, payload.c_str());
 
-        ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand send command being called with payload %s", payload.c_str());
+        if (!mContentAppEndpointManager.HasValidObjectRef())
+        {
+            ChipLogProgress(Zcl, "mContentAppEndpointManager is not valid");
+            return;
+        }
 
-        jstring resp = (jstring) env->CallObjectMethod(
-            mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
+        jstring resp = static_cast<jstring>(env->CallObjectMethod(
+            mContentAppEndpointManager.ObjectRef(), mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
             static_cast<jlong>(handlerContext.mRequestPath.mClusterId), static_cast<jlong>(handlerContext.mRequestPath.mCommandId),
-            jsonString.jniValue());
+            jsonString.jniValue()));
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
@@ -106,8 +110,13 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
 
         ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand send command being called with payload %s", payload.c_str());
 
+        if (!mContentAppEndpointManager.HasValidObjectRef())
+        {
+            return Protocols::InteractionModel::Status::Failure;
+        }
+
         jstring resp =
-            (jstring) env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(epId),
+            (jstring) env->CallObjectMethod(mContentAppEndpointManager.ObjectRef(), mSendCommandMethod, static_cast<jint>(epId),
                                             static_cast<jlong>(clusterId), static_cast<jlong>(commandId), jsonString.jniValue());
         if (env->ExceptionCheck())
         {
