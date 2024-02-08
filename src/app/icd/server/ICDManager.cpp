@@ -544,5 +544,19 @@ bool ICDManager::CheckInMessagesWouldBeSent()
     return false;
 }
 
+void ICDManager::TriggerCheckInMessages()
+{
+    VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
+
+    // Only trigger Check-In messages when we are in IdleMode.
+    // If we are already in ActiveMode, Check-In messages have already been sent.
+    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
+
+    // If we don't have any Check-In messages to send, do nothing
+    VerifyOrReturn(CheckInMessagesWouldBeSent());
+
+    UpdateOperationState(OperationalState::ActiveMode);
+}
+
 } // namespace app
 } // namespace chip

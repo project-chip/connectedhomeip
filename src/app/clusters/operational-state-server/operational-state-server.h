@@ -341,7 +341,29 @@ namespace RvcOperationalState {
 class Delegate : public OperationalState::Delegate
 {
 public:
+    /**
+     * Handle Command Callback in application: GoHome
+     * @param[out] err operational error after callback.
+     */
     virtual void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    };
+
+    /**
+     * The start command is not supported by the RvcOperationalState cluster hence this method should never be called.
+     * This is a dummy implementation of the handler method so the consumer of this class does not need to define it.
+     */
+    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    };
+
+    /**
+     * The stop command is not supported by the RvcOperationalState cluster hence this method should never be called.
+     * This is a dummy implementation of the handler method so the consumer of this class does not need to define it.
+     */
+    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
     };
