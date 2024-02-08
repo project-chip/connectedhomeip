@@ -25,6 +25,7 @@
 #import <Matter/Matter.h>
 
 #import "MTRCommandPayloadExtensions_Internal.h"
+#import "MTRDeviceTestDelegate.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
@@ -119,55 +120,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertEqual(error.code, 0);
     [_expectation fulfill];
     _expectation = nil;
-}
-
-@end
-
-typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
-
-@interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
-@property (nonatomic) dispatch_block_t onReachable;
-@property (nonatomic, nullable) dispatch_block_t onNotReachable;
-@property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
-@property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
-@property (nonatomic, nullable) dispatch_block_t onReportEnd;
-@end
-
-@implementation MTRDeviceTestDelegate
-- (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state
-{
-    if (state == MTRDeviceStateReachable) {
-        self.onReachable();
-    } else if (state != MTRDeviceStateReachable && self.onNotReachable != nil) {
-        self.onNotReachable();
-    }
-}
-
-- (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
-{
-    if (self.onAttributeDataReceived != nil) {
-        self.onAttributeDataReceived(attributeReport);
-    }
-}
-
-- (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
-{
-    if (self.onEventDataReceived != nil) {
-        self.onEventDataReceived(eventReport);
-    }
-}
-
-- (void)unitTestReportEndForDevice:(MTRDevice *)device
-{
-    if (self.onReportEnd != nil) {
-        self.onReportEnd();
-    }
-}
-
-- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
-{
-    // Make sure our subscriptions time out in finite time.
-    return @(2); // seconds
 }
 
 @end
@@ -1673,8 +1625,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Now make sure we ignore later tests.  Ideally we would just unsubscribe
     // or remove the delegate, but there's no good way to do that.
-    delegate.onReachable = ^() {
-    };
+    delegate.onReachable = nil;
     delegate.onNotReachable = nil;
     delegate.onAttributeDataReceived = nil;
     delegate.onEventDataReceived = nil;
