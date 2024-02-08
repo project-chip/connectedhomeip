@@ -38,6 +38,8 @@ namespace Protocols {
 namespace InteractionModel {
 
 // This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
+// TODO: This needs to go back to being an enum class.
+// https://github.com/project-chip/connectedhomeip/issues/32025
 enum Status : uint8_t
 {
 #define CHIP_IM_STATUS_CODE(name, spec_name, value) name = value,
