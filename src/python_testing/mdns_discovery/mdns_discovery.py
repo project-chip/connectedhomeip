@@ -75,19 +75,22 @@ class MdnsServiceType(Enum):
     BORDER_ROUTER = "_meshcop._udp.local."
 
 
-class DummyServiceListener(ServiceListener):
+class MdnsServiceListener(ServiceListener):
     """
     A service listener required for the TXT record data to get populated and come back
     """
 
+    def __init__(self):
+        self.updated_event = asyncio.Event()
+
     def add_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
-        pass
+        self.updated_event.set()
 
     def remove_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
         pass
 
     def update_service(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
-        pass
+        self.updated_event.set()
 
 
 class MdnsDiscovery:
@@ -177,16 +180,20 @@ class MdnsDiscovery:
             print(f"Looking for MDNS service type '{service_type}',  service name '{service_name}'")
 
             # Adds service listener
-            service_listener = DummyServiceListener()
+            service_listener = MdnsServiceListener()
             self._zc.add_service_listener(MdnsServiceType.OPERATIONAL.value, service_listener)
 
-            # Adds delay so TXT record is able to get populated
-            await asyncio.sleep(1)
+            # Wait for the add/update service event or timeout
+            try:
+                await asyncio.wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
+            except asyncio.TimeoutError:
+                print(f"Service lookup for {service_name} timeout ({discovery_timeout_sec}) reached without an update.")
+            finally:
+                self._zc.remove_service_listener(service_listener)
 
             # Get service info
             service_info = AsyncServiceInfo(service_type, service_name)
             is_discovered = await service_info.async_request(self._zc, 3000)
-            self._zc.remove_service_listener(service_listener)
 
             # Adds service to discovered services
             if is_discovered:
