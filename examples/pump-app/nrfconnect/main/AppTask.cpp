@@ -562,7 +562,7 @@ void AppTask::DispatchEvent(const AppEvent & event)
 
 void AppTask::UpdateClusterState()
 {
-    EmberStatus status;
+    EmberAfStatus status;
 
     ChipLogProgress(NotSpecified, "UpdateClusterState");
 
