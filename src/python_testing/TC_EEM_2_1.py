@@ -39,11 +39,11 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2", "TH reads Accuracy attribute. Verify that the DUT response contains a MeasurementAccuracyStruct value."),
-            TestStep("3", "TH reads CumulativeEnergyImported attribute. Verify that the DUT response contains  either null or an EnergyMeasurementStruct value."),
-            TestStep("4", "TH reads CumulativeEnergyExported attribute. Verify that the DUT response contains  either null or an EnergyMeasurementStruct value."),
-            TestStep("5", "TH reads PeriodicEnergyImported attribute. Verify that the DUT response contains  either null or an EnergyMeasurementStruct value."),
-            TestStep("6", "TH reads PeriodicEnergyExported attribute. Verify that the DUT response contains  either null or an EnergyMeasurementStruct value."),
-            TestStep("7", "TH reads CumulativeEnergyReset attribute. Verify that the DUT response contains  either null or an CumulativeEnergyResetStruct value."),
+            TestStep("3", "TH reads CumulativeEnergyImported attribute. Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
+            TestStep("4", "TH reads CumulativeEnergyExported attribute. Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
+            TestStep("5", "TH reads PeriodicEnergyImported attribute. Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
+            TestStep("6", "TH reads PeriodicEnergyExported attribute. Verify that the DUT response contains either null or an EnergyMeasurementStruct value."),
+            TestStep("7", "TH reads CumulativeEnergyReset attribute. Verify that the DUT response contains either null or an CumulativeEnergyResetStruct value."),
         ]
 
         return steps
