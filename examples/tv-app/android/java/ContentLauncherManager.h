@@ -22,6 +22,7 @@
 #include <app/clusters/content-launch-server/content-launch-server.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/JniReferences.h>
 
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
@@ -51,7 +52,7 @@ public:
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 private:
-    jobject mContentLauncherManagerObject           = nullptr;
+    chip::JniGlobalReference mContentLauncherManagerObject;
     jmethodID mGetAcceptHeaderMethod                = nullptr;
     jmethodID mGetSupportedStreamingProtocolsMethod = nullptr;
     jmethodID mLaunchContentMethod                  = nullptr;

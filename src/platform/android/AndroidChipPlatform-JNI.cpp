@@ -53,9 +53,8 @@ static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUU
 #endif
 
 namespace {
-JavaVM * sJVM;
-jclass sAndroidChipPlatformCls          = NULL;
-jclass sAndroidChipPlatformExceptionCls = NULL;
+JavaVM * sJVM = nullptr;
+JniGlobalReference sAndroidChipPlatformExceptionCls;
 } // namespace
 
 CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -78,11 +77,14 @@ CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(DeviceLayer, "Loading Java class references.");
 
     // Get various class references need by the API.
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/platform/AndroidChipPlatform", sAndroidChipPlatformCls);
+
+    jclass androidChipPlatformException;
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/platform/AndroidChipPlatformException",
+                                                        androidChipPlatformException);
     SuccessOrExit(err);
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/platform/AndroidChipPlatformException",
-                                                   sAndroidChipPlatformExceptionCls);
+    err = sAndroidChipPlatformExceptionCls.Init(static_cast<jobject>(androidChipPlatformException));
     SuccessOrExit(err);
+
     ChipLogProgress(DeviceLayer, "Java class references loaded.");
 
     err = BleConnectCallbackJNI_OnLoad(jvm, reserved);
