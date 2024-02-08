@@ -45,7 +45,7 @@ using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 static constexpr size_t kApplicationBasicDelegateTableSize =
-    EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kApplicationBasicDelegateTableSize <= kEmberInvalidEndpointIndex, "ApplicationBasic Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogProgress(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id,
-                                                       EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kApplicationBasicDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -93,7 +93,7 @@ namespace ApplicationBasic {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationBasic::Id,
-                                                       EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kApplicationBasicDelegateTableSize)
     {

@@ -49,7 +49,7 @@ using chip::Protocols::InteractionModel::Status;
 using RemainingScreenTimeExpiredEvent = chip::app::Clusters::ContentControl::Events::RemainingScreenTimeExpired::Type;
 
 static constexpr size_t kContentControlDeletageTableSize =
-    EMBER_AF_CONTENT_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_CONTENT_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kContentControlDeletageTableSize <= kEmberInvalidEndpointIndex, "ContentControl Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogProgress(Zcl, "ContentControl NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, ContentControl::Id, EMBER_AF_CONTENT_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ContentControl::Id, MATTER_DM_CONTENT_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kContentControlDeletageTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -95,7 +95,7 @@ namespace ContentControl {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, ContentControl::Id, EMBER_AF_CONTENT_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ContentControl::Id, MATTER_DM_CONTENT_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kContentControlDeletageTableSize)
     {

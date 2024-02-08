@@ -63,7 +63,7 @@ public:
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
-    jobject JavaObjectRef() { return mJavaObjectRef; }
+    jobject JavaObjectRef() { return mJavaObjectRef.ObjectRef(); }
     jlong ToJNIHandle();
 
 #ifndef JAVA_MATTER_CONTROLLER_TEST
@@ -224,8 +224,8 @@ private:
 
     chip::app::DefaultICDClientStorage mICDClientStorage;
 
-    JavaVM * mJavaVM       = nullptr;
-    jobject mJavaObjectRef = nullptr;
+    JavaVM * mJavaVM = nullptr;
+    chip::JniGlobalReference mJavaObjectRef;
 #ifdef JAVA_MATTER_CONTROLLER_TEST
     ExampleOperationalCredentialsIssuerPtr mOpCredsIssuer;
     PersistentStorage mExampleStorage;
