@@ -25,14 +25,6 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-#define BLE_MIN_CONNECTION_INTERVAL_MS 45 // 45 msec
-#define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
-#define BLE_SLAVE_LATENCY_MS 0
-#define BLE_TIMEOUT_MS 400
-#define BLE_DEFAULT_TIMER_PERIOD_MS (1)
-#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (5000) // Time kept to support all WiFi chips BLE (RS9116/ SiWx917 NCP/SOC)
-#endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #include "FreeRTOS.h"
 #include "timers.h"
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
@@ -199,7 +191,6 @@ private:
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
     void HandleRXCharWrite(rsi_ble_event_write_t * evt);
-    void StartBleSendIndicationTimeoutTimer(uint32_t aTimeoutInMs);
     void CancelBleSendIndicationTimeoutTimer(void);
     static void BleSendIndicationTimeoutHandler(TimerHandle_t xTimer);
 #else

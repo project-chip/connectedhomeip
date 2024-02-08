@@ -68,6 +68,13 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
+#define BLE_MIN_CONNECTION_INTERVAL_MS 45 // 45 msec
+#define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
+#define BLE_SLAVE_LATENCY_MS 0
+#define BLE_TIMEOUT_MS 400
+#define BLE_DEFAULT_TIMER_PERIOD_MS (1)
+#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (5000) // Time kept to support all WiFi chips BLE (RS9116/ SiWx917 NCP/SOC)
+
 extern sl_wfx_msg_t event_msg;
 
 StaticTask_t rsiBLETaskStruct;
@@ -292,7 +299,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
                                        BleAdvTimeoutHandler                        // timer callback handler
     );
 
-    sbleSendIndicationTimeoutTimer = xTimerCreate("SendIndicationTimer",                              // Just a text name, not used by the RTOS kernel
+    sbleSendIndicationTimeoutTimer = xTimerCreate("SendIndicationTimeoutTimer",                              // Just a text name, not used by the RTOS kernel
                                        pdMS_TO_TICKS(BLE_SEND_INDICATION_TIMER_PERIOD_MS), // == default timer period
                                        false,                                      // no timer reload (==one-shot)
                                        (void *) this,                              // init timer id = ble obj context
@@ -478,7 +485,12 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
                                     data->Start());
     
-    StartBleSendIndicationTimeoutTimer(BLE_SEND_INDICATION_TIMER_PERIOD_MS);
+    if (xTimerStart(sbleSendIndicationTimeoutTimer, 0) != pdPASS)
+    {        
+        /* The timer could not be set into the Active
+         state. */
+        ChipLogError(DeviceLayer, "Failed to start send Indication timeout timer");
+    }
 
     if (status != RSI_SUCCESS)
     {
@@ -1123,22 +1135,6 @@ void BLEManagerImpl::CancelBleSendIndicationTimeoutTimer(void)
     if (xTimerStop(sbleSendIndicationTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         ChipLogError(DeviceLayer, "Failed to cancel send indication timeout timer");
-    }
-}
-
-void BLEManagerImpl::StartBleSendIndicationTimeoutTimer(uint32_t aTimeoutInMs)
-{
-    if (xTimerIsTimerActive(sbleSendIndicationTimeoutTimer))
-    {
-        CancelBleAdvTimeoutTimer();
-    }
-
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
-    // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sbleSendIndicationTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(BLE_CONFIG_TIMEOUT)) != pdPASS)
-    {
-        ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
 }
 
