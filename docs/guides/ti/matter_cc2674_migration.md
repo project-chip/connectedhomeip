@@ -22,7 +22,9 @@ CC2674P10 device
     defines for the CC2674
     -   `ti_simplelink_board = "CC2674"`
     -   `ti_simplelink_device = "CC2674P10RGZ"`
--   `third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/ti/common/flash/no_rtos/extFlash/bsp.h`, modify the SPI GPIO pins to the value below:
+-   `third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/ti/common/flash/no_rtos/extFlash/bsp.h`,
+    modify the SPI GPIO pins to the value below:
+
 ```
 #define BSP_IOID_FLASH_CS       IOID_20
 #define BSP_SPI_MOSI            IOID_9
@@ -30,7 +32,8 @@ CC2674P10 device
 #define BSP_SPI_CLK_FLASH       IOID_10
 
 ```
-The GPIO pin values for SPI will need to be adjusted based on your design. 
+
+The GPIO pin values for SPI will need to be adjusted based on your design.
 
 ## Configuring `chip.syscfg` in the SysConfig GUI
 
