@@ -122,8 +122,7 @@ private:
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
-    static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
-    static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
+    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice);
 
     bool mIsCentral     = false;
     bool mIsInitialized = false;
