@@ -65,25 +65,12 @@ public:
 #endif
 
     /**
-     * \brief This function register matter CLI and button features.
+     * \brief This function registers custom matter CLI and button features.
      *
      * \return CHIP_ERROR
      *
      */
     virtual CHIP_ERROR AppMatter_Register(void) override;
-
-    /* Functions that would be called in the Matter task context */
-    static void StartCommissioning(intptr_t arg);
-    static void StopCommissioning(intptr_t arg);
-    static void SwitchCommissioningState(intptr_t arg);
-
-    /* Commissioning handlers */
-    virtual void StartCommissioningHandler(void) override;
-    virtual void StopCommissioningHandler(void) override;
-    virtual void SwitchCommissioningStateHandler(void) override;
-
-    /* FactoryResetHandler */
-    virtual void FactoryResetHandler(void) override;
 
 private:
     void DispatchEvent(const AppEvent & event);
