@@ -26,13 +26,13 @@
  *      to continually add top-level TLV elements by evicting
  *      pre-existing elements.
  */
+#include <lib/core/TLVCircularBuffer.h>
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/TLVCircularBuffer.h>
 #include <lib/core/TLVTags.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>

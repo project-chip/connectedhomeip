@@ -15,6 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/core/TLVReader.h>
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +29,6 @@
 #include <lib/core/Optional.h>
 #include <lib/core/TLVBackingStore.h>
 #include <lib/core/TLVCommon.h>
-#include <lib/core/TLVReader.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/BufferWriter.h>
