@@ -541,3 +541,81 @@ Also, see the up-to-date unit testing coverage report of the Matter SDK
 
 If you make any change to the GN build system, the next build will regenerate
 the ninja files automatically. No need to do anything.
+
+## Include what you use (IWYU)
+
+### Install IWYU (instructions for Linux)
+
+Generally follow the instructions at
+[include-what-you-use GitHub repository](https://github.com/include-what-you-use/include-what-you-use)
+
+An abbreviated version is as follows:
+
+```bash
+# Checkout the repository
+git clone https://github.com/include-what-you-use/include-what-you-use.git
+
+# Createa build folder
+mkdir include-what-you-use/build && cd include-what-you-use
+
+# Figure out the clang version you use
+clang --version
+
+# Based on the output (in this case `[...] clang version 16.0.6 (16) [...]`) select the appropriate tags
+git checkout clang_16
+cd build
+cmake -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=/usr/lib/llvm-16 ..
+make
+sudo make install
+```
+
+### Using IWYU
+
+### Generate `compile_commands.json`
+
+IWYU requires a `compile_commands.json` to figure out the command line arguments to clang.
+Our pigweed build environment pulls out the latest clang (so it may be version 18 or higher)
+which will be different from the clang build you had above. We expect arguments to be
+compatible.
+
+Create a build with a compile database. For example:
+
+```bash
+source scripts/activate.sh
+./scripts/build/build_examples.py --target linux-x64-all-clusters-clang build
+```
+
+Notes on the above:
+
+- This compiles using the pigweed build environment. This will make sure
+  that generated code (using zap-cli) is available
+- **However** it compiles with the pigweed clang, which likely will be
+  different from your system one (e.g. 18). We expect compile database
+  command arguments to be compatible
+
+### Run include-what-you-use
+
+Use the `iwyu_tool.py` with the `-p` option to specify the compilation
+database:
+
+```bash
+iwyu_tool.py -p out/linux-x64-all-clusters-clang/compile_commands.json $SOURCE_FILES
+```
+
+A helper script also exists under `scripts/helpers/iwyu-check.py`. This one defaults
+to seraching `src/platform` however that can be modified. Usage is like:
+
+```bash
+./scripts/helpers/iwyu-check.py                                                    \
+    --compile-commands-glob out/linux-x64-all-clusters-clang/compile_commands.json \
+    --scanning-destination $SOURCE_FILE
+```
+
+
+
+
+
+
+
+
+
