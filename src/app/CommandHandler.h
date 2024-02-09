@@ -431,19 +431,25 @@ public:
 
 #if CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
-     * @brief Fault injection to craft InvokeResponseMessages in particular way for testing
+     * @brief Crafts InvokeResponseMessages using fault injection for tests
      *
-     * Used by Test Harness in certification testing to get server to respond to request in
-     * a variety of manners that client (DUT) is expected to be able to handle based on spec.
+     * Used by the Test Harness (TH) during certification testing to simulate various server
+     * response behaviors. This helps verify that the client device under test (DUT) handles
+     * responses correctly, as outlined in the specifications.
      *
+     * Ensures strict conformance of the DUT's InvokeRequestMessage with the test plan. If
+     * the DUT's request deviates from expectations, the TH will terminate with a detailed
+     * error message.
      *
-     * @param [in] ec exchange context to sending InvokeResponseMessages to client
-     * @param [in] payload payload of the incoming InvokeRequestMessage from client
-     * @param [in] isTimedInvoke is the interaction timed
-     * @param [in] oneReponsePerMessage when true each InvokeResponse is sent to client
-     *             in it's own InvokeResponseMessage
-     * @param [in] invertResponseOrdering
-     * @param [in] dropSecondResponse
+     * @param [in] ec Exchange context for sending InvokeResponseMessages to the client.
+     * @param [in] payload Payload of the incoming InvokeRequestMessage from the client.
+     * @param [in] isTimedInvoke Indicates whether the interaction is timed.
+     * @param [in] oneResponsePerMessage If true, each InvokeResponse is encapsulated in a
+     *             separate InvokeResponseMessage.
+     * @param [in] invertResponseOrdering If true, inverts the order of InvokeResponses
+     *             compared to the order specified in the incoming InvokeRequest.
+     * @param [in] dropSecondResponse If true, prevents the second InvokeResponse from
+     *             being sent to the client.
      */
     void TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload, bool isTimedInvoke,
                                         bool oneReponsePerMessage, bool invertResponseOrdering, bool dropSecondResponse);

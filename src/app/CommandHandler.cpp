@@ -930,8 +930,8 @@ CHIP_ERROR TestOnlyExtractCommandPathFromNextInvokeRequest(TLV::TLVReader & invo
 } // anonymous namespace
 
 // This method copies code from other sections of this file. Minimal attempt is made at consolidating
-// repeatative code because within this method we want to server to crash with a helpful message that
-// is actionable to understand why test failed.
+// repetitive code because within this method we want the server to crash with a helpful message that
+// is actionable for understanding why the test failed.
 void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
                                                     bool isTimedInvoke, bool oneReponsePerMessage, bool invertResponseOrdering,
                                                     bool dropSecondResponse)
@@ -939,8 +939,6 @@ void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext *
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH failured: Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH failured: state should be Idle, issue with TH");
 
-    // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
-    // Exchange Manager for unsolicited InvokeCommand Requests.
     mResponseSender.SetExchangeContext(ec);
     Handle workHandle(this);
     mResponseSender.WillSendMessage();
