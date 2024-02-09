@@ -36,7 +36,7 @@ public:
 
     // Attribute Accessors
     PowerModeEnum GetPowerMode() override { return mPowerMode; }
-    uint8_t GetNumberOfMeasurementTypes() override { return mNumberOfMeasurementTypes; };
+    uint8_t GetNumberOfMeasurementTypes() override;
 
     // TODO
     CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) override;
@@ -63,7 +63,6 @@ public:
 
     // Internal Application API to set attribute values
     CHIP_ERROR SetPowerMode(PowerModeEnum);
-    CHIP_ERROR SetNumberOfMeasurementTypes(uint8_t);
     CHIP_ERROR SetVoltage(DataModel::Nullable<int64_t>);
     CHIP_ERROR SetActiveCurrent(DataModel::Nullable<int64_t>);
     CHIP_ERROR SetReactiveCurrent(DataModel::Nullable<int64_t>);
@@ -81,7 +80,6 @@ public:
 private:
     // Attribute storage
     PowerModeEnum mPowerMode;
-    uint8_t mNumberOfMeasurementTypes = kDefaultNumberOfMeasurementTypes;
     DataModel::Nullable<int64_t> mVoltage;
     DataModel::Nullable<int64_t> mActiveCurrent;
     DataModel::Nullable<int64_t> mReactiveCurrent;

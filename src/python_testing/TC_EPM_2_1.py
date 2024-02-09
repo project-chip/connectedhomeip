@@ -82,7 +82,45 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         self.step("4")
         accuracy = await self.read_epm_attribute_expect_success("Accuracy")
         logger.info(f"Rx'd Accuracy: {accuracy}")
-        # todo check list length
+        logger.info("Checking Accuracy meets spec requirements")
+        found_active_power = False
+        for measurement in accuracy:
+            logging.info(
+                f"measurementType:{measurement.measurementType} measured:{measurement.measured} minMeasuredValue:{measurement.minMeasuredValue} maxMeasuredValue:{measurement.maxMeasuredValue}")
+
+            # Scan all measurement types to check we have the mandatory kActivePower
+            if (measurement.measurementType == Clusters.ElectricalPowerMeasurement.Enums.MeasurementTypeEnum.kActivePower):
+                found_active_power = True
+
+            # Check that the ranges are in order from minimum to maximum and don't have gaps
+            asserts.assert_equal(measurement.minMeasuredValue, measurement.accuracyRanges[0].rangeMin,
+                                 "minMeasuredValue must be the same as 1st accuracyRange rangeMin")
+
+            for index, range_entry in enumerate(measurement.accuracyRanges):
+                logging.info(f"   [{index}] rangeMin:{range_entry.rangeMin} rangeMax:{range_entry.rangeMax} percentMax:{range_entry.percentMax} percentMin:{range_entry.percentMin} percentTypical:{range_entry.percentTypical} fixedMax:{range_entry.fixedMax} fixedMin:{range_entry.fixedMin} fixedTypical:{range_entry.fixedTypical}")
+                asserts.assert_greater(range_entry.rangeMax, range_entry.rangeMin, "rangeMax should be > rangeMin")
+                if index == 0:
+                    minimum_range = range_entry.rangeMin
+                    maximum_range = range_entry.rangeMax
+                    prev_range_max = range_entry.rangeMax
+                else:
+                    minimum_range = min(minimum_range, range_entry.rangeMin)
+                    maximum_range = max(maximum_range, range_entry.rangeMax)
+                    asserts.assert_equal(range_entry.rangeMin, prev_range_max + 1,
+                                         f"Index[{index}] rangeMin was not +1 more then previous index's rangeMax {prev_range_max}")
+                    prev_range_max = range_entry.rangeMax
+
+            # Check that the last range rangeMax has the same value as the measurement.maxMeasuredValue
+            asserts.assert_equal(measurement.maxMeasuredValue, prev_range_max,
+                                 "maxMeasuredValue must be the same as the last accuracyRange rangeMax")
+            asserts.assert_equal(maximum_range, measurement.maxMeasuredValue,
+                                 "The maxMeasuredValue must be the same as any of the maximum of all rangeMax's")
+            asserts.assert_equal(minimum_range, measurement.minMeasuredValue,
+                                 "The minMeasuredValue must be the same as any of the minimum of all rangeMin's")
+
+        asserts.assert_is(found_active_power, True, "There must be an ActivePower measurement accuracy")
+        asserts.assert_equal(len(accuracy), number_of_measurements,
+                             "The number of accuracy entries should match the NumberOfMeasurementTypes")
 
         self.step("5")
         ranges = await self.read_epm_attribute_expect_success("Ranges")

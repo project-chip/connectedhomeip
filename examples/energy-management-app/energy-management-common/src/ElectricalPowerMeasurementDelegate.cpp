@@ -57,24 +57,6 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::SetPowerMode(PowerModeEnum newVal
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR ElectricalPowerMeasurementDelegate::SetNumberOfMeasurementTypes(uint8_t newValue)
-{
-    uint8_t oldValue = mNumberOfMeasurementTypes;
-
-    if (newValue < 1 || newValue > kMaxNumberOfMeasurementTypes)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-
-    mNumberOfMeasurementTypes = newValue;
-    if (oldValue != newValue)
-    {
-        ChipLogDetail(AppServer, "mNumberOfMeasurementTypes  updated to %d", static_cast<int>(mNumberOfMeasurementTypes));
-        MatterReportingAttributeChangeCallback(mEndpointId, ElectricalPowerMeasurement::Id, NumberOfMeasurementTypes::Id);
-    }
-
-    return CHIP_NO_ERROR;
-}
 
 const MeasurementAccuracyRangeStruct::Type activePowerAccuracyRanges[] = {
     // 2 - 5%, 3% Typ
@@ -180,6 +162,12 @@ static const Structs::MeasurementAccuracyStruct::Type kMeasurementAccuracies[] =
         .accuracyRanges   = DataModel::List<const MeasurementAccuracyRangeStruct::Type>(voltageAccuracyRanges),
     },
 };
+
+uint8_t ElectricalPowerMeasurementDelegate::GetNumberOfMeasurementTypes()
+{
+    return ArraySize(kMeasurementAccuracies);
+};
+
 CHIP_ERROR ElectricalPowerMeasurementDelegate::GetAccuracyByIndex(uint8_t accuracyIndex,
                                                                   Structs::MeasurementAccuracyStruct::Type & accuracy)
 {
@@ -193,7 +181,6 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::GetAccuracyByIndex(uint8_t accura
     return CHIP_NO_ERROR;
 }
 
-// CHIP_ERROR ElectricalPowerMeasurementDelegate::SetAccuracy(); // TODO
 // CHIP_ERROR ElectricalPowerMeasurementDelegate::SetRanges();   // TODO
 CHIP_ERROR ElectricalPowerMeasurementDelegate::SetVoltage(DataModel::Nullable<int64_t> newValue)
 {
@@ -340,8 +327,6 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::SetFrequency(DataModel::Nullable<
 
     return CHIP_NO_ERROR;
 }
-// DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>>;// TODO
-// DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>>;// TODO
 
 CHIP_ERROR ElectricalPowerMeasurementDelegate::SetPowerFactor(DataModel::Nullable<int64_t> newValue)
 {
