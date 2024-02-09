@@ -40,7 +40,6 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    using RangeIterator               = CommonIterator<Structs::MeasurementRangeStruct::Type>;
     using HarmonicMeasurementIterator = CommonIterator<Structs::HarmonicMeasurementStruct::Type>;
 
     virtual PowerModeEnum GetPowerMode()          = 0;
@@ -116,7 +115,6 @@ private:
     CHIP_ERROR EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     CHIP_ERROR EncodeRanges(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
-    CHIP_ERROR ReadRanges(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadHarmonicCurrents(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadHarmonicPhases(AttributeValueEncoder & aEncoder);
 };
