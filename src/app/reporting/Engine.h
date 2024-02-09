@@ -25,7 +25,6 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/InteractionModelEngine.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
@@ -41,6 +40,7 @@
 namespace chip {
 namespace app {
 
+class InteractionModelEngine;
 class TestReadInteraction;
 
 namespace reporting {
