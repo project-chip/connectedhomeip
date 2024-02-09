@@ -16,17 +16,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/tests/integration/MockEvents.h>
 
-/**
- *    @file
- *      This file declares mock event generator and example
- *
- */
-
-#include "MockEvents.h"
-#include "common.h"
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
+#include <app/tests/integration/common.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>

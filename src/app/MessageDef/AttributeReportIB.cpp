@@ -14,17 +14,17 @@
  *    limitations under the License.
  */
 
-#include "AttributeReportIB.h"
-#include "AttributeDataIB.h"
-#include "MessageDefHelper.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include <app/MessageDef/AttributeReportIB.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/AttributeDataIB.h>
+#include <app/MessageDef/MessageDefHelper.h>
+#include <app/MessageDef/StructBuilder.h>
+#include <app/MessageDef/StructParser.h>
 
 namespace chip {
 namespace app {

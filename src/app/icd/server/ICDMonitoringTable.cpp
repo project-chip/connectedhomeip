@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "ICDMonitoringTable.h"
+#include <app/icd/server/ICDMonitoringTable.h>
 
 #include <crypto/RandUtils.h>
 

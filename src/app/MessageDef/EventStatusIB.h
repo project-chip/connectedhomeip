@@ -17,12 +17,11 @@
 
 #pragma once
 
-#include "EventPathIB.h"
-#include "StatusIB.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
-
 #include <app/AppConfig.h>
+#include <app/MessageDef/EventPathIB.h>
+#include <app/MessageDef/StatusIB.h>
+#include <app/MessageDef/StructBuilder.h>
+#include <app/MessageDef/StructParser.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/clusters/ota-provider/ota-provider.h>
 
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -23,13 +24,9 @@
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/error-mapping.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/Constants.h>
-
-#include <lib/support/Span.h>
-
-#include "ota-provider-delegate.h"
-#include "ota-provider.h"
 
 using namespace chip;
 using namespace chip::app::Clusters;

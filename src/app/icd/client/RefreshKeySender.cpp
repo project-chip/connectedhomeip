@@ -14,14 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/icd/client/RefreshKeySender.h>
 
-#include "RefreshKeySender.h"
-#include "CheckInDelegate.h"
-#include "controller/InvokeInteraction.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandPathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
+#include <app/icd/client/CheckInDelegate.h>
+#include <controller/InvokeInteraction.h>
+
 #include <memory>
 
 namespace chip {

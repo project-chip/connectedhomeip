@@ -13,13 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/****************************************************************************
- * @file
- * @brief Implementation for the Power Source Server Cluster
- ***************************************************************************/
-
-#include "power-source-server.h"
+#include <app/clusters/power-source-server/power-source-server.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>

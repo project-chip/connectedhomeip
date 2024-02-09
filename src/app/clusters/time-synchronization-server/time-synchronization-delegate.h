@@ -18,10 +18,9 @@
 
 #pragma once
 
-#include "TimeSyncDataProvider.h"
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
 #include <lib/support/Span.h>
 
 namespace chip {

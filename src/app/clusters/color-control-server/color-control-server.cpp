@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 
-#include "color-control-server.h"
+#include <app/clusters/color-control-server/color-control-server.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>

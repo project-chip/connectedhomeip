@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "application-basic-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/application-basic-server/application-basic-delegate.h>
 
 namespace chip {
 namespace app {

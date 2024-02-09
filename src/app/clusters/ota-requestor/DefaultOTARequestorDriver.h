@@ -14,13 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
+#include <app/clusters/ota-requestor/OTARequestorDriver.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
-
-#include "OTARequestorDriver.h"
 
 namespace chip {
 

@@ -15,14 +15,11 @@
  *    limitations under the License.
  */
 
-#include "general-diagnostics-server.h"
+#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 
 #include <stdint.h>
 #include <string.h>
 
-#include <app/util/config.h>
-
-#include "app/server/Server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -30,7 +27,9 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>

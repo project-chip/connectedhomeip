@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "messages-delegate.h"
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/messages-server/messages-delegate.h>
 #include <app/util/basic-types.h>
 
 namespace chip {

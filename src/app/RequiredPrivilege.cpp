@@ -15,8 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "RequiredPrivilege.h"
+#include <app/RequiredPrivilege.h>
 
 namespace chip {
 namespace app {

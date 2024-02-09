@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "target-navigator-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 
 namespace chip {
 namespace app {

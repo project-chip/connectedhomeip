@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "AttributePathIBs.h"
-#include "DataVersionFilterIBs.h"
-#include "EventFilterIBs.h"
-#include "EventPathIBs.h"
-#include "MessageBuilder.h"
-#include "MessageParser.h"
 #include <app/AppConfig.h>
+#include <app/MessageDef/AttributePathIBs.h>
+#include <app/MessageDef/DataVersionFilterIBs.h>
+#include <app/MessageDef/EventFilterIBs.h>
+#include <app/MessageDef/EventPathIBs.h>
+#include <app/MessageDef/MessageBuilder.h>
+#include <app/MessageDef/MessageParser.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

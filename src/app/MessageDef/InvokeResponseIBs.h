@@ -18,15 +18,14 @@
 #pragma once
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/ArrayBuilder.h>
+#include <app/MessageDef/ArrayParser.h>
+#include <app/MessageDef/InvokeResponseIB.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
-#include "InvokeResponseIB.h"
 
 namespace chip {
 namespace app {

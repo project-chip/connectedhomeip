@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include "messaging/ExchangeContext.h"
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
@@ -26,6 +25,7 @@
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/ExchangeContext.h>
 
 namespace chip {
 namespace app {

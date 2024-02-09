@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "content-launch-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/content-launch-server/content-launch-delegate.h>
 
 namespace chip {
 namespace app {

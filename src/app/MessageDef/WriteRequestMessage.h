@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "AttributeDataIBs.h"
-#include "MessageBuilder.h"
-#include "MessageParser.h"
+#include <app/MessageDef/AttributeDataIBs.h>
+#include <app/MessageDef/MessageBuilder.h>
+#include <app/MessageDef/MessageParser.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

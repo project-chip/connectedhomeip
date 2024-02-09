@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "groups-server.h"
+#include <app/clusters/groups-server/groups-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>

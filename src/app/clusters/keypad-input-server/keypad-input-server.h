@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "keypad-input-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/MessageDef/keypad-input-delegate.h>
 
 namespace chip {
 namespace app {

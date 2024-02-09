@@ -15,8 +15,7 @@
  *   limitations under the License.
  *
  */
-
-#include "InteractionModel.h"
+#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
 
 using namespace chip;
 using namespace chip::app;

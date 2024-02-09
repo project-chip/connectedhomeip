@@ -22,7 +22,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <protocols/bdx/DiagnosticLogs.h>
 
-#include "BDXDiagnosticLogsProvider.h"
+#include <app/clusters/diagnostic-logs-server/BDXDiagnosticLogsProvider.h>
 
 #ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
 static constexpr size_t kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize =

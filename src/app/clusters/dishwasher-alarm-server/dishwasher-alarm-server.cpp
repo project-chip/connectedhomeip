@@ -15,7 +15,7 @@
  *    limitations under the License.
  *
  */
-#include "dishwasher-alarm-server.h"
+#include <app/clusters/dishwasher-alarm-server/dishwasher-alarm-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>

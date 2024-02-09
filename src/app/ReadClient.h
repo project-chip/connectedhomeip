@@ -23,7 +23,6 @@
  */
 
 #pragma once
-#include "system/SystemClock.h"
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
@@ -48,6 +47,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT

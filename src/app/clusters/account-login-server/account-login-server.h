@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "account-login-delegate.h"
+#include <app/clusters/account-login-server/account-login-delegate.h>
 
 namespace chip {
 namespace app {

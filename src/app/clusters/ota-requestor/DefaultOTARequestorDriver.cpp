@@ -31,12 +31,11 @@
 // - A QueryImage call results in the driver iterating through the list of default OTA providers, from beginning to the end, until a
 //   provider successfully transfers the OTA image. If a provider is busy, it will be retried a set number of times before moving
 //   to the next available one. If all else fails, the periodic query timer is kicked off again.
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
-
-#include "DefaultOTARequestorDriver.h"
-#include "OTARequestorInterface.h"
 
 namespace chip {
 namespace DeviceLayer {

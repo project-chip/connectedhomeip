@@ -21,15 +21,14 @@
  *
  */
 
-#include "AttributeDataIBs.h"
-
-#include "MessageDefHelper.h"
+#include <app/MessageDef/AttributeDataIBs.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/MessageDefHelper.h>
 
 using namespace chip;
 using namespace chip::TLV;

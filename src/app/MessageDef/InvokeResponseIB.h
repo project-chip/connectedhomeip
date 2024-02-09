@@ -14,20 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/CommandDataIB.h>
+#include <app/MessageDef/CommandStatusIB.h>
+#include <app/MessageDef/StructBuilder.h>
+#include <app/MessageDef/StructParser.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include "CommandDataIB.h"
-#include "CommandStatusIB.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
 
 namespace chip {
 namespace app {

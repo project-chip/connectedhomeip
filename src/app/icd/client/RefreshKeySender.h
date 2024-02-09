@@ -17,17 +17,17 @@
 
 #pragma once
 
-#include "ICDClientInfo.h"
-#include "ICDClientStorage.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandSender.h>
 #include <app/OperationalSessionSetup.h>
-
+#include <app/icd/client/ICDClientInfo.h>
+#include <app/icd/client/ICDClientStorage.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CodeUtils.h>
+
 #include <stddef.h>
 
 namespace chip {

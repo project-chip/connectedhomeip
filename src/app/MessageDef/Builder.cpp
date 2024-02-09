@@ -15,13 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines builder in CHIP interaction model
- *
- */
-
-#include "Builder.h"
+#include <app/MessageDef/Builder.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

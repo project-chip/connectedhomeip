@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include "AttributePathIB.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include <app/MessageDef/AttributePathIB.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/StructBuilder.h>
+#include <app/MessageDef/StructParser.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

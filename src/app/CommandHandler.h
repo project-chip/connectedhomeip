@@ -30,9 +30,8 @@
 
 #pragma once
 
-#include "CommandPathRegistry.h"
-#include "CommandResponseSender.h"
-
+#include <app/CommandPathRegistry.h>
+#include <app/CommandResponseSender.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>

@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "dishwasher-alarm-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/dishwasher-alarm-server/dishwasher-alarm-delegate.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>

@@ -15,9 +15,10 @@
  *    limitations under the License.
  */
 
-#include "CommandResponseSender.h"
-#include "InteractionModelEngine.h"
-#include "messaging/ExchangeContext.h"
+#include <app/CommandResponseSender.h>
+
+#include <app/InteractionModelEngine.h>
+#include <messaging/ExchangeContext.h>
 
 namespace chip {
 namespace app {

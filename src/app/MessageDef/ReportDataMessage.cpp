@@ -15,21 +15,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines ReportDataMessage parser and builder in CHIP interaction model
- *
- */
-
-#include "ReportDataMessage.h"
-
-#include "MessageDefHelper.h"
+#include <app/MessageDef/ReportDataMessage.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/MessageDefHelper.h>
 
 using namespace chip;
 

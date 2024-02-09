@@ -26,7 +26,7 @@
 
 #include <type_traits>
 
-#include "CommandSenderLegacyCallback.h"
+#include <app/CommandSenderLegacyCallback.h>
 
 #include <app/CommandPathParams.h>
 #include <app/MessageDef/InvokeRequestMessage.h>

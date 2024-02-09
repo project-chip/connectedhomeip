@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include "system/SystemPacketBuffer.h"
 #include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
+#include <system/SystemPacketBuffer.h>
 #include <tuple>
 
 namespace chip {

@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 
-#include "scenes-server.h"
+#include <app/clusters/scenes-server/scenes-server.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>

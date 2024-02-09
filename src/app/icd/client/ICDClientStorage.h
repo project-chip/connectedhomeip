@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "ICDClientInfo.h"
+#include <app/icd/client/ICDClientInfo.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -26,6 +26,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/CommonIterator.h>
 #include <protocols/secure_channel/CheckinMessage.h>
+
 #include <stddef.h>
 
 namespace chip {

@@ -14,9 +14,10 @@
  *    limitations under the License.
  */
 
-#include "MessageParser.h"
-#include "MessageDefHelper.h"
+#include <app/MessageDef/MessageParser.h>
+
 #include <app/InteractionModelRevision.h>
+#include <app/MessageDef/MessageDefHelper.h>
 
 namespace chip {
 namespace app {

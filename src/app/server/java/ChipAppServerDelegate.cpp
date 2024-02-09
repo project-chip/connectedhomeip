@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/server/java/ChipAppServerDelegate.h>
 
-#include "ChipAppServerDelegate.h"
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 

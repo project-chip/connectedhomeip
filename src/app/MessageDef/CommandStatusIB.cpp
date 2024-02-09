@@ -14,16 +14,16 @@
  *    limitations under the License.
  */
 
-#include "CommandStatusIB.h"
-#include "MessageDefHelper.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include <app/MessageDef/CommandStatusIB.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/MessageDefHelper.h>
+#include <app/MessageDef/StructBuilder.h>
+#include <app/MessageDef/StructParser.h>
 
 namespace chip {
 namespace app {

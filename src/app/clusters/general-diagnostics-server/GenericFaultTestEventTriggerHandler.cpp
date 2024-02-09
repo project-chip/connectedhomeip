@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "GenericFaultTestEventTriggerHandler.h"
+#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <lib/support/CodeUtils.h>

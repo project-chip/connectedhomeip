@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include "operational-state-cluster-objects.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/clusters/operational-state-server/operational-state-cluster-objects.h>
 #include <app/util/af.h>
 
 namespace chip {

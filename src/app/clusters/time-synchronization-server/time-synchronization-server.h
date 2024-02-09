@@ -14,19 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- * @file API declarations for time sync cluster.
- */
-
 #pragma once
 
 #ifndef TIME_SYNC_ENABLE_TSC_FEATURE
 #define TIME_SYNC_ENABLE_TSC_FEATURE 1
 #endif
 
-#include "TimeSyncDataProvider.h"
-#include "time-synchronization-delegate.h"
+#include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 
 #if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/ReadClient.h>

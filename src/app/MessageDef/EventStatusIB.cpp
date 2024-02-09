@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-#include "EventStatusIB.h"
-#include "MessageDefHelper.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include <app/MessageDef/EventStatusIB.h>
+#include <app/MessageDef/MessageDefHelper.h>
+#include <app/MessageDef/StructBuilder.h>
+#include <app/MessageDef/StructParser.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

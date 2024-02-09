@@ -24,16 +24,15 @@
 #pragma once
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/AttributeReportIBs.h>
+#include <app/MessageDef/EventReportIBs.h>
+#include <app/MessageDef/MessageBuilder.h>
+#include <app/MessageDef/MessageParser.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include "AttributeReportIBs.h"
-#include "EventReportIBs.h"
-#include "MessageBuilder.h"
-#include "MessageParser.h"
 
 namespace chip {
 namespace app {

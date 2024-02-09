@@ -14,22 +14,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/clusters/barrier-control-server/barrier-control-server.h>
 
-#include "barrier-control-server.h"
+#include <assert.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <lib/support/TypeTraits.h>
-
-#include <assert.h>
-
-// We need this for initializating default reporting configurations.
-#include <app/reporting/reporting.h>
-
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 

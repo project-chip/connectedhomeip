@@ -16,10 +16,9 @@
  *    limitations under the License.
  */
 
-#include "OTATestEventTriggerHandler.h"
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 
-#include "OTARequestorInterface.h"
-
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {

@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 
-#include "AttributePathIB.h"
-#include "MessageDefHelper.h"
+#include <app/MessageDef/AttributePathIB.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/MessageDefHelper.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/Nullable.h>
 

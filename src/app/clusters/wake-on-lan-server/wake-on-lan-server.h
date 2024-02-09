@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "wake-on-lan-delegate.h"
+#include <app/clusters/wake-on-lan-server/wake-on-lan-delegate.h>
 
 namespace chip {
 namespace app {

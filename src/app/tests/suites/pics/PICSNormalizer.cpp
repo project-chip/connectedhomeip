@@ -13,8 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "PICSNormalizer.h"
+#include <app/tests/suites/pics/PICSNormalizer.h>
 
 #include <algorithm>
 #include <cctype>

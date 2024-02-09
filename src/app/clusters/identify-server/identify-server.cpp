@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
-#include "identify-server.h"
+#include <app/clusters/identify-server/identify-server.h>
+
+#include <array>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -24,11 +26,9 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-
 #include <app/util/af.h>
 #include <app/util/common.h>
 #include <app/util/error-mapping.h>
-#include <array>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <tracing/macros.h>

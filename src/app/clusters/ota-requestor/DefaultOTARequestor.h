@@ -23,13 +23,12 @@
 #pragma once
 
 #include <app/CASESessionManager.h>
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <app/clusters/ota-requestor/OTARequestorStorage.h>
 #include <app/server/Server.h>
 #include <protocols/bdx/BdxMessages.h>
-
-#include "BDXDownloader.h"
-#include "OTARequestorDriver.h"
-#include "OTARequestorInterface.h"
-#include "OTARequestorStorage.h"
 
 namespace chip {
 

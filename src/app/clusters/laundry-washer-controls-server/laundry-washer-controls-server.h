@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "laundry-washer-controls-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-delegate.h>
 #include <app/util/af.h>
 
 namespace chip {

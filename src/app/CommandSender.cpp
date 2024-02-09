@@ -15,16 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/CommandSender.h>
 
-/**
- *    @file
- *      This file defines objects for a CHIP IM Invoke Command Sender
- *
- */
-
-#include "CommandSender.h"
-#include "InteractionModelEngine.h"
-#include "StatusResponse.h"
+#include <app/InteractionModelEngine.h>
+#include <app/StatusResponse.h>
 #include <app/TimedRequest.h>
 #include <platform/LockTracker.h>
 #include <protocols/Protocols.h>

@@ -1,4 +1,4 @@
-#include "sample-mei-server.h"
+#include <app/clusters/sample-mei-server/sample-mei-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>

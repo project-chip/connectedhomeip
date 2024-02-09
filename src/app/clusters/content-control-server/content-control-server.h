@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "content-control-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/content-control-server/content-control-delegate.h>
 
 namespace chip {
 namespace app {

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "StructParser.h"
+#include <app/MessageDef/StructParser.h>
 
 namespace chip {
 namespace app {

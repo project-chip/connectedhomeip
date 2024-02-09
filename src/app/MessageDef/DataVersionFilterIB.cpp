@@ -13,21 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines DataVersionFilter parser and builder in CHIP interaction model
- *
- */
-
-#include "DataVersionFilterIB.h"
-
-#include "MessageDefHelper.h"
+#include <app/MessageDef/DataVersionFilterIB.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/MessageDefHelper.h>
 
 namespace chip {
 namespace app {

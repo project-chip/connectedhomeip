@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "media-playback-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/media-playback-server/media-playback-delegate.h>
 
 namespace chip {
 namespace app {

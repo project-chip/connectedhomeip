@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/icd/server/ICDConfigurationData.h>
 
-#include "ICDConfigurationData.h"
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CodeUtils.h>
 

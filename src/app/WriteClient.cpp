@@ -15,18 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/WriteClient.h>
 
-/**
- *    @file
- *      This file defines the initiator side of a CHIP Write Interaction.
- *
- */
-
-#include "lib/core/CHIPError.h"
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TimedRequest.h>
-#include <app/WriteClient.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace app {

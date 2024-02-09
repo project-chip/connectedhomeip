@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-#include "TimedRequestMessage.h"
-#include "MessageDefHelper.h"
+#include <app/MessageDef/TimedRequestMessage.h>
+
+#include <app/MessageDef/MessageDefHelper.h>
 
 namespace chip {
 namespace app {

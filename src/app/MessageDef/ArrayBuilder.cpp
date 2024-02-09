@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "ArrayBuilder.h"
+#include <app/MessageDef/ArrayBuilder.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

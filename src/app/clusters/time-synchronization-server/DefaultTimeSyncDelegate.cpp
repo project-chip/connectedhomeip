@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
-#include "DefaultTimeSyncDelegate.h"
-#include "inet/IPAddress.h"
+#include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
+
+#include <inet/IPAddress.h>
 #include <platform/RuntimeOptionsProvider.h>
 #include <system/SystemClock.h>
 

@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
-#include "EventPathIB.h"
-#include "EventPathIBs.h"
+#include <app/MessageDef/EventPathIB.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/ArrayBuilder.h>
+#include <app/MessageDef/ArrayParser.h>
+#include <app/MessageDef/EventPathIBs.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

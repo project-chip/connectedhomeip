@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "BooleanStateConfigurationTestEventTriggerHandler.h"
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h>
 
 using namespace chip::app::Clusters::BooleanStateConfiguration;
 

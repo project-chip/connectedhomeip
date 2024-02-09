@@ -21,15 +21,17 @@
  *
  */
 
-#include "MessageDefHelper.h"
+#include <app/MessageDef/MessageDefHelper.h>
+
 #include <algorithm>
+#include <inttypes.h>
+#include <stdarg.h>
+#include <stdio.h>
+
 #include <app/AppConfig.h>
 #include <app/InteractionModelRevision.h>
 #include <app/util/basic-types.h>
-#include <inttypes.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <stdarg.h>
-#include <stdio.h>
 
 namespace chip {
 namespace app {

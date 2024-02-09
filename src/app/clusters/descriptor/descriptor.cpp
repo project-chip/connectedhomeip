@@ -19,6 +19,7 @@
  * @file
  * @brief Implementation for the Descriptor Server Cluster
  ***************************************************************************/
+#include <app/clusters/descriptor/descriptor.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -27,8 +28,6 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include "descriptor.h"
 
 using namespace chip;
 using namespace chip::app;

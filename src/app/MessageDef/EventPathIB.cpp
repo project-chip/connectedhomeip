@@ -16,16 +16,14 @@
  *    limitations under the License.
  */
 
-#include "EventPathIB.h"
-
-#include "MessageDefHelper.h"
+#include <app/MessageDef/EventPathIB.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #include <app/AppConfig.h>
-
+#include <app/MessageDef/MessageDefHelper.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {

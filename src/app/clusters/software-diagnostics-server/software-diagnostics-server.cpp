@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 
-#include "software-diagnostics-server.h"
+#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>

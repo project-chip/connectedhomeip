@@ -16,12 +16,15 @@
  *    limitations under the License.
  */
 
-#include "AndroidAppServerWrapper.h"
+#include <app/server/java/AndroidAppServerWrapper.h>
+
+#include <iostream>
+#include <thread>
+
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <iostream>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -30,7 +33,6 @@
 #include <platform/PlatformManager.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <thread>
 
 using namespace chip;
 using namespace chip::Credentials;

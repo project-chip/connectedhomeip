@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "OTARequestorStorage.h"
+#include <app/clusters/ota-requestor/OTARequestorStorage.h>
 
 namespace chip {
 

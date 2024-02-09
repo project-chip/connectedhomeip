@@ -23,8 +23,6 @@
  *      Currently it provides simple command and read handler with sample cluster
  *
  */
-
-#include "MockEvents.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
@@ -33,6 +31,7 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
+#include <app/tests/integration/MockEvents.h>
 #include <app/tests/integration/common.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>

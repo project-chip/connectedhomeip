@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "application-launcher-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/application-launcher-server/application-launcher-delegate.h>
 
 namespace chip {
 namespace app {

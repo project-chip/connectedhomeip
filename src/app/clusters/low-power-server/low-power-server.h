@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "low-power-delegate.h"
+#include <app/clusters/low-power-server/low-power-delegate.h>
 
 namespace chip {
 namespace app {

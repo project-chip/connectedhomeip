@@ -15,8 +15,7 @@
  *   limitations under the License.
  *
  */
-
-#include "DiscoveryCommands.h"
+#include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
 
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>

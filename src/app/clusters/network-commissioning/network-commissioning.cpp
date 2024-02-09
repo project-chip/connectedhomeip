@@ -18,7 +18,7 @@
 
 #include <limits>
 
-#include "network-commissioning.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>

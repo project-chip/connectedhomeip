@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-#include "time-synchronization-server.h"
-#include "DefaultTimeSyncDelegate.h"
-#include "time-synchronization-delegate.h"
+#include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 
 #if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/InteractionModelEngine.h>

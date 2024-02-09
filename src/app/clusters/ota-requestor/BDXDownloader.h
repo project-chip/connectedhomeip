@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "OTADownloader.h"
+#include <app/clusters/ota-requestor/OTADownloader.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>

@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 
-#include "TimedHandler.h"
+#include <app/TimedHandler.h>
+
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/StatusResponse.h>

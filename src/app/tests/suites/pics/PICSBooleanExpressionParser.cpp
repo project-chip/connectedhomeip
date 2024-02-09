@@ -15,10 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
 
-#include "PICSBooleanExpressionParser.h"
-#include "PICSNormalizer.h"
-
+#include <app/tests/suites/pics/PICSNormalizer.h>
 #include <lib/support/CodeUtils.h>
 
 bool PICSBooleanExpressionParser::Eval(std::string expression, std::map<std::string, bool> & PICS)

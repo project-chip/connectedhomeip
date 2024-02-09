@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "device-energy-management-server.h"
+#include <app/clusters/device-energy-management-server/device-energy-management-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>

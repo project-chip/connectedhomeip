@@ -23,12 +23,12 @@
  *
  */
 
-#include "InteractionModelEngine.h"
+#include <app/InteractionModelEngine.h>
 
 #include <cinttypes>
 
-#include "access/RequestPath.h"
-#include "access/SubjectDescriptor.h"
+#include <access/RequestPath.h>
+#include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>

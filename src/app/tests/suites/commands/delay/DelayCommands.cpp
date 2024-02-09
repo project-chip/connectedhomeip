@@ -15,8 +15,7 @@
  *   limitations under the License.
  *
  */
-
-#include "DelayCommands.h"
+#include <app/tests/suites/commands/delay/DelayCommands.h>
 
 namespace {
 const char basePath[] = "./src/app/tests/suites/commands/delay/scripts/";

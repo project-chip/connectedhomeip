@@ -15,8 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "lib/support/CHIPMem.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/power-source-server/power-source-server.h>
 #include <app/util/af.h>
@@ -25,14 +23,16 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <nlunit-test.h>
 #include <protocols/interaction_model/Constants.h>
-#include <type_traits>
 
+#include <nlunit-test.h>
+
+#include <type_traits>
 #include <vector>
 
 namespace {

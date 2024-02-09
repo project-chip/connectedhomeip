@@ -15,7 +15,7 @@
  *    limitations under the License.
  *
  */
-#include "refrigerator-alarm-server.h"
+#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>

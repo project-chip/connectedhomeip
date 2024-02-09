@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "channel-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/channel-server/channel-delegate.h>
 
 namespace chip {
 namespace app {

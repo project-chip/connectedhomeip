@@ -15,19 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines AttributeDataIBs parser and builder in CHIP interaction model
- *
- */
-
 #pragma once
 
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
-#include "AttributeDataIB.h"
+#include <app/MessageDef/AttributeDataIB.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/ArrayBuilder.h>
+#include <app/MessageDef/ArrayParser.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

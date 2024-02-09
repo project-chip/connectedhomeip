@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 #pragma once
+
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/OTARequestorUserConsentDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
-
-#include "DefaultOTARequestorDriver.h"
 
 namespace chip {
 namespace DeviceLayer {

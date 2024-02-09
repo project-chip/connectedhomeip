@@ -14,10 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/tests/suites/pics/PICSBooleanReader.h>
 
-#include "PICSBooleanReader.h"
-#include "PICSNormalizer.h"
-
+#include <app/tests/suites/pics/PICSNormalizer.h>
 #include <lib/support/CodeUtils.h>
 
 #include <fstream>

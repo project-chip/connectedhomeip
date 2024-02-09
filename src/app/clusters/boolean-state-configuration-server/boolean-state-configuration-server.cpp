@@ -16,7 +16,7 @@
  *
  */
 
-#include "boolean-state-configuration-server.h"
+#include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>

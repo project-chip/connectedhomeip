@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "time-synchronization-delegate.h"
+#include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 
 namespace chip {
 namespace app {

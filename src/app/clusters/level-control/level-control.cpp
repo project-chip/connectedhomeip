@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-// clusters specific header
-#include "level-control.h"
+#include <app/clusters/level-control/level-control.h>
 
 // this file contains all the common includes for clusters in the util
 #include <app-common/zap-generated/attributes/Accessors.h>

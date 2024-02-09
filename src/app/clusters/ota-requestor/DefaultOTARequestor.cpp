@@ -19,8 +19,10 @@
 /* This file contains the implementation of the OTARequestorInterface class. All the core
  * OTA Requestor logic is contained in this class.
  */
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 
 #include <app/clusters/basic-information/basic-information.h>
+#include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPEncoding.h>
@@ -28,9 +30,6 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/OTAImageProcessor.h>
 #include <protocols/bdx/BdxUri.h>
-
-#include "BDXDownloader.h"
-#include "DefaultOTARequestor.h"
 
 namespace chip {
 

@@ -23,12 +23,11 @@
 
 #pragma once
 
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
-#include "AttributeReportIB.h"
-
 #include <app/AppConfig.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/MessageDef/ArrayBuilder.h>
+#include <app/MessageDef/ArrayParser.h>
+#include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>

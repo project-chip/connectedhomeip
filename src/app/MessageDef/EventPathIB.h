@@ -18,12 +18,11 @@
 
 #pragma once
 
-#include "ListBuilder.h"
-#include "ListParser.h"
-
 #include <app/AppConfig.h>
 #include <app/ConcreteEventPath.h>
 #include <app/EventPathParams.h>
+#include <app/MessageDef/ListBuilder.h>
+#include <app/MessageDef/ListParser.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/NodeId.h>

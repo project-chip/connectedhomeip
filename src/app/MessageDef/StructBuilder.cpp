@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "StructBuilder.h"
+#include <app/MessageDef/StructBuilder.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

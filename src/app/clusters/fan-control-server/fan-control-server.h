@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include "fan-control-delegate.h"
+#include <app/clusters/fan-control-server/fan-control-delegate.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-types.h>
 

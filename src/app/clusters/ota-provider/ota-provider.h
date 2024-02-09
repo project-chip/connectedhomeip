@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "ota-provider-delegate.h"
+#include <app/clusters/ota-provider/ota-provider-delegate.h>
 
 namespace chip {
 namespace app {

@@ -15,8 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "ArrayParser.h"
+#include <app/MessageDef/ArrayParser.h>
 
 namespace chip {
 namespace app {

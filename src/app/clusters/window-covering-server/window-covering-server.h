@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include "window-covering-delegate.h"
+#include <app/clusters/window-covering-server/window-covering-delegate.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
 #include <protocols/interaction_model/StatusCode.h>
-
-#include <app/data-model/Nullable.h>
 
 static constexpr chip::Percent100ths WC_PERCENT100THS_MIN_OPEN   = 0;
 static constexpr chip::Percent100ths WC_PERCENT100THS_MAX_CLOSED = 10000;

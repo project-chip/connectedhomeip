@@ -15,10 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 
-#include "DefaultOTARequestorStorage.h"
-#include "OTARequestorInterface.h"
-
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/TLV.h>

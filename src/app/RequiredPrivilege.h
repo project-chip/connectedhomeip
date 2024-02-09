@@ -18,10 +18,9 @@
 
 #pragma once
 
-#include "ConcreteAttributePath.h"
-#include "ConcreteCommandPath.h"
-#include "ConcreteEventPath.h"
-
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/util/privilege-storage.h>
 
 #include <access/Privilege.h>

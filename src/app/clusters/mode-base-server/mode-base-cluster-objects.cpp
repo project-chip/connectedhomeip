@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "mode-base-cluster-objects.h"
+#include <app/clusters/mode-base-server/mode-base-cluster-objects.h>
 
 namespace chip {
 namespace app {

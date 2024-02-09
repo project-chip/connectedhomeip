@@ -16,7 +16,7 @@
  *
  */
 
-#include "basic-information.h"
+#include <app/clusters/basic-information/basic-information.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>

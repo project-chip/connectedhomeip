@@ -21,20 +21,21 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "door-lock-server.h"
+#include <app/clusters/door-lock-server/door-lock-server.h>
+
+#include <cinttypes>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/error-mapping.h>
-#include <cinttypes>
-
-#include <app/CommandHandler.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;

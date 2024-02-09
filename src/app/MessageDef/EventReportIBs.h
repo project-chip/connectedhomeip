@@ -23,11 +23,10 @@
 
 #pragma once
 
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
-#include "EventReportIB.h"
-
 #include <app/AppConfig.h>
+#include <app/MessageDef/ArrayBuilder.h>
+#include <app/MessageDef/ArrayParser.h>
+#include <app/MessageDef/EventReportIB.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

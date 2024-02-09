@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include "mode-base-cluster-objects.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributePersistenceProvider.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/clusters/mode-base-server/mode-base-cluster-objects.h>
 #include <app/util/af.h>
 #include <lib/support/IntrusiveList.h>
 

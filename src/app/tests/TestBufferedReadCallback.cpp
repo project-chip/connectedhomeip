@@ -16,19 +16,21 @@
  *    limitations under the License.
  */
 
-#include "app-common/zap-generated/ids/Attributes.h"
-#include "lib/core/TLVTags.h"
-#include "protocols/interaction_model/Constants.h"
-#include "system/SystemPacketBuffer.h"
-#include "system/TLVPacketBufferBackingStore.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/BufferedReadCallback.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
+#include <lib/core/TLVTags.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <protocols/interaction_model/Constants.h>
+#include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
+
 #include <nlunit-test.h>
+
 #include <vector>
 
 using TestContext = chip::Test::AppContext;

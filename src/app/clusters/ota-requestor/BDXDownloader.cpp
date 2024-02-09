@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "BDXDownloader.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
 
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>

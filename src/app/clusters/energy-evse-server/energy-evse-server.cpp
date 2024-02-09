@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "energy-evse-server.h"
+#include <app/clusters/energy-evse-server/energy-evse-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>

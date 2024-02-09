@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "ConcreteEventPath.h"
-#include "EventLoggingTypes.h"
+#include <app/ConcreteEventPath.h>
+#include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 
 namespace chip {

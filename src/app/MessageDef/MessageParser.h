@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "StructParser.h"
 #include <app/AppConfig.h>
 #include <app/InteractionModelRevision.h>
+#include <app/MessageDef/StructParser.h>
 #include <app/util/basic-types.h>
 
 namespace chip {

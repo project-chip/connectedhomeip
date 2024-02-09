@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "ListBuilder.h"
+#include <app/MessageDef/ListBuilder.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

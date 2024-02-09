@@ -15,8 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "lib/support/CHIPMem.h"
 #include <access/AccessControl.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
@@ -33,6 +31,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>

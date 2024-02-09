@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "TestHarnessDACProvider.h"
+#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>

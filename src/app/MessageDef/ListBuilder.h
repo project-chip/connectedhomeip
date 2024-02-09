@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "Builder.h"
-#include "Parser.h"
+#include <app/MessageDef/Builder.h>
+#include <app/MessageDef/Parser.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>

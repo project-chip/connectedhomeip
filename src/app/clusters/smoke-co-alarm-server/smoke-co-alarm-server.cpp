@@ -18,10 +18,8 @@
 /**
  * @file
  *   Routines for the Smoke CO Alarm Server plugin.
- *
  */
-
-#include "smoke-co-alarm-server.h"
+#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>

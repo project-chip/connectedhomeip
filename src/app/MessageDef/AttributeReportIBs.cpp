@@ -21,14 +21,14 @@
  *
  */
 
-#include "AttributeReportIBs.h"
-#include "MessageDefHelper.h"
+#include <app/MessageDef/AttributeReportIBs.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #include <app/AppConfig.h>
+#include <app/MessageDef/MessageDefHelper.h>
 
 namespace chip {
 namespace app {

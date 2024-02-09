@@ -19,7 +19,8 @@
  *    @file
  *          Provides the implementation of the FailSafeContext object.
  */
-#include "FailSafeContext.h"
+#include <app/FailSafeContext.h>
+
 #include <app/icd/server/ICDServerConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck

@@ -14,9 +14,10 @@
  *    limitations under the License.
  */
 
-#include "StatusResponseMessage.h"
-#include "MessageDefHelper.h"
-#include "protocols/interaction_model/Constants.h"
+#include <app/MessageDef/StatusResponseMessage.h>
+
+#include <app/MessageDef/MessageDefHelper.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip::Protocols::InteractionModel;
 

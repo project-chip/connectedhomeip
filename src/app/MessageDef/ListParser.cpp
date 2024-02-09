@@ -15,8 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "ListParser.h"
+#include <app/MessageDef/ListParser.h>
 
 namespace chip {
 namespace app {

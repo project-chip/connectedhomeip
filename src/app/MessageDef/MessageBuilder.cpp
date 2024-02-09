@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "MessageBuilder.h"
+#include <app/MessageDef/MessageBuilder.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

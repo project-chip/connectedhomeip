@@ -15,8 +15,7 @@
  *   limitations under the License.
  *
  */
-
-#include "SystemCommands.h"
+#include <app/tests/suites/commands/system/SystemCommands.h>
 
 #include <lib/support/CHIPMemString.h>
 

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "icd-management-server.h"
+#include <app/clusters/icd-management-server/icd-management-server.h>
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>

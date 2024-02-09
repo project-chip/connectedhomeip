@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "audio-output-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/audio-output-server/audio-output-delegate.h>
 
 namespace chip {
 namespace app {

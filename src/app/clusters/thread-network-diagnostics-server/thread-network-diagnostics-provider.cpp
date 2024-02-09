@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "thread-network-diagnostics-provider.h"
+#include <app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-provider.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Encode.h>

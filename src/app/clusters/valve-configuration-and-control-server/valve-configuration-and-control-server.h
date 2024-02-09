@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "valve-configuration-and-control-delegate.h"
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>

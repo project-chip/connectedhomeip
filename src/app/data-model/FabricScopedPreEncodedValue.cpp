@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/data-model/FabricScopedPreEncodedValue.h>
 
-#include "FabricScopedPreEncodedValue.h"
 #include <lib/core/TLVReader.h>
 #include <lib/support/CodeUtils.h>
 

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "ExtendedOTARequestorDriver.h"
-#include "OTARequestorInterface.h"
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server/Server.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 

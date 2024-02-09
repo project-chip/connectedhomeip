@@ -16,15 +16,16 @@
  */
 
 #pragma once
-#include "EventPathIBs.h"
-#include "MessageBuilder.h"
-#include "MessageParser.h"
+
 #include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <src/app/MessageDef/EventPathIBs.h>
+#include <src/app/MessageDef/MessageBuilder.h>
+#include <src/app/MessageDef/MessageParser.h>
 
 namespace chip {
 namespace app {

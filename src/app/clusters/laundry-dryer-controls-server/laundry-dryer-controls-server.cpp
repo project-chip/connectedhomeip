@@ -14,13 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
-
-#include "laundry-dryer-controls-delegate.h"
-#include "laundry-dryer-controls-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-enums.h>
@@ -31,7 +26,11 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-delegate.h>
 #include <app/server/Server.h>
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 

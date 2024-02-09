@@ -14,16 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/****************************************************************************
- * @file
- * @brief Routines for the Content App Observer plugin, the
- *server implementation of the Content App Observer cluster.
- *******************************************************************************
- ******************************************************************************/
-
 #pragma once
 
-#include "content-app-observer-delegate.h"
+#include <app/clusters/content-app-observer/content-app-observer-delegate.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {

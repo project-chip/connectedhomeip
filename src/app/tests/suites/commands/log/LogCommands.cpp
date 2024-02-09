@@ -15,8 +15,8 @@
  *   limitations under the License.
  *
  */
+#include <app/tests/suites/commands/log/LogCommands.h>
 
-#include "LogCommands.h"
 #include <iostream>
 
 CHIP_ERROR LogCommands::Log(const char * identity, const chip::app::Clusters::LogCommands::Commands::Log::Type & value)

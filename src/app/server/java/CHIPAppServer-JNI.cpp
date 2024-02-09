@@ -15,17 +15,13 @@
  *   limitations under the License.
  *
  */
+#include <app/server/java/AndroidAppServerWrapper.h>
 
-/**
- *    @file
- *      Implementation of JNI bridge for CHIP App Server for Android TV apps
- *
- */
-#include "AndroidAppServerWrapper.h"
-#include "ChipAppServerDelegate.h"
-#include "ChipFabricProvider-JNI.h"
-#include "ChipThreadWork.h"
 #include <jni.h>
+
+#include <app/server/java/ChipAppServerDelegate.h>
+#include <app/server/java/ChipFabricProvider-JNI.h>
+#include <app/server/java/ChipThreadWork.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CHIPMem.h>

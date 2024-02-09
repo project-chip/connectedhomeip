@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "electrical-power-measurement-server.h"
+#include <app/clusters/electrical-power-measurement-server/electrical-power-measurement-server.h>
 
 #include <protocols/interaction_model/StatusCode.h>
 

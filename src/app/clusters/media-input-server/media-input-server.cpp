@@ -21,13 +21,13 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "media-input-server.h"
-#include "media-input-delegate.h"
+#include <app/clusters/media-input-server/media-input-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/media-input-server/media-input-delegate.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -83,8 +83,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
         gDelegateTable[ep] = delegate;
     }
     else
-    {
-    }
+    {}
 }
 
 bool HasFeature(chip::EndpointId endpoint, Feature feature)

@@ -14,17 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/****************************************************************************
- * @file
- * @brief APIs and defines for the Door Lock Server
- *plugin.
- *******************************************************************************
- ******************************************************************************/
-
 #pragma once
 
-#include "door-lock-delegate.h"
+#include <app/clusters/door-lock-server/door-lock-delegate.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>

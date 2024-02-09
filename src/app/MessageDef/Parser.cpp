@@ -21,7 +21,7 @@
  *
  */
 
-#include "Parser.h"
+#include <app/MessageDef/Parser.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

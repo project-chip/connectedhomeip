@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "Parser.h"
+#include <app/MessageDef/Parser.h>
 
 namespace chip {
 namespace app {

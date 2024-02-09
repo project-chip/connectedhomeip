@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "media-input-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/media-input-server/media-input-delegate.h>
 
 namespace chip {
 namespace app {

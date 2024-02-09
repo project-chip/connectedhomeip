@@ -15,16 +15,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "lib/core/TLV.h"
-#include "lib/core/TLVTags.h"
-#include "lib/core/TLVTypes.h"
-#include "protocols/interaction_model/Constants.h"
-#include "system/SystemPacketBuffer.h"
-#include "system/TLVPacketBufferBackingStore.h"
 #include <app/BufferedReadCallback.h>
+
 #include <app/InteractionModelEngine.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/support/ScopedBuffer.h>
+#include <protocols/interaction_model/Constants.h>
+#include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {

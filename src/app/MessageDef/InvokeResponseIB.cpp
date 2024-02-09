@@ -13,15 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/MessageDef/InvokeResponseIB.h>
 
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "InvokeResponseIB.h"
-#include "MessageDefHelper.h"
-
 #include <app/AppConfig.h>
+#include <app/MessageDef/MessageDefHelper.h>
 
 namespace chip {
 namespace app {

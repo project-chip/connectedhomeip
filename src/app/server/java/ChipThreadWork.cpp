@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/server/java/ChipThreadWork.h>
 
-#include "ChipThreadWork.h"
 #include <platform/CHIPDeviceLayer.h>
 
 #include <condition_variable>

@@ -15,8 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "TimedRequest.h"
+#include <app/TimedRequest.h>
 
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/StatusResponse.h>

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "AccessControl.h"
+#include <app/dynamic_server/AccessControl.h>
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>

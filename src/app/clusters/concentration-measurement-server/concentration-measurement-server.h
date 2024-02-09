@@ -15,10 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include "concentration-measurement-cluster-objects.h"
+#include <app/clusters/concentration-measurement-server/concentration-measurement-cluster-objects.h>
+
 #include <app/AttributeAccessInterface.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>

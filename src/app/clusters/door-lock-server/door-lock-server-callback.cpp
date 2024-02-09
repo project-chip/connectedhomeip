@@ -14,25 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/clusters/door-lock-server/door-lock-server.h>
 
-/****************************************************************************
- * @file
- * @brief Routines for the Door Lock Server plugin.
- *******************************************************************************
- ******************************************************************************/
-
-#include "door-lock-server.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/callback.h>
-#include <app/EventLogging.h>
-#include <app/server/Server.h>
-#include <app/util/af.h>
 #include <cinttypes>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/callback.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
+#include <app/server/Server.h>
+#include <app/util/af.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
