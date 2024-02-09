@@ -235,7 +235,10 @@ chip_test_suite_using_nltest("tests") {
   if (chip_config_network_layer_ble &&
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissionManager.cpp" ]
-    public_deps += [ "${chip_root}/src/app/server" ]
+    public_deps += [
+      "${chip_root}/src/app/server",
+      "${chip_root}/src/messaging/tests/echo:common",
+    ]
   }
 
   if (chip_persist_subscriptions) {

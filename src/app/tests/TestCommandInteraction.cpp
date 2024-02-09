@@ -883,6 +883,7 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 1);
+    NL_TEST_ASSERT(apSuite, commandSender.GetInvokeResponseMessageCount() == 0);
 
     ctx.DrainAndServiceIO();
 
@@ -1265,25 +1266,25 @@ void TestCommandInteraction::TestCommandSenderLegacyCallbackBuildingBatchCommand
     CHIP_ERROR err    = CHIP_NO_ERROR;
     mockCommandSenderDelegate.ResetCounter();
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
-    app::CommandSender::AdditionalCommandParameters commandParameters;
-    commandParameters.SetStartOrEndDataStruct(true);
+    app::CommandSender::PrepareCommandParameters prepareCommandParams;
+    app::CommandSender::FinishCommandParameters finishCommandParams;
+    prepareCommandParams.SetStartDataStruct(true).SetCommandRef(0);
+    finishCommandParams.SetEndDataStruct(true).SetCommandRef(0);
 
-    // TODO(#30453): Once CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED is removed we will need
-    // to call SetCommandSenderConfig with remoteMaxPathsPerInvoke set to 2.
     commandSender.mBatchCommandsEnabled    = true;
     commandSender.mRemoteMaxPathsPerInvoke = 2;
 
     auto commandPathParams = MakeTestCommandPath();
-    err                    = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    err                    = commandSender.PrepareCommand(commandPathParams, prepareCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     chip::TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
     err                           = writer->PutBoolean(chip::TLV::ContextTag(1), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = commandSender.FinishCommand(commandParameters);
+    err = commandSender.FinishCommand(finishCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Preparing second command.
-    commandParameters.commandRef.ClearValue();
-    err = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    prepareCommandParams.SetCommandRef(1);
+    err = commandSender.PrepareCommand(commandPathParams, prepareCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
@@ -1296,30 +1297,31 @@ void TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchCom
     CHIP_ERROR err    = CHIP_NO_ERROR;
     mockCommandSenderExtendedDelegate.ResetCounter();
     app::CommandSender commandSender(&mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager());
-    app::CommandSender::AdditionalCommandParameters commandParameters;
-    commandParameters.SetStartOrEndDataStruct(true);
+    app::CommandSender::PrepareCommandParameters prepareCommandParams;
+    app::CommandSender::FinishCommandParameters finishCommandParams;
+    prepareCommandParams.SetStartDataStruct(true).SetCommandRef(0);
+    finishCommandParams.SetEndDataStruct(true).SetCommandRef(0);
 
-    // TODO(#30453): Once CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED is removed we will need
-    // to call SetCommandSenderConfig with remoteMaxPathsPerInvoke set to 2.
     commandSender.mBatchCommandsEnabled    = true;
     commandSender.mRemoteMaxPathsPerInvoke = 2;
 
     auto commandPathParams = MakeTestCommandPath();
-    err                    = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    err                    = commandSender.PrepareCommand(commandPathParams, prepareCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     chip::TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
     err                           = writer->PutBoolean(chip::TLV::ContextTag(1), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = commandSender.FinishCommand(commandParameters);
+    err = commandSender.FinishCommand(finishCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Preparing second command.
-    commandParameters.commandRef.ClearValue();
-    err = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    prepareCommandParams.SetCommandRef(1);
+    finishCommandParams.SetCommandRef(1);
+    err = commandSender.PrepareCommand(commandPathParams, prepareCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     writer = commandSender.GetCommandDataIBTLVWriter();
     err    = writer->PutBoolean(chip::TLV::ContextTag(1), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = commandSender.FinishCommand(commandParameters);
+    err = commandSender.FinishCommand(finishCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
@@ -1338,12 +1340,14 @@ void TestCommandInteraction::TestCommandSenderCommandSuccessResponseFlow(nlTestS
     err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, commandSender.GetInvokeResponseMessageCount() == 0);
 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 1 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 0);
+    NL_TEST_ASSERT(apSuite, commandSender.GetInvokeResponseMessageCount() == 1);
 
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);

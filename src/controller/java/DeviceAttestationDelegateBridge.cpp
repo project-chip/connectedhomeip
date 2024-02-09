@@ -68,7 +68,7 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
     ChipLogProgress(Controller, "OnDeviceAttestationCompleted with result: %hu", static_cast<uint16_t>(attestationResult));
 
     mResult = attestationResult;
-    if (mDeviceAttestationDelegate != nullptr)
+    if (mDeviceAttestationDelegate.HasValidObjectRef())
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -79,10 +79,10 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
         VerifyOrReturn(deviceAttestationDelegateCls != nullptr,
                        ChipLogError(Controller, "Could not find device attestation delegate class."));
 
-        if (env->IsInstanceOf(mDeviceAttestationDelegate, deviceAttestationDelegateCls))
+        if (env->IsInstanceOf(mDeviceAttestationDelegate.ObjectRef(), deviceAttestationDelegateCls))
         {
             jmethodID onDeviceAttestationCompletedMethod;
-            JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate, "onDeviceAttestationCompleted",
+            JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate.ObjectRef(), "onDeviceAttestationCompleted",
                                                     "(JLchip/devicecontroller/AttestationInfo;I)V",
                                                     &onDeviceAttestationCompletedMethod);
             VerifyOrReturn(onDeviceAttestationCompletedMethod != nullptr,
@@ -98,19 +98,8 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
                                ChipLogError(Controller, "Failed to create AttestationInfo, error: %s", err.AsString()));
             }
 
-            env->CallVoidMethod(mDeviceAttestationDelegate, onDeviceAttestationCompletedMethod, reinterpret_cast<jlong>(device),
-                                javaAttestationInfo, static_cast<jint>(attestationResult));
+            env->CallVoidMethod(mDeviceAttestationDelegate.ObjectRef(), onDeviceAttestationCompletedMethod,
+                                reinterpret_cast<jlong>(device), javaAttestationInfo, static_cast<jint>(attestationResult));
         }
-    }
-}
-
-DeviceAttestationDelegateBridge::~DeviceAttestationDelegateBridge()
-{
-    if (mDeviceAttestationDelegate != nullptr)
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-        env->DeleteGlobalRef(mDeviceAttestationDelegate);
-        mDeviceAttestationDelegate = nullptr;
     }
 }

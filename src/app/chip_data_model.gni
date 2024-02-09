@@ -66,22 +66,20 @@ template("chip_data_model") {
     input = rebase_path(invoker.zap_file)
     generator = "app-templates"
 
+    # NOTE: these files MUST be in sync with outputs in
+    #       src/app/zap-templates/app-templates.json
     outputs = [
       "zap-generated/access.h",
       "zap-generated/gen_config.h",
       "zap-generated/endpoint_config.h",
     ]
 
+    # NOTE: these are ALSO auto-generated but handled below:
+    #       "zap-generated/IMClusterCommandHandler.cpp"
+    #         -> contains one large DispatchSingleClusterCommand and DispatchServerCommand
+
     if (chip_code_pre_generated_directory == "") {
       prune_outputs = []
-    }
-
-    if (chip_controller) {
-      outputs += [ "zap-generated/CHIPClusters.h" ]
-    } else {
-      if (defined(prune_outputs)) {
-        prune_outputs += [ "zap-generated/CHIPClusters.h" ]
-      }
     }
 
     # TODO: It is unclear here why `zap_pregenerated_dir` has any relevance

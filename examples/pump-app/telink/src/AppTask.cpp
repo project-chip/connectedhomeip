@@ -131,7 +131,7 @@ void AppTask::UpdateClusterState()
     // Write the new values
     bool onOffState = !PumpMgr().IsStopped();
 
-    EmberStatus status = Clusters::OnOff::Attributes::OnOff::Set(kOnOffClusterEndpoint, onOffState);
+    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kOnOffClusterEndpoint, onOffState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("ERR: Updating On/Off state  %x", status);

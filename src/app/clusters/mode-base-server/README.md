@@ -23,7 +23,7 @@ To use a Mode Base derived cluster, you need to
     `Server::Init()`.
 -   Alternatively, the last two steps can be done in the
     `emberAf<ClusterName>ClusterInitCallback` function.
--   Add `#define EMBER_AF_PLUGIN_MODE_BASE` to your
+-   Add `#define MATTER_DM_PLUGIN_MODE_BASE` to your
     `chip_device_project_config_include` file. In the examples, this file is
     `CHIPProjectAppConfig.h`.
 

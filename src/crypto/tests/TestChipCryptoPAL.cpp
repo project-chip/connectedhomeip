@@ -126,6 +126,34 @@ public:
 
 #include "DacValidationExplicitVectors.h"
 
+// Verify that two HKDF keys are equal by checking if they generate the same attestation challenge.
+// Note that the keys cannot be compared directly because they are given as key handles.
+void AssertKeysEqual(nlTestSuite * inSuite, SessionKeystore & keystore, HkdfKeyHandle & left, const HkdfKeyHandle & right)
+{
+    auto generateChallenge = [&](const HkdfKeyHandle & key, AttestationChallenge & challenge) -> void {
+        constexpr uint8_t kTestSalt[] = { 'T', 'E', 'S', 'T', 'S', 'A', 'L', 'T' };
+        constexpr uint8_t kTestInfo[] = { 'T', 'E', 'S', 'T', 'I', 'N', 'F', 'O' };
+
+        Aes128KeyHandle i2rKey;
+        Aes128KeyHandle r2iKey;
+
+        CHIP_ERROR error = keystore.DeriveSessionKeys(key, ByteSpan(kTestSalt), ByteSpan(kTestInfo), i2rKey, r2iKey, challenge);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        // Ignore the keys, just return the attestation challenge
+        keystore.DestroyKey(i2rKey);
+        keystore.DestroyKey(r2iKey);
+    };
+
+    AttestationChallenge leftChallenge;
+    AttestationChallenge rightChallenge;
+
+    generateChallenge(left, leftChallenge);
+    generateChallenge(right, rightChallenge);
+
+    NL_TEST_ASSERT(inSuite, memcmp(leftChallenge.ConstBytes(), rightChallenge.ConstBytes(), AttestationChallenge::Capacity()) == 0);
+}
+
 } // namespace
 
 static uint32_t gs_test_entropy_source_called = 0;
@@ -1839,10 +1867,7 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     size_t Pverifier_len = sizeof(Pverifier);
     uint8_t Vverifier[kMAX_Hash_Length];
     size_t Vverifier_len = sizeof(Vverifier);
-    uint8_t VKe[kMAX_Hash_Length];
-    size_t VKe_len = sizeof(VKe);
-    uint8_t PKe[kMAX_Hash_Length];
-    size_t PKe_len = sizeof(PKe);
+    DefaultSessionKeystore keystore;
 
     int numOfTestVectors = ArraySize(rfc_tvs);
     int numOfTestsRan    = 0;
@@ -1939,17 +1964,27 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
         error = Verifier.KeyConfirm(Pverifier, Pverifier_len);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-        PKe_len = sizeof(PKe);
-        error   = Prover.GetKeys(PKe, &PKe_len);
+        // Import HKDF key from the test vector to the keystore
+        HkdfKeyHandle vectorKe;
+        error = keystore.CreateKey(ByteSpan(vector->Ke, vector->Ke_len), vectorKe);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, PKe_len == vector->Ke_len);
-        NL_TEST_ASSERT(inSuite, memcmp(PKe, vector->Ke, vector->Ke_len) == 0);
 
-        VKe_len = sizeof(VKe);
-        error   = Verifier.GetKeys(VKe, &VKe_len);
+        // Verify that both sides generated the same HKDF key as in the test vector
+        // Since the HKDF keys may not be availabe in the raw form, do not compare them directly,
+        // but rather check if the same attestation challenge is derived from
+        HkdfKeyHandle PKe;
+        error = Prover.GetKeys(keystore, PKe);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, VKe_len == vector->Ke_len);
-        NL_TEST_ASSERT(inSuite, memcmp(VKe, vector->Ke, vector->Ke_len) == 0);
+        AssertKeysEqual(inSuite, keystore, PKe, vectorKe);
+
+        HkdfKeyHandle VKe;
+        error = Verifier.GetKeys(keystore, VKe);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+        AssertKeysEqual(inSuite, keystore, VKe, vectorKe);
+
+        keystore.DestroyKey(vectorKe);
+        keystore.DestroyKey(PKe);
+        keystore.DestroyKey(VKe);
 
         numOfTestsRan += 1;
     }

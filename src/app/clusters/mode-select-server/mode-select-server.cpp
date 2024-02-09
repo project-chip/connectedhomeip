@@ -34,9 +34,9 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
 
-#ifdef EMBER_AF_PLUGIN_ON_OFF
+#ifdef MATTER_DM_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h>
-#endif // EMBER_AF_PLUGIN_ON_OFF
+#endif // MATTER_DM_PLUGIN_ON_OFF
 
 using namespace std;
 using namespace chip;
@@ -140,7 +140,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
         EmberAfStatus status = Attributes::StartUpMode::Get(endpointId, startUpMode);
         if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpMode.IsNull())
         {
-#ifdef EMBER_AF_PLUGIN_ON_OFF
+#ifdef MATTER_DM_PLUGIN_ON_OFF
             // OnMode with Power Up
             // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
             // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
@@ -162,7 +162,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                     }
                 }
             }
-#endif // EMBER_AF_PLUGIN_ON_OFF
+#endif // MATTER_DM_PLUGIN_ON_OFF
 
             BootReasonType bootReason = BootReasonType::kUnspecified;
             CHIP_ERROR error          = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);

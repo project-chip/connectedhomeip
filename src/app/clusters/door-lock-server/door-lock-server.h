@@ -202,7 +202,8 @@ public:
     inline bool SupportsAnyCredential(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId)
-            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials);
+            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials,
+                    Feature::kAliroProvisioning);
     }
 
     inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
@@ -705,7 +706,7 @@ private:
         const chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::DecodableType & commandData);
 
     static constexpr size_t kDoorLockClusterServerMaxEndpointCount =
-        EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+        MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
     static_assert(kDoorLockClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "DoorLock Endpoint count error");
 
     std::array<EmberAfDoorLockEndpointContext, kDoorLockClusterServerMaxEndpointCount> mEndpointCtx;

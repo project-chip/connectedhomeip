@@ -1,6 +1,5 @@
-/*
- *
- *    Copyright (c) 2020 Project CHIP Authors
+/**
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,24 +15,23 @@
  */
 
 /**
- *    @file
- *      This file declares test entry points for CHIP Internet (inet)
- *      layer library unit tests.
- *
+ * RAII wrapper around os_unfair_lock.
  */
 
-#pragma once
+#import <os/lock.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <mutex>
 
-int TestInetAddress(void);
-int TestInetBuffer(void);
-int TestInetErrorStr(void);
-int TestInetTimer(void);
-int TestInetEndPoint(void);
-int TestInetLayerDNS(void);
-#ifdef __cplusplus
-}
-#endif
+template <>
+class std::lock_guard<os_unfair_lock>
+{
+public:
+    explicit lock_guard(os_unfair_lock & lock) : mLock(lock) { os_unfair_lock_lock(&mLock); }
+    ~lock_guard() { os_unfair_lock_unlock(&mLock); }
+
+    lock_guard(const lock_guard &)     = delete;
+    void operator=(const lock_guard &) = delete;
+
+private:
+    os_unfair_lock & mLock;
+};

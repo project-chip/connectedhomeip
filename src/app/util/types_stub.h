@@ -149,32 +149,6 @@ struct EmberBindingTableEntry
     }
 };
 
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberStatus
-#else
-typedef uint8_t EmberStatus;
-enum
-#endif // DOXYGEN_SHOULD_SKIP_THIS
-{
-    /**
-     * @name Generic Messages
-     * These messages are system wide.
-     */
-    //@{
-
-    /**
-     * @brief The generic "no error" message.
-     */
-    EMBER_SUCCESS = 0x00,
-
-    /**
-     * @brief An invalid value was passed as an argument to a function.
-     */
-    EMBER_BAD_ARGUMENT = 0x02,
-
-    //@} // END Generic Messages
-};
-
 /**
  * @brief Function pointer for timer callback
  */
