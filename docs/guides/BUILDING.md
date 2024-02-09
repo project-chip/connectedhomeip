@@ -573,10 +573,10 @@ sudo make install
 
 ### Generate `compile_commands.json`
 
-IWYU requires a `compile_commands.json` to figure out the command line arguments to clang.
-Our pigweed build environment pulls out the latest clang (so it may be version 18 or higher)
-which will be different from the clang build you had above. We expect arguments to be
-compatible.
+IWYU requires a `compile_commands.json` to figure out the command line arguments
+to clang. Our pigweed build environment pulls out the latest clang (so it may be
+version 18 or higher) which will be different from the clang build you had
+above. We expect arguments to be compatible.
 
 Create a build with a compile database. For example:
 
@@ -587,35 +587,26 @@ source scripts/activate.sh
 
 Notes on the above:
 
-- This compiles using the pigweed build environment. This will make sure
-  that generated code (using zap-cli) is available
-- **However** it compiles with the pigweed clang, which likely will be
-  different from your system one (e.g. 18). We expect compile database
-  command arguments to be compatible
+-   This compiles using the pigweed build environment. This will make sure that
+    generated code (using zap-cli) is available
+-   **However** it compiles with the pigweed clang, which likely will be
+    different from your system one (e.g. 18). We expect compile database command
+    arguments to be compatible
 
 ### Run include-what-you-use
 
-Use the `iwyu_tool.py` with the `-p` option to specify the compilation
-database:
+Use the `iwyu_tool.py` with the `-p` option to specify the compilation database:
 
 ```bash
 iwyu_tool.py -p out/linux-x64-all-clusters-clang/compile_commands.json $SOURCE_FILES
 ```
 
-A helper script also exists under `scripts/helpers/iwyu-check.py`. This one defaults
-to searching `src/platform` however that can be modified. Usage is like:
+A helper script also exists under `scripts/helpers/iwyu-check.py`. This one
+defaults to searching `src/platform` however that can be modified. Usage is
+like:
 
 ```bash
 ./scripts/helpers/iwyu-check.py                                                    \
     --compile-commands-glob out/linux-x64-all-clusters-clang/compile_commands.json \
     --scanning-destination $SOURCE_FILE
 ```
-
-
-
-
-
-
-
-
-
