@@ -18,7 +18,6 @@
 #include <lib/core/TLVReader.h>
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <lib/core/CHIPConfig.h>

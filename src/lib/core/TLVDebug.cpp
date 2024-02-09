@@ -22,7 +22,6 @@
 #endif
 
 #include <inttypes.h>
-#include <stdint.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLVReader.h>
