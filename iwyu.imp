@@ -4,7 +4,7 @@
 #    -p out/linux-x64-all-clusters-clang/compile_commands.json  \
 #    src/lib/core/                                              \
 #    --                                                         \
-#    -Xiwyu --mapping_file=iwyu.imp                             \
+#    -Xiwyu --mapping_file=$(pwd)/iwyu.imp                      \
 #    -Xiwyu --no_comments                                       \
 #    -Xiwyu --comment_style=none                                \
 #    -Xiwyu --cxx17ns                                           \
@@ -16,6 +16,7 @@
 # fix_includes.py <../iwyu.out
 #
 [
-    { include: [ '"system/SystemBuildConfig"', private, '<system/SystemConfig.h>', public ] },
-    { include: [ '"core/CHIPBuildConfig"', private, '<lib/core/BuildConfig.h>', public ] },
+    { include: [ '"system/SystemBuildConfig.h"', private, '<system/SystemConfig.h>', public ] },
+    { include: [ '"core/CHIPBuildConfig.h"', private, '<lib/core/BuildConfig.h>', public ] },
+    { include: [ '@"platform/.*/CHIPPlatformConfig.h"', private, '<lib/core/BuildConfig.h>', public ] },
 ]
