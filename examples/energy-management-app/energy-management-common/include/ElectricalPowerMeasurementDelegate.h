@@ -38,10 +38,8 @@ public:
     PowerModeEnum GetPowerMode() override { return mPowerMode; }
     uint8_t GetNumberOfMeasurementTypes() override;
 
-    // TODO
     CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) override;
-
-    RangeIterator * IterateRanges() override { return nullptr; }
+    CHIP_ERROR GetRangeByIndex(uint8_t, Structs::MeasurementRangeStruct::Type &) override;
 
     DataModel::Nullable<int64_t> GetVoltage() override { return mVoltage; }
     DataModel::Nullable<int64_t> GetActiveCurrent() override { return mActiveCurrent; }

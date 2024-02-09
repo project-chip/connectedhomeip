@@ -228,6 +228,7 @@ CHIP_ERROR EnergyMeterInit()
         EndpointId(ENERGY_EVSE_ENDPOINT), *gEPMDelegate,
         BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
         BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
             ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
             ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent));
 

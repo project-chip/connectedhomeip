@@ -17,7 +17,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
@@ -66,6 +65,8 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         self.step("1")
         # Commission DUT - already done
+
+        supported_attributes = await self.get_supported_epm_attributes()
 
         self.step("2")
         power_mode = await self.read_epm_attribute_expect_success("PowerMode")
@@ -123,71 +124,87 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                              "The number of accuracy entries should match the NumberOfMeasurementTypes")
 
         self.step("5")
-        ranges = await self.read_epm_attribute_expect_success("Ranges")
-        logger.info(f"Rx'd Ranges: {ranges}")
-        # Check list length between 0 and NumberOfMeasurementTypes
-        asserts.assert_greater_equal(0, len(ranges))
-        asserts.assert_less_equal(number_of_measurements, len(ranges))
-        
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.Ranges.attribute_id in supported_attributes):
+            ranges = await self.read_epm_attribute_expect_success("Ranges")
+            logger.info(f"Rx'd Ranges: {ranges}")
+            # Check list length between 0 and NumberOfMeasurementTypes
+            asserts.assert_greater_equal(len(ranges), 0)
+            asserts.assert_less_equal(len(ranges), number_of_measurements)
+
         self.step("6")
-        voltage = await self.check_epm_attribute_in_range("Voltage", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd Voltage: {voltage}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.Voltage.attribute_id in supported_attributes):
+            voltage = await self.check_epm_attribute_in_range("Voltage", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd Voltage: {voltage}")
 
         self.step("7")
-        active_current = await self.check_epm_attribute_in_range("ActiveCurrent", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd ActiveCurrent: {active_current}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ActiveCurrent.attribute_id in supported_attributes):
+            active_current = await self.check_epm_attribute_in_range("ActiveCurrent", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd ActiveCurrent: {active_current}")
 
         self.step("8")
-        reactive_current = await self.check_epm_attribute_in_range("ReactiveCurrent", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd ReactiveCurrent: {reactive_current}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ReactiveCurrent.attribute_id in supported_attributes):
+            reactive_current = await self.check_epm_attribute_in_range("ReactiveCurrent", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd ReactiveCurrent: {reactive_current}")
 
         self.step("9")
-        apparent_current = await self.check_epm_attribute_in_range("ApparentCurrent", 0, 2 ^ 62)
-        logger.info(f"Rx'd ApparentCurrent: {apparent_current}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ApparentCurrent.attribute_id in supported_attributes):
+            apparent_current = await self.check_epm_attribute_in_range("ApparentCurrent", 0, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd ApparentCurrent: {apparent_current}")
 
         self.step("10")
-        active_power = await self.check_epm_attribute_in_range("ActivePower", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd ActivePower: {active_power}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ActivePower.attribute_id in supported_attributes):
+            active_power = await self.check_epm_attribute_in_range("ActivePower", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd ActivePower: {active_power}")
 
         self.step("11")
-        reactive_power = await self.check_epm_attribute_in_range("ReactivePower", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd ReactivePower: {reactive_power}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ReactivePower.attribute_id in supported_attributes):
+            reactive_power = await self.check_epm_attribute_in_range("ReactivePower", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd ReactivePower: {reactive_power}")
 
         self.step("12")
-        apparent_power = await self.check_epm_attribute_in_range("ApparentPower", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd ApparentPower: {apparent_power}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ApparentPower.attribute_id in supported_attributes):
+            apparent_power = await self.check_epm_attribute_in_range("ApparentPower", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd ApparentPower: {apparent_power}")
 
         self.step("13")
-        rms_voltage = await self.check_epm_attribute_in_range("RMSVoltage", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd RMSVoltage: {rms_voltage}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.RMSVoltage.attribute_id in supported_attributes):
+            rms_voltage = await self.check_epm_attribute_in_range("RMSVoltage", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd RMSVoltage: {rms_voltage}")
 
         self.step("14")
-        rms_current = await self.check_epm_attribute_in_range("RMSCurrent", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd RMSCurrent: {rms_current}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.RMSCurrent.attribute_id in supported_attributes):
+            rms_current = await self.check_epm_attribute_in_range("RMSCurrent", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd RMSCurrent: {rms_current}")
 
         self.step("15")
-        rms_power = await self.check_epm_attribute_in_range("RMSPower", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd RMSPower: {rms_power}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.RMSPower.attribute_id in supported_attributes):
+            rms_power = await self.check_epm_attribute_in_range("RMSPower", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd RMSPower: {rms_power}")
 
         self.step("16")
-        frequency = await self.check_epm_attribute_in_range("Frequency", 0, 1'000'000)
-        logger.info(f"Rx'd Frequency: {frequency}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.Frequency.attribute_id in supported_attributes):
+            frequency = await self.check_epm_attribute_in_range("Frequency", 0, 1000000, allow_null=True)
+            logger.info(f"Rx'd Frequency: {frequency}")
 
         self.step("17")
-        harmonic_currents = await self.read_epm_attribute_expect_success("HarmonicCurrents")
-        logger.info(f"Rx'd HarmonicCurrents: {harmonic_currents}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.HarmonicCurrents.attribute_id in supported_attributes):
+            harmonic_currents = await self.read_epm_attribute_expect_success("HarmonicCurrents", allow_null=True)
+            logger.info(f"Rx'd HarmonicCurrents: {harmonic_currents}")
 
         self.step("18")
-        harmonic_phases = await self.read_epm_attribute_expect_success("HarmonicPhases")
-        logger.info(f"Rx'd HarmonicPhases: {harmonic_phases}")
-        
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.HarmonicPhases.attribute_id in supported_attributes):
+            harmonic_phases = await self.read_epm_attribute_expect_success("HarmonicPhases", allow_null=True)
+            logger.info(f"Rx'd HarmonicPhases: {harmonic_phases}")
+
         self.step("19")
-        power_factor = await self.check_epm_attribute_in_range("PowerFactor", -10000, 10000)
-        logger.info(f"Rx'd PowerFactor: {power_factor}")
-        
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.PowerFactor.attribute_id in supported_attributes):
+            power_factor = await self.check_epm_attribute_in_range("PowerFactor", -10000, 10000, allow_null=True)
+            logger.info(f"Rx'd PowerFactor: {power_factor}")
+
         self.step("20")
-        neutral_current = await self.check_epm_attribute_in_range("NeutralCurrent", -2 ^ 62, 2 ^ 62)
-        logger.info(f"Rx'd NeutralCurrent: {neutral_current}")
+        if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.NeutralCurrent.attribute_id in supported_attributes):
+            neutral_current = await self.check_epm_attribute_in_range("NeutralCurrent", -2 ^ 62, 2 ^ 62, allow_null=True)
+            logger.info(f"Rx'd NeutralCurrent: {neutral_current}")
 
 
 if __name__ == "__main__":

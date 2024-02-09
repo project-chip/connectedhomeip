@@ -1893,6 +1893,7 @@ endpoint 1 {
     callback attribute powerMode;
     callback attribute numberOfMeasurementTypes;
     callback attribute accuracy;
+    callback attribute ranges;
     callback attribute voltage;
     callback attribute activeCurrent;
     callback attribute activePower;

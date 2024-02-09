@@ -181,7 +181,36 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::GetAccuracyByIndex(uint8_t accura
     return CHIP_NO_ERROR;
 }
 
-// CHIP_ERROR ElectricalPowerMeasurementDelegate::SetRanges();   // TODO
+CHIP_ERROR ElectricalPowerMeasurementDelegate::GetRangeByIndex(uint8_t rangeIndex, Structs::MeasurementRangeStruct::Type & range)
+{
+    /** TODO - Manufacturers wanting to support this should
+     * implement an array of
+     * Structs::MeasurementRangeStruct::Type mMeasurementRanges[];
+     *
+     * their application code should update the relevant measurement 'Range' information including
+     *   - .measurementType
+     *   - .min
+     *   - .max
+     *   - .startTimestamp
+     *   - .endTimestamp
+     *   - .minTimestamp (the time at which the minimum value was recorded)
+     *   - .maxTimestamp (the time at which the maximum value was recorded)
+     *   (and optionally use sys time equivalents)
+     *
+     *   if (rangeIndex >= ArraySize(mMeasurementRanges))
+     *   {
+     *       return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+     *   }
+     *
+     *   range = mMeasurementRanges[rangeIndex];
+     *
+     *   return CHIP_NO_ERROR;
+     */
+
+    /* Return an empty list for now */
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
 CHIP_ERROR ElectricalPowerMeasurementDelegate::SetVoltage(DataModel::Nullable<int64_t> newValue)
 {
     DataModel::Nullable<int64_t> oldValue = mVoltage;

@@ -79,8 +79,12 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeAccuracy(encoder); }));
         break;
     case Ranges::Id:
-        return ReadRanges(aEncoder);
-        // TODO
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRanges))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeRanges(encoder); }));
         break;
     case Voltage::Id:
         if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeVoltage))
@@ -225,33 +229,22 @@ CHIP_ERROR Instance::EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelpe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadRanges(AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::EncodeRanges(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRanges))
+    for (uint8_t i = 0; true; i++)
     {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto ranges    = mDelegate.IterateRanges();
-    VerifyOrReturnError(ranges != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    if (ranges->Count() == 0)
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([&ranges](const auto & encoder) -> CHIP_ERROR {
-            Structs::MeasurementRangeStruct::Type range;
-            while (ranges->Next(range))
-            {
-                encoder.Encode(range);
-            }
+        Structs::MeasurementRangeStruct::Type range;
 
+        auto err = mDelegate.GetRangeByIndex(i, range);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
             return CHIP_NO_ERROR;
-        });
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(range));
     }
-    ranges->Release();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Instance::ReadHarmonicCurrents(AttributeValueEncoder & aEncoder)
