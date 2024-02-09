@@ -125,11 +125,69 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         self.step("5")
         ranges = await self.read_epm_attribute_expect_success("Ranges")
         logger.info(f"Rx'd Ranges: {ranges}")
-        # todo check list length between 0 and NumberOfMeasurementTypes
-
+        # Check list length between 0 and NumberOfMeasurementTypes
+        asserts.assert_greater_equal(0, len(ranges))
+        asserts.assert_less_equal(number_of_measurements, len(ranges))
+        
         self.step("6")
         voltage = await self.check_epm_attribute_in_range("Voltage", -2 ^ 62, 2 ^ 62)
         logger.info(f"Rx'd Voltage: {voltage}")
+
+        self.step("7")
+        active_current = await self.check_epm_attribute_in_range("ActiveCurrent", -2 ^ 62, 2 ^ 62)
+        logger.info(f"Rx'd ActiveCurrent: {active_current}")
+
+        self.step("8")
+        reactive_current = await self.check_epm_attribute_in_range("ReactiveCurrent", -2 ^ 62, 2 ^ 62)
+        logger.info(f"Rx'd ReactiveCurrent: {reactive_current}")
+
+        self.step("9")
+        apparent_current = await self.check_epm_attribute_in_range("ApparentCurrent", 0, 2 ^ 62)
+        logger.info(f"Rx'd ApparentCurrent: {apparent_current}")
+
+        self.step("10")
+        active_power = await self.check_epm_attribute_in_range("ActivePower", -2 ^ 62, 2 ^ 62)
+        logger.info(f"Rx'd ActivePower: {active_power}")
+
+        self.step("11")
+        reactive_power = await self.check_epm_attribute_in_range("ReactivePower", -2 ^ 62, 2 ^ 62)
+        logger.info(f"Rx'd ReactivePower: {reactive_power}")
+
+        self.step("12")
+        apparent_power = await self.check_epm_attribute_in_range("ApparentPower", -2 ^ 62, 2 ^ 62)
+        logger.info(f"Rx'd ApparentPower: {apparent_power}")
+
+        self.step("13")
+        rms_voltage = await self.check_epm_attribute_in_range("RMSVoltage", -2 ^ 62, 2 ^ 62)
+        logger.info(f"Rx'd RMSVoltage: {rms_voltage}")
+
+        self.step("14")
+        rms_current = await self.check_epm_attribute_in_range("RMSCurrent", -2 ^ 62, 2 ^ 62)
+        logger.info(f"Rx'd RMSCurrent: {rms_current}")
+
+        self.step("15")
+        rms_power = await self.check_epm_attribute_in_range("RMSPower", -2 ^ 62, 2 ^ 62)
+        logger.info(f"Rx'd RMSPower: {rms_power}")
+
+        self.step("16")
+        frequency = await self.check_epm_attribute_in_range("Frequency", 0, 1'000'000)
+        logger.info(f"Rx'd Frequency: {frequency}")
+
+        self.step("17")
+        harmonic_currents = await self.read_epm_attribute_expect_success("HarmonicCurrents")
+        logger.info(f"Rx'd HarmonicCurrents: {harmonic_currents}")
+
+        self.step("18")
+        harmonic_phases = await self.read_epm_attribute_expect_success("HarmonicPhases")
+        logger.info(f"Rx'd HarmonicPhases: {harmonic_phases}")
+        
+        self.step("19")
+        power_factor = await self.check_epm_attribute_in_range("PowerFactor", -10000, 10000)
+        logger.info(f"Rx'd PowerFactor: {power_factor}")
+        
+        self.step("20")
+        neutral_current = await self.check_epm_attribute_in_range("NeutralCurrent", -2 ^ 62, 2 ^ 62)
+        logger.info(f"Rx'd NeutralCurrent: {neutral_current}")
 
 
 if __name__ == "__main__":
