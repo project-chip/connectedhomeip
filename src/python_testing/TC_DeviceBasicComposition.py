@@ -29,7 +29,7 @@ from matter_testing_support import (AttributePathLocation, ClusterPathLocation, 
                                     async_test_body, default_matter_test_main)
 from mobly import asserts
 from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
-                                               find_tree_roots, get_all_children, get_direct_children_of_root, parts_list_cycles,
+                                               find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,
                                                separate_endpoint_types)
 
 
@@ -554,13 +554,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         ok = True
         for endpoint_id in flat:
             # ensure that every sub-id in the parts list is included in the parent
-            sub_children = []
-            for child in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
-                sub_children.update(get_all_children(child))
-            if not all(item in sub_children for item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]):
+            if not flat_list_ok(endpoint_id, self.endpoints):
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
-                                  problem='Flat parts list does not include all the sub-parts', spec_location='Endpoint composition')
+                                  problem='Flat parts list does not exactly match sub-parts', spec_location='Endpoint composition')
                 ok = False
         if not ok:
             self.fail_current_test()
