@@ -2,9 +2,9 @@
 #
 # iwyu_tool.py                                                  \
 #    -p out/linux-x64-all-clusters-clang/compile_commands.json  \
-#    --mapping_file iwyu.imp                                    \
 #    src/lib/core/                                              \
 #    --                                                         \
+#    -Xiwyu --mapping_file=iwyu.imp                             \
 #    -Xiwyu --no_comments                                       \
 #    -Xiwyu --comment_style=none                                \
 #    -Xiwyu --cxx17ns                                           \
