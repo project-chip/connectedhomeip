@@ -253,25 +253,25 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     return kEmberInvalidEndpointIndex;
 }
 
-EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
-                                        const chip::Span<chip::DataVersion> & dataVersionStorage,
-                                        chip::Span<const EmberAfDeviceType> deviceTypeList, EndpointId parentEndpointId)
+CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
+                                     const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                     chip::Span<const EmberAfDeviceType> deviceTypeList, EndpointId parentEndpointId)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
     if (realIndex >= MAX_ENDPOINT_COUNT)
     {
-        return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
+        return CHIP_ERROR_NO_MEMORY;
     }
     if (id == kInvalidEndpointId)
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     auto serverClusterCount = emberAfClusterCountForEndpointType(ep, /* server = */ true);
     if (dataVersionStorage.size() < serverClusterCount)
     {
-        return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     index = static_cast<uint16_t>(realIndex);
@@ -279,7 +279,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
     {
         if (emAfEndpoints[i].endpoint == id)
         {
-            return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
+            return CHIP_ERROR_ENDPOINT_EXISTS;
         }
     }
 
@@ -307,7 +307,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
     // Now enable the endpoint.
     emberAfEndpointEnableDisable(id, true);
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return CHIP_NO_ERROR;
 }
 
 EndpointId emberAfClearDynamicEndpoint(uint16_t index)
@@ -937,10 +937,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
     {
         emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isEnabled);
     }
-
-#if defined(EZSP_HOST)
-    ezspSetEndpointFlags(endpoint, (enable ? EZSP_ENDPOINT_ENABLED : EZSP_ENDPOINT_DISABLED));
-#endif
 
     if (currentlyEnabled != enable)
     {

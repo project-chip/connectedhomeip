@@ -70,7 +70,6 @@ protected:
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
     void _ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     // ===== Members for use by the implementation subclass.
 
@@ -152,14 +151,6 @@ template <class ImplClass>
 inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()
 {
     ThreadStackMgrImpl().ResetThreadNetworkDiagnosticsCounts();
-}
-
-template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_Thread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                              app::AttributeValueEncoder & encoder)
-{
-    return ThreadStackMgrImpl().WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 } // namespace Internal

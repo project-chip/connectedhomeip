@@ -617,12 +617,6 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
     VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, err->message));
 
-    if (mpAdapterName != nullptr)
-        mpOwningName = g_strdup_printf("%s", mpAdapterName);
-    else
-        mpOwningName = g_strdup_printf("C-%04x", getpid() & 0xffff);
-    ChipLogDetail(DeviceLayer, "TRACE: Bus acquired for name %s", mpOwningName);
-
     SetupGattServer(conn.get());
 
     mpObjMgr = g_dbus_object_manager_client_new_sync(
@@ -662,26 +656,14 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplication()
     return err;
 }
 
-CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName)
+CHIP_ERROR BluezEndpoint::Init(bool aIsCentral, uint32_t aAdapterId)
 {
-    CHIP_ERROR err;
+    VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     mAdapterId = aAdapterId;
     mIsCentral = aIsCentral;
 
-    if (apBleAddr != nullptr)
-        mpAdapterAddr = g_strdup(apBleAddr);
-
-    if (!aIsCentral)
-    {
-        mpAdapterName = g_strdup(apBleName);
-    }
-    else
-    {
-        mpConnectCancellable = g_cancellable_new();
-    }
-
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
@@ -689,6 +671,13 @@ CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char 
     mIsInitialized = true;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BluezEndpoint::Init(bool aIsCentral, const char * apBleAddr)
+{
+    VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    mpAdapterAddr = g_strdup(apBleAddr);
+    return Init(aIsCentral, mAdapterId);
 }
 
 void BluezEndpoint::Shutdown()
@@ -717,14 +706,10 @@ void BluezEndpoint::Shutdown()
                 g_object_unref(self->mpC2);
             if (self->mpC3 != nullptr)
                 g_object_unref(self->mpC3);
-            if (self->mpConnectCancellable != nullptr)
-                g_object_unref(self->mpConnectCancellable);
             return CHIP_NO_ERROR;
         },
         this);
 
-    g_free(mpOwningName);
-    g_free(mpAdapterName);
     g_free(mpAdapterAddr);
     g_free(mpRootPath);
     g_free(mpServicePath);
@@ -756,7 +741,7 @@ void BluezEndpoint::ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult,
             g_clear_error(&MakeUniquePointerReceiver(error).Get());
 
             bluez_device1_call_disconnect_sync(device, nullptr, &MakeUniquePointerReceiver(error).Get());
-            bluez_device1_call_connect(device, params->mEndpoint.mpConnectCancellable, ConnectDeviceDone, params);
+            bluez_device1_call_connect(device, params->mEndpoint.mConnectCancellable.get(), ConnectDeviceDone, params);
             return;
         }
 
@@ -772,8 +757,7 @@ void BluezEndpoint::ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult,
 
 CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(ConnectParams * apParams)
 {
-    g_cancellable_reset(apParams->mEndpoint.mpConnectCancellable);
-    bluez_device1_call_connect(apParams->mpDevice, apParams->mEndpoint.mpConnectCancellable, ConnectDeviceDone, apParams);
+    bluez_device1_call_connect(apParams->mpDevice, apParams->mEndpoint.mConnectCancellable.get(), ConnectDeviceDone, apParams);
     return CHIP_NO_ERROR;
 }
 
@@ -782,6 +766,7 @@ CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
     auto params = chip::Platform::New<ConnectParams>(*this, &aDevice);
     VerifyOrReturnError(params != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    mConnectCancellable.reset(g_cancellable_new());
     if (PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectDeviceImpl, params) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule ConnectDeviceImpl() on CHIPoBluez thread");
@@ -794,8 +779,8 @@ CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
 
 void BluezEndpoint::CancelConnect()
 {
-    VerifyOrDie(mpConnectCancellable != nullptr);
-    g_cancellable_cancel(mpConnectCancellable);
+    g_cancellable_cancel(mConnectCancellable.get());
+    mConnectCancellable.reset();
 }
 
 } // namespace Internal

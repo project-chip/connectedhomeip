@@ -24,7 +24,63 @@
 #include <lib/support/TypeTraits.h>
 #include <string>
 
+#define JNI_LOCAL_REF_COUNT 256
+
 namespace chip {
+class JniLocalReferenceScope
+{
+public:
+    explicit JniLocalReferenceScope(JNIEnv * env) : mEnv(env)
+    {
+        if (mEnv->PushLocalFrame(JNI_LOCAL_REF_COUNT) == 0)
+        {
+            mlocalFramePushed = true;
+        }
+    }
+
+    ~JniLocalReferenceScope()
+    {
+        if (mlocalFramePushed)
+        {
+            mEnv->PopLocalFrame(nullptr);
+            mlocalFramePushed = false;
+        }
+    }
+
+    // Delete copy constructor and copy assignment operator
+    JniLocalReferenceScope(const JniLocalReferenceScope &)             = delete;
+    JniLocalReferenceScope & operator=(const JniLocalReferenceScope &) = delete;
+
+private:
+    JNIEnv * const mEnv;
+    bool mlocalFramePushed = false;
+};
+
+class JniGlobalReference
+{
+public:
+    JniGlobalReference() {}
+
+    CHIP_ERROR Init(jobject aObjectRef);
+
+    JniGlobalReference(JniGlobalReference && aOther)
+    {
+        mObjectRef        = aOther.mObjectRef;
+        aOther.mObjectRef = nullptr;
+    }
+
+    ~JniGlobalReference() { Reset(); }
+
+    void Reset();
+
+    jobject ObjectRef() const { return mObjectRef; }
+
+    bool HasValidObjectRef() const { return mObjectRef != nullptr; }
+
+private:
+    jobject mObjectRef = nullptr;
+};
+
 class JniReferences
 {
 public:
@@ -44,7 +100,7 @@ public:
      *
      * we need clsType in context to get ClassLoader
      *
-     * This must be called before GetEnvForCurrentThread() or GetClassRef().
+     * This must be called before GetEnvForCurrentThread().
      */
     void SetJavaVm(JavaVM * jvm, const char * clsType);
 
@@ -55,18 +111,6 @@ public:
      * first, then retrieve the JNIEnv.
      */
     JNIEnv * GetEnvForCurrentThread();
-
-    /**
-     * @brief
-     *   Creates a global jclass reference to the given class type.
-     *
-     *   This must be called after SetJavaVm().
-     *
-     * @param[in] env The JNIEnv for finding a Java class and creating a new Java reference.
-     * @param[in] clsType The fully-qualified Java class name to find, e.g. java/lang/IllegalStateException.
-     * @param[out] outCls A Java reference to the class matching clsType.
-     */
-    CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
 
     /**
      * @brief
@@ -94,6 +138,7 @@ public:
 
     void ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR errToThrow);
 
+    void ThrowError(JNIEnv * env, JniGlobalReference & exceptionCls, CHIP_ERROR errToThrow);
     /**
      * Creates a java.util.Optional wrapping the specified jobject. If the wrapped jobject is null, an empty
      * Optional will be returned.
@@ -156,17 +201,14 @@ public:
     template <class T, typename std::enable_if_t<!std::is_enum<T>::value, int> = 0>
     CHIP_ERROR CreateBoxedObject(std::string boxedTypeClsName, std::string constructorSignature, T value, jobject & outObj)
     {
-        JNIEnv * env   = GetEnvForCurrentThread();
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        jclass boxedTypeCls;
-        err = GetClassRef(env, boxedTypeClsName.c_str(), boxedTypeCls);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        JNIEnv * env = GetEnvForCurrentThread();
+        VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        jclass boxedTypeCls = nullptr;
+        ReturnErrorOnFailure(GetLocalClassRef(env, boxedTypeClsName.c_str(), boxedTypeCls));
 
         jmethodID boxedTypeConstructor = env->GetMethodID(boxedTypeCls, "<init>", constructorSignature.c_str());
         outObj                         = env->NewObject(boxedTypeCls, boxedTypeConstructor, value);
-        env->DeleteGlobalRef(boxedTypeCls);
-
-        return err;
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -190,12 +232,13 @@ public:
 private:
     JniReferences() {}
 
-    JavaVM * mJvm              = nullptr;
-    jobject mClassLoader       = nullptr;
+    JavaVM * mJvm = nullptr;
+    JniGlobalReference mClassLoader;
     jmethodID mFindClassMethod = nullptr;
 
-    jclass mHashMapClass   = nullptr;
-    jclass mListClass      = nullptr;
-    jclass mArrayListClass = nullptr;
+    JniGlobalReference mHashMapClass;
+    JniGlobalReference mListClass;
+    JniGlobalReference mArrayListClass;
 };
+
 } // namespace chip

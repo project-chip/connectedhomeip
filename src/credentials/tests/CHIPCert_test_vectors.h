@@ -28,6 +28,7 @@
 
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPCertificateSet.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -72,6 +73,8 @@ enum class TestCertLoadFlags : uint8_t
 extern CHIP_ERROR GetTestCert(TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert);
 extern const char * GetTestCertName(TestCert certType);
 extern CHIP_ERROR GetTestCertPubkey(TestCert certType, ByteSpan & pubkey);
+extern CHIP_ERROR GetTestCertPrivkey(TestCert certType, ByteSpan & privkey);
+extern CHIP_ERROR GetTestCertKeypair(TestCert certType, Crypto::P256SerializedKeypair & keypair);
 extern CHIP_ERROR GetTestCertSKID(TestCert certType, ByteSpan & skid);
 extern CHIP_ERROR GetTestCertAKID(TestCert certType, ByteSpan & akid);
 
@@ -213,6 +216,7 @@ extern const ByteSpan sTestCert_PDCID01_PrivateKey;
 extern const ByteSpan sTestCert_PDCID01_SubjectKeyId;   // empty
 extern const ByteSpan sTestCert_PDCID01_AuthorityKeyId; // empty
 extern const ByteSpan sTestCert_PDCID01_KeyId;
+extern const ByteSpan sTestCert_PDCID01_KeypairDER;
 
 } // namespace TestCerts
 } // namespace chip
