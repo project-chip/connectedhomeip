@@ -68,6 +68,7 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
 	    const size_t len = std::min(mBufMax, name.size());
             memcpy(this->Data(index), name.data(), len);
             output.name = chip::CharSpan(this->Data(index), len);
+	    return audioOutputRenamed;
         }
     }
 
@@ -83,6 +84,7 @@ bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
         {
             audioOutputSelected = true;
             mCurrentOutput      = index;
+	    return audioOutputSelected;
         }
     }
 
