@@ -966,6 +966,12 @@ menu "CHIP Device Layer"
            default n
            help
                This option enables the system statistics to be sent to the insights cloud.
+
+      config INSIGHTS_TRACE_PERMIT_LIST_SIZE
+           int "Config option to set permitlist size"
+           range 5 30
+           depends on ESP_INSIGHTS_ENABLED
+           default 20
     endmenu
 
 
