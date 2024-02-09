@@ -384,7 +384,7 @@ right timeout value based on transport characteristics as well as the responsive
 
 **Returns**:
 
-  - command respone. The type of the response is defined by the command.
+  - command response. The type of the response is defined by the command.
 
 **Raises**:
 
