@@ -97,6 +97,8 @@ public:
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 };
 
+Instance * GetOperationalStateInstance();
+
 void Shutdown();
 
 } // namespace OvenCavityOperationalState

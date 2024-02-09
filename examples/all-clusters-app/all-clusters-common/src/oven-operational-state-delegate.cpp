@@ -22,8 +22,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OvenCavityOperationalState;
 
-static OperationalState::Instance * gOvenCavityOperationalStateInstance         = nullptr;
+static OvenCavityOperationalState::Instance * gOvenCavityOperationalStateInstance         = nullptr;
 static OvenCavityOperationalStateDelegate * gOvenCavityOperationalStateDelegate = nullptr;
+
+OvenCavityOperationalState::Instance * OvenCavityOperationalState::GetOperationalStateInstance()
+{
+    return gOvenCavityOperationalStateInstance;
+}
 
 void OvenCavityOperationalState::Shutdown()
 {

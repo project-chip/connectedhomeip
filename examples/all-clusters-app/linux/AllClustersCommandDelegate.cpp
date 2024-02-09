@@ -32,6 +32,8 @@
 #include <laundry-washer-mode.h>
 #include <oven-modes.h>
 #include <rvc-modes.h>
+#include <operational-state-delegate-impl.h>
+#include <oven-operational-state-delegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -178,6 +180,12 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         {
             self->OnAirQualityChange(static_cast<uint32_t>(jsonAirQualityEnum.asUInt()));
         }
+    }
+    else if (name == "OperationalStateChange")
+    {
+        std::string device   = self->mJsonValue["Device"].asString();
+        std::string operation     = self->mJsonValue["Operation"].asString();
+        self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
     }
     else
     {
@@ -425,6 +433,60 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
     else
     {
         ChipLogDetail(NotSpecified, "Invalid mode type : %s", type.c_str());
+        return;
+    }
+}
+
+void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, std::string operation, Json::Value param)
+{
+    OperationalState::Instance * operationalStateInstance = nullptr;
+    if (device == "Generic")
+    {
+        operationalStateInstance = OperationalState::GetOperationalStateInstance();
+    }
+    else if (device == "Oven")
+    {
+        operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid device type : %s", device.c_str());
+        return;
+    }
+
+    if (operation == "Start" || operation == "Resume")
+    {
+        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    }
+    else if (operation == "Pause")
+    {
+        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    }
+    else if (operation == "Stop")
+    {
+        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    }
+    else if (operation == "OnFault")
+    {
+
+        uint8_t event_id = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
+        if (!param.isNull())
+        {
+            event_id = to_underlying(static_cast<OperationalState::ErrorStateEnum>(param.asUInt()));
+        }
+
+        OperationalState::GenericOperationalError err(event_id);
+        operationalStateInstance->OnOperationalErrorDetected(err);
+    }
+    else if (operation == "OnCompletion")
+    {
+        Optional<DataModel::Nullable<uint32_t>> operationTime(DataModel::Nullable<uint32_t>(100));
+        Optional<DataModel::Nullable<uint32_t>> pausedTime(DataModel::Nullable<uint32_t>(10));
+        operationalStateInstance->OnOperationCompletionDetected(0, operationTime, pausedTime);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid operation : %s", operation.c_str());
         return;
     }
 }
