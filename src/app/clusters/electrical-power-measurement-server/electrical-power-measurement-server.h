@@ -45,24 +45,24 @@ public:
     virtual PowerModeEnum GetPowerMode()          = 0;
     virtual uint8_t GetNumberOfMeasurementTypes() = 0;
 
-    virtual CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) = 0;
-    virtual CHIP_ERROR GetRangeByIndex(uint8_t, Structs::MeasurementRangeStruct::Type &)       = 0;
+    virtual CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &)         = 0;
+    virtual CHIP_ERROR GetRangeByIndex(uint8_t, Structs::MeasurementRangeStruct::Type &)               = 0;
+    virtual CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t, Structs::HarmonicMeasurementStruct::Type &) = 0;
+    virtual CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t, Structs::HarmonicMeasurementStruct::Type &)   = 0;
 
-    virtual DataModel::Nullable<int64_t> GetVoltage()               = 0;
-    virtual DataModel::Nullable<int64_t> GetActiveCurrent()         = 0;
-    virtual DataModel::Nullable<int64_t> GetReactiveCurrent()       = 0;
-    virtual DataModel::Nullable<int64_t> GetApparentCurrent()       = 0;
-    virtual DataModel::Nullable<int64_t> GetActivePower()           = 0;
-    virtual DataModel::Nullable<int64_t> GetReactivePower()         = 0;
-    virtual DataModel::Nullable<int64_t> GetApparentPower()         = 0;
-    virtual DataModel::Nullable<int64_t> GetRMSVoltage()            = 0;
-    virtual DataModel::Nullable<int64_t> GetRMSCurrent()            = 0;
-    virtual DataModel::Nullable<int64_t> GetRMSPower()              = 0;
-    virtual DataModel::Nullable<int64_t> GetFrequency()             = 0;
-    virtual HarmonicMeasurementIterator * IterateHarmonicCurrents() = 0;
-    virtual HarmonicMeasurementIterator * IterateHarmonicPhases()   = 0;
-    virtual DataModel::Nullable<int64_t> GetPowerFactor()           = 0;
-    virtual DataModel::Nullable<int64_t> GetNeutralCurrent()        = 0;
+    virtual DataModel::Nullable<int64_t> GetVoltage()         = 0;
+    virtual DataModel::Nullable<int64_t> GetActiveCurrent()   = 0;
+    virtual DataModel::Nullable<int64_t> GetReactiveCurrent() = 0;
+    virtual DataModel::Nullable<int64_t> GetApparentCurrent() = 0;
+    virtual DataModel::Nullable<int64_t> GetActivePower()     = 0;
+    virtual DataModel::Nullable<int64_t> GetReactivePower()   = 0;
+    virtual DataModel::Nullable<int64_t> GetApparentPower()   = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSVoltage()      = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSCurrent()      = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSPower()        = 0;
+    virtual DataModel::Nullable<int64_t> GetFrequency()       = 0;
+    virtual DataModel::Nullable<int64_t> GetPowerFactor()     = 0;
+    virtual DataModel::Nullable<int64_t> GetNeutralCurrent()  = 0;
 
 protected:
     EndpointId mEndpointId = 0;
@@ -114,9 +114,8 @@ private:
 
     CHIP_ERROR EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     CHIP_ERROR EncodeRanges(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
-
-    CHIP_ERROR ReadHarmonicCurrents(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadHarmonicPhases(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR EncodeHarmonicCurrents(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR EncodeHarmonicPhases(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 };
 
 } // namespace ElectricalPowerMeasurement

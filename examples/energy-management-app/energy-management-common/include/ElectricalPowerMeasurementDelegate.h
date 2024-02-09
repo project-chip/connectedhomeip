@@ -40,6 +40,8 @@ public:
 
     CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) override;
     CHIP_ERROR GetRangeByIndex(uint8_t, Structs::MeasurementRangeStruct::Type &) override;
+    CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t, Structs::HarmonicMeasurementStruct::Type &) override;
+    CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t, Structs::HarmonicMeasurementStruct::Type &) override;
 
     DataModel::Nullable<int64_t> GetVoltage() override { return mVoltage; }
     DataModel::Nullable<int64_t> GetActiveCurrent() override { return mActiveCurrent; }
@@ -52,10 +54,6 @@ public:
     DataModel::Nullable<int64_t> GetRMSCurrent() override { return mRMSCurrent; }
     DataModel::Nullable<int64_t> GetRMSPower() override { return mRMSPower; }
     DataModel::Nullable<int64_t> GetFrequency() override { return mFrequency; }
-    // TODO
-    HarmonicMeasurementIterator * IterateHarmonicCurrents() override { return nullptr; }
-    HarmonicMeasurementIterator * IterateHarmonicPhases() override { return nullptr; }
-
     DataModel::Nullable<int64_t> GetPowerFactor() override { return mPowerFactor; }
     DataModel::Nullable<int64_t> GetNeutralCurrent() override { return mNeutralCurrent; };
 
@@ -89,8 +87,6 @@ private:
     DataModel::Nullable<int64_t> mRMSCurrent;
     DataModel::Nullable<int64_t> mRMSPower;
     DataModel::Nullable<int64_t> mFrequency;
-    DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> mHarmonicCurrents;
-    DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> mHarmonicPhases;
     DataModel::Nullable<int64_t> mPowerFactor;
     DataModel::Nullable<int64_t> mNeutralCurrent;
 };

@@ -184,9 +184,19 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetFrequency()));
         break;
     case HarmonicCurrents::Id:
-        return ReadHarmonicCurrents(aEncoder);
+        VerifyOrReturnError(
+            HasFeature(ElectricalPowerMeasurement::Feature::kHarmonics), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicCurrents, feature is not supported"));
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeHarmonicCurrents(encoder); }));
+        break;
     case HarmonicPhases::Id:
-        return ReadHarmonicPhases(aEncoder);
+        VerifyOrReturnError(
+            HasFeature(ElectricalPowerMeasurement::Feature::kPowerQuality), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicPhases, feature is not supported"));
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeHarmonicPhases(encoder); }));
+        break;
     case PowerFactor::Id:
         if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributePowerFactor))
         {
@@ -247,59 +257,40 @@ CHIP_ERROR Instance::EncodeRanges(const AttributeValueEncoder::ListEncodeHelper 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadHarmonicCurrents(AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::EncodeHarmonicCurrents(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kHarmonics), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                        ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicCurrents, feature is not supported"));
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto currents  = mDelegate.IterateHarmonicCurrents();
-    VerifyOrReturnError(currents != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    if (currents->Count() == 0)
+    for (uint8_t i = 0; true; i++)
     {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([&currents](const auto & encoder) -> CHIP_ERROR {
-            Structs::HarmonicMeasurementStruct::Type current;
-            while (currents->Next(current))
-            {
-                encoder.Encode(current);
-            }
+        Structs::HarmonicMeasurementStruct::Type current;
 
+        auto err = mDelegate.GetHarmonicCurrentsByIndex(i, current);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
             return CHIP_NO_ERROR;
-        });
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(current));
     }
-    currents->Release();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadHarmonicPhases(AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::EncodeHarmonicPhases(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kPowerQuality), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                        ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicPhases, feature is not supported"));
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto phases    = mDelegate.IterateHarmonicPhases();
-    VerifyOrReturnError(phases != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    if (phases->Count() == 0)
+    for (uint8_t i = 0; true; i++)
     {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([&phases](const auto & encoder) -> CHIP_ERROR {
-            Structs::HarmonicMeasurementStruct::Type phase;
-            while (phases->Next(phase))
-            {
-                encoder.Encode(phase);
-            }
+        Structs::HarmonicMeasurementStruct::Type phase;
 
+        auto err = mDelegate.GetHarmonicPhasesByIndex(i, phase);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
             return CHIP_NO_ERROR;
-        });
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(phase));
     }
-    phases->Release();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace ElectricalPowerMeasurement

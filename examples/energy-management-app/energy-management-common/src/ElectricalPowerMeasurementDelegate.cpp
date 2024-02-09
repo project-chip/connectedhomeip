@@ -210,6 +210,63 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::GetRangeByIndex(uint8_t rangeInde
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
+CHIP_ERROR
+ElectricalPowerMeasurementDelegate::GetHarmonicCurrentsByIndex(uint8_t harmonicCurrentsIndex,
+                                                               Structs::HarmonicMeasurementStruct::Type & harmonicCurrent)
+{
+    /** TODO - Manufacturers wanting to support this could implement an array of
+     * Structs::HarmonicMeasurementStruct::Type mHarmonicCurrentMeasurements[];
+     *
+     * The application code should update the relevant harmonic 'order' information including
+     *   - .order
+     *   - .measurement
+     *
+     * The application should also ensure it notifies remote clients that the value has changed
+     *  MatterReportingAttributeChangeCallback(mEndpointId, ElectricalPowerMeasurement::Id, HarmonicCurrents::Id);
+     */
+
+    /*   if (rangeIndex >= ArraySize(mHarmonicCurrentMeasurements))
+     *   {
+     *       return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+     *   }
+     *
+     *   range = mHarmonicCurrentMeasurements[rangeIndex];
+     *
+     *   return CHIP_NO_ERROR;
+     */
+
+    /* Return an empty list for now */
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+CHIP_ERROR ElectricalPowerMeasurementDelegate::GetHarmonicPhasesByIndex(uint8_t harmonicPhaseIndex,
+                                                                        Structs::HarmonicMeasurementStruct::Type & harmonicPhase)
+{
+    /** TODO - Manufacturers wanting to support this could implement an array of
+     * Structs::HarmonicMeasurementStruct::Type mHarmonicPhaseMeasurements[];
+     *
+     * The application code should update the relevant harmonic 'order' information including
+     *   - .order
+     *   - .measurement
+     *
+     * The application should also ensure it notifies remote clients that the value has changed
+     *  MatterReportingAttributeChangeCallback(mEndpointId, ElectricalPowerMeasurement::Id, HarmonicPhases::Id);
+     */
+
+    /*   if (rangeIndex >= ArraySize(mHarmonicPhaseMeasurements))
+     *   {
+     *       return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+     *   }
+     *
+     *   range = mHarmonicPhaseMeasurements[rangeIndex];
+     *
+     *   return CHIP_NO_ERROR;
+     */
+
+    /* Return an empty list for now */
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
 CHIP_ERROR ElectricalPowerMeasurementDelegate::SetVoltage(DataModel::Nullable<int64_t> newValue)
 {
     DataModel::Nullable<int64_t> oldValue = mVoltage;
