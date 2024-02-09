@@ -17,6 +17,6 @@
 #
 [
     { include: [ '"system/SystemBuildConfig.h"', private, '<system/SystemConfig.h>', public ] },
-    { include: [ '"core/CHIPBuildConfig.h"', private, '<lib/core/BuildConfig.h>', public ] },
-    { include: [ '@"platform/.*/CHIPPlatformConfig.h"', private, '<lib/core/BuildConfig.h>', public ] },
+    { include: [ '"core/CHIPBuildConfig.h"', private, '<lib/core/CHIPConfig.h>', public ] },
+    { include: [ '@"platform/.*/CHIPPlatformConfig.h"', private, '<lib/core/CHIPConfig.h>', public ] },
 ]

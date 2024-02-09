@@ -15,20 +15,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file specifies types and utility interfaces for managing and
- *      working with CHIP TLV.
- *
- */
-
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/TLV.h>
+
 #include <stddef.h>
-#include <stdint.h>
 
 namespace chip {
 

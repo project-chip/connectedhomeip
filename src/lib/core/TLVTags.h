@@ -24,8 +24,6 @@
 #include <type_traits>
 
 namespace chip {
-class StringBuilderBase;
-
 namespace TLV {
 
 class Tag

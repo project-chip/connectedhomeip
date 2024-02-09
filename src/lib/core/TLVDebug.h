@@ -25,10 +25,7 @@
 #include <lib/core/TLVTypes.h>
 
 namespace chip {
-
 namespace TLV {
-class TLVReader;
-enum class TLVTagControl : uint8_t;
 
 /**
  *   @namespace chip::TLV::Debug
