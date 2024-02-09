@@ -22,24 +22,7 @@ from matter_testing_support import TestStep, MatterBaseTest, async_test_body, de
 from mobly import asserts
 from TC_OpstateCommon import TC_OVENOPSTATE_BASE, TestInfo
 
-class TC_OVENOPSTATE_2_1(MatterBaseTest):
-
-    async def read_and_validate_opstate(self, step, expected_state):
-        self.print_step(step, "Read OperationalState attribute")
-        operational_state = await self.read_mod_attribute_expect_success(
-            endpoint=self.endpoint, attribute=Clusters.OvenCavityOperationalState.Attributes.OperationalState)
-        logging.info("OperationalState: %s" % (operational_state))
-        asserts.assert_equal(operational_state, expected_state,
-                             "OperationalState(%s) should equal %s" % (operational_state, expected_state))
-
-    async def read_and_validate_operror(self, step, expected_error):
-        self.print_step(step, "Read OperationalError attribute")
-        operational_error = await self.read_mod_attribute_expect_success(
-            endpoint=self.endpoint, attribute=Clusters.OvenCavityOperationalState.Attributes.OperationalError)
-        logging.info("OperationalError: %s" % (operational_error))
-        asserts.assert_equal(operational_error.errorStateID, expected_error,
-                             "errorStateID(%s) should equal %s" % (operational_error.errorStateID, expected_error))
-
+class TC_OVENOPSTATE_2_1(MatterBaseTest, TC_OVENOPSTATE_BASE):
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -48,12 +31,10 @@ class TC_OVENOPSTATE_2_1(MatterBaseTest):
             cluster=Clusters.OvenCavityOperationalState
         )
 
-        self.TC_BASE = TC_OVENOPSTATE_BASE(
-                            implementer=self,
-                            test_info=test_info)
+        super().setup_base(test_info=test_info)
 
     def steps_TC_OVENOPSTATE_2_1(self) -> list[TestStep]:
-        return self.TC_BASE.steps_TC_OPSTATE_BASE_2_1()
+        return self.STEPS_TC_OPSTATE_BASE_2_1()
 
     def pics_TC_OVENOPSTATE_2_1(self) -> list[str]:
         return ["OVENOPSTATE.S"]
@@ -61,7 +42,7 @@ class TC_OVENOPSTATE_2_1(MatterBaseTest):
     @async_test_body
     async def test_TC_OVENOPSTATE_2_1(self):
         endpoint = self.matter_test_config.endpoint
-        await self.TC_BASE.test_TC_OPSTATE_BASE_2_1(endpoint)
+        await self.TEST_TC_OPSTATE_BASE_2_1(endpoint)
 
 if __name__ == "__main__":
     default_matter_test_main()

@@ -23,7 +23,7 @@ from mobly import asserts
 from TC_OpstateCommon import TC_OVENOPSTATE_BASE, TestInfo
 
 
-class TC_OVENOPSTATE_1_1(MatterBaseTest):
+class TC_OVENOPSTATE_1_1(MatterBaseTest, TC_OVENOPSTATE_BASE):
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -32,12 +32,10 @@ class TC_OVENOPSTATE_1_1(MatterBaseTest):
             cluster=Clusters.OvenCavityOperationalState
         )
 
-        self.TC_BASE = TC_OVENOPSTATE_BASE(
-                            implementer=self,
-                            test_info=test_info)
+        super().setup_base(test_info=test_info)
 
     def steps_TC_OVENOPSTATE_1_1(self) -> list[TestStep]:
-        return self.TC_BASE.steps_TC_OPSTATE_BASE_1_1()
+        return self.STEPS_TC_OPSTATE_BASE_1_1()
 
     def pics_TC_OVENOPSTATE_1_1(self) -> list[str]:
         return ["OVENOPSTATE.S"]
@@ -48,10 +46,9 @@ class TC_OVENOPSTATE_1_1(MatterBaseTest):
         cluster_revision = 1
         feature_map=0
 
-        await self.TC_BASE.test_TC_OPSTATE_BASE_1_1(endpoint=endpoint,
+        await self.TEST_TC_OPSTATE_BASE_1_1(endpoint=endpoint,
                                                     cluster_revision=cluster_revision,
                                                     feature_map=feature_map)
-
 
 if __name__ == "__main__":
     default_matter_test_main()
