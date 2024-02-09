@@ -21,16 +21,17 @@
 #include <vector>
 
 using namespace std;
+using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Messages;
 using Message = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
 
 // Commands
-void MessagesManager::HandlePresentMessagesRequest(
-    const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
-    const chip::BitMask<MessageControlBitmap> & messageControl, const chip::app::DataModel::Nullable<uint32_t> & startTime,
-    const chip::app::DataModel::Nullable<uint16_t> & duration, const chip::CharSpan & messageText,
-    const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
+void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, const MessagePriorityEnum & priority,
+                                                   const BitMask<MessageControlBitmap> & messageControl,
+                                                   const DataModel::Nullable<uint32_t> & startTime,
+                                                   const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
+                                                   const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     std::vector<char *> needToFree;
     std::vector<MessageResponseOption *> optionToFree;
@@ -70,7 +71,7 @@ void MessagesManager::HandlePresentMessagesRequest(
 
             if (response.messageResponseID.HasValue())
             {
-                optionArray[counter].messageResponseID = chip::Optional<uint32_t>(response.messageResponseID.ValueOr(0));
+                optionArray[counter].messageResponseID = Optional<uint32_t>(response.messageResponseID.ValueOr(0));
             }
 
             if (response.label.HasValue())
@@ -85,26 +86,26 @@ void MessagesManager::HandlePresentMessagesRequest(
                 ChipLogProgress(Controller, "HandlePresentMessagesRequest option label:%s size:%lu", labelBuffer,
                                 response.label.Value().size());
 
-                optionArray[counter].label = chip::Optional<chip::CharSpan>(chip::CharSpan::fromCharString(labelBuffer));
+                optionArray[counter].label = Optional<CharSpan>(CharSpan::fromCharString(labelBuffer));
             }
             counter++;
         }
 
-        Message message{ chip::ByteSpan(messageIdBuffer, messageId.size()),
+        Message message{ ByteSpan(messageIdBuffer, messageId.size()),
                          priority,
                          messageControl,
                          startTime,
                          duration,
-                         chip::CharSpan::fromCharString(messageTextBuffer),
-                         chip::Optional<chip::app::DataModel::List<MessageResponseOption>>(
-                             chip::app::DataModel::List<MessageResponseOption>(optionArray, size)) };
+                         CharSpan::fromCharString(messageTextBuffer),
+                         Optional<DataModel::List<MessageResponseOption>>(
+                             DataModel::List<MessageResponseOption>(optionArray, size)) };
 
         mMessages.push_back(message);
     }
     else
     {
-        Message message{ chip::ByteSpan(messageIdBuffer, messageId.size()), priority, messageControl, startTime, duration,
-                         chip::CharSpan::fromCharString(messageTextBuffer) };
+        Message message{ ByteSpan(messageIdBuffer, messageId.size()), priority, messageControl, startTime, duration,
+                         CharSpan::fromCharString(messageTextBuffer) };
         mMessages.push_back(message);
     }
 
@@ -130,14 +131,14 @@ exit:
     }
 }
 
-void MessagesManager::HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds)
+void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
 {
     auto iter = messageIds.begin();
     while (iter.Next())
     {
         auto & id = iter.GetValue();
 
-        mMessages.remove_if([id](chip::app::Clusters::Messages::Structs::MessageStruct::Type & entry) {
+        mMessages.remove_if([id](Clusters::Messages::Structs::MessageStruct::Type & entry) {
             if (entry.messageID.data_equal(id))
             {
                 // free the memory allocated for this entry
@@ -163,7 +164,7 @@ void MessagesManager::HandleCancelMessagesRequest(const chip::app::DataModel::De
 }
 
 // Attributes
-CHIP_ERROR MessagesManager::HandleGetMessages(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (Message & entry : mMessages)
@@ -174,7 +175,7 @@ CHIP_ERROR MessagesManager::HandleGetMessages(chip::app::AttributeValueEncoder &
     });
 }
 
-CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (Message & entry : mMessages)
@@ -186,7 +187,7 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(chip::app::AttributeValueE
 }
 
 // Global Attributes
-uint32_t MessagesManager::GetFeatureMap(chip::EndpointId endpoint)
+uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
 {
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
