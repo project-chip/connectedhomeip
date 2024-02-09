@@ -28,7 +28,7 @@ from matter_testing_support import (MatterBaseTest, async_test_body, compare_tim
                                     utc_time_in_matter_epoch)
 from mobly import asserts, signals
 from taglist_and_topology_test_support import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
-                                               find_tag_list_problems, find_tree_roots, get_all_children,
+                                               find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 
 
@@ -303,6 +303,14 @@ class TestMatterTestingSupport(MatterBaseTest):
         endpoints[9][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(2)
         cycles = parts_list_cycles(tree, endpoints)
         asserts.assert_equal(cycles, [2, 3, 4, 5, 9, 10, 13, 14, 16])
+
+    def test_flat_list(self):
+        endpoints = self.create_example_topology()
+        # check the aggregator endpoint to ensure it's ok - aggregator is on 11
+        asserts.assert_true(flat_list_ok(11, endpoints), "Incorrect failure on flat list")
+        # Remove one of the sub-children endpoints from the parts list - it should fail
+        endpoints[11][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(14)
+        asserts.assert_false(flat_list_ok(11, endpoints), "Incorrect pass on flat list missing a part list entry")
 
     def test_get_all_children(self):
         endpoints = self.create_example_topology()
