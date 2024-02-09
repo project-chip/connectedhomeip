@@ -34,10 +34,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
-#include <lib/core/TLVCommon.h>
+#include <lib/core/TLVBackingStore.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
-#include <lib/core/TLVWriter.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>

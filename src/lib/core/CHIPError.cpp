@@ -17,8 +17,6 @@
  */
 #include <lib/core/CHIPError.h>
 
-#include <stdint.h>
-
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/ErrorStr.h>
 

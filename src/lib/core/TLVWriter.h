@@ -33,8 +33,6 @@
 #include <utility>
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/TLVBackingStore.h>
-#include <lib/core/TLVCommon.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>

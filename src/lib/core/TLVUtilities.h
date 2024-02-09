@@ -19,6 +19,8 @@
 
 #include <lib/core/CHIPError.h>
 
+#include <lib/core/TLVReader.h>
+
 #include <stddef.h>
 
 namespace chip {

@@ -18,11 +18,11 @@
 #pragma once
 
 #include <stddef.h>
-#include <stdint.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/TLV.h>
 #include <lib/core/TLVTypes.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVReader.h>
 
 namespace chip {
 namespace TLV {
