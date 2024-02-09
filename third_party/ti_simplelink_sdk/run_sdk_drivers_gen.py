@@ -38,7 +38,7 @@ source_file = args.sdk + args.src_path
 dest_path = args.dest_path
 
 make_command = ["make", "-C", args.sdk, "CMAKE=cmake", "GCC_ARMCOMPILER=" +
-            GCC_ARMCOMPILER_PATH, "IAR_ARMCOMPILER=", "TICLANG_ARMCOMPILER=", "GENERATOR=Ninja"]
+                GCC_ARMCOMPILER_PATH, "IAR_ARMCOMPILER=", "TICLANG_ARMCOMPILER=", "GENERATOR=Ninja"]
 
 pid = os.fork()
 if pid:
@@ -51,7 +51,7 @@ if pid:
 
 else:
     make_command = ["make", "-C", args.sdk, "CMAKE=cmake", "GCC_ARMCOMPILER=" +
-                GCC_ARMCOMPILER_PATH, "IAR_ARMCOMPILER=", "TICLANG_ARMCOMPILER=", "GENERATOR=Ninja"]
+                    GCC_ARMCOMPILER_PATH, "IAR_ARMCOMPILER=", "TICLANG_ARMCOMPILER=", "GENERATOR=Ninja"]
     res = subprocess.run(make_command, capture_output=True, encoding="utf8")
     if res.returncode != 0:
         print("!!!!!!!!!!!! EXEC FAILED !!!!!!!!!!!!!!!!")
@@ -61,4 +61,3 @@ else:
         print("%s" % res.stderr)
         print("res.returncode: %d", res.returncode)
         sys.exit(1)
-   
