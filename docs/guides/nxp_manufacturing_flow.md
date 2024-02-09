@@ -1,8 +1,4 @@
----
-orphan: true
----
-
-# NXP manufacturing data guide
+# NXP Manufacturing data
 
 By default, the example application is configured to use generic test
 certificates and provisioning data embedded with the application code. It is
@@ -33,10 +29,9 @@ ninja -C out spake2p
 
 ### a. Certificates
 
-To generate the different certificates, NXP provides a Python script
-`scripts/tools/nxp/generate_certs.py`. This script will always generate the PAI
-and DAC certificates/keys. It can also generate the Certification Declaration
-and the PAA certificate/key depending on the parameters.
+To generate the different certificates, NXP provides a Python script `scripts/tools/nxp/generate_certs.py`.
+This script will always generate the PAI and DAC certificates/keys.
+It can also generate the Certification Declaration and the PAA certificate/key depending on the parameters.
 
 | Parameter          | Description                                                                                       | Type                   | Required |
 | ------------------ | ------------------------------------------------------------------------------------------------- | ---------------------- | -------- |
@@ -54,22 +49,19 @@ and the PAA certificate/key depending on the parameters.
 | `--valid_from`     | The start date for the certificate's validity period.                                             | string                 | No       |
 | `--lifetime`       | The lifetime for the certificates, in whole days.                                                 | string                 | No       |
 
-You can also run the following command to get more details on the parameters and
-their default value (if applicable):
+You can also run the following command to get more details on the parameters and their default value (if applicable):
 
 ```shell
 python scripts/tools/nxp/generate_certs.py --help
 ```
 
-Example of a command that will generate CD, PAA, PAI and DAC certificates and
-keys in both .pem and .der formats:
+Example of a command that will generate CD, PAA, PAI and DAC certificates and keys in both .pem and .der formats:
 
 ```shell
 python scripts/tools/nxp/generate_certs.py --gen_cd --cd_type 1 --chip_cert_path ./out/chip-cert --vendor_id 0x1037 --product_id 0xA220 --vendor_name "NXP Semiconductors" --product_name all-clusters-app --device_type 65535 --output .
 ```
 
-> **Note**: the commands provided in this guide are just for the example and
-> shall be adapted to your use case accordingly
+> **Note**: the commands provided in this guide are just for the example and shall be adapted to your use case accordingly
 
 ### c. Provisioning data
 
@@ -112,30 +104,30 @@ Here is the interpretation of the **required** parameters:
 --pai_cert         -> path to the PAI (der format) location
 --spake2p_path     -> path to the spake2p tool
 --out              -> name of the binary that will be used for storing all the generated data
-
-
 ```
 
 Here is the interpretation of the **optional** parameters:
 
 ```shell
---dac_key_password     -> Password to decode DAC key
---dac_key_use_sss_blob -> Used when --dac_key contains a path to an encrypted blob, instead of the
-                          actual DAC private key. The blob metadata size is 24, so the total length
-                          of the resulting value is private key length (32) + 24 = 56. False by default.
---spake2p_verifier     -> SPAKE2+ verifier (passed as base64 encoded string). If this option is set,
-                          all SPAKE2+ inputs will be encoded in the final binary. The spake2p tool
-                          will not be used to generate a new verifier on the fly.
---aes128_key           -> 128 bits AES key used to encrypt the whole dataset. Please make sure
-                          that the target application/board supports this feature: it has access to
-                          the private key and implements a mechanism which can be used to decrypt
-                          the factory data information.
---date                 -> Manufacturing Date (YYYY-MM-DD format)
---part_number          -> Part number as string
---product_url          -> Product URL as string
---product_label        -> Product label as string
---serial_num           -> Serial Number
---unique_id            -> Unique id used for rotating device id generation
+--dac_key_password      -> Password to decode DAC key
+--dac_key_use_sss_blob  -> Used when --dac_key contains a path to an encrypted blob, instead of the
+                           actual DAC private key. The blob metadata size is 24, so the total length
+                           of the resulting value is private key length (32) + 24 = 56. False by default.
+--spake2p_verifier      -> SPAKE2+ verifier (passed as base64 encoded string). If this option is set,
+                           all SPAKE2+ inputs will be encoded in the final binary. The spake2p tool
+                           will not be used to generate a new verifier on the fly.
+--aes128_key            -> 128 bits AES key used to encrypt the whole dataset. Please make sure
+                           that the target application/board supports this feature: it has access to
+                           the private key and implements a mechanism which can be used to decrypt
+                           the factory data information.
+--date                  -> Manufacturing Date (YYYY-MM-DD format)
+--part_number           -> Part number as string
+--product_url           -> Product URL as string
+--product_label         -> Product label as string
+--serial_num            -> Serial Number
+--unique_id             -> Unique id used for rotating device id generation
+--product_finish        -> Visible finish of the product
+--product_primary_color -> Representative color of the visible parts of the product
 ```
 
 ## 3. Write provisioning data
@@ -154,10 +146,19 @@ location given by `__MATTER_FACTORY_DATA_START`, using `JLink`:
 loadfile factory_data.bin 0xf4000
 ```
 
-where `0xf4000` is the value of `__MATTER_FACTORY_DATA_START` in the
-corresponding .map file (can be different if using a custom linker script).
+where `0xf4000` is the value of `__MATTER_FACTORY_DATA_START` in the corresponding .map file (can be different if using a custom linker script).
 
-For the **RT1060**, **RT1170** and **RW61X** platform, the binary needs to be
+For **RW61X** platform, the binary needs to be written in the internal flash at
+location given by `__MATTER_FACTORY_DATA_START`, using `JLink`:
+
+```
+loadfile factory_data.bin 0xBFFF000
+```
+
+where `0xBFFF000` is the value of `__FACTORY_DATA_START` in the corresponding .map file (can be different if using a custom linker script).
+
+
+For the **RT1060** and **RT1170** platform, the binary needs to be
 written using `MCUXpresso Flash Tool GUI` at the address value corresponding to
 `__FACTORY_DATA_START` (the map file of the application should be checked to get
 the exact value).
@@ -197,30 +198,26 @@ Also, demo **DAC**, **PAI** and **PAA** certificates needed in case
 `./scripts/tools/nxp/demo_generated_certs`.
 
 ## 6. Increased security for DAC private key
-
+### 6.1 K32W1
 Supported platforms:
 
--   K32W1 - `src/plaftorm/nxp/k32w/k32w1/FactoryDataProviderImpl.h`
+- K32W1 - `src/plaftorm/nxp/k32w/k32w1/FactoryDataProviderImpl.h`
 
-For platforms that have a secure subsystem (`SSS`), the DAC private key can be
-converted to an encrypted blob. This blob will overwrite the DAC private key in
-factory data and will be imported in the `SSS` at initialization, by the factory
-data provider instance.
+For platforms that have a secure subsystem (`SSS`), the DAC private key can be converted
+to an encrypted blob. This blob will overwrite the DAC private key in factory data and
+will be imported in the `SSS` at initialization, by the factory data provider instance.
 
-The conversion process shall happen at manufacturing time and should be run one
-time only:
+The conversion process shall happen at manufacturing time and should be run one time only:
 
--   Write factory data binary.
--   Build the application with
-    `chip_with_factory_data=1 chip_convert_dac_private_key=1` set.
--   Write the application to the board and let it run.
+- Write factory data binary.
+- Build the application with `chip_with_factory_data=1 chip_convert_dac_private_key=1` set.
+- Write the application to the board and let it run.
 
 After the conversion process:
 
--   Make sure the application is built with `chip_with_factory_data=1`, but
-    without `chip_convert_dac_private_key` arg, since conversion already
-    happened.
--   Write the application to the board.
+- Make sure the application is built with `chip_with_factory_data=1`, but without
+  `chip_convert_dac_private_key` arg, since conversion already happened.
+- Write the application to the board.
 
 If you are using Jlink, you can see a conversion script example in:
 
@@ -228,17 +225,36 @@ If you are using Jlink, you can see a conversion script example in:
 ./scripts/tools/nxp/factory_data_generator/k32w1/example_convert_dac_private_key.jlink
 ```
 
-Factory data should now contain a corresponding encrypted blob instead of the
-DAC private key.
+Factory data should now contain a corresponding encrypted blob instead of the DAC private key.
 
-If an encrypted blob of the DAC private key is already available (e.g. obtained
-previously, using other methods), then the conversion process shall be skipped.
-Instead, option `--dac_key_use_sss_blob` can be used in the factory data
-generation command:
+If an encrypted blob of the DAC private key is already available (e.g. obtained previously, using
+other methods), then the conversion process shall be skipped. Instead, option `--dac_key_use_sss_blob`
+can be used in the factory data generation command:
 
 ```shell
 python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid "0x1037" --pid "0xA221" --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "12345678" --date "2023-01-01" --hw_version 1 --hw_version_str "1.0" --cert_declaration ./Chip-Test-CD-1037-A221.der --dac_cert ./Chip-DAC-NXP-1037-A221-Cert.der --dac_key ./Chip-DAC-NXP-1037-A221-Key-encrypted-blob.bin --pai_cert ./Chip-PAI-NXP-1037-A221-Cert.der --spake2p_path ./out/spake2p --unique_id "00112233445566778899aabbccddeeff" --dac_key_use_sss_blob --out ./factory_data_with_blob.bin
 ```
 
-Please note that `--dac_key` now points to a binary file that contains the
-encrypted blob.
+Please note that `--dac_key` now points to a binary file that contains the encrypted blob.
+
+### 6.2 RW61X
+
+Supported platforms:
+
+- RW61X - `src/plaftorm/nxp/rt/rw61x/FactoryDataProviderImpl.h`
+
+For platforms that have a secure subsystem (`SE50`), the DAC private key can be converted
+to an encrypted blob. This blob will overwrite the DAC private key in factory data and
+will be imported in the `SE50` before to sign, by the factory data provider instance.
+
+The conversion process shall happen at manufacturing time and should be run one time only:
+
+- Write factory data binary.
+- Build the application with `chip_with_factory_data=1 chip_convert_dac_private_key=1` set.
+- Write the application to the board and let it run.
+
+After the conversion process:
+
+- Make sure the application is built with `chip_with_factory_data=1`, but without
+  `chip_convert_dac_private_key` arg, since conversion already happened.
+- Write the application to the board.
