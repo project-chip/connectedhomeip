@@ -603,7 +603,7 @@ iwyu_tool.py -p out/linux-x64-all-clusters-clang/compile_commands.json $SOURCE_F
 ```
 
 A helper script also exists under `scripts/helpers/iwyu-check.py`. This one defaults
-to seraching `src/platform` however that can be modified. Usage is like:
+to searching `src/platform` however that can be modified. Usage is like:
 
 ```bash
 ./scripts/helpers/iwyu-check.py                                                    \
