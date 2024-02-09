@@ -43,6 +43,13 @@ pw_proto_library("attributes_service") {
   prefix = "attributes_service"
 }
 
+pw_proto_library("boolean_state_service") {
+  sources = [ "protos/boolean_state_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "boolean_state_service"
+}
+
 pw_proto_library("device_service") {
   sources = [ "protos/device_service.proto" ]
   inputs = [ "protos/device_service.options" ]

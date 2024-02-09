@@ -39,9 +39,8 @@ struct MCConnectionExampleView: View {
                 
                 if(connectionSuccess)
                 {
-                    /* TODO add this back in
-                     NavigationLink(
-                        destination: ClusterSelectorView(),
+                    NavigationLink(
+                        destination: MCActionSelectorView(_selectedCastingPlayer: self.selectedCastingPlayer), 
                         label: {
                             Text("Next")
                                 .frame(width: 100, height: 30, alignment: .center)
@@ -50,7 +49,7 @@ struct MCConnectionExampleView: View {
                     ).background(Color.blue)
                         .foregroundColor(Color.white)
                         .frame(maxHeight: .infinity, alignment: .bottom)
-                        .padding()*/
+                        .padding()
                 }
             }
         }

@@ -184,7 +184,7 @@ public:
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
                 jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
+                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure);
 
     void Shutdown();
 
@@ -202,7 +202,7 @@ public:
     CHIP_ERROR UpdateDeviceAttestationDelegateBridge(jobject deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
                                                      bool shouldWaitAfterDeviceAttestation);
 
-    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate);
+    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate, jobject cdTrustKeys);
 
     CHIP_ERROR StartOTAProvider(jobject otaProviderDelegate);
 

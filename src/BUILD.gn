@@ -43,9 +43,6 @@ config("includes") {
     include_dirs += [ "${chip_external_platform_include_dir}" ]
   }
 
-  # TODO: generated file dependency should be a lib NOT an include
-  include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
-
   defines = [ "CHIP_HAVE_CONFIG_H=1" ]
 
   # Make __FILE__ and related macros relative to chip_root

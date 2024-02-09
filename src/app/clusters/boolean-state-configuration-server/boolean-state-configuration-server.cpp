@@ -41,7 +41,7 @@ using chip::app::Clusters::BooleanStateConfiguration::Delegate;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kBooleanStateConfigurationDelegateTableSize =
-    EMBER_AF_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static_assert(kBooleanStateConfigurationDelegateTableSize <= kEmberInvalidEndpointIndex,
               "BooleanStateConfiguration Delegate table size error");
@@ -57,7 +57,7 @@ Delegate * gDelegateTable[kBooleanStateConfigurationDelegateTableSize] = { nullp
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanStateConfiguration::Id,
-                                                       EMBER_AF_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kBooleanStateConfigurationDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -234,7 +234,7 @@ namespace BooleanStateConfiguration {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanStateConfiguration::Id,
-                                                       EMBER_AF_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kBooleanStateConfigurationDelegateTableSize)
     {
@@ -274,8 +274,11 @@ CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep)
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsEnabled::Get(ep, &alarmsEnabled),
                         CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarmsEnabled), CHIP_IM_GLOBAL_STATUS(Failure));
-    emitAlarmsStateChangedEvent(ep);
+    if (alarmsEnabled.HasAny())
+    {
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarmsEnabled), CHIP_IM_GLOBAL_STATUS(Failure));
+        emitAlarmsStateChangedEvent(ep);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -283,21 +286,34 @@ CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep)
 CHIP_ERROR ClearAllAlarms(EndpointId ep)
 {
     BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
+    bool emitEvent = false;
+
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &alarmsActive),
                         CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Get(ep, &alarmsSuppressed),
                         CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
-    if (alarmsActive.HasAny() || alarmsSuppressed.HasAny())
+    if (alarmsActive.HasAny())
     {
         alarmsActive.ClearAll();
-        alarmsSuppressed.ClearAll();
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarmsActive),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        emitEvent = true;
+    }
+
+    if (alarmsSuppressed.HasAny())
+    {
+        alarmsSuppressed.ClearAll();
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Set(ep, alarmsSuppressed),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        emitEvent = true;
+    }
+
+    if (emitEvent)
+    {
         emitAlarmsStateChangedEvent(ep);
     }
+
     return CHIP_NO_ERROR;
 }
 
