@@ -29,26 +29,58 @@ namespace chip::app::Clusters::EnergyPreference
 
 struct Delegate
 {
+    //Note: This delegate does not handle the "Current Active" indexes attributes storage.  
+    //eg: Current Energy Balance and Current Low Power Mode Sensitivity.  These can be handled using
+    //ember built in storage, or via the external callbacks as desired by the implementer.
+
     virtual ~Delegate() {}
 
-    // Gives a reference to the energy balance struct at aIndex
-    // Balance struct should exist for the life time of the matter server
+    /**
+     * Get an Energy Balance.
+     * @param aEndpoint The endpoint to query.
+     * @param aIndex The index of the balance, with 0 representing the first one.
+     * @param aOutBalance The BalanceStruct to copy the data into.
+     * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
+     */
     virtual CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
-                                               chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & balance) = 0;
+                                               chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & aOutBalance) = 0;
 
-    // Gives a reference to the  at aIndex
+    /**
+     * Get an Energy Priority.
+     * @param aEndpoint The endpoint to query.
+     * @param aIndex The index of the priority, with 0 representing the first one.
+     * @param aOutPriority The EnergyPriorityEnum to copy the data into.
+     * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
+     */
     virtual CHIP_ERROR GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
-                                                chip::app::Clusters::EnergyPreference::EnergyPriorityEnum & priority)         = 0;
+                                                chip::app::Clusters::EnergyPreference::EnergyPriorityEnum & aOutPriority) = 0;
 
 
-    // Gives a reference to the low power mode sensitivity balance struct at aIndex
-    // Balance struct should exist for the life time of the matter server
+    /**
+     * Get a Power Sensitity Balance Struct.
+     * @param aEndpoint The endpoint to query.
+     * @param aIndex The index of the priority, with 0 representing the first one.
+     * @param aOutBalance The BalanceStruct to copy the data into.
+     * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
+     */
     virtual CHIP_ERROR
     GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
-                                      chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & balance) = 0;
+                                      chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & aOutBalance) = 0;
 
+
+    /**
+     * Get the number of energy balances this endpoint has.
+     * @param aEndpoint The endpoint to query.
+     * @return the number of balance structs in the list.
+     */
     virtual size_t GetNumEnergyBalances(chip::EndpointId aEndpoint) = 0;
-    virtual size_t GetNumLowPowerModes(chip::EndpointId aEndpoint)  = 0;
+
+    /**
+     * Get the number of low power mode sensitivities this endpoint has.
+     * @param aEndpoint The endpoint to query.
+     * @return the number of balance structs in the list.
+     */
+    virtual size_t GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint)  = 0;
 };
 
 void SetDelegate(Delegate * aDelegate);

@@ -34,7 +34,7 @@ struct EPrefDelegate : public Delegate
     CHIP_ERROR GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, BalanceStruct::Type & balance) override;
 
     size_t GetNumEnergyBalances(chip::EndpointId aEndpoint) override;
-    size_t GetNumLowPowerModes(chip::EndpointId aEndpoint) override;
+    size_t GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint) override;
 };
 
 EPrefDelegate::EPrefDelegate() : Delegate()
@@ -54,7 +54,7 @@ size_t EPrefDelegate::GetNumEnergyBalances(chip::EndpointId aEndpoint)
     return (ArraySize(gsEnergyBalances));
 }
 
-size_t EPrefDelegate::GetNumLowPowerModes(chip::EndpointId aEndpoint)
+size_t EPrefDelegate::GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint)
 {
     return (ArraySize(gsEnergyBalances));
 }
@@ -87,7 +87,7 @@ EPrefDelegate::GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aInde
 CHIP_ERROR
 EPrefDelegate::GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, BalanceStruct::Type & balance)
 {
-    if (aIndex < GetNumLowPowerModes(aEndpoint))
+    if (aIndex < GetNumLowPowerModeSensitivities(aEndpoint))
     {
         balance = gsPowerBalances[aIndex];
         return CHIP_NO_ERROR;

@@ -17,13 +17,14 @@
 
 #include "energy-preference-server.h"
 
-#include <app/util/attribute-storage.h>
+#include <app/util/attribute-storage.h> // Needed for registerAttributeAccessOverride
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/AttributeAccessInterface.h> // added in case we ever don't need app/util/attribute-storage.h at some point.
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
@@ -34,7 +35,7 @@ using namespace chip::app::Clusters::EnergyPreference;
 using namespace chip::app::Clusters::EnergyPreference::Structs;
 using namespace chip::app::Clusters::EnergyPreference::Attributes;
 
-using imcode = Protocols::InteractionModel::Status;
+using Status = Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -159,7 +160,7 @@ Delegate * GetDelegate()
 
 } // Set matter energy preferences delegate
 
-Protocols::InteractionModel::Status
+Status
 MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
@@ -171,43 +172,45 @@ MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const ConcreteAtt
     const bool lowPowerSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0);
 
     if (delegate == nullptr)
-        return imcode::UnsupportedWrite;
+    {
+        return Status::UnsupportedWrite;
+    }
 
     switch (attributePath.mAttributeId)
     {
     case CurrentEnergyBalance::Id: {
         if (balanceSupported == false)
         {
-            return imcode::UnsupportedAttribute;
+            return Status::UnsupportedAttribute;
         }
 
         uint8_t index    = Encoding::Get8(value);
         size_t arraySize = delegate->GetNumEnergyBalances(endpoint);
         if (index >= arraySize)
         {
-            return imcode::ConstraintError;
+            return Status::ConstraintError;
         }
 
-        return imcode::Success;
+        return Status::Success;
     }
 
     case CurrentLowPowerModeSensitivity::Id: {
         if (lowPowerSupported == false)
         {
-            return imcode::UnsupportedAttribute;
+            return Status::UnsupportedAttribute;
         }
 
         uint8_t index    = Encoding::Get8(value);
-        size_t arraySize = delegate->GetNumLowPowerModes(endpoint);
+        size_t arraySize = delegate->GetNumLowPowerModeSensitivities(endpoint);
         if (index >= arraySize)
         {
-            return imcode::ConstraintError;
+            return Status::ConstraintError;
         }
 
-        return imcode::Success;
+        return Status::Success;
     }
     default:
-        return imcode::Success;
+        return Status::Success;
     }
 }
 
