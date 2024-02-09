@@ -25,9 +25,9 @@ Python tests located in src/python_testing
     -   default controller (self.default_controller) of type ChipDeviceCtrl
     -   MatterBaseTest inherits from the Mobly BaseTestClass
 -   Test function(s) (start with test\_) and are all run automatically
-    -   To run in the test harness, the test name must be test*TC_PICSCODE*#\_#
+    -   To run in the test harness, the test name must be test_TC_PICSCODE\_#\_#
         -   more information about integration with the test harness can be
-            found in [Test Harness](#TestHarness)
+            found in [Test Harness helpers](#test-harness-helpers) section
     -   any tests that use async function (read / write / commands) should be
         decorated with the @async_test_body decorator
 -   Use ChipDeviceCtrl to interact with the DUT
