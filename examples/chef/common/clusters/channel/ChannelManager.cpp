@@ -22,6 +22,8 @@
 #include <app/util/config.h>
 
 #include <vector>
+#include <iostream>
+#include <sstream>
 
 using namespace chip;
 using namespace chip::app;
@@ -135,13 +137,15 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
 
 bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & match)
 {
-    char number[32];
-    sprintf(number, "%d.%d", channel.majorNumber, channel.minorNumber);
+    std::stringstream ss;
+    ss << channel.majorNumber << "." << channel.minorNumber;
+    std::string number = ss.str();
+
     bool nameMatch = channel.name.HasValue() ? channel.name.Value().data_equal(match) : false;
     bool affiliateCallSignMatch =
         channel.affiliateCallSign.HasValue() ? channel.affiliateCallSign.Value().data_equal(match) : false;
     bool callSignMatch = channel.callSign.HasValue() ? channel.callSign.Value().data_equal(match) : false;
-    bool numberMatch   = match.data_equal(chip::CharSpan::fromCharString(number));
+    bool numberMatch   = match.data_equal(chip::CharSpan::fromCharString(number.c_str()));
 
     return affiliateCallSignMatch || callSignMatch || nameMatch || numberMatch;
 }
