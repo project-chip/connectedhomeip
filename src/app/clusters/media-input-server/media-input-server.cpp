@@ -83,7 +83,8 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
         gDelegateTable[ep] = delegate;
     }
     else
-    {}
+    {
+    }
 }
 
 bool HasFeature(chip::EndpointId endpoint, Feature feature)
