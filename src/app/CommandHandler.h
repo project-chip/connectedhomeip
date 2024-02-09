@@ -432,18 +432,18 @@ public:
 #if CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
      * @brief Fault injection to craft InvokeResponseMessages in particular way for testing
-     * 
+     *
      * Used by Test Harness in certification testing to get server to respond to request in
      * a variety of manners that client (DUT) is expected to be able to handle based on spec.
-     * 
-     * 
+     *
+     *
      * @param [in] ec exchange context to sending InvokeResponseMessages to client
      * @param [in] payload payload of the incoming InvokeRequestMessage from client
      * @param [in] isTimedInvoke is the interaction timed
      * @param [in] oneReponsePerMessage when true each InvokeResponse is sent to client
      *             in it's own InvokeResponseMessage
-     * @param [in] invertResponseOrdering 
-     * @param [in] dropSecondResponse 
+     * @param [in] invertResponseOrdering
+     * @param [in] dropSecondResponse
      */
     void TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
                                         bool isTimedInvoke, bool oneReponsePerMessage, bool invertResponseOrdering,
