@@ -746,6 +746,7 @@ isUpperCase
 itemName
 iterable
 itsfoss
+IWYU
 JDK
 jinja
 JLink
@@ -1609,7 +1610,6 @@ YNJV
 Yocto
 yoctoproject
 YourFolder
-YWYU
 zapt
 zaptool
 ZCL
