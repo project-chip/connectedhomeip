@@ -796,12 +796,11 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
         auto isMatch = mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator());
-        VerifyOrReturn(isMatch,
-                       const uint16_t value = mBLEScanConfig.mDiscriminator.IsShortDiscriminator()
-                           ? mBLEScanConfig.mDiscriminator.GetShortValue()
-                           : mBLEScanConfig.mDiscriminator.GetLongValue();
-                       ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u",
-                                    info.GetDeviceDiscriminator(), value));
+        VerifyOrReturn(
+            isMatch,
+            ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", info.GetDeviceDiscriminator(),
+                         mBLEScanConfig.mDiscriminator.IsShortDiscriminator() ? mBLEScanConfig.mDiscriminator.GetShortValue()
+                                                                              : mBLEScanConfig.mDiscriminator.GetLongValue()));
         ChipLogProgress(Ble, "Device discriminator match. Attempting to connect.");
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
