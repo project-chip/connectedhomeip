@@ -1,5 +1,4 @@
 /**
- *
  *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,20 +14,19 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import <Foundation/Foundation.h>
+#import <Matter/Matter.h>
 
-#include "messages-delegate.h"
-#include <app-common/zap-generated/cluster-enums.h>
-#include <app/util/basic-types.h>
+NS_ASSUME_NONNULL_BEGIN
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Messages {
+typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+@interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
+@property (nonatomic, nullable) dispatch_block_t onReachable;
+@property (nonatomic, nullable) dispatch_block_t onNotReachable;
+@property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
+@property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
+@property (nonatomic, nullable) dispatch_block_t onReportEnd;
+@end
 
-} // namespace Messages
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+NS_ASSUME_NONNULL_END

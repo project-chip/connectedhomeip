@@ -347,7 +347,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
         &_matterEndpointMetadata,
         Span<DataVersion>(_matterDataVersions.get(), _matterEndpointMetadata.clusterCount),
         Span<EmberAfDeviceType>(_matterDeviceTypes.get(), _deviceTypes.count));
-    if (status != EMBER_ZCL_STATUS_SUCCESS) {
+    if (status != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Unexpected failure to define our Matter endpoint");
     }
 

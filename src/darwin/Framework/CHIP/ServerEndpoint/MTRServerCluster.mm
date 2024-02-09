@@ -176,11 +176,6 @@ MTR_DIRECT_MEMBERS
         return NO;
     }
 
-    if (attribute.parentCluster.mClusterId != kInvalidClusterId) {
-        MTR_LOG_ERROR("Cannot add attribute to cluster %llu; already added to cluster %" PRIu32, _clusterID.unsignedLongLongValue, attribute.parentCluster.mClusterId);
-        return NO;
-    }
-
     auto attributeID = attribute.attributeID.unsignedLongLongValue;
     if (attributeID == MTRAttributeIDTypeGlobalAttributeAttributeListID || attributeID == MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID || attributeID == MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID || attributeID == MTRAttributeIDTypeGlobalAttributeClusterRevisionID) {
         MTR_LOG_ERROR("Cannot add global attribute %llx on cluster %llx", attributeID, _clusterID.unsignedLongLongValue);
@@ -201,8 +196,11 @@ MTR_DIRECT_MEMBERS
         }
     }
 
+    if (![attribute addToCluster:ConcreteClusterPath(_parentEndpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue))]) {
+        return NO;
+    }
+
     [_attributes addObject:attribute];
-    attribute.parentCluster = ConcreteClusterPath(_parentEndpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue));
     return YES;
 }
 
@@ -374,7 +372,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     // Update it on all the attributes, in case the attributes were added to us
     // before we were added to the endpoint.
     for (MTRServerAttribute * attr in _attributes) {
-        attr.parentCluster = ConcreteClusterPath(endpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue));
+        [attr updateParentCluster:ConcreteClusterPath(endpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue))];
     }
 }
 

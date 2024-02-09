@@ -320,6 +320,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_FABRIC_EXISTS.AsInteger():
         desc = "Trying to add a NOC for a fabric that already exists";
         break;
+    case CHIP_ERROR_ENDPOINT_EXISTS.AsInteger():
+        desc = "Trying to add dynamic endpoint that already exists";
+        break;
     case CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER.AsInteger():
         desc = "Wrong encryption type error code received from peer";
         break;
