@@ -39,6 +39,10 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/TextOnlyLogging.h>
 
+#if CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ
+#include <lib/support/utf8.h>
+#endif
+
 namespace chip {
 namespace TLV {
 
