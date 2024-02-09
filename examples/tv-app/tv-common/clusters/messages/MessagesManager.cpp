@@ -39,7 +39,7 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
     uint8_t * messageIdBuffer = nullptr;
     char * messageTextBuffer  = new char[messageText.size()];
     VerifyOrExit(messageTextBuffer != nullptr,
-                 ChipLogProgress(Controller, "HandlePresentMessagesRequest alloc failed size:%lu", messageText.size()));
+                 ChipLogProgress(Controller, "HandlePresentMessagesRequest messageTextBuffer alloc failed"));
     needToFree.push_back(messageTextBuffer);
     memcpy(messageTextBuffer, messageText.data(), messageText.size());
 
@@ -47,7 +47,7 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
 
     messageIdBuffer = new uint8_t[messageId.size()];
     VerifyOrExit(messageIdBuffer != nullptr,
-                 ChipLogProgress(Controller, "HandlePresentMessagesRequest alloc failed size:%lu", messageId.size()));
+                 ChipLogProgress(Controller, "HandlePresentMessagesRequest messageIdBuffer alloc failed"));
     memcpy(messageIdBuffer, messageId.data(), messageId.size());
 
     if (responses.HasValue())
@@ -58,7 +58,7 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
 
         MessageResponseOption * optionArray = new MessageResponseOption[size];
         VerifyOrExit(optionArray != nullptr,
-                     ChipLogProgress(Controller, "HandlePresentMessagesRequest MessageResponseOption alloc failed size:%lu", size));
+                     ChipLogProgress(Controller, "HandlePresentMessagesRequest MessageResponseOption alloc failed"));
         optionToFree.push_back(optionArray);
 
         int counter = 0;
@@ -78,8 +78,7 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
             {
                 char * labelBuffer = new char[response.label.Value().size()];
                 VerifyOrExit(labelBuffer != nullptr,
-                             ChipLogProgress(Controller, "HandlePresentMessagesRequest alloc failed size:%lu",
-                                             response.label.Value().size()));
+                             ChipLogProgress(Controller, "HandlePresentMessagesRequest label alloc failed"));
                 needToFree.push_back(labelBuffer);
                 memcpy(labelBuffer, response.label.Value().data(), response.label.Value().size());
 
@@ -119,7 +118,7 @@ exit:
     // only reach here on errors
     if (messageIdBuffer != nullptr)
     {
-        delete messageIdBuffer;
+        delete[] messageIdBuffer;
     }
     for (MessageResponseOption * memloc : optionToFree)
     {
@@ -127,7 +126,7 @@ exit:
     }
     for (char * memloc : needToFree)
     {
-        delete memloc;
+        delete[] memloc;
     }
 }
 
@@ -148,13 +147,13 @@ void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList
                     {
                         if (option.label.HasValue())
                         {
-                            delete option.label.Value().data();
+                            delete[] option.label.Value().data();
                         }
                     }
                     delete[] entry.responses.Value().data();
                 }
-                delete entry.messageID.data();
-                delete entry.messageText.data();
+                delete[] entry.messageID.data();
+                delete[] entry.messageText.data();
                 return true;
             }
             return false;
