@@ -33,7 +33,9 @@
 #endif
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/TLVReader.h>
 #include <lib/core/TLVTags.h>
+#include <lib/core/TLVWriter.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 

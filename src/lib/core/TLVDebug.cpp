@@ -27,6 +27,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 
