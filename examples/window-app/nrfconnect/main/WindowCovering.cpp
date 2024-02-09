@@ -343,4 +343,6 @@ void WindowCovering::DoPostAttributeChange(intptr_t aArg)
     VerifyOrReturn(data != nullptr);
 
     PostAttributeChange(data->mEndpoint, data->mAttributeId);
+
+    chip::Platform::Delete(data);
 }
