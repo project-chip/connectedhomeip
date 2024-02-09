@@ -16,7 +16,6 @@
 #
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches

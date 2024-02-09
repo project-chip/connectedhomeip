@@ -16,7 +16,6 @@
 #
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
