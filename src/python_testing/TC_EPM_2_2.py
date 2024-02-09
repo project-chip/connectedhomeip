@@ -17,11 +17,8 @@
 
 import logging
 import time
-from datetime import datetime, timedelta, timezone
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
@@ -49,7 +46,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("4b", "TH reads from the DUT the ActiveCurrent attribute. Verify the read is successful and that the value is between 3'848 and 4'848 mA. Note the value read."),
             TestStep("4c", "TH reads from the DUT the Voltage attribute. Verify the read is successful and that the value is between 229'000 and 231'000 mV. Note the value read."),
             TestStep("5", "Wait 3 seconds"),
-            TestStep("5a", "TH reads from the DUT the ActivePower attribute. Verify the read is successful, that the value is between 0'980'000 and 1'020'000 mW, and the value is different from the value read in step 4a."),
+            TestStep("5a", "TH reads from the DUT the ActivePower attribute. Verify the read is successful, that the value is between '980'000 and 1'020'000 mW, and the value is different from the value read in step 4a."),
             TestStep("5b", "TH reads from the DUT the ActiveCurrent attribute. Verify the read is successful, that the value is between 3'848 and 4'848 mA, and the value is different from the value read in step 4b."),
             TestStep("5c", "TH reads from the DUT the Voltage attribute. Verify the read is successful, that the value is between 229'000 and 231'000 mV, and the value is different from the value read in step 4c."),
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EPM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EPM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
