@@ -141,13 +141,12 @@ bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & match)
     ss << channel.majorNumber << "." << channel.minorNumber;
     std::string number = ss.str();
 
-    bool nameMatch = channel.name.HasValue() ? channel.name.Value().data_equal(match) : false;
-    bool affiliateCallSignMatch =
-        channel.affiliateCallSign.HasValue() ? channel.affiliateCallSign.Value().data_equal(match) : false;
-    bool callSignMatch = channel.callSign.HasValue() ? channel.callSign.Value().data_equal(match) : false;
-    bool numberMatch   = match.data_equal(chip::CharSpan::fromCharString(number.c_str()));
+    auto isMatch = [&match](const Optional<chip::CharSpan> &a)
+    {
+        return a.HasValue() && a.Value().data_equal(match);
+    };
 
-    return affiliateCallSignMatch || callSignMatch || nameMatch || numberMatch;
+    return isMatch(channel.name) || isMatch(channel.affiliateCallSign) || isMatch(channel.callSign) || match.data_equal(chip::CharSpan::fromCharString(number.c_str()));
 }
 
 void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match)
