@@ -451,6 +451,9 @@ public:
      * @param [in] dropSecondResponse If true, prevents the second InvokeResponse from
      *             being sent to the client.
      */
+    // TODO(#30453): Once handling InvokeRequestMessage is refactor such that components like
+    // CommandHandler is not reliant on an exchange context to unit test. Unit test will
+    // be created that checks for correct behavior for this method.
     void TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload, bool isTimedInvoke,
                                         bool oneReponsePerMessage, bool invertResponseOrdering, bool dropSecondResponse);
 #endif // CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
