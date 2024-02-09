@@ -119,7 +119,7 @@ class BasicCompositionTests:
                 address = f"{commissionable_node.addresses[0]}"
                 logging.info(f"Found instance {instance_name}, VID={vid}, PID={pid}, Address={address}")
 
-                node_id = 1
+                node_id = self.dut_node_id
                 dev_ctrl.EstablishPASESessionIP(address, info.passcode, node_id)
             else:
                 asserts.fail("Failed to find the DUT according to command line arguments.")

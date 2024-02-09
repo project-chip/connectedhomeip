@@ -23,7 +23,11 @@ import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from basic_composition_support import BasicCompositionTests
+from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
+from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
+from chip.interaction_model import InteractionModelError, Status
+from chip.tlv import uint
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
                                     async_test_body, default_matter_test_main)
@@ -31,6 +35,9 @@ from mobly import asserts
 from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
                                                find_tree_roots, get_all_children, get_direct_children_of_root, parts_list_cycles,
                                                separate_endpoint_types)
+
+# The above code is importing various classes from the "ClusterObjects" module and assigning them to
+# variables. These classes are likely used for creating and managing clusters of objects in a program.
 
 
 def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False) -> Callable:
@@ -165,7 +172,43 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
-    def test_TC_IDM_10_1(self):
+    async def _read_non_standard_attribute_check_unsupported_read(self, endpoint_id, cluster_id, attribute_id) -> bool:
+        @dataclass
+        class TempAttribute(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return cluster_id
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return attribute_id
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            @ChipUtility.classproperty
+            def standard_attribute(cls) -> bool:
+                return False
+
+            value: 'uint' = 0
+
+        result = await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[(endpoint_id, TempAttribute)])
+        try:
+            attr_ret = result.tlvAttributes[endpoint_id][cluster_id][attribute_id]
+        except KeyError:
+            attr_ret = None
+
+        print(attr_ret)
+
+        error_type_ok = attr_ret is not None and isinstance(
+            attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
+
+        got_expected_error = error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
+        return got_expected_error
+
+    @async_test_body
+    async def test_TC_IDM_10_1(self):
         self.print_step(1, "Perform a wildcard read of attributes on all endpoints - already done")
 
         @dataclass
@@ -236,15 +279,19 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         logging.debug(
                             f"Checking presence of claimed supported {attribute_string} on {location.as_cluster_string(self.cluster_mapper)}: {'found' if has_attribute else 'not_found'}")
 
-                        # Check attribute is actually present.
                         if not has_attribute:
-                            # TODO: Handle detecting write-only attributes from schema.
-                            if "WriteOnly" in attribute_string:
-                                continue
+                            # Check if this is a write-only attribute by trying to read it.
+                            # If it's present and write-only it should return an UNSUPPORTED_READ error. All other errors are a failure.
+                            # Because these can be MEI attributes, we need to build the ClusterAttributeDescriptor manually since it's
+                            # not guaranteed to be generated. Since we expect an error back anyway, the type doesn't matter.
 
-                            self.record_error(self.get_test_name(), location=location,
-                                              problem=f"Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed in AttributeList ({attribute_list})", spec_location="AttributeList Attribute")
-                            success = False
+                            write_only_attribute = await self._read_non_standard_attribute_check_unsupported_read(
+                                endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+
+                            if not write_only_attribute:
+                                self.record_error(self.get_test_name(), location=location,
+                                                  problem=f"Did not find {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed in AttributeList ({attribute_list})", spec_location="AttributeList Attribute")
+                                success = False
                             continue
 
                         attribute_value = cluster[attribute_id]
