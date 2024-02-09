@@ -618,11 +618,24 @@ suggested fixes. Here is an example run:
 iwyu_tool.py                                                  \
     -p out/linux-x64-all-clusters-clang/compile_commands.json \
     src/lib/core/TLVReader.cpp                                \
-    -- --comment_style=none \
+    --                                                        \
+    -Xiwyu --no_comments                                      \
+    -Xiwyu --comment_style=none                               \
+    -Xiwyu --cxx17ns                                          \
+    -Xiwyu --no_fwd_decls                                     \
     | tee out/iwyu.out
+    
+# if you have a mapping file (e.g. iwyu.impl), you could also add this:
+#    -Xiwyu --mapping_file=(pwd)/iwyu.imp 
+# to the command line
 
 # apply suggestions. Note that paths ARE relative so you need to change
 # into the build directory
 cd out/linux-x64-all-clusters-clang/
 fix_includes.py <../iwyu.out
+
+# Note that some post processing may be required:
+#  - replace "" with <> for includes
+#  - re-organize lists
+#  - replace private includes (like CHIPBuildConfig.h to CHIPConfig.h)
 ```
