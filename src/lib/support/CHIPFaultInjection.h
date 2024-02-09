@@ -58,9 +58,12 @@ typedef enum
     kFault_BDXAllocTransfer,     /**< Fail the allocation of a BDXTransfer object */
     kFault_SecMgrBusy,           /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
     // TODO find a better name for these
-    kFault_BatchCommandIdmTcHelper1, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2 InvokeResponseMessages */
-    kFault_BatchCommandIdmTcHelper2, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2 InvokeResponseMessages where response are inverted order to the request order */
-    kFault_BatchCommandIdmTcHelper3, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 1 InvokeResponseMessages, dropping the response to the second request */
+    kFault_BatchCommandIdmTcHelper1, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2
+                                        InvokeResponseMessages */
+    kFault_BatchCommandIdmTcHelper2, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2
+                                        InvokeResponseMessages where response are inverted order to the request order */
+    kFault_BatchCommandIdmTcHelper3, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 1
+                                        InvokeResponseMessages, dropping the response to the second request */
 #if CONFIG_NETWORK_LAYER_BLE
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif                   // CONFIG_NETWORK_LAYER_BLE

@@ -445,10 +445,9 @@ public:
      * @param [in] invertResponseOrdering
      * @param [in] dropSecondResponse
      */
-    void TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
-                                        bool isTimedInvoke, bool oneReponsePerMessage, bool invertResponseOrdering,
-                                        bool dropSecondResponse);
-#endif  // CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload, bool isTimedInvoke,
+                                        bool oneReponsePerMessage, bool invertResponseOrdering, bool dropSecondResponse);
+#endif // CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
     friend class TestCommandInteraction;
