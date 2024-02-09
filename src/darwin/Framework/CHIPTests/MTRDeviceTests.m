@@ -31,8 +31,6 @@
 #import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
-#import <app/util/af-enums.h>
-
 #import <math.h> // For INFINITY
 
 // system dependencies
@@ -255,7 +253,6 @@ static BOOL sNeedsStackShutdown = YES;
                                   NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
                                   XCTAssertNil(error);
-                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                   {
                                       XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -309,7 +306,7 @@ static BOOL sNeedsStackShutdown = YES;
                               completion:^(id _Nullable values, NSError * _Nullable error) {
                                   NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
 
-                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                                  XCTAssertNil(error);
 
                                   {
                                       XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -354,7 +351,6 @@ static BOOL sNeedsStackShutdown = YES;
                                  NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
-                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -450,7 +446,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Set up expectation for report
     XCTestExpectation * reportExpectation = [self expectationWithDescription:@"report received"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertNil(error);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
         NSDictionary * result = values[0];
 
@@ -487,7 +483,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
-                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -511,7 +506,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Set up expectation for 2nd report
     reportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertNil(error);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
         NSDictionary * result = values[0];
 
@@ -547,7 +542,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
-                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -605,8 +599,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                       XCTAssertEqualObjects(report.path.attribute, @(0));
                                       XCTAssertNotNil(report.error);
                                       XCTAssertNil(report.value);
-                                      XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:report.error],
-                                          EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+                                      XCTAssertTrue([MTRErrorTestUtils error:report.error isInteractionModelError:MTRInteractionErrorCodeUnsupportedCluster]);
 
                                       MTRAttributePath * path = result[@"attributePath"];
                                       XCTAssertEqual(path.endpoint.unsignedIntegerValue, 0);
@@ -615,8 +608,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                       XCTAssertNotNil(result[@"error"]);
                                       XCTAssertNil(result[@"data"]);
                                       XCTAssertTrue([result[@"error"] isKindOfClass:[NSError class]]);
-                                      XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]],
-                                          EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+                                      XCTAssertTrue([MTRErrorTestUtils error:result[@"error"] isInteractionModelError:MTRInteractionErrorCodeUnsupportedCluster]);
                                   }
 
                                   [expectation fulfill];
@@ -645,7 +637,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
 
                               XCTAssertNil(values);
-                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE);
+                              XCTAssertTrue([MTRErrorTestUtils error:error isInteractionModelError:MTRInteractionErrorCodeUnsupportedAttribute]);
 
                               [expectation fulfill];
                           }];
@@ -678,7 +670,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
                              XCTAssertNil(values);
-                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+                             XCTAssertTrue([MTRErrorTestUtils error:error isInteractionModelError:MTRInteractionErrorCodeUnsupportedCommand]);
 
                              [expectation fulfill];
                          }];
@@ -694,9 +686,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * errorReportExpectation = [self expectationWithDescription:@"receive subscription error"];
     reportHandler = ^(id _Nullable value, NSError * _Nullable error) {
         // Because our subscription has no existent paths, it gets an
-        // InvalidAction response, which is EMBER_ZCL_STATUS_MALFORMED_COMMAND.
+        // InvalidAction response.
         XCTAssertNil(value);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        XCTAssertTrue([MTRErrorTestUtils error:error isInteractionModelError:MTRInteractionErrorCodeInvalidAction]);
         [errorReportExpectation fulfill];
     };
 
@@ -754,7 +746,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                   NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
                                   XCTAssertNil(error);
-                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                   {
                                       XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -837,7 +828,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSLog(@"Invoking command...");
     [cluster onWithCompletion:^(NSError * _Nullable err) {
         NSLog(@"Invoked command with error: %@", err);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+        XCTAssertNil(err);
         [commandExpectation fulfill];
     }];
     [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
@@ -854,7 +845,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                                            queue:queue
                                                       completion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
                                                           NSLog(@"Read attribute cache value: %@, error: %@", value, err);
-                                                          XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+                                                          XCTAssertNil(err);
                                                           XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:YES]]);
                                                           [cacheExpectation fulfill];
                                                       }];
@@ -901,7 +892,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     commandExpectation = [self expectationWithDescription:@"Command invoked"];
     [cluster offWithCompletion:^(NSError * _Nullable err) {
         NSLog(@"Invoked command with error: %@", err);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+        XCTAssertNil(err);
         [commandExpectation fulfill];
     }];
     [self waitForExpectations:[NSArray arrayWithObject:commandExpectation] timeout:kTimeoutInSeconds];
@@ -923,7 +914,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                                            queue:queue
                                                       completion:^(NSNumber * _Nullable value, NSError * _Nullable err) {
                                                           NSLog(@"Read attribute cache value: %@, error: %@", value, err);
-                                                          XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+                                                          XCTAssertNil(err);
                                                           XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
                                                           [cacheExpectation fulfill];
                                                       }];
@@ -939,7 +930,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                queue:queue
                           completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                               NSLog(@"Read attribute cache value: %@, error %@", values, error);
-                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                              XCTAssertNil(error);
                               XCTAssertEqual([values count], 1);
 
                               __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:values[0] error:nil];
@@ -973,7 +964,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                queue:queue
                           completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                               NSLog(@"Read attribute cache value: %@, error %@", values, error);
-                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                              XCTAssertNil(error);
                               XCTAssertTrue([values count] > 0);
                               for (NSDictionary<NSString *, id> * value in values) {
                                   __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:value error:nil];
@@ -1004,7 +995,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                queue:queue
                           completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                               NSLog(@"Read attribute cache value: %@, error %@", values, error);
-                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                              XCTAssertNil(error);
                               XCTAssertTrue([values count] > 0);
                               for (NSDictionary<NSString *, id> * value in values) {
                                   MTRAttributePath * path = value[@"attributePath"];
@@ -1027,7 +1018,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                queue:queue
                           completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                               NSLog(@"Read attribute cache value: %@, error %@", values, error);
-                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                              XCTAssertNil(error);
                               XCTAssertTrue([values count] > 0);
                               for (NSDictionary<NSString *, id> * value in values) {
                                   MTRAttributePath * path = value[@"attributePath"];
@@ -1097,7 +1088,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Set up expectation for report
     XCTestExpectation * reportExpectation = [self expectationWithDescription:@"report received"];
     globalReportHandler = ^(id _Nullable value, NSError * _Nullable error) {
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertNil(error);
         XCTAssertTrue([value isKindOfClass:[NSArray class]]);
         NSDictionary * result = value[0];
         MTRAttributePath * path = result[@"attributePath"];
@@ -1125,7 +1116,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
-                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -1844,7 +1834,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                         NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
                         XCTAssertNil(error);
-                        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                         NSArray * resultArray = values;
@@ -2022,7 +2011,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                         NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
                         XCTAssertNil(error);
-                        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                         NSArray * resultArray = values;
@@ -2084,7 +2072,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                         NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
                         XCTAssertNil(error);
-                        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                         NSArray * resultArray = values;
@@ -2102,8 +2089,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                             if ([path.attribute isEqualToNumber:failAttributeID]) {
                                 XCTAssertNil(result[@"data"]);
                                 XCTAssertNotNil(result[@"error"]);
-                                XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]],
-                                    MTRInteractionErrorCodeUnsupportedAttribute);
+                                XCTAssertTrue([MTRErrorTestUtils error:result[@"error"] isInteractionModelError:MTRInteractionErrorCodeUnsupportedAttribute]);
                             } else {
                                 XCTAssertNotNil(result[@"data"]);
                                 XCTAssertNil(result[@"error"]);
@@ -2143,7 +2129,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * eventErrorReportExpectation = [self expectationWithDescription:@"report nonexistent event"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertNil(error);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertNil(error);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
 
         for (NSDictionary * result in values) {
@@ -2162,8 +2148,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                     XCTAssertEqualObjects(path.cluster, failClusterId);
                     XCTAssertNil(result[@"data"]);
                     XCTAssertNotNil(result[@"error"]);
-                    XCTAssertEqual(
-                        [MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]], MTRInteractionErrorCodeUnsupportedCluster);
+                    XCTAssertTrue([MTRErrorTestUtils error:result[@"error"] isInteractionModelError:MTRInteractionErrorCodeUnsupportedCluster]);
                     [attributeErrorReportExpectation fulfill];
                 } else {
                     XCTFail("Unexpected attribute value");
@@ -2175,8 +2160,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 XCTAssertEqualObjects(path.event, @0);
                 XCTAssertNil(result[@"data"]);
                 XCTAssertNotNil(result[@"error"]);
-                XCTAssertEqual(
-                    [MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]], MTRInteractionErrorCodeUnsupportedEndpoint);
+                XCTAssertTrue([MTRErrorTestUtils error:result[@"error"] isInteractionModelError:MTRInteractionErrorCodeUnsupportedEndpoint]);
                 [eventErrorReportExpectation fulfill];
             } else {
                 XCTFail("Unexpected result dictionary");
@@ -2210,7 +2194,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * reportExpectation = [self expectationWithDescription:@"report received"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertNil(error);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
 
         for (NSDictionary * result in values) {
@@ -2250,7 +2233,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
-                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -2279,7 +2261,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     reportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertNil(error);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
 
         for (NSDictionary * result in values) {
@@ -2316,7 +2297,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
-                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -2368,7 +2348,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
             XCTAssertNotNil(error);
-            XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], MTRInteractionErrorCodeInvalidAction);
+            XCTAssertTrue([MTRErrorTestUtils error:error isInteractionModelError:MTRInteractionErrorCodeInvalidAction]);
             XCTAssertNil(values);
             [errorExpectation fulfill];
         }
@@ -2399,7 +2379,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * startupEventExpectation = [self expectationWithDescription:@"report startup event"];
     __auto_type reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertNil(error);
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
 
         for (NSDictionary * result in values) {
@@ -2658,7 +2637,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Set up expectation for report
     __auto_type reportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertNil(error);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
         NSDictionary * result = values[0];
         MTRAttributePath * path = result[@"attributePath"];
@@ -2685,7 +2664,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
-                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -2716,7 +2694,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
-                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
@@ -2740,7 +2717,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Set up expectation for 2nd report
     reportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
-        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertNil(error);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
         NSDictionary * result = values[0];
         MTRAttributePath * path = result[@"attributePath"];
@@ -2766,7 +2743,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
                                  XCTAssertNil(error);
-                                 XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
