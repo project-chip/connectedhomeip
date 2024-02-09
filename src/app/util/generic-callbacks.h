@@ -21,11 +21,7 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
-#include <app/CommandHandler.h>
-#include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
 /** @brief Cluster Init
