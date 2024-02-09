@@ -19,7 +19,7 @@ import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
 from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import MatterBaseTest, default_matter_test_main
+from matter_testing_support import MatterBaseTest, ProblemNotice, default_matter_test_main
 from mobly import asserts
 from spec_parsing_support import (ClusterParser, XmlCluster, add_cluster_data_from_xml, check_clusters_for_unknown_commands,
                                   combine_derived_clusters_with_base)
