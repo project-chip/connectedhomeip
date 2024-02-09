@@ -29,7 +29,7 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
     def desc_TC_EEM_2_1(self) -> str:
         """Returns a description of this test"""
-        return "5.1.3. [TC-EEM-2.1] Attributes with Server as DUT"
+        return "5.1.2. [TC-EEM-2.1] Attributes with Server as DUT"
 
     def pics_TC_EEM_2_1(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
