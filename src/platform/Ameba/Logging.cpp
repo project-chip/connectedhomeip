@@ -24,7 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/logging/LogV.h>
 
-#include <lib/core/CHIPConfig.h>
+#include <core/CHIPConfig.h>
 #include <support/TypeTraits.h>
 #include <support/logging/Constants.h>
 
