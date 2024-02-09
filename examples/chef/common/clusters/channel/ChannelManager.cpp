@@ -108,7 +108,6 @@ ChannelManager::ChannelManager()
 
 CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (auto const & channel : ChannelManager().mChannels)
         {
