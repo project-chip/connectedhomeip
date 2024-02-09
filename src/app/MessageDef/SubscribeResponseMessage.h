@@ -23,9 +23,9 @@
 #include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <src/app/MessageDef/EventPathIBs.h>
-#include <src/app/MessageDef/MessageBuilder.h>
-#include <src/app/MessageDef/MessageParser.h>
+#include <app/MessageDef/EventPathIBs.h>
+#include <app/MessageDef/MessageBuilder.h>
+#include <app/MessageDef/MessageParser.h>
 
 namespace chip {
 namespace app {

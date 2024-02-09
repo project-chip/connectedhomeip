@@ -19,7 +19,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
-#include <app/util/app/util/common.h>
+#include <app/util/common.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
