@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <ElectricalPowerMeasurementAccuracies.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <app/reporting/reporting.h>
 
