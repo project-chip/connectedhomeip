@@ -84,6 +84,20 @@ tests:
       arguments:
           values:
               - name: "EnableKey"
+                value: "hex:00000000000000000000000000000000"
+              - name: "EventTrigger"
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 5: Invoke the TestEventTrigger command with EnableKey field set
+          to 8-bytes to zeros and EventTrigger field set to 0."
+      PICS: DGGEN.S.C00.Rsp
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
                 value: "hex:0000000000000000"
               - name: "EventTrigger"
                 value: 0
