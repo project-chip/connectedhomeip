@@ -118,7 +118,7 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char 
     mpRoot    = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.GetGattApplicationObjectManager()));
     mpAdapter = reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter()));
 
-    g_object_get(G_OBJECT(mpRoot), "object-path", &MakeUniquePointerReceiver(rootPath).Get(), nullptr);
+    g_object_get(G_OBJECT(mpRoot), "object-path", &rootPath.GetReceiver(), nullptr);
     mpAdvPath = g_strdup_printf("%s/advertising", rootPath.get());
     mpAdvUUID = g_strdup(aAdvUUID);
 
@@ -241,8 +241,7 @@ void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
     GAutoPtr<GError> error;
     gboolean success = FALSE;
 
-    success =
-        bluez_leadvertising_manager1_call_register_advertisement_finish(advMgr, aResult, &MakeUniquePointerReceiver(error).Get());
+    success = bluez_leadvertising_manager1_call_register_advertisement_finish(advMgr, aResult, &error.GetReceiver());
     if (success == FALSE)
     {
         g_dbus_object_manager_server_unexport(mpRoot, mpAdvPath);
@@ -304,8 +303,7 @@ void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
     GAutoPtr<GError> error;
     gboolean success = FALSE;
 
-    success =
-        bluez_leadvertising_manager1_call_unregister_advertisement_finish(advMgr, aResult, &MakeUniquePointerReceiver(error).Get());
+    success = bluez_leadvertising_manager1_call_unregister_advertisement_finish(advMgr, aResult, &error.GetReceiver());
 
     if (success == FALSE)
     {
