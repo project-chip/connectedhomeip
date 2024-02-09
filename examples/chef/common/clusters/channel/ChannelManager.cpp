@@ -152,7 +152,7 @@ bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & match)
 void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match)
 {
     std::vector<ChannelInfoType> matchedChannels;
-    uint16_t index = 0;
+    uint16_t iFirstMatchedChannel = 0;
     for (auto const & channel : mChannels)
     {
         // verify if CharSpan matches channel name
@@ -161,12 +161,9 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         {
             matchedChannels.push_back(channel);
         }
-        else if (matchedChannels.size() == 0)
+        else if (matchedChannels.empty())
         {
-            // "index" is only used when we end up with matchedChannels.size() == 1.
-            // In that case, we want it to be the number of non-matching channels we saw before
-            // the matching one.
-            index++;
+            iFirstMatchedChannel++;
         }
     }
 
@@ -178,7 +175,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
         helper.Success(response);
     }
-    else if (matchedChannels.size() == 0)
+    else if (matchedChannels.empty())
     {
         // Error: Found no match
         response.status = chip::app::Clusters::Channel::StatusEnum::kNoMatches;
@@ -189,7 +186,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         response.status      = chip::app::Clusters::Channel::StatusEnum::kSuccess;
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
         mCurrentChannel      = matchedChannels[0];
-        mCurrentChannelIndex = index;
+        mCurrentChannelIndex = iFirstMatchedChannel;
         helper.Success(response);
     }
 }
