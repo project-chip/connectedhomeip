@@ -22,7 +22,6 @@
 		037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D882991BD4F00B7EEE2 /* ModelCommandBridge.h */; };
 		037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D892991BD4F00B7EEE2 /* ClusterCommandBridge.h */; };
 		037C3DB92991BD5000B7EEE2 /* ReportCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */; };
-		037C3DBA2991BD5000B7EEE2 /* TestCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */; };
 		037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8E2991BD4F00B7EEE2 /* Commands.h */; };
 		037C3DBC2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D8F2991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.mm */; };
 		037C3DBD2991BD5000B7EEE2 /* OTAProviderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D902991BD4F00B7EEE2 /* OTAProviderDelegate.h */; };
@@ -395,7 +394,6 @@
 		037C3D882991BD4F00B7EEE2 /* ModelCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelCommandBridge.h; sourceTree = "<group>"; };
 		037C3D892991BD4F00B7EEE2 /* ClusterCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusterCommandBridge.h; sourceTree = "<group>"; };
 		037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReportCommandBridge.h; sourceTree = "<group>"; };
-		037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCommandBridge.h; sourceTree = "<group>"; };
 		037C3D8E2991BD4F00B7EEE2 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
 		037C3D8F2991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OTASoftwareUpdateInteractive.mm; sourceTree = "<group>"; };
 		037C3D902991BD4F00B7EEE2 /* OTAProviderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OTAProviderDelegate.h; sourceTree = "<group>"; };
@@ -849,14 +847,6 @@
 				037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */,
 			);
 			path = clusters;
-			sourceTree = "<group>";
-		};
-		037C3D8B2991BD4F00B7EEE2 /* tests */ = {
-			isa = PBXGroup;
-			children = (
-				037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */,
-			);
-			path = tests;
 			sourceTree = "<group>";
 		};
 		037C3D8D2991BD4F00B7EEE2 /* provider */ = {
@@ -1466,7 +1456,6 @@
 				037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */,
 				037C3DC52991BD5100B7EEE2 /* StorageManagementCommand.h in Headers */,
 				037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */,
-				037C3DBA2991BD5000B7EEE2 /* TestCommandBridge.h in Headers */,
 				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
 				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
 				03FB93DF2A46200A0048CB35 /* Commands.h in Headers */,
