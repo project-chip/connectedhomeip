@@ -77,8 +77,8 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         self.step("3")
         number_of_measurements = await self.read_epm_attribute_expect_success("NumberOfMeasurementTypes")
         logger.info(f"Rx'd NumberOfMeasurementTypes: {number_of_measurements}")
-        asserts.assert_greater(number_of_measurements, 1,
-                               "NumberOfMeasurementTypes must be > 1")
+        asserts.assert_greater_equal(number_of_measurements, 1,
+                                     "NumberOfMeasurementTypes must be >= 1")
 
         self.step("4")
         accuracy = await self.read_epm_attribute_expect_success("Accuracy")

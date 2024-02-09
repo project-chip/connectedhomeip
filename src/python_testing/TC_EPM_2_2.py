@@ -88,17 +88,16 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         self.step("5a")
         active_power2 = await self.check_epm_attribute_in_range("ActivePower", 980000, 1020000)  # 1kW +/- 20W
+        asserts.assert_not_equal(active_power, active_power2,
+                                 f"Expected ActivePower readings to have changed {active_power}, {active_power2}")
 
         self.step("5b")
         active_current2 = await self.check_epm_attribute_in_range("ActiveCurrent", 3848, 4848)    # 4.348 A +/- 500mA
+        asserts.assert_not_equal(active_current, active_current2,
+                                 f"Expected ActiveCurrent readings to have changed {active_current}, {active_current2}")
 
         self.step("5c")
         voltage2 = await self.check_epm_attribute_in_range("Voltage", 229000, 231000)      # 230V +/- 1V
-
-        asserts.assert_not_equal(active_power, active_power2,
-                                 f"Expected ActivePower readings to have changed {active_power}, {active_power2}")
-        asserts.assert_not_equal(active_current, active_current2,
-                                 f"Expected ActiveCurrent readings to have changed {active_current}, {active_current2}")
         asserts.assert_not_equal(voltage, voltage2, f"Expected Voltage readings to have changed {voltage}, {voltage2}")
 
         self.step("6")
