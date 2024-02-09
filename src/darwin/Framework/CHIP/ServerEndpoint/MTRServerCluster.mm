@@ -313,6 +313,9 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     _deviceController = controller;
 
+    MTR_LOG_DEFAULT("Associated %@, attribute count %llu, with controller", self,
+        static_cast<unsigned long long>(attributeCount));
+
     return YES;
 }
 
@@ -406,6 +409,12 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     }
     matterCommandList[commandList.count] = kInvalidClusterId;
     return matterCommandList;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRServerCluster endpoint %u, id " ChipLogFormatMEI ">",
+                     _parentEndpoint, ChipLogValueMEI(_clusterID.unsignedLongLongValue)];
 }
 
 @end
