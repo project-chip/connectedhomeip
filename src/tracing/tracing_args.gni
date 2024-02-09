@@ -25,6 +25,11 @@ declare_args() {
   # backends explicitly
   matter_enable_tracing_support = current_os == "android"
 
+  if (chip_device_platform == "darwin") {
+    matter_enable_tracing_support = true
+  }
+
+
   # Defines the trace backend. Current matter tracing splits the logic
   # into two parts:
   #   - data logging, well defined and using type-safe data
@@ -46,6 +51,8 @@ declare_args() {
   #
   if (current_os == "linux" || current_os == "android") {
     matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
+  } else if (chip_device_platform == "darwin") {
+    matter_trace_config = "${chip_root}/src/tracing/darwin:darwin_tracing"
   } else {
     matter_trace_config = "${chip_root}/src/tracing/none"
   }
