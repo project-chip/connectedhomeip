@@ -15,11 +15,18 @@
  *    limitations under the License.
  */
 
-#include "OTAImageHeader.h"
+#include <lib/core/OTAImageHeader.h>
 
-#include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
+#include <string.h>
+
+#include <lib/core/Optional.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 

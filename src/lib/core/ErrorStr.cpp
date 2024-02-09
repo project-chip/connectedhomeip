@@ -31,7 +31,9 @@
 #include <stdio.h>
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 

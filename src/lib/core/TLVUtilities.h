@@ -25,11 +25,10 @@
 
 #pragma once
 
-#include <stddef.h>
-#include <stdint.h>
-
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
+#include <stddef.h>
+#include <stdint.h>
 
 namespace chip {
 

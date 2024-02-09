@@ -21,10 +21,12 @@
  *      This file contains functions for working with CHIP errors.
  */
 
-#include <stddef.h>
+#include <lib/core/ErrorStr.h>
+
+#include <stdint.h>
 
 #include <lib/core/CHIPConfig.h>
-#include <lib/core/ErrorStr.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 

@@ -15,14 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file defines types and interfaces for debugging and
- *      logging CHIP TLV.
- *
- */
-
 #pragma once
 
 #include <stddef.h>
@@ -30,10 +22,13 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
+#include <lib/core/TLVTypes.h>
 
 namespace chip {
 
 namespace TLV {
+class TLVReader;
+enum class TLVTagControl : uint8_t;
 
 /**
  *   @namespace chip::TLV::Debug
