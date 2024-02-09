@@ -429,7 +429,7 @@ public:
         return mResponseSender.GetSubjectDescriptor();
     }
 
-#if CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_WITH_NLFAULTINJECTION
     /**
      * @brief Crafts InvokeResponseMessages using fault injection for tests
      *
@@ -456,7 +456,7 @@ public:
     // be created that checks for correct behavior for this method.
     void TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload, bool isTimedInvoke,
                                         bool oneReponsePerMessage, bool invertResponseOrdering, bool dropSecondResponse);
-#endif // CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 private:
     friend class TestCommandInteraction;

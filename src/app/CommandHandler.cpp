@@ -911,7 +911,7 @@ void CommandHandler::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "Command handler moving to [%10.10s]", GetStateStr());
 }
 
-#if CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CHIP_WITH_NLFAULTINJECTION
 
 namespace {
 
@@ -1015,7 +1015,7 @@ void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext *
     VerifyOrDieWithMsg(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, DataManagement,
                        "DUT Failure: Failed to exit TLV contain for InvokeRequestMessage");
 }
-#endif // CHIP_WITH_NLFAULTINJECTION || CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 } // namespace app
 } // namespace chip
