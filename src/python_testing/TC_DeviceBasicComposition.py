@@ -36,9 +36,6 @@ from taglist_and_topology_test_support import (create_device_type_list_for_root,
                                                find_tree_roots, get_all_children, get_direct_children_of_root, parts_list_cycles,
                                                separate_endpoint_types)
 
-# The above code is importing various classes from the "ClusterObjects" module and assigning them to
-# variables. These classes are likely used for creating and managing clusters of objects in a program.
-
 
 def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False) -> Callable:
     """Returns a checker for whether `obj` is an int that fits in a range."""
