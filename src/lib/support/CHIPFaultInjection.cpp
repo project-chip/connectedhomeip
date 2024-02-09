@@ -47,9 +47,10 @@ static const nl::FaultInjection::Name sFaultNames[] = {
     "BDXBadBlockCounter",
     "BDXAllocTransfer",
     "SecMgrBusy",
-    "BatchCommandIdmTcHelper1"
-    "BatchCommandIdmTcHelper2"
-    "BatchCommandIdmTcHelper3"
+    // TODO find a better name for these
+    "BatchCommandIdmTcHelper1",
+    "BatchCommandIdmTcHelper2",
+    "BatchCommandIdmTcHelper3",
 #if CONFIG_NETWORK_LAYER_BLE
     "CHIPOBLESend",
 #endif // CONFIG_NETWORK_LAYER_BLE
