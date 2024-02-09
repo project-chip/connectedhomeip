@@ -610,3 +610,19 @@ like:
     --compile-commands-glob out/linux-x64-all-clusters-clang/compile_commands.json \
     --scanning-destination $SOURCE_FILE
 ```
+
+To correct things, a script called `fix_includes.py` exists that can apply
+suggested fixes. Here is an example run:
+
+```bash
+iwyu_tool.py                                                  \
+    -p out/linux-x64-all-clusters-clang/compile_commands.json \
+    src/lib/core/TLVReader.cpp                                \
+    -- --comment_style=none \
+    | tee out/iwyu.out
+
+# apply suggestions. Note that paths ARE relative so you need to change
+# into the build directory
+cd out/linux-x64-all-clusters-clang/
+fix_includes.py <../iwyu.out
+```
