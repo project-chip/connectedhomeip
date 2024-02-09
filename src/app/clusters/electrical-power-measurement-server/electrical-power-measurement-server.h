@@ -40,13 +40,14 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    using AccuracyIterator            = CommonIterator<Structs::MeasurementAccuracyStruct::Type>;
     using RangeIterator               = CommonIterator<Structs::MeasurementRangeStruct::Type>;
     using HarmonicMeasurementIterator = CommonIterator<Structs::HarmonicMeasurementStruct::Type>;
 
-    virtual PowerModeEnum GetPowerMode()                            = 0;
-    virtual uint8_t GetNumberOfMeasurementTypes()                   = 0;
-    virtual AccuracyIterator * IterateAccuracy()                    = 0;
+    virtual PowerModeEnum GetPowerMode()          = 0;
+    virtual uint8_t GetNumberOfMeasurementTypes() = 0;
+
+    virtual CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) = 0;
+
     virtual RangeIterator * IterateRanges()                         = 0;
     virtual DataModel::Nullable<int64_t> GetVoltage()               = 0;
     virtual DataModel::Nullable<int64_t> GetActiveCurrent()         = 0;
@@ -112,7 +113,7 @@ private:
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-    CHIP_ERROR ReadAccuracy(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     CHIP_ERROR ReadRanges(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadHarmonicCurrents(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadHarmonicPhases(AttributeValueEncoder & aEncoder);

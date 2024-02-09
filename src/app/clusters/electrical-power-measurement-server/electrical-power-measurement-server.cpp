@@ -75,9 +75,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetNumberOfMeasurementTypes()));
         break;
     case Accuracy::Id:
-        return ReadAccuracy(aEncoder);
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeAccuracy(encoder); }));
+        break;
     case Ranges::Id:
         return ReadRanges(aEncoder);
+        // TODO
+        break;
     case Voltage::Id:
         if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeVoltage))
         {
@@ -203,29 +207,22 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadAccuracy(AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    auto accuracies = mDelegate.IterateAccuracy();
-    VerifyOrReturnError(accuracies != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    if (accuracies->Count() == 0)
+    for (uint8_t i = 0; true; i++)
     {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([&accuracies](const auto & encoder) -> CHIP_ERROR {
-            Structs::MeasurementAccuracyStruct::Type accuracy;
-            while (accuracies->Next(accuracy))
-            {
-                encoder.Encode(accuracy);
-            }
+        Structs::MeasurementAccuracyStruct::Type accuracy;
 
+        auto err = mDelegate.GetAccuracyByIndex(i, accuracy);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
             return CHIP_NO_ERROR;
-        });
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(accuracy));
     }
-    accuracies->Release();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Instance::ReadRanges(AttributeValueEncoder & aEncoder)

@@ -39,7 +39,8 @@ public:
     uint8_t GetNumberOfMeasurementTypes() override { return mNumberOfMeasurementTypes; };
 
     // TODO
-    AccuracyIterator * IterateAccuracy() override { return nullptr; }
+    CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) override;
+
     RangeIterator * IterateRanges() override { return nullptr; }
 
     DataModel::Nullable<int64_t> GetVoltage() override { return mVoltage; }

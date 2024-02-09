@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <ElectricalPowerMeasurementAccuracies.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <app/reporting/reporting.h>
 
@@ -71,6 +72,123 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::SetNumberOfMeasurementTypes(uint8
         ChipLogDetail(AppServer, "mNumberOfMeasurementTypes  updated to %d", static_cast<int>(mNumberOfMeasurementTypes));
         MatterReportingAttributeChangeCallback(mEndpointId, ElectricalPowerMeasurement::Id, NumberOfMeasurementTypes::Id);
     }
+
+    return CHIP_NO_ERROR;
+}
+
+const MeasurementAccuracyRangeStruct::Type activePowerAccuracyRanges[] = {
+    // 2 - 5%, 3% Typ
+    {
+        .rangeMin       = -50'000'000, // -50kW
+        .rangeMax       = -10'000'000, // -10kW
+        .percentMax     = MakeOptional(static_cast<chip::Percent100ths>(5000)),
+        .percentMin     = MakeOptional(static_cast<chip::Percent100ths>(2000)),
+        .percentTypical = MakeOptional(static_cast<chip::Percent100ths>(3000)),
+    },
+    // 0.1 - 1%, 0.5% Typ
+    {
+        .rangeMin       = -9'999'999, // -9.999kW
+        .rangeMax       = 9'999'999,  //  9.999kW
+        .percentMax     = MakeOptional(static_cast<chip::Percent100ths>(1000)),
+        .percentMin     = MakeOptional(static_cast<chip::Percent100ths>(100)),
+        .percentTypical = MakeOptional(static_cast<chip::Percent100ths>(500)),
+    },
+    // 2 - 5%, 3% Typ
+    {
+        .rangeMin       = 10'000'000, // 10 kW
+        .rangeMax       = 50'000'000, // 50 kW
+        .percentMax     = MakeOptional(static_cast<chip::Percent100ths>(5000)),
+        .percentMin     = MakeOptional(static_cast<chip::Percent100ths>(2000)),
+        .percentTypical = MakeOptional(static_cast<chip::Percent100ths>(3000)),
+    },
+};
+
+const MeasurementAccuracyRangeStruct::Type activeCurrentAccuracyRanges[] = {
+    // 2 - 5%, 3% Typ
+    {
+        .rangeMin       = -100'000, // -100A
+        .rangeMax       = -5'000,   // -5A
+        .percentMax     = MakeOptional(static_cast<chip::Percent100ths>(5000)),
+        .percentMin     = MakeOptional(static_cast<chip::Percent100ths>(2000)),
+        .percentTypical = MakeOptional(static_cast<chip::Percent100ths>(3000)),
+    },
+    // 0.1 - 1%, 0.5% Typ
+    {
+        .rangeMin       = -4'999, // -4.999A
+        .rangeMax       = 4'999,  //  4.999A
+        .percentMax     = MakeOptional(static_cast<chip::Percent100ths>(1000)),
+        .percentMin     = MakeOptional(static_cast<chip::Percent100ths>(100)),
+        .percentTypical = MakeOptional(static_cast<chip::Percent100ths>(500)),
+    },
+    // 2 - 5%, 3% Typ
+    {
+        .rangeMin       = 5'000,   // 5A
+        .rangeMax       = 100'000, // 100 A
+        .percentMax     = MakeOptional(static_cast<chip::Percent100ths>(5000)),
+        .percentMin     = MakeOptional(static_cast<chip::Percent100ths>(2000)),
+        .percentTypical = MakeOptional(static_cast<chip::Percent100ths>(3000)),
+    },
+};
+
+const MeasurementAccuracyRangeStruct::Type voltageAccuracyRanges[] = {
+    // 2 - 5%, 3% Typ
+    {
+        .rangeMin       = -500'000, // -500V
+        .rangeMax       = -100'000, // -100V
+        .percentMax     = MakeOptional(static_cast<chip::Percent100ths>(5000)),
+        .percentMin     = MakeOptional(static_cast<chip::Percent100ths>(2000)),
+        .percentTypical = MakeOptional(static_cast<chip::Percent100ths>(3000)),
+    },
+    // 0.1 - 1%, 0.5% Typ
+    {
+        .rangeMin       = -99'999, // -99.999V
+        .rangeMax       = 99'999,  //  99.999V
+        .percentMax     = MakeOptional(static_cast<chip::Percent100ths>(1000)),
+        .percentMin     = MakeOptional(static_cast<chip::Percent100ths>(100)),
+        .percentTypical = MakeOptional(static_cast<chip::Percent100ths>(500)),
+    },
+    // 2 - 5%, 3% Typ
+    {
+        .rangeMin       = 100'000, // 100 V
+        .rangeMax       = 500'000, // 500 V
+        .percentMax     = MakeOptional(static_cast<chip::Percent100ths>(5000)),
+        .percentMin     = MakeOptional(static_cast<chip::Percent100ths>(2000)),
+        .percentTypical = MakeOptional(static_cast<chip::Percent100ths>(3000)),
+    }
+};
+
+static const Structs::MeasurementAccuracyStruct::Type kMeasurementAccuracies[] = {
+    {
+        .measurementType  = MeasurementTypeEnum::kActivePower,
+        .measured         = true,
+        .minMeasuredValue = -50'000'000, // -50 kW
+        .maxMeasuredValue = 50'000'000,  //  50 kW
+        .accuracyRanges   = DataModel::List<const MeasurementAccuracyRangeStruct::Type>(activePowerAccuracyRanges),
+    },
+    {
+        .measurementType  = MeasurementTypeEnum::kActiveCurrent,
+        .measured         = true,
+        .minMeasuredValue = -100'000, // -100A
+        .maxMeasuredValue = 100'000,  //  100A
+        .accuracyRanges   = DataModel::List<const MeasurementAccuracyRangeStruct::Type>(activeCurrentAccuracyRanges),
+    },
+    {
+        .measurementType  = MeasurementTypeEnum::kVoltage,
+        .measured         = true,
+        .minMeasuredValue = -500'000, // -500V
+        .maxMeasuredValue = 500'000,  //  500V
+        .accuracyRanges   = DataModel::List<const MeasurementAccuracyRangeStruct::Type>(voltageAccuracyRanges),
+    },
+};
+CHIP_ERROR ElectricalPowerMeasurementDelegate::GetAccuracyByIndex(uint8_t accuracyIndex,
+                                                                  Structs::MeasurementAccuracyStruct::Type & accuracy)
+{
+    if (accuracyIndex >= ArraySize(kMeasurementAccuracies))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+
+    accuracy = kMeasurementAccuracies[accuracyIndex];
 
     return CHIP_NO_ERROR;
 }
