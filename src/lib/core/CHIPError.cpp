@@ -15,18 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file contains functions for working with CHIP errors.
- */
-
-#include <lib/core/ErrorStr.h>
+#include <lib/core/CHIPError.h>
 
 #include <stdint.h>
 
 #include <lib/core/CHIPConfig.h>
-#include <lib/core/CHIPError.h>
+#include <lib/core/ErrorStr.h>
 
 namespace chip {
 
