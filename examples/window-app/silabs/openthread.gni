@@ -27,7 +27,7 @@ openthread_external_platform =
 
 # ICD Default configurations
 chip_enable_icd_server = true
-enable_synchronized_sed = true
+#enable_synchronized_sed = true
 chip_subscription_timeout_resumption = false
 sl_use_subscription_synching = true
 
