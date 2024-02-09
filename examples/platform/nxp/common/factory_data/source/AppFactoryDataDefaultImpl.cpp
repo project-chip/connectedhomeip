@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright 2023-2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,7 @@ using namespace ::chip::DeviceLayer;
  * Allows to register Matter factory data before initializing the Matter stack
  * Empty content here nothing particular to do.
  */
-CHIP_ERROR AppFactoryData_PreMatterStackInit(void)
+CHIP_ERROR chip::NXP::App::AppFactoryData_PreMatterStackInit(void)
 {
     return CHIP_NO_ERROR;
 }
@@ -54,7 +54,7 @@ CHIP_ERROR AppFactoryData_PreMatterStackInit(void)
  * In this example we assume that the matter factory dataset is encrypted.
  * This example demonstrates the usage of AES ecb with a software key.
  */
-CHIP_ERROR AppFactoryData_PostMatterStackInit(void)
+CHIP_ERROR chip::NXP::App::AppFactoryData_PostMatterStackInit(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA

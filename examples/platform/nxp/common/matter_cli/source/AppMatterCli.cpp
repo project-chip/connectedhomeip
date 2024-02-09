@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright 2023-2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,14 @@
  */
 
 #include "AppMatterCli.h"
-#include "AppTask.h"
+#include "AppTaskBase.h"
 #include <app/server/Server.h>
 #include <cstring>
 #include <platform/CHIPDeviceLayer.h>
+
+#ifdef CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER
+#include <operational-state-delegate-impl.h>
+#endif /* CONFIG_CHIP_APP_DEVICE_TYPE_LAUNDRY_WASHER */
 
 #ifdef ENABLE_CHIP_SHELL
 #include "task.h"
@@ -38,6 +42,9 @@ static bool isShellInitialized = false;
 #define MATTER_CLI_LOG(...)
 #endif /* ENABLE_CHIP_SHELL */
 
+using namespace chip;
+using namespace chip::app::Clusters;
+
 void AppMatterCliTask(void * args)
 {
 #ifdef ENABLE_CHIP_SHELL
@@ -52,11 +59,11 @@ CHIP_ERROR commissioningManager(int argc, char * argv[])
     CHIP_ERROR error = CHIP_NO_ERROR;
     if (strncmp(argv[0], "on", 2) == 0)
     {
-        GetAppTask().StartCommissioningHandler();
+        chip::NXP::App::GetAppTask().StartCommissioningHandler();
     }
     else if (strncmp(argv[0], "off", 3) == 0)
     {
-        GetAppTask().StopCommissioningHandler();
+        chip::NXP::App::GetAppTask().StopCommissioningHandler();
     }
     else
     {
@@ -68,7 +75,7 @@ CHIP_ERROR commissioningManager(int argc, char * argv[])
 
 CHIP_ERROR cliFactoryReset(int argc, char * argv[])
 {
-    GetAppTask().FactoryResetHandler();
+    chip::NXP::App::GetAppTask().FactoryResetHandler();
     return CHIP_NO_ERROR;
 }
 
@@ -84,7 +91,7 @@ CHIP_ERROR cliReset(int argc, char * argv[])
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppMatterCli_RegisterCommands(void)
+CHIP_ERROR chip::NXP::App::AppMatterCli_RegisterCommands(void)
 {
 #ifdef ENABLE_CHIP_SHELL
     if (!isShellInitialized)
@@ -123,15 +130,21 @@ CHIP_ERROR AppMatterCli_RegisterCommands(void)
         };
 
         Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));
-
-        if (xTaskCreate(&AppMatterCliTask, "AppMatterCli_task", MATTER_CLI_TASK_SIZE, NULL, 1, &AppMatterCliTaskHandle) != pdPASS)
-        {
-            ChipLogError(Shell, "Failed to start Matter CLI task");
-            return CHIP_ERROR_INTERNAL;
-        }
         isShellInitialized = true;
     }
 #endif /* ENABLE_CHIP_SHELL */
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR chip::NXP::App::AppMatterCli_StartTask()
+{
+#ifdef ENABLE_CHIP_SHELL
+    if (xTaskCreate(&AppMatterCliTask, "AppMatterCli_task", MATTER_CLI_TASK_SIZE, NULL, 1, &AppMatterCliTaskHandle) != pdPASS)
+    {
+        ChipLogError(Shell, "Failed to start Matter CLI task");
+        return CHIP_ERROR_INTERNAL;
+    }
+#endif /* ENABLE_CHIP_SHELL */
     return CHIP_NO_ERROR;
 }

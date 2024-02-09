@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2023 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,27 +16,34 @@
  *    limitations under the License.
  */
 
-#ifndef _APP_FACTORY_DATA_H_
-#define _APP_FACTORY_DATA_H_
+#pragma once
 
-#include <lib/core/CHIPError.h>
+struct AppEvent;
+using EventHandler = void (*)(const AppEvent &);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct AppEvent
+{
+    enum AppEventTypes
+    {
+        kEventType_Timer = 0,
+        kEventType_TurnOn,
+        kEventType_Install,
+    };
 
-/**
- * Allows to register Matter factory data before initializing the Matter stack
- */
-CHIP_ERROR AppFactoryData_PreMatterStackInit(void);
+    uint16_t Type;
 
-/**
- * Allows to register Matter factory data  after initializing the Matter stack
- */
-CHIP_ERROR AppFactoryData_PostMatterStackInit(void);
+    union
+    {
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } ClusterEvent;
+    };
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* _APP_FACTORY_DATA_H_ */
+    EventHandler Handler;
+};

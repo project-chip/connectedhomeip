@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright 2023-2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,8 @@
  *    limitations under the License.
  */
 
-#ifndef _MATTER_BUTTON_H_
-#define _MATTER_BUTTON_H_
+#ifndef _APP_FACTORY_DATA_H_
+#define _APP_FACTORY_DATA_H_
 
 #include <lib/core/CHIPError.h>
 
@@ -26,13 +26,24 @@
 extern "C" {
 #endif
 
+namespace chip {
+namespace NXP {
+namespace App {
 /**
- * API allowing to register matter buttons
+ * Allows to register Matter factory data before initializing the Matter stack
  */
-CHIP_ERROR AppMatterButton_registerButtons(void);
+CHIP_ERROR AppFactoryData_PreMatterStackInit(void);
+
+/**
+ * Allows to register Matter factory data  after initializing the Matter stack
+ */
+CHIP_ERROR AppFactoryData_PostMatterStackInit(void);
+} // namespace App
+} // namespace NXP
+} // namespace chip
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _MATTER_BUTTON_H_ */
+#endif /* _APP_FACTORY_DATA_H_ */
