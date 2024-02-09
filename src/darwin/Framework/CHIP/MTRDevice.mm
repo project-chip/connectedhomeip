@@ -1503,15 +1503,20 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     NSMutableArray * attributesToReport = [NSMutableArray array];
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
-    for (NSDictionary<NSString *, id> * attributeReponseValue in reportedAttributeValues) {
-        MTRAttributePath * attributePath = attributeReponseValue[MTRAttributePathKey];
-        NSDictionary * attributeDataValue = attributeReponseValue[MTRDataKey];
-        NSError * attributeError = attributeReponseValue[MTRErrorKey];
+    BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
+    NSMutableArray * attributesToPersist;
+    if (dataStoreExists) {
+        attributesToPersist = [NSMutableArray array];
+    }
+    for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
+        MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
+        NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
+        NSError * attributeError = attributeResponseValue[MTRErrorKey];
         NSDictionary * previousValue;
 
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {
-            MTR_LOG_INFO("%@ report %@ no data value or error: %@", self, attributePath, attributeReponseValue);
+            MTR_LOG_INFO("%@ report %@ no data value or error: %@", self, attributePath, attributeResponseValue);
             continue;
         }
 
@@ -1532,6 +1537,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             previousValue = _readCache[attributePath];
             _readCache[attributePath] = nil;
         } else {
+            BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:_readCache[attributePath]];
+            // Check if attribute needs to be persisted - compare only to read cache and disregard expected values
+            if (dataStoreExists && readCacheValueChanged) {
+                [attributesToPersist addObject:attributeResponseValue];
+            }
+
             // if expected values exists, purge and update read cache
             NSArray * expectedValue = _expectedValueCache[attributePath];
             if (expectedValue) {
@@ -1542,7 +1553,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 }
                 _expectedValueCache[attributePath] = nil;
                 _readCache[attributePath] = attributeDataValue;
-            } else if (![self _attributeDataValue:attributeDataValue isEqualToDataValue:_readCache[attributePath]]) {
+            } else if (readCacheValueChanged) {
                 // otherwise compare and update read cache
                 previousValue = _readCache[attributePath];
                 _readCache[attributePath] = attributeDataValue;
@@ -1580,11 +1591,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         if (shouldReportAttribute) {
             if (previousValue) {
-                NSMutableDictionary * mutableAttributeReponseValue = attributeReponseValue.mutableCopy;
-                mutableAttributeReponseValue[MTRPreviousDataKey] = previousValue;
-                [attributesToReport addObject:mutableAttributeReponseValue];
+                NSMutableDictionary * mutableAttributeResponseValue = attributeResponseValue.mutableCopy;
+                mutableAttributeResponseValue[MTRPreviousDataKey] = previousValue;
+                [attributesToReport addObject:mutableAttributeResponseValue];
             } else {
-                [attributesToReport addObject:attributeReponseValue];
+                [attributesToReport addObject:attributeResponseValue];
             }
             [attributePathsToReport addObject:attributePath];
         }
@@ -1592,7 +1603,26 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     MTR_LOG_INFO("%@ report from reported values %@", self, attributePathsToReport);
 
+    if (dataStoreExists && attributesToPersist.count) {
+        [_deviceController.controllerDataStore storeAttributeValues:attributesToPersist forNodeID:_nodeID];
+    }
+
     return attributesToReport;
+}
+
+- (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
+{
+    if (reportChanges) {
+        [self _handleAttributeReport:attributeValues];
+    } else {
+        os_unfair_lock_lock(&self->_lock);
+        for (NSDictionary * responseValue in attributeValues) {
+            MTRAttributePath * path = responseValue[MTRAttributePathKey];
+            NSDictionary * dataValue = responseValue[MTRDataKey];
+            _readCache[path] = dataValue;
+        }
+        os_unfair_lock_unlock(&self->_lock);
+    }
 }
 
 // If value is non-nil, associate with expectedValueID
@@ -1662,9 +1692,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     NSMutableArray * attributesToReport = [NSMutableArray array];
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
-    for (NSDictionary<NSString *, id> * attributeReponseValue in expectedAttributeValues) {
-        MTRAttributePath * attributePath = attributeReponseValue[MTRAttributePathKey];
-        NSDictionary * attributeDataValue = attributeReponseValue[MTRDataKey];
+    for (NSDictionary<NSString *, id> * attributeResponseValue in expectedAttributeValues) {
+        MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
+        NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
 
         BOOL shouldReportValue = NO;
         NSDictionary<NSString *, id> * attributeValueToReport;

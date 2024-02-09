@@ -864,6 +864,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         if ([self isRunning]) {
             _nodeIDToDeviceMap[nodeID] = deviceToReturn;
         }
+
+        // Load persisted attributes if they exist.
+        NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
+        if (attributesFromCache) {
+            [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
+        }
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 
