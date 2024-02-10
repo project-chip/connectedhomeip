@@ -318,7 +318,7 @@ bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIde
         std::string nextIdString(program.identifier.data(), program.identifier.size());
         if (nextIdString == idString)
         {
-            program.recordingFlag = MakeOptional(static_cast<uint32_t>(0));
+            program.recordingFlag = MakeOptional<uint32_t>(0);
         }
     }
     return true;
