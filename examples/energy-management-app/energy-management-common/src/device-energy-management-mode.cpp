@@ -95,6 +95,6 @@ void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpo
     gDeviceEnergyManagementModeDelegate = std::make_unique<DeviceEnergyManagementMode::DeviceEnergyManagementModeDelegate>();
     gDeviceEnergyManagementModeInstance =
         std::make_unique<ModeBase::Instance>(gDeviceEnergyManagementModeDelegate.get(), 0x1, DeviceEnergyManagementMode::Id,
-                                             chip::to_underlying(DeviceEnergyManagementMode::Feature::kOnOff));
+                                             chip::to_underlying(DeviceEnergyManagementMode::Feature::kNoFeatures));
     gDeviceEnergyManagementModeInstance->Init();
 }
