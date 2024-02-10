@@ -1568,6 +1568,7 @@ provisional cluster EnergyEvseMode = 157 {
   }
 
   bitmap Feature : bitmap32 {
+    kNoFeatures = 0x0;
     kOnOff = 0x1;
   }
 
@@ -1619,6 +1620,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
   }
 
   bitmap Feature : bitmap32 {
+    kNoFeatures = 0x0;
     kOnOff = 0x1;
   }
 

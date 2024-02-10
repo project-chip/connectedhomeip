@@ -18067,6 +18067,7 @@ typedef NS_ENUM(uint16_t, MTREnergyEVSEModeModeTag) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTREnergyEVSEModeFeature) {
+    MTREnergyEVSEModeFeatureNoFeatures MTR_PROVISIONALLY_AVAILABLE = 0x0,
     MTREnergyEVSEModeFeatureOnOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
@@ -18078,6 +18079,7 @@ typedef NS_ENUM(uint16_t, MTRDeviceEnergyManagementModeModeTag) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRDeviceEnergyManagementModeFeature) {
+    MTRDeviceEnergyManagementModeFeatureNoFeatures MTR_PROVISIONALLY_AVAILABLE = 0x0,
     MTRDeviceEnergyManagementModeFeatureOnOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 

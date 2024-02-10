@@ -95,8 +95,8 @@ This is because zap does not currently support generating code for clusters that
     <cluster code="0x0059"/> <!-- Dishwasher Mode -->
     <cluster code="0x005E"/> <!-- Microwave Oven Mode -->
     <cluster code="0x0049"/> <!-- Oven Mode -->
-    <cluster code="0x009D"/> <!-- Energy EVSE Mode -->
-    <cluster code="0x009F"/> <!-- Device Energy Management Mode -->
+    <!-- <cluster code="0x009D"/> Energy EVSE Mode. This cluster optionally allows for kNoFeatures or kOnOff -->
+    <!-- <cluster code="0x009F"/> Device Energy Management Mode. This cluster optionally allows for kNoFeatures or kOnOff -->
     <field name="OnOff" mask="0x1"/>
   </bitmap>
 </configurator>
