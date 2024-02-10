@@ -84,9 +84,9 @@ void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
 jboolean OnOffManager::SetOnOff(jint endpoint, bool value)
 {
     chip::DeviceLayer::StackLock stack;
-    Protocols::InteractionModel::Status status =
+    chip::Protocols::InteractionModel::Status status =
         app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
-    return status == Protocols::InteractionModel::Status::Success;
+    return status == chip::Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)

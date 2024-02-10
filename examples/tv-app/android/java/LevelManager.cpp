@@ -83,9 +83,9 @@ void LevelManager::PostLevelChanged(chip::EndpointId endpoint, uint8_t value)
 
 jboolean LevelManager::SetLevel(jint endpoint, jint value)
 {
-    Protocols::InteractionModel::Status status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(
+    chip::Protocols::InteractionModel::Status status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(
         static_cast<chip::EndpointId>(endpoint), static_cast<uint8_t>(value));
-    return status == Protocols::InteractionModel::Status::Success;
+    return status == chip::Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR LevelManager::InitializeWithObjects(jobject managerObject)
