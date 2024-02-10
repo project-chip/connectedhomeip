@@ -75,9 +75,17 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetNumberOfMeasurementTypes()));
         break;
     case Accuracy::Id:
-        return ReadAccuracy(aEncoder);
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeAccuracy(encoder); }));
+        break;
     case Ranges::Id:
-        return ReadRanges(aEncoder);
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRanges))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeRanges(encoder); }));
+        break;
     case Voltage::Id:
         if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeVoltage))
         {
@@ -176,9 +184,19 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetFrequency()));
         break;
     case HarmonicCurrents::Id:
-        return ReadHarmonicCurrents(aEncoder);
+        VerifyOrReturnError(
+            HasFeature(ElectricalPowerMeasurement::Feature::kHarmonics), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicCurrents, feature is not supported"));
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeHarmonicCurrents(encoder); }));
+        break;
     case HarmonicPhases::Id:
-        return ReadHarmonicPhases(aEncoder);
+        VerifyOrReturnError(
+            HasFeature(ElectricalPowerMeasurement::Feature::kPowerQuality), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicPhases, feature is not supported"));
+        ReturnErrorOnFailure(
+            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeHarmonicPhases(encoder); }));
+        break;
     case PowerFactor::Id:
         if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributePowerFactor))
         {
@@ -203,113 +221,76 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadAccuracy(AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    auto accuracies = mDelegate.IterateAccuracy();
-    VerifyOrReturnError(accuracies != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    if (accuracies->Count() == 0)
+    for (uint8_t i = 0; true; i++)
     {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([&accuracies](const auto & encoder) -> CHIP_ERROR {
-            Structs::MeasurementAccuracyStruct::Type accuracy;
-            while (accuracies->Next(accuracy))
-            {
-                encoder.Encode(accuracy);
-            }
+        Structs::MeasurementAccuracyStruct::Type accuracy;
 
+        auto err = mDelegate.GetAccuracyByIndex(i, accuracy);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
             return CHIP_NO_ERROR;
-        });
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(accuracy));
     }
-    accuracies->Release();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadRanges(AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::EncodeRanges(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRanges))
+    for (uint8_t i = 0; true; i++)
     {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto ranges    = mDelegate.IterateRanges();
-    VerifyOrReturnError(ranges != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    if (ranges->Count() == 0)
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([&ranges](const auto & encoder) -> CHIP_ERROR {
-            Structs::MeasurementRangeStruct::Type range;
-            while (ranges->Next(range))
-            {
-                encoder.Encode(range);
-            }
+        Structs::MeasurementRangeStruct::Type range;
 
+        auto err = mDelegate.GetRangeByIndex(i, range);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
             return CHIP_NO_ERROR;
-        });
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(range));
     }
-    ranges->Release();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadHarmonicCurrents(AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::EncodeHarmonicCurrents(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kHarmonics), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                        ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicCurrents, feature is not supported"));
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto currents  = mDelegate.IterateHarmonicCurrents();
-    VerifyOrReturnError(currents != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    if (currents->Count() == 0)
+    for (uint8_t i = 0; true; i++)
     {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([&currents](const auto & encoder) -> CHIP_ERROR {
-            Structs::HarmonicMeasurementStruct::Type current;
-            while (currents->Next(current))
-            {
-                encoder.Encode(current);
-            }
+        Structs::HarmonicMeasurementStruct::Type current;
 
+        auto err = mDelegate.GetHarmonicCurrentsByIndex(i, current);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
             return CHIP_NO_ERROR;
-        });
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(current));
     }
-    currents->Release();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::ReadHarmonicPhases(AttributeValueEncoder & aEncoder)
+CHIP_ERROR Instance::EncodeHarmonicPhases(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kPowerQuality), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-                        ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicPhases, feature is not supported"));
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    auto phases    = mDelegate.IterateHarmonicPhases();
-    VerifyOrReturnError(phases != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    if (phases->Count() == 0)
+    for (uint8_t i = 0; true; i++)
     {
-        err = aEncoder.EncodeEmptyList();
-    }
-    else
-    {
-        err = aEncoder.EncodeList([&phases](const auto & encoder) -> CHIP_ERROR {
-            Structs::HarmonicMeasurementStruct::Type phase;
-            while (phases->Next(phase))
-            {
-                encoder.Encode(phase);
-            }
+        Structs::HarmonicMeasurementStruct::Type phase;
 
+        auto err = mDelegate.GetHarmonicPhasesByIndex(i, phase);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
             return CHIP_NO_ERROR;
-        });
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(encoder.Encode(phase));
     }
-    phases->Release();
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace ElectricalPowerMeasurement
