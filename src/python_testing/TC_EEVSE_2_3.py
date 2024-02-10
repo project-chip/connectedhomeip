@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,8 +35,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
     def pics_TC_EEVSE_2_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        # In this case - there is no feature flags needed to run this test case
-        return None
+        return ["EEVSE.S", "EEVSE.S.F00"]
 
     def steps_TC_EEVSE_2_3(self) -> list[TestStep]:
         steps = [
