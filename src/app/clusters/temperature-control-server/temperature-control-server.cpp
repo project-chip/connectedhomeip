@@ -21,7 +21,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -134,14 +133,14 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
             emberAfStatus          = MinTemperature::Get(endpoint, &minTemperature);
             if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
-                status = app::ToInteractionModelStatus(emberAfStatus);
+                status = emberAfStatus;
                 goto exit;
             }
 
             emberAfStatus = MaxTemperature::Get(endpoint, &maxTemperature);
             if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
-                status = app::ToInteractionModelStatus(emberAfStatus);
+                status = emberAfStatus;
                 goto exit;
             }
 
@@ -156,7 +155,7 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
                 emberAfStatus = Step::Get(endpoint, &step);
                 if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
                 {
-                    status = app::ToInteractionModelStatus(emberAfStatus);
+                    status = emberAfStatus;
                     goto exit;
                 }
 

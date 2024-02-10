@@ -29,7 +29,6 @@
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
 #include <cinttypes>
 
 #include <app/CommandHandler.h>
@@ -3418,7 +3417,7 @@ void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
     }
     else
     {
-        commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
+        commandObj->AddStatus(commandPath, status);
     }
 }
 

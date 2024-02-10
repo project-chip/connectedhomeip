@@ -22,7 +22,6 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <app/util/util.h>
 #include <tracing/macros.h>
 
@@ -573,7 +572,7 @@ bool OnOffServer::offCommand(app::CommandHandler * commandObj, const app::Concre
     MATTER_TRACE_SCOPE("OffCommand", "OnOff");
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Off::Id, false);
 
-    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -582,7 +581,7 @@ bool OnOffServer::onCommand(app::CommandHandler * commandObj, const app::Concret
     MATTER_TRACE_SCOPE("OnCommand", "OnOff");
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::On::Id, false);
 
-    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -591,7 +590,7 @@ bool OnOffServer::toggleCommand(app::CommandHandler * commandObj, const app::Con
     MATTER_TRACE_SCOPE("ToggleCommand", "OnOff");
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Toggle::Id, false);
 
-    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 
@@ -643,7 +642,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
             }
         }
 
-        status = app::ToInteractionModelStatus(setOnOffValue(endpoint, Commands::Off::Id, false));
+        status = setOnOffValue(endpoint, Commands::Off::Id, false);
     }
     else
     {
