@@ -462,8 +462,8 @@ void AppTask::UpdateClusterState()
     uint8_t onoff = LightingMgr().IsTurnedOn();
 
     // write the new on/off value
-    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(1, onoff);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(1, onoff);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(NotSpecified, "Updating on/off cluster failed: %x", status);
     }
@@ -472,7 +472,7 @@ void AppTask::UpdateClusterState()
 
     status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(1, level);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(NotSpecified, "Updating level cluster failed: %x", status);
     }

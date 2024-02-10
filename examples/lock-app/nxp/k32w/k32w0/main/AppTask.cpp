@@ -777,9 +777,9 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     }
 
     // write the new door lock state
-    EmberAfStatus status = Attributes::LockState::Set(1, newValue);
+    Protocols::InteractionModel::Status status = Attributes::LockState::Set(1, newValue);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(NotSpecified, "ERR: updating door lock state %x", status);
     }

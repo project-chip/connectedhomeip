@@ -19,6 +19,9 @@
 #pragma once
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -31,19 +34,19 @@ public:
 
     void Init()
     {
-        EmberAfStatus status = TemperatureMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, -500);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        Status status = TemperatureMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, -500);
+        VerifyOrReturn(Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
 
         status = TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(mEndpointId, 6000);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        VerifyOrReturn(Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MaxMeasuredValue attribute"));
     }
 
     void OnTemperatureChangeHandler(int16_t newValue)
     {
-        EmberAfStatus status = TemperatureMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        Status status = TemperatureMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
+        VerifyOrReturn(Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValue attribute"));
         ChipLogDetail(NotSpecified, "The new TemperatureMeasurement value: %d", newValue);
     }

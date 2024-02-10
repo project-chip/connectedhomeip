@@ -78,15 +78,15 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             {
                 xy.x = *reinterpret_cast<uint16_t *>(value);
                 // get Y from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
-                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
+                assert(status == Protocols::InteractionModel::Status::Success);
             }
             if (attributeId == ColorControl::Attributes::CurrentY::Id)
             {
                 xy.y = *reinterpret_cast<uint16_t *>(value);
                 // get X from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
-                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
+                assert(status == Protocols::InteractionModel::Status::Success);
             }
 
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
@@ -108,22 +108,22 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 // We only support 8-bit hue. Assuming hue is linear, normalize 16-bit to 8-bit.
                 hsv.h = (uint8_t) ((*reinterpret_cast<uint16_t *>(value)) >> 8);
                 // get saturation from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
-                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+                assert(status == Protocols::InteractionModel::Status::Success);
             }
             else if (attributeId == ColorControl::Attributes::CurrentHue::Id)
             {
                 hsv.h = *value;
                 // get saturation from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
-                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
+                assert(status == Protocols::InteractionModel::Status::Success);
             }
             else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
             {
                 hsv.s = *value;
                 // get hue from cluster value storage
-                EmberAfStatus status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
-                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+                Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentHue::Get(endpoint, &hsv.h);
+                assert(status == Protocols::InteractionModel::Status::Success);
             }
             ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
             LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(hsv), (uint8_t *) &hsv);
@@ -164,11 +164,11 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     XyColor_t xy;
     bool onOffValue = false;
     app::DataModel::Nullable<uint8_t> currentLevel;
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
 
     status = OnOff::Attributes::OnOff::Get(1, &onOffValue);
 
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    if (status == Protocols::InteractionModel::Status::Success)
     {
         LightingMgr().InitiateAction(onOffValue ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 1,
                                      (uint8_t *) onOffValue);
@@ -176,7 +176,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
     /* restore values saved by DeferredAttributePersistenceProvider */
     status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS || currentLevel.IsNull())
+    if (status != Protocols::InteractionModel::Status::Success || currentLevel.IsNull())
     {
         return;
     }
@@ -184,12 +184,12 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     levelValue = currentLevel.Value();
 
     status = ColorControl::Attributes::CurrentY::Get(endpoint, &xy.y);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         return;
     }
     status = ColorControl::Attributes::CurrentX::Get(endpoint, &xy.x);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         return;
     }
