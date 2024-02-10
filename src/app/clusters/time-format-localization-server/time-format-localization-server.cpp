@@ -39,6 +39,8 @@ using namespace chip::app::Clusters::TimeFormatLocalization;
 using namespace chip::app::Clusters::TimeFormatLocalization::Attributes;
 using namespace chip::DeviceLayer;
 
+using chip::Protocols::InteractionModel::Status;
+
 namespace {
 
 class TimeFormatLocalizationAttrAccess : public AttributeAccessInterface
@@ -202,18 +204,18 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 {
     CalendarTypeEnum calendarType;
     CalendarTypeEnum validType;
-    EmberAfStatus status = ActiveCalendarType::Get(endpoint, &calendarType);
+    Status status = ActiveCalendarType::Get(endpoint, &calendarType);
 
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                   ChipLogError(Zcl, "Failed to read calendar type with error: 0x%02x", status));
+    VerifyOrReturn(Status::Success == status,
+                   ChipLogError(Zcl, "Failed to read calendar type with error: 0x%02x", to_underlying(status)));
 
     // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
     // If initial value is not one of the allowed values, pick one valid value and write it.
     if (!IsSupportedCalendarType(calendarType, validType))
     {
         status = ActiveCalendarType::Set(endpoint, validType);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(Zcl, "Failed to write calendar type with error: 0x%02x", status));
+        VerifyOrReturn(Status::Success == status,
+                       ChipLogError(Zcl, "Failed to write calendar type with error: 0x%02x", to_underlying(status)));
     }
 }
 

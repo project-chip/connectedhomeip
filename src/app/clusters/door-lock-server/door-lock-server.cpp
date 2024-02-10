@@ -466,7 +466,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
     switch (operationType)
     {
     case DataOperationTypeEnum::kAdd:
@@ -481,7 +481,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
     default:
         // appclusters, 5.2.4.34: SetUser command allow only kAdd/kModify, we should respond with INVALID_COMMAND if we got kClear
         // or anything else
-        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
+        status = Status::InvalidCommand;
         ChipLogProgress(Zcl, "[SetUser] Invalid operation type [endpointId=%d,operationType=%u]", commandPath.mEndpointId,
                         to_underlying(operationType));
         break;
@@ -1873,25 +1873,24 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
     return false;
 }
 
-EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
-                                         uint16_t userIndex, const Nullable<chip::CharSpan> & userName,
-                                         const Nullable<uint32_t> & userUniqueId, const Nullable<UserStatusEnum> & userStatus,
-                                         const Nullable<UserTypeEnum> & userType,
-                                         const Nullable<CredentialRuleEnum> & credentialRule,
-                                         const Nullable<CredentialStruct> & credential)
+Status DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
+                                  uint16_t userIndex, const Nullable<chip::CharSpan> & userName,
+                                  const Nullable<uint32_t> & userUniqueId, const Nullable<UserStatusEnum> & userStatus,
+                                  const Nullable<UserTypeEnum> & userType, const Nullable<CredentialRuleEnum> & credentialRule,
+                                  const Nullable<CredentialStruct> & credential)
 {
     EmberAfPluginDoorLockUserInfo user;
     if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
     {
         ChipLogError(Zcl, "[createUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", endpointId, userIndex);
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Status::Failure;
     }
 
     // appclusters, 5.2.4.34: to modify user its status should be set to Available. If it is we should return OCCUPIED.
     if (UserStatusEnum::kAvailable != user.userStatus)
     {
         ChipLogProgress(Zcl, "[createUser] Unable to overwrite existing user [endpointId=%d,userIndex=%d]", endpointId, userIndex);
-        return static_cast<EmberAfStatus>(DlStatus::kOccupied);
+        return Status::Failure;
     }
 
     const auto & newUserName                = !userName.IsNull() ? userName.Value() : ""_span;
@@ -1917,7 +1916,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
                         endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
                         newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                         static_cast<unsigned int>(newTotalCredentials));
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Status::Failure;
     }
 
     ChipLogProgress(Zcl,
@@ -1934,25 +1933,24 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex,
-                                         chip::NodeId sourceNodeId, uint16_t userIndex, const Nullable<chip::CharSpan> & userName,
-                                         const Nullable<uint32_t> & userUniqueId, const Nullable<UserStatusEnum> & userStatus,
-                                         const Nullable<UserTypeEnum> & userType,
-                                         const Nullable<CredentialRuleEnum> & credentialRule)
+Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
+                                  uint16_t userIndex, const Nullable<chip::CharSpan> & userName,
+                                  const Nullable<uint32_t> & userUniqueId, const Nullable<UserStatusEnum> & userStatus,
+                                  const Nullable<UserTypeEnum> & userType, const Nullable<CredentialRuleEnum> & credentialRule)
 {
     // We should get the user by that index first
     EmberAfPluginDoorLockUserInfo user;
     if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
     {
         ChipLogError(Zcl, "[modifyUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", endpointId, userIndex);
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Status::Failure;
     }
 
     // appclusters, 5.2.4.34: to modify user its status should NOT be set to Available. If it is we should return INVALID_COMMAND.
     if (UserStatusEnum::kAvailable == user.userStatus)
     {
         ChipLogProgress(Zcl, "[modifyUser] Unable to modify non-existing user [endpointId=%d,userIndex=%d]", endpointId, userIndex);
-        return EMBER_ZCL_STATUS_INVALID_COMMAND;
+        return Status::InvalidCommand;
     }
 
     // appclusters, 5.2.4.34: UserName SHALL be null if modifying a user record that was not created by the accessing fabric
@@ -1962,7 +1960,7 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Fabr
                         "[modifyUser] Unable to modify name of user created by different fabric "
                         "[endpointId=%d,userIndex=%d,creatorIdx=%d,modifierIdx=%d]",
                         endpointId, userIndex, user.createdBy, modifierFabricIndex);
-        return EMBER_ZCL_STATUS_INVALID_COMMAND;
+        return Status::InvalidCommand;
     }
 
     // appclusters, 5.2.4.34: UserUniqueID SHALL be null if modifying the user record that was not created by the accessing fabric.
@@ -1972,7 +1970,7 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Fabr
                         "[modifyUser] Unable to modify UUID of user created by different fabric "
                         "[endpointId=%d,userIndex=%d,creatorIdx=%d,modifierIdx=%d]",
                         endpointId, userIndex, user.createdBy, modifierFabricIndex);
-        return EMBER_ZCL_STATUS_INVALID_COMMAND;
+        return Status::InvalidCommand;
     }
 
     const auto & newUserName = !userName.IsNull() ? userName.Value() : user.userName;
@@ -1991,7 +1989,7 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Fabr
                      ",userType=%u,credentialRule=%u]",
                      endpointId, modifierFabricIndex, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
                      newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Status::Failure;
     }
 
     ChipLogProgress(Zcl,
@@ -2004,7 +2002,7 @@ EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::Fabr
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kModify, sourceNodeId,
                              modifierFabricIndex, userIndex, userIndex);
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Status::Success;
 }
 
 Status DoorLockServer::clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
@@ -3406,7 +3404,7 @@ bool DoorLockServer::RemoteOperationEnabled(chip::EndpointId endpointId) const
 }
 
 void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                         EmberAfStatus status)
+                                         Status status)
 {
     VerifyOrDie(nullptr != commandObj);
 
@@ -3627,10 +3625,10 @@ void DoorLockServer::SendEvent(chip::EndpointId endpointId, T & event)
 
 template <typename T>
 bool DoorLockServer::GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                                  EmberAfStatus (*getFn)(chip::EndpointId endpointId, T * value), T & value) const
+                                  Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const
 {
-    EmberAfStatus status = getFn(endpointId, &value);
-    bool success         = (EMBER_ZCL_STATUS_SUCCESS == status);
+    Status status = getFn(endpointId, &value);
+    bool success  = (Status::Success == status);
 
     if (!success)
     {
@@ -3642,10 +3640,10 @@ bool DoorLockServer::GetAttribute(chip::EndpointId endpointId, chip::AttributeId
 
 template <typename T>
 bool DoorLockServer::SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                                  EmberAfStatus (*setFn)(chip::EndpointId endpointId, T value), T value)
+                                  Status (*setFn)(chip::EndpointId endpointId, T value), T value)
 {
-    EmberAfStatus status = setFn(endpointId, value);
-    bool success         = (EMBER_ZCL_STATUS_SUCCESS == status);
+    Status status = setFn(endpointId, value);
+    bool success  = (Status::Success == status);
 
     if (!success)
     {
@@ -3951,11 +3949,11 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
         return;
     }
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
     if (!emberAfPluginDoorLockSetAliroReaderConfig(endpointID, signingKey, verificationKey, groupIdentifier, groupResolvingKey))
     {
         ChipLogProgress(Zcl, "[SetAliroReaderConfig] Unable to set aliro reader config [endpointId=%d]", endpointID);
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
     sendClusterResponse(commandObj, commandPath, status);
 }
@@ -3973,11 +3971,11 @@ void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * comma
         return;
     }
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
     if (!emberAfPluginDoorLockClearAliroReaderConfig(endpointID))
     {
         ChipLogProgress(Zcl, "[SetAliroReaderConfig] Unable to set aliro reader config [endpointId=%d]", endpointID);
-        status = EMBER_ZCL_STATUS_FAILURE;
+        status = Status::Failure;
     }
     sendClusterResponse(commandObj, commandPath, status);
 }

@@ -27,11 +27,13 @@
 #include <app/util/attribute-storage.h>
 #include <controller/CHIPCluster.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
 using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
 using chip::Controller::CommandResponseFailureCallback;
 using chip::Controller::CommandResponseSuccessCallback;
+using chip::Protocols::InteractionModel::Status;
 
 using BindingListType = chip::app::Clusters::Binding::Attributes::Binding::TypeInfo::Type;
 
@@ -40,14 +42,14 @@ namespace AppPlatform {
 
 // The AppPlatform overrides emberAfExternalAttributeReadCallback to handle external attribute reads for ContentApps.
 // This callback can be used to handle external attribute reads for attributes belonging to static endpoints.
-EmberAfStatus AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                       const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                       uint16_t maxReadLength);
+Status AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                uint16_t maxReadLength);
 
 // The AppPlatform overrides emberAfExternalAttributeWriteCallback to handle external attribute writes for ContentApps.
 // This callback can be used to handle external attribute writes for attributes belonging to static endpoints.
-EmberAfStatus AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+Status AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                 const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
 inline constexpr EndpointId kTargetBindingClusterEndpointId = 0;
 inline constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;

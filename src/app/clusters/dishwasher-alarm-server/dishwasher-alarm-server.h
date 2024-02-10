@@ -24,6 +24,9 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -35,16 +38,16 @@ class DishwasherAlarmServer
 public:
     static DishwasherAlarmServer & Instance();
 
-    EmberAfStatus GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask);
-    EmberAfStatus GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state);
-    EmberAfStatus GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch);
-    EmberAfStatus GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * suppported);
+    Status GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask);
+    Status GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state);
+    Status GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch);
+    Status GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * suppported);
 
     // Whenever there is change on Mask we should change State accordingly.
-    EmberAfStatus SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask);
-    EmberAfStatus SetLatchValue(EndpointId endpoint, const BitMask<AlarmMap> latch);
+    Status SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask);
+    Status SetLatchValue(EndpointId endpoint, const BitMask<AlarmMap> latch);
     // A change in supported value will result in a corresponding change in mask and state.
-    EmberAfStatus SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported);
+    Status SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported);
 
     /**
      * @brief Set the value of the State attribute
@@ -60,7 +63,7 @@ public:
      * honoring the Mask and Supported attributes.
      * The default value for the ignoreLatchState parameter is false.
      */
-    EmberAfStatus SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState, bool ignoreLatchState = false);
+    Status SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState, bool ignoreLatchState = false);
 
     /**
      * @brief Reset the value of latched alarms in the State attribute.
@@ -69,7 +72,7 @@ public:
      * @param[in] alarms Each bit set to a 1 in this parameter corresponds to a bit in the
      * State attribute will SHALL be reset to false.
      */
-    EmberAfStatus ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
+    Status ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
 
     // check whether the Alarm featureMap has enabled Reset feature.
     bool HasResetFeature(EndpointId endpoint);

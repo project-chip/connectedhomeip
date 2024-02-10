@@ -45,15 +45,15 @@ using GetSetupPINResponseType = app::Clusters::AccountLogin::Commands::GetSetupP
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
-EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength)
+Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                            const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                            uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
     ChipLogDetail(DeviceLayer, "emberAfExternalAttributeReadCallback endpoint %d ", endpointIndex);
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
+    Status ret = Status::Failure;
 
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
@@ -68,14 +68,14 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     return ret;
 }
 
-EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Status emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                             const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
     ChipLogDetail(DeviceLayer, "emberAfExternalAttributeWriteCallback endpoint %d ", endpointIndex);
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
+    Status ret = Status::Failure;
 
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
@@ -93,18 +93,18 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 namespace chip {
 namespace AppPlatform {
 
-EmberAfStatus __attribute__((weak)) AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                                             const EmberAfAttributeMetadata * attributeMetadata,
-                                                                             uint8_t * buffer, uint16_t maxReadLength)
+Status __attribute__((weak)) AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                      const EmberAfAttributeMetadata * attributeMetadata,
+                                                                      uint8_t * buffer, uint16_t maxReadLength)
 {
-    return (EMBER_ZCL_STATUS_FAILURE);
+    return (Status::Failure);
 }
 
-EmberAfStatus __attribute__((weak))
+Status __attribute__((weak))
 AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                           const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
-    return (EMBER_ZCL_STATUS_FAILURE);
+    return (Status::Failure);
 }
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,

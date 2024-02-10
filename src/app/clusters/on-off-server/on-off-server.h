@@ -24,6 +24,9 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+using chip::Protocols::InteractionModel::Status;
 
 /**********************************************************
  * Defines and Macros
@@ -61,9 +64,9 @@ public:
     bool OnWithTimedOffCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
-    EmberAfStatus getOnOffValue(chip::EndpointId endpoint, bool * currentOnOffValue);
-    EmberAfStatus setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange);
-    EmberAfStatus getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp);
+    Status getOnOffValue(chip::EndpointId endpoint, bool * currentOnOffValue);
+    Status setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange);
+    Status getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp);
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     inline bool SupportsLightingApplications(chip::EndpointId endpointId) { return HasFeature(endpointId, Feature::kLighting); }
