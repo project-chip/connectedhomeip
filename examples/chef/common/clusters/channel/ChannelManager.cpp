@@ -151,31 +151,26 @@ bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & match)
 
 void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match)
 {
-    std::vector<ChannelInfoType> matchedChannels;
-    uint16_t iFirstMatchedChannel = 0;
-    for (auto const & channel : mChannels)
+    int iMatchedChannel = -1;
+    ChangeChannelResponseType response;
+
+    for (uint16_t i = 0; i < mChannels.size(); i++)
     {
         // verify if CharSpan matches channel name
         // or callSign or affiliateCallSign or majorNumber.minorNumber
-        if (isChannelMatched(channel, match))
+        if (isChannelMatched(mChannels[i], match))
         {
-            matchedChannels.push_back(channel);
-        }
-        else if (matchedChannels.empty())
-        {
-            iFirstMatchedChannel++;
-        }
+            if (iMatchedChannel != -1) {
+                // Error: Found multiple matches
+                response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
+                helper.Success(response);
+		return;
+	    }
+	    iMatchedChannel = i;
+	}
     }
 
-    ChangeChannelResponseType response;
-
-    // Error: Found multiple matches
-    if (matchedChannels.size() > 1)
-    {
-        response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
-        helper.Success(response);
-    }
-    else if (matchedChannels.empty())
+    if (iMatchedChannel == -1)
     {
         // Error: Found no match
         response.status = chip::app::Clusters::Channel::StatusEnum::kNoMatches;
@@ -185,8 +180,8 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     {
         response.status      = chip::app::Clusters::Channel::StatusEnum::kSuccess;
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
-        mCurrentChannel      = matchedChannels[0];
-        mCurrentChannelIndex = iFirstMatchedChannel;
+        mCurrentChannel      = mChannels[iMatchedChannel];
+        mCurrentChannelIndex = iMatchedChannel;
         helper.Success(response);
     }
 }
@@ -206,6 +201,7 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
                 channelChanged       = true;
                 mCurrentChannelIndex = index;
                 mCurrentChannel      = channel;
+		return channelChanged;
             }
         }
         index++;
