@@ -27,9 +27,30 @@
 
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
+#include <app/AttributePathParams.h>
+#include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandSender.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/ConcreteEventPath.h>
+#include <app/DataVersionFilter.h>
+#include <app/EventPathParams.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
+#include <app/ObjectList.h>
+#include <app/ReadClient.h>
+#include <app/ReadHandler.h>
+#include <app/StatusResponse.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
+#include <app/SubscriptionsInfoProvider.h>
+#include <app/TimedHandler.h>
+#include <app/WriteClient.h>
+#include <app/WriteHandler.h>
+#include <app/reporting/Engine.h>
+#include <app/reporting/ReportScheduler.h>
+#include <app/util/attribute-metadata.h>
+#include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -41,27 +62,6 @@
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <app/AttributePathParams.h>
-#include <app/CommandHandler.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/CommandSender.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/ConcreteEventPath.h>
-#include <app/DataVersionFilter.h>
-#include <app/EventPathParams.h>
-#include <app/ObjectList.h>
-#include <app/ReadClient.h>
-#include <app/ReadHandler.h>
-#include <app/StatusResponse.h>
-#include <app/TimedHandler.h>
-#include <app/WriteClient.h>
-#include <app/WriteHandler.h>
-#include <app/reporting/Engine.h>
-#include <app/reporting/ReportScheduler.h>
-#include <app/util/attribute-metadata.h>
-#include <app/util/basic-types.h>
 
 #include <app/CASESessionManager.h>
 
@@ -79,7 +79,8 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback,
-                               public FabricTable::Delegate
+                               public FabricTable::Delegate,
+                               public SubscriptionsInfoProvider
 {
 public:
     /**
@@ -248,6 +249,14 @@ public:
     void OnActiveModeNotification(ScopedNodeId aPeer);
 
     /**
+     *  Used to notify when a peer becomes LIT ICD or vice versa.
+     *
+     *  ReadClient will call this function when it finds any updates of the OperatingMode attribute from ICD management
+     * cluster. The application doesn't need to call this function, usually.
+     */
+    void OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType);
+
+    /**
      * Add a read client to the internally tracked list of weak references. This list is used to
      * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
      */
@@ -315,8 +324,9 @@ public:
 
     CHIP_ERROR ResumeSubscriptions();
 
-    // Check if a given subject (CAT or NodeId) has at least 1 active subscription
-    bool SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subject);
+    bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
+
+    bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
@@ -396,6 +406,8 @@ private:
     void OnDone(ReadHandler & apReadObj) override;
 
     ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
+
+    InteractionModelEngine * GetInteractionModelEngine() override { return this; }
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 

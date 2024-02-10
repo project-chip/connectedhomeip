@@ -46,6 +46,9 @@ class TC_OPSTATE_2_3(MatterBaseTest):
                             "Unexpected return type for Resume")
         return ret
 
+    def pics_TC_OPSTATE_2_3(self) -> list[str]:
+        return ["OPSTATE.S"]
+
     @async_test_body
     async def test_TC_OPSTATE_2_3(self):
 
@@ -59,6 +62,8 @@ class TC_OPSTATE_2_3(MatterBaseTest):
         asserts.assert_true(self.check_pics("OPSTATE.S.A0004"), "OPSTATE.S.A0004 must be supported")
         asserts.assert_true(self.check_pics("OPSTATE.S.C00.Rsp"), "OPSTATE.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("OPSTATE.S.C03.Rsp"), "OPSTATE.S.C03.Rsp must be supported")
+        # This command SHALL be supported by an implementation if any of the other commands are supported (6.5)
+        asserts.assert_true(self.check_pics("OPSTATE.S.C04.Rsp"), "OPSTATE.S.C04.Rsp must be supported")
 
         attributes = Clusters.OperationalState.Attributes
 
@@ -135,7 +140,7 @@ class TC_OPSTATE_2_3(MatterBaseTest):
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(13, "Manually put the device in a state where it cannot receive a Pause command")
+        self.print_step(13, "Manually put the device in the Stopped(0x00) operational state")
         input("Press Enter when done.\n")
 
         self.print_step(14, "Send Pause command")
@@ -144,10 +149,22 @@ class TC_OPSTATE_2_3(MatterBaseTest):
                              Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
                              "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(15, "Manually put the device in a state where it cannot receive a Resume command")
+        self.print_step(15, "Send Resume command")
+        ret = await self.send_resume_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(16, "Manually put the device in the Error(0x03) operational state")
         input("Press Enter when done.\n")
 
-        self.print_step(16, "Send Resume command")
+        self.print_step(17, "Send Pause command")
+        ret = await self.send_pause_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(18, "Send Resume command")
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID,
                              Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,

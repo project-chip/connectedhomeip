@@ -63,7 +63,7 @@ public:
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
-    jobject JavaObjectRef() { return mJavaObjectRef; }
+    jobject JavaObjectRef() { return mJavaObjectRef.ObjectRef(); }
     jlong ToJNIHandle();
 
 #ifndef JAVA_MATTER_CONTROLLER_TEST
@@ -184,7 +184,7 @@ public:
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
                 jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
+                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure);
 
     void Shutdown();
 
@@ -202,7 +202,7 @@ public:
     CHIP_ERROR UpdateDeviceAttestationDelegateBridge(jobject deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
                                                      bool shouldWaitAfterDeviceAttestation);
 
-    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate);
+    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate, jobject cdTrustKeys);
 
     CHIP_ERROR StartOTAProvider(jobject otaProviderDelegate);
 
@@ -224,8 +224,8 @@ private:
 
     chip::app::DefaultICDClientStorage mICDClientStorage;
 
-    JavaVM * mJavaVM       = nullptr;
-    jobject mJavaObjectRef = nullptr;
+    JavaVM * mJavaVM = nullptr;
+    chip::JniGlobalReference mJavaObjectRef;
 #ifdef JAVA_MATTER_CONTROLLER_TEST
     ExampleOperationalCredentialsIssuerPtr mOpCredsIssuer;
     PersistentStorage mExampleStorage;

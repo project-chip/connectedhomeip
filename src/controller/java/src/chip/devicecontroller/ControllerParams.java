@@ -14,6 +14,7 @@ public final class ControllerParams {
   private final boolean attemptNetworkScanWiFi;
   private final boolean attemptNetworkScanThread;
   private final boolean skipCommissioningComplete;
+  private final boolean skipAttestationCertificateValidation;
   private final Optional<String> countryCode;
   private final Optional<Integer> regulatoryLocationType;
   @Nullable private final KeypairDelegate keypairDelegate;
@@ -33,6 +34,7 @@ public final class ControllerParams {
     this.attemptNetworkScanWiFi = builder.attemptNetworkScanWiFi;
     this.attemptNetworkScanThread = builder.attemptNetworkScanThread;
     this.skipCommissioningComplete = builder.skipCommissioningComplete;
+    this.skipAttestationCertificateValidation = builder.skipAttestationCertificateValidation;
     this.countryCode = builder.countryCode;
     this.regulatoryLocationType = builder.regulatoryLocationType;
     this.keypairDelegate = builder.keypairDelegate;
@@ -74,6 +76,10 @@ public final class ControllerParams {
 
   public boolean getSkipCommissioningComplete() {
     return skipCommissioningComplete;
+  }
+
+  public boolean getSkipAttestationCertificateValidation() {
+    return skipAttestationCertificateValidation;
   }
 
   public Optional<String> getCountryCode() {
@@ -137,6 +143,7 @@ public final class ControllerParams {
     private boolean attemptNetworkScanWiFi = false;
     private boolean attemptNetworkScanThread = false;
     private boolean skipCommissioningComplete = false;
+    private boolean skipAttestationCertificateValidation = false;
     private Optional<String> countryCode = Optional.empty();
     private Optional<Integer> regulatoryLocationType = Optional.empty();
     @Nullable private KeypairDelegate keypairDelegate = null;
@@ -254,6 +261,21 @@ public final class ControllerParams {
      */
     public Builder setSkipCommissioningComplete(boolean skipCommissioningComplete) {
       this.skipCommissioningComplete = skipCommissioningComplete;
+      return this;
+    }
+
+    /**
+     * Used when the Commissioner disables Attestation Certificate Validation.
+     *
+     * <p>Specifically, this sets SkipAttestationCertificateValidation in the
+     * CommissioningParameters passed to the CommissioningDelegate.
+     *
+     * @param skipAttestationCertificateValidation
+     * @return
+     */
+    public Builder setSkipAttestationCertificateValidation(
+        boolean skipAttestationCertificateValidation) {
+      this.skipAttestationCertificateValidation = skipAttestationCertificateValidation;
       return this;
     }
 

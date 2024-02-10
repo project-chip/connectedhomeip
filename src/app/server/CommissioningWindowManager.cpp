@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/server/CommissioningWindowManager.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
@@ -558,11 +558,11 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
         app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlag::kCommissioningWindowOpen;
         if (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen)
         {
-            app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(request);
+            app::ICDNotifier::GetInstance().NotifyActiveRequestNotification(request);
         }
         else
         {
-            app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(request);
+            app::ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(request);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }

@@ -48,9 +48,6 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     {
     case DeviceLayer::DeviceEventType::kDnssdInitialized:
     case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    case DeviceLayer::DeviceEventType::kICDPollingIntervalChange:
-#endif
         app::DnssdServer::Instance().StartServer();
         break;
     default:
@@ -329,13 +326,20 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
             }
         }
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
+    else
+    {
+        advertiseParameters.SetCommissionerPasscodeSupported(Optional<bool>(true));
+    }
+#endif
 
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u",
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u",
                     advertiseParameters.GetVendorId().ValueOr(0), advertiseParameters.GetProductId().ValueOr(0),
                     advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
-                    to_underlying(advertiseParameters.GetCommissioningMode()));
+                    to_underlying(advertiseParameters.GetCommissioningMode()),
+                    advertiseParameters.GetCommissionerPasscodeSupported().ValueOr(false) ? 1 : 0);
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
@@ -492,7 +496,7 @@ CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[
 void DnssdServer::OnICDModeChange()
 {
     // ICDMode changed, restart DNS-SD advertising, because SII and ICD key are affected by this change.
-    // StartServer will take care of setting the operational and commissionable advertissements
+    // StartServer will take care of setting the operational and commissionable advertisements
     StartServer();
 }
 

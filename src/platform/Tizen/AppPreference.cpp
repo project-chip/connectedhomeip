@@ -33,6 +33,10 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "ErrorUtils.h"
+
+using chip::DeviceLayer::Internal::TizenToChipError;
+
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
@@ -56,18 +60,11 @@ CHIP_ERROR GetData(const char * key, void * data, size_t dataSize, size_t * getD
     std::unique_ptr<char, decltype(&::free)> _{ encodedData, &::free };
 
     int err = preference_get_string(key, &encodedData);
-    if (err == PREFERENCE_ERROR_NO_KEY)
-    {
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    }
-    if (err == PREFERENCE_ERROR_OUT_OF_MEMORY)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
     if (err != PREFERENCE_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "Failed to get preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
-        return CHIP_ERROR_INCORRECT_STATE;
+        if (err != PREFERENCE_ERROR_NO_KEY)
+            ChipLogError(DeviceLayer, "Failed to get preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
+        return TizenToChipError(err);
     }
 
     size_t encodedDataSize = strlen(encodedData);
@@ -104,15 +101,9 @@ CHIP_ERROR SaveData(const char * key, const void * data, size_t dataSize)
     encodedData[encodedDataSize] = '\0';
 
     int err = preference_set_string(key, encodedData.Get());
-    if (err == PREFERENCE_ERROR_OUT_OF_MEMORY)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    if (err != PREFERENCE_ERROR_NONE)
-    {
-        ChipLogError(DeviceLayer, "Failed to set preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(
+        err == PREFERENCE_ERROR_NONE, TizenToChipError(err),
+        ChipLogError(DeviceLayer, "Failed to set preference [%s]: %s", StringOrNullMarker(key), get_error_message(err)));
 
     ChipLogDetail(DeviceLayer, "Save preference data: key=%s len=%u", key, static_cast<unsigned int>(dataSize));
     ChipLogByteSpan(DeviceLayer, ByteSpan(reinterpret_cast<const uint8_t *>(data), dataSize));
@@ -123,14 +114,11 @@ CHIP_ERROR SaveData(const char * key, const void * data, size_t dataSize)
 CHIP_ERROR RemoveData(const char * key)
 {
     int err = preference_remove(key);
-    if (err == PREFERENCE_ERROR_NO_KEY)
-    {
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    }
     if (err != PREFERENCE_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "Failed to remove preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
-        return CHIP_ERROR_INCORRECT_STATE;
+        if (err != PREFERENCE_ERROR_NO_KEY)
+            ChipLogError(DeviceLayer, "Failed to remove preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
+        return TizenToChipError(err);
     }
 
     ChipLogProgress(DeviceLayer, "Remove preference data: key=%s", key);

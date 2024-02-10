@@ -60,6 +60,22 @@ struct PyWriteAttributeData
     size_t tlvLength;
 };
 
+struct TestOnlyPyBatchCommandsOverrides
+{
+    // When max paths per invoke override value is set to 0, we will not use
+    // it as an override. Otherwise, this value will be provided to the
+    // CommandSender as the remote node's maximum paths.
+    uint16_t overrideRemoteMaxPathsPerInvoke;
+    bool suppressTimedRequestMessage;
+    uint16_t * overrideCommandRefsList;
+    size_t overrideCommandRefsListLength;
+};
+
+struct TestOnlyPyOnDoneInfo
+{
+    size_t responseMessageCount;
+};
+
 } // namespace python
 
 namespace Controller {

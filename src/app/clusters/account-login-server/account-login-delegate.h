@@ -44,6 +44,8 @@ public:
                                    const chip::CharSpan & tempAccountIdentifierString)                                 = 0;
     virtual void GetSetupPin(char * setupPin, size_t setupPinSize, const chip::CharSpan & tempAccountIdentifierString) = 0;
 
+    virtual uint16_t GetClusterRevision(chip::EndpointId endpoint) = 0;
+
     virtual ~Delegate() = default;
 };
 

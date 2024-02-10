@@ -29,8 +29,8 @@
 namespace chip {
 namespace scenes {
 
-#ifdef MATTER_SCENES_TABLE_SIZE
-static constexpr uint16_t kMaxScenesPerEndpoint = MATTER_SCENES_TABLE_SIZE;
+#ifdef SCENES_MANAGEMENT_TABLE_SIZE
+static constexpr uint16_t kMaxScenesPerEndpoint = SCENES_MANAGEMENT_TABLE_SIZE;
 #else
 static constexpr uint16_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_TABLE_SIZE;
 #endif

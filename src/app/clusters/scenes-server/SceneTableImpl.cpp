@@ -802,7 +802,7 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    for (auto endpoint : app::EnabledEndpointsWithServerCluster(chip::app::Clusters::Scenes::Id))
+    for (auto endpoint : app::EnabledEndpointsWithServerCluster(chip::app::Clusters::ScenesManagement::Id))
     {
         FabricSceneData fabric(endpoint, fabric_index);
         SceneIndex idx = 0;

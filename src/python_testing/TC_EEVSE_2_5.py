@@ -20,8 +20,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from TC_EEVSE_Utils import EEVSEBaseTestHelper, EventChangeCallback
+from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
     def pics_TC_EEVSE_2_5(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
         # In this case - there is no feature flags needed to run this test case
-        return None
+        return ["EEVSE.S"]
 
     def steps_TC_EEVSE_2_5(self) -> list[TestStep]:
         steps = [

@@ -25,7 +25,6 @@
 #include "silabs_utils.h"
 #include "sl_status.h"
 #include "task.h"
-
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 

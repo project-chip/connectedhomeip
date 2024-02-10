@@ -37,8 +37,8 @@
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDConfigurationData.h> // nogncheck
-#include <app/icd/ICDNotifier.h>          // nogncheck
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h>          // nogncheck
 #endif
 
 using namespace chip::System::Clock::Literals;
@@ -316,7 +316,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     if (err == CHIP_NO_ERROR)
     {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+        app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();

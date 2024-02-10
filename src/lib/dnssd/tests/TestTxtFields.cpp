@@ -85,6 +85,9 @@ void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
 
     strcpy(key, "XX");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
+
+    strcpy(key, "CP");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kCommissionerPasscode);
 }
 
 void TestGetTxtFieldKeyCaseInsensitive(nlTestSuite * inSuite, void * inContext)
@@ -284,6 +287,20 @@ void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(ret, data) == 0);
 }
 
+void TestGetCommissionerPasscode(nlTestSuite * inSuite, void * inContext)
+{
+    char cm[64];
+    strcpy(cm, "0");
+    NL_TEST_ASSERT(inSuite, GetCommissionerPasscode(GetSpan(cm)) == 0);
+
+    strcpy(cm, "1");
+    NL_TEST_ASSERT(inSuite, GetCommissionerPasscode(GetSpan(cm)) == 1);
+
+    // overflow a uint8
+    sprintf(cm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
+    NL_TEST_ASSERT(inSuite, GetCommissionerPasscode(GetSpan(cm)) == 0);
+}
+
 bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 {
 
@@ -292,7 +309,7 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
         node.commissionData.rotatingIdLen != 0 || node.commissionData.pairingHint != 0 ||
         node.resolutionData.mrpRetryIntervalIdle.HasValue() || node.resolutionData.mrpRetryIntervalActive.HasValue() ||
         node.resolutionData.mrpRetryActiveThreshold.HasValue() || node.resolutionData.isICDOperatingAsLIT.HasValue() ||
-        node.resolutionData.supportsTcp)
+        node.resolutionData.supportsTcp || node.commissionData.commissionerPasscode != 0)
     {
         return false;
     }
@@ -341,6 +358,14 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
     NL_TEST_ASSERT(inSuite, filled.commissionData.commissioningMode == 1);
     filled.commissionData.commissioningMode = 0;
+    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+
+    // Commissioning mode
+    strcpy(key, "CP");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
+    NL_TEST_ASSERT(inSuite, filled.commissionData.commissionerPasscode == 1);
+    filled.commissionData.commissionerPasscode = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Device type
@@ -744,6 +769,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtFieldRotatingDeviceId", TestGetRotatingDeviceId),                        //
     NL_TEST_DEF("TxtFieldPairingHint", TestGetPairingHint),                                  //
     NL_TEST_DEF("TxtFieldPairingInstruction", TestGetPairingInstruction),                    //
+    NL_TEST_DEF("TxtFieldCommissionerPasscode", TestGetCommissionerPasscode),                //
     NL_TEST_DEF("TxtFieldFillDiscoveredNodeDataFromTxt", TestFillDiscoveredNodeDataFromTxt), //
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalIdle", TxtFieldSessionIdleInterval<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalActive", TxtFieldSessionActiveInterval<DiscoveredNodeData>),

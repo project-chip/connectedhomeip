@@ -19,128 +19,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation MTRScenesClusterAttributeValuePair
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _attributeID = @(0);
-
-        _attributeValue = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRScenesClusterAttributeValuePair alloc] init];
-
-    other.attributeID = self.attributeID;
-    other.attributeValue = self.attributeValue;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; attributeValue:%@; >", NSStringFromClass([self class]), _attributeID, _attributeValue];
-    return descriptionString;
-}
-
-- (void)setAttributeId:(NSNumber * _Nonnull)attributeId
-{
-    self.attributeID = attributeId;
-}
-
-- (NSNumber * _Nonnull)attributeId
-{
-    return self.attributeID;
-}
-
-@end
-
-@implementation MTRScenesClusterExtensionFieldSet
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _clusterID = @(0);
-
-        _attributeValueList = [NSArray array];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRScenesClusterExtensionFieldSet alloc] init];
-
-    other.clusterID = self.clusterID;
-    other.attributeValueList = self.attributeValueList;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clusterID:%@; attributeValueList:%@; >", NSStringFromClass([self class]), _clusterID, _attributeValueList];
-    return descriptionString;
-}
-
-- (void)setClusterId:(NSNumber * _Nonnull)clusterId
-{
-    self.clusterID = clusterId;
-}
-
-- (NSNumber * _Nonnull)clusterId
-{
-    return self.clusterID;
-}
-
-@end
-
-@implementation MTRScenesClusterSceneInfoStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _sceneCount = @(0);
-
-        _currentScene = @(0);
-
-        _currentGroup = @(0);
-
-        _sceneValid = @(0);
-
-        _remainingCapacity = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRScenesClusterSceneInfoStruct alloc] init];
-
-    other.sceneCount = self.sceneCount;
-    other.currentScene = self.currentScene;
-    other.currentGroup = self.currentGroup;
-    other.sceneValid = self.sceneValid;
-    other.remainingCapacity = self.remainingCapacity;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceneCount:%@; currentScene:%@; currentGroup:%@; sceneValid:%@; remainingCapacity:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _sceneCount, _currentScene, _currentGroup, _sceneValid, _remainingCapacity, _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {
@@ -2920,29 +2798,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRICDManagementClusterOnTransitionToActiveModeEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRICDManagementClusterOnTransitionToActiveModeEvent alloc] init];
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTROvenCavityOperationalStateClusterErrorStateStruct
 - (instancetype)init
 {
@@ -4166,6 +4021,108 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRScenesManagementClusterAttributeValuePair
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attributeID = @(0);
+
+        _attributeValue = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRScenesManagementClusterAttributeValuePair alloc] init];
+
+    other.attributeID = self.attributeID;
+    other.attributeValue = self.attributeValue;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; attributeValue:%@; >", NSStringFromClass([self class]), _attributeID, _attributeValue];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterExtensionFieldSet
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clusterID = @(0);
+
+        _attributeValueList = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRScenesManagementClusterExtensionFieldSet alloc] init];
+
+    other.clusterID = self.clusterID;
+    other.attributeValueList = self.attributeValueList;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clusterID:%@; attributeValueList:%@; >", NSStringFromClass([self class]), _clusterID, _attributeValueList];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterSceneInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sceneCount = @(0);
+
+        _currentScene = @(0);
+
+        _currentGroup = @(0);
+
+        _sceneValid = @(0);
+
+        _remainingCapacity = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRScenesManagementClusterSceneInfoStruct alloc] init];
+
+    other.sceneCount = self.sceneCount;
+    other.currentScene = self.currentScene;
+    other.currentGroup = self.currentGroup;
+    other.sceneValid = self.sceneValid;
+    other.remainingCapacity = self.remainingCapacity;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceneCount:%@; currentScene:%@; currentGroup:%@; sceneValid:%@; remainingCapacity:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _sceneCount, _currentScene, _currentGroup, _sceneValid, _remainingCapacity, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRHEPAFilterMonitoringClusterReplacementProductStruct
 - (instancetype)init
 {
@@ -4340,6 +4297,207 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _rangeMin = @(0);
+
+        _rangeMax = @(0);
+
+        _percentMax = nil;
+
+        _percentMin = nil;
+
+        _percentTypical = nil;
+
+        _fixedMax = nil;
+
+        _fixedMin = nil;
+
+        _fixedTypical = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct alloc] init];
+
+    other.rangeMin = self.rangeMin;
+    other.rangeMax = self.rangeMax;
+    other.percentMax = self.percentMax;
+    other.percentMin = self.percentMin;
+    other.percentTypical = self.percentTypical;
+    other.fixedMax = self.fixedMax;
+    other.fixedMin = self.fixedMin;
+    other.fixedTypical = self.fixedTypical;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rangeMin:%@; rangeMax:%@; percentMax:%@; percentMin:%@; percentTypical:%@; fixedMax:%@; fixedMin:%@; fixedTypical:%@; >", NSStringFromClass([self class]), _rangeMin, _rangeMax, _percentMax, _percentMin, _percentTypical, _fixedMax, _fixedMin, _fixedTypical];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _measurementType = @(0);
+
+        _measured = @(0);
+
+        _minMeasuredValue = @(0);
+
+        _maxMeasuredValue = @(0);
+
+        _accuracyRanges = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct alloc] init];
+
+    other.measurementType = self.measurementType;
+    other.measured = self.measured;
+    other.minMeasuredValue = self.minMeasuredValue;
+    other.maxMeasuredValue = self.maxMeasuredValue;
+    other.accuracyRanges = self.accuracyRanges;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: measurementType:%@; measured:%@; minMeasuredValue:%@; maxMeasuredValue:%@; accuracyRanges:%@; >", NSStringFromClass([self class]), _measurementType, _measured, _minMeasuredValue, _maxMeasuredValue, _accuracyRanges];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _order = @(0);
+
+        _measurement = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct alloc] init];
+
+    other.order = self.order;
+    other.measurement = self.measurement;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: order:%@; measurement:%@; >", NSStringFromClass([self class]), _order, _measurement];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalPowerMeasurementClusterMeasurementRangeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _measurementType = @(0);
+
+        _min = @(0);
+
+        _max = @(0);
+
+        _startTimestamp = nil;
+
+        _endTimestamp = nil;
+
+        _minTimestamp = nil;
+
+        _maxTimestamp = nil;
+
+        _startSystime = nil;
+
+        _endSystime = nil;
+
+        _minSystime = nil;
+
+        _maxSystime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterMeasurementRangeStruct alloc] init];
+
+    other.measurementType = self.measurementType;
+    other.min = self.min;
+    other.max = self.max;
+    other.startTimestamp = self.startTimestamp;
+    other.endTimestamp = self.endTimestamp;
+    other.minTimestamp = self.minTimestamp;
+    other.maxTimestamp = self.maxTimestamp;
+    other.startSystime = self.startSystime;
+    other.endSystime = self.endSystime;
+    other.minSystime = self.minSystime;
+    other.maxSystime = self.maxSystime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: measurementType:%@; min:%@; max:%@; startTimestamp:%@; endTimestamp:%@; minTimestamp:%@; maxTimestamp:%@; startSystime:%@; endSystime:%@; minSystime:%@; maxSystime:%@; >", NSStringFromClass([self class]), _measurementType, _min, _max, _startTimestamp, _endTimestamp, _minTimestamp, _maxTimestamp, _startSystime, _endSystime, _minSystime, _maxSystime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ranges = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent alloc] init];
+
+    other.ranges = self.ranges;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ranges:%@; >", NSStringFromClass([self class]), _ranges];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct
 - (instancetype)init
 {
@@ -4422,6 +4580,42 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: measurementType:%@; measured:%@; minMeasuredValue:%@; maxMeasuredValue:%@; accuracyRanges:%@; >", NSStringFromClass([self class]), _measurementType, _measured, _minMeasuredValue, _maxMeasuredValue, _accuracyRanges];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _importedResetTimestamp = nil;
+
+        _exportedResetTimestamp = nil;
+
+        _importedResetSystime = nil;
+
+        _exportedResetSystime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct alloc] init];
+
+    other.importedResetTimestamp = self.importedResetTimestamp;
+    other.exportedResetTimestamp = self.exportedResetTimestamp;
+    other.importedResetSystime = self.importedResetSystime;
+    other.exportedResetSystime = self.exportedResetSystime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: importedResetTimestamp:%@; exportedResetTimestamp:%@; importedResetSystime:%@; exportedResetSystime:%@; >", NSStringFromClass([self class]), _importedResetTimestamp, _exportedResetTimestamp, _importedResetSystime, _exportedResetSystime];
     return descriptionString;
 }
 
@@ -4856,6 +5050,171 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRMessagesClusterMessageResponseOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageResponseID = nil;
+
+        _label = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageResponseOptionStruct alloc] init];
+
+    other.messageResponseID = self.messageResponseID;
+    other.label = self.label;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageResponseID:%@; label:%@; >", NSStringFromClass([self class]), _messageResponseID, _label];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessageStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+
+        _priority = @(0);
+
+        _messageControl = @(0);
+
+        _startTime = nil;
+
+        _duration = nil;
+
+        _messageText = @"";
+
+        _responses = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageStruct alloc] init];
+
+    other.messageID = self.messageID;
+    other.priority = self.priority;
+    other.messageControl = self.messageControl;
+    other.startTime = self.startTime;
+    other.duration = self.duration;
+    other.messageText = self.messageText;
+    other.responses = self.responses;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; priority:%@; messageControl:%@; startTime:%@; duration:%@; messageText:%@; responses:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _priority, _messageControl, _startTime, _duration, _messageText, _responses];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessageQueuedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageQueuedEvent alloc] init];
+
+    other.messageID = self.messageID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessagePresentedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessagePresentedEvent alloc] init];
+
+    other.messageID = self.messageID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessageCompleteEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+
+        _responseID = nil;
+
+        _reply = nil;
+
+        _futureMessagesPreference = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageCompleteEvent alloc] init];
+
+    other.messageID = self.messageID;
+    other.responseID = self.responseID;
+    other.reply = self.reply;
+    other.futureMessagesPreference = self.futureMessagesPreference;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; responseID:%@; reply:%@; futureMessagesPreference:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _responseID, _reply, _futureMessagesPreference];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDeviceEnergyManagementClusterCostStruct
 - (instancetype)init
 {
@@ -4907,11 +5266,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _remainingSlotTime = @(0);
 
-        _slotIsPauseable = @(0);
+        _slotIsPauseable = nil;
 
-        _minPauseDuration = @(0);
+        _minPauseDuration = nil;
 
-        _maxPauseDuration = @(0);
+        _maxPauseDuration = nil;
 
         _manufacturerESAState = nil;
 
@@ -4990,6 +5349,8 @@ NS_ASSUME_NONNULL_BEGIN
         _isPauseable = @(0);
 
         _slots = [NSArray array];
+
+        _forecastUpdateReason = @(0);
     }
     return self;
 }
@@ -5006,13 +5367,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.latestEndTime = self.latestEndTime;
     other.isPauseable = self.isPauseable;
     other.slots = self.slots;
+    other.forecastUpdateReason = self.forecastUpdateReason;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; activeSlotNumber:%@; startTime:%@; endTime:%@; earliestStartTime:%@; latestEndTime:%@; isPauseable:%@; slots:%@; >", NSStringFromClass([self class]), _forecastId, _activeSlotNumber, _startTime, _endTime, _earliestStartTime, _latestEndTime, _isPauseable, _slots];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; activeSlotNumber:%@; startTime:%@; endTime:%@; earliestStartTime:%@; latestEndTime:%@; isPauseable:%@; slots:%@; forecastUpdateReason:%@; >", NSStringFromClass([self class]), _forecastId, _activeSlotNumber, _startTime, _endTime, _earliestStartTime, _latestEndTime, _isPauseable, _slots, _forecastUpdateReason];
     return descriptionString;
 }
 
@@ -5209,6 +5571,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _cause = @(0);
     }
     return self;
 }
@@ -5217,12 +5581,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRDeviceEnergyManagementClusterResumedEvent alloc] init];
 
+    other.cause = self.cause;
+
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cause:%@; >", NSStringFromClass([self class]), _cause];
     return descriptionString;
 }
 
@@ -5514,6 +5880,132 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: step:%@; label:%@; >", NSStringFromClass([self class]), _step, _label];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyEVSEModeClusterModeTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _value = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyEVSEModeClusterModeTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.value = self.value;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyEVSEModeClusterModeOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _mode = @(0);
+
+        _modeTags = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyEVSEModeClusterModeOptionStruct alloc] init];
+
+    other.label = self.label;
+    other.mode = self.mode;
+    other.modeTags = self.modeTags;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementModeClusterModeTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _value = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementModeClusterModeTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.value = self.value;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementModeClusterModeOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _mode = @(0);
+
+        _modeTags = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementModeClusterModeOptionStruct alloc] init];
+
+    other.label = self.label;
+    other.mode = self.mode;
+    other.modeTags = self.modeTags;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
     return descriptionString;
 }
 
@@ -6126,6 +6618,228 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterScheduleTransitionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dayOfWeek = @(0);
+
+        _transitionTime = @(0);
+
+        _presetHandle = nil;
+
+        _systemMode = nil;
+
+        _coolingSetpoint = nil;
+
+        _heatingSetpoint = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterScheduleTransitionStruct alloc] init];
+
+    other.dayOfWeek = self.dayOfWeek;
+    other.transitionTime = self.transitionTime;
+    other.presetHandle = self.presetHandle;
+    other.systemMode = self.systemMode;
+    other.coolingSetpoint = self.coolingSetpoint;
+    other.heatingSetpoint = self.heatingSetpoint;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; presetHandle:%@; systemMode:%@; coolingSetpoint:%@; heatingSetpoint:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, [_presetHandle base64EncodedStringWithOptions:0], _systemMode, _coolingSetpoint, _heatingSetpoint];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterScheduleStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleHandle = nil;
+
+        _systemMode = @(0);
+
+        _name = nil;
+
+        _presetHandle = nil;
+
+        _transitions = [NSArray array];
+
+        _builtIn = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterScheduleStruct alloc] init];
+
+    other.scheduleHandle = self.scheduleHandle;
+    other.systemMode = self.systemMode;
+    other.name = self.name;
+    other.presetHandle = self.presetHandle;
+    other.transitions = self.transitions;
+    other.builtIn = self.builtIn;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: scheduleHandle:%@; systemMode:%@; name:%@; presetHandle:%@; transitions:%@; builtIn:%@; >", NSStringFromClass([self class]), [_scheduleHandle base64EncodedStringWithOptions:0], _systemMode, _name, [_presetHandle base64EncodedStringWithOptions:0], _transitions, _builtIn];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterPresetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetHandle = nil;
+
+        _presetScenario = @(0);
+
+        _name = nil;
+
+        _coolingSetpoint = nil;
+
+        _heatingSetpoint = nil;
+
+        _builtIn = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterPresetStruct alloc] init];
+
+    other.presetHandle = self.presetHandle;
+    other.presetScenario = self.presetScenario;
+    other.name = self.name;
+    other.coolingSetpoint = self.coolingSetpoint;
+    other.heatingSetpoint = self.heatingSetpoint;
+    other.builtIn = self.builtIn;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; presetScenario:%@; name:%@; coolingSetpoint:%@; heatingSetpoint:%@; builtIn:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _presetScenario, _name, _coolingSetpoint, _heatingSetpoint, _builtIn];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterPresetTypeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetScenario = @(0);
+
+        _numberOfPresets = @(0);
+
+        _presetTypeFeatures = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterPresetTypeStruct alloc] init];
+
+    other.presetScenario = self.presetScenario;
+    other.numberOfPresets = self.numberOfPresets;
+    other.presetTypeFeatures = self.presetTypeFeatures;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetScenario:%@; numberOfPresets:%@; presetTypeFeatures:%@; >", NSStringFromClass([self class]), _presetScenario, _numberOfPresets, _presetTypeFeatures];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterQueuedPresetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetHandle = nil;
+
+        _transitionTimestamp = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterQueuedPresetStruct alloc] init];
+
+    other.presetHandle = self.presetHandle;
+    other.transitionTimestamp = self.transitionTimestamp;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; transitionTimestamp:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _transitionTimestamp];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterScheduleTypeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _systemMode = @(0);
+
+        _numberOfSchedules = @(0);
+
+        _scheduleTypeFeatures = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterScheduleTypeStruct alloc] init];
+
+    other.systemMode = self.systemMode;
+    other.numberOfSchedules = self.numberOfSchedules;
+    other.scheduleTypeFeatures = self.scheduleTypeFeatures;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: systemMode:%@; numberOfSchedules:%@; scheduleTypeFeatures:%@; >", NSStringFromClass([self class]), _systemMode, _numberOfSchedules, _scheduleTypeFeatures];
     return descriptionString;
 }
 
@@ -7789,6 +8503,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRTestClusterClusterTestFabricScopedEventEvent : MTRUnitTestingClusterTestFabricScopedEventEvent
 @dynamic fabricIndex;
+@end
+
+@implementation MTRUnitTestingClusterTestDifferentVendorMeiEventEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRUnitTestingClusterTestDifferentVendorMeiEventEvent alloc] init];
+
+    other.arg1 = self.arg1;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRSampleMEIClusterPingCountEventEvent

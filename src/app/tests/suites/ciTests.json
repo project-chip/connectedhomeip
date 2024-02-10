@@ -12,6 +12,7 @@
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10"
     ],
+    "ContentAppObserver": [],
     "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_5"],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
@@ -63,8 +64,6 @@
         "Test_TC_FAN_2_2",
         "Test_TC_FAN_2_3",
         "Test_TC_FAN_2_4",
-        "Test_TC_FAN_3_1",
-        "Test_TC_FAN_3_2",
         "Test_TC_FAN_3_6"
     ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
@@ -119,7 +118,13 @@
         "Test_TC_WASHERCTRL_2_1",
         "Test_TC_WASHERCTRL_2_2"
     ],
-
+    "OvenMode": [
+        "Test_TC_OTCCM_1_1",
+        "Test_TC_OTCCM_2_1",
+        "Test_TC_OTCCM_3_1",
+        "Test_TC_OTCCM_3_2",
+        "Test_TC_OTCCM_3_3"
+    ],
     "LaundryDryerControl": ["Test_TC_DRYERCTRL_1_1", "Test_TC_DRYERCTRL_2_1"],
 
     "MediaControl": [
@@ -331,7 +336,7 @@
         "Test_TC_G_1_1",
         "Test_TC_G_2_1"
     ],
-    "Scenes": [
+    "ScenesManagement": [
         "TestScenesFabricRemoval",
         "TestScenesFabricSceneInfo",
         "TestScenesMultiFabric",
@@ -382,6 +387,7 @@
         "Binding",
         "ColorControl",
         "ConcentrationMeasurement",
+        "ContentAppObserver",
         "DeviceManagement",
         "Descriptor",
         "DiagnosticsLogs",
@@ -401,6 +407,7 @@
         "TimeFormatLocalization",
         "LaundryWasherMode",
         "LaundryWasherControl",
+        "OvenMode",
         "LaundryDryerControl",
         "MediaControl",
         "ModeSelect",
@@ -436,7 +443,7 @@
         "Subscriptions",
         "DoorLock",
         "Groups",
-        "Scenes",
+        "ScenesManagement",
         "ResourceMonitoring"
     ]
 }

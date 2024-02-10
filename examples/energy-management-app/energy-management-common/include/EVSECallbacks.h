@@ -30,7 +30,6 @@ using namespace chip::app::Clusters::EnergyEvse;
  * This is not specific to the EnergyEVSE cluster, but includes DeviceEnergyManagement
  * and potential future clusters.
  */
-
 enum class EVSECallbackType : uint8_t
 {
     /*

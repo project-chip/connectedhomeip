@@ -681,7 +681,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_UNINITIALIZED                               CHIP_CORE_ERROR(0x1c)
 
-// AVAILABLE: 0x1d
+/**
+ *  @def CHIP_ERROR_INVALID_IPK
+ *
+ *  @brief
+ *    The IPK is invalid
+ *
+ */
+#define CHIP_ERROR_INVALID_IPK                                 CHIP_CORE_ERROR(0x1d)
 
 /**
  *  @def CHIP_ERROR_INVALID_STRING_LENGTH
@@ -1252,7 +1259,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_FABRIC_EXISTS                               CHIP_CORE_ERROR(0x7e)
 
-// AVAILABLE: 0x7f
+/**
+ *  @def CHIP_ERROR_ENDPOINT_EXISTS
+ *
+ *  @brief
+ *    The endpoint with the given endpoint id already exists.
+ *
+ */
+#define CHIP_ERROR_ENDPOINT_EXISTS                               CHIP_CORE_ERROR(0x7f)
 
 /**
  *  @def CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER

@@ -122,6 +122,10 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(mDelegate.GetSessionEnergyCharged());
     case SessionEnergyDischarged::Id:
         return aEncoder.Encode(mDelegate.GetSessionEnergyDischarged());
+
+    /* FeatureMap - is held locally */
+    case FeatureMap::Id:
+        return aEncoder.Encode(mFeature);
     }
     /* Allow all other unhandled attributes to fall through to Ember */
     return CHIP_NO_ERROR;

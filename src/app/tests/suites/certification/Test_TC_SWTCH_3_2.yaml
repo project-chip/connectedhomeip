@@ -17,6 +17,7 @@ name: 74.3.2. [TC-SWTCH-3.2] Primary functionality with client as DUT
 
 PICS:
     - SWTCH.C
+    - MCORE.IDM.C.SubscribeEvent
 
 config:
     nodeId: 0x12344321
@@ -198,11 +199,7 @@ tests:
           [1659679728.732429][2530:2530] CHIP:-: The latching switch is moved to a new position:0
           [1659679728.732454][2530:2530] CHIP:ZCL: SwitchServer: OnSwitchLatch
 
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-          2. switch subscribe-event switch-latched 1 100 1 1
+          ./chip-tool switch read-event switch-latched  1 1
 
           Verify switch latched event has newposition set to 0 on DUT (chip-tool) logs and below is the sample log provided for the raspi platform:
 
@@ -235,8 +232,7 @@ tests:
 
           In parallel to this Check the CurrentPosition value.
 
-          1. ./chip-tool interactive start
-          2. switch read current-position 1 1
+          ./chip-tool switch read current-position 1 1
 
           Verify CurrentPosition value is 1 on TH (all-cluster-app) logs
 
@@ -268,7 +264,7 @@ tests:
           [1686292319.379847][30986:30986] CHIP:DMG: }
 
 
-          TH simulates operation of the switch by changing state (attribute CurrentPosition) from 0 to 1 and back every 10 seconds (over a 1 minute period), DUT reads attribute CurrentPosition regularly
+          TH simulates operation of the switch by changing state (attribute CurrentPosition) from 1 to 0 and  read  the CurrentPosition attribute
 
           After 10 seconds, repeat the command with /tmp/chip_all_clusters_fifo using with value 0 as position
 
@@ -279,12 +275,9 @@ tests:
           [1686292713.872617][30986:30986] CHIP:-: The latching switch is moved to a new position:0
           [1686292713.872629][30986:30986] CHIP:ZCL: SwitchServer: OnSwitchLatch
 
-          In parallel to this Check the CurrentPosition value.
+          ./chip-tool switch read current-position 1 1
 
-          1. ./chip-tool interactive start
-          2. switch read current-position 1 1
-
-          Verify CurrentPosition value is 1 on TH (all-cluster-app) logs
+          Verify CurrentPosition value is 0 on TH (all-cluster-app) logs
 
           [1686293150.796547][30986:30986] CHIP:DMG: ReportDataMessage =
           [1686293150.796549][30986:30986] CHIP:DMG: {
@@ -312,6 +305,8 @@ tests:
           [1686293150.796616][30986:30986] CHIP:DMG:         SuppressResponse = true,
           [1686293150.796618][30986:30986] CHIP:DMG:         InteractionModelRevision = 1
           [1686293150.796620][30986:30986] CHIP:DMG: }
+
+          Repeat the above Steps over 1 minute period of time
       disabled: true
 
     - label:
@@ -333,39 +328,11 @@ tests:
           [1659621148.832380][8590:8590] CHIP:ZCL: SwitchServer: OnSwitchLatch
           [1659621148.832494][8590:8590] CHIP:EVL: LogEvent event number: 0x0000000000000007 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x00000000022D0CBB
 
-          After 10 seconds, repeat the command with /tmp/chip_all_clusters_fifo using with value 0 as position
-          After another 10 seconds, repeat the command with /tmp/chip_all_clusters_fifo using with value 1 as position
-          Repeat this toggling every 10 seconds for 1 minute total.
-
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-          2. switch subscribe-event switch-latched 1 100 1 1
+          Send the SwitchLatched event on every change of position
+          ./chip-tool switch read-event switch-latched  1 1
 
           Verify SwitchLatched Position is changing for 0 to 1 on DUT(chip-tool) Log:
 
-          [1659680091.149404][2592:2597] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
-          [1659680091.149428][2592:2597] CHIP:TOO:          Event number: 3
-          [1659680091.149449][2592:2597] CHIP:TOO:          Priority: Info
-          [1659680091.149470][2592:2597] CHIP:TOO:          Timestamp: 2181028
-          [1659680091.149536][2592:2597] CHIP:TOO:   SwitchLatched: {
-          [1659680091.149571][2592:2597] CHIP:TOO:     NewPosition: 0
-          [1659680091.149593][2592:2597] CHIP:TOO:    }
-          [1659680091.149674][2592:2597] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
-          [1659680091.149696][2592:2597] CHIP:TOO:          Event number: 4
-          [1659680091.149717][2592:2597] CHIP:TOO:          Priority: Info
-          [1659680091.149737][2592:2597] CHIP:TOO:          Timestamp: 2286911
-          [1659680091.149763][2592:2597] CHIP:TOO:   SwitchLatched: {
-          [1659680091.149785][2592:2597] CHIP:TOO:     NewPosition: 1
-          [1659680091.149805][2592:2597] CHIP:TOO:    }
-          [1659680091.149884][2592:2597] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
-          [1659680091.149906][2592:2597] CHIP:TOO:          Event number: 5
-          [1659680091.149926][2592:2597] CHIP:TOO:          Priority: Info
-          [1659680091.149947][2592:2597] CHIP:TOO:          Timestamp: 2368467
-          [1659680091.149971][2592:2597] CHIP:TOO:   SwitchLatched: {
-          [1659680091.149993][2592:2597] CHIP:TOO:     NewPosition: 0
-          [1659680091.150013][2592:2597] CHIP:TOO:    }
           [1659680091.150093][2592:2597] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659680091.150114][2592:2597] CHIP:TOO:          Event number: 6
           [1659680091.150135][2592:2597] CHIP:TOO:          Priority: Info
@@ -387,9 +354,8 @@ tests:
           [1659680091.150597][2592:2597] CHIP:TOO:   SwitchLatched: {
           [1659680091.150630][2592:2597] CHIP:TOO:     NewPosition: 1 <= this value will change for every change in position of simulated switch
 
-
-
-          Watch whether DUT presents state of simulated switch and/or controls another device based on the state of the switch.
+          After 10 seconds, Send the above commands with NewPosition set to 0
+          Repeat above Steps back every 10 seconds (over a 1 minute period) by changing the New Position 1 to 0 and 0 to 1
       disabled: true
 
     - label:
@@ -409,10 +375,13 @@ tests:
     - label: "Step 3b: DUT reads global attribute FeatureMap"
       PICS: SWTCH.C.F01
       verification: |
-          1. ./chip-tool interactive start
-          2. switch read feature-map 1 1
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch(LS) or MS, MSR, MSL, MSM.
 
-          Verify  FeatureMap value is  1 On TH (all-clusters-app) log
+          In Raspi platform LS feature is implemented, So below mentioned log is for reference only
+
+          ./chip-tool switch read feature-map 1 1
+
+          Verify  FeatureMap value is  30 On TH (all-clusters-app) log
 
           CHIP:DMG: ReportDataMessage =
           [1671450600.457719][8426:8426] CHIP:DMG: {
@@ -430,7 +399,7 @@ tests:
           [1671450600.458108][8426:8426] CHIP:DMG:                                         Attribute = 0x0000_FFFC,
           [1671450600.458122][8426:8426] CHIP:DMG:                                 }
           [1671450600.458137][8426:8426] CHIP:DMG:
-          [1671450600.458151][8426:8426] CHIP:DMG:                                 Data = 1,
+          [1671450600.458151][8426:8426] CHIP:DMG:                                 Data = 30,
           [1671450600.458161][8426:8426] CHIP:DMG:                         },
           [1671450600.458179][8426:8426] CHIP:DMG:
           [1671450600.458188][8426:8426] CHIP:DMG:                 },
@@ -445,8 +414,7 @@ tests:
     - label: "Step 3c: DUT reads attribute NumberOfPositions"
       PICS: SWTCH.C.F01
       verification: |
-          1 ./chip-tool interactive start
-          2. switch read number-of-positions 1 1
+          ./chip-tool switch read number-of-positions 1 1
 
           Verify  NumberOfPositions value is 2 in TH (all-clusters-app) log
 
@@ -497,13 +465,7 @@ tests:
           [1659624126.647438][8590:8590] CHIP:-: The new position when the momentary switch starts to be pressed:1
           [1659624126.647480][8590:8590] CHIP:ZCL: SwitchServer: OnInitialPress
 
-          Verify for InitialPress event  in DUT(chip-tool) Log, e.g. (one such message per event subscription being set up)
-
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-          2. switch subscribe-event initial-press 1 100 1 1
+          ./chip-tool switch read-event initial-press  1 1
 
           Verify InitialPress event with NewPosition set to 0 on DUT(chip-tool) log:
 
@@ -524,11 +486,7 @@ tests:
           [1659683678.805777][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
           [1659683678.805858][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
 
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-          2. switch subscribe-event short-release 1 100 1 1
+          ./chip-tool switch read-event short-release  1 1
 
           Verify ShortRelease event with PreviousPosition set to 0 on DUT(chip-tool) log:
 
@@ -551,12 +509,7 @@ tests:
           [1686294416.290761][30986:30986] CHIP:-: The new position when the momentary switch has been pressed for a long time:1
           [1686294416.290775][30986:30986] CHIP:ZCL: SwitchServer: OnLongPress
 
-
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-          2. switch subscribe-event long-press 1 100 1 1
+          ./chip-tool switch read-event long-press  1 1
 
           Verify LongPress event with NewPosition set to 1 on TH(chip-tool) log:
 
@@ -577,11 +530,7 @@ tests:
           [1686294209.672219][30986:30986] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released after having been pressed for a long time:1
           [1686294209.672229][30986:30986] CHIP:ZCL: SwitchServer: OnLongRelease
 
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-          2. switch subscribe-event long-release 1 100 1 1
+          ./chip-tool switch read-event long-release  1 1
 
           Verify LongRelease event with PreviousPosition set to 1 on DUT(chip-tool) log:
 
@@ -606,7 +555,7 @@ tests:
 
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
 
-          TH simulates operation of the switch by repeating these steps (over a 1 minute period)
+          change state from 0 to 1
 
           echo '{"Name":"InitialPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
@@ -617,10 +566,9 @@ tests:
           [1659624126.647438][8590:8590] CHIP:-: The new position when the momentary switch starts to be pressed:1
           [1659624126.647480][8590:8590] CHIP:ZCL: SwitchServer: OnInitialPress
 
-          In parallel to this, Read the CurrentPosition attribute
+          wait 10 seconds, Read the CurrentPosition attribute
 
-          1. ./chip-tool interactive start
-          2. switch read current-position 1 1
+          ./chip-tool switch read current-position 1 1
 
           Verify CurrentPosition value is 1 On TH(all-cluster-app) log
 
@@ -651,7 +599,6 @@ tests:
           [1686294581.634152][30986:30986] CHIP:DMG:         InteractionModelRevision = 1
           [1686294581.634154][30986:30986] CHIP:DMG: }
 
-
           After 0.2 seconds, send this command
 
           echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
@@ -663,10 +610,9 @@ tests:
           [1659683678.805777][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
           [1659683678.805858][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
 
-          In parallel to this, Read the CurrentPosition attribute
+          wait 10 seconds, Read the CurrentPosition attribute
 
-          1. ./chip-tool interactive start
-          2. switch read current-position 1 1
+          ./chip-tool switch read current-position 1 1
 
           Verify CurrentPosition value is 0 On TH(all-cluster-app) log
 
@@ -696,6 +642,9 @@ tests:
           [1686294592.640739][30986:30986] CHIP:DMG:         SuppressResponse = true,
           [1686294592.640755][30986:30986] CHIP:DMG:         InteractionModelRevision = 1
           [1686294592.640768][30986:30986] CHIP:DMG: }
+
+
+          Repeat above steps over 1 minute period of time
       disabled: true
 
     - label:
@@ -720,22 +669,7 @@ tests:
           [1659624126.647438][8590:8590] CHIP:-: The new position when the momentary switch starts to be pressed:1
           [1659624126.647480][8590:8590] CHIP:ZCL: SwitchServer: OnInitialPress
 
-          After 0.2 seconds, send this command
-
-          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
-
-          Verify ShortRelease event with PreviousPosition set to 1 on TH(all-cluster-app) log:
-
-          [1659684051.064329][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
-          [1659684051.064820][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7716
-          [1659684051.064904][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
-          [1659684051.064994][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
-
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-          2. switch subscribe-event initial-press 1 100 1 1
+          ./chip-tool switch read-event initial-press  1 1
 
           Verify InitialPress event with NewPosition set to 1 on DUT(chip-tool) log:
 
@@ -747,11 +681,18 @@ tests:
           [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
           [1659527630.476969][4774:4779] CHIP:TOO:    }
 
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
+          After 0.2 seconds, send this command
 
-          1. ./chip-tool interactive start
-          2. switch subscribe-event short-release 1 100 1 1
+          echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+
+          Verify ShortRelease event with PreviousPosition set to 1 on TH(all-cluster-app) log:
+
+          [1659684051.064329][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
+          [1659684051.064820][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e7716
+          [1659684051.064904][2530:2530] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released:1
+          [1659684051.064994][2530:2530] CHIP:ZCL: SwitchServer: OnShortRelease
+
+          ./chip-tool switch read-event short-release  1 1
 
           Verify ShortRelease event with PreviousPosition set to 1 on DUT(chip-tool) log:
 
@@ -762,11 +703,7 @@ tests:
           [1659527630.476887][4774:4779] CHIP:TOO:   ShortRelease: {
           [1659527630.476934][4774:4779] CHIP:TOO:     PreviousPosition: 1
           [1659527630.476969][4774:4779] CHIP:TOO:    }
-
-          After 10 seconds, repeat these commands (again with 0.2 s between them).
-          Repeat this for 1 minute total.
-
-          Watch whether DUT presents state of simulated switch and/or controls another device based on the state of the switch.
+          Repeat above steps over a 1 minute period of time
       disabled: true
 
     - label:
@@ -792,6 +729,18 @@ tests:
           [1686295316.319509][30986:30986] CHIP:-: The new position when the momentary switch starts to be pressed:1
           [1686295316.319518][30986:30986] CHIP:ZCL: SwitchServer: OnInitialPress
 
+          ./chip-tool switch read-event initial-press   1 1
+
+          Verify InitialPress event with NewPosition set to 1 on TH(chip-tool) log:
+
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 4
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687000
+          [1659527630.476887][4774:4779] CHIP:TOO:   InitialPress: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
+
           After 0.75 seconds, send this command
 
           echo '{"Name":"LongPress","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
@@ -802,6 +751,18 @@ tests:
           [1686295316.319478][30986:30986] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to bae4056b
           [1686295316.319509][30986:30986] CHIP:-: The new position when the momentary switch starts to be pressed:1
           [1686295316.319518][30986:30986] CHIP:ZCL: SwitchServer: OnInitialPress
+
+          ./chip-tool switch read-event long-press 1 1
+
+          Verify LongPress event with NewPosition set to 1 on TH(chip-tool) log:
+
+          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
+          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 5
+          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
+          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687750
+          [1659527630.476887][4774:4779] CHIP:TOO:   LongPress: {
+          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
+          [1659527630.476969][4774:4779] CHIP:TOO:    }
 
           After 2 seconds, send this command
 
@@ -814,43 +775,7 @@ tests:
           [1686295393.569959][30986:30986] CHIP:-: The the previous value of the CurrentPosition when the momentary switch has been released after having been pressed for a long time:1
           [1686295393.569976][30986:30986] CHIP:ZCL: SwitchServer: OnLongRelease
 
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-          2. switch subscribe-event initial-press 1 100 1 1
-
-          Verify InitialPress event with NewPosition set to 1 on TH(chip-tool) log:
-
-          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
-          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 4
-          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
-          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687000
-          [1659527630.476887][4774:4779] CHIP:TOO:   InitialPress: {
-          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
-          [1659527630.476969][4774:4779] CHIP:TOO:    }
-
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-          2. switch subscribe-event long-press 1 100 1 1
-
-          Verify LongPress event with NewPosition set to 1 on TH(chip-tool) log:
-
-          [1659527630.476706][4774:4779] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
-          [1659527630.476742][4774:4779] CHIP:TOO:   Event number: 5
-          [1659527630.476771][4774:4779] CHIP:TOO:   Priority: Info
-          [1659527630.476799][4774:4779] CHIP:TOO:   Timestamp: 29687750
-          [1659527630.476887][4774:4779] CHIP:TOO:   LongPress: {
-          [1659527630.476934][4774:4779] CHIP:TOO:     NewPosition: 1
-          [1659527630.476969][4774:4779] CHIP:TOO:    }
-
-          Please use Interactive mode to Verify the subscription of an event
-          Here the command to enter interactive mode:--
-
-          1. ./chip-tool interactive start
-           2. switch subscribe-event long-release 1 100 1 1
+          ./chip-tool  switch read-event long-release 1 1
 
           Verify LonglRelease event with PreviousPosition set to 1 on TH(chip-tool) log:
 
@@ -862,8 +787,5 @@ tests:
           [1659527630.476934][4774:4779] CHIP:TOO:     PreviousPosition: 1
           [1659527630.476969][4774:4779] CHIP:TOO:    }
 
-          After 8 seconds, repeat this set of commands
-          Repeat this for 1 minute total.
-
-          Watch whether DUT presents state of simulated switch and/or controls another device based on the state of the switch.
+          Repeat above steps Over a 1 minute period of time
       disabled: true

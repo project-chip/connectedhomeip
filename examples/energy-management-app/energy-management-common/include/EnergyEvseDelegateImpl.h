@@ -26,6 +26,14 @@
 #include <cstring>
 
 using chip::Protocols::InteractionModel::Status;
+
+/**
+ * @brief   Helper function to get current timestamp in Epoch format
+ *
+ * @param   chipEpoch reference to hold return timestamp
+ */
+CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -53,7 +61,7 @@ class EvseSession
 public:
     EvseSession(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
     /**
-     * @brief This function samples the start-time, and energy meter to hold the session info
+     * @brief This function records the start time and provided energy meter values as part of the new session.
      *
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
@@ -132,22 +140,6 @@ public:
     Status StartDiagnostics() override;
 
     /**
-     * @brief    Called when EVSE cluster receives SetTargets command
-     */
-
-    Status SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &) override;
-
-    /**
-     * @brief    Called when EVSE cluster receives GetTargets command
-     */
-
-    Status GetTargets(Commands::GetTargetsResponse::Type &) override;
-    /**
-     * @brief    Called when EVSE cluster receives ClearTargets command
-     */
-    Status ClearTargets() override;
-
-    /**
      * @brief    Called by EVSE Hardware to register a single callback handler
      */
     Status HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg);
@@ -187,10 +179,6 @@ public:
     Status SendEnergyTransferStartedEvent();
     Status SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason);
     Status SendFaultEvent(FaultStateEnum newFaultState);
-    Status
-    ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
-    Status
-    SaveTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
 
     // ------------------------------------------------------------------
     // Get attribute methods

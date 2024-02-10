@@ -13,10 +13,13 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 263.4.1. [TC-DISHM-3.1] OnMode verification with DUT as Server
+name: 263.4.1. [TC-DISHM-3.1] On Mode functionality with DUT as Server
 
 PICS:
-    - DISHM.S
+    - DISHM.S.A0003
+    - DISHM.S.F00
+    - OO.S.C00.Rsp
+    - OO.S.C01.Rsp
 
 config:
     nodeId: 0x12344321

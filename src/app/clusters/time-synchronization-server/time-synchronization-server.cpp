@@ -773,10 +773,10 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
     CHIP_ERROR err = UpdateUTCTime(utcTime);
     if (err != CHIP_NO_ERROR && !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
     {
-        ChipLogError(Zcl, "Error setting UTC time on the device");
+        ChipLogError(Zcl, "Error setting UTC time on the device: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-    GetDelegate()->UTCTimeChanged(utcTime);
+    GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
     mGranularity         = granularity;
     EmberAfStatus status = TimeSource::Set(ep, source);
     if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))

@@ -31,6 +31,7 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
+#include <tracing/macros.h>
 
 using SceneTableEntry   = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
 using SceneStorageId    = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
@@ -40,12 +41,12 @@ using ExtensionFieldSet = chip::scenes::ExtensionFieldSet;
 using GroupDataProvider = chip::Credentials::GroupDataProvider;
 using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
 using AuthMode          = chip::Access::AuthMode;
-using ScenesServer      = chip::app::Clusters::Scenes::ScenesServer;
+using ScenesServer      = chip::app::Clusters::ScenesManagement::ScenesServer;
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Scenes {
+namespace ScenesManagement {
 
 namespace {
 
@@ -60,7 +61,15 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 {
     if (CHIP_NO_ERROR != err)
     {
-        resp.status = to_underlying(StatusIB(err).mStatus);
+        // TODO : Properly fix mapping between error types (issue https://github.com/project-chip/connectedhomeip/issues/26885)
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            resp.status = to_underlying(Protocols::InteractionModel::Status::NotFound);
+        }
+        else
+        {
+            resp.status = to_underlying(StatusIB(err).mStatus);
+        }
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
     }
     return err;
@@ -259,7 +268,8 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
 {
     VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, Scenes::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t index =
+        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (index < ArraySize(mSceneInfoStructs))
     {
@@ -359,7 +369,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     response.sceneID = req.sceneID;
 
     // Verify the attributes are respecting constraints
-    if (req.transitionTime > scenes::kScenesMaxTransitionTimeS || req.sceneName.size() > scenes::kSceneNameMaxLength)
+    if (req.transitionTime > scenes::kScenesMaxTransitionTime || req.sceneName.size() > scenes::kSceneNameMaxLength)
     {
         response.status = to_underlying(Protocols::InteractionModel::Status::InvalidCommand);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -376,29 +386,17 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         return;
     }
 
-    uint32_t transitionTimeMs = 0;
-    if (Commands::AddScene::Id == ctx.mRequestPath.mCommandId)
-    {
-        transitionTimeMs = static_cast<uint32_t>(req.transitionTime) * 1000u;
-    }
-    else if (Commands::EnhancedAddScene::Id == ctx.mRequestPath.mCommandId)
-    {
-        transitionTimeMs = static_cast<uint32_t>(req.transitionTime) * 100u;
-    }
-
-    auto fieldSetIter = req.extensionFieldSets.begin();
-
-    uint8_t EFSCount = 0;
-
     uint32_t featureMap = 0;
     ReturnOnFailure(AddResponseOnError(ctx, response, Attributes::FeatureMap::Get(ctx.mRequestPath.mEndpointId, &featureMap)));
 
-    SceneData storageData(CharSpan(), transitionTimeMs);
+    SceneData storageData(CharSpan(), req.transitionTime);
     if (featureMap & to_underlying(Feature::kSceneNames))
     {
         storageData.SetName(req.sceneName);
     }
 
+    auto fieldSetIter = req.extensionFieldSets.begin();
+    uint8_t EFSCount  = 0;
     // Goes through all EFS in command
     while (fieldSetIter.Next() && EFSCount < scenes::kMaxClustersPerScene)
     {
@@ -522,16 +520,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
     }
 
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
-
-    // Verifies how to convert transition time
-    if (Commands::ViewScene::Id == ctx.mRequestPath.mCommandId)
-    {
-        response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 1000));
-    }
-    else if (Commands::EnhancedViewScene::Id == ctx.mRequestPath.mCommandId)
-    {
-        response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 100));
-    }
+    response.transitionTime.SetValue(scene.mStorageData.mSceneTransitionTimeMs);
 
     response.sceneName.SetValue(CharSpan(scene.mStorageData.mName, scene.mStorageData.mNameLength));
     Span<Structs::ExtensionFieldSet::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
@@ -601,7 +590,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
 }
 
 CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & endpointID, const GroupId & groupID,
-                            const SceneId & sceneID, const Optional<DataModel::Nullable<uint16_t>> & transitionTime,
+                            const SceneId & sceneID, const Optional<DataModel::Nullable<uint32_t>> & transitionTime,
                             GroupDataProvider * groupProvider)
 {
     // Make SceneValid false for all fabrics before recalling a scene
@@ -633,7 +622,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
         // Check for nullable
         if (!transitionTime.Value().IsNull())
         {
-            scene.mStorageData.mSceneTransitionTimeMs = static_cast<uint32_t>(transitionTime.Value().Value() * 100);
+            scene.mStorageData.mSceneTransitionTimeMs = transitionTime.Value().Value();
         }
     }
 
@@ -678,14 +667,6 @@ void ScenesServer::InvokeCommand(HandlerContext & ctxt)
     case Commands::GetSceneMembership::Id:
         HandleCommand<Commands::GetSceneMembership::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleGetSceneMembership(ctx, req); });
-        return;
-    case Commands::EnhancedAddScene::Id:
-        HandleCommand<Commands::EnhancedAddScene::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleEnhancedAddScene(ctx, req); });
-        return;
-    case Commands::EnhancedViewScene::Id:
-        HandleCommand<Commands::EnhancedViewScene::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleEnhancedViewScene(ctx, req); });
         return;
     case Commands::CopyScene::Id:
         HandleCommand<Commands::CopyScene::DecodableType>(
@@ -771,7 +752,7 @@ void ScenesServer::StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpoint
 }
 void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
-    Optional<DataModel::Nullable<uint16_t>> transitionTime;
+    Optional<DataModel::Nullable<uint32_t>> transitionTime;
 
     RecallSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, transitionTime, mGroupProvider);
 }
@@ -811,16 +792,19 @@ void ScenesServer::RemoveFabric(EndpointId aEndpointId, FabricIndex aFabricIndex
 
 void ScenesServer::HandleAddScene(HandlerContext & ctx, const Commands::AddScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("AddScene", "Scenes");
     AddSceneParse<Commands::AddScene::DecodableType, Commands::AddSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleViewScene(HandlerContext & ctx, const Commands::ViewScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("ViewScene", "Scenes");
     ViewSceneParse<Commands::ViewScene::DecodableType, Commands::ViewSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::RemoveScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("RemoveScene", "Scenes");
     Commands::RemoveSceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -877,6 +861,7 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
 
 void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::RemoveAllScenes::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("RemoveAllScenes", "Scenes");
     Commands::RemoveAllScenesResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -926,6 +911,7 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
 
 void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("StoreScene", "Scenes");
     Commands::StoreSceneResponse::Type response;
 
     // Response data
@@ -946,6 +932,7 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
 
 void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::RecallScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("RecallScene", "Scenes");
     CHIP_ERROR err = RecallSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
                                       req.sceneID, req.transitionTime, mGroupProvider);
 
@@ -967,6 +954,7 @@ void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::Recal
 
 void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands::GetSceneMembership::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("GetSceneMembership", "Scenes");
     Commands::GetSceneMembershipResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -1011,17 +999,9 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void ScenesServer::HandleEnhancedAddScene(HandlerContext & ctx, const Commands::EnhancedAddScene::DecodableType & req)
-{
-    AddSceneParse<Commands::EnhancedAddScene::DecodableType, Commands::EnhancedAddSceneResponse::Type>(ctx, req, mGroupProvider);
-}
-
-void ScenesServer::HandleEnhancedViewScene(HandlerContext & ctx, const Commands::EnhancedViewScene::DecodableType & req)
-{
-    ViewSceneParse<Commands::EnhancedViewScene::DecodableType, Commands::EnhancedViewSceneResponse::Type>(ctx, req, mGroupProvider);
-}
 void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopyScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("CopyScene", "Scenes");
     Commands::CopySceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -1055,7 +1035,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                                        sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
 
     // Checks if we copy a single scene or all of them
-    if (req.mode.GetField(app::Clusters::Scenes::CopyModeBitmap::kCopyAllScenes))
+    if (req.mode.GetField(app::Clusters::ScenesManagement::CopyModeBitmap::kCopyAllScenes))
     {
         // Scene Table interface data
         SceneId scenesInGroup[scenes::kMaxScenesPerFabric];
@@ -1121,45 +1101,18 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-} // namespace Scenes
+} // namespace ScenesManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
 using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Scenes;
+using namespace chip::app::Clusters::ScenesManagement;
 
-void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
+void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
-    uint32_t featureMap  = 0;
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
-    {
-        // According to spec, bit 7 MUST match feature bit 0 (SceneNames)
-        BitMask<NameSupportBitmap> nameSupport = (featureMap & to_underlying(Feature::kSceneNames))
-            ? BitMask<NameSupportBitmap>(NameSupportBitmap::kSceneNames)
-            : BitMask<NameSupportBitmap>();
-        status                                 = Attributes::NameSupport::Set(endpoint, nameSupport);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
-        }
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "ERR: getting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
-    }
-
-    // Explicit AttributeValuePairs and TableSize features are mandatory for matter so we force-set them here
-    featureMap |= (to_underlying(Feature::kExplicit) | to_underlying(Feature::kTableSize));
-    status = Attributes::FeatureMap::Set(endpoint, featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        ChipLogDetail(Zcl, "ERR: setting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
-    }
-
-    status = Attributes::LastConfiguredBy::SetNull(endpoint);
+    EmberAfStatus status = Attributes::LastConfiguredBy::SetNull(endpoint);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
         ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
@@ -1173,7 +1126,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
     }
 }
 
-void MatterScenesClusterServerShutdownCallback(EndpointId endpoint)
+void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
 {
     uint16_t endpointTableSize = 0;
     ReturnOnFailure(Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
@@ -1183,7 +1136,7 @@ void MatterScenesClusterServerShutdownCallback(EndpointId endpoint)
     sceneTable->RemoveEndpoint();
 }
 
-void MatterScenesPluginServerInitCallback()
+void MatterScenesManagementPluginServerInitCallback()
 {
     CHIP_ERROR err = ScenesServer::Instance().Init();
     if (err != CHIP_NO_ERROR)

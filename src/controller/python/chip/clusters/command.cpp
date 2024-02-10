@@ -55,24 +55,26 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
 namespace chip {
 namespace python {
 
-using OnCommandSenderResponseCallback = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+using OnCommandSenderResponseCallback     = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                                  chip::CommandId commandId, size_t index,
                                                  std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                                  chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
-using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,
+using OnCommandSenderErrorCallback        = void (*)(PyObject appContext,
                                               std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                               chip::ClusterStatus clusterStatus, PyChipError chiperror);
-using OnCommandSenderDoneCallback     = void (*)(PyObject appContext);
+using OnCommandSenderDoneCallback         = void (*)(PyObject appContext);
+using TestOnlyOnCommandSenderDoneCallback = void (*)(PyObject appContext, python::TestOnlyPyOnDoneInfo testOnlyDoneInfo);
 
-OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
-OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
-OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
+OnCommandSenderResponseCallback gOnCommandSenderResponseCallback         = nullptr;
+OnCommandSenderErrorCallback gOnCommandSenderErrorCallback               = nullptr;
+OnCommandSenderDoneCallback gOnCommandSenderDoneCallback                 = nullptr;
+TestOnlyOnCommandSenderDoneCallback gTestOnlyOnCommandSenderDoneCallback = nullptr;
 
 class CommandSenderCallback : public CommandSender::ExtendableCallback
 {
 public:
-    CommandSenderCallback(PyObject appContext, bool isBatchedCommands) :
-        mAppContext(appContext), mIsBatchedCommands(isBatchedCommands)
+    CommandSenderCallback(PyObject appContext, bool isBatchedCommands, bool callTestOnlyOnDone) :
+        mAppContext(appContext), mIsBatchedCommands(isBatchedCommands), mCallTestOnlyOnDone(callTestOnlyOnDone)
     {}
 
     void OnResponse(CommandSender * apCommandSender, const CommandSender::ResponseData & aResponseData) override
@@ -148,7 +150,17 @@ public:
 
     void OnDone(CommandSender * apCommandSender) override
     {
-        gOnCommandSenderDoneCallback(mAppContext);
+        if (mCallTestOnlyOnDone)
+        {
+            python::TestOnlyPyOnDoneInfo testOnlyOnDoneInfo;
+            testOnlyOnDoneInfo.responseMessageCount = apCommandSender->GetInvokeResponseMessageCount();
+            gTestOnlyOnCommandSenderDoneCallback(mAppContext, testOnlyOnDoneInfo);
+        }
+        else
+        {
+            gOnCommandSenderDoneCallback(mAppContext);
+        }
+
         delete apCommandSender;
         delete this;
     };
@@ -179,7 +191,142 @@ private:
     PyObject mAppContext = nullptr;
     std::unordered_map<uint16_t, size_t> commandRefToIndex;
     bool mIsBatchedCommands;
+    bool mCallTestOnlyOnDone;
 };
+
+PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
+                                      uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
+                                      python::TestOnlyPyBatchCommandsOverrides * testOnlyOverrides,
+                                      python::PyInvokeRequestData * batchCommandData, size_t length)
+{
+    CommandSender::ConfigParameters config;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    bool testOnlySuppressTimedRequestMessage = false;
+    uint16_t * testOnlyCommandRefsOverride   = nullptr;
+
+    VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
+
+    // Test only override validation checks and setup
+    if (testOnlyOverrides != nullptr)
+    {
+        if (testOnlyOverrides->suppressTimedRequestMessage)
+        {
+            VerifyOrReturnError(timedRequestTimeoutMs == 0, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+            testOnlySuppressTimedRequestMessage = true;
+        }
+        if (testOnlyOverrides->overrideCommandRefsList != nullptr)
+        {
+            VerifyOrReturnError(length == testOnlyOverrides->overrideCommandRefsListLength,
+                                ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+            testOnlyCommandRefsOverride = testOnlyOverrides->overrideCommandRefsList;
+        }
+    }
+
+    if (testOnlyOverrides != nullptr && testOnlyOverrides->overrideRemoteMaxPathsPerInvoke)
+    {
+        config.SetRemoteMaxPathsPerInvoke(testOnlyOverrides->overrideRemoteMaxPathsPerInvoke);
+    }
+    else
+    {
+        auto remoteSessionParameters = device->GetSecureSession().Value()->GetRemoteSessionParameters();
+        config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
+    }
+
+    bool isBatchedCommands  = true;
+    bool callTestOnlyOnDone = testOnlyOverrides != nullptr;
+    std::unique_ptr<CommandSenderCallback> callback =
+        std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
+
+    bool isTimedRequest = timedRequestTimeoutMs != 0 || testOnlySuppressTimedRequestMessage;
+    std::unique_ptr<CommandSender> sender =
+        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(), isTimedRequest, suppressResponse);
+
+    SuccessOrExit(err = sender->SetCommandSenderConfig(config));
+
+    for (size_t i = 0; i < length; i++)
+    {
+        chip::EndpointId endpointId = batchCommandData[i].commandPath.endpointId;
+        chip::ClusterId clusterId   = batchCommandData[i].commandPath.clusterId;
+        chip::CommandId commandId   = batchCommandData[i].commandPath.commandId;
+        void * tlv                  = batchCommandData[i].tlvData;
+        size_t tlvLength            = batchCommandData[i].tlvLength;
+
+        const uint8_t * tlvBuffer = reinterpret_cast<const uint8_t *>(tlv);
+
+        app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
+                                             (app::CommandPathFlags::kEndpointIdValid) };
+
+        CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.commandRef.SetValue(static_cast<uint16_t>(i));
+
+        SuccessOrExit(err = sender->PrepareCommand(cmdParams, prepareCommandParams));
+        {
+            auto writer = sender->GetCommandDataIBTLVWriter();
+            VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            TLV::TLVReader reader;
+            reader.Init(tlvBuffer, static_cast<uint32_t>(tlvLength));
+            reader.Next();
+            SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
+        }
+
+        Optional<uint16_t> timedRequestTimeout =
+            timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs) : Optional<uint16_t>::Missing();
+        CommandSender::FinishCommandParameters finishCommandParams(timedRequestTimeout);
+        if (testOnlyCommandRefsOverride != nullptr)
+        {
+            finishCommandParams.commandRef.SetValue(testOnlyCommandRefsOverride[i]);
+        }
+        else
+        {
+            finishCommandParams.commandRef = prepareCommandParams.commandRef;
+        }
+        SuccessOrExit(err = sender->TestOnlyFinishCommand(finishCommandParams));
+
+        // CommandSender provides us with the CommandReference for this associated command. In order to match responses
+        // we have to add CommandRef to index lookup.
+        VerifyOrExit(finishCommandParams.commandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        if (testOnlyCommandRefsOverride != nullptr)
+        {
+            // Making sure the value we used to override CommandRef was actually used.
+            VerifyOrDie(finishCommandParams.commandRef.Value() == testOnlyCommandRefsOverride[i]);
+            // Ignoring the result of adding to index as the test might be trying to set duplicate CommandRefs.
+            callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i);
+        }
+        else
+        {
+            SuccessOrExit(err = callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i));
+        }
+    }
+
+    {
+        Optional<System::Clock::Timeout> interactionTimeout = interactionTimeoutMs != 0
+            ? MakeOptional(System::Clock::Milliseconds32(interactionTimeoutMs))
+            : Optional<System::Clock::Timeout>::Missing();
+        if (testOnlySuppressTimedRequestMessage)
+        {
+            SuccessOrExit(err = sender->TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(device->GetSecureSession().Value(),
+                                                                                               interactionTimeout));
+        }
+        else
+        {
+            SuccessOrExit(err = sender->SendCommandRequest(device->GetSecureSession().Value(), interactionTimeout));
+        }
+    }
+
+    sender.release();
+    callback.release();
+
+    // TODO(#30985): Reconsider the purpose of busyWait and if it can be broken out into it's
+    // own method/primitive.
+    if (busyWaitMs)
+    {
+        usleep(busyWaitMs * 1000);
+    }
+
+exit:
+    return ToPyChipError(err);
+}
 
 } // namespace python
 } // namespace chip
@@ -189,11 +336,13 @@ using namespace chip::python;
 extern "C" {
 void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
                                         OnCommandSenderErrorCallback onCommandSenderErrorCallback,
-                                        OnCommandSenderDoneCallback onCommandSenderDoneCallback)
+                                        OnCommandSenderDoneCallback onCommandSenderDoneCallback,
+                                        TestOnlyOnCommandSenderDoneCallback testOnlyOnCommandSenderDoneCallback)
 {
-    gOnCommandSenderResponseCallback = onCommandSenderResponseCallback;
-    gOnCommandSenderErrorCallback    = onCommandSenderErrorCallback;
-    gOnCommandSenderDoneCallback     = onCommandSenderDoneCallback;
+    gOnCommandSenderResponseCallback     = onCommandSenderResponseCallback;
+    gOnCommandSenderErrorCallback        = onCommandSenderErrorCallback;
+    gOnCommandSenderDoneCallback         = onCommandSenderDoneCallback;
+    gTestOnlyOnCommandSenderDoneCallback = testOnlyOnCommandSenderDoneCallback;
 }
 
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
@@ -205,8 +354,10 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
+    bool isBatchedCommands  = false;
+    bool callTestOnlyOnDone = false;
     std::unique_ptr<CommandSenderCallback> callback =
-        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/false);
+        std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
     std::unique_ptr<CommandSender> sender =
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                         /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
@@ -251,81 +402,23 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
                                                    uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
                                                    python::PyInvokeRequestData * batchCommandData, size_t length)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    python::TestOnlyPyBatchCommandsOverrides * testOnlyOverrides = nullptr;
+    return SendBatchCommandsInternal(appContext, device, timedRequestTimeoutMs, interactionTimeoutMs, busyWaitMs, suppressResponse,
+                                     testOnlyOverrides, batchCommandData, length);
+}
 
-    VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
-    auto remoteSessionParameters = device->GetSecureSession().Value()->GetRemoteSessionParameters();
-    CommandSender::ConfigParameters config;
-
-    // TODO(#30986): Need to create a separate pychip_CommandSender_TestOnlySendBatchCommands so that we perform
-    // operations that is very clear at callsite that violating certain aspects like setting this MaxPathsPerInvoke
-    // to a number other than what is reported by the remote node is allowed. Right now the only user of this
-    // function is cert test script. To implement pychip_CommandSender_TestOnlySendBatchCommands in a clean way
-    // we need to move away from the variadic arguments.
-    // config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
-    (void) remoteSessionParameters; // Still want to get remoteSessionParameters, just wont use it right now.
-    config.SetRemoteMaxPathsPerInvoke(std::numeric_limits<uint16_t>::max());
-
-    std::unique_ptr<CommandSenderCallback> callback =
-        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/true);
-    std::unique_ptr<CommandSender> sender =
-        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
-                                        /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
-
-    SuccessOrExit(err = sender->SetCommandSenderConfig(config));
-
-    for (size_t i = 0; i < length; i++)
-    {
-        chip::EndpointId endpointId = batchCommandData[i].commandPath.endpointId;
-        chip::ClusterId clusterId   = batchCommandData[i].commandPath.clusterId;
-        chip::CommandId commandId   = batchCommandData[i].commandPath.commandId;
-        void * tlv                  = batchCommandData[i].tlvData;
-        size_t tlvLength            = batchCommandData[i].tlvLength;
-
-        const uint8_t * tlvBuffer = reinterpret_cast<const uint8_t *>(tlv);
-
-        app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
-
-        CommandSender::AdditionalCommandParameters additionalParams;
-
-        SuccessOrExit(err = sender->PrepareCommand(cmdParams, additionalParams));
-        {
-            auto writer = sender->GetCommandDataIBTLVWriter();
-            VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-            TLV::TLVReader reader;
-            reader.Init(tlvBuffer, static_cast<uint32_t>(tlvLength));
-            reader.Next();
-            SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
-        }
-
-        SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                             : Optional<uint16_t>::Missing(),
-                                                  additionalParams));
-
-        // CommandSender provides us with the CommandReference for this associated command. In order to match responses
-        // we have to add CommandRef to index lookup.
-        VerifyOrExit(additionalParams.commandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
-        SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.commandRef.Value(), i));
-    }
-
-    SuccessOrExit(err = sender->SendCommandRequest(device->GetSecureSession().Value(),
-                                                   interactionTimeoutMs != 0
-                                                       ? MakeOptional(System::Clock::Milliseconds32(interactionTimeoutMs))
-                                                       : Optional<System::Clock::Timeout>::Missing()));
-
-    sender.release();
-    callback.release();
-
-    // TODO(#30985): Reconsider the purpose of busyWait and if it can be broken out into it's
-    // own method/primitive.
-    if (busyWaitMs)
-    {
-        usleep(busyWaitMs * 1000);
-    }
-
-exit:
-    return ToPyChipError(err);
+PyChipError pychip_CommandSender_TestOnlySendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
+                                                           uint16_t interactionTimeoutMs, uint16_t busyWaitMs,
+                                                           bool suppressResponse,
+                                                           python::TestOnlyPyBatchCommandsOverrides testOnlyOverrides,
+                                                           python::PyInvokeRequestData * batchCommandData, size_t length)
+{
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    return SendBatchCommandsInternal(appContext, device, timedRequestTimeoutMs, interactionTimeoutMs, busyWaitMs, suppressResponse,
+                                     &testOnlyOverrides, batchCommandData, length);
+#else
+    return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
+#endif
 }
 
 PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
@@ -338,8 +431,10 @@ PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
+    bool isBatchedCommands  = false;
+    bool callTestOnlyOnDone = false;
     std::unique_ptr<CommandSenderCallback> callback =
-        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/false);
+        std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
     std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                                                             /* is timed request */ true, suppressResponse);
 

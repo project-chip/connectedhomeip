@@ -63,10 +63,10 @@ Davis, CA 95616, USA
   <conditions/>
   <clusters>
     <cluster id="0x0056" name="Temperature Control" side="server">
-      <mandatoryConform/>
+      <optionalConform choice="a" more="true"/>
     </cluster>
     <cluster id="0x0402" name="Temperature Measurement" side="server">
-      <optionalConform/>
+      <optionalConform choice="a" more="true"/>
     </cluster>
   </clusters>
 </deviceType>

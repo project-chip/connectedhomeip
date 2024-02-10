@@ -23,6 +23,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <system/SystemLayer.h>
 
@@ -75,6 +76,20 @@ public:
     CHIP_ERROR StopScan();
 
 private:
+    enum ChipDeviceScannerState
+    {
+        SCANNER_UNINITIALIZED,
+        SCANNER_INITIALIZED,
+        SCANNER_SCANNING
+    };
+
+    enum ScannerTimerState
+    {
+        TIMER_CANCELED,
+        TIMER_STARTED,
+        TIMER_EXPIRED
+    };
+
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
     static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
     static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
@@ -92,15 +107,13 @@ private:
 
     GDBusObjectManager * mManager         = nullptr;
     BluezAdapter1 * mAdapter              = nullptr;
-    GCancellable * mCancellable           = nullptr;
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
-    bool mIsInitialized                   = false;
-    bool mIsScanning                      = false;
-    bool mIsStopping                      = false;
+    ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
     /// Used to track if timer has already expired and doesn't need to be canceled.
-    bool mTimerExpired = false;
+    ScannerTimerState mTimerState = ScannerTimerState::TIMER_CANCELED;
+    GAutoPtr<GCancellable> mCancellable;
 };
 
 } // namespace Internal

@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:32
+            image: ghcr.io/project-chip/chip-build-esp32:35
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -130,7 +130,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:32
+            image: ghcr.io/project-chip/chip-build-esp32:35
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -165,3 +165,6 @@ jobs:
 
             - name: Build example Lighting App (external platform)
               run: scripts/examples/esp_example.sh lighting-app sdkconfig.ext_plat.defaults
+
+            - name: Build example Energy Management App
+              run: scripts/examples/esp_example.sh energy-management-app sdkconfig.defaults

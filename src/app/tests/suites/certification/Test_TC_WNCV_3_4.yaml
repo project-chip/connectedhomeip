@@ -18,6 +18,7 @@ name:
 
 PICS:
     - WNCV.S
+    - WNCV.S.F02 | WNCV.S.F04
 
 config:
     nodeId: 0x12344321

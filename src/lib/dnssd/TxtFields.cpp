@@ -183,6 +183,11 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
     Platform::CopyString(pairingInstruction, kMaxPairingInstructionLen + 1, value);
 }
 
+uint8_t GetCommissionerPasscode(const ByteSpan & value)
+{
+    return MakeU8FromAsciiDecimal(value);
+}
+
 Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
 {
     const auto undefined     = std::numeric_limits<uint32_t>::max();
@@ -249,6 +254,9 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionN
         break;
     case TxtFieldKey::kPairingHint:
         nodeData.pairingHint = Internal::GetPairingHint(val);
+        break;
+    case TxtFieldKey::kCommissionerPasscode:
+        nodeData.commissionerPasscode = Internal::GetCommissionerPasscode(val);
         break;
     default:
         break;

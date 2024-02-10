@@ -193,3 +193,26 @@ tests:
           value: null
           constraints:
               type: int32s
+
+    #Possibilites if Bit 4 (IsSynchronizedSleepyEndDeviceCapable) is only set if bit 2 (IsSleepyEndDeviceCapable) is also set expects value 20
+    #Verify that Bit 0 (IsBorderRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 9
+    #Verify that Bit 1 (IsRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 10
+    #So the possibilites of value here are in the range of 0-20 expected value as per test-plan [0, 4, 8, 9, 10, 16, 20]
+    - label:
+          "Step 14: TH reads the SupportedThreadFeatures attribute from the DUT"
+      PICS: CNET.S.A0009
+      command: "readAttribute"
+      attribute: "SupportedThreadFeatures"
+      response:
+          constraints:
+              type: bitmap16
+              anyOf: [0, 4, 8, 9, 10, 16, 20]
+
+    - label: "Step 15:TH reads the ThreadVersion attribute from the DUT"
+      PICS: CNET.S.A000A
+      command: "readAttribute"
+      attribute: "ThreadVersion"
+      response:
+          constraints:
+              type: int16u
+              minValue: 4

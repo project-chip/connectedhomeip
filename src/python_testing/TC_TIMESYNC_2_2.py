@@ -29,6 +29,9 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    def pics_TC_TIMESYNC_2_2(self) -> list[str]:
+        return ["TIMESYNC.S"]
+
     @async_test_body
     async def test_TC_TIMESYNC_2_2(self):
 

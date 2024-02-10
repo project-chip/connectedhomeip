@@ -20,12 +20,13 @@
 #pragma once
 
 #include "app/util/attribute-storage.h"
+#include "protocols/interaction_model/StatusCode.h"
 #include "pw_status/status.h"
 
 #define RETURN_STATUS_IF_NOT_OK(expr)                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        pw::Status __status = chip::rpc::EmberStatusToPwStatus(expr);                                                              \
+        pw::Status __status = chip::rpc::ToPwStatus(expr);                                                                         \
         if (!__status.ok())                                                                                                        \
         {                                                                                                                          \
             return __status;                                                                                                       \
@@ -35,7 +36,7 @@
 namespace chip {
 namespace rpc {
 
-constexpr pw::Status EmberStatusToPwStatus(EmberAfStatus ember_status)
+constexpr pw::Status ToPwStatus(EmberAfStatus ember_status)
 {
     switch (ember_status)
     {
@@ -45,6 +46,27 @@ constexpr pw::Status EmberStatusToPwStatus(EmberAfStatus ember_status)
         return pw::Status::NotFound();
     case EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS:
         return pw::Status::PermissionDenied();
+    default:
+        return pw::Status::Unknown();
+    }
+}
+
+constexpr pw::Status ToPwStatus(CHIP_ERROR chip_error_status)
+{
+    switch (chip_error_status.AsInteger())
+    {
+    case CHIP_NO_ERROR.AsInteger():
+        return pw::OkStatus();
+    case CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute).AsInteger():
+    case CHIP_IM_GLOBAL_STATUS(UnsupportedCommand).AsInteger():
+    case CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint).AsInteger():
+    case CHIP_IM_GLOBAL_STATUS(UnsupportedEvent).AsInteger():
+        return pw::Status::NotFound();
+    case CHIP_IM_GLOBAL_STATUS(UnsupportedAccess).AsInteger():
+        return pw::Status::PermissionDenied();
+    case CHIP_IM_GLOBAL_STATUS(InvalidAction).AsInteger():
+    case CHIP_IM_GLOBAL_STATUS(InvalidCommand).AsInteger():
+        return pw::Status::InvalidArgument();
     default:
         return pw::Status::Unknown();
     }

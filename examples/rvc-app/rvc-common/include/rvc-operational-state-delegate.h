@@ -34,7 +34,7 @@ typedef void (RvcDevice::*HandleOpStateCommand)(Clusters::OperationalState::Gene
 namespace RvcOperationalState {
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
-class RvcOperationalStateDelegate : public OperationalState::Delegate
+class RvcOperationalStateDelegate : public RvcOperationalState::Delegate
 {
 private:
     const Clusters::OperationalState::GenericOperationalState mOperationalStateList[7] = {
@@ -53,6 +53,8 @@ private:
     HandleOpStateCommand mPauseCallback;
     RvcDevice * mResumeRvcDeviceInstance;
     HandleOpStateCommand mResumeCallback;
+    RvcDevice * mGoHomeRvcDeviceInstance;
+    HandleOpStateCommand mGoHomeCallback;
 
 public:
     /**
@@ -100,20 +102,10 @@ public:
     void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     /**
-     * Handle Command Callback in application: Start
+     * Handle Command Callback in application: GoHome
      * @param[out] get operational error after callback.
      */
-    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
-        // This command in not supported.
-    };
-
-    /**
-     * Handle Command Callback in application: Stop
-     * @param[out] get operational error after callback.
-     */
-    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
-        // This command in not supported.
-    };
+    void HandleGoHomeCommandCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     void SetPauseCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
     {
@@ -125,6 +117,12 @@ public:
     {
         mResumeCallback          = aCallback;
         mResumeRvcDeviceInstance = aInstance;
+    };
+
+    void SetGoHomeCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
+    {
+        mGoHomeCallback          = aCallback;
+        mGoHomeRvcDeviceInstance = aInstance;
     };
 };
 

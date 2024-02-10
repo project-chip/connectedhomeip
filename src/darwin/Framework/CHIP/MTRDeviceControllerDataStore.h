@@ -30,7 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Interface that represents a single CASE session resumption entry.
  */
-MTR_HIDDEN
 @interface MTRCASESessionResumptionInfo : NSObject <NSSecureCoding>
 @property (nonatomic) NSNumber * nodeID;
 @property (nonatomic) NSData * resumptionID;
@@ -42,7 +41,6 @@ MTR_HIDDEN
  * Interface that wraps a type-safe API around
  * MTRDeviceControllerStorageDelegate.
  */
-MTR_HIDDEN
 @interface MTRDeviceControllerDataStore : NSObject
 
 - (nullable instancetype)initWithController:(MTRDeviceController *)controller
@@ -64,6 +62,14 @@ MTR_HIDDEN
  */
 - (CHIP_ERROR)storeLastLocallyUsedNOC:(MTRCertificateTLVBytes)noc;
 - (MTRCertificateTLVBytes _Nullable)fetchLastLocallyUsedNOC;
+
+/**
+ * Storage for MTRDevice attribute read cache. This is local-only storage as an optimization. New controller devices using MTRDevice API can prime their own local cache from devices directly.
+ */
+- (nullable NSArray<NSDictionary *> *)getStoredAttributesForNodeID:(NSNumber *)nodeID;
+- (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
+- (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
+- (void)clearAllStoredAttributes;
 
 @end
 

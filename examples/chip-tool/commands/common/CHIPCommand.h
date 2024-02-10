@@ -24,6 +24,8 @@
 
 #include "Command.h"
 
+#include "BDXDiagnosticLogsServerDelegate.h"
+
 #include <TracingCommandLineArgument.h>
 #include <app/icd/client/CheckInHandler.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>

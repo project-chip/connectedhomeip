@@ -86,6 +86,10 @@ if [ "$#" == "0" ]; then
         chip_enable_icd_server
             Configure has a Intermitently connected device. (Default false)
             Must also set chip_openthread_ftd=false
+        enable_synchronized_sed
+            Enable Synchronized Sleepy end device. (Default false)
+            Must also set chip_enable_icd_server=true chip_openthread_ftd=false
+            --icd can be used to configure both arguments
         use_rs9116
             Build wifi example with extension board rs9116. (Default false)
         use_SiWx917
@@ -292,7 +296,7 @@ else
     if [ "$SILABS_BOARD" == "BRD4338A" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
-        optArgs+="chip_device_platform =\"SiWx917\" "
+        optArgs+="chip_device_platform =\"SiWx917\" is_debug=false "
     fi
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then

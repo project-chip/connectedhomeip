@@ -97,11 +97,11 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 
 class BasicCompositionTests:
-    async def setup_class_helper(self):
+    async def setup_class_helper(self, default_to_pase: bool = True):
         dev_ctrl = self.default_controller
         self.problems = []
 
-        do_test_over_pase = self.user_params.get("use_pase_only", True)
+        do_test_over_pase = self.user_params.get("use_pase_only", default_to_pase)
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
         if do_test_over_pase:

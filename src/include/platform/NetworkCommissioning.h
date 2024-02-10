@@ -29,6 +29,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/Optional.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/Variant.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -36,6 +37,7 @@
 #include <app-common/zap-generated/cluster-enums.h>
 
 #include <limits>
+#include <utility>
 
 namespace chip {
 namespace DeviceLayer {
@@ -129,9 +131,13 @@ using NetworkIterator            = Iterator<Network>;
 using WiFiScanResponseIterator   = Iterator<WiFiScanResponse>;
 using ThreadScanResponseIterator = Iterator<ThreadScanResponse>;
 using Status                     = app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum;
-using WiFiBand                   = app::Clusters::NetworkCommissioning::WiFiBandEnum;
-using WiFiSecurity               = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
-using ThreadCapabilities         = app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap;
+using WiFiBandEnum               = app::Clusters::NetworkCommissioning::WiFiBandEnum;
+// For backwards compatibility with pre-rename enum values.
+using WiFiBand           = WiFiBandEnum;
+using WiFiSecurityBitmap = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+// For backwards compatibility with pre-rename bitmap values.
+using WiFiSecurity       = WiFiSecurityBitmap;
+using ThreadCapabilities = app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap;
 
 // BaseDriver and WirelessDriver are the common interfaces for a network driver, platform drivers should not implement this
 // directly, instead, users are expected to implement WiFiDriver, ThreadDriver and EthernetDriver.
@@ -345,31 +351,34 @@ public:
     /**
      * @brief Signs the specified message with the private key of a Network Client Identity.
      */
-    virtual CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, ByteSpan & message, Crypto::P256ECDSASignature & outSignature)
+    virtual CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
+                                              Crypto::P256ECDSASignature & outSignature)
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
     /**
-     *  @brief Provide all the frequency bands supported by the Wi-Fi interface
+     *  @brief Provide all the frequency bands supported by the Wi-Fi interface.
      *
      *  The default implementation returns the 2.4 GHz band support.
-     *  Note: WiFi platforms should implement this function in their WiFiDriver to provide their complete device capabilities
+     *  Note: WiFi platforms should implement this function in their WiFiDriver to provide their complete device capabilities.
      *
-     *  @param bands Reference to a span that is used to return the supported bands.
-     *               The span is initialized with a fixed-size buffer.
-     *               The implementation is expected to resize the span to match the number of returned results.
+     *  The returned bit mask has values of WiFiBandEnum packed into the bits. For example:
      *
-     *  @return CHIP_NO_ERROR on success or a CHIP_ERROR on failure.
+     *    - Bit 0 = (WiFiBandEnum::k2g4 == 0) --> (1 << 0) == (1 << WiFiBandEnum::k2g4)
+     *    - Bit 2 = (WiFiBandEnum::k5g == 2) --> (1 << 2) == (1 << WiFiBandEnum::k5g)
+     *    - If both 2.4G and 5G are supported --> ((1 << k2g4) || (1 << k5g)) == (1 || 4) == 5
+     *
+     *  On error, return 0 (no bands supported). This should never happen... Note that
+     *  certification tests will REQUIRE at least one bit set in the set.
+     *
+     *  @return a bitmask of supported Wi-Fi bands where each bit is associated with a WiFiBandEnum value.
      */
-    virtual CHIP_ERROR GetSupportedWiFiBands(Span<WiFiBand> & bands)
+    virtual uint32_t GetSupportedWiFiBandsMask() const
     {
-        ReturnErrorCodeIf(bands.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
-        bands.front() = WiFiBand::k2g4;
-        bands.reduce_size(1);
-
-        return CHIP_NO_ERROR;
+        // Default to 2.4G support (100% example platform coverage as of Matter 1.3) listed.
+        return static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
     }
 
     ~WiFiDriver() override = default;

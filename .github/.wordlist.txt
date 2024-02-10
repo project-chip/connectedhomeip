@@ -17,6 +17,7 @@ ables
 AccessControl
 AccessControlEntry
 accessor
+Accessors
 AccountLogin
 acdbc
 ack
@@ -31,7 +32,9 @@ AddNOC
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
+AddResponse
 AddThreadNetwork
+AddStatus
 adk
 AdministratorCommissioning
 adoc
@@ -92,11 +95,13 @@ ASR
 AssertionError
 AST
 ASYNC
+ATLs
 atomics
 att
 attId
 attr
 attrib
+AttributeAccessInterface
 attributeValue
 attrListName
 attrMask
@@ -156,6 +161,7 @@ blockquote
 bluetoothd
 bluez
 BOOL
+booleans
 BooleanState
 bootable
 Bootloader
@@ -256,6 +262,7 @@ clusterAttrs
 clusterId
 clusterList
 clusterListName
+ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
@@ -276,6 +283,8 @@ codelabs
 ColorControl
 Comcast
 Commandline
+CommandHandlerInterface
+CommandName
 Commissionable
 CommissionableDataProvider
 commissionables
@@ -289,6 +298,7 @@ configs
 configTOTAL
 ConfigurationManager
 ConfigurationManagerImpl
+conformant
 connectedhomeip
 ConnectionData
 ConnectIP
@@ -372,6 +382,7 @@ DefaultOTARequestor
 DefaultOTARequestorDriver
 DefaultOTARequestorStorage
 DefaultSuccess
+defaultValue
 definedValue
 DehumidificationControl
 DelayedActionTime
@@ -490,8 +501,12 @@ eg
 EjQ
 elftools
 elock
+emberAf
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
+EmberAfInitializeAttributes
+emberAfSetDynamicEndpoint
+emsp
 EnableNetwork
 EnableWiFiNetwork
 endian
@@ -521,6 +536,7 @@ EvalCodeWithName
 EvalFrameDefault
 EV
 EVB
+EventLogging
 evk
 EVSE
 exceptfds
@@ -592,8 +608,10 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
+GetInDevelopmentTests
 GetIP
 getManualTests
+GetSafeAttributePersistenceProvider
 getstarted
 getTests
 GH
@@ -616,6 +634,7 @@ GPL
 GPLv
 Gradle
 gradlew
+graphviz
 Groupcast
 GroupId
 GroupKeyManagement
@@ -629,6 +648,7 @@ Gv
 gz
 gzbf
 HaloaceticAcidsConcentrationMeasurement
+HandleCommand
 hardcoded
 hardknott
 hardwarever
@@ -659,6 +679,7 @@ IasWd
 iaszone
 ibb
 ICA
+ICAC
 ICD
 ICDs
 iCloud
@@ -700,6 +721,7 @@ installDebug
 instantiation
 integrations
 IntelliSense
+InteractionModelEngine
 InteractionModelVersion
 Interoperable
 introvideos
@@ -709,6 +731,7 @@ IoT
 ipaddr
 iPadOS
 ipadr
+IPK
 ipp
 iptables
 iputils
@@ -804,6 +827,7 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+LogEvent
 loopback
 LowPower
 LPC
@@ -832,6 +856,7 @@ matterc
 MatterCustomTrace
 matterd
 MatterLock
+MatterReportingAttributeChangeCallback
 matterSdkSourceBuild
 matterSourceBuildAbiFilters
 matterUTestLib
@@ -918,6 +943,7 @@ namespacing
 nano
 natively
 navpad
+nbsp
 NCP
 ncs
 nding
@@ -1059,12 +1085,14 @@ Pigweed
 PinCode
 pinrequest
 PIXIT
+PIXITs
 pkgconfig
 PKI
 plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+PluginServerCallback
 png
 Podman
 PollControl
@@ -1137,6 +1165,7 @@ RADVD
 raspberryPi
 RasPi
 rAv
+RCAC
 RCP
 ReadAttribute
 ReadConfigValue
@@ -1152,6 +1181,8 @@ recommand
 recommanded
 recurse
 regen
+registerAttributeAccessOverride
+RegisterCommandHandler
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1161,6 +1192,7 @@ RendezvousParameters
 RendezVousTest
 REPL
 repo
+repos
 req
 Requestor
 Requestor's
@@ -1198,6 +1230,7 @@ RTOS
 RTT
 RTX
 runArgs
+runIf
 RUNAS
 RunMain
 runtime
@@ -1206,6 +1239,7 @@ rw
 RXD
 sandboxed
 saveAs
+saveDataVersschemaionAs
 sbin
 scalability
 scalable
@@ -1356,6 +1390,7 @@ TestArray
 TestCluster
 TestConstraints
 TestEmptyString
+TestEqualities
 TestGenExample
 TestGroupDemoConfig
 TestMultiRead

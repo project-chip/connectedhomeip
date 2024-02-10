@@ -41,6 +41,7 @@
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
+#import "MTRServerEndpoint_Internal.h"
 #import "MTRSetupPayload.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
@@ -55,6 +56,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
+#include <app/server/Dnssd.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningWindowOpener.h>
@@ -62,6 +64,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <inet/InetInterface.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/LockTracker.h>
 #include <platform/PlatformManager.h>
@@ -69,6 +72,7 @@
 #include <system/SystemClock.h>
 
 #include <atomic>
+#include <dns_sd.h>
 
 #import <os/lock.h>
 
@@ -121,6 +125,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     os_unfair_lock _deviceMapLock; // protects nodeIDToDeviceMap
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
+
+    // _serverEndpoints is only touched on the Matter queue.
+    NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
 }
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
@@ -221,6 +228,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         _factory = factory;
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
         _nodeIDToDeviceMap = [NSMutableDictionary dictionary];
+        _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
 
         _deviceControllerDelegateBridge = new MTRDeviceControllerDelegateBridge();
@@ -284,6 +292,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (void)shutDownCppController
 {
     assertChipStackLockedByCurrentThread();
+
+    // Shut down all our endpoints.
+    for (MTRServerEndpoint * endpoint in [_serverEndpoints copy]) {
+        [self removeServerEndpointOnMatterQueue:endpoint];
+    }
 
     if (_cppCommissioner) {
         auto * commissionerToShutDown = _cppCommissioner;
@@ -851,6 +864,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         if ([self isRunning]) {
             _nodeIDToDeviceMap[nodeID] = deviceToReturn;
         }
+
+        // Load persisted attributes if they exist.
+        NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
+        if (attributesFromCache) {
+            [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
+        }
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 
@@ -945,6 +964,78 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     };
 
     return [self syncRunOnWorkQueueWithReturnValue:block error:nil];
+}
+
+- (BOOL)addServerEndpoint:(MTRServerEndpoint *)endpoint
+{
+    VerifyOrReturnValue([self checkIsRunning], NO);
+
+    if (![_factory addServerEndpoint:endpoint]) {
+        return NO;
+    }
+
+    if (![endpoint associateWithController:self]) {
+        MTR_LOG_ERROR("Failed to associate MTRServerEndpoint with MTRDeviceController");
+        [_factory removeServerEndpoint:endpoint];
+        return NO;
+    }
+
+    [self asyncDispatchToMatterQueue:^() {
+        [self->_serverEndpoints addObject:endpoint];
+        [endpoint registerMatterEndpoint];
+        MTR_LOG_DEFAULT("Added server endpoint %u to controller %@", static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
+            self->_uniqueIdentifier);
+    }
+        errorHandler:^(NSError * error) {
+            MTR_LOG_ERROR("Unexpected failure dispatching to Matter queue on running controller in addServerEndpoint, adding endpoint %u",
+                static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue));
+        }];
+    return YES;
+}
+
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion
+{
+    [self removeServerEndpointInternal:endpoint queue:queue completion:completion];
+}
+
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint
+{
+    [self removeServerEndpointInternal:endpoint queue:nil completion:nil];
+}
+
+- (void)removeServerEndpointInternal:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t _Nullable)queue completion:(dispatch_block_t _Nullable)completion
+{
+    VerifyOrReturn([self checkIsRunning]);
+
+    // We need to unhook the endpoint from the Matter side before we can start
+    // tearing it down.
+    [self asyncDispatchToMatterQueue:^() {
+        [self removeServerEndpointOnMatterQueue:endpoint];
+        MTR_LOG_DEFAULT("Removed server endpoint %u from controller %@", static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
+            self->_uniqueIdentifier);
+        if (queue != nil && completion != nil) {
+            dispatch_async(queue, completion);
+        }
+    }
+        errorHandler:^(NSError * error) {
+            // Error means we got shut down, so the endpoint is removed now.
+            MTR_LOG_DEFAULT("controller %@ already shut down, so endpoint %u has already been removed", self->_uniqueIdentifier,
+                static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue));
+            if (queue != nil && completion != nil) {
+                dispatch_async(queue, completion);
+            }
+        }];
+}
+
+- (void)removeServerEndpointOnMatterQueue:(MTRServerEndpoint *)endpoint
+{
+    assertChipStackLockedByCurrentThread();
+
+    [endpoint unregisterMatterEndpoint];
+    [_serverEndpoints removeObject:endpoint];
+    [endpoint invalidate];
+
+    [_factory removeServerEndpoint:endpoint];
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
@@ -1216,13 +1307,72 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     [device nodeMayBeAdvertisingOperational];
 }
 
+- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                            queue:(dispatch_queue_t)queue
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    [_factory downloadLogFromNodeWithID:nodeID
+                             controller:self
+                                   type:type
+                                timeout:timeout
+                                  queue:queue
+                             completion:completion];
+}
+
+- (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath
+{
+    assertChipStackLockedByCurrentThread();
+
+    for (MTRServerEndpoint * endpoint in _serverEndpoints) {
+        if ([clusterPath.endpoint isEqual:endpoint.endpointID]) {
+            return [endpoint matterAccessGrantsForCluster:clusterPath.cluster];
+        }
+    }
+
+    // Nothing matched, no grants.
+    return @[];
+}
+
+- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
+{
+    assertChipStackLockedByCurrentThread();
+
+    for (MTRServerEndpoint * endpoint in _serverEndpoints) {
+        for (MTRServerCluster * cluster in endpoint.serverClusters) {
+            if (![cluster.clusterID isEqual:clusterID]) {
+                continue;
+            }
+
+            for (MTRServerAttribute * attr in cluster.attributes) {
+                if (![attr.attributeID isEqual:attributeID]) {
+                    continue;
+                }
+
+                return @(attr.requiredReadPrivilege);
+            }
+        }
+    }
+
+    return nil;
+}
+
+#ifdef DEBUG
++ (void)forceLocalhostAdvertisingOnly
+{
+    auto interfaceIndex = chip::Inet::InterfaceId::PlatformType(kDNSServiceInterfaceIndexLocalOnly);
+    auto interfaceId = chip::Inet::InterfaceId(interfaceIndex);
+    chip::app::DnssdServer::Instance().SetInterfaceId(interfaceId);
+}
+#endif // DEBUG
+
 @end
 
 /**
  * Shim to allow us to treat an MTRDevicePairingDelegate as an
  * MTRDeviceControllerDelegate.
  */
-MTR_HIDDEN
 @interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
 - (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
@@ -1280,7 +1430,6 @@ MTR_HIDDEN
  * Shim to allow us to treat an MTRNOCChainIssuer as an
  * MTROperationalCertificateIssuer.
  */
-MTR_HIDDEN
 @interface MTROperationalCertificateChainIssuerShim : NSObject <MTROperationalCertificateIssuer>
 @property (nonatomic, readonly) id<MTRNOCChainIssuer> nocChainIssuer;
 @property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;

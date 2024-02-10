@@ -17,13 +17,10 @@
 
 #include "general-diagnostics-server.h"
 
-#include <app/util/config.h>
+#include <stdint.h>
+#include <string.h>
 
-#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-// Need the `nogncheck` because it's inter-cluster dependency and this
-// breaks GN deps checks since that doesn't know how to deal with #ifdef'd includes :(.
-#include "app/clusters/time-synchronization-server/time-synchronization-server.h" // nogncheck
-#endif                                                                            // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+#include <app/util/config.h>
 
 #include "app/server/Server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -34,6 +31,7 @@
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/ScopedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -49,6 +47,8 @@ using chip::DeviceLayer::GetDiagnosticDataProvider;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
+
+constexpr uint8_t kCurrentClusterRevision = 2;
 
 bool IsTestEventTriggerEnabled()
 {
@@ -215,10 +215,24 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
         return aEncoder.Encode(isTestEventTriggersEnabled);
     }
-    // Note: Attribute ID 0x0009 was removed (#30002).
-    default: {
-        break;
+        // Note: Attribute ID 0x0009 was removed (#30002).
+
+    case FeatureMap::Id: {
+        uint32_t features = 0;
+
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+        features |= to_underlying(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
+#endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+
+        return aEncoder.Encode(features);
     }
+
+    case ClusterRevision::Id: {
+        return aEncoder.Encode(kCurrentClusterRevision);
+    }
+
+    default:
+        break;
     }
     return CHIP_NO_ERROR;
 }
@@ -358,35 +372,43 @@ void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNet
 } // namespace app
 } // namespace chip
 
-bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::TestEventTrigger::DecodableType & commandData)
-{
+namespace {
 
-    if (commandData.enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
+TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
+{
+    if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
     {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return true;
+        return nullptr;
     }
 
-    if (IsByteSpanAllZeros(commandData.enableKey))
+    if (IsByteSpanAllZeros(enableKey))
     {
-        commandObj->AddStatus(commandPath, Status::ConstraintError);
-        return true;
+        return nullptr;
     }
 
     auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
 
-    // Spec says "EnableKeyMismatch" but this never existed prior to 1.0 SVE2 and mismatches
-    // test plans as well. ConstraintError is specified for most other errors, so
-    // we keep the behavior as close as possible, except for EnableKeyMismatch which
-    // is going to be a ConstraintError.
-    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(commandData.enableKey))
+    if (triggerDelegate == nullptr || !triggerDelegate->DoesEnableKeyMatch(enableKey))
+    {
+        return nullptr;
+    }
+
+    return triggerDelegate;
+}
+
+} // namespace
+
+bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::TestEventTrigger::DecodableType & commandData)
+{
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    if (triggerDelegate == nullptr)
     {
         commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
     }
 
-    CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTrigger(commandData.eventTrigger);
+    CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTriggers(commandData.eventTrigger);
 
     // When HandleEventTrigger fails, we simply convert any error to INVALID_COMMAND
     commandObj->AddStatus(commandPath, (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success);
@@ -402,35 +424,14 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
 
     System::Clock::Microseconds64 posix_time_us{ 0 };
 
+    // Only consider real time if time sync cluster is actually enabled. Avoids
+    // likelihood of frequently reporting unsynced time.
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-    bool time_is_synced = false;
-    using Clusters::TimeSynchronization::GranularityEnum;
-    GranularityEnum granularity = Clusters::TimeSynchronization::TimeSynchronizationServer::Instance().GetGranularity();
-    switch (granularity)
+    CHIP_ERROR posix_time_err = System::SystemClock().GetClock_RealTime(posix_time_us);
+    if (posix_time_err != CHIP_NO_ERROR)
     {
-    case GranularityEnum::kUnknownEnumValue:
-    case GranularityEnum::kNoTimeGranularity:
-        time_is_synced = false;
-        break;
-    case GranularityEnum::kMinutesGranularity:
-        // Minute granularity is not deemed good enough for TimeSnapshot to report PosixTimeMs, by spec.
-        time_is_synced = false;
-        break;
-    case GranularityEnum::kSecondsGranularity:
-    case GranularityEnum::kMillisecondsGranularity:
-    case GranularityEnum::kMicrosecondsGranularity:
-        time_is_synced = true;
-        break;
-    }
-
-    if (time_is_synced)
-    {
-        CHIP_ERROR posix_time_err = System::SystemClock().GetClock_RealTime(posix_time_us);
-        if (posix_time_err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
-            posix_time_us = System::Clock::Microseconds64{ 0 };
-        }
+        ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
+        posix_time_us = System::Clock::Microseconds64{ 0 };
     }
 #endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 
@@ -444,6 +445,44 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
             static_cast<uint64_t>(std::chrono::duration_cast<System::Clock::Milliseconds64>(posix_time_us).count()));
     }
     commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
+bool emberAfGeneralDiagnosticsClusterPayloadTestRequestCallback(CommandHandler * commandObj,
+                                                                const ConcreteCommandPath & commandPath,
+                                                                const Commands::PayloadTestRequest::DecodableType & commandData)
+{
+    // Max allowed is 2048.
+    if (commandData.count > 2048)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    // Ensure Test Event triggers are enabled and key matches.
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    if (triggerDelegate == nullptr)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    Commands::PayloadTestResponse::Type response;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
+    if (!payload.Calloc(commandData.count))
+    {
+        commandObj->AddStatus(commandPath, Status::ResourceExhausted);
+        return true;
+    }
+
+    memset(payload.Get(), commandData.value, payload.AllocatedSize());
+    response.payload = ByteSpan{ payload.Get(), payload.AllocatedSize() };
+
+    if (commandObj->AddResponseData(commandPath, response) != CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Status::ResourceExhausted);
+    }
+
     return true;
 }
 

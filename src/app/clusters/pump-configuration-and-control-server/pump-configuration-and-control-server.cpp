@@ -156,12 +156,12 @@ static void setEffectiveModes(EndpointId endpoint)
         // Maximum, Minimum or Local
 
     case OperationModeEnum::kMaximum: {
-#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
         uint8_t maxLevel;
 #endif
         Attributes::EffectiveOperationMode::Set(endpoint, OperationModeEnum::kMaximum);
         Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantSpeed);
-#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
         LevelControl::Attributes::MaxLevel::Get(endpoint, &maxLevel);
         LevelControl::Attributes::CurrentLevel::Set(endpoint, maxLevel);
 #endif
@@ -175,12 +175,12 @@ static void setEffectiveModes(EndpointId endpoint)
     break;
 
     case OperationModeEnum::kMinimum: {
-#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
         uint8_t minLevel;
 #endif
         Attributes::EffectiveOperationMode::Set(endpoint, OperationModeEnum::kMinimum);
         Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantSpeed);
-#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
         LevelControl::Attributes::MinLevel::Get(endpoint, &minLevel);
         if (minLevel == 0)
         {
