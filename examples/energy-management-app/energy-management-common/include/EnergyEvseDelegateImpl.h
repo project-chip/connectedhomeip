@@ -20,6 +20,7 @@
 
 #include "app/clusters/energy-evse-server/energy-evse-server.h"
 #include <EVSECallbacks.h>
+#include <EnergyEvseTargetsStore.h>
 
 #include <app/util/af.h>
 #include <app/util/config.h>
@@ -138,6 +139,29 @@ public:
      * @brief    Called when EVSE cluster receives StartDiagnostics command
      */
     Status StartDiagnostics() override;
+
+    /**
+     * @brief    Called when EVSE cluster receives the SetTargets command
+     */
+    Status
+    SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
+
+    /**
+     * @brief    Called when EVSE cluster receives GetTargets command
+     */
+    Status GetTargets(Commands::GetTargetsResponse::Type & response);
+
+    /**
+     * @brief    Called when EVSE cluster receives ClearTargets command
+     */
+    Status ClearTargets();
+
+    /* Helper functions for managing targets*/
+    Status
+    ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
+
+    Status
+    SaveTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
 
     /**
      * @brief    Called by EVSE Hardware to register a single callback handler
@@ -317,6 +341,9 @@ private:
 
     /* Helper variable to hold meter val since last EnergyTransferStarted event */
     int64_t mMeterValueAtEnergyTransferStart;
+
+    /* Targets Object */
+    EvseTargets mChargingTargets;
 };
 
 } // namespace EnergyEvse
