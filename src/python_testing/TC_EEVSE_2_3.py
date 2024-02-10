@@ -16,14 +16,12 @@
 
 
 import logging
-import time
-from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from TC_EEVSE_Utils import EEVSEBaseTestHelper, EventChangeCallback
+from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +99,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("4")
         await self.send_test_event_trigger_pluggedin()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EVConnected)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVConnected)
         session_id = event_data.sessionID
 
         self.step("5")
@@ -232,7 +230,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("16")
         await self.send_test_event_trigger_pluggedin_clear()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EVNotDetected)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVNotDetected)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand
         self.validate_ev_not_detected_event(event_data, session_id, expected_state, expected_duration=0, expected_charged=0)
 

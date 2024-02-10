@@ -16,6 +16,7 @@
 
 
 import logging
+import typing
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
@@ -73,6 +74,40 @@ class EEVSEBaseTestHelper:
                                              expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.StartDiagnostics(),
+                                       endpoint=endpoint,
+                                       timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_clear_targets_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000,
+                                         expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.ClearTargets(),
+                                       endpoint=endpoint,
+                                       timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+    async def send_get_targets_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000,
+                                       expected_status: Status = Status.Success):
+        try:
+            get_targets_resp = await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.GetTargets(),
+                                                          endpoint=endpoint,
+                                                          timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+
+        return get_targets_resp
+
+    async def send_set_targets_command(self, endpoint: int = None,
+                                       chargingTargetSchedules: typing.List[Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct] = None,
+                                       timedRequestTimeoutMs: int = 3000,
+                                       expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.SetTargets(chargingTargetSchedules),
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
