@@ -300,7 +300,7 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
         std::string nextIdString(program.identifier.data(), program.identifier.size());
         if (nextIdString == idString)
         {
-            program.recordingFlag = MakeOptional(static_cast<uint32_t>(shouldRecordSeries ? 2 : 1));
+            program.recordingFlag = MakeOptional(static_cast<uint32_t>(shouldRecordSeries ? RecordingFlagBitmap::kRecordSeries : RecordingFlagBitmap::kScheduled));
         }
     }
 
