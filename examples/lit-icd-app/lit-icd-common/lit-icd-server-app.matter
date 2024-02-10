@@ -1764,6 +1764,7 @@ endpoint 0 {
     callback attribute clientsSupportedPerFabric;
     ram      attribute userActiveModeTriggerHint default = 0x110D;
     ram      attribute userActiveModeTriggerInstruction default = "Restart the application";
+    ram      attribute operatingMode default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
