@@ -108,6 +108,11 @@ public:
     void OnICDManagementServerEvent(ICDManagementEvents event) override;
     void OnSubscriptionReport() override;
 
+    /**
+     * @brief Trigger the ICDManager to send Check-In message if necessary
+     */
+    void TriggerCheckInMessages();
+
 protected:
     friend class TestICDManager;
 

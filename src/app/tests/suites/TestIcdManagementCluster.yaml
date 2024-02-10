@@ -52,12 +52,61 @@ tests:
                   },
               ]
 
+    - label: "Read ICDCounter"
+      command: "readAttribute"
+      attribute: "ICDCounter"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+          saveAs: beforeRebootICDCounter
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Connect to the device again"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Wait for 1S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    # Verifies ICDCounter increment and Check-In message at reboot
+    - label: "Read ICDCounter after reboot"
+      command: "readAttribute"
+      attribute: "ICDCounter"
+      response:
+          value: beforeRebootICDCounter + 101
+
+    - label: "Verify the ICD is operating as a LIT ICD"
+      command: "readAttribute"
+      attribute: OperatingMode
+      response:
+          value: 1
+
     - label: "Unregister Client Registered During Commissioning"
       command: "UnregisterClient"
       arguments:
           values:
               - name: "CheckInNodeID"
                 value: commissionerNodeId
+
+    - label: "Verify the ICD is operating as a SIT ICD"
+      command: "readAttribute"
+      attribute: OperatingMode
+      response:
+          value: 0
 
     - label: "Read Feature Map"
       command: "readAttribute"
@@ -82,34 +131,6 @@ tests:
       attribute: "ActiveModeThreshold"
       response:
           value: 5000
-
-    - label: "Read ICDCounter"
-      command: "readAttribute"
-      attribute: "ICDCounter"
-      response:
-          constraints:
-              type: int32u
-              minValue: 0x0
-              maxValue: 0xFFFFFFFF
-          saveAs: beforeRebootICDCounter
-
-    - label: "Reboot target device"
-      cluster: "SystemCommands"
-      command: "Reboot"
-
-    - label: "Connect to the device again"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-
-    - label: "Read ICDCounter after reboot"
-      command: "readAttribute"
-      attribute: "ICDCounter"
-      response:
-          value: beforeRebootICDCounter + 100
 
     - label: "Read UserActiveModeTriggerHint"
       command: "readAttribute"
