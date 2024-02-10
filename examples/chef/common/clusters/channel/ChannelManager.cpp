@@ -135,7 +135,7 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
     return aEncoder.Encode(mCurrentChannel);
 }
 
-bool isChannelMatched(const ChannelInfoType & channel, const CharSpan & match)
+bool ChannelManager::isChannelMatched(const ChannelInfoType & channel, const chip::CharSpan & match)
 {
     std::stringstream ss;
     ss << channel.majorNumber << "." << channel.minorNumber;

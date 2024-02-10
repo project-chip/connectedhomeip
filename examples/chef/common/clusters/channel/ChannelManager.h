@@ -20,11 +20,10 @@
 #include <app/clusters/channel-server/channel-server.h>
 #include <vector>
 
-using chip::CharSpan;
-using chip::app::AttributeValueEncoder;
-using chip::app::CommandResponseHelper;
+
+class ChannelManager : public chip::app::Clusters::Channel::Delegate
+{
 using RecordingFlagBitmap       = chip::app::Clusters::Channel::RecordingFlagBitmap;
-using ChannelDelegate           = chip::app::Clusters::Channel::Delegate;
 using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type;
 using ProgramGuideResponseType  = chip::app::Clusters::Channel::Commands::ProgramGuideResponse::Type;
 using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type;
@@ -33,20 +32,17 @@ using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupI
 using PageTokenType             = chip::app::Clusters::Channel::Structs::PageTokenStruct::Type;
 using ProgramType               = chip::app::Clusters::Channel::Structs::ProgramStruct::Type;
 using ChannelPagingType         = chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type;
-
-class ChannelManager : public ChannelDelegate
-{
 public:
     ChannelManager();
 
-    CHIP_ERROR HandleGetChannelList(AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR HandleGetLineup(AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR HandleGetCurrentChannel(AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetChannelList(chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetLineup(chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetCurrentChannel(chip::app::AttributeValueEncoder & aEncoder) override;
 
-    void HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match) override;
+    void HandleChangeChannel(chip::app::CommandResponseHelper<ChangeChannelResponseType> & helper, const chip::CharSpan & match) override;
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) override;
     bool HandleSkipChannel(const int16_t & count) override;
-    void HandleGetProgramGuide(CommandResponseHelper<ProgramGuideResponseType> & helper, const chip::Optional<uint32_t> & startTime,
+    void HandleGetProgramGuide(chip::app::CommandResponseHelper<ProgramGuideResponseType> & helper, const chip::Optional<uint32_t> & startTime,
                                const chip::Optional<uint32_t> & endTime,
                                const chip::Optional<chip::app::DataModel::DecodableList<ChannelInfoType>> & channelList,
                                const chip::Optional<PageTokenType> & pageToken,
@@ -71,6 +67,6 @@ protected:
     std::vector<ProgramType> mPrograms;
 
 private:
-    // TODO: set this based upon meta data from app
     uint32_t mDynamicEndpointFeatureMap = 3;
+    bool isChannelMatched(const ChannelInfoType & channel, const chip::CharSpan & match);
 };
