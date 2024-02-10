@@ -27,8 +27,6 @@
 #import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
-#import <app/util/af-enums.h>
-
 #import <math.h> // For INFINITY
 
 // system dependencies
