@@ -255,7 +255,7 @@ void ChannelManager::HandleGetProgramGuide(
         {
             continue;
         }
-        if (endTime.HasValue() && endTime.ValueOr(0) < program.endTime)
+        if (endTime.ValueOr(0) < program.endTime)
         {
             continue;
         }
