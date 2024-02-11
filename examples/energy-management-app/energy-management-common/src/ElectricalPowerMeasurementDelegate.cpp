@@ -167,6 +167,15 @@ uint8_t ElectricalPowerMeasurementDelegate::GetNumberOfMeasurementTypes()
     return ArraySize(kMeasurementAccuracies);
 };
 
+/* @brief This function is called by the cluster server at the start of read cycle
+ *        This could take a semaphore to stop a background update of the data
+ */
+CHIP_ERROR ElectricalPowerMeasurementDelegate::StartAccuracyRead()
+{
+    /* Since we have a static array we don't need to do anything here */
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ElectricalPowerMeasurementDelegate::GetAccuracyByIndex(uint8_t accuracyIndex,
                                                                   Structs::MeasurementAccuracyStruct::Type & accuracy)
 {
@@ -177,6 +186,24 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::GetAccuracyByIndex(uint8_t accura
 
     accuracy = kMeasurementAccuracies[accuracyIndex];
 
+    return CHIP_NO_ERROR;
+}
+
+/* @brief This function is called by the cluster server at the end of read cycle
+ *        This could release a semaphore to allow a background update of the data
+ */
+CHIP_ERROR ElectricalPowerMeasurementDelegate::EndAccuracyRead()
+{
+    /* Since we have a static array we don't need to do anything here */
+    return CHIP_NO_ERROR;
+}
+
+/* @brief This function is called by the cluster server at the start of read cycle
+ *        This could take a semaphore to stop a background update of the data
+ */
+CHIP_ERROR ElectricalPowerMeasurementDelegate::StartRangesRead()
+{
+    /* Since we don't an implementation here we don't need to do anything here */
     return CHIP_NO_ERROR;
 }
 
@@ -210,6 +237,23 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::GetRangeByIndex(uint8_t rangeInde
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
+/* @brief This function is called by the cluster server at the end of read cycle
+ *        This could release a semaphore to allow a background update of the data
+ */
+CHIP_ERROR ElectricalPowerMeasurementDelegate::EndRangesRead()
+{
+    /* Since we don't an implementation here we don't need to do anything here */
+    return CHIP_NO_ERROR;
+}
+
+/* @brief This function is called by the cluster server at the start of read cycle
+ *        This could take a semaphore to stop a background update of the data
+ */
+CHIP_ERROR ElectricalPowerMeasurementDelegate::StartHarmonicCurrentsRead()
+{
+    /* Since we don't an implementation here we don't need to do anything here */
+    return CHIP_NO_ERROR;
+}
 CHIP_ERROR
 ElectricalPowerMeasurementDelegate::GetHarmonicCurrentsByIndex(uint8_t harmonicCurrentsIndex,
                                                                Structs::HarmonicMeasurementStruct::Type & harmonicCurrent)
@@ -238,6 +282,23 @@ ElectricalPowerMeasurementDelegate::GetHarmonicCurrentsByIndex(uint8_t harmonicC
     /* Return an empty list for now */
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
+/* @brief This function is called by the cluster server at the end of read cycle
+ *        This could release a semaphore to allow a background update of the data
+ */
+CHIP_ERROR ElectricalPowerMeasurementDelegate::EndHarmonicCurrentsRead()
+{
+    /* Since we don't an implementation here we don't need to do anything here */
+    return CHIP_NO_ERROR;
+}
+
+/* @brief This function is called by the cluster server at the start of read cycle
+ *        This could take a semaphore to stop a background update of the data
+ */
+CHIP_ERROR ElectricalPowerMeasurementDelegate::StartHarmonicPhasesRead()
+{
+    /* Since we don't an implementation here we don't need to do anything here */
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR ElectricalPowerMeasurementDelegate::GetHarmonicPhasesByIndex(uint8_t harmonicPhaseIndex,
                                                                         Structs::HarmonicMeasurementStruct::Type & harmonicPhase)
@@ -265,6 +326,14 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::GetHarmonicPhasesByIndex(uint8_t 
 
     /* Return an empty list for now */
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+/* @brief This function is called by the cluster server at the end of read cycle
+ *        This could release a semaphore to allow a background update of the data
+ */
+CHIP_ERROR ElectricalPowerMeasurementDelegate::EndHarmonicPhasesRead()
+{
+    /* Since we don't an implementation here we don't need to do anything here */
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ElectricalPowerMeasurementDelegate::SetVoltage(DataModel::Nullable<int64_t> newValue)
