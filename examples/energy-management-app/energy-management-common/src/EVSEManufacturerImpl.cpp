@@ -21,6 +21,7 @@
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
+#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -152,8 +153,13 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
 
     // Get current timestamp
     uint32_t currentTimestamp = 0;
-    uint64_t nowMS            = System::SystemClock().GetMonotonicMilliseconds64().count(); // In case we can't get real time
-    CHIP_ERROR err            = GetEpochTS(currentTimestamp);
+
+    // In case we can't get real time
+    System::Clock::Milliseconds64 system_time_ms =
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+    uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
+
+    CHIP_ERROR err = GetEpochTS(currentTimestamp);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "GetEpochTS returned error getting timestamp");
@@ -224,8 +230,13 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
 
     // Get current timestamp
     uint32_t currentTimestamp = 0;
-    uint64_t nowMS            = System::SystemClock().GetMonotonicMilliseconds64().count(); // In case we can't get real time
-    CHIP_ERROR err            = GetEpochTS(currentTimestamp);
+
+    // In case we can't get real time
+    System::Clock::Milliseconds64 system_time_ms =
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+    uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
+
+    CHIP_ERROR err = GetEpochTS(currentTimestamp);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "GetEpochTS returned error getting timestamp");

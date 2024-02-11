@@ -42,7 +42,7 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::SetPowerMode(PowerModeEnum newVal
 {
     PowerModeEnum oldValue = mPowerMode;
 
-    if (newValue >= PowerModeEnum::kUnknownEnumValue)
+    if (EnsureKnownEnumValue(newValue) == PowerModeEnum::kUnknownEnumValue)
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
