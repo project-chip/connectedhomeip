@@ -371,10 +371,14 @@ void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets
     // Call the delegate
     Commands::GetTargetsResponse::Type response;
     Status status = mDelegate.GetTargets(response);
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    if (status == Status::Success)
+    {
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    }
+    else
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    }
 }
 void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData)
 {
