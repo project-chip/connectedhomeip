@@ -21,7 +21,7 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "Power Topology"
-    endpoint: 0
+    endpoint: 1
 
 tests:
     - label: "Step 1: Wait for the commissioned device to be retrieved"
