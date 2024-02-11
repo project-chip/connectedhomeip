@@ -111,6 +111,15 @@ void OvenCavityOperationalStateDelegate::HandleResumeStateCallback(OperationalSt
 
 void OvenCavityOperationalStateDelegate::HandleStartStateCallback(OperationalState::GenericOperationalError & err)
 {
+    OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    GetInstance()->GetCurrentOperationalError(current_err);
+
+    if(current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
+        return;
+    }
+
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
