@@ -254,6 +254,7 @@ Status EnergyEvseDelegate::SetTargets(
     /* The Application needs to be told that the Targets have been updated
      * so it can potentially re-optimise the charging start time etc
      */
+    // TODO
 
     return Status::Success;
 }
@@ -371,11 +372,37 @@ Status EnergyEvseDelegate::GetTargets(Commands::GetTargetsResponse::Type & respo
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::GetTargets()");
 
-    // TODO return target response
-    //    DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
+    DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
+    // Structs::ChargingTargetStruct::Type dailyTargetArrayDay1[3] = {
+    //     { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(120), .addedEnergy = MakeOptional(10000) },
+    //     { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(800), .addedEnergy = MakeOptional(5000) },
+    //     { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(1200), .addedEnergy = MakeOptional(2000) },
+    // };
+    // Structs::ChargingTargetStruct::Type dailyTargetArrayDay2[1] = {
+    //     { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(800), .addedEnergy = MakeOptional(5000) },
+    // };
+    // Structs::ChargingTargetStruct::Type dailyTargetArrayDay3[1] = {
+    //     { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(1200), .addedEnergy = MakeOptional(2000) },
+    // };
 
-    //    chargingTargetsSchedules.response.chargingTargets = chargingTargetSchedules;
-    // = mChargingTargets.GetTargets();
+    // Structs::ChargingTargetScheduleStruct::Type array[3] = {
+    //     {
+    //         .dayOfWeekForSequence = 0x40,
+    //         .chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(dailyTargetArrayDay1),
+    //     },
+    //     {
+    //         .dayOfWeekForSequence = 0x10,
+    //         .chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(dailyTargetArrayDay2),
+    //     },
+    //     {
+    //         .dayOfWeekForSequence = 0x01,
+    //         .chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(dailyTargetArrayDay3),
+
+    //     },
+    // };
+
+    // chargingTargetSchedules          = array;
+    response.chargingTargetSchedules = chargingTargetSchedules;
 
     return Status::Success;
 }
