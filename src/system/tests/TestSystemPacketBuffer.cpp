@@ -70,9 +70,9 @@ using ::chip::System::pbuf;
 #define OF_LWIP_PBUF(x) (reinterpret_cast<PacketBuffer *>(reinterpret_cast<void *>(x)))
 
 namespace {
-void ScrambleData(uint8_t * start, uint16_t length)
+void ScrambleData(uint8_t * start, size_t length)
 {
-    for (uint16_t i = 0; i < length; ++i)
+    for (size_t i = 0; i < length; ++i)
         ++start[i];
 }
 } // namespace
@@ -137,7 +137,7 @@ public:
 
     static void PrintHandle(const char * tag, const PacketBuffer * buffer)
     {
-        printf("%s %p ref=%u len=%-4u next=%p\n", StringOrNullMarker(tag), buffer, buffer ? buffer->ref : 0,
+        printf("%s %p ref=%u len=%-4zu next=%p\n", StringOrNullMarker(tag), buffer, buffer ? buffer->ref : 0,
                buffer ? buffer->len : 0, buffer ? buffer->next : nullptr);
     }
     static void PrintHandle(const char * tag, const PacketBufferHandle & handle) { PrintHandle(tag, handle.mBuffer); }
@@ -152,7 +152,7 @@ private:
             handle(nullptr)
         {}
 
-        uint16_t init_len;
+        size_t init_len;
         uint16_t reserved_size;
         uint8_t * start_buffer;
         uint8_t * end_buffer;
@@ -163,7 +163,7 @@ private:
     static void PrintHandle(const char * tag, const BufferConfiguration & config) { PrintHandle(tag, config.handle); }
     static void PrintConfig(const char * tag, const BufferConfiguration & config)
     {
-        printf("%s pay=%-4zu len=%-4u res=%-4u:", StringOrNullMarker(tag), config.payload_ptr - config.start_buffer,
+        printf("%s pay=%-4zu len=%-4zu res=%-4u:", StringOrNullMarker(tag), config.payload_ptr - config.start_buffer,
                config.init_len, config.reserved_size);
         PrintHandle("", config.handle);
     }
@@ -287,21 +287,17 @@ void PacketBufferTest::PrepareTestBuffer(BufferConfiguration * config, int flags
     if (config->handle.IsNull())
     {
         config->handle = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-        if (config->handle.IsNull())
-        {
-            printf("NewPacketBuffer: Failed to allocate packet buffer (%u retained): %s\n",
-                   static_cast<unsigned int>(handles.size()), strerror(errno));
-            exit(EXIT_FAILURE);
-        }
+        VerifyOrDieWithMsg(!config->handle.IsNull(), chipSystemLayer,
+                           "NewPacketBuffer: Failed to allocate packet buffer (%u retained): %s",
+                           static_cast<unsigned int>(handles.size()), strerror(errno));
         if (flags & kRecordHandle)
         {
             handles.push_back(config->handle.Retain());
         }
     }
-    else if ((flags & kAllowHandleReuse) == 0)
+    else
     {
-        printf("Dirty test configuration\n");
-        exit(EXIT_FAILURE);
+        VerifyOrDieWithMsg((flags & kAllowHandleReuse) != 0, chipSystemLayer, "Dirty test configuration");
     }
 
     const size_t lInitialSize = PacketBuffer::kStructureSize + config->reserved_size;
@@ -329,8 +325,15 @@ void PacketBufferTest::PrepareTestBuffer(BufferConfiguration * config, int flags
         config->handle->next = nullptr;
     }
     config->handle->payload = config->payload_ptr;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    VerifyOrDieWithMsg(config->init_len < UINT16_MAX, chipSystemLayer, "Max Length exceeded for LwIP based systems");
+
+    config->handle->len     = static_cast<uint16_t>(config->init_len);
+    config->handle->tot_len = static_cast<uint16_t>(config->init_len);
+#else
     config->handle->len     = config->init_len;
     config->handle->tot_len = config->init_len;
+#endif
 }
 
 bool PacketBufferTest::ResetHandles()
@@ -492,7 +495,7 @@ void PacketBufferTest::CheckSetStart(nlTestSuite * inSuite, void * inContext)
 
             NL_TEST_ASSERT(inSuite, config.handle->payload == verify_start);
 
-            if ((verify_start - config.payload_ptr) > config.init_len)
+            if (verify_start - config.payload_ptr > static_cast<int32_t>(config.init_len))
             {
                 // Set start to the beginning of payload, right after handle's header.
                 NL_TEST_ASSERT(inSuite, config.handle->len == 0);
@@ -501,7 +504,10 @@ void PacketBufferTest::CheckSetStart(nlTestSuite * inSuite, void * inContext)
             {
                 // Set start to somewhere between the end of the handle's
                 // header and the end of payload.
-                NL_TEST_ASSERT(inSuite, config.handle->len == (config.init_len - (verify_start - config.payload_ptr)));
+                NL_TEST_ASSERT(
+                    inSuite,
+                    config.handle->len ==
+                        static_cast<size_t>((static_cast<int32_t>(config.init_len) - (verify_start - config.payload_ptr))));
             }
         }
     }
@@ -560,8 +566,10 @@ void PacketBufferTest::CheckSetDataLength(nlTestSuite * inSuite, void * inContex
 
                     if (length > (config_2.end_buffer - config_2.payload_ptr))
                     {
-                        NL_TEST_ASSERT(inSuite, config_2.handle->len == (config_2.end_buffer - config_2.payload_ptr));
-                        NL_TEST_ASSERT(inSuite, config_2.handle->tot_len == (config_2.end_buffer - config_2.payload_ptr));
+                        NL_TEST_ASSERT(inSuite,
+                                       config_2.handle->len == static_cast<size_t>(config_2.end_buffer - config_2.payload_ptr));
+                        NL_TEST_ASSERT(inSuite,
+                                       config_2.handle->tot_len == static_cast<size_t>(config_2.end_buffer - config_2.payload_ptr));
                         NL_TEST_ASSERT(inSuite, config_2.handle->next == nullptr);
                     }
                     else
@@ -578,14 +586,17 @@ void PacketBufferTest::CheckSetDataLength(nlTestSuite * inSuite, void * inContex
 
                     if (length > (config_2.end_buffer - config_2.payload_ptr))
                     {
-                        NL_TEST_ASSERT(inSuite, config_2.handle->len == (config_2.end_buffer - config_2.payload_ptr));
-                        NL_TEST_ASSERT(inSuite, config_2.handle->tot_len == (config_2.end_buffer - config_2.payload_ptr));
+                        NL_TEST_ASSERT(inSuite,
+                                       config_2.handle->len == static_cast<size_t>(config_2.end_buffer - config_2.payload_ptr));
+                        NL_TEST_ASSERT(inSuite,
+                                       config_2.handle->tot_len == static_cast<size_t>(config_2.end_buffer - config_2.payload_ptr));
                         NL_TEST_ASSERT(inSuite, config_2.handle->next == nullptr);
 
                         NL_TEST_ASSERT(inSuite,
                                        config_1.handle->tot_len ==
-                                           (config_1.init_len + static_cast<int32_t>(config_2.end_buffer - config_2.payload_ptr) -
-                                            static_cast<int32_t>(config_2.init_len)));
+                                           static_cast<size_t>(static_cast<int32_t>(config_1.init_len) +
+                                                               static_cast<int32_t>(config_2.end_buffer - config_2.payload_ptr) -
+                                                               static_cast<int32_t>(config_2.init_len)));
                     }
                     else
                     {
@@ -593,10 +604,11 @@ void PacketBufferTest::CheckSetDataLength(nlTestSuite * inSuite, void * inContex
                         NL_TEST_ASSERT(inSuite, config_2.handle->tot_len == length);
                         NL_TEST_ASSERT(inSuite, config_2.handle->next == nullptr);
 
-                        NL_TEST_ASSERT(
-                            inSuite,
-                            config_1.handle->tot_len ==
-                                (config_1.init_len + static_cast<int32_t>(length) - static_cast<int32_t>(config_2.init_len)));
+                        NL_TEST_ASSERT(inSuite,
+                                       config_1.handle->tot_len ==
+                                           static_cast<size_t>(static_cast<int32_t>(config_1.init_len) +
+                                                               static_cast<int32_t>(length) -
+                                                               static_cast<int32_t>(config_2.init_len)));
                     }
                 }
             }
@@ -633,7 +645,7 @@ void PacketBufferTest::CheckMaxDataLength(nlTestSuite * inSuite, void * inContex
     {
         test->PrepareTestBuffer(&config, kRecordHandle);
 
-        NL_TEST_ASSERT(inSuite, config.handle->MaxDataLength() == (config.end_buffer - config.payload_ptr));
+        NL_TEST_ASSERT(inSuite, config.handle->MaxDataLength() == static_cast<uint32_t>(config.end_buffer - config.payload_ptr));
     }
 }
 
@@ -651,7 +663,9 @@ void PacketBufferTest::CheckAvailableDataLength(nlTestSuite * inSuite, void * in
         test->PrepareTestBuffer(&config, kRecordHandle);
 
         NL_TEST_ASSERT(inSuite,
-                       config.handle->AvailableDataLength() == ((config.end_buffer - config.payload_ptr) - config.init_len));
+                       config.handle->AvailableDataLength() ==
+                           static_cast<size_t>(static_cast<int32_t>(config.end_buffer - config.payload_ptr) -
+                                               static_cast<int32_t>(config.init_len)));
     }
 }
 
@@ -861,7 +875,7 @@ void PacketBufferTest::CheckCompactHead(nlTestSuite * inSuite, void * inContext)
 
             test->PrepareTestBuffer(&config, kRecordHandle | kAllowHandleReuse);
             config.handle->SetDataLength(length, config.handle);
-            const uint16_t data_length = config.handle->DataLength();
+            const uint32_t data_length = static_cast<uint32_t>(config.handle->DataLength());
 
             config.handle->CompactHead();
 
@@ -904,14 +918,14 @@ void PacketBufferTest::CheckCompactHead(nlTestSuite * inSuite, void * inContext)
                     NL_TEST_ASSERT(inSuite, config_2.handle.IsNull());
 
                     config_1.handle->SetDataLength(length_1, config_1.handle);
-                    const uint16_t data_length_1 = config_1.handle->DataLength();
+                    const uint32_t data_length_1 = static_cast<uint32_t>(config_1.handle->DataLength());
 
                     // This chain will cause buffer_2 to be freed.
                     config_1.handle->next = buffer_2;
 
                     // Add various lengths to the second buffer
                     buffer_2->SetDataLength(length_2, config_1.handle);
-                    const uint16_t data_length_2 = buffer_2->DataLength();
+                    const uint32_t data_length_2 = static_cast<uint32_t>(buffer_2->DataLength());
 
                     config_1.handle->CompactHead();
 
@@ -1045,8 +1059,8 @@ void PacketBufferTest::CheckConsume(nlTestSuite * inSuite, void * inContext)
                         config_1.handle->SetDataLength(len_1, config_1.handle);
                         config_2.handle->SetDataLength(len_2, config_1.handle);
 
-                        const uint16_t buf_1_len = config_1.handle->len;
-                        const uint16_t buf_2_len = config_2.handle->len;
+                        const uint32_t buf_1_len = static_cast<uint32_t>(config_1.handle->len);
+                        const uint32_t buf_2_len = static_cast<uint32_t>(config_2.handle->len);
 
                         PacketBufferHandle original_handle_1 = config_1.handle.Retain();
                         NL_TEST_ASSERT(inSuite, config_1.handle->ref == 2); // config_1.handle and original_handle_1
@@ -1117,7 +1131,7 @@ void PacketBufferTest::CheckEnsureReservedSize(nlTestSuite * inSuite, void * inC
             const uint16_t length = theContext->lengths[i];
 
             test->PrepareTestBuffer(&config, kRecordHandle | kAllowHandleReuse);
-            const uint16_t kAllocSize = config.handle->AllocSize();
+            const uint32_t kAllocSize = static_cast<uint32_t>(config.handle->AllocSize());
             uint16_t reserved_size    = config.reserved_size;
 
             if (PacketBuffer::kStructureSize + config.reserved_size > kAllocSize)
@@ -1163,7 +1177,7 @@ void PacketBufferTest::CheckAlignPayload(nlTestSuite * inSuite, void * inContext
         for (size_t n = 0; n < theContext->length_count; ++n)
         {
             test->PrepareTestBuffer(&config, kRecordHandle | kAllowHandleReuse);
-            const uint16_t kAllocSize = config.handle->AllocSize();
+            const uint32_t kAllocSize = static_cast<uint32_t>(config.handle->AllocSize());
 
             if (theContext->lengths[n] == 0)
             {
@@ -1171,17 +1185,17 @@ void PacketBufferTest::CheckAlignPayload(nlTestSuite * inSuite, void * inContext
                 continue;
             }
 
-            uint16_t reserved_size = config.reserved_size;
+            uint32_t reserved_size = config.reserved_size;
             if (config.reserved_size > kAllocSize)
             {
                 reserved_size = kAllocSize;
             }
 
-            const uint16_t payload_offset =
+            const uint32_t payload_offset =
                 static_cast<uint16_t>(reinterpret_cast<uintptr_t>(config.handle->Start()) % theContext->lengths[n]);
-            uint16_t payload_shift = 0;
+            uint32_t payload_shift = 0;
             if (payload_offset > 0)
-                payload_shift = static_cast<uint16_t>(theContext->lengths[n] - payload_offset);
+                payload_shift = static_cast<uint32_t>(theContext->lengths[n] - payload_offset);
 
             if (payload_shift <= kAllocSize - reserved_size)
             {
@@ -1307,10 +1321,10 @@ void PacketBufferTest::CheckRead(nlTestSuite * inSuite, void * inContext)
             test->PrepareTestBuffer(&config_1, kAllowHandleReuse);
             test->PrepareTestBuffer(&config_2, kAllowHandleReuse);
 
-            const uint16_t length_1     = config_1.handle->MaxDataLength();
-            const uint16_t length_2     = config_2.handle->MaxDataLength();
+            const size_t length_1       = config_1.handle->MaxDataLength();
+            const size_t length_2       = config_2.handle->MaxDataLength();
             const size_t length_sum     = length_1 + length_2;
-            const uint16_t length_total = static_cast<uint16_t>(length_sum);
+            const uint32_t length_total = static_cast<uint32_t>(length_sum);
             NL_TEST_ASSERT(inSuite, length_total == length_sum);
 
             memcpy(config_1.handle->Start(), payloads, length_1);
@@ -1338,7 +1352,7 @@ void PacketBufferTest::CheckRead(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
             // Check that running off the end of a corrupt buffer chain is detected.
-            if (length_total < UINT16_MAX)
+            if (length_total < UINT32_MAX)
             {
                 // First case: TotalLength() is wrong.
                 config_1.handle->tot_len = static_cast<uint16_t>(config_1.handle->tot_len + 1);

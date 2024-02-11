@@ -384,7 +384,8 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     err = JniReferences::GetInstance().N2J_ByteArray(env, static_cast<const uint8_t *>(charId->bytes), 16, charIdObj);
     SuccessOrExit(err);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, pBuf->Start(), pBuf->DataLength(), characteristicDataObj);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()),
+                                                     characteristicDataObj);
     SuccessOrExit(err);
 
     env->ExceptionClear();

@@ -51,7 +51,7 @@ public:
     CHIP_ERROR EnableNoDelay() override;
     CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount) override;
     CHIP_ERROR DisableKeepAlive() override;
-    CHIP_ERROR AckReceive(uint16_t len) override;
+    CHIP_ERROR AckReceive(size_t len) override;
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     void TCPUserTimeoutHandler() override;
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
