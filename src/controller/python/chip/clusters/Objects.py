@@ -26217,7 +26217,6 @@ class EnergyEvseMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kNoFeatures = 0x0
             kOnOff = 0x1
 
     class Structs:
@@ -26491,7 +26490,6 @@ class DeviceEnergyManagementMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kNoFeatures = 0x0
             kOnOff = 0x1
 
     class Structs:

@@ -55,10 +55,5 @@ limitations under the License.
       <arg name="Status"     type="enum8"                   optional="false"/>
       <arg name="StatusText" type="char_string" length="64" optional="true"/>
     </command>
-  </cluster>    
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x009D"/>
-    <field name="NoFeatures" mask="0x0"/>
-    <field name="OnOff" mask="0x1"/>
-  </bitmap>
+  </cluster>
 </configurator>
