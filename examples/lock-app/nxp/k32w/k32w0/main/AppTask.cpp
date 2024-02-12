@@ -777,9 +777,9 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     }
 
     // write the new door lock state
-    Protocols::InteractionModel::Status status = Attributes::LockState::Set(1, newValue);
+    chip::Protocols::InteractionModel::Status status = Attributes::LockState::Set(1, newValue);
 
-    if (status != Protocols::InteractionModel::Status::Success)
+    if (status != chip::Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(NotSpecified, "ERR: updating door lock state %x", status);
     }
