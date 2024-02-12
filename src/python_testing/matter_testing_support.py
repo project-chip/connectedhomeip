@@ -976,8 +976,21 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.runner_hook.test_stop(exception=None, duration=test_duration)
 
     def pics_guard(self, pics_condition: bool):
+        """Checks a condition and if False marks the test step as skipped and
+           returns False, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("4")
+              if self.pics_guard(condition_needs_to_be_true_to_execute):
+                  # do the test for step 4
+
+              self.step("5")
+              if self.pics_guard(condition2_needs_to_be_true_to_execute):
+                  # do the test for step 5
+           """
         if not pics_condition:
             self.mark_current_step_skipped()
+        return pics_condition
 
     def mark_current_step_skipped(self):
         try:
