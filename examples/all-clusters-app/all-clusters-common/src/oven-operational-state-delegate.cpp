@@ -83,6 +83,14 @@ OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Mut
 
 void OvenCavityOperationalStateDelegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
 {
+    OperationalState::OperationalStateEnum state = static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
+
+    if(state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
@@ -97,6 +105,15 @@ void OvenCavityOperationalStateDelegate::HandlePauseStateCallback(OperationalSta
 
 void OvenCavityOperationalStateDelegate::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
 {
+
+    OperationalState::OperationalStateEnum state = static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
+
+    if(state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
