@@ -40,7 +40,8 @@ protected:
     uint8_t mCurrentInput;
     std::vector<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type> mInputs;
     // Magic numbers are here on purpose, please allocate memory
-    char mCharDataBuffer[10][32];
+    static constexpr size_t mBufMax = 32;
+    char mCharDataBuffer[10][mBufMax];
 
 private:
     static constexpr int mTotalInput              = 3;

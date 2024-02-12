@@ -100,8 +100,10 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
         if (input.index == index)
         {
             mediaInputRenamed = true;
-            memcpy(this->Data(index), name.data(), name.size());
+	    const size_t len = std::min(mBufMax, name.size());
+            memcpy(this->Data(index), name.data(), len);
             input.name = chip::CharSpan(this->Data(index), name.size());
+            return mediaInputRenamed;
         }
     }
 
