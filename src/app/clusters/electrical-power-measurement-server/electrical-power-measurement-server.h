@@ -32,8 +32,6 @@ namespace ElectricalPowerMeasurement {
 using namespace chip::app::Clusters::ElectricalPowerMeasurement::Attributes;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement::Structs;
 
-using chip::Protocols::InteractionModel::Status;
-
 class Delegate
 {
 public:

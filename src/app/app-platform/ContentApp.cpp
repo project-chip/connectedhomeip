@@ -29,11 +29,14 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 using namespace chip;
 using namespace chip::AppPlatform;
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace AppPlatform {
