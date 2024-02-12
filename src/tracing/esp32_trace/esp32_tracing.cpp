@@ -154,7 +154,7 @@ void ESP32Backend::TraceCounter(const char * label)
     ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
 }
 
-void ESP32Backend::TraceMetric(const char * label, int value)
+void ESP32Backend::TraceMetric(const char * label, int32_t value)
 {
     if (!mRegistered)
     {
@@ -162,7 +162,7 @@ void ESP32Backend::TraceMetric(const char * label, int value)
                                   "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
         mRegistered = true;
     }
-    ESP_LOGI("mtr", "The value of %s is %d ", label, value);
+    ESP_LOGI("mtr", "The value of %s is %ld ", label, value);
     esp_diag_metrics_add_int(label, value);
 }
 

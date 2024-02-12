@@ -84,7 +84,7 @@ void Counter(const char * label)
     }
 }
 
-void Metric(const char * label, int value)
+void Metric(const char * label, int32_t value)
 {
     for (auto & backend : gTracingBackends)
     {
