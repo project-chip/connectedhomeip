@@ -18,10 +18,10 @@
 
 import chip.clusters as Clusters
 from matter_testing_support import TestStep, MatterBaseTest, async_test_body, default_matter_test_main
-from TC_OpstateCommon import TC_OVENOPSTATE_BASE, TestInfo
+from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
 
 
-class TC_OVENOPSTATE_1_1(MatterBaseTest, TC_OVENOPSTATE_BASE):
+class TC_OVENOPSTATE_1_1(MatterBaseTest, TC_OPSTATE_BASE):
     def __init__(self, *args):
         super().__init__(*args)
 

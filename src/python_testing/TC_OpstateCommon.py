@@ -44,7 +44,7 @@ class TestInfo:
     cluster: Clusters
 
 
-class TC_OVENOPSTATE_BASE():
+class TC_OPSTATE_BASE():
     def setup_base(self, test_info=None, app_pipe="/tmp/chip_all_clusters_fifo_"):
 
         asserts.assert_true(test_info is not None,
@@ -224,18 +224,18 @@ class TC_OVENOPSTATE_BASE():
 
         if (self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)) or
             self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code))):
-            expected_value.append(commands.Pause.command_id)
+                expected_value.append(commands.Pause.command_id)
 
-        if (self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or \
+        if (self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or
             self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code))):
-            expected_value.append(commands.Stop.command_id)
+                expected_value.append(commands.Stop.command_id)
 
         if self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)):
             expected_value.append(commands.Start.command_id)
 
         if (self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)) or
             self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code))):
-            expected_value.append(commands.Resume.command_id)
+                expected_value.append(commands.Resume.command_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
                                                   attribute=attributes.AcceptedCommandList,
@@ -249,7 +249,7 @@ class TC_OVENOPSTATE_BASE():
             self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or
             self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)) or
             self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code))):
-            expected_value.append(commands.OperationalCommandResponse.command_id)
+                expected_value.append(commands.OperationalCommandResponse.command_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
                                                   attribute=attributes.GeneratedCommandList,
@@ -846,7 +846,6 @@ class TC_OVENOPSTATE_BASE():
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
         events = cluster.Events
-        commands = cluster.Commands
 
         self.init_test()
 
@@ -873,12 +872,12 @@ class TC_OVENOPSTATE_BASE():
             # STEP 3: At the DUT take the vendor defined action to generate an OperationalError event
             self.step(3)
             self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": 1}' % self.device)
-            event_data = events_callback.wait_for_event_report(cluster.Events.OperationalError).errorState
+            event_data = events_callback.wait_for_event_report(events.OperationalError).errorState
 
             # Defined Errors
             defined_errors = [error.value for error in cluster.Enums.ErrorStateEnum
-                                if (error is not cluster.Enums.ErrorStateEnum.kUnknownEnumValue or
-                                    error is not cluster.Enums.ErrorStateEnum.kNoError)]
+                              if (error is not cluster.Enums.ErrorStateEnum.kUnknownEnumValue or
+                                  error is not cluster.Enums.ErrorStateEnum.kNoError)]
 
             in_range = (0x80 <= event_data.errorStateID <= 0xBF)
             asserts.assert_true(event_data.errorStateID in defined_errors
@@ -890,8 +889,8 @@ class TC_OVENOPSTATE_BASE():
             self.step(4)
             if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
                 await self.read_and_expect_value(endpoint=endpoint,
-                                                attribute=attributes.OperationalState,
-                                                expected_value=cluster.Enums.OperationalStateEnum.kError)
+                                                 attribute=attributes.OperationalState,
+                                                 expected_value=cluster.Enums.OperationalStateEnum.kError)
         else:
             self.skip_step(2)
             self.skip_step(3)
