@@ -20,11 +20,12 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
+from chip.interaction_model import InteractionModelError
 from mobly import asserts
 from dataclasses import dataclass
 from matter_testing_support import TestStep
 import psutil
+
 
 def get_pid(name):
     pid = None
@@ -36,15 +37,17 @@ def get_pid(name):
 
     return pid
 
+
 @dataclass
 class TestInfo:
     pics_code: str
     cluster: Clusters
 
+
 class TC_OVENOPSTATE_BASE():
     def setup_base(self, test_info=None, app_pipe="/tmp/chip_all_clusters_fifo_"):
 
-        asserts.assert_true(test_info != None,
+        asserts.assert_true(test_info is not None,
                             "You shall define the test info!")
 
         self.test_info = test_info
@@ -63,7 +66,7 @@ class TC_OVENOPSTATE_BASE():
             app_pid = self.matter_test_config.app_pid
             if app_pid == 0:
                 app_pid = get_pid("chip-all-clusters-app")
-                if app_pid == None:
+                if app_pid is None:
                     asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
             self.app_pipe = self.app_pipe + str(app_pid)
 
@@ -87,7 +90,7 @@ class TC_OVENOPSTATE_BASE():
                                               timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            asserts.fail("Unexpected error returned: %s" % e.status)
 
     async def send_cmd_expect_response(self, endpoint, cmd, expected_response, timedRequestTimeoutMs=None):
         ret = await self.send_cmd(endpoint=endpoint,
@@ -102,8 +105,8 @@ class TC_OVENOPSTATE_BASE():
     async def read_expect_success(self, endpoint, attribute):
         logging.info("\t##### Read %s" % attribute)
         attr_value = await self.read_single_attribute_check_success(endpoint=endpoint,
-                                                              cluster=self.test_info.cluster,
-                                                              attribute=attribute)
+                                                                    cluster=self.test_info.cluster,
+                                                                    attribute=attribute)
         logging.info("\t## %s: %s" % (attribute, attr_value))
 
         return attr_value
@@ -170,14 +173,14 @@ class TC_OVENOPSTATE_BASE():
         # STEP 2: TH reads from the DUT the ClusterRevision attribute
         self.step(2)
         await self.read_and_expect_value(endpoint=endpoint,
-                              attribute=attributes.ClusterRevision,
-                              expected_value=cluster_revision)
+                                         attribute=attributes.ClusterRevision,
+                                         expected_value=cluster_revision)
 
         # STEP 3: TH reads from the DUT the FeatureMap attribute
         self.step(3)
         await self.read_and_expect_value(endpoint=endpoint,
-                              attribute=attributes.FeatureMap,
-                              expected_value=feature_map)
+                                         attribute=attributes.FeatureMap,
+                                         expected_value=feature_map)
 
         # STEP 4: TH reads from the DUT the AttributeList attribute
         self.step(4)
@@ -198,8 +201,8 @@ class TC_OVENOPSTATE_BASE():
             expected_value.append(attributes.CountdownTime.attribute_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
-                              attribute=attributes.AttributeList,
-                              expected_contains=expected_value)
+                                                  attribute=attributes.AttributeList,
+                                                  expected_contains=expected_value)
 
         # STEP 5: TH reads from the DUT the EventList attribute
         self.step(5)
@@ -212,8 +215,8 @@ class TC_OVENOPSTATE_BASE():
                 expected_value.append(events.OperationCompletion.event_id)
 
             await self.read_and_expect_array_contains(endpoint=endpoint,
-                              attribute=attributes.EventList,
-                              expected_contains=expected_value)
+                                                      attribute=attributes.EventList,
+                                                      expected_contains=expected_value)
 
         # STEP 6: TH reads from the DUT the AcceptedCommandList attribute
         self.step(6)
@@ -221,22 +224,22 @@ class TC_OVENOPSTATE_BASE():
 
         if self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)) or \
             self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)):
-            expected_value.append(commands.Pause.command_id)
+                expected_value.append(commands.Pause.command_id)
 
         if self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or \
             self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)):
-            expected_value.append(commands.Stop.command_id)
+                expected_value.append(commands.Stop.command_id)
 
         if self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)):
             expected_value.append(commands.Start.command_id)
 
         if self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)) or \
             self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)):
-            expected_value.append(commands.Resume.command_id)
+                expected_value.append(commands.Resume.command_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
-                              attribute=attributes.AcceptedCommandList,
-                              expected_contains=expected_value)
+                                                  attribute=attributes.AcceptedCommandList,
+                                                  expected_contains=expected_value)
 
         # STEP 7: TH reads from the DUT the AcceptedCommandList attribute
         self.step(7)
@@ -244,14 +247,13 @@ class TC_OVENOPSTATE_BASE():
 
         if self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)) or \
             self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or \
-            self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)) or \
-            self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)):
+                self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)) or \
+                    self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)):
             expected_value.append(commands.OperationalCommandResponse.command_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
-                              attribute=attributes.GeneratedCommandList,
-                              expected_contains=expected_value)
-
+                                                  attribute=attributes.GeneratedCommandList,
+                                                  expected_contains=expected_value)
 
     ############################
     #   TEST CASE 2.1
@@ -286,8 +288,6 @@ class TC_OVENOPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_2_1(self, endpoint=1):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-        events = cluster.Events
-        commands = cluster.Commands
 
         self.init_test()
 
@@ -338,7 +338,7 @@ class TC_OVENOPSTATE_BASE():
                                     "Found a OperationalStateList entry with invalid ID value!")
                 if in_range:
                     asserts.assert_true(state.operationalStateLabel is not None,
-                                    "The OperationalStateLabel should be populated")
+                                        "The OperationalStateLabel should be populated")
 
                 if state.operationalStateID == cluster.Enums.OperationalStateEnum.kError:
                     error_state_present = True
@@ -421,7 +421,7 @@ class TC_OVENOPSTATE_BASE():
             self.step("7a")
             if self.pics_guard(self.check_pics(("%s.S.M.ERR_NO_ERROR" % self.test_info.pics_code))):
                 self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
-                                                  (self.device, cluster.Enums.ErrorStateEnum.kNoError))
+                                                 (self.device, cluster.Enums.ErrorStateEnum.kNoError))
                 # STEP 7b: TH reads from the DUT the OperationalError attribute
                 self.step("7b")
                 await self.read_and_expect_property_value(endpoint=endpoint,
@@ -435,7 +435,7 @@ class TC_OVENOPSTATE_BASE():
             self.step("7c")
             if self.pics_guard(self.check_pics(("%s.S.M.ERR_UNABLE_TO_START_OR_RESUME" % self.test_info.pics_code))):
                 self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
-                                                  (self.device, cluster.Enums.ErrorStateEnum.kUnableToStartOrResume))
+                                                 (self.device, cluster.Enums.ErrorStateEnum.kUnableToStartOrResume))
                 # STEP 7d: TH reads from the DUT the OperationalError attribute
                 self.step("7d")
                 await self.read_and_expect_property_value(endpoint=endpoint,
@@ -449,7 +449,7 @@ class TC_OVENOPSTATE_BASE():
             self.step("7e")
             if self.pics_guard(self.check_pics(("%s.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION" % self.test_info.pics_code))):
                 self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
-                                                  (self.device, cluster.Enums.ErrorStateEnum.kUnableToCompleteOperation))
+                                                 (self.device, cluster.Enums.ErrorStateEnum.kUnableToCompleteOperation))
                 # STEP 7f: TH reads from the DUT the OperationalError attribute
                 self.step("7f")
                 await self.read_and_expect_property_value(endpoint=endpoint,
@@ -463,7 +463,7 @@ class TC_OVENOPSTATE_BASE():
             self.step("7g")
             if self.pics_guard(self.check_pics(("%s.S.M.ERR_COMMAND_INVALID_IN_STATE" % self.test_info.pics_code))):
                 self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
-                                                  (self.device, cluster.Enums.ErrorStateEnum.kCommandInvalidInState))
+                                                 (self.device, cluster.Enums.ErrorStateEnum.kCommandInvalidInState))
                 # STEP 7h: TH reads from the DUT the OperationalError attribute
                 self.step("7h")
                 await self.read_and_expect_property_value(endpoint=endpoint,
@@ -500,7 +500,6 @@ class TC_OVENOPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_2_2(self, endpoint=1):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-        events = cluster.Events
         commands = cluster.Commands
 
         self.init_test()
@@ -520,7 +519,7 @@ class TC_OVENOPSTATE_BASE():
         # STEP 2: Manually put the DUT into a state wherein it can receive a Start Command
         self.step(2)
         self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
-                                                  (self.device, cluster.Enums.ErrorStateEnum.kNoError))
+                                         (self.device, cluster.Enums.ErrorStateEnum.kNoError))
         self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Stop"}' % self.device)
 
         # STEP 3: TH reads from the DUT the OperationalStateList attribute
@@ -540,7 +539,7 @@ class TC_OVENOPSTATE_BASE():
 
         # STEP 4: TH sends Start command to the DUT
         self.step(4)
-        if self.pics_guard(self.check_pics("%s.S.C02.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C02.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             ret = await self.send_cmd_expect_response(endpoint=endpoint,
                                                       cmd=commands.Start(),
@@ -549,17 +548,17 @@ class TC_OVENOPSTATE_BASE():
         # STEP 5: TH reads from the DUT the OperationalState attribute
         self.step(5)
         if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
-            operational_state = await self.read_and_expect_value(endpoint=endpoint,
-                                                                 attribute=attributes.OperationalState,
-                                                                 expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+            await self.read_and_expect_value(endpoint=endpoint,
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
 
         # STEP 6: TH reads from the DUT the OperationalError attribute
         self.step(6)
         if self.pics_guard(self.check_pics("%s.S.A0005" % self.test_info.pics_code)):
-            operational_error = await self.read_and_expect_property_value(endpoint=endpoint,
-                                                                          attribute=attributes.OperationalError,
-                                                                          attr_property="errorStateID",
-                                                                          expected_value=cluster.Enums.ErrorStateEnum.kNoError)
+            await self.read_and_expect_property_value(endpoint=endpoint,
+                                                      attribute=attributes.OperationalError,
+                                                      attr_property="errorStateID",
+                                                      expected_value=cluster.Enums.ErrorStateEnum.kNoError)
 
         # STEP 7: TH reads from the DUT the CountdownTime attribute
         self.step(7)
@@ -610,46 +609,225 @@ class TC_OVENOPSTATE_BASE():
 
         # STEP 12: TH sends Start command to the DUT
         self.step(12)
-        if self.pics_guard(self.check_pics("%s.S.C02.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C02.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
-            ret = await self.send_cmd_expect_response(endpoint=endpoint,
-                                                      cmd=commands.Start(),
-                                                      expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Start(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kNoError)
 
         # STEP 13: TH sends Stop command to the DUT
         self.step(13)
-        if self.pics_guard(self.check_pics("%s.S.C01.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C01.Rsp" % self.test_info.pics_code) and
                              self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
-            ret = await self.send_cmd_expect_response(endpoint=endpoint,
-                                                      cmd=commands.Stop(),
-                                                      expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Stop(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kNoError)
 
         # STEP 14: TH reads from the DUT the OperationalState attribute
         self.step(14)
         if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
-            operational_state = await self.read_and_expect_value(endpoint=endpoint,
-                                                                 attribute=attributes.OperationalState,
-                                                                 expected_value=cluster.Enums.OperationalStateEnum.kStopped)
+            await self.read_and_expect_value(endpoint=endpoint,
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kStopped)
 
         # STEP 15: TH sends Stop command to the DUT
         self.step(15)
-        if self.pics_guard(self.check_pics("%s.S.C01.Rsp" % self.test_info.pics_code) and \
-                             self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
-            ret = await self.send_cmd_expect_response(endpoint=endpoint,
-                                                      cmd=commands.Stop(),
-                                                      expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+        if self.pics_guard(self.check_pics("%s.S.C01.Rsp" % self.test_info.pics_code) and
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Stop(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kNoError)
 
         # STEP 16: Manually put the DUT into a state wherein it cannot receive a Start Command
         self.step(16)
         if self.pics_guard(self.check_pics("%s.S.M.ERR_UNABLE_TO_START_OR_RESUME" % self.test_info.pics_code)):
             self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
-                                                  (self.device, cluster.Enums.ErrorStateEnum.kUnableToCompleteOperation))
+                                             (self.device, cluster.Enums.ErrorStateEnum.kUnableToCompleteOperation))
 
         # STEP 17: TH sends Start command to the DUT
         self.step(17)
-        if self.pics_guard(self.check_pics("%s.S.M.ERR_UNABLE_TO_START_OR_RESUME" % self.test_info.pics_code) and \
-                           self.check_pics("%s.S.C02.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.M.ERR_UNABLE_TO_START_OR_RESUME" % self.test_info.pics_code) and
+                           self.check_pics("%s.S.C02.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
-            ret = await self.send_cmd_expect_response(endpoint=endpoint,
-                                                      cmd=commands.Start(),
-                                                      expected_response=cluster.Enums.ErrorStateEnum.kUnableToStartOrResume)
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Start(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kUnableToStartOrResume)
+
+    ############################
+    #   TEST CASE 2.3
+    ############################
+    def STEPS_TC_OPSTATE_BASE_2_3(self) -> list[TestStep]:
+        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                 TestStep(2, "Manually put the DUT into a state wherein it can receive a Pause Command"),
+                 TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
+                 TestStep(4, "TH sends Pause command to the DUT"),
+                 TestStep(5, "TH reads from the DUT the OperationalState attribute"),
+                 TestStep(6, "TH reads from the DUT the CountdownTime attribute"),
+                 TestStep(7, "TH waits for 5 seconds"),
+                 TestStep(8, "TH reads from the DUT the CountdownTime attribute"),
+                 TestStep(9, "TH sends Pause command to the DUT"),
+                 TestStep(10, "TH sends Resume command to the DUT"),
+                 TestStep(11, "TH reads from the DUT the OperationalState attribute"),
+                 TestStep(12, "TH sends Resume command to the DUT"),
+                 TestStep(13, "Manually put the device in the Stopped(0x00) operational state"),
+                 TestStep(14, "TH sends Pause command to the DUT"),
+                 TestStep(15, "TH sends Resume command to the DUT"),
+                 TestStep(16, "Manually put the device in the Error(0x03) operational state"),
+                 TestStep(17, "TH sends Pause command to the DUT"),
+                 TestStep(18, "TH sends Resume command to the DUT")
+                 ]
+        return steps
+
+    async def TEST_TC_OPSTATE_BASE_2_3(self, endpoint=1):
+        cluster = self.test_info.cluster
+        attributes = cluster.Attributes
+        events = cluster.Events
+        commands = cluster.Commands
+
+        self.init_test()
+
+        asserts.assert_true('PIXIT.WAITTIME' in self.matter_test_config.global_test_params,
+                            "PIXIT.WAITTIME must be included on the command line in "
+                            "the --int-arg flag as PIXIT.WAITTIME:<wait time>")
+
+        wait_time = self.matter_test_config.global_test_params['PIXIT.WAITTIME']
+
+        if wait_time == 0:
+            asserts.fail("PIXIT.WAITTIME shall be higher than 0.")
+
+        # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
+        self.step(1)
+
+        # STEP 2: Manually put the DUT into a state wherein it can receive a Pause Command
+        self.step(2)
+        self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
+                                                  (self.device, cluster.Enums.ErrorStateEnum.kNoError))
+        time.sleep(1)
+        self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Start"}' % self.device)
+
+        # STEP 3: TH reads from the DUT the OperationalStateList attribute
+        self.step(3)
+        if self.pics_guard(self.check_pics(("%s.S.A0003" % self.test_info.pics_code))):
+            operational_state_list = await self.read_expect_success(endpoint=endpoint,
+                                                                    attribute=attributes.OperationalStateList)
+
+            operational_state_list_ids = [op_state.operationalStateID for op_state in operational_state_list]
+
+            defined_states = [state.value for state in cluster.Enums.OperationalStateEnum
+                              if state is not cluster.Enums.OperationalStateEnum.kUnknownEnumValue]
+
+            for state in defined_states:
+                if state not in operational_state_list_ids:
+                    asserts.fail("The list shall include structs with the following OperationalStateIds: %s", defined_states)
+
+        # STEP 4: TH sends Pause command to the DUT
+        self.step(4)
+        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and \
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Pause(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+        # STEP 5: TH reads from the DUT the OperationalState attribute
+        self.step(5)
+        if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
+            await self.read_and_expect_value(endpoint=endpoint,
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kPaused)
+
+        # STEP 6: TH reads from the DUT the CountdownTime attribute
+        self.step(6)
+        if self.pics_guard(self.check_pics("%s.S.A0002" % self.test_info.pics_code)):
+            initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
+                                                                    attribute=attributes.CountdownTime)
+            if initial_countdown_time is not NullValue:
+                asserts.assert_true(0 <= initial_countdown_time <= 259200,
+                                    "CountdownTime(%s) must be between 0 and 259200" % initial_countdown_time)
+
+        # STEP 7: TH waits for 5 seconds
+        self.step(7)
+        time.sleep(5)
+
+        # STEP 8: TH reads from the DUT the CountdownTime attribute
+        self.step(8)
+        if self.pics_guard(self.check_pics("%s.S.A0002" % self.test_info.pics_code)):
+            countdown_time = await self.read_expect_success(endpoint=endpoint,
+                                                            attribute=attributes.CountdownTime)
+
+            if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
+                asserts.assert_equal(countdown_time, initial_countdown_time,
+                                       "The countdown time shall be equal since pause command")
+
+        # STEP 9: TH sends Pause command to the DUT
+        self.step(9)
+        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and \
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Pause(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+        # STEP 10: TH sends Resume command to the DUT
+        self.step(10)
+        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and \
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Resume(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+        # STEP 11: TH reads from the DUT the OperationalState attribute
+        self.step(11)
+        if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
+            await self.read_and_expect_value(endpoint=endpoint,
+                                             attribute=attributes.OperationalState,
+                                             expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+
+        # STEP 12: TH sends Resume command to the DUT
+        self.step(12)
+        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and \
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Resume(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+        # STEP 13: Manually put the device in the Stopped(0x00) operational state
+        self.step(13)
+        if self.pics_guard(self.check_pics(("%s.S.M.ST_STOPPED" % self.test_info.pics_code))):
+            self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Stop"}' % self.device)
+
+        # STEP 14: TH sends Pause command to the DUT
+        self.step(14)
+        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and \
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Pause(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kCommandInvalidInState)
+
+        # STEP 15: TH sends Resume command to the DUT
+        self.step(15)
+        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and \
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Resume(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kCommandInvalidInState)
+
+        # STEP 16: Manually put the device in the Error(0x03) operational state
+        self.step(16)
+        if self.pics_guard(self.check_pics(("%s.S.M.ST_ERROR" % self.test_info.pics_code))):
+            self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": 1}' % self.device)
+
+        # STEP 17: TH sends Pause command to the DUT
+        self.step(17)
+        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and \
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Pause(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kCommandInvalidInState)
+
+        # STEP 18: TH sends Resume command to the DUT
+        self.step(18)
+        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and \
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Resume(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kCommandInvalidInState)
+
