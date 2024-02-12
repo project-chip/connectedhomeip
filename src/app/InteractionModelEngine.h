@@ -220,11 +220,11 @@ public:
     void UnregisterReadHandlerAppCallback() { mpReadHandlerApplicationCallback = nullptr; }
 
     // TimedHandlerDelegate implementation
-    virtual void OnTimedInteractionFailed(TimedHandler * apTimedHandler);
-    virtual void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
-                               const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    virtual void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
-                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    void OnTimedInteractionFailed(TimedHandler * apTimedHandler) override;
+    void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+    void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
