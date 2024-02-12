@@ -21,8 +21,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using chip::Protocols::InteractionModel::Status;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -34,19 +32,20 @@ public:
 
     void Init()
     {
-        Status status = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, 0);
-        VerifyOrReturn(Status::Success == status,
+        Protocols::InteractionModel::Status status = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, 0);
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MinMeasuredValue attribute"));
 
         status = RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Set(mEndpointId, 10000);
-        VerifyOrReturn(Status::Success == status,
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MaxMeasuredValue attribute"));
     };
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {
-        Status status = RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
-        VerifyOrReturn(Status::Success == status,
+        Protocols::InteractionModel::Status status =
+            RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MeasuredValue attribute"));
         ChipLogDetail(NotSpecified, "The new RelativeHumidityMeasurement value: %d", newValue);
     }

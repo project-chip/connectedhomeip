@@ -21,8 +21,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using chip::Protocols::InteractionModel::Status;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -34,19 +32,19 @@ public:
 
     void Init()
     {
-        Status status = TemperatureMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, -500);
-        VerifyOrReturn(Status::Success == status,
+        Protocols::InteractionModel::Status status = TemperatureMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, -500);
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MinMeasuredValue attribute"));
 
         status = TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(mEndpointId, 6000);
-        VerifyOrReturn(Status::Success == status,
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MaxMeasuredValue attribute"));
     }
 
     void OnTemperatureChangeHandler(int16_t newValue)
     {
-        Status status = TemperatureMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
-        VerifyOrReturn(Status::Success == status,
+        Protocols::InteractionModel::Status status = TemperatureMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
+        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValue attribute"));
         ChipLogDetail(NotSpecified, "The new TemperatureMeasurement value: %d", newValue);
     }
