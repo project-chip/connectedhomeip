@@ -54,6 +54,9 @@ void TestCheckedGlobalInstanceReference(nlTestSuite * inSuite, void * inContext)
 {
     CheckedGlobalInstanceReference<TestClass> ref(&gTestClass);
 
+    // We expect that sizes of global references is minimal
+    NL_TEST_ASSERT(inSuite, sizeof(ref) == 1);
+
     NL_TEST_ASSERT(inSuite, ref->num == 123);
     NL_TEST_ASSERT(inSuite, strcmp(ref->str, "abc") == 0);
 
@@ -89,6 +92,9 @@ void TestSimpleInstanceReference(nlTestSuite * inSuite, void * inContext)
 
     SimpleInstanceReference ref_a(&a);
     SimpleInstanceReference ref_b(&b);
+
+    // overhead of simple references should be a simple pointer
+    NL_TEST_ASSERT(inSuite, sizeof(ref_a) <= sizeof(void *));
 
     NL_TEST_ASSERT(inSuite, ref_a->num == 123);
     NL_TEST_ASSERT(inSuite, ref_b->num == 100);
