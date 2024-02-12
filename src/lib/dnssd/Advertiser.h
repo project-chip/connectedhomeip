@@ -94,6 +94,8 @@ public:
         return *reinterpret_cast<Derived *>(this);
     }
     const Optional<ReliableMessageProtocolConfig> & GetLocalMRPConfig() const { return mLocalMRPConfig; }
+
+    // NOTE: The SetTcpSupported API is deprecated and not compliant with 1.3. T flag should not be set.
     Derived & SetTcpSupported(Optional<bool> tcpSupported)
     {
         mTcpSupported = tcpSupported;
