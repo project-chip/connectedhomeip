@@ -147,11 +147,21 @@ void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
     VerifyOrDieWithMsg(mICDManager != nullptr, Discovery,
                        "Invalid pointer to the ICDManager which is required for the LIT operating mode");
 
+    Dnssd::ICDModeAdvertise ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kNone;
     // Only advertise the ICD key if the device can operate as a LIT
     if (mICDManager->SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
     {
-        advParams.SetICDOperatingAsLIT(Optional<bool>(mICDManager->GetICDMode() == ICDConfigurationData::ICDMode::LIT));
+        if (mICDManager->GetICDMode() == ICDConfigurationData::ICDMode::LIT)
+        {
+            ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kLIT;
+        }
+        else
+        {
+            ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kSIT;
+        }
     }
+
+    advParams.SetICDModeToAdvertise(ICDModeToAdvertise);
 }
 #endif
 
@@ -185,6 +195,8 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         AddICDKeyToAdvertisement(advertiseParameters);
+#else
+        advertiseParameters.SetICDModeToAdvertise(Dnssd::ICDModeAdvertise::kNone);
 #endif
 
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
@@ -258,6 +270,8 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     AddICDKeyToAdvertisement(advertiseParameters);
+#else
+    advertiseParameters.SetICDModeToAdvertise(Dnssd::ICDModeAdvertise::kNone);
 #endif
 
     if (commissionableNode)

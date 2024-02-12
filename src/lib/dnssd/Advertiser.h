@@ -48,6 +48,13 @@ enum class CommissioningMode
     kEnabledEnhanced // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
 };
 
+enum class ICDModeAdvertise : uint8_t
+{
+    kNone, // The device is does not support LIT ICD configurations. No ICD= key is advertised in DNS-SD.
+    kSIT,  // The ICD supports LIT configuration, but is currently operating as SIT. ICD=0 in DNS-SD key/value pairs.
+    kLIT,  // The ICD is currently operating as LIT. ICD=1 in DNS-SD key/value pairs.
+};
+
 template <class Derived>
 class BaseAdvertisingParams
 {
@@ -103,12 +110,12 @@ public:
     }
     Optional<bool> GetTcpSupported() const { return mTcpSupported; }
 
-    Derived & SetICDOperatingAsLIT(Optional<bool> operatesAsLIT)
+    Derived & SetICDModeToAdvertise(ICDModeAdvertise operatingMode)
     {
-        mICDOperatesAsLIT = operatesAsLIT;
+        mICDModeAdvertise = operatingMode;
         return *reinterpret_cast<Derived *>(this);
     }
-    Optional<bool> GetICDOperatingAsLIT() const { return mICDOperatesAsLIT; }
+    ICDModeAdvertise GetICDModeToAdvertise() const { return mICDModeAdvertise; }
 
 private:
     uint16_t mPort                   = CHIP_PORT;
@@ -118,7 +125,7 @@ private:
     size_t mMacLength                = 0;
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
     Optional<bool> mTcpSupported;
-    Optional<bool> mICDOperatesAsLIT;
+    ICDModeAdvertise mICDModeAdvertise;
 };
 
 /// Defines parameters required for advertising a CHIP node
