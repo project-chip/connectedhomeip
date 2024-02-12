@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/CommonIterator.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {

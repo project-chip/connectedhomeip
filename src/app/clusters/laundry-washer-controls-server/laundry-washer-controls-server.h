@@ -24,8 +24,6 @@
 
 #include <protocols/interaction_model/StatusCode.h>
 
-using chip::Protocols::InteractionModel::Status;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -52,14 +50,16 @@ public:
     /**
      * API to set/get the SpinSpeedCurrent attribute
      */
-    Status SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent);
-    Status GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent);
+    chip::Protocols::InteractionModel::Status SetSpinSpeedCurrent(EndpointId endpointId,
+                                                                  DataModel::Nullable<uint8_t> spinSpeedCurrent);
+    chip::Protocols::InteractionModel::Status GetSpinSpeedCurrent(EndpointId endpointId,
+                                                                  DataModel::Nullable<uint8_t> & spinSpeedCurrent);
 
     /**
      * API to set/get the NumberOfRinses attribute
      */
-    Status SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
-    Status GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
+    chip::Protocols::InteractionModel::Status SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
+    chip::Protocols::InteractionModel::Status GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
 
 private:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

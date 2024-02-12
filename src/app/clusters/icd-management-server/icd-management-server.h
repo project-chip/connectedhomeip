@@ -29,8 +29,6 @@
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using chip::Protocols::InteractionModel::Status;
-
 class ICDManagementServer
 {
 public:
@@ -46,14 +44,16 @@ public:
      * ICDConfigurationData If function fails, icdCounter will be unchanged
      * @return Status
      */
-    Status RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData,
-                          uint32_t & icdCounter);
+    chip::Protocols::InteractionModel::Status
+    RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                   const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData,
+                   uint32_t & icdCounter);
 
-    Status UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                            const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status
+    UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                     const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 
-    Status StayActiveRequest(chip::FabricIndex fabricIndex);
+    chip::Protocols::InteractionModel::Status StayActiveRequest(chip::FabricIndex fabricIndex);
 
 private:
     /**

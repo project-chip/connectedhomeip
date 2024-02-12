@@ -48,8 +48,6 @@ using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 
-using chip::Protocols::InteractionModel::Status;
-
 class DLL_EXPORT ContentApp
 {
 public:
@@ -68,8 +66,9 @@ public:
     virtual MediaPlaybackDelegate * GetMediaPlaybackDelegate()             = 0;
     virtual TargetNavigatorDelegate * GetTargetNavigatorDelegate()         = 0;
 
-    Status HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);
-    Status HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
+    chip::Protocols::InteractionModel::Status HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer,
+                                                                  uint16_t maxReadLength);
+    chip::Protocols::InteractionModel::Status HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
 
 protected:
     EndpointId mEndpointId = 0;

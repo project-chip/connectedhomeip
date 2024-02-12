@@ -33,7 +33,6 @@
 using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
 using chip::Controller::CommandResponseFailureCallback;
 using chip::Controller::CommandResponseSuccessCallback;
-using chip::Protocols::InteractionModel::Status;
 
 using BindingListType = chip::app::Clusters::Binding::Attributes::Binding::TypeInfo::Type;
 
@@ -42,14 +41,16 @@ namespace AppPlatform {
 
 // The AppPlatform overrides emberAfExternalAttributeReadCallback to handle external attribute reads for ContentApps.
 // This callback can be used to handle external attribute reads for attributes belonging to static endpoints.
-Status AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status
+AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                         const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                         uint16_t maxReadLength);
 
 // The AppPlatform overrides emberAfExternalAttributeWriteCallback to handle external attribute writes for ContentApps.
 // This callback can be used to handle external attribute writes for attributes belonging to static endpoints.
-Status AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                 const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+chip::Protocols::InteractionModel::Status
+AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
 inline constexpr EndpointId kTargetBindingClusterEndpointId = 0;
 inline constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;

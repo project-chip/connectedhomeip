@@ -23,8 +23,6 @@
 #include <app/util/af.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using chip::Protocols::InteractionModel::Status;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -49,8 +47,10 @@ public:
     /**
      * API to set/get the SelectedDrynessLevel attribute
      */
-    Status SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel);
-    Status GetSelectedDrynessLevel(EndpointId endpointId, DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel);
+    chip::Protocols::InteractionModel::Status SetSelectedDrynessLevel(EndpointId endpointId,
+                                                                      DrynessLevelEnum newSelectedDrynessLevel);
+    chip::Protocols::InteractionModel::Status GetSelectedDrynessLevel(EndpointId endpointId,
+                                                                      DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel);
 
 private:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

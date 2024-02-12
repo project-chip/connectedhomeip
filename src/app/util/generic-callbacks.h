@@ -28,8 +28,6 @@
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
-using chip::Protocols::InteractionModel::Status;
-
 /** @brief Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -84,9 +82,9 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED. Any other return value indicates the
  * application was not able to read the attribute.
  */
-Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                            const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                            uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                               const EmberAfAttributeMetadata * attributeMetadata,
+                                                                               uint8_t * buffer, uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -128,8 +126,10 @@ Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::Clu
  * other return value indicates the application was not able to write the
  * attribute.
  */
-Status emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                             const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint,
+                                                                                chip::ClusterId clusterId,
+                                                                                const EmberAfAttributeMetadata * attributeMetadata,
+                                                                                uint8_t * buffer);
 
 /** @brief Pre Attribute Change
  *

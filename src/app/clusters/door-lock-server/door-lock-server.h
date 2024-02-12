@@ -61,8 +61,6 @@ using chip::app::DataModel::NullNullable;
 using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
 using LockOpCredentials = CredentialStruct;
 
-using chip::Protocols::InteractionModel::Status;
-
 /**
  * Handler for executing remote lock operations.
  *
@@ -309,15 +307,17 @@ private:
     bool findUserIndexByCredential(chip::EndpointId endpointId, CredentialTypeEnum credentialType, chip::ByteSpan credentialData,
                                    uint16_t & userIndex, uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo);
 
-    Status createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
-                      uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                      const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
-                      const Nullable<CredentialRuleEnum> & credentialRule,
-                      const Nullable<CredentialStruct> & credential = Nullable<CredentialStruct>());
-    Status modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
-                      uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                      const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
-                      const Nullable<CredentialRuleEnum> & credentialRule);
+    chip::Protocols::InteractionModel::Status
+    createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId, uint16_t userIndex,
+               const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+               const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
+               const Nullable<CredentialRuleEnum> & credentialRule,
+               const Nullable<CredentialStruct> & credential = Nullable<CredentialStruct>());
+    chip::Protocols::InteractionModel::Status
+    modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId, uint16_t userIndex,
+               const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+               const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
+               const Nullable<CredentialRuleEnum> & credentialRule);
     chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
                                                         chip::NodeId sourceNodeId, uint16_t userIndex, bool sendUserChangeEvent);
     chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
@@ -479,7 +479,7 @@ private:
     bool engageLockout(chip::EndpointId endpointId);
 
     static void sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                    Status status);
+                                    chip::Protocols::InteractionModel::Status status);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
@@ -546,7 +546,7 @@ private:
      */
     template <typename T>
     bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
+                      chip::Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
 
     /**
      * @brief Set generic attribute value
@@ -561,7 +561,7 @@ private:
      */
     template <typename T>
     bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      Status (*setFn)(chip::EndpointId endpointId, T value), T value);
+                      chip::Protocols::InteractionModel::Status (*setFn)(chip::EndpointId endpointId, T value), T value);
 
     // AttributeAccessInterface's Read API
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
