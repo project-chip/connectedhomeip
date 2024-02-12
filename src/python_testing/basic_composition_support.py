@@ -107,7 +107,8 @@ class BasicCompositionTests:
         if do_test_over_pase:
             setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
             asserts.assert_true(setupCode, "Require either --qr-code or --manual-code.")
-            dev_ctrl.EstablishPASESession(setupCode, self.dut_node_id)
+            node_id = self.dut_node_id
+            dev_ctrl.EstablishPASESession(setupCode, node_id)
         else:
             # Using the already commissioned node
             node_id = self.dut_node_id
