@@ -520,6 +520,7 @@ class TC_OVENOPSTATE_BASE():
         self.step(2)
         self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
                                          (self.device, cluster.Enums.ErrorStateEnum.kNoError))
+        time.sleep(1)
         self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Stop"}' % self.device)
 
         # STEP 3: TH reads from the DUT the OperationalStateList attribute
