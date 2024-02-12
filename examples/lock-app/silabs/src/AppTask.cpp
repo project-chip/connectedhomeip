@@ -70,6 +70,45 @@ using namespace EFR32DoorLock::LockInitParams;
 
 namespace {
 LEDWidget sLockLED;
+TimerHandle_t sUnlatchTimer;
+
+void UpdateClusterStateAfterUnlatch(intptr_t context)
+{
+    LockMgr().UnlockAfterUnlatch();
+}
+
+void UnlatchTimerCallback(TimerHandle_t xTimer)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterStateAfterUnlatch, reinterpret_cast<intptr_t>(nullptr));
+}
+
+void CancelUnlatchTimer(void)
+{
+    if (xTimerStop(sUnlatchTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    {
+        SILABS_LOG("sUnlatchTimer stop() failed");
+        appError(APP_ERROR_STOP_TIMER_FAILED);
+    }
+}
+
+void StartUnlatchTimer(uint32_t timeoutMs)
+{
+    if (xTimerIsTimerActive(sUnlatchTimer))
+    {
+        SILABS_LOG("app timer already started!");
+        CancelUnlatchTimer();
+    }
+
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ms if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerStart(sUnlatchTimer, pdMS_TO_TICKS(timeoutMs)) != pdPASS)
+    {
+        SILABS_LOG("sUnlatchTimer timer start() failed");
+        appError(APP_ERROR_START_TIMER_FAILED);
+    }
+}
+
 } // namespace
 
 using namespace chip::TLV;
@@ -179,6 +218,8 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
+
+    sUnlatchTimer = xTimerCreate("UnlatchTimer", pdMS_TO_TICKS(UNLATCH_TIME_MS), pdFALSE, (void *) 0, UnlatchTimerCallback);
 
     // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
@@ -309,6 +350,10 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
         sAppTask.GetLCD().WriteDemoUI(locked);
 #endif // DISPLAY_ENABLED
     }
+    else if (aAction == LockManager::UNLATCH_ACTION)
+    {
+        SILABS_LOG("Unlatch Action has been initiated");
+    }
 
     if (aActor == AppEvent::kEventType_Button)
     {
@@ -324,6 +369,11 @@ void AppTask::ActionCompleted(LockManager::Action_t aAction)
     if (aAction == LockManager::LOCK_ACTION)
     {
         SILABS_LOG("Lock Action has been completed")
+    }
+    else if (aAction == LockManager::UNLATCH_ACTION)
+    {
+        SILABS_LOG("Unlatch Action has been completed")
+        StartUnlatchTimer(UNLATCH_TIME_MS);
     }
     else if (aAction == LockManager::UNLOCK_ACTION)
     {
