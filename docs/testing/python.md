@@ -13,7 +13,7 @@ Python tests located in src/python_testing
     sample test showing test setup and test harness integration
 -   [https://github.com/google/mobly/blob/master/docs/tutorial.md](https://github.com/google/mobly/blob/master/docs/tutorial.md)
 -   [ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/ChipDeviceCtrl.py) -
-    Controller implementation ([API documentation](./ChipDeviceCtrlAPI.md))
+    Controller implementation - [API documentation](./ChipDeviceCtrlAPI.md)
 -   [scripts/tests/run_python_test.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/run_python_test.py)
     to easily set up app and script for testing - used in CI
 
