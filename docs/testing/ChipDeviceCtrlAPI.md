@@ -1,61 +1,61 @@
 # Table of Contents
 
-* [chip.ChipDeviceCtrl](#chip.ChipDeviceCtrl)
-  * [CommissionableNode](#chip.ChipDeviceCtrl.CommissionableNode)
-    * [Commission](#chip.ChipDeviceCtrl.CommissionableNode.Commission)
-  * [DeviceProxyWrapper](#chip.ChipDeviceCtrl.DeviceProxyWrapper)
-  * [ChipDeviceControllerBase](#chip.ChipDeviceCtrl.ChipDeviceControllerBase)
-    * [Shutdown](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.Shutdown)
-    * [ShutdownAll](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ShutdownAll)
-    * [ExpireSessions](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ExpireSessions)
-    * [DiscoverCommissionableNodes](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodes)
-    * [DiscoverCommissionableNodesLongDiscriminator](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesLongDiscriminator)
-    * [DiscoverCommissionableNodesShortDiscriminator](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesShortDiscriminator)
-    * [DiscoverCommissionableNodesVendor](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesVendor)
-    * [DiscoverCommissionableNodesDeviceType](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesDeviceType)
-    * [DiscoverCommissionableNodesCommissioningEnabled](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesCommissioningEnabled)
-    * [PrintDiscoveredDevices](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.PrintDiscoveredDevices)
-    * [DiscoverAllCommissioning](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverAllCommissioning)
-    * [OpenCommissioningWindow](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.OpenCommissioningWindow)
-    * [GetFabricIdInternal](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetFabricIdInternal)
-    * [GetNodeIdInternal](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetNodeIdInternal)
-    * [GetConnectedDeviceSync](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetConnectedDeviceSync)
-    * [ComputeRoundTripTimeout](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ComputeRoundTripTimeout)
-    * [GetRemoteSessionParameters](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetRemoteSessionParameters)
-    * [TestOnlySendBatchCommands](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendBatchCommands)
-    * [TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke)
-    * [SendCommand](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendCommand)
-    * [SendBatchCommands](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendBatchCommands)
-    * [SendGroupCommand](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendGroupCommand)
-    * [WriteAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteAttribute)
-    * [WriteGroupAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteGroupAttribute)
-    * [Read](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.Read)
-    * [ReadAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadAttribute)
-    * [ReadEvent](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadEvent)
-    * [ZCLSend](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSend)
-    * [ZCLReadAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLReadAttribute)
-    * [ZCLWriteAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLWriteAttribute)
-    * [ZCLSubscribeAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSubscribeAttribute)
-    * [InitGroupTestingData](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.InitGroupTestingData)
-  * [ChipDeviceController](#chip.ChipDeviceCtrl.ChipDeviceController)
-    * [Commission](#chip.ChipDeviceCtrl.ChipDeviceController.Commission)
-    * [CommissionThread](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionThread)
-    * [CommissionWiFi](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionWiFi)
-    * [SetWiFiCredentials](#chip.ChipDeviceCtrl.ChipDeviceController.SetWiFiCredentials)
-    * [SetThreadOperationalDataset](#chip.ChipDeviceCtrl.ChipDeviceController.SetThreadOperationalDataset)
-    * [ResetCommissioningParameters](#chip.ChipDeviceCtrl.ChipDeviceController.ResetCommissioningParameters)
-    * [SetTimeZone](#chip.ChipDeviceCtrl.ChipDeviceController.SetTimeZone)
-    * [SetDSTOffset](#chip.ChipDeviceCtrl.ChipDeviceController.SetDSTOffset)
-    * [SetDefaultNTP](#chip.ChipDeviceCtrl.ChipDeviceController.SetDefaultNTP)
-    * [SetTrustedTimeSource](#chip.ChipDeviceCtrl.ChipDeviceController.SetTrustedTimeSource)
-    * [SetCheckMatchingFabric](#chip.ChipDeviceCtrl.ChipDeviceController.SetCheckMatchingFabric)
-    * [GetFabricCheckResult](#chip.ChipDeviceCtrl.ChipDeviceController.GetFabricCheckResult)
-    * [CommissionOnNetwork](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionOnNetwork)
-    * [CommissionWithCode](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionWithCode)
-    * [CommissionIP](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionIP)
-    * [IssueNOCChain](#chip.ChipDeviceCtrl.ChipDeviceController.IssueNOCChain)
-  * [BareChipDeviceController](#chip.ChipDeviceCtrl.BareChipDeviceController)
-    * [\_\_init\_\_](#chip.ChipDeviceCtrl.BareChipDeviceController.__init__)
+-   [chip.ChipDeviceCtrl](#chip.ChipDeviceCtrl)
+    -   [CommissionableNode](#chip.ChipDeviceCtrl.CommissionableNode)
+        -   [Commission](#chip.ChipDeviceCtrl.CommissionableNode.Commission)
+    -   [DeviceProxyWrapper](#chip.ChipDeviceCtrl.DeviceProxyWrapper)
+    -   [ChipDeviceControllerBase](#chip.ChipDeviceCtrl.ChipDeviceControllerBase)
+        -   [Shutdown](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.Shutdown)
+        -   [ShutdownAll](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ShutdownAll)
+        -   [ExpireSessions](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ExpireSessions)
+        -   [DiscoverCommissionableNodes](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodes)
+        -   [DiscoverCommissionableNodesLongDiscriminator](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesLongDiscriminator)
+        -   [DiscoverCommissionableNodesShortDiscriminator](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesShortDiscriminator)
+        -   [DiscoverCommissionableNodesVendor](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesVendor)
+        -   [DiscoverCommissionableNodesDeviceType](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesDeviceType)
+        -   [DiscoverCommissionableNodesCommissioningEnabled](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesCommissioningEnabled)
+        -   [PrintDiscoveredDevices](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.PrintDiscoveredDevices)
+        -   [DiscoverAllCommissioning](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverAllCommissioning)
+        -   [OpenCommissioningWindow](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.OpenCommissioningWindow)
+        -   [GetFabricIdInternal](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetFabricIdInternal)
+        -   [GetNodeIdInternal](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetNodeIdInternal)
+        -   [GetConnectedDeviceSync](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetConnectedDeviceSync)
+        -   [ComputeRoundTripTimeout](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ComputeRoundTripTimeout)
+        -   [GetRemoteSessionParameters](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetRemoteSessionParameters)
+        -   [TestOnlySendBatchCommands](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendBatchCommands)
+        -   [TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke)
+        -   [SendCommand](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendCommand)
+        -   [SendBatchCommands](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendBatchCommands)
+        -   [SendGroupCommand](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendGroupCommand)
+        -   [WriteAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteAttribute)
+        -   [WriteGroupAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteGroupAttribute)
+        -   [Read](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.Read)
+        -   [ReadAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadAttribute)
+        -   [ReadEvent](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadEvent)
+        -   [ZCLSend](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSend)
+        -   [ZCLReadAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLReadAttribute)
+        -   [ZCLWriteAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLWriteAttribute)
+        -   [ZCLSubscribeAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSubscribeAttribute)
+        -   [InitGroupTestingData](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.InitGroupTestingData)
+    -   [ChipDeviceController](#chip.ChipDeviceCtrl.ChipDeviceController)
+        -   [Commission](#chip.ChipDeviceCtrl.ChipDeviceController.Commission)
+        -   [CommissionThread](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionThread)
+        -   [CommissionWiFi](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionWiFi)
+        -   [SetWiFiCredentials](#chip.ChipDeviceCtrl.ChipDeviceController.SetWiFiCredentials)
+        -   [SetThreadOperationalDataset](#chip.ChipDeviceCtrl.ChipDeviceController.SetThreadOperationalDataset)
+        -   [ResetCommissioningParameters](#chip.ChipDeviceCtrl.ChipDeviceController.ResetCommissioningParameters)
+        -   [SetTimeZone](#chip.ChipDeviceCtrl.ChipDeviceController.SetTimeZone)
+        -   [SetDSTOffset](#chip.ChipDeviceCtrl.ChipDeviceController.SetDSTOffset)
+        -   [SetDefaultNTP](#chip.ChipDeviceCtrl.ChipDeviceController.SetDefaultNTP)
+        -   [SetTrustedTimeSource](#chip.ChipDeviceCtrl.ChipDeviceController.SetTrustedTimeSource)
+        -   [SetCheckMatchingFabric](#chip.ChipDeviceCtrl.ChipDeviceController.SetCheckMatchingFabric)
+        -   [GetFabricCheckResult](#chip.ChipDeviceCtrl.ChipDeviceController.GetFabricCheckResult)
+        -   [CommissionOnNetwork](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionOnNetwork)
+        -   [CommissionWithCode](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionWithCode)
+        -   [CommissionIP](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionIP)
+        -   [IssueNOCChain](#chip.ChipDeviceCtrl.ChipDeviceController.IssueNOCChain)
+    -   [BareChipDeviceController](#chip.ChipDeviceCtrl.BareChipDeviceController)
+        -   [\_\_init\_\_](#chip.ChipDeviceCtrl.BareChipDeviceController.__init__)
 
 <a id="chip.ChipDeviceCtrl"></a>
 
@@ -81,8 +81,8 @@ def Commission(nodeId: int, setupPinCode: int) -> PyChipError
 
 Commission the device using the device controller discovered this device.
 
-nodeId: The nodeId commissioned to the device
-setupPinCode: The setup pin code of the device
+nodeId: The nodeId commissioned to the device setupPinCode: The setup pin code
+of the device
 
 <a id="chip.ChipDeviceCtrl.DeviceProxyWrapper"></a>
 
@@ -92,11 +92,11 @@ setupPinCode: The setup pin code of the device
 class DeviceProxyWrapper()
 ```
 
-Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to be
-freed when DeviceProxyWrapper goes out of scope. There is a potential issue where
-if this is copied around that a double free will occure, but how this is used today
-that is not an issue that needs to be accounted for and it will become very apparent
-if that happens.
+Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to
+be freed when DeviceProxyWrapper goes out of scope. There is a potential issue
+where if this is copied around that a double free will occure, but how this is
+used today that is not an issue that needs to be accounted for and it will
+become very apparent if that happens.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase"></a>
 
@@ -135,10 +135,11 @@ Shut down all active controllers and reclaim any used resources.
 def ExpireSessions(nodeid)
 ```
 
-Close all sessions with `nodeid` (if any existed) so that sessions get re-established.
+Close all sessions with `nodeid` (if any existed) so that sessions get
+re-established.
 
-This is needed to properly handle operations that invalidate a node's state, such as
-UpdateNOC.
+This is needed to properly handle operations that invalidate a node's state,
+such as UpdateNOC.
 
 WARNING: ONLY CALL THIS IF YOU UNDERSTAND THE SIDE-EFFECTS
 
@@ -155,8 +156,8 @@ def DiscoverCommissionableNodes(
 ) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]
 ```
 
-Discover commissionable nodes via DNS-SD with specified filters.
-Supported filters are:
+Discover commissionable nodes via DNS-SD with specified filters. Supported
+filters are:
 
     discovery.FilterType.NONE
     discovery.FilterType.SHORT_DISCRIMINATOR
@@ -168,8 +169,9 @@ Supported filters are:
     discovery.FilterType.COMMISSIONER
     discovery.FilterType.COMPRESSED_FABRIC_ID
 
-This function will always return a list of CommissionableDevice. When stopOnFirst is set,
-this function will return when at least one device is discovered or on timeout.
+This function will always return a list of CommissionableDevice. When
+stopOnFirst is set, this function will return when at least one device is
+discovered or on timeout.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesLongDiscriminator"></a>
 
@@ -251,16 +253,13 @@ def OpenCommissioningWindow(
         option: CommissioningWindowPasscode) -> CommissioningParameters
 ```
 
-Opens a commissioning window on the device with the given nodeid.
-nodeid:        Node id of the device
-timeout:       Command timeout
-iteration:     The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
-               PAKE passcode verifier to be used for this commissioning. Valid range: 1000 - 100000
-               Ignored if option == 0
-discriminator: The long discriminator for the DNS-SD advertisement. Valid range: 0-4095
-               Ignored if option == 0
-option:        0 = kOriginalSetupCode
-               1 = kTokenWithRandomPIN
+Opens a commissioning window on the device with the given nodeid. nodeid: Node
+id of the device timeout: Command timeout iteration: The PAKE iteration count
+associated with the PAKE Passcode ID and ephemeral PAKE passcode verifier to be
+used for this commissioning. Valid range: 1000 - 100000 Ignored if option == 0
+discriminator: The long discriminator for the DNS-SD advertisement. Valid range:
+0-4095 Ignored if option == 0 option: 0 = kOriginalSetupCode 1 =
+kTokenWithRandomPIN
 
 Returns CommissioningParameters
 
@@ -272,7 +271,8 @@ Returns CommissioningParameters
 def GetFabricIdInternal()
 ```
 
-Get the fabric ID from the object. Only used to validate cached value from property.
+Get the fabric ID from the object. Only used to validate cached value from
+property.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetNodeIdInternal"></a>
 
@@ -282,7 +282,8 @@ Get the fabric ID from the object. Only used to validate cached value from prope
 def GetNodeIdInternal() -> int
 ```
 
-Get the node ID from the object. Only used to validate cached value from property.
+Get the node ID from the object. Only used to validate cached value from
+property.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetConnectedDeviceSync"></a>
 
@@ -302,10 +303,11 @@ Returns DeviceProxyWrapper upon success.
 def ComputeRoundTripTimeout(nodeid, upperLayerProcessingTimeoutMs: int = 0)
 ```
 
-Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
-receive a message, process it and send it back. This is computed based on the session type, the type of transport,
-sleepy characteristics of the target and a caller-provided value for the time it takes to process a message
-at the upper layer on the target For group sessions.
+Returns a computed timeout value based on the round-trip time it takes for the
+peer at the other end of the session to receive a message, process it and send
+it back. This is computed based on the session type, the type of transport,
+sleepy characteristics of the target and a caller-provided value for the time it
+takes to process a message at the upper layer on the target For group sessions.
 
 This will result in a session being established if one wasn't already.
 
@@ -317,10 +319,11 @@ This will result in a session being established if one wasn't already.
 def GetRemoteSessionParameters(nodeid) -> typing.Optional[SessionParameters]
 ```
 
-Returns the SessionParameters of reported by the remote node associated with `nodeid`.
-If there is some error in getting SessionParameters None is returned.
+Returns the SessionParameters of reported by the remote node associated with
+`nodeid`. If there is some error in getting SessionParameters None is returned.
 
-This will result in a session being established if one wasn't already established.
+This will result in a session being established if one wasn't already
+established.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendBatchCommands"></a>
 
@@ -339,11 +342,11 @@ async def TestOnlySendBatchCommands(
         commandRefsOverride: typing.Optional[typing.List[int]] = None)
 ```
 
-Please see SendBatchCommands for description.
-TestOnly overridable arguments:
-    remoteMaxPathsPerInvoke: Overrides the number of batch commands we think can be sent to remote node.
-    suppressTimedRequestMessage: When set to true, we suppress sending Timed Request Message.
-    commandRefsOverride: List of commandRefs to use for each command with the same index in `commands`.
+Please see SendBatchCommands for description. TestOnly overridable arguments:
+remoteMaxPathsPerInvoke: Overrides the number of batch commands we think can be
+sent to remote node. suppressTimedRequestMessage: When set to true, we suppress
+sending Timed Request Message. commandRefsOverride: List of commandRefs to use
+for each command with the same index in `commands`.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke"></a>
 
@@ -374,21 +377,24 @@ async def SendCommand(nodeid: int,
                       suppressResponse: typing.Union[None, bool] = None)
 ```
 
-Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
-the response. If a valid responseType is passed in, that will be used to deserialize the object. If not,
-the type will be automatically deduced from the metadata received over the wire.
+Send a cluster-object encapsulated command to a node and get returned a future
+that can be awaited upon to receive the response. If a valid responseType is
+passed in, that will be used to deserialize the object. If not, the type will be
+automatically deduced from the metadata received over the wire.
 
-timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
-interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
-right timeout value based on transport characteristics as well as the responsiveness of the target.
+timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None'
+to indicate a non-timed request. interactionTimeoutMs: Overall timeout for the
+interaction. Omit or set to 'None' to have the SDK automatically compute the
+right timeout value based on transport characteristics as well as the
+responsiveness of the target.
 
 **Returns**:
 
-  - command response. The type of the response is defined by the command.
+-   command response. The type of the response is defined by the command.
 
 **Raises**:
 
-  - InteractionModelError on error
+-   InteractionModelError on error
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendBatchCommands"></a>
 
@@ -404,29 +410,35 @@ async def SendBatchCommands(
         suppressResponse: typing.Optional[bool] = None)
 ```
 
-Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
-the responses. If a valid responseType is passed in, that will be used to deserialize the object. If not,
+Send a batch of cluster-object encapsulated commands to a node and get returned
+a future that can be awaited upon to receive the responses. If a valid
+responseType is passed in, that will be used to deserialize the object. If not,
 the type will be automatically deduced from the metadata received over the wire.
 
-nodeId: Target's Node ID
-commands: A list of InvokeRequestInfo containing the commands to invoke.
-timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
-interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
-right timeout value based on transport characteristics as well as the responsiveness of the target.
-busyWaitMs: How long to wait in ms after sending command to device before performing any other operations.
+nodeId: Target's Node ID commands: A list of InvokeRequestInfo containing the
+commands to invoke. timedWriteTimeoutMs: Timeout for a timed invoke request.
+Omit or set to 'None' to indicate a non-timed request. interactionTimeoutMs:
+Overall timeout for the interaction. Omit or set to 'None' to have the SDK
+automatically compute the right timeout value based on transport characteristics
+as well as the responsiveness of the target. busyWaitMs: How long to wait in ms
+after sending command to device before performing any other operations.
 suppressResponse: Do not send a response to this action
 
 **Returns**:
 
-  - List of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
-  - A value of `None` indicates success.
-  - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
-  contain `interaction_model.Status.UnsupportedCommand`.
-  - If a command is not responded to by server, command will contain `interaction_model.Status.NoCommandResponse`
+-   List of command responses in the same order as what was given in `commands`.
+    The type of the response is defined by the command.
+-   A value of `None` indicates success.
+-   If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the
+    corresponding index associated with the command will, contain
+    `interaction_model.Status.UnsupportedCommand`.
+-   If a command is not responded to by server, command will contain
+    `interaction_model.Status.NoCommandResponse`
 
 **Raises**:
 
-  - InteractionModelError if error with sending of InvokeRequestMessage fails as a whole.
+-   InteractionModelError if error with sending of InvokeRequestMessage fails as
+    a whole.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendGroupCommand"></a>
 
@@ -438,16 +450,16 @@ def SendGroupCommand(groupid: int,
                      busyWaitMs: typing.Union[None, int] = None)
 ```
 
-Send a group cluster-object encapsulated command to a group_id and get returned a future
-that can be awaited upon to get confirmation command was sent.
+Send a group cluster-object encapsulated command to a group_id and get returned
+a future that can be awaited upon to get confirmation command was sent.
 
 **Returns**:
 
-  - None: responses are not sent to group commands
+-   None: responses are not sent to group commands
 
 **Raises**:
 
-  - InteractionModelError on error
+-   InteractionModelError on error
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteAttribute"></a>
 
@@ -464,19 +476,19 @@ async def WriteAttribute(nodeid: int,
 
 Write a list of attributes on a target node.
 
-nodeId: Target's Node ID
-timedWriteTimeoutMs: Timeout for a timed write request. Omit or set to 'None' to indicate a non-timed request.
-attributes: A list of tuples of type (endpoint, cluster-object):
-interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
-right timeout value based on transport characteristics as well as the responsiveness of the target.
+nodeId: Target's Node ID timedWriteTimeoutMs: Timeout for a timed write request.
+Omit or set to 'None' to indicate a non-timed request. attributes: A list of
+tuples of type (endpoint, cluster-object): interactionTimeoutMs: Overall timeout
+for the interaction. Omit or set to 'None' to have the SDK automatically compute
+the right timeout value based on transport characteristics as well as the
+responsiveness of the target.
 
-E.g
-(1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
+E.g (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
 to the XYZ attribute on the test cluster to endpoint 1
 
 **Returns**:
 
-  - [AttributeStatus] (list - one for each pth)
+-   [AttributeStatus] (list - one for each pth)
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteGroupAttribute"></a>
 
@@ -491,11 +503,11 @@ def WriteGroupAttribute(groupid: int,
 
 Write a list of attributes on a target group.
 
-groupid: Group ID to send write attribute to.
-attributes: A list of tuples of type (cluster-object, data-version). The data-version can be omitted.
+groupid: Group ID to send write attribute to. attributes: A list of tuples of
+type (cluster-object, data-version). The data-version can be omitted.
 
-E.g
-    (Clusters.UnitTesting.Attributes.XYZAttribute('hello'), 1) -- Group Write 'hello' with data version 1
+E.g (Clusters.UnitTesting.Attributes.XYZAttribute('hello'), 1) -- Group Write
+'hello' with data version 1
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.Read"></a>
 
@@ -543,51 +555,51 @@ async def Read(
 
 Read a list of attributes and/or events from a target node
 
-nodeId: Target's Node ID
-attributes: A list of tuples of varying types depending on the type of read being requested:
-(endpoint, Clusters.ClusterA.AttributeA):   Endpoint = specific,    Cluster = specific,   Attribute = specific
-(endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Attribute = *
-(Clusters.ClusterA.AttributeA):             Endpoint = *,           Cluster = specific,   Attribute = specific
-endpoint:                                   Endpoint = specific,    Cluster = *,          Attribute = *
-Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Attribute = *
-'*' or ():                                  Endpoint = *,           Cluster = *,          Attribute = *
+nodeId: Target's Node ID attributes: A list of tuples of varying types depending
+on the type of read being requested: (endpoint, Clusters.ClusterA.AttributeA):
+Endpoint = specific, Cluster = specific, Attribute = specific (endpoint,
+Clusters.ClusterA): Endpoint = specific, Cluster = specific, Attribute = _
+(Clusters.ClusterA.AttributeA): Endpoint = _, Cluster = specific, Attribute =
+specific endpoint: Endpoint = specific, Cluster = _, Attribute = _
+Clusters.ClusterA: Endpoint = _, Cluster = specific, Attribute = _ '_' or ():
+Endpoint = _, Cluster = _, Attribute = _
 
-The cluster and attributes specified above are to be selected from the generated cluster objects.
+The cluster and attributes specified above are to be selected from the generated
+cluster objects.
 
-e.g.
-ReadAttribute(1, [ 1 ] ) -- case 4 above.
-ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
-ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
+e.g. ReadAttribute(1, [ 1 ] ) -- case 4 above. ReadAttribute(1, [
+Clusters.BasicInformation ] ) -- case 5 above. ReadAttribute(1, [ (1,
+Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
 
 dataVersionFilters: A list of tuples of (endpoint, cluster, data version).
 
-events: A list of tuples of varying types depending on the type of read being requested:
-(endpoint, Clusters.ClusterA.EventA, urgent):       Endpoint = specific,
-Cluster = specific,   Event = specific, Urgent = True/False
-(endpoint, Clusters.ClusterA, urgent):              Endpoint = specific,
-Cluster = specific,   Event = *, Urgent = True/False
-(Clusters.ClusterA.EventA, urgent):                 Endpoint = *,
-Cluster = specific,   Event = specific, Urgent = True/False
-endpoint:                                   Endpoint = specific,    Cluster = *,          Event = *, Urgent = True/False
-Clusters.ClusterA:                          Endpoint = *,          Cluster = specific,    Event = *, Urgent = True/False
-'*' or ():                                  Endpoint = *,          Cluster = *,          Event = *, Urgent = True/False
+events: A list of tuples of varying types depending on the type of read being
+requested: (endpoint, Clusters.ClusterA.EventA, urgent): Endpoint = specific,
+Cluster = specific, Event = specific, Urgent = True/False (endpoint,
+Clusters.ClusterA, urgent): Endpoint = specific, Cluster = specific, Event = _,
+Urgent = True/False (Clusters.ClusterA.EventA, urgent): Endpoint = _, Cluster =
+specific, Event = specific, Urgent = True/False endpoint: Endpoint = specific,
+Cluster = _, Event = _, Urgent = True/False Clusters.ClusterA: Endpoint = _,
+Cluster = specific, Event = _, Urgent = True/False '_' or (): Endpoint = _,
+Cluster = _, Event = _, Urgent = True/False
 
 eventNumberFilter: Optional minimum event number filter.
 
-returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
-a single cluster-wide cluster object.
+returnClusterObject: This returns the data as consolidated cluster objects, with
+all attributes for a cluster inside a single cluster-wide cluster object.
 
-reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
-When not provided, a read request will be sent.
+reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling).
+Used by establishing subscriptions. When not provided, a read request will be
+sent.
 
 **Returns**:
 
-  - AsyncReadTransaction.ReadResponse. Please see ReadAttribute and ReadEvent for examples of how to access data.
-  
+-   AsyncReadTransaction.ReadResponse. Please see ReadAttribute and ReadEvent
+    for examples of how to access data.
 
 **Raises**:
 
-  - InteractionModelError (chip.interaction_model) on error
+-   InteractionModelError (chip.interaction_model) on error
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadAttribute"></a>
 
@@ -618,52 +630,52 @@ async def ReadAttribute(
         autoResubscribe: bool = True)
 ```
 
-Read a list of attributes from a target node, this is a wrapper of DeviceController.Read()
+Read a list of attributes from a target node, this is a wrapper of
+DeviceController.Read()
 
-nodeId: Target's Node ID
-attributes: A list of tuples of varying types depending on the type of read being requested:
-(endpoint, Clusters.ClusterA.AttributeA):   Endpoint = specific,    Cluster = specific,   Attribute = specific
-(endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Attribute = *
-(Clusters.ClusterA.AttributeA):             Endpoint = *,           Cluster = specific,   Attribute = specific
-endpoint:                                   Endpoint = specific,    Cluster = *,          Attribute = *
-Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Attribute = *
-'*' or ():                                  Endpoint = *,           Cluster = *,          Attribute = *
+nodeId: Target's Node ID attributes: A list of tuples of varying types depending
+on the type of read being requested: (endpoint, Clusters.ClusterA.AttributeA):
+Endpoint = specific, Cluster = specific, Attribute = specific (endpoint,
+Clusters.ClusterA): Endpoint = specific, Cluster = specific, Attribute = _
+(Clusters.ClusterA.AttributeA): Endpoint = _, Cluster = specific, Attribute =
+specific endpoint: Endpoint = specific, Cluster = _, Attribute = _
+Clusters.ClusterA: Endpoint = _, Cluster = specific, Attribute = _ '_' or ():
+Endpoint = _, Cluster = _, Attribute = _
 
-The cluster and attributes specified above are to be selected from the generated cluster objects.
+The cluster and attributes specified above are to be selected from the generated
+cluster objects.
 
-e.g.
-ReadAttribute(1, [ 1 ] ) -- case 4 above.
-ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
-ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
+e.g. ReadAttribute(1, [ 1 ] ) -- case 4 above. ReadAttribute(1, [
+Clusters.BasicInformation ] ) -- case 5 above. ReadAttribute(1, [ (1,
+Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
 
-returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
-a single cluster-wide cluster object.
+returnClusterObject: This returns the data as consolidated cluster objects, with
+all attributes for a cluster inside a single cluster-wide cluster object.
 
-reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
-When not provided, a read request will be sent.
+reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling).
+Used by establishing subscriptions. When not provided, a read request will be
+sent.
 
 **Returns**:
 
-  - subscription request: ClusterAttribute.SubscriptionTransaction
-  To get notified on attribute change use SetAttributeUpdateCallback on the returned
-  SubscriptionTransaction. This is used to set a callback function, which is a callable of
-  type Callable[[TypedAttributePath, SubscriptionTransaction], None]
-  Get the attribute value from the change path using GetAttribute on the SubscriptionTransasction
-  You can await changes in the main loop using a trigger mechanism from the callback.
-  ex. queue.SimpleQueue
-  
-  - read request: AsyncReadTransation.ReadResponse.attributes.
-  This is of type AttributeCache.attributeCache (Attribute.py),
-  which is a dict mapping endpoints to a list of Cluster (ClusterObjects.py) classes
-  (dict[int, List[Cluster]])
-  Access as ret[endpoint_id][<Cluster class>][<Attribute class>]
-  Ex. To access the OnTime attribute from the OnOff cluster on EP 1
-  ret[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
-  
+-   subscription request: ClusterAttribute.SubscriptionTransaction To get
+    notified on attribute change use SetAttributeUpdateCallback on the returned
+    SubscriptionTransaction. This is used to set a callback function, which is a
+    callable of type Callable[[TypedAttributePath, SubscriptionTransaction],
+    None] Get the attribute value from the change path using GetAttribute on the
+    SubscriptionTransasction You can await changes in the main loop using a
+    trigger mechanism from the callback. ex. queue.SimpleQueue
+
+-   read request: AsyncReadTransation.ReadResponse.attributes. This is of type
+    AttributeCache.attributeCache (Attribute.py), which is a dict mapping
+    endpoints to a list of Cluster (ClusterObjects.py) classes (dict[int,
+    List[Cluster]]) Access as ret[endpoint_id][<cluster class>][<Attribute
+    class>] Ex. To access the OnTime attribute from the OnOff cluster on EP 1
+    ret[1][clusters.onoff][Clusters.OnOff.Attributes.OnTime]
 
 **Raises**:
 
-  - InteractionModelError (chip.interaction_model) on error
+-   InteractionModelError (chip.interaction_model) on error
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadEvent"></a>
 
@@ -691,46 +703,44 @@ async def ReadEvent(
         autoResubscribe: bool = True)
 ```
 
-Read a list of events from a target node, this is a wrapper of DeviceController.Read()
+Read a list of events from a target node, this is a wrapper of
+DeviceController.Read()
 
-nodeId: Target's Node ID
-events: A list of tuples of varying types depending on the type of read being requested:
-(endpoint, Clusters.ClusterA.EventA, urgent):       Endpoint = specific,
-Cluster = specific,   Event = specific, Urgent = True/False
-(endpoint, Clusters.ClusterA, urgent):              Endpoint = specific,
-Cluster = specific,   Event = *, Urgent = True/False
-(Clusters.ClusterA.EventA, urgent):                 Endpoint = *,
-Cluster = specific,   Event = specific, Urgent = True/False
-endpoint:                                   Endpoint = specific,    Cluster = *,          Event = *, Urgent = True/False
-Clusters.ClusterA:                          Endpoint = *,          Cluster = specific,    Event = *, Urgent = True/False
-'*' or ():                                  Endpoint = *,          Cluster = *,          Event = *, Urgent = True/False
+nodeId: Target's Node ID events: A list of tuples of varying types depending on
+the type of read being requested: (endpoint, Clusters.ClusterA.EventA, urgent):
+Endpoint = specific, Cluster = specific, Event = specific, Urgent = True/False
+(endpoint, Clusters.ClusterA, urgent): Endpoint = specific, Cluster = specific,
+Event = _, Urgent = True/False (Clusters.ClusterA.EventA, urgent): Endpoint = _,
+Cluster = specific, Event = specific, Urgent = True/False endpoint: Endpoint =
+specific, Cluster = _, Event = _, Urgent = True/False Clusters.ClusterA:
+Endpoint = _, Cluster = specific, Event = _, Urgent = True/False '_' or ():
+Endpoint = _, Cluster = _, Event = _, Urgent = True/False
 
-The cluster and events specified above are to be selected from the generated cluster objects.
+The cluster and events specified above are to be selected from the generated
+cluster objects.
 
-e.g.
-ReadEvent(1, [ 1 ] ) -- case 4 above.
-ReadEvent(1, [ Clusters.BasicInformation ] ) -- case 5 above.
-ReadEvent(1, [ (1, Clusters.BasicInformation.Events.Location ] ) -- case 1 above.
+e.g. ReadEvent(1, [ 1 ] ) -- case 4 above. ReadEvent(1, [
+Clusters.BasicInformation ] ) -- case 5 above. ReadEvent(1, [ (1,
+Clusters.BasicInformation.Events.Location ] ) -- case 1 above.
 
-eventNumberFilter: Optional minimum event number filter.
-reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
-When not provided, a read request will be sent.
+eventNumberFilter: Optional minimum event number filter. reportInterval: A tuple
+of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing
+subscriptions. When not provided, a read request will be sent.
 
 **Returns**:
 
-  - subscription request: ClusterAttribute.SubscriptionTransaction
-  To get notified on event subscriptions, use the SetEventUpdateCallback function on the
-  returned  SubscriptionTransaction. This is a callable of type
-  Callable[[EventReadResult, SubscriptionTransaction], None]
-  You can await events using a trigger mechanism in the callback. ex. queue.SimpleQueue
-  
-  - read request: AsyncReadTransation.ReadResponse.events.
-  This is a List[ClusterEvent].
-  
+-   subscription request: ClusterAttribute.SubscriptionTransaction To get
+    notified on event subscriptions, use the SetEventUpdateCallback function on
+    the returned SubscriptionTransaction. This is a callable of type
+    Callable[[EventReadResult, SubscriptionTransaction], None] You can await
+    events using a trigger mechanism in the callback. ex. queue.SimpleQueue
+
+-   read request: AsyncReadTransation.ReadResponse.events. This is a
+    List[ClusterEvent].
 
 **Raises**:
 
-  - InteractionModelError (chip.interaction_model) on error
+-   InteractionModelError (chip.interaction_model) on error
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSend"></a>
 
@@ -740,8 +750,8 @@ When not provided, a read request will be sent.
 def ZCLSend(cluster, command, nodeid, endpoint, groupid, args, blocking=False)
 ```
 
-Wrapper over SendCommand that catches the exceptions
-Returns a tuple of (errorCode, CommandResponse)
+Wrapper over SendCommand that catches the exceptions Returns a tuple of
+(errorCode, CommandResponse)
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLReadAttribute"></a>
 
@@ -756,8 +766,7 @@ def ZCLReadAttribute(cluster,
                      blocking=True)
 ```
 
-Wrapper over ReadAttribute for a single attribute
-Returns an AttributeReadResult
+Wrapper over ReadAttribute for a single attribute Returns an AttributeReadResult
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLWriteAttribute"></a>
 
@@ -774,8 +783,7 @@ def ZCLWriteAttribute(cluster: str,
                       blocking=True)
 ```
 
-Wrapper over WriteAttribute for a single attribute
-return PyChipError
+Wrapper over WriteAttribute for a single attribute return PyChipError
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSubscribeAttribute"></a>
 
@@ -793,8 +801,8 @@ def ZCLSubscribeAttribute(cluster,
                           autoResubscribe=True)
 ```
 
-Wrapper over ReadAttribute for a single attribute
-Returns a SubscriptionTransaction. See ReadAttribute for more information.
+Wrapper over ReadAttribute for a single attribute Returns a
+SubscriptionTransaction. See ReadAttribute for more information.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.InitGroupTestingData"></a>
 
@@ -804,7 +812,8 @@ Returns a SubscriptionTransaction. See ReadAttribute for more information.
 def InitGroupTestingData()
 ```
 
-Populates the Device Controller's GroupDataProvider with known test group info and keys.
+Populates the Device Controller's GroupDataProvider with known test group info
+and keys.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController"></a>
 
@@ -816,7 +825,8 @@ class ChipDeviceController(ChipDeviceControllerBase)
 
 The ChipDeviceCommissioner binding, named as ChipDeviceController
 
-TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
+TODO: This class contains DEPRECATED functions, we should update the test
+scripts to avoid the usage of those functions.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController.Commission"></a>
 
@@ -826,16 +836,17 @@ TODO: This class contains DEPRECATED functions, we should update the test script
 def Commission(nodeid) -> PyChipError
 ```
 
-Start the auto-commissioning process on a node after establishing a PASE connection.
-This function is intended to be used in conjunction with `EstablishPASESessionBLE` or
-`EstablishPASESessionIP`. It can be called either before or after the DevicePairingDelegate
-receives the OnPairingComplete call. Commissioners that want to perform simple
-auto-commissioning should use the supplied "PairDevice" functions above, which will
-establish the PASE connection and commission automatically.
+Start the auto-commissioning process on a node after establishing a PASE
+connection. This function is intended to be used in conjunction with
+`EstablishPASESessionBLE` or `EstablishPASESessionIP`. It can be called either
+before or after the DevicePairingDelegate receives the OnPairingComplete call.
+Commissioners that want to perform simple auto-commissioning should use the
+supplied "PairDevice" functions above, which will establish the PASE connection
+and commission automatically.
 
 **Returns**:
 
-- `bool` - True if successful, False otherwise.
+-   `bool` - True if successful, False otherwise.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController.CommissionThread"></a>
 
@@ -897,7 +908,8 @@ Sets the commissioning parameters back to the default values.
 def SetTimeZone(offset: int, validAt: int, name: str = "")
 ```
 
-Set the time zone to set during commissioning. Currently only one time zone entry is supported
+Set the time zone to set during commissioning. Currently only one time zone
+entry is supported
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController.SetDSTOffset"></a>
 
@@ -907,7 +919,8 @@ Set the time zone to set during commissioning. Currently only one time zone entr
 def SetDSTOffset(offset: int, validStarting: int, validUntil: int)
 ```
 
-Set the DST offset to set during commissioning. Currently only one DST entry is supported
+Set the DST offset to set during commissioning. Currently only one DST entry is
+supported
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController.SetDefaultNTP"></a>
 
@@ -927,7 +940,8 @@ Set the DefaultNTP to set during commissioning
 def SetTrustedTimeSource(nodeId: int, endpoint: int)
 ```
 
-Set the trusetd time source nodeId to set during commissioning. This must be a node on the commissioner fabric.
+Set the trusetd time source nodeId to set during commissioning. This must be a
+node on the commissioner fabric.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController.SetCheckMatchingFabric"></a>
 
@@ -937,7 +951,8 @@ Set the trusetd time source nodeId to set during commissioning. This must be a n
 def SetCheckMatchingFabric(check: bool)
 ```
 
-Instructs the auto-commissioner to perform a matching fabric check before commissioning.
+Instructs the auto-commissioner to perform a matching fabric check before
+commissioning.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController.GetFabricCheckResult"></a>
 
@@ -975,7 +990,8 @@ Supported filters are:
     DiscoveryFilterType.COMMISSIONER
     DiscoveryFilterType.COMPRESSED_FABRIC_ID
 
-The filter can be an integer, a string or None depending on the actual type of selected filter.
+The filter can be an integer, a string or None depending on the actual type of
+selected filter.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController.CommissionWithCode"></a>
 
@@ -987,8 +1003,8 @@ def CommissionWithCode(setupPayload: str,
                        networkOnly: bool = False) -> PyChipError
 ```
 
-Commission with the given nodeid from the setupPayload.
-setupPayload may be a QR or manual code.
+Commission with the given nodeid from the setupPayload. setupPayload may be a QR
+or manual code.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController.CommissionIP"></a>
 
@@ -1009,8 +1025,8 @@ def IssueNOCChain(csr: Clusters.OperationalCredentials.Commands.CSRResponse,
                   nodeId: int)
 ```
 
-Issue an NOC chain using the associated OperationalCredentialsDelegate.
-The NOC chain will be provided in TLV cert format.
+Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC
+chain will be provided in TLV cert format.
 
 <a id="chip.ChipDeviceCtrl.BareChipDeviceController"></a>
 
@@ -1038,18 +1054,18 @@ def __init__(operationalKey: p256keypair.P256Keypair,
 
 Creates a controller without autocommissioner.
 
-The allocated controller uses the noc, icac, rcac and ipk instead of the default,
-random generated certificates / keys. Which is suitable for creating a controller
-for manually signing certificates for testing.
+The allocated controller uses the noc, icac, rcac and ipk instead of the
+default, random generated certificates / keys. Which is suitable for creating a
+controller for manually signing certificates for testing.
 
 **Arguments**:
 
-- `operationalKey` - A P256Keypair object for the operational key of the controller.
-- `noc` - The NOC for the controller, in bytes.
-- `icac` - The optional ICAC for the controller.
-- `rcac` - The RCAC for the controller.
-- `ipk` - The optional IPK for the controller, when None is provided, the defaultIpk
-  will be used.
-- `adminVendorId` - The adminVendorId of the controller.
-- `name` - The name of the controller, for debugging use only.
-
+-   `operationalKey` - A P256Keypair object for the operational key of the
+    controller.
+-   `noc` - The NOC for the controller, in bytes.
+-   `icac` - The optional ICAC for the controller.
+-   `rcac` - The RCAC for the controller.
+-   `ipk` - The optional IPK for the controller, when None is provided, the
+    defaultIpk will be used.
+-   `adminVendorId` - The adminVendorId of the controller.
+-   `name` - The name of the controller, for debugging use only.
