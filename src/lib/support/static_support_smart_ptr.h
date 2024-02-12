@@ -25,9 +25,10 @@ namespace chip {
 /// for some application-specific class
 ///
 /// It works specifically together with CheckedGlobalInstanceReference
-template<class T>
-struct GlobalInstanceProvider {
-    static T* InstancePointer();
+template <class T>
+struct GlobalInstanceProvider
+{
+    static T * InstancePointer();
 };
 
 /// A class that looks like a smart pointer (overrides operator->)
@@ -49,21 +50,20 @@ struct GlobalInstanceProvider {
 /// comparing instance pointers has to work) and does not require alignment,
 /// as opposed to sizeof(void*) usage for SimpleInstanceReferences
 ///
-template<class T>
-class CheckedGlobalInstanceReference {
+template <class T>
+class CheckedGlobalInstanceReference
+{
 public:
-    CheckedGlobalInstanceReference(T *e) {
-        VerifyOrDie(e == GlobalInstanceProvider<T>::InstancePointer());
-    }
-    CheckedGlobalInstanceReference& operator=(T* value) {
+    CheckedGlobalInstanceReference(T * e) { VerifyOrDie(e == GlobalInstanceProvider<T>::InstancePointer()); }
+    CheckedGlobalInstanceReference & operator=(T * value)
+    {
         VerifyOrDie(value == GlobalInstanceProvider<T>::InstancePointer());
         return *this;
     }
 
-    inline T *operator->() { return GlobalInstanceProvider<T>::InstancePointer(); }
-    inline const T *operator->() const { return GlobalInstanceProvider<T>::InstancePointer(); }
+    inline T * operator->() { return GlobalInstanceProvider<T>::InstancePointer(); }
+    inline const T * operator->() const { return GlobalInstanceProvider<T>::InstancePointer(); }
 };
-
 
 /// A class that acts as a wrapper to a pointer and provides
 /// operator-> overrides.
@@ -83,20 +83,22 @@ public:
 ///     template<class T>
 ///     using PointerContainer = chip::SimpleInstanceReference<T>;
 ///   #endif
-template<class T>
-class SimpleInstanceReference{
-  public:
-    SimpleInstanceReference(T *e) : mValue(e) {}
-    SimpleInstanceReference& operator=(T* value) {
+template <class T>
+class SimpleInstanceReference
+{
+public:
+    SimpleInstanceReference(T * e) : mValue(e) {}
+    SimpleInstanceReference & operator=(T * value)
+    {
         mValue = value;
         return *this;
     }
 
-    T *operator->() { return mValue; }
-    const T *operator->() const { return mValue; }
+    T * operator->() { return mValue; }
+    const T * operator->() const { return mValue; }
 
-  private:
-    T *mValue;
+private:
+    T * mValue;
 };
 
 } // namespace chip

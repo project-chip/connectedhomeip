@@ -17,8 +17,8 @@
  */
 #include <lib/support/static_support_smart_ptr.h>
 
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/Scoped.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <cstring>
 
@@ -27,11 +27,12 @@
 using namespace chip;
 namespace {
 
-struct TestClass {
-    const char *str;
+struct TestClass
+{
+    const char * str;
     int num;
 
-    TestClass(const char *s, int n): str(s), num(n) {}
+    TestClass(const char * s, int n) : str(s), num(n) {}
 };
 
 TestClass gTestClass("abc", 123);
@@ -39,13 +40,13 @@ TestClass gTestClass("abc", 123);
 
 namespace chip {
 
-template<>
-TestClass* GlobalInstanceProvider<TestClass>::InstancePointer() {
+template <>
+TestClass * GlobalInstanceProvider<TestClass>::InstancePointer()
+{
     return &gTestClass;
 }
 
 } // namespace chip
-
 
 namespace {
 
@@ -93,7 +94,7 @@ void TestSimpleInstanceReference(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ref_b->num == 100);
 
     ref_a->num = 99;
-    b.num = 30;
+    b.num      = 30;
 
     NL_TEST_ASSERT(inSuite, a.num == 99);
     NL_TEST_ASSERT(inSuite, ref_b->num == 30);
@@ -106,7 +107,7 @@ const nlTest sTests[] = {
     NL_TEST_SENTINEL(),
 };
 
-}
+} // namespace
 
 int TestStaticSupportSmartPtr()
 {
