@@ -25,10 +25,11 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
-#include <app/util/basic-types.h>
 #include <app/reporting/ReportScheduler.h>
+#include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -253,34 +254,29 @@ private:
 
     inline void BumpDirtySetGeneration() { mDirtyGeneration++; }
 
-    /**
-     * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
-     * within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
-     *
-     */
+    /// Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
+    /// within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
     bool mRunScheduled = false;
 
-    /**
-     * The number of report date request in flight
-     *
-     */
+    /// This may be "fake" pointer or a real delegate pointer, depending
+    /// on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting
+    ///
+    /// when this is not a real pointer, it checks that the value is always
+    /// set to the global InteractionModelEngine and the size of this
+    /// member is 1 byte (minimal size and due to alignment after mRunScheduled
+    /// it should have no size overhead within the class)
+    InteractionModelDelegatePointer<EngineDelegate> mDelegate;
+
+    /// The number of report date request in flight
     uint32_t mNumReportsInFlight = 0;
 
-    /**
-     *  Current read handler index
-     *
-     */
+    /// Current read handler index
     uint32_t mCurReadHandlerIdx = 0;
 
-    /**
-     * The read handler we're calling BuildAndSendSingleReportData on right now.
-     */
+    /// The read handler we're calling BuildAndSendSingleReportData on right now.
     ReadHandler * mRunningReadHandler = nullptr;
 
-    /**
-     *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
-     *
-     */
+    /// mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // For unit tests, always use inline allocation for code coverage.
     ObjectPool<AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET, ObjectPoolMem::kInline> mGlobalDirtySet;
@@ -306,8 +302,6 @@ private:
     uint32_t mReservedSize          = 0;
     uint32_t mMaxAttributesPerChunk = UINT32_MAX;
 #endif
-
-    EngineDelegate * mDelegate = nullptr;
 };
 
 }; // namespace reporting

@@ -42,6 +42,13 @@ declare_args() {
   chip_im_force_fabric_quota_check = false
 
   enable_eventlist_attribute = false
+
+  # Systems that can spare a bit of RAM for InteractionModelEngine/delegate
+  # pointers should do so (allows InteractionModelEngine decoupling and less usage
+  # of global pointers)
+  chip_im_static_global_interaction_model_engine =
+      current_os != "linux" || current_os != "mac" || current_os != "ios" ||
+      current_os != "android"
 }
 
 buildconfig_header("app_buildconfig") {
@@ -57,6 +64,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
+    "CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE=${chip_im_static_global_interaction_model_engine}",
   ]
 
   visibility = [ ":app_config" ]
@@ -129,6 +137,8 @@ static_library("interaction-model") {
     "CASESessionManager.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
+    "InteractionModelDelegatePointers.cpp",
+    "InteractionModelDelegatePointers.h",
     "InteractionModelEngine.cpp",
     "InteractionModelEngine.h",
     "InteractionModelTimeout.h",
@@ -161,6 +171,7 @@ static_library("interaction-model") {
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:static-support",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
