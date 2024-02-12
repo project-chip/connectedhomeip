@@ -125,54 +125,33 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
         self.print_step(1, "Commissioning, already done")
 
-        if self.check_pics("RVCOPSTATE.S.M.ST_STOPPED"):
-            self.print_instruction(2, "Manually put the device in the STOPPED operational state")
+        if self.check_pics("RVCOPSTATE.S.M.ST_ERROR"):
+            self.print_instruction(2, "Manually put the device in the ERROR operational state")
 
-            await self.read_operational_state_with_check(3, op_states.kStopped)
+            await self.read_operational_state_with_check(3, op_states.kError)
 
-            await self.send_go_home_cmd_with_check(4, op_errors.kNoError)
+            await self.send_go_home_cmd_with_check(4, op_errors.kCommandInvalidInState)
 
-            await self.read_operational_state_with_check(5, rvc_op_states.kSeekingCharger)
+        if self.check_pics("RVCOPSTATE.S.M.ST_CHARGING"):
+            self.print_instruction(5, "Manually put the device in the CHARGING operational state")
 
-        if self.check_pics("RVCOPSTATE.S.M.ST_RUNNING"):
-            self.print_instruction(6, "Manually put the device in the RUNNING operational state")
+            await self.read_operational_state_with_check(6, rvc_op_states.kCharging)
 
-            await self.read_operational_state_with_check(7, op_states.kRunning)
+            await self.send_go_home_cmd_with_check(7, op_errors.kCommandInvalidInState)
 
-            await self.send_go_home_cmd_with_check(8, op_errors.kNoError)
+        if self.check_pics("RVCOPSTATE.S.M.ST_DOCKED"):
+            self.print_instruction(8, "Manually put the device in the DOCKED operational state")
+
+            await self.read_operational_state_with_check(9, rvc_op_states.kDocked)
+
+            await self.send_go_home_cmd_with_check(10, op_errors.kCommandInvalidInState)
+
+        if self.check_pics("PICS_M_ST_SEEKING_CHARGER"):
+            self.print_instruction(8, "Manually put the device in the SEEKING CHARGER operational state")
 
             await self.read_operational_state_with_check(9, rvc_op_states.kSeekingCharger)
 
-        if self.check_pics("RVCOPSTATE.S.M.ST_PAUSED"):
-            self.print_instruction(10, "Manually put the device in the PAUSED operational state")
-
-            await self.read_operational_state_with_check(11, op_states.kPaused)
-
-            await self.send_go_home_cmd_with_check(12, op_errors.kNoError)
-
-            await self.read_operational_state_with_check(13, rvc_op_states.kSeekingCharger)
-
-        if self.check_pics("RVCOPSTATE.S.M.ST_ERROR"):
-            self.print_instruction(14, "Manually put the device in the ERROR operational state")
-
-            await self.read_operational_state_with_check(15, op_states.kError)
-
-            await self.send_go_home_cmd_with_check(16, op_errors.kCommandInvalidInState)
-
-        if self.check_pics("RVCOPSTATE.S.M.ST_CHARGING"):
-            self.print_instruction(17, "Manually put the device in the CHARGING operational state")
-
-            await self.read_operational_state_with_check(18, rvc_op_states.kCharging)
-
-            await self.send_go_home_cmd_with_check(19, op_errors.kCommandInvalidInState)
-
-        if self.check_pics("RVCOPSTATE.S.M.ST_DOCKED"):
-            self.print_instruction(20, "Manually put the device in the DOCKED operational state")
-
-            await self.read_operational_state_with_check(21, rvc_op_states.kDocked)
-
-            await self.send_go_home_cmd_with_check(22, op_errors.kCommandInvalidInState)
-
+            await self.send_go_home_cmd_with_check(10, op_errors.kNoError)
 
 if __name__ == "__main__":
     default_matter_test_main()
