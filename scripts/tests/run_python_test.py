@@ -136,8 +136,13 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
         DumpProgramOutputToQueue(
             log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, log_queue)
 
+    if(app_process is not None):
+        app_pid = app_process.pid
+    else:
+        app_pid = 0
+
     script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-                      '--log-format', '%(message)s', "--app-pid", str(app_process.pid)] + shlex.split(script_args)
+                      '--log-format', '%(message)s', "--app-pid", str(app_pid)] + shlex.split(script_args)
 
     if script_gdb:
         #
