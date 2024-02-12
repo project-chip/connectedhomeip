@@ -299,6 +299,8 @@ def target_for_name(name: str):
         return TestTarget.BRIDGE
     if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
         return TestTarget.LIT_ICD
+    if name.startswith("Test_TC_MWOCTRL_") or name.startswith("Test_TC_MWOM_"):
+        return TestTarget.MWO
     return TestTarget.ALL_CLUSTERS
 
 
