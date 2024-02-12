@@ -262,6 +262,9 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                               problem=f"Failed validation of value on {location.as_string(self.cluster_mapper)}: {str(e)}", spec_location="Global Elements")
                             success = False
                             continue
+                        except KeyError:
+                            # This would have been caught already in the previous step
+                            continue
 
         self.print_step(4, "Validate the attribute list exactly matches the set of reported attributes")
         if success:
