@@ -25,7 +25,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <app/util/util.h>
 
 #include <app/reporting/reporting.h>
@@ -808,7 +807,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "ERR: reading current level %x", status);
-        return app::ToInteractionModelStatus(status);
+        return status;
     }
 
     if (currentLevel.IsNull())
@@ -873,7 +872,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
                 ChipLogProgress(Zcl, "ERR: reading on/off transition time %x", status);
-                return app::ToInteractionModelStatus(status);
+                return status;
             }
 
             // Transition time comes in (or is stored, in the case of On/Off Transition
@@ -963,7 +962,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
         ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
@@ -1022,7 +1021,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     if (rate.IsNull())
     {
         app::DataModel::Nullable<uint8_t> defaultMoveRate;
-        status = app::ToInteractionModelStatus(Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate));
+        status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
         if (status != Status::Success || defaultMoveRate.IsNull())
         {
             ChipLogProgress(Zcl, "ERR: reading default move rate %x", to_underlying(status));
@@ -1093,7 +1092,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
         ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));

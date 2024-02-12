@@ -21,6 +21,7 @@
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
+#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -104,7 +105,6 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
     ElectricalPowerMeasurementDelegate * dg = mn->GetEPMDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    // Set power mode to AC
     ReturnErrorOnFailure(dg->SetPowerMode(PowerModeEnum::kAc));
 
     return CHIP_NO_ERROR;
@@ -146,18 +146,10 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
                                                          int64_t aCumulativeEnergyExported)
 {
     MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     EnergyMeasurementStruct::Type energyImported;
     EnergyMeasurementStruct::Type energyExported;
-
-    // Get current timestamp
-    uint32_t currentTimestamp = 0;
-    uint64_t nowMS            = System::SystemClock().GetMonotonicMilliseconds64().count(); // In case we can't get real time
-    CHIP_ERROR err            = GetEpochTS(currentTimestamp);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "GetEpochTS returned error getting timestamp");
-    }
 
     /** IMPORT */
     // Copy last endTimestamp into new startTimestamp if it exists
@@ -183,7 +175,10 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
 
     energyExported.energy = aCumulativeEnergyExported;
 
-    if (currentTimestamp != 0)
+    // Get current timestamp
+    uint32_t currentTimestamp;
+    CHIP_ERROR err = GetEpochTS(currentTimestamp);
+    if (err == CHIP_NO_ERROR)
     {
         // use EpochTS
         energyImported.endTimestamp.SetValue(currentTimestamp);
@@ -191,7 +186,13 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
     }
     else
     {
-        // use systemtime-ms
+        ChipLogError(AppServer, "GetEpochTS returned error getting timestamp %" CHIP_ERROR_FORMAT, err.Format());
+
+        // use systemTime as a fallback
+        System::Clock::Milliseconds64 system_time_ms =
+            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+        uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
+
         energyImported.endSystime.SetValue(nowMS);
         energyExported.endSystime.SetValue(nowMS);
     }
@@ -218,18 +219,10 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
                                                        int64_t aPeriodicEnergyExported)
 {
     MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     EnergyMeasurementStruct::Type energyImported;
     EnergyMeasurementStruct::Type energyExported;
-
-    // Get current timestamp
-    uint32_t currentTimestamp = 0;
-    uint64_t nowMS            = System::SystemClock().GetMonotonicMilliseconds64().count(); // In case we can't get real time
-    CHIP_ERROR err            = GetEpochTS(currentTimestamp);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "GetEpochTS returned error getting timestamp");
-    }
 
     /** IMPORT */
     // Copy last endTimestamp into new startTimestamp if it exists
@@ -255,7 +248,10 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
 
     energyExported.energy = aPeriodicEnergyExported;
 
-    if (currentTimestamp != 0)
+    // Get current timestamp
+    uint32_t currentTimestamp;
+    CHIP_ERROR err = GetEpochTS(currentTimestamp);
+    if (err == CHIP_NO_ERROR)
     {
         // use EpochTS
         energyImported.endTimestamp.SetValue(currentTimestamp);
@@ -263,7 +259,13 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
     }
     else
     {
-        // use systemtime-ms
+        ChipLogError(AppServer, "GetEpochTS returned error getting timestamp");
+
+        // use systemTime as a fallback
+        System::Clock::Milliseconds64 system_time_ms =
+            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+        uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
+
         energyImported.endSystime.SetValue(nowMS);
         energyExported.endSystime.SetValue(nowMS);
     }

@@ -19,6 +19,7 @@
 #include "InteractiveCommands.h"
 
 #include <lib/support/Base64.h>
+#include <logging/logging.h>
 #include <platform/logging/LogV.h>
 
 #include <editline.h>
@@ -72,7 +73,7 @@ void ClearLine()
 void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
     ClearLine();
-    chip::Logging::Platform::LogV(module, category, msg, args);
+    dft::logging::LogRedirectCallback(module, category, msg, args);
     ClearLine();
 }
 
@@ -244,7 +245,7 @@ void ENFORCE_FORMAT(3, 0) InteractiveServerLoggingCallback(const char * module, 
     va_list args_copy;
     va_copy(args_copy, args);
 
-    chip::Logging::Platform::LogV(module, category, msg, args);
+    dft::logging::LogRedirectCallback(module, category, msg, args);
 
     char message[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     vsnprintf(message, sizeof(message), msg, args_copy);

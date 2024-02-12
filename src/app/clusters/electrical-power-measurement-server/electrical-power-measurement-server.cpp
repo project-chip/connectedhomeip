@@ -223,74 +223,120 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
 CHIP_ERROR Instance::EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ReturnErrorOnFailure(mDelegate.StartAccuracyRead());
     for (uint8_t i = 0; true; i++)
     {
         Structs::MeasurementAccuracyStruct::Type accuracy;
 
-        auto err = mDelegate.GetAccuracyByIndex(i, accuracy);
+        err = mDelegate.GetAccuracyByIndex(i, accuracy);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            return CHIP_NO_ERROR;
+            // Convert end of list to CHIP_NO_ERROR
+            err = CHIP_NO_ERROR;
+            goto exit;
         }
-        ReturnErrorOnFailure(err);
 
-        ReturnErrorOnFailure(encoder.Encode(accuracy));
+        // Check if another error occurred before trying to encode
+        SuccessOrExit(err);
+
+        err = encoder.Encode(accuracy);
+        SuccessOrExit(err);
     }
-    return CHIP_NO_ERROR;
+
+exit:
+    // Tell the delegate the read is complete
+    mDelegate.EndAccuracyRead();
+    return err;
 }
 
 CHIP_ERROR Instance::EncodeRanges(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ReturnErrorOnFailure(mDelegate.StartRangesRead());
     for (uint8_t i = 0; true; i++)
     {
         Structs::MeasurementRangeStruct::Type range;
 
-        auto err = mDelegate.GetRangeByIndex(i, range);
+        err = mDelegate.GetRangeByIndex(i, range);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            return CHIP_NO_ERROR;
+            // Convert end of list to CHIP_NO_ERROR
+            err = CHIP_NO_ERROR;
+            goto exit;
         }
-        ReturnErrorOnFailure(err);
 
-        ReturnErrorOnFailure(encoder.Encode(range));
+        // Check if another error occurred before trying to encode
+        SuccessOrExit(err);
+
+        err = encoder.Encode(range);
+        SuccessOrExit(err);
     }
-    return CHIP_NO_ERROR;
+
+exit:
+    // Tell the delegate the read is complete
+    err = mDelegate.EndRangesRead();
+    return err;
 }
 
 CHIP_ERROR Instance::EncodeHarmonicCurrents(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ReturnErrorOnFailure(mDelegate.StartHarmonicCurrentsRead());
     for (uint8_t i = 0; true; i++)
     {
         Structs::HarmonicMeasurementStruct::Type current;
 
-        auto err = mDelegate.GetHarmonicCurrentsByIndex(i, current);
+        err = mDelegate.GetHarmonicCurrentsByIndex(i, current);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            return CHIP_NO_ERROR;
+            // Convert end of list to CHIP_NO_ERROR
+            err = CHIP_NO_ERROR;
+            goto exit;
         }
-        ReturnErrorOnFailure(err);
+        // Check if another error occurred before trying to encode
+        SuccessOrExit(err);
 
-        ReturnErrorOnFailure(encoder.Encode(current));
+        err = encoder.Encode(current);
+        SuccessOrExit(err);
     }
-    return CHIP_NO_ERROR;
+
+exit:
+    // Tell the delegate the read is complete
+    err = mDelegate.EndHarmonicCurrentsRead();
+    return err;
 }
 
 CHIP_ERROR Instance::EncodeHarmonicPhases(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ReturnErrorOnFailure(mDelegate.StartHarmonicPhasesRead());
     for (uint8_t i = 0; true; i++)
     {
         Structs::HarmonicMeasurementStruct::Type phase;
 
-        auto err = mDelegate.GetHarmonicPhasesByIndex(i, phase);
+        err = mDelegate.GetHarmonicPhasesByIndex(i, phase);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            return CHIP_NO_ERROR;
+            // Convert end of list to CHIP_NO_ERROR
+            err = CHIP_NO_ERROR;
+            goto exit;
         }
-        ReturnErrorOnFailure(err);
+        // Check if another error occurred before trying to encode
+        SuccessOrExit(err);
 
-        ReturnErrorOnFailure(encoder.Encode(phase));
+        err = encoder.Encode(phase);
+        SuccessOrExit(err);
     }
-    return CHIP_NO_ERROR;
+
+exit:
+    // Tell the delegate the read is complete
+    err = mDelegate.EndHarmonicPhasesRead();
+    return err;
 }
 
 } // namespace ElectricalPowerMeasurement

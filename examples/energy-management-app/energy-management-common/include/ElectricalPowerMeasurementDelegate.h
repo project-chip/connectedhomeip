@@ -38,10 +38,27 @@ public:
     PowerModeEnum GetPowerMode() override { return mPowerMode; }
     uint8_t GetNumberOfMeasurementTypes() override;
 
+    /* These functions are called by the ReadAttribute handler to iterate through lists
+     * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
+     * lock on the data.
+     * The delegate is expected to not change these values once Start<Type>Read has been called
+     * until the End<Type>Read() has been called (e.g. releasing a lock on the data)
+     */
+    CHIP_ERROR StartAccuracyRead() override;
     CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) override;
+    CHIP_ERROR EndAccuracyRead() override;
+
+    CHIP_ERROR StartRangesRead() override;
     CHIP_ERROR GetRangeByIndex(uint8_t, Structs::MeasurementRangeStruct::Type &) override;
+    CHIP_ERROR EndRangesRead() override;
+
+    CHIP_ERROR StartHarmonicCurrentsRead() override;
     CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t, Structs::HarmonicMeasurementStruct::Type &) override;
+    CHIP_ERROR EndHarmonicCurrentsRead() override;
+
+    CHIP_ERROR StartHarmonicPhasesRead() override;
     CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t, Structs::HarmonicMeasurementStruct::Type &) override;
+    CHIP_ERROR EndHarmonicPhasesRead() override;
 
     DataModel::Nullable<int64_t> GetVoltage() override { return mVoltage; }
     DataModel::Nullable<int64_t> GetActiveCurrent() override { return mActiveCurrent; }

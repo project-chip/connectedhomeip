@@ -153,6 +153,19 @@ void ESP32Backend::TraceCounter(const char * label)
 {
     ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
 }
+
+void ESP32Backend::TraceMetric(const char * label, int32_t value)
+{
+    if (!mRegistered)
+    {
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, label /* Unique key 8 */, label /* label displayed on dashboard */,
+                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
+        mRegistered = true;
+    }
+    ESP_LOGI("mtr", "The value of %s is %ld ", label, value);
+    esp_diag_metrics_add_int(label, value);
+}
+
 void ESP32Backend::TraceBegin(const char * label, const char * group)
 {
     HashValue hashValue = MurmurHash(group);
