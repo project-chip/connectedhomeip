@@ -24,15 +24,14 @@ namespace chip {
 
 #if CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE
 
-template<class T>
+template <class T>
 using InteractionModelDelegatePointer = chip::CheckedGlobalInstanceReference<T>;
 
 #else
 
-template<class T>
+template <class T>
 using InteractionModelDelegatePointer = chip::SimpleInstanceReference<T>;
 
 #endif // CHIP_CONFIG_STATIC_GLOBAL_INTERATION_MODEL_ENGINE
 
 } // namespace chip
-

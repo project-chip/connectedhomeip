@@ -25,11 +25,12 @@
 
 namespace chip {
 
-template<>
-app::reporting::EngineDelegate *GlobalInstanceProvider<app::reporting::EngineDelegate>::InstancePointer() {
+template <>
+app::reporting::EngineDelegate * GlobalInstanceProvider<app::reporting::EngineDelegate>::InstancePointer()
+{
     return app::InteractionModelEngine::GetInstance();
 }
 
-} // namespace
+} // namespace chip
 
 #endif
