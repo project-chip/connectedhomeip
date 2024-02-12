@@ -80,7 +80,8 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
-                               public SubscriptionsInfoProvider
+                               public SubscriptionsInfoProvider,
+                               public TimedHandlerDelegate
 {
 public:
     /**
@@ -218,26 +219,12 @@ public:
     }
     void UnregisterReadHandlerAppCallback() { mpReadHandlerApplicationCallback = nullptr; }
 
-    /**
-     * Called when a timed interaction has failed (i.e. the exchange it was
-     * happening on has closed while the exchange delegate was the timed
-     * handler).
-     */
-    void OnTimedInteractionFailed(TimedHandler * apTimedHandler);
-
-    /**
-     * Called when a timed invoke is received.  This function takes over all
-     * handling of the exchange, status reporting, and so forth.
-     */
-    void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
-                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-
-    /**
-     * Called when a timed write is received.  This function takes over all
-     * handling of the exchange, status reporting, and so forth.
-     */
-    void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
-                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    // TimedHandlerDelegate implementation
+    virtual void OnTimedInteractionFailed(TimedHandler * apTimedHandler);
+    virtual void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                               const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    virtual void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**

@@ -31,6 +31,11 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
+namespace chip {
+namespace app {
+
+class TimedHandler;
+
 /**
  * A TimedHandler handles a Timed Request action and then waits for a
  * subsequent Invoke or Write action and hands those on to
@@ -43,14 +48,37 @@
  * either the exchange is closed or the interaction is handed on to the
  * InteractionModelEngine.
  */
+class TimedHandlerDelegate {
+  public:
+    virtual ~TimedHandlerDelegate() = default;
 
-namespace chip {
-namespace app {
+    /**
+     * Called when a timed invoke is received.  This function takes over all
+     * handling of the exchange, status reporting, and so forth.
+     */
+    virtual void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                               const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) = 0;
+
+
+    /**
+     * Called when a timed write is received.  This function takes over all
+     * handling of the exchange, status reporting, and so forth.
+     */
+    virtual void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) = 0;
+
+    /**
+     * Called when a timed interaction has failed (i.e. the exchange it was
+     * happening on has closed while the exchange delegate was the timed
+     * handler).
+     */
+    virtual void OnTimedInteractionFailed(TimedHandler * apTimedHandler) = 0;
+};
 
 class TimedHandler : public Messaging::ExchangeDelegate
 {
 public:
-    TimedHandler() {}
+    TimedHandler(TimedHandlerDelegate *delegate) : mDelegate(delegate) {}
     ~TimedHandler() override {}
 
     // ExchangeDelegate implementation.
@@ -83,16 +111,13 @@ private:
         kExpectingFollowingAction, // Expecting write or invoke.
     };
 
-    // Because we have a vtable pointer and mTimeLimit needs to be 8-byte
-    // aligned on ARM, putting mState first here means we fit in 16 bytes on
-    // 32-bit ARM, whereas if we put it second we'd be 24 bytes.
-    // On platforms where either vtable pointers are 8 bytes or 64-bit ints can
-    // be 4-byte-aligned the ordering here does not matter.
+    TimedHandlerDelegate *mDelegate;
     State mState = State::kExpectingTimedAction;
     // We keep track of the time limit for message reception, in case our
     // exchange's "response expected" timer gets delayed and does not fire when
     // the time runs out.
     System::Clock::Timestamp mTimeLimit;
+
 };
 
 } // namespace app
