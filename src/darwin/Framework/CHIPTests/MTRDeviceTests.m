@@ -38,6 +38,8 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
+
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
@@ -127,46 +129,11 @@ static MTRBaseDevice * GetConnectedDevice(void)
 @interface MTRDeviceTests : XCTestCase
 @end
 
-static BOOL sStackInitRan = NO;
-static BOOL sNeedsStackShutdown = YES;
-
 @implementation MTRDeviceTests
 
-+ (void)tearDown
++ (void)setUp
 {
-    // Global teardown, runs once
-    if (sNeedsStackShutdown) {
-        // We don't need to worry about ResetCommissionee.  If we get here,
-        // we're running only one of our test methods (using
-        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
-        // we did not run test999_TearDown.
-        [self shutdownStack];
-    }
-}
-
-- (void)setUp
-{
-    // Per-test setup, runs before each test.
-    [super setUp];
-    [self setContinueAfterFailure:NO];
-
-    if (sStackInitRan == NO) {
-        [self initStack];
-        [self waitForCommissionee];
-    }
-}
-
-- (void)tearDown
-{
-    // Per-test teardown, runs after each test.
-    [super tearDown];
-}
-
-- (void)initStack
-{
-    sStackInitRan = YES;
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
+    XCTestExpectation * pairingExpectation = [[XCTestExpectation alloc] initWithDescription:@"Pairing Complete"];
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -194,7 +161,7 @@ static BOOL sNeedsStackShutdown = YES;
     sController = controller;
 
     MTRDeviceTestDeviceControllerDelegate * deviceControllerDelegate =
-        [[MTRDeviceTestDeviceControllerDelegate alloc] initWithExpectation:expectation];
+        [[MTRDeviceTestDeviceControllerDelegate alloc] initWithExpectation:pairingExpectation];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
     [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
@@ -204,38 +171,33 @@ static BOOL sNeedsStackShutdown = YES;
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
-    [controller setupCommissioningSessionWithPayload:payload newNodeID:@(kDeviceId) error:&error];
+    XCTAssertTrue([controller setupCommissioningSessionWithPayload:payload newNodeID:@(kDeviceId) error:&error]);
     XCTAssertNil(error);
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ pairingExpectation ] timeout:kPairingTimeoutInSeconds], XCTWaiterResultCompleted);
 
-    [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
+    XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(expectation);
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds], XCTWaiterResultCompleted);
 }
 
-+ (void)shutdownStack
++ (void)tearDown
 {
-    sNeedsStackShutdown = NO;
+    ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), nil, kTimeoutInSeconds);
 
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
-
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+
+    [super tearDown];
 }
 
-- (void)waitForCommissionee
+- (void)setUp
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-
-    WaitForCommissionee(expectation);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)test000_SetUp
-{
-    // Nothing to do here; our setUp method handled this already.  This test
-    // just exists to make the setup not look like it's happening inside other
-    // tests.
+    [super setUp];
+    [self setContinueAfterFailure:NO];
 }
 
 - (void)test001_ReadAttribute
@@ -2886,12 +2848,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * cluster = [[MTRClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
     XCTAssertEqual(cluster.device, device);
     XCTAssertEqualObjects(cluster.endpointID, @(0));
-}
-
-- (void)test999_TearDown
-{
-    ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), self, kTimeoutInSeconds);
-    [[self class] shutdownStack];
 }
 
 @end
