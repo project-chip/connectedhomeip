@@ -19,13 +19,14 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/WriteHandler.h>
 #include <app/util/attribute-metadata.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
 
 namespace chip {
 namespace app {
+
+class WriteHandler;
 
 /**
  * Returns the metadata of the attribute for the given path.
