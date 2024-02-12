@@ -371,8 +371,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  * application an opportunity to take care of cluster initialization procedures.
  * It is called exactly once for each endpoint where cluster is present.
  *
- * @param endpoint   Ver.: always
- *
  * TODO Issue #3841
  * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
  * attributes to the default value.
@@ -382,7 +380,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    // TODO: implement any additional Cluster Server init actions
 }
 
 #ifdef EMBER_AF_PLUGIN_AUDIO_OUTPUT_SERVER
