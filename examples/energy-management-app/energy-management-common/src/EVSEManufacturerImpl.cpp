@@ -105,7 +105,6 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
     ElectricalPowerMeasurementDelegate * dg = mn->GetEPMDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    // Set power mode to AC
     ReturnErrorOnFailure(dg->SetPowerMode(PowerModeEnum::kAc));
 
     return CHIP_NO_ERROR;
