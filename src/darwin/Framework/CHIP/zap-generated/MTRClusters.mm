@@ -18,13 +18,13 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRClusterConstants.h"
+#import "MTRDevice_Internal.h"
 #import "MTRCluster_Internal.h"
 #import "MTRClusters_Internal.h"
-#import "MTRCommandPayloadsObjc.h"
-#import "MTRDefines_Internal.h"
-#import "MTRDevice_Internal.h"
-#import "MTRLogging_Internal.h"
 #import "MTRStructsObjc.h"
+#import "MTRCommandPayloadsObjc.h"
+#import "MTRLogging_Internal.h"
+#import "MTRDefines_Internal.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>

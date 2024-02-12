@@ -18,11 +18,11 @@
 
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 
+#include <app/data-model/Decode.h>
+#include <app/data-model/DecodableList.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/data-model/DecodableList.h>
-#include <app/data-model/Decode.h>
 #include <jni.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>

@@ -20,8 +20,8 @@
 // Prevent multiple inclusion
 #pragma once
 
-#include <app/util/endpoint-config-defines.h>
 #include <lib/core/CHIPConfig.h>
+#include <app/util/endpoint-config-defines.h>
 
 // Default values for the attributes longer than a pointer,
 // in a form of a binary blob

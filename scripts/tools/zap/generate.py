@@ -314,7 +314,7 @@ def runClangPrettifier(templates_file, output_dir):
             #       compatible only with pigweed provided clang-format (which is
             #       tracking non-released clang).
             clang_format = getClangFormatBinary()
-            args = [clang_format, '-i']
+            args = [clang_format, '--sort-includes=false', '-i']
             args.extend(clangOutputs)
             subprocess.check_call(args)
             print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))

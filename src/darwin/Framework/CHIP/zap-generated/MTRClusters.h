@@ -18,8 +18,8 @@
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
-#import <Matter/MTRDefines.h>
 #import <Matter/MTRDevice.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -17,8 +17,8 @@
 
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRClusterStateCacheContainer.h>
-#import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

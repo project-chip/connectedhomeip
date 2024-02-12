@@ -18,16 +18,16 @@
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 
 #import "MTRStructsObjc.h"
-#import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
 
+#include <app/data-model/Decode.h>
+#include <app/data-model/DecodableList.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/data-model/DecodableList.h>
-#include <app/data-model/Decode.h>
-#include <lib/core/DataModelTypes.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/core/DataModelTypes.h>
 
 using namespace chip;
 using namespace chip::app;

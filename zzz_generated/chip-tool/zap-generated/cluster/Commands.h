@@ -26,11 +26,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
-#include <commands/clusters/ClusterCommand.h>
+#include <commands/common/Commands.h>
 #include <commands/clusters/ComplexArgument.h>
+#include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ReportCommand.h>
 #include <commands/clusters/WriteAttributeCommand.h>
-#include <commands/common/Commands.h>
 
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |

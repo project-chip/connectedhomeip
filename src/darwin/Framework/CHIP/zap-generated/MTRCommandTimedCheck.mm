@@ -17,8 +17,8 @@
 
 #import "MTRCommandTimedCheck.h"
 
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 using namespace chip;
 using namespace chip::app;

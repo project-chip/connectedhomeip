@@ -1,7 +1,7 @@
 {{> header}}
 
-#include <app/data-model/WrappedStructEncoder.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/WrappedStructEncoder.h>
 
 #include <variant>
 
