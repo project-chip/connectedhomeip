@@ -276,7 +276,6 @@
     "LevelControl": [],
     "LaundryWasherMode": ["Test_TC_LWM_1_2"],
     "OnOff": ["Test_TC_OO_2_3"],
-    "OperationalState": ["Test_TC_OPSTATE_2_2", "Test_TC_OPSTATE_2_5"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "SmokeCOAlarm": [],
     "RefrigeratorAlarm": ["Test_TC_REFALM_2_2", "Test_TC_REFALM_2_3"],
