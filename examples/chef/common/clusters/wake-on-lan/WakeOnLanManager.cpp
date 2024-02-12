@@ -17,7 +17,7 @@
  */
 
 #include <app/util/config.h>
-#ifdef EMBER_AF_PLUGIN_WAKE_ON_LAN_SERVER
+#ifdef MATTER_DM_PLUGIN_WAKE_ON_LAN_SERVER
 #include "WakeOnLanManager.h"
 #include <fstream>
 #include <iostream>
@@ -65,4 +65,4 @@ CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncode
 
     return aEncoder.Encode(CharSpan::fromCharString(getMacAddress().c_str()));
 }
-#endif // EMBER_AF_PLUGIN_WAKE_ON_LAN_SERVER
+#endif // MATTER_DM_PLUGIN_WAKE_ON_LAN_SERVER

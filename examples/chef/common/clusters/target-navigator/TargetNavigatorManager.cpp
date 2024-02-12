@@ -16,12 +16,17 @@
  */
 
 #include <app/util/config.h>
-#ifdef EMBER_AF_PLUGIN_TARGET_NAVIGATOR_SERVER
+#ifdef MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER
 #include "TargetNavigatorManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters::TargetNavigator;
+
+using chip::CharSpan;
+using chip::app::AttributeValueEncoder;
+using chip::app::CommandResponseHelper;
 
 TargetNavigatorManager::TargetNavigatorManager(std::list<std::string> targets, uint8_t currentTarget)
 {
@@ -68,4 +73,21 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
-#endif // EMBER_AF_PLUGIN_TARGET_NAVIGATOR_SERVER
+
+uint16_t TargetNavigatorManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success             = (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == EMBER_ZCL_STATUS_SUCCESS);
+    if (!success)
+    {
+        ChipLogError(Zcl, "TargetNavigatorManager::GetClusterRevision error reading cluster revision");
+    }
+
+    return clusterRevision;
+}
+#endif // MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER

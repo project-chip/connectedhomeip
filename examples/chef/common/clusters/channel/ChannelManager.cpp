@@ -16,7 +16,7 @@
  */
 
 #include <app/util/config.h>
-#ifdef EMBER_AF_PLUGIN_CHANNEL_SERVER
+#ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include "ChannelManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
@@ -326,7 +326,7 @@ bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIde
 
 uint32_t ChannelManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return mDynamicEndpointFeatureMap;
     }
@@ -335,4 +335,20 @@ uint32_t ChannelManager::GetFeatureMap(chip::EndpointId endpoint)
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
 }
-#endif // EMBER_AF_PLUGIN_CHANNEL_SERVER
+
+uint16_t ChannelManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success             = (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == EMBER_ZCL_STATUS_SUCCESS);
+    if (!success)
+    {
+        ChipLogError(Zcl, "ChannelManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
+}
+#endif // MATTER_DM_PLUGIN_CHANNEL_SERVER

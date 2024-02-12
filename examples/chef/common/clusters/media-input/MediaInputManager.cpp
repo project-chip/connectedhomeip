@@ -16,7 +16,7 @@
  */
 
 #include <app/util/config.h>
-#ifdef EMBER_AF_PLUGIN_MEDIA_INPUT_SERVER
+#ifdef MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER
 #include "MediaInputManager.h"
 
 using namespace std;
@@ -92,7 +92,6 @@ bool MediaInputManager::HandleHideInputStatus()
 
 bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
-    // TODO: Insert code here
     bool mediaInputRenamed = false;
 
     for (InputInfoType & input : mInputs)
@@ -109,4 +108,4 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
 
     return mediaInputRenamed;
 }
-#endif // EMBER_AF_PLUGIN_MEDIA_INPUT_SERVER
+#endif // MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER

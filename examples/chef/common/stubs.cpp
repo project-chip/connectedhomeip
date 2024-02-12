@@ -400,7 +400,7 @@ void emberAfChannelClusterInitCallback(EndpointId endpoint)
     ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
     Channel::SetDefaultDelegate(endpoint, &channelManager);
 }
-#endif // MATTER_DM_PLUGIN_CHANNEL_SERVER
+#endif
 
 #ifdef MATTER_DM_PLUGIN_KEYPAD_INPUT_SERVER
 #include "keypad-input/KeypadInputManager.h"

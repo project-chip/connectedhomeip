@@ -17,7 +17,7 @@
  */
 
 #include <app/util/config.h>
-#ifdef EMBER_AF_PLUGIN_KEYPAD_INPUT_SERVER
+#ifdef MATTER_DM_PLUGIN_KEYPAD_INPUT_SERVER
 #include "KeypadInputManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
@@ -26,9 +26,10 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::KeypadInput;
 
+using chip::app::CommandResponseHelper;
+
 void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeType & keycCode)
 {
-    // TODO: Insert code here
     Commands::SendKeyResponse::Type response;
 
     switch (keycCode)
@@ -102,8 +103,13 @@ void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType
 
 uint32_t KeypadInputManager::GetFeatureMap(chip::EndpointId endpoint)
 {
+    if (endpoint >= MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
 }
-#endif // EMBER_AF_PLUGIN_KEYPAD_INPUT_SERVER
+#endif // MATTER_DM_PLUGIN_KEYPAD_INPUT_SERVER

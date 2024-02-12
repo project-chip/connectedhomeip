@@ -17,7 +17,7 @@
  */
 
 #include <app/util/config.h>
-#ifdef EMBER_AF_PLUGIN_AUDIO_OUTPUT_SERVER
+#ifdef MATTER_DM_PLUGIN_AUDIO_OUTPUT_SERVER
 #include "AudioOutputManager.h"
 
 using namespace std;
@@ -35,7 +35,7 @@ AudioOutputManager::AudioOutputManager()
         outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
         // note: safe only because of use of string literal
         outputInfo.name  = chip::CharSpan::fromCharString("HDMI");
-        outputInfo.index = i;
+        outputInfo.index = static_cast<uint8_t>(i);
         mOutputs.push_back(outputInfo);
     }
 }
@@ -90,4 +90,4 @@ bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
 
     return audioOutputSelected;
 }
-#endif // EMBER_AF_PLUGIN_AUDIO_OUTPUT_SERVER
+#endif // MATTER_DM_PLUGIN_AUDIO_OUTPUT_SERVER

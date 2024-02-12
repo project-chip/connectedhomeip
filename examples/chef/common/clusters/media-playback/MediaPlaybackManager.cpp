@@ -16,7 +16,7 @@
  */
 
 #include <app/util/config.h>
-#ifdef EMBER_AF_PLUGIN_MEDIA_PLAYBACK_SERVER
+#ifdef MATTER_DM_PLUGIN_MEDIA_PLAYBACK_SERVER
 #include "MediaPlaybackManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
@@ -25,7 +25,11 @@ using namespace std;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
 using namespace chip::Uint8;
+
 using chip::CharSpan;
+using chip::app::AttributeValueEncoder;
+using chip::app::CommandResponseHelper;
+
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
@@ -319,7 +323,7 @@ bool MediaPlaybackManager::HandleDeactivateTextTrack()
 
 uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return mDynamicEndpointFeatureMap;
     }
@@ -329,4 +333,20 @@ uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
     return featureMap;
 }
 
-#endif /// EMBER_AF_PLUGIN_MEDIA_PLAYBACK_SERVER
+uint16_t MediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success             = (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == EMBER_ZCL_STATUS_SUCCESS);
+    if (!success)
+    {
+        ChipLogError(Zcl, "MediaPlaybackManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
+}
+
+#endif /// MATTER_DM_PLUGIN_MEDIA_PLAYBACK_SERVER

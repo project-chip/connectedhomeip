@@ -17,13 +17,12 @@
  */
 
 #include <app/util/config.h>
-#ifdef EMBER_AF_PLUGIN_LOW_POWER_SERVER
+#ifdef MATTER_DM_PLUGIN_LOW_POWER_SERVER
 #include "LowPowerManager.h"
 
 bool LowPowerManager::HandleSleep()
 {
-    // TODO: Insert code here
     ChipLogProgress(Zcl, "LowPowerManager::HandleSleep");
     return true;
 }
-#endif // EMBER_AF_PLUGIN_LOW_POWER_SERVER
+#endif // MATTER_DM_PLUGIN_LOW_POWER_SERVER

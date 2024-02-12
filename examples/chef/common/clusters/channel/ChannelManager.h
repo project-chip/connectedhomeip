@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/clusters/channel-server/channel-server.h>
+#include <app/util/util.h>
 #include <vector>
 
 class ChannelManager : public chip::app::Clusters::Channel::Delegate
@@ -31,6 +32,7 @@ class ChannelManager : public chip::app::Clusters::Channel::Delegate
     using PageTokenType             = chip::app::Clusters::Channel::Structs::PageTokenStruct::Type;
     using ProgramType               = chip::app::Clusters::Channel::Structs::ProgramStruct::Type;
     using ChannelPagingType         = chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type;
+    using Feature                   = chip::app::Clusters::Channel::Feature;
 
 public:
     ChannelManager();
@@ -60,6 +62,7 @@ public:
                                    const chip::ByteSpan & data) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
     uint16_t mCurrentChannelIndex;
@@ -68,6 +71,7 @@ protected:
     std::vector<ProgramType> mPrograms;
 
 private:
-    uint32_t mDynamicEndpointFeatureMap = 3;
     bool isChannelMatched(const ChannelInfoType & channel, const chip::CharSpan & match);
+    static constexpr uint32_t mDynamicEndpointFeatureMap = static_cast<uint32_t>(chip::BitMask<Feature, uint32_t>(Feature::kChannelList, Feature::kLineupInfo).Raw());
+    static constexpr uint16_t kClusterRevision    = 2;
 };
