@@ -400,7 +400,6 @@ public:
 #endif
 
 private:
-    friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
     friend class SubscriptionResumptionSessionEstablisher;
