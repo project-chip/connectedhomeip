@@ -23,4 +23,4 @@ pydoc-markdown -m chip.ChipDeviceCtrl '{
       render_toc: true,
       insert_header_anchors: true
     }
-  }' >${SCRIPT_DIR}/ChipDeviceCtrlAPI.md
+  }' >"$SCRIPT_DIR"/ChipDeviceCtrlAPI.md
