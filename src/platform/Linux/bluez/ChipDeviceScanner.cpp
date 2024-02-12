@@ -306,7 +306,7 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     {
         // Not critical: ignore if fails
         ChipLogError(Ble, "Failed to set discovery filters: %s", error->message);
-        g_clear_error(&error.GetReceiver());
+        error.reset();
     }
 
     ChipLogProgress(Ble, "BLE initiating scan.");
