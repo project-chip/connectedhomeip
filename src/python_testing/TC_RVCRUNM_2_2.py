@@ -207,7 +207,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             op_state = await self.read_op_state_operational_state()
 
             asserts.assert_true(op_state in valid_op_states,
-                                "Expected a RVCOPSTATE's OperationalState attribute to be one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
+                                "Expected RVCOPSTATE's OperationalState attribute to be one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
 
         self.print_step(11, "Send ChangeToMode MODE_B command")
         await self.send_change_to_mode_with_check(self.mode_b, 0)
