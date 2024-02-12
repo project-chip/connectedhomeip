@@ -23,7 +23,8 @@
 
 class AudioOutputManager : public chip::app::Clusters::AudioOutput::Delegate
 {
-    using OutputInfoType      = chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type;
+    using OutputInfoType = chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type;
+
 public:
     AudioOutputManager();
 

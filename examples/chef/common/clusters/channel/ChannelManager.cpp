@@ -21,9 +21,9 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 
-#include <vector>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -141,12 +141,10 @@ bool ChannelManager::isChannelMatched(const ChannelInfoType & channel, const chi
     ss << channel.majorNumber << "." << channel.minorNumber;
     std::string number = ss.str();
 
-    auto isMatch = [&match](const Optional<chip::CharSpan> &a)
-    {
-        return a.HasValue() && a.Value().data_equal(match);
-    };
+    auto isMatch = [&match](const Optional<chip::CharSpan> & a) { return a.HasValue() && a.Value().data_equal(match); };
 
-    return isMatch(channel.name) || isMatch(channel.affiliateCallSign) || isMatch(channel.callSign) || match.data_equal(chip::CharSpan::fromCharString(number.c_str()));
+    return isMatch(channel.name) || isMatch(channel.affiliateCallSign) || isMatch(channel.callSign) ||
+        match.data_equal(chip::CharSpan::fromCharString(number.c_str()));
 }
 
 void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match)
@@ -160,14 +158,15 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         // or callSign or affiliateCallSign or majorNumber.minorNumber
         if (isChannelMatched(mChannels[i], match))
         {
-            if (iMatchedChannel != -1) {
+            if (iMatchedChannel != -1)
+            {
                 // Error: Found multiple matches
                 response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
                 helper.Success(response);
-		return;
-	    }
-	    iMatchedChannel = i;
-	}
+                return;
+            }
+            iMatchedChannel = i;
+        }
     }
 
     if (iMatchedChannel == -1)
@@ -201,7 +200,7 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
                 channelChanged       = true;
                 mCurrentChannelIndex = index;
                 mCurrentChannel      = channel;
-		return channelChanged;
+                return channelChanged;
             }
         }
         index++;
@@ -300,7 +299,8 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
         std::string nextIdString(program.identifier.data(), program.identifier.size());
         if (nextIdString == idString)
         {
-            program.recordingFlag = MakeOptional(static_cast<uint32_t>(shouldRecordSeries ? RecordingFlagBitmap::kRecordSeries : RecordingFlagBitmap::kScheduled));
+            program.recordingFlag = MakeOptional(
+                static_cast<uint32_t>(shouldRecordSeries ? RecordingFlagBitmap::kRecordSeries : RecordingFlagBitmap::kScheduled));
         }
     }
 

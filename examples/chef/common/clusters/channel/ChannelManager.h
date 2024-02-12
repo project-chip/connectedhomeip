@@ -20,18 +20,18 @@
 #include <app/clusters/channel-server/channel-server.h>
 #include <vector>
 
-
 class ChannelManager : public chip::app::Clusters::Channel::Delegate
 {
-using RecordingFlagBitmap       = chip::app::Clusters::Channel::RecordingFlagBitmap;
-using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type;
-using ProgramGuideResponseType  = chip::app::Clusters::Channel::Commands::ProgramGuideResponse::Type;
-using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type;
-using AdditionalInfoType        = chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type;
-using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
-using PageTokenType             = chip::app::Clusters::Channel::Structs::PageTokenStruct::Type;
-using ProgramType               = chip::app::Clusters::Channel::Structs::ProgramStruct::Type;
-using ChannelPagingType         = chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type;
+    using RecordingFlagBitmap       = chip::app::Clusters::Channel::RecordingFlagBitmap;
+    using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type;
+    using ProgramGuideResponseType  = chip::app::Clusters::Channel::Commands::ProgramGuideResponse::Type;
+    using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type;
+    using AdditionalInfoType        = chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type;
+    using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
+    using PageTokenType             = chip::app::Clusters::Channel::Structs::PageTokenStruct::Type;
+    using ProgramType               = chip::app::Clusters::Channel::Structs::ProgramStruct::Type;
+    using ChannelPagingType         = chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type;
+
 public:
     ChannelManager();
 
@@ -39,11 +39,12 @@ public:
     CHIP_ERROR HandleGetLineup(chip::app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetCurrentChannel(chip::app::AttributeValueEncoder & aEncoder) override;
 
-    void HandleChangeChannel(chip::app::CommandResponseHelper<ChangeChannelResponseType> & helper, const chip::CharSpan & match) override;
+    void HandleChangeChannel(chip::app::CommandResponseHelper<ChangeChannelResponseType> & helper,
+                             const chip::CharSpan & match) override;
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) override;
     bool HandleSkipChannel(const int16_t & count) override;
-    void HandleGetProgramGuide(chip::app::CommandResponseHelper<ProgramGuideResponseType> & helper, const chip::Optional<uint32_t> & startTime,
-                               const chip::Optional<uint32_t> & endTime,
+    void HandleGetProgramGuide(chip::app::CommandResponseHelper<ProgramGuideResponseType> & helper,
+                               const chip::Optional<uint32_t> & startTime, const chip::Optional<uint32_t> & endTime,
                                const chip::Optional<chip::app::DataModel::DecodableList<ChannelInfoType>> & channelList,
                                const chip::Optional<PageTokenType> & pageToken,
                                const chip::Optional<chip::BitMask<RecordingFlagBitmap>> & recordingFlag,

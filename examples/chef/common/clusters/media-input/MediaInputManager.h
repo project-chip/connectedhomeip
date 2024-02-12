@@ -24,7 +24,8 @@
 
 class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate
 {
-using InputInfoType = chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type;
+    using InputInfoType = chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type;
+
 public:
     MediaInputManager();
 
@@ -44,5 +45,5 @@ protected:
     char mCharDataBuffer[10][mBufMax];
 
 private:
-    static constexpr int mTotalInput              = 3;
+    static constexpr int mTotalInput = 3;
 };

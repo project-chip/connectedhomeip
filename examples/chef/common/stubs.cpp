@@ -378,9 +378,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  * emberAfPluginOnOffClusterServerPostInitCallback.
  *
  */
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-}
+void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
 
 #ifdef EMBER_AF_PLUGIN_AUDIO_OUTPUT_SERVER
 #include "audio-output/AudioOutputManager.h"
