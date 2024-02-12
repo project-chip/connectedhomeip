@@ -161,5 +161,6 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
             await self.send_go_home_cmd_with_check(10, op_errors.kNoError)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
