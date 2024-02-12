@@ -69,14 +69,13 @@ def error_enum_to_text(error_enum):
     elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing:
         return "MopCleaningPadMissing(0x47)"
 
-    def pics_TC_RVCOPSTATE_2_4(self) -> list[str]:
-        return ["RVCOPSTATE.S"]
-
 
 class TC_RVCOPSTATE_2_4(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(*args)
         self.endpoint = None
+        self.is_ci = False
+        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcOperationalState
@@ -105,15 +104,29 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         asserts.assert_equal(operational_state, expected_state,
                              "OperationalState(%s) should be %s" % (operational_state, state_enum_to_text(expected_state)))
 
-    # Prints the instruction and waits for a user input to continue
-    def print_instruction(self, step_number, instruction):
-        self.print_step(step_number, instruction)
-        input("Press Enter when done.\n")
+    # Sends an RvcRunMode Change to mode command
+    async def send_run_change_to_mode_cmd(self, new_mode):
+        await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
+                                   endpoint=self.endpoint)
+
+    # Sends and out-of-band command to the rvc-app
+    def write_to_app_pipe(self, command):
+        with open(self.app_pipe, "w") as app_pipe:
+            app_pipe.write(command + "\n")
+
+    def pics_TC_RVCOPSTATE_2_4(self) -> list[str]:
+        return ["RVCOPSTATE.S"]
 
     @async_test_body
     async def test_TC_RVCOPSTATE_2_4(self):
         self.endpoint = self.matter_test_config.endpoint
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
+        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+        if self.is_ci:
+            app_pid = self.matter_test_config.app_pid
+            if app_pid == 0:
+                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
+            self.app_pipe = self.app_pipe + str(app_pid)
 
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Tx"), "RVCOPSTATE.S.C04.Tx must be supported")
@@ -123,31 +136,58 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         rvc_op_states = Clusters.RvcOperationalState.Enums.OperationalStateEnum
         op_errors = Clusters.OperationalState.Enums.ErrorStateEnum
 
+        # These are the mode values used by the RVC example app that is used in CI.
+        rvc_app_run_mode_idle = 0
+        rvc_app_run_mode_cleaning = 1
+
         self.print_step(1, "Commissioning, already done")
 
+        # Ensure that the device is in the correct state
+        if self.is_ci:
+            self.write_to_app_pipe('{"Name": "Reset"}')
+
         if self.check_pics("RVCOPSTATE.S.M.ST_ERROR"):
-            self.print_instruction(2, "Manually put the device in the ERROR operational state")
+            self.print_step(2, "Manually put the device in the ERROR operational state")
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "UnableToStartOrResume"}')
+            else:
+                input("Press Enter when done.\n")
 
             await self.read_operational_state_with_check(3, op_states.kError)
 
             await self.send_go_home_cmd_with_check(4, op_errors.kCommandInvalidInState)
 
         if self.check_pics("RVCOPSTATE.S.M.ST_CHARGING"):
-            self.print_instruction(5, "Manually put the device in the CHARGING operational state")
+            self.print_step(5, "Manually put the device in the CHARGING operational state")
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "Reset"}')
+                self.write_to_app_pipe('{"Name": "Docked"}')
+                self.write_to_app_pipe('{"Name": "Charging"}')
+            else:
+                input("Press Enter when done.\n")
 
             await self.read_operational_state_with_check(6, rvc_op_states.kCharging)
 
             await self.send_go_home_cmd_with_check(7, op_errors.kCommandInvalidInState)
 
         if self.check_pics("RVCOPSTATE.S.M.ST_DOCKED"):
-            self.print_instruction(8, "Manually put the device in the DOCKED operational state")
+            self.print_step(8, "Manually put the device in the DOCKED operational state")
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "Charged"}')
+            else:
+                input("Press Enter when done.\n")
 
             await self.read_operational_state_with_check(9, rvc_op_states.kDocked)
 
             await self.send_go_home_cmd_with_check(10, op_errors.kCommandInvalidInState)
 
         if self.check_pics("PICS_M_ST_SEEKING_CHARGER"):
-            self.print_instruction(8, "Manually put the device in the SEEKING CHARGER operational state")
+            self.print_step(8, "Manually put the device in the SEEKING CHARGER operational state")
+            if self.is_ci:
+                await self.send_run_change_to_mode_cmd(rvc_app_run_mode_cleaning)
+                await self.send_run_change_to_mode_cmd(rvc_app_run_mode_idle)
+            else:
+                input("Press Enter when done.\n")
 
             await self.read_operational_state_with_check(9, rvc_op_states.kSeekingCharger)
 
