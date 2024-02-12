@@ -191,9 +191,9 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         op_state = await self.read_op_state_operational_state()
 
         valid_op_states = [
-            Clusters.OperationalState.Enums.OperationalStateEnum.kStopped, 
-            Clusters.OperationalState.Enums.OperationalStateEnum.kPaused, 
-            Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCharging, 
+            Clusters.OperationalState.Enums.OperationalStateEnum.kStopped,
+            Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
+            Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCharging,
             Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked]
 
         if op_state not in valid_op_states:
@@ -206,8 +206,8 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             self.print_step(10, "Read RVCOPSTATE's OperationalState attribute")
             op_state = await self.read_op_state_operational_state()
 
-            asserts.assert_true(op_state in valid_op_states, 
-            "Expected a RVCOPSTATE's OperationalState attribute to be one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
+            asserts.assert_true(op_state in valid_op_states,
+                                "Expected a RVCOPSTATE's OperationalState attribute to be one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
 
         self.print_step(11, "Send ChangeToMode MODE_B command")
         await self.send_change_to_mode_with_check(self.mode_b, 0)
