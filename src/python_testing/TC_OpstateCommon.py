@@ -486,7 +486,7 @@ class TC_OPSTATE_BASE():
                  TestStep(7, "TH reads from the DUT the CountdownTime attribute"),
                  TestStep(8, "TH reads from the DUT the PhaseList attribute"),
                  TestStep(9, "TH reads from the DUT the CurrentPhase attribute"),
-                 TestStep(10, "TH waits for a vendor defined wait time, this being a period of time less than the expected duration of the operation that has been started"),
+                 TestStep(10, "TH waits for {PIXIT.WAITTIME.COUNTDOWN}"),
                  TestStep(11, "TH reads from the DUT the CountdownTime attribute"),
                  TestStep(12, "TH sends Start command to the DUT"),
                  TestStep(13, "TH sends Stop command to the DUT"),
@@ -504,14 +504,14 @@ class TC_OPSTATE_BASE():
 
         self.init_test()
 
-        asserts.assert_true('PIXIT.WAITTIME' in self.matter_test_config.global_test_params,
-                            "PIXIT.WAITTIME must be included on the command line in "
-                            "the --int-arg flag as PIXIT.WAITTIME:<wait time>")
+        asserts.assert_true('PIXIT.WAITTIME.COUNTDOWN' in self.matter_test_config.global_test_params,
+                            "PIXIT.WAITTIME.COUNTDOWN must be included on the command line in "
+                            "the --int-arg flag as PIXIT.WAITTIME.COUNTDOWN:<wait time>")
 
-        wait_time = self.matter_test_config.global_test_params['PIXIT.WAITTIME']
+        wait_time = self.matter_test_config.global_test_params['PIXIT.WAITTIME.COUNTDOWN']
 
         if wait_time == 0:
-            asserts.fail("PIXIT.WAITTIME shall be higher than 0.")
+            asserts.fail("PIXIT.WAITTIME.COUNTDOWN shall be higher than 0.")
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -520,8 +520,9 @@ class TC_OPSTATE_BASE():
         self.step(2)
         self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
                                          (self.device, cluster.Enums.ErrorStateEnum.kNoError))
-        time.sleep(1)
-        self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Stop"}' % self.device)
+        if self.is_ci:
+            time.sleep(1)
+            self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Stop"}' % self.device)
 
         # STEP 3: TH reads from the DUT the OperationalStateList attribute
         self.step(3)
@@ -592,7 +593,7 @@ class TC_OPSTATE_BASE():
                 asserts.assert_true(0 <= current_phase and current_phase < phase_list_len,
                                     "CurrentPhase(%s) must be between 0 and %s" % (current_phase, (phase_list_len - 1)))
 
-        # STEP 10: TH waits for a vendor defined wait time, this being a period of time less than the expected duration of the operation that has been started
+        # STEP 10: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(10)
         if self.pics_guard(self.check_pics("%s.S.A0002" % self.test_info.pics_code)):
             time.sleep(wait_time)
@@ -664,7 +665,7 @@ class TC_OPSTATE_BASE():
                  TestStep(4, "TH sends Pause command to the DUT"),
                  TestStep(5, "TH reads from the DUT the OperationalState attribute"),
                  TestStep(6, "TH reads from the DUT the CountdownTime attribute"),
-                 TestStep(7, "TH waits for 5 seconds"),
+                 TestStep(7, "TH waits for {PIXIT.WAITTIME.COUNTDOWN}"),
                  TestStep(8, "TH reads from the DUT the CountdownTime attribute"),
                  TestStep(9, "TH sends Pause command to the DUT"),
                  TestStep(10, "TH sends Resume command to the DUT"),
@@ -686,14 +687,14 @@ class TC_OPSTATE_BASE():
 
         self.init_test()
 
-        asserts.assert_true('PIXIT.WAITTIME' in self.matter_test_config.global_test_params,
-                            "PIXIT.WAITTIME must be included on the command line in "
-                            "the --int-arg flag as PIXIT.WAITTIME:<wait time>")
+        asserts.assert_true('PIXIT.WAITTIME.COUNTDOWN' in self.matter_test_config.global_test_params,
+                            "PIXIT.WAITTIME.COUNTDOWN must be included on the command line in "
+                            "the --int-arg flag as PIXIT.WAITTIME.COUNTDOWN:<wait time>")
 
-        wait_time = self.matter_test_config.global_test_params['PIXIT.WAITTIME']
+        wait_time = self.matter_test_config.global_test_params['PIXIT.WAITTIME.COUNTDOWN']
 
         if wait_time == 0:
-            asserts.fail("PIXIT.WAITTIME shall be higher than 0.")
+            asserts.fail("PIXIT.WAITTIME.COUNTDOWN shall be higher than 0.")
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -702,8 +703,9 @@ class TC_OPSTATE_BASE():
         self.step(2)
         self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
                                          (self.device, cluster.Enums.ErrorStateEnum.kNoError))
-        time.sleep(1)
-        self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Start"}' % self.device)
+        if self.is_ci:
+            time.sleep(1)
+            self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Start"}' % self.device)
 
         # STEP 3: TH reads from the DUT the OperationalStateList attribute
         self.step(3)
@@ -744,9 +746,9 @@ class TC_OPSTATE_BASE():
                 asserts.assert_true(0 <= initial_countdown_time <= 259200,
                                     "CountdownTime(%s) must be between 0 and 259200" % initial_countdown_time)
 
-        # STEP 7: TH waits for 5 seconds
+        # STEP 7: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(7)
-        time.sleep(5)
+        time.sleep(wait_time)
 
         # STEP 8: TH reads from the DUT the CountdownTime attribute
         self.step(8)
