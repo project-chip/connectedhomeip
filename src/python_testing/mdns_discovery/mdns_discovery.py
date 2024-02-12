@@ -22,7 +22,7 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Dict, List, Optional
 
-from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
+from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf, DNSRecordType
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
 
 
@@ -193,13 +193,19 @@ class MdnsDiscovery:
 
             # Get service info
             service_info = AsyncServiceInfo(service_type, service_name)
-            is_discovered = await service_info.async_request(self._zc, 3000)
+            is_discovered = await service_info.async_request(
+                self._zc,
+                3000,
+                record_type=DNSRecordType.A,
+                load_from_cache=False)
 
             # Adds service to discovered services
             if is_discovered:
                 mdns_service_info = self._to_mdns_service_info_class(service_info)
             self._discovered_services = {}
-            self._discovered_services[service_type] = [mdns_service_info]
+            self._discovered_services[service_type] = []
+            if mdns_service_info is not None:
+                self._discovered_services[service_type].append(mdns_service_info)
 
             if log_output:
                 self._log_output()
@@ -290,9 +296,9 @@ class MdnsDiscovery:
         self._event.clear()
 
         if all_services:
-            self._service_types = list(await AsyncZeroconfServiceTypes.async_find())
+            self._service_types = list(set(await AsyncZeroconfServiceTypes.async_find()))
 
-        print(f"Browsing for MDNS service(s) of type: {self._service_types}")
+        print(f"\n\tBrowsing for MDNS service(s) of type: {self._service_types}\n")
 
         aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
                                          type_=self._service_types,
@@ -302,7 +308,9 @@ class MdnsDiscovery:
         try:
             await asyncio.wait_for(self._event.wait(), timeout=discovery_timeout_sec)
         except asyncio.TimeoutError:
-            print(f"MDNS service discovery timed out after {discovery_timeout_sec} seconds.")
+            for service_type in self._service_types:
+                self._discovered_services[service_type] = []
+            print(f"\n\tMDNS service discovery for {self._service_types} timed out after {discovery_timeout_sec} seconds.\n")
         finally:
             await aiobrowser.async_cancel()
 
@@ -362,8 +370,9 @@ class MdnsDiscovery:
             mdns_service_info = self._to_mdns_service_info_class(service_info)
 
             if service_type not in self._discovered_services:
-                self._discovered_services[service_type] = [mdns_service_info]
-            else:
+                self._discovered_services[service_type] = []
+
+            if mdns_service_info is not None:
                 self._discovered_services[service_type].append(mdns_service_info)
 
     def _to_mdns_service_info_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
@@ -413,8 +422,10 @@ class MdnsDiscovery:
         mdns_service_info = None
         self._service_types = [service_type.value]
         await self._discover(discovery_timeout_sec, log_output)
+
         if service_type.value in self._discovered_services:
-            mdns_service_info = self._discovered_services[service_type.value][0]
+            if len(self._discovered_services[service_type.value]) > 0:
+                mdns_service_info = self._discovered_services[service_type.value][0]
 
         return mdns_service_info
 
@@ -425,6 +436,6 @@ class MdnsDiscovery:
         The method is intended to be used for debugging or informational purposes, providing a clear and
         comprehensive view of all services discovered during the mDNS service discovery process.
         """
-        converted_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
-        json_str = json.dumps(converted_services, indent=4)
+        log_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
+        json_str = json.dumps(log_services, indent=4)
         print(json_str)
