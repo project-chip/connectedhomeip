@@ -28,6 +28,7 @@
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
+#include <app/reporting/ReportScheduler.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -40,10 +41,30 @@
 namespace chip {
 namespace app {
 
-class InteractionModelEngine;
 class TestReadInteraction;
 
 namespace reporting {
+
+// An object support for functionality required by reporting.
+class EngineDelegate
+{
+public:
+    virtual ~EngineDelegate()                                                                                     = default;
+    virtual Messaging::ExchangeManager * GetExchangeManagerForReportingEngine()                                   = 0;
+    virtual ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> & GetReadHandlerPool() = 0;
+
+    virtual ObjectPool<ObjectList<EventPathParams>,
+                       CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS> &
+    GetEventPathPool() = 0;
+
+    /**
+     * Returns the handler at a particular index within the active handler list.
+     */
+    virtual ReadHandler * ActiveHandlerAt(unsigned int index) = 0;
+
+    virtual reporting::ReportScheduler * GetReportScheduler() = 0;
+};
+
 /*
  *  @class Engine
  *
@@ -60,7 +81,7 @@ public:
     /**
      *  Constructor Engine with a valid InteractionModelEngine pointer.
      */
-    Engine(InteractionModelEngine * apImEngine);
+    Engine(EngineDelegate * delegate) : mDelegate(delegate) {}
 
     /**
      * Initializes the reporting engine. Should only be called once.
@@ -286,7 +307,7 @@ private:
     uint32_t mMaxAttributesPerChunk = UINT32_MAX;
 #endif
 
-    InteractionModelEngine * mpImEngine = nullptr;
+    EngineDelegate * mDelegate = nullptr;
 };
 
 }; // namespace reporting

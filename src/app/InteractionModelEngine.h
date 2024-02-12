@@ -80,6 +80,7 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
+                               public reporting::EngineDelegate,
                                public SubscriptionsInfoProvider
 {
 public:
@@ -132,6 +133,21 @@ public:
      */
     CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
 
+    // reporting::EngineDelegate implementation
+    Messaging::ExchangeManager * GetExchangeManagerForReportingEngine() override { return mpExchangeMgr; }
+    ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> & GetReadHandlerPool() override
+    {
+        return mReadHandlers;
+    }
+    ReadHandler * ActiveHandlerAt(unsigned int aIndex) override;
+    reporting::ReportScheduler * GetReportScheduler() override { return mReportScheduler; }
+    ObjectPool<ObjectList<EventPathParams>,
+               CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS> &
+    GetEventPathPool() override
+    {
+        return mEventPathPool;
+    }
+
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
      * Tears down an active subscription.
@@ -168,11 +184,6 @@ public:
     uint32_t GetNumActiveWriteHandlers() const;
 
     /**
-     * Returns the handler at a particular index within the active handler list.
-     */
-    ReadHandler * ActiveHandlerAt(unsigned int aIndex);
-
-    /**
      * Returns the write handler at a particular index within the active handler list.
      */
     WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
@@ -183,8 +194,6 @@ public:
     uint32_t GetMagicNumber() const { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
-
-    reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
     void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
 
@@ -329,11 +338,6 @@ public:
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    //
-    // Get direct access to the underlying read handler pool
-    //
-    auto & GetReadHandlerPool() { return mReadHandlers; }
-
     //
     // Override the maximal capacity of the fabric table only for interaction model engine
     //
