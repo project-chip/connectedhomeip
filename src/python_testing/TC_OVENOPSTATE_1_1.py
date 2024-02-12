@@ -15,11 +15,9 @@
 #    limitations under the License.
 #
 
-import logging
 
 import chip.clusters as Clusters
 from matter_testing_support import TestStep, MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 from TC_OpstateCommon import TC_OVENOPSTATE_BASE, TestInfo
 
 
@@ -44,11 +42,13 @@ class TC_OVENOPSTATE_1_1(MatterBaseTest, TC_OVENOPSTATE_BASE):
     async def test_TC_OVENOPSTATE_1_1(self):
         endpoint = self.matter_test_config.endpoint
         cluster_revision = 1
-        feature_map=0
+        feature_map = 0
 
         await self.TEST_TC_OPSTATE_BASE_1_1(endpoint=endpoint,
-                                                    cluster_revision=cluster_revision,
-                                                    feature_map=feature_map)
+                                            cluster_revision=cluster_revision,
+                                            feature_map=feature_map)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
+
