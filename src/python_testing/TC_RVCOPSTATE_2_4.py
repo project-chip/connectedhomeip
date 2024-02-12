@@ -77,7 +77,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
                                    endpoint=self.endpoint)
 
-    # Sends and out-of-band command to the rvc-app
+    # Sends an out-of-band command to the rvc-app
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
