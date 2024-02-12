@@ -23,6 +23,7 @@
 #include <app/util/config.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters::KeypadInput;
 
 void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeType & keycCode)
@@ -101,11 +102,6 @@ void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType
 
 uint32_t KeypadInputManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT)
-    {
-        return mDynamicEndpointFeatureMap;
-    }
-
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
