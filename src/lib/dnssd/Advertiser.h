@@ -50,9 +50,9 @@ enum class CommissioningMode
 
 enum class ICDModeAdvertise : uint8_t
 {
-    kNone, // The device is does not support LIT ICD configurations. No ICD= key is advertised in DNS-SD.
-    kSIT,  // The ICD supports LIT configuration, but is currently operating as SIT. ICD=0 in DNS-SD key/value pairs.
-    kLIT,  // The ICD is currently operating as LIT. ICD=1 in DNS-SD key/value pairs.
+    kNone, // The device does not support the LIT feature-set. No ICD= key is advertised in DNS-SD.
+    kSIT,  // The ICD supports the LIT feature-set, but is currently operating as a SIT. ICD=0 in DNS-SD key/value pairs.
+    kLIT,  // The ICD is currently operating as a LIT. ICD=1 in DNS-SD key/value pairs.
 };
 
 template <class Derived>

@@ -222,8 +222,8 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     case TxtFieldKey::kSessionActiveThreshold:
         return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key);
     case TxtFieldKey::kLongIdleTimeICD:
-        // The ICD key is only added to the advertissment when the device supports ICD LIT configuration.
-        // Return UNINITIALIZED when the operating mode is kNone to ensures that the ICD string isn't added
+        // The ICD key is only added to the advertissment when the device supports the ICD LIT feature-set.
+        // Return UNINITIALIZED when the operating mode is kNone to ensure that the ICD string isn't added
         // by the AddTxtRecord without erroring out the action.
         VerifyOrReturnError(params.GetICDModeToAdvertise() != ICDModeAdvertise::kNone, CHIP_ERROR_UNINITIALIZED);
         return CopyTextRecordValue(buffer, bufferLen, (params.GetICDModeToAdvertise() == ICDModeAdvertise::kLIT));
