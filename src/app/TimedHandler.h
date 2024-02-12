@@ -48,8 +48,9 @@ class TimedHandler;
  * either the exchange is closed or the interaction is handed on to the
  * InteractionModelEngine.
  */
-class TimedHandlerDelegate {
-  public:
+class TimedHandlerDelegate
+{
+public:
     virtual ~TimedHandlerDelegate() = default;
 
     /**
@@ -58,7 +59,6 @@ class TimedHandlerDelegate {
      */
     virtual void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) = 0;
-
 
     /**
      * Called when a timed write is received.  This function takes over all
@@ -78,7 +78,7 @@ class TimedHandlerDelegate {
 class TimedHandler : public Messaging::ExchangeDelegate
 {
 public:
-    TimedHandler(TimedHandlerDelegate *delegate) : mDelegate(delegate) {}
+    TimedHandler(TimedHandlerDelegate * delegate) : mDelegate(delegate) {}
     ~TimedHandler() override {}
 
     // ExchangeDelegate implementation.
@@ -111,13 +111,12 @@ private:
         kExpectingFollowingAction, // Expecting write or invoke.
     };
 
-    TimedHandlerDelegate *mDelegate;
+    TimedHandlerDelegate * mDelegate;
     State mState = State::kExpectingTimedAction;
     // We keep track of the time limit for message reception, in case our
     // exchange's "response expected" timer gets delayed and does not fire when
     // the time runs out.
     System::Clock::Timestamp mTimeLimit;
-
 };
 
 } // namespace app
