@@ -23,7 +23,7 @@ from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
 from mobly import asserts
 from dataclasses import dataclass
-from matter_testing_support import TestStep
+from matter_testing_support import TestStep, EventChangeCallback
 import psutil
 
 
@@ -222,20 +222,20 @@ class TC_OVENOPSTATE_BASE():
         self.step(6)
         expected_value = []
 
-        if self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)) or \
-            self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)):
-                expected_value.append(commands.Pause.command_id)
+        if (self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)) or
+            self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code))):
+            expected_value.append(commands.Pause.command_id)
 
-        if self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or \
-            self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)):
-                expected_value.append(commands.Stop.command_id)
+        if (self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or \
+            self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code))):
+            expected_value.append(commands.Stop.command_id)
 
         if self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)):
             expected_value.append(commands.Start.command_id)
 
-        if self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)) or \
-            self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)):
-                expected_value.append(commands.Resume.command_id)
+        if (self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)) or
+            self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code))):
+            expected_value.append(commands.Resume.command_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
                                                   attribute=attributes.AcceptedCommandList,
@@ -245,10 +245,10 @@ class TC_OVENOPSTATE_BASE():
         self.step(7)
         expected_value = []
 
-        if self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)) or \
-            self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or \
-                self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)) or \
-                    self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)):
+        if (self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)) or
+            self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or
+            self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)) or
+            self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code))):
             expected_value.append(commands.OperationalCommandResponse.command_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
@@ -542,9 +542,9 @@ class TC_OVENOPSTATE_BASE():
         self.step(4)
         if self.pics_guard(self.check_pics("%s.S.C02.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
-            ret = await self.send_cmd_expect_response(endpoint=endpoint,
-                                                      cmd=commands.Start(),
-                                                      expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Start(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kNoError)
 
         # STEP 5: TH reads from the DUT the OperationalState attribute
         self.step(5)
@@ -619,7 +619,7 @@ class TC_OVENOPSTATE_BASE():
         # STEP 13: TH sends Stop command to the DUT
         self.step(13)
         if self.pics_guard(self.check_pics("%s.S.C01.Rsp" % self.test_info.pics_code) and
-                             self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Stop(),
                                                 expected_response=cluster.Enums.ErrorStateEnum.kNoError)
@@ -682,7 +682,6 @@ class TC_OVENOPSTATE_BASE():
     async def TEST_TC_OPSTATE_BASE_2_3(self, endpoint=1):
         cluster = self.test_info.cluster
         attributes = cluster.Attributes
-        events = cluster.Events
         commands = cluster.Commands
 
         self.init_test()
@@ -702,7 +701,7 @@ class TC_OVENOPSTATE_BASE():
         # STEP 2: Manually put the DUT into a state wherein it can receive a Pause Command
         self.step(2)
         self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
-                                                  (self.device, cluster.Enums.ErrorStateEnum.kNoError))
+                                         (self.device, cluster.Enums.ErrorStateEnum.kNoError))
         time.sleep(1)
         self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Start"}' % self.device)
 
@@ -723,7 +722,7 @@ class TC_OVENOPSTATE_BASE():
 
         # STEP 4: TH sends Pause command to the DUT
         self.step(4)
-        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Pause(),
@@ -757,11 +756,11 @@ class TC_OVENOPSTATE_BASE():
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
                 asserts.assert_equal(countdown_time, initial_countdown_time,
-                                       "The countdown time shall be equal since pause command")
+                                     "The countdown time shall be equal since pause command")
 
         # STEP 9: TH sends Pause command to the DUT
         self.step(9)
-        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Pause(),
@@ -769,7 +768,7 @@ class TC_OVENOPSTATE_BASE():
 
         # STEP 10: TH sends Resume command to the DUT
         self.step(10)
-        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Resume(),
@@ -784,7 +783,7 @@ class TC_OVENOPSTATE_BASE():
 
         # STEP 12: TH sends Resume command to the DUT
         self.step(12)
-        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Resume(),
@@ -797,7 +796,7 @@ class TC_OVENOPSTATE_BASE():
 
         # STEP 14: TH sends Pause command to the DUT
         self.step(14)
-        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Pause(),
@@ -805,7 +804,7 @@ class TC_OVENOPSTATE_BASE():
 
         # STEP 15: TH sends Resume command to the DUT
         self.step(15)
-        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Resume(),
@@ -818,7 +817,7 @@ class TC_OVENOPSTATE_BASE():
 
         # STEP 17: TH sends Pause command to the DUT
         self.step(17)
-        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Pause(),
@@ -826,9 +825,75 @@ class TC_OVENOPSTATE_BASE():
 
         # STEP 18: TH sends Resume command to the DUT
         self.step(18)
-        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and \
+        if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and
                            self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
             await self.send_cmd_expect_response(endpoint=endpoint,
                                                 cmd=commands.Resume(),
                                                 expected_response=cluster.Enums.ErrorStateEnum.kCommandInvalidInState)
+
+    ############################
+    #   TEST CASE 2.4
+    ############################
+    def STEPS_TC_OPSTATE_BASE_2_4(self) -> list[TestStep]:
+        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                 TestStep(2, "Set up a subscription to the OperationalError event"),
+                 TestStep(3, "At the DUT take the vendor defined action to generate an OperationalError event"),
+                 TestStep(4, "TH reads from the DUT the OperationalState attribute")
+                 ]
+        return steps
+
+    async def TEST_TC_OPSTATE_BASE_2_4(self, endpoint=1):
+        cluster = self.test_info.cluster
+        attributes = cluster.Attributes
+        events = cluster.Events
+        commands = cluster.Commands
+
+        self.init_test()
+
+        pixit_var_name = 'PIXIT.%s.ErrorEventGen' % self.test_info.pics_code
+        print(pixit_var_name in self.matter_test_config.global_test_params)
+        asserts.assert_true(pixit_var_name in self.matter_test_config.global_test_params,
+                            "%s must be included on the command line in "
+                            "the --int-arg flag as %s:<0 or 1>" % (pixit_var_name, pixit_var_name))
+
+        error_event_gen = self.matter_test_config.global_test_params[pixit_var_name]
+
+        # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
+        self.step(1)
+
+        if self.pics_guard(error_event_gen):
+            # STEP 2: Set up a subscription to the OperationalError event
+            self.step(2)
+            # Subscribe to Events and when they are sent push them to a queue for checking later
+            events_callback = EventChangeCallback(cluster)
+            await events_callback.start(self.default_controller,
+                                        self.dut_node_id,
+                                        endpoint)
+
+            # STEP 3: At the DUT take the vendor defined action to generate an OperationalError event
+            self.step(3)
+            self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": 1}' % self.device)
+            event_data = events_callback.wait_for_event_report(cluster.Events.OperationalError).errorState
+
+            # Defined Errors
+            defined_errors = [error.value for error in cluster.Enums.ErrorStateEnum
+                                if (error is not cluster.Enums.ErrorStateEnum.kUnknownEnumValue or
+                                    error is not cluster.Enums.ErrorStateEnum.kNoError)]
+
+            in_range = (0x80 <= event_data.errorStateID <= 0xBF)
+            asserts.assert_true(event_data.errorStateID in defined_errors
+                                or in_range, "Event has an invalid ID value!")
+            if in_range:
+                asserts.assert_true(event_data.errorStateLabel is not None, "ErrorStateLabel should be populated")
+
+            # STEP 4: TH reads from the DUT the OperationalState attribute
+            self.step(4)
+            if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
+                await self.read_and_expect_value(endpoint=endpoint,
+                                                attribute=attributes.OperationalState,
+                                                expected_value=cluster.Enums.OperationalStateEnum.kError)
+        else:
+            self.skip_step(2)
+            self.skip_step(3)
+            self.skip_step(4)
 
