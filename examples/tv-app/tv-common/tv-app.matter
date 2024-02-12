@@ -2789,7 +2789,6 @@ cluster ContentLauncher = 1290 {
   bitmap SupportedProtocolsBitmap : bitmap32 {
     kDASH = 0x1;
     kHLS = 0x2;
-    kWebRTC = 0x2;
   }
 
   struct DimensionStruct {
@@ -3570,7 +3569,7 @@ endpoint 1 {
     callback attribute lineup;
     callback attribute currentChannel;
     ram      attribute featureMap default = 0x0003;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeChannel;
     handle command ChangeChannelResponse;
@@ -3587,7 +3586,7 @@ endpoint 1 {
     callback attribute targetList;
     ram      attribute currentTarget default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command NavigateTarget;
     handle command NavigateTargetResponse;
@@ -3610,7 +3609,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x003;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command Play;
     handle command Pause;
@@ -3659,7 +3658,7 @@ endpoint 1 {
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
     ram      attribute featureMap default = 0x0003;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command LaunchContent;
     handle command LaunchURL;
@@ -3706,7 +3705,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 28;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command UpdatePIN;
     handle command ResetPIN;

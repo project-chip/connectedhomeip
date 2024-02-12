@@ -73,6 +73,7 @@ source_set("address_policy") {
   sources = [
     "AddressPolicy.cpp",
     "AddressPolicy.h",
+    "ListenIterator.h",
     "ServerIPAddresses.h",
   ]
 

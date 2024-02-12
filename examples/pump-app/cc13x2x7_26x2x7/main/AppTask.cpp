@@ -459,7 +459,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 void AppTask::InitOnOffClusterState()
 {
 
-    EmberStatus status;
+    EmberAfStatus status;
 
     ChipLogProgress(NotSpecified, "Init On/Off clusterstate");
 
@@ -482,7 +482,7 @@ void AppTask::UpdateClusterState(void)
 
 void AppTask::UpdateCluster(intptr_t context)
 {
-    EmberStatus status;
+    EmberAfStatus status;
     BitMask<PumpConfigurationAndControl::PumpStatusBitmap> pumpStatus;
 
     ChipLogProgress(NotSpecified, "Update Cluster State");

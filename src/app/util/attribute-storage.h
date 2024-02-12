@@ -190,10 +190,15 @@ CHIP_ERROR SetTagList(chip::EndpointId endpoint,
 //
 // An optional parent endpoint id should be passed for child endpoints of composed device.
 //
-EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
-                                        const chip::Span<chip::DataVersion> & dataVersionStorage,
-                                        chip::Span<const EmberAfDeviceType> deviceTypeList = {},
-                                        chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+// Returns  CHIP_NO_ERROR                   No error.
+//          CHIP_ERROR_NO_MEMORY            MAX_ENDPOINT_COUNT is reached or when no storage is left for clusters
+//          CHIP_ERROR_INVALID_ARGUMENT     The EndpointId value passed is kInvalidEndpointId
+//          CHIP_ERROR_ENDPOINT_EXISTS      If the EndpointId value passed already exists
+//
+CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
+                                     const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                     chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                     chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 

@@ -549,7 +549,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * wildcards).
  */
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-@interface MTRClusterPath : NSObject <NSCopying>
+@interface MTRClusterPath : NSObject <NSCopying, NSSecureCoding>
 
 @property (nonatomic, readonly, copy) NSNumber * endpoint;
 @property (nonatomic, readonly, copy) NSNumber * cluster;
@@ -565,7 +565,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * wildcards).
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRAttributePath : MTRClusterPath
+@interface MTRAttributePath : MTRClusterPath <NSSecureCoding>
 
 @property (nonatomic, readonly, copy) NSNumber * attribute;
 

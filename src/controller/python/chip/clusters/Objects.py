@@ -42616,7 +42616,6 @@ class ContentLauncher(Cluster):
         class SupportedProtocolsBitmap(IntFlag):
             kDash = 0x1
             kHls = 0x2
-            kWebRTC = 0x2
 
     class Structs:
         @dataclass
