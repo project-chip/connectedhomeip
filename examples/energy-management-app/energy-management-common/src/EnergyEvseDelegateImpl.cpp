@@ -1476,7 +1476,7 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
      */
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        ChipLogError(Zcl, "Platform does not support GetClock_RealTimeMS.");
+        ChipLogError(Zcl, "Platform does not support GetClock_RealTimeMS. Check EVSE certification requirements!");
         return err;
     }
 
