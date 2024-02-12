@@ -223,19 +223,19 @@ class TC_OPSTATE_BASE():
         expected_value = []
 
         if (self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)) or
-            self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code))):
-                expected_value.append(commands.Pause.command_id)
+                self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code))):
+            expected_value.append(commands.Pause.command_id)
 
         if (self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or
-            self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code))):
-                expected_value.append(commands.Stop.command_id)
+                self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code))):
+            expected_value.append(commands.Stop.command_id)
 
         if self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)):
             expected_value.append(commands.Start.command_id)
 
         if (self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code)) or
-            self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code))):
-                expected_value.append(commands.Resume.command_id)
+                self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code))):
+            expected_value.append(commands.Resume.command_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
                                                   attribute=attributes.AcceptedCommandList,
@@ -246,10 +246,10 @@ class TC_OPSTATE_BASE():
         expected_value = []
 
         if (self.check_pics(("%s.S.C00.Rsp" % self.test_info.pics_code)) or
-            self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or
-            self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)) or
-            self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code))):
-                expected_value.append(commands.OperationalCommandResponse.command_id)
+                self.check_pics(("%s.S.C01.Rsp" % self.test_info.pics_code)) or
+                self.check_pics(("%s.S.C02.Rsp" % self.test_info.pics_code)) or
+                self.check_pics(("%s.S.C03.Rsp" % self.test_info.pics_code))):
+            expected_value.append(commands.OperationalCommandResponse.command_id)
 
         await self.read_and_expect_array_contains(endpoint=endpoint,
                                                   attribute=attributes.GeneratedCommandList,
