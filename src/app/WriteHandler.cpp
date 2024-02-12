@@ -18,8 +18,9 @@
 
 #include "messaging/ExchangeContext.h"
 #include <app/AppConfig.h>
-#include <app/InteractionModelEngine.h>
+#include <app/InteractionModelFunctions.h>
 #include <app/MessageDef/EventPathIB.h>
+#include <app/MessageDef/WriteRequestMessage.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
@@ -34,9 +35,10 @@ using namespace Protocols::InteractionModel;
 using Status                         = Protocols::InteractionModel::Status;
 constexpr uint8_t kListAttributeType = 0x48;
 
-CHIP_ERROR WriteHandler::Init()
+CHIP_ERROR WriteHandler::Init(WriteHandlerDelegate * delegate)
 {
     VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+    mDelegate = delegate;
 
     MoveToState(State::Initialized);
 
@@ -58,6 +60,7 @@ void WriteHandler::Close()
     mExchangeCtx.Release();
     mSuppressResponse = false;
     MoveToState(State::Uninitialized);
+    mDelegate = nullptr;
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -216,6 +219,7 @@ void WriteHandler::DeliverFinalListWriteEnd(bool writeWasSuccessful)
 CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful)
 {
     VerifyOrReturnError(mProcessingAttributePath.HasValue() && mProcessingAttributeIsList, CHIP_NO_ERROR);
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
@@ -239,7 +243,7 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
 
         processingConcreteAttributePath.mEndpointId = mapping.endpoint_id;
 
-        if (!InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, processingConcreteAttributePath))
+        if (!mDelegate->HasConflictWriteRequests(this, processingConcreteAttributePath))
         {
             DeliverListWriteEnd(processingConcreteAttributePath, writeWasSuccessful);
         }
@@ -274,6 +278,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
     const Access::SubjectDescriptor subjectDescriptor = mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
@@ -304,7 +309,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             dataAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         }
 
-        if (InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, dataAttributePath) ||
+        if (mDelegate->HasConflictWriteRequests(this, dataAttributePath) ||
             // Per chunking protocol, we are processing the list entries, but the initial empty list is not processed, so we reject
             // it with Busy status code.
             (dataAttributePath.IsListItemOperation() && !IsSameAttribute(mProcessingAttributePath, dataAttributePath)))
@@ -372,6 +377,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
     const Access::SubjectDescriptor subjectDescriptor =
         mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetSubjectDescriptor();
 
@@ -452,13 +458,13 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             {
                 auto processingConcreteAttributePath        = mProcessingAttributePath.Value();
                 processingConcreteAttributePath.mEndpointId = mapping.endpoint_id;
-                if (!InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, processingConcreteAttributePath))
+                if (!mDelegate->HasConflictWriteRequests(this, processingConcreteAttributePath))
                 {
                     DeliverListWriteEnd(processingConcreteAttributePath, true /* writeWasSuccessful */);
                 }
             }
 
-            if (InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, dataAttributePath))
+            if (mDelegate->HasConflictWriteRequests(this, dataAttributePath))
             {
                 ChipLogDetail(DataManagement,
                               "Writing attribute endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI

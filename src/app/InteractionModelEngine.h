@@ -80,6 +80,7 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
+                               public WriteHandlerDelegate,
                                public SubscriptionsInfoProvider
 {
 public:
@@ -283,11 +284,7 @@ public:
      */
     size_t GetNumDirtySubscriptions() const;
 
-    /**
-     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
-     * transaction is in the middle of processing the chunked value of the given path.)
-     */
-    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
+    bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath) override;
 
     /**
      * Select the oldest (and the one that exceeds the per subscription resource minimum if there are any) read handler on the
@@ -709,20 +706,6 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath);
 
 /**
- *  Get the registered attribute access override. nullptr when attribute access override is not found.
- *
- * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
- */
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
-
-/**
- * TODO: Document.
- */
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                  const ConcreteDataAttributePath & aAttributePath, TLV::TLVReader & aReader,
-                                  WriteHandler * apWriteHandler);
-
-/**
  * Check if the given cluster has the given DataVersion.
  */
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
@@ -731,13 +714,6 @@ bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath,
  * Returns true if device type is on endpoint, false otherwise.
  */
 bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
-
-/**
- * Returns the metadata of the attribute for the given path.
- *
- * @retval The metadata of the attribute, will return null if the given attribute does not exists.
- */
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath);
 
 /**
  * Returns the event support status for the given event, as an interaction model status.

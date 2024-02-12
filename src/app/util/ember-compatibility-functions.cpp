@@ -27,6 +27,7 @@
 #include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
+#include <app/InteractionModelFunctions.h>
 #include <app/RequiredPrivilege.h>
 #include <app/att-storage.h>
 #include <app/reporting/Engine.h>

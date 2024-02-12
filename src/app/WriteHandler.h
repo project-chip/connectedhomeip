@@ -35,6 +35,21 @@
 
 namespace chip {
 namespace app {
+
+class WriteHandler;
+
+class WriteHandlerDelegate
+{
+public:
+    virtual ~WriteHandlerDelegate() = default;
+
+    /**
+     * Returns whether the write operation to the given path is conflict with another write operations. (i.e. another write
+     * transaction is in the middle of processing the chunked value of the given path.)
+     */
+    virtual bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath) = 0;
+};
+
 /**
  *  @brief The write handler is responsible for processing a write request and sending a write reply.
  */
@@ -53,7 +68,7 @@ public:
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(WriteHandlerDelegate * delegate);
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
@@ -157,6 +172,7 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     Messaging::ExchangeHolder mExchangeCtx;
+    WriteHandlerDelegate * mDelegate;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     State mState           = State::Uninitialized;
     bool mIsTimedRequest   = false;
