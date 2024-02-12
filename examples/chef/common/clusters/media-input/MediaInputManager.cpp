@@ -27,7 +27,7 @@ MediaInputManager::MediaInputManager()
 {
     mCurrentInput = 1;
 
-    for (int i = 1; i < 3; ++i)
+    for (int i = 1; i < mTotalInput; ++i)
     {
         InputInfoType inputInfo;
         inputInfo.description = chip::CharSpan::fromCharString("High-Definition Multimedia Interface");
@@ -40,7 +40,6 @@ MediaInputManager::MediaInputManager()
 
 CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (auto const & inputInfo : this->mInputs)
         {
