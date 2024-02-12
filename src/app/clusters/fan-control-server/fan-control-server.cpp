@@ -32,7 +32,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 

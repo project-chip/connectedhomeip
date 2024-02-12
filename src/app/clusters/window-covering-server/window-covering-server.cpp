@@ -26,7 +26,6 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <lib/support/TypeTraits.h>
 #include <string.h>
 
