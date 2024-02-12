@@ -118,9 +118,6 @@ static MTRDeviceController * sController = nil;
 @interface MTRCommissionableBrowserTests : XCTestCase
 @end
 
-static BOOL sStackInitRan = NO;
-static BOOL sNeedsStackShutdown = YES;
-
 @implementation MTRCommissionableBrowserTests
 
 + (void)setUp
