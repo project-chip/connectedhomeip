@@ -1890,7 +1890,8 @@ Status DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricIndex
     if (UserStatusEnum::kAvailable != user.userStatus)
     {
         ChipLogProgress(Zcl, "[createUser] Unable to overwrite existing user [endpointId=%d,userIndex=%d]", endpointId, userIndex);
-        return Status::Failure;
+        return static_cast<Status>(DlStatus::kOccupied);
+        ;
     }
 
     const auto & newUserName                = !userName.IsNull() ? userName.Value() : ""_span;
