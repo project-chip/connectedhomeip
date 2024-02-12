@@ -52,9 +52,9 @@ private:
     void operator=(const DiscoveryDelegateImpl &)        = delete;
 
 public:
-    jobject castingPlayerChangeListenerJavaObject = nullptr;
-    jmethodID onAddedCallbackJavaMethodID         = nullptr;
-    jmethodID onChangedCallbackJavaMethodID       = nullptr;
+    JniGlobalReference castingPlayerChangeListenerJavaObject;
+    jmethodID onAddedCallbackJavaMethodID   = nullptr;
+    jmethodID onChangedCallbackJavaMethodID = nullptr;
     // jmethodID onRemovedCallbackJavaMethodID = nullptr;
 
     static DiscoveryDelegateImpl * GetInstance()
@@ -72,7 +72,7 @@ public:
                         "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() called with CastingPlayer, ID: %s",
                         player->GetId());
 
-        VerifyOrReturn(castingPlayerChangeListenerJavaObject != nullptr,
+        VerifyOrReturn(castingPlayerChangeListenerJavaObject.HasValidObjectRef(),
                        ChipLogError(AppServer,
                                     "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Not set, "
                                     "CastingPlayerChangeListener == nullptr"));
@@ -89,7 +89,8 @@ public:
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         chip::DeviceLayer::StackUnlock unlock;
-        env->CallVoidMethod(castingPlayerChangeListenerJavaObject, onAddedCallbackJavaMethodID, matterCastingPlayerJavaObject);
+        env->CallVoidMethod(castingPlayerChangeListenerJavaObject.ObjectRef(), onAddedCallbackJavaMethodID,
+                            matterCastingPlayerJavaObject);
     }
 
     void HandleOnUpdated(matter::casting::memory::Strong<CastingPlayer> player) override
@@ -98,7 +99,7 @@ public:
                         "CastingPlayerDiscovery-JNI DiscoveryDelegateImpl::HandleOnUpdated() called with CastingPlayer, ID: %s",
                         player->GetId());
 
-        VerifyOrReturn(castingPlayerChangeListenerJavaObject != nullptr,
+        VerifyOrReturn(castingPlayerChangeListenerJavaObject.HasValidObjectRef(),
                        ChipLogError(AppServer,
                                     "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Not set, "
                                     "CastingPlayerChangeListener == nullptr"));
@@ -115,7 +116,8 @@ public:
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         chip::DeviceLayer::StackUnlock unlock;
-        env->CallVoidMethod(castingPlayerChangeListenerJavaObject, onChangedCallbackJavaMethodID, matterCastingPlayerJavaObject);
+        env->CallVoidMethod(castingPlayerChangeListenerJavaObject.ObjectRef(), onChangedCallbackJavaMethodID,
+                            matterCastingPlayerJavaObject);
     }
 
     // TODO: In following PRs. Implement HandleOnRemoved after implemented in tv-casting-commom CastingPlayerDiscovery.h/cpp
@@ -186,7 +188,7 @@ JNI_METHOD(jobject, addCastingPlayerChangeListener)(JNIEnv * env, jobject, jobje
     ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::addCastingPlayerChangeListener() called");
     VerifyOrReturnValue(castingPlayerChangeListenerJavaObject != nullptr, support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
 
-    if (DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject != nullptr)
+    if (DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject.HasValidObjectRef())
     {
         ChipLogError(AppServer,
                      "CastingPlayerDiscovery-JNI::addCastingPlayerChangeListener() Warning: Call removeCastingPlayerChangeListener "
@@ -209,8 +211,13 @@ JNI_METHOD(jobject, addCastingPlayerChangeListener)(JNIEnv * env, jobject, jobje
     // support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
 
     // Set Java callbacks in the DiscoveryDelegateImpl Singleton
-    DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject =
-        env->NewGlobalRef(castingPlayerChangeListenerJavaObject);
+    CHIP_ERROR err =
+        DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject.Init(castingPlayerChangeListenerJavaObject);
+    if (err != CHIP_NO_ERROR)
+    {
+        return support::createJMatterError(err);
+    }
+
     DiscoveryDelegateImpl::GetInstance()->onAddedCallbackJavaMethodID   = onAddedJavaMethodID;
     DiscoveryDelegateImpl::GetInstance()->onChangedCallbackJavaMethodID = onChangedJavaMethodID;
     // DiscoveryDelegateImpl::GetInstance()->onRemovedCallbackJavaMethodID = onRemovedJavaMethodID;
@@ -224,15 +231,13 @@ JNI_METHOD(jobject, removeCastingPlayerChangeListener)(JNIEnv * env, jobject, jo
     ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::removeCastingPlayerChangeListener() called");
 
     // Check if the passed object is the same as the one added in addCastingPlayerChangeListener() JNI method
-    jboolean isSameObject = env->IsSameObject(castingPlayerChangeListenerJavaObject,
-                                              DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject);
+    jboolean isSameObject =
+        env->IsSameObject(castingPlayerChangeListenerJavaObject,
+                          DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject.ObjectRef());
 
     if ((bool) isSameObject)
     {
-        // Delete the global reference to the Java object
-        env->DeleteGlobalRef(DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject);
-        // Remove the Java callbacks in the DiscoveryDelegateImpl Singleton
-        DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject = nullptr;
+        DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject.Reset();
         // No explicit cleanup required
         DiscoveryDelegateImpl::GetInstance()->onAddedCallbackJavaMethodID   = nullptr;
         DiscoveryDelegateImpl::GetInstance()->onChangedCallbackJavaMethodID = nullptr;

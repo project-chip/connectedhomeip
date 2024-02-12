@@ -158,8 +158,7 @@ CHIP_ERROR DoorLockManager::InitializeWithObjects(jobject managerObject)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mDoorLockManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mDoorLockManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mDoorLockManagerObject.Init(managerObject));
 
     jclass DoorLockManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(DoorLockManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -181,11 +180,11 @@ void DoorLockManager::HandleLockStateChanged(jint endpoint, jint value)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
-    VerifyOrReturn(mDoorLockManagerObject != nullptr, ChipLogProgress(Zcl, "mDoorLockManagerObject null"));
+    VerifyOrReturn(mDoorLockManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mDoorLockManagerObject null"));
     VerifyOrReturn(mHandleLockStateChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleLockStateChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mDoorLockManagerObject, mHandleLockStateChangedMethod, value);
+    env->CallVoidMethod(mDoorLockManagerObject.ObjectRef(), mHandleLockStateChangedMethod, value);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in DoorLockManager::HandleLockStateChanged");

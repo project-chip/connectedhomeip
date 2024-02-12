@@ -22,6 +22,8 @@ import("${chip_root}/build/chip/fuzz_test.gni")
 chip_test_suite_using_nltest("tests") {
   output_name = "libMinimalMdnstests"
 
+  sources = [ "CheckOnlyServer.h" ]
+
   test_sources = [
     "TestMinimalMdnsAllocator.cpp",
     "TestQueryReplyFilter.cpp",

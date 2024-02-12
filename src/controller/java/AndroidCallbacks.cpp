@@ -500,7 +500,6 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(JNIEnv * env, const app::Concrete
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     jclass invokeElementCls = nullptr;
-    jobject localRef        = nullptr;
     err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/model/InvokeElement", invokeElementCls);
     ReturnErrorOnFailure(err);
 
@@ -536,20 +535,18 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(JNIEnv * env, const app::Concrete
         err = TlvToJson(readerForJson, json);
         ReturnErrorOnFailure(err);
         UtfString jsonString(env, json.c_str());
-        localRef = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
-                                               static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId),
-                                               jniByteArray.jniValue(), jsonString.jniValue());
+        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
+                                             static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId),
+                                             jniByteArray.jniValue(), jsonString.jniValue());
     }
     else
     {
-        localRef = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
-                                               static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId), nullptr,
-                                               nullptr);
+        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
+                                             static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId), nullptr,
+                                             nullptr);
     }
-    VerifyOrReturnError(localRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-    outObj = env->NewGlobalRef(localRef);
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void ReportCallback::OnError(CHIP_ERROR aError)
