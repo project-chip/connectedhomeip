@@ -1112,7 +1112,7 @@ void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
     Status status = Attributes::LastConfiguredBy::SetNull(endpoint);
     if (Status::Success != status)
     {
-        ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
+        ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, to_underlying(status));
     }
 
     // Initialize the FabricSceneInfo by getting the number of scenes and the remaining capacity for storing fabric scene data
@@ -1126,7 +1126,7 @@ void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
 {
     uint16_t endpointTableSize = 0;
-    ReturnOnFailure(Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
+    VerifyOrReturn(Status::Success == Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);

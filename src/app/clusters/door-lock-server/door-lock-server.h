@@ -29,6 +29,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -307,12 +308,11 @@ private:
     bool findUserIndexByCredential(chip::EndpointId endpointId, CredentialTypeEnum credentialType, chip::ByteSpan credentialData,
                                    uint16_t & userIndex, uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo);
 
-    chip::Protocols::InteractionModel::Status
-    createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId, uint16_t userIndex,
-               const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-               const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
-               const Nullable<CredentialRuleEnum> & credentialRule,
-               const Nullable<CredentialStruct> & credential = Nullable<CredentialStruct>());
+    chip::app::StatusIB createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
+                                   uint16_t userIndex, const Nullable<chip::CharSpan> & userName,
+                                   const Nullable<uint32_t> & userUniqueId, const Nullable<UserStatusEnum> & userStatus,
+                                   const Nullable<UserTypeEnum> & userType, const Nullable<CredentialRuleEnum> & credentialRule,
+                                   const Nullable<CredentialStruct> & credential = Nullable<CredentialStruct>());
     chip::Protocols::InteractionModel::Status
     modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId, uint16_t userIndex,
                const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
@@ -479,7 +479,7 @@ private:
     bool engageLockout(chip::EndpointId endpointId);
 
     static void sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                    chip::Protocols::InteractionModel::Status status);
+                                    chip::app::StatusIB status);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
