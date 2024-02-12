@@ -229,7 +229,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::SetCookingParameters::DecodableType & req)
 {
     ChipLogDetail(Zcl, "Microwave Oven Control: HandleSetCookingParameters");
-    Status status;
+    Status status = Status::Success;
     uint8_t opState;
     uint8_t modeValue;
     uint8_t reqCookMode;

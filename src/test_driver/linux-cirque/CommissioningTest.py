@@ -38,6 +38,9 @@ CHIP_REPO = os.path.join(os.path.abspath(
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 TEST_DISCRIMINATOR2 = 3584
+TEST_DISCRIMINATOR3 = 1203
+TEST_DISCRIMINATOR4 = 2145
+TEST_DISCOVERY_TYPE = [0, 1, 2]
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
 DEVICE_CONFIG = {
@@ -60,6 +63,24 @@ DEVICE_CONFIG = {
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     },
     'device2': {
+        'type': 'CHIPEndDevice',
+        'base_image': '@default',
+        'capability': ['Thread', 'TrafficControl', 'Mount'],
+        'rcp_mode': True,
+        'docker_network': 'Ipv6',
+        'traffic_control': {'latencyMs': 100},
+        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+    },
+    'device3': {
+        'type': 'CHIPEndDevice',
+        'base_image': '@default',
+        'capability': ['Thread', 'TrafficControl', 'Mount'],
+        'rcp_mode': True,
+        'docker_network': 'Ipv6',
+        'traffic_control': {'latencyMs': 100},
+        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+    },
+    'device4': {
         'type': 'CHIPEndDevice',
         'base_image': '@default',
         'capability': ['Thread', 'TrafficControl', 'Mount'],
@@ -95,6 +116,10 @@ class TestCommissioner(CHIPVirtualHome):
         servers[0]['nodeid'] = 1
         servers[1]['discriminator'] = TEST_DISCRIMINATOR2
         servers[1]['nodeid'] = 2
+        servers[2]['discriminator'] = TEST_DISCRIMINATOR3
+        servers[2]['nodeid'] = 3
+        servers[3]['discriminator'] = TEST_DISCRIMINATOR4
+        servers[3]['nodeid'] = 4
 
         for server in servers:
             self.execute_device_cmd(
@@ -128,13 +153,42 @@ class TestCommissioner(CHIPVirtualHome):
                          "Test failed: non-zero return code")
 
         command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
-                   "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {}").format(
+                   "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
             servers[1]['discriminator'],
             "33331712336",
-            servers[1]['nodeid'])
+            servers[1]['nodeid'],
+            TEST_DISCOVERY_TYPE[2])
+        ret = self.execute_device_cmd(req_device_id, command)
+
+        self.assertEqual(ret['return_code'], '0',
+                         "Test failed: non-zero return code")
+
+        command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
+                   "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
+            os.path.join(
+                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+            servers[2]['discriminator'],
+            "10054912339",
+            servers[2]['nodeid'],
+            TEST_DISCOVERY_TYPE[0])
+        ret = self.execute_device_cmd(req_device_id, command)
+
+        self.assertEqual(ret['return_code'], '0',
+                         "Test failed: non-zero return code")
+
+        command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
+                   "{} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {} --discovery-type {}").format(
+            os.path.join(
+                CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+            os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+            servers[3]['discriminator'],
+            "20054912334",
+            servers[3]['nodeid'],
+            TEST_DISCOVERY_TYPE[1])
         ret = self.execute_device_cmd(req_device_id, command)
 
         self.assertEqual(ret['return_code'], '0',

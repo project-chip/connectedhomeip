@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +15,23 @@
  */
 
 /**
- * @file
- * @brief Declaration of a method that normalizes a PICS code.
+ * RAII wrapper around os_unfair_lock.
  */
 
-#include <string>
+#import <os/lock.h>
 
-class PICSNormalizer
+#include <mutex>
+
+template <>
+class std::lock_guard<os_unfair_lock>
 {
 public:
-    static std::string Normalize(std::string code);
+    explicit lock_guard(os_unfair_lock & lock) : mLock(lock) { os_unfair_lock_lock(&mLock); }
+    ~lock_guard() { os_unfair_lock_unlock(&mLock); }
+
+    lock_guard(const lock_guard &)     = delete;
+    void operator=(const lock_guard &) = delete;
+
+private:
+    os_unfair_lock & mLock;
 };
