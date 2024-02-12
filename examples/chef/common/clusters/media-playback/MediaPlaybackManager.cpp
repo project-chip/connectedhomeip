@@ -73,7 +73,6 @@ CHIP_ERROR MediaPlaybackManager::HandleGetActiveAudioTrack(AttributeValueEncoder
 
 CHIP_ERROR MediaPlaybackManager::HandleGetAvailableAudioTracks(AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (auto const & audioTrack : mAvailableAudioTracks)
         {
@@ -90,7 +89,6 @@ CHIP_ERROR MediaPlaybackManager::HandleGetActiveTextTrack(AttributeValueEncoder 
 
 CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEncoder & aEncoder)
 {
-    // TODO: Insert code here
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (auto const & textTrack : mAvailableTextTracks)
         {
@@ -102,7 +100,6 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
 
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    // TODO: Insert code here
     mCurrentState  = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed = 1;
 
@@ -114,7 +111,6 @@ void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackRe
 
 void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    // TODO: Insert code here
     mCurrentState  = PlaybackStateEnum::kPaused;
     mPlaybackSpeed = 0;
 
@@ -126,7 +122,6 @@ void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackR
 
 void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    // TODO: Insert code here
     mCurrentState     = PlaybackStateEnum::kNotPlaying;
     mPlaybackSpeed    = 0;
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
@@ -140,7 +135,6 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
 void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                              const chip::Optional<bool> & audioAdvanceUnmuted)
 {
-    // TODO: Insert code here
     if (mPlaybackSpeed == kPlaybackMaxForwardSpeed)
     {
         // if already at max speed, return error
@@ -167,7 +161,6 @@ void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::Pla
 
 void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    // TODO: Insert code here
     mCurrentState     = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed    = 1;
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
@@ -181,7 +174,6 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
 void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                         const chip::Optional<bool> & audioAdvanceUnmuted)
 {
-    // TODO: Insert code here
     if (mPlaybackSpeed == kPlaybackMaxRewindSpeed)
     {
         // if already at max speed in reverse, return error
@@ -209,7 +201,6 @@ void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::Playback
 void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                               const uint64_t & deltaPositionMilliseconds)
 {
-    // TODO: Insert code here
     uint64_t newPosition = (mPlaybackPosition.position.Value() > deltaPositionMilliseconds
                                 ? mPlaybackPosition.position.Value() - deltaPositionMilliseconds
                                 : 0);
@@ -224,7 +215,6 @@ void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::Pl
 void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                              const uint64_t & deltaPositionMilliseconds)
 {
-    // TODO: Insert code here
     uint64_t newPosition = mPlaybackPosition.position.Value() + deltaPositionMilliseconds;
     newPosition          = newPosition > mDuration ? mDuration : newPosition;
     mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
@@ -238,7 +228,6 @@ void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::Pla
 void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                       const uint64_t & positionMilliseconds)
 {
-    // TODO: Insert code here
     if (positionMilliseconds > mDuration)
     {
         Commands::PlaybackResponse::Type response;
@@ -259,7 +248,6 @@ void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackRe
 
 void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    // TODO: Insert code here
     mCurrentState     = PlaybackStateEnum::kPlaying;
     mPlaybackSpeed    = 1;
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
@@ -272,7 +260,6 @@ void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackRe
 
 void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    // TODO: Insert code here
     mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
 
     Commands::PlaybackResponse::Type response;

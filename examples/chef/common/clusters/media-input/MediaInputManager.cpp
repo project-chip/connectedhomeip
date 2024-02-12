@@ -56,7 +56,6 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
-    // TODO: Insert code here
     bool mediaInputSelected = false;
     for (InputInfoType & input : mInputs)
     {
@@ -64,6 +63,7 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
         {
             mediaInputSelected = true;
             mCurrentInput      = index;
+            return mediaInputSelected;
         }
     }
 
