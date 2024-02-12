@@ -137,6 +137,8 @@ MTR_DIRECT_MEMBERS
 
     _value = [value copy];
 
+    MTR_LOG_DEFAULT("Attribute value updated: %@", self); // Logs new as part of our description.
+
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController == nil) {
         // We're not bound to a controller, so safe to directly update
@@ -183,6 +185,8 @@ MTR_DIRECT_MEMBERS
 
     _deviceController = controller;
 
+    MTR_LOG_DEFAULT("Associated %@ with controller", self);
+
     return YES;
 }
 
@@ -216,6 +220,11 @@ MTR_DIRECT_MEMBERS
 {
     std::lock_guard lock(_lock);
     return _parentCluster;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRServerAttribute endpoint %u, cluster " ChipLogFormatMEI ", id " ChipLogFormatMEI ", value '%@'>", static_cast<EndpointId>(_parentCluster.mEndpointId), ChipLogValueMEI(_parentCluster.mClusterId), ChipLogValueMEI(_attributeID.unsignedLongLongValue), _value];
 }
 
 @end
