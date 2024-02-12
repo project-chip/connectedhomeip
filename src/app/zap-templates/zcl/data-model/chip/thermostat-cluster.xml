@@ -27,8 +27,7 @@ limitations under the License.
     <field name="LocalTemperatureNotExposed" mask="0x40"/>
     <field name="MatterScheduleConfiguration" mask="0x80"/>
     <field name="Presets" mask="0x100"/>
-    <field name="Setpoints" mask="0x200"/>
-    <field name="QueuedPresetsSupported" mask="0x400"/>
+    <field name="QueuedPresetsSupported" mask="0x200"/>
   </bitmap>
 
   <bitmap name="ACErrorCodeBitmap" type="bitmap32">
@@ -267,7 +266,7 @@ limitations under the License.
     <item fieldId="2" name="Name" type="char_string" length="64" optional="true"/>
     <item fieldId="3" name="PresetHandle" type="octet_string" length="16" optional="true"/>
     <item fieldId="4" name="Transitions" array="true" type="ScheduleTransitionStruct" minLength="1"/>
-    <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true" optional="true"/>
+    <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true"/>
   </struct>
 
   <struct name="ScheduleTransitionStruct" apiMaturity="provisional">
