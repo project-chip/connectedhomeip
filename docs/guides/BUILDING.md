@@ -624,9 +624,9 @@ iwyu_tool.py                                                  \
     -Xiwyu --cxx17ns                                          \
     -Xiwyu --no_fwd_decls                                     \
     | tee out/iwyu.out
-    
+
 # if you have a mapping file (e.g. iwyu.impl), you could also add this:
-#    -Xiwyu --mapping_file=(pwd)/iwyu.imp 
+#    -Xiwyu --mapping_file=(pwd)/iwyu.imp
 # to the command line
 
 # apply suggestions. Note that paths ARE relative so you need to change
