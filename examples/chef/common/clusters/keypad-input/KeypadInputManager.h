@@ -24,7 +24,7 @@ class KeypadInputManager : public chip::app::Clusters::KeypadInput::Delegate
 {
     using SendKeyResponseType = chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type;
     using CecKeyCodeType      = chip::app::Clusters::KeypadInput::CECKeyCodeEnum;
-    using Feature                   = chip::app::Clusters::KeypadInput::Feature;
+    using Feature             = chip::app::Clusters::KeypadInput::Feature;
 
 public:
     void HandleSendKey(chip::app::CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCodeType & keyCode) override;
@@ -32,5 +32,6 @@ public:
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
 private:
-    static constexpr uint32_t mDynamicEndpointFeatureMap = static_cast<uint32_t>(chip::BitMask<Feature, uint32_t>(Feature::kNavigationKeyCodes, Feature::kLocationKeys, Feature::kNumberKeys).Raw());
+    static constexpr uint32_t mDynamicEndpointFeatureMap = static_cast<uint32_t>(
+        chip::BitMask<Feature, uint32_t>(Feature::kNavigationKeyCodes, Feature::kLocationKeys, Feature::kNumberKeys).Raw());
 };

@@ -21,10 +21,10 @@
 
 class TargetNavigatorManager : public chip::app::Clusters::TargetNavigator::Delegate
 {
-using TargetInfoType             = chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type;
-using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
+    using TargetInfoType             = chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type;
+    using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
 
- public:
+public:
     TargetNavigatorManager() : TargetNavigatorManager({ "exampleName", "exampleName" }, kNoCurrentTarget){};
     TargetNavigatorManager(std::list<std::string> targets, uint8_t currentTarget);
 

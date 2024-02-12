@@ -23,13 +23,13 @@
 
 class MediaPlaybackManager : public chip::app::Clusters::MediaPlayback::Delegate
 {
-using PlaybackResponseType  = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
-using PlaybackPositionType  = chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type;
-using TrackType             = chip::app::Clusters::MediaPlayback::Structs::TrackStruct::Type;
-using TrackAttributesType   = chip::app::Clusters::MediaPlayback::Structs::TrackAttributesStruct::Type;
-using Feature                   = chip::app::Clusters::MediaPlayback::Feature;
+    using PlaybackResponseType = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
+    using PlaybackPositionType = chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type;
+    using TrackType            = chip::app::Clusters::MediaPlayback::Structs::TrackStruct::Type;
+    using TrackAttributesType  = chip::app::Clusters::MediaPlayback::Structs::TrackAttributesStruct::Type;
+    using Feature              = chip::app::Clusters::MediaPlayback::Feature;
 
- public:
+public:
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
     uint64_t HandleGetStartTime() override;
     uint64_t HandleGetDuration() override;
@@ -54,7 +54,8 @@ using Feature                   = chip::app::Clusters::MediaPlayback::Feature;
                             const uint64_t & deltaPositionMilliseconds) override;
     void HandleSkipForward(chip::app::CommandResponseHelper<PlaybackResponseType> & helper,
                            const uint64_t & deltaPositionMilliseconds) override;
-    void HandleSeek(chip::app::CommandResponseHelper<PlaybackResponseType> & helper, const uint64_t & positionMilliseconds) override;
+    void HandleSeek(chip::app::CommandResponseHelper<PlaybackResponseType> & helper,
+                    const uint64_t & positionMilliseconds) override;
     void HandleNext(chip::app::CommandResponseHelper<PlaybackResponseType> & helper) override;
     void HandleStartOver(chip::app::CommandResponseHelper<PlaybackResponseType> & helper) override;
     bool HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex) override;
@@ -110,6 +111,7 @@ protected:
     static const int kPlaybackMaxRewindSpeed  = -10;
 
 private:
-    static constexpr uint32_t mDynamicEndpointFeatureMap = static_cast<uint32_t>(chip::BitMask<Feature, uint32_t>(Feature::kAdvancedSeek, Feature::kVariableSpeed).Raw());
-    static constexpr uint16_t kClusterRevision    = 2;
+    static constexpr uint32_t mDynamicEndpointFeatureMap =
+        static_cast<uint32_t>(chip::BitMask<Feature, uint32_t>(Feature::kAdvancedSeek, Feature::kVariableSpeed).Raw());
+    static constexpr uint16_t kClusterRevision = 2;
 };

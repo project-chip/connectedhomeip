@@ -72,6 +72,7 @@ protected:
 
 private:
     bool isChannelMatched(const ChannelInfoType & channel, const chip::CharSpan & match);
-    static constexpr uint32_t mDynamicEndpointFeatureMap = static_cast<uint32_t>(chip::BitMask<Feature, uint32_t>(Feature::kChannelList, Feature::kLineupInfo).Raw());
-    static constexpr uint16_t kClusterRevision    = 2;
+    static constexpr uint32_t mDynamicEndpointFeatureMap =
+        static_cast<uint32_t>(chip::BitMask<Feature, uint32_t>(Feature::kChannelList, Feature::kLineupInfo).Raw());
+    static constexpr uint16_t kClusterRevision = 2;
 };

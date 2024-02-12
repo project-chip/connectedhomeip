@@ -30,7 +30,6 @@ using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 
-
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
     return mCurrentState;
