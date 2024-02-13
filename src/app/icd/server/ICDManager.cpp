@@ -72,7 +72,9 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     mExchangeManager   = exchangeManager;
     mSubManager        = manager;
 
-    VerifyOrDie(InitCounter() == CHIP_NO_ERROR);
+    VerifyOrDie(ICDConfigurationData::GetInstance().GetICDCounter().Init(mStorage, DefaultStorageKeyAllocator::ICDCheckInCounter(),
+                                                                         ICDConfigurationData::kICDCounterPersistenceIncrement) ==
+                CHIP_NO_ERROR);
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
@@ -115,7 +117,8 @@ void ICDManager::SendCheckInMsgs()
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
     VerifyOrDie(mStorage != nullptr);
     VerifyOrDie(mFabricTable != nullptr);
-    uint32_t counter        = ICDConfigurationData::GetInstance().GetICDCounter();
+
+    uint32_t counterValue   = ICDConfigurationData::GetInstance().GetICDCounter().GetNextCheckInCounterValue();
     bool counterIncremented = false;
 
     for (const auto & fabricInfo : *mFabricTable)
@@ -156,7 +159,7 @@ void ICDManager::SendCheckInMsgs()
             {
                 counterIncremented = true;
 
-                if (CHIP_NO_ERROR != IncrementCounter())
+                if (CHIP_NO_ERROR != ICDConfigurationData::GetInstance().GetICDCounter().Advance())
                 {
                     ChipLogError(AppServer, "Incremented ICDCounter but failed to access/save to Persistent storage");
                 }
@@ -167,61 +170,13 @@ void ICDManager::SendCheckInMsgs()
             ICDCheckInSender * sender = mICDSenderPool.CreateObject(mExchangeManager);
             VerifyOrReturn(sender != nullptr, ChipLogError(AppServer, "Failed to allocate ICDCheckinSender"));
 
-            if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable, counter))
+            if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable, counterValue))
             {
                 ChipLogError(AppServer, "Failed to send ICD Check-In");
             }
         }
     }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
-}
-
-CHIP_ERROR ICDManager::InitCounter()
-{
-    CHIP_ERROR err;
-    uint32_t temp;
-    uint16_t size = static_cast<uint16_t>(sizeof(uint32_t));
-
-    err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDCheckInCounter().KeyName(), &temp, size);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        // First time retrieving the counter
-        temp = chip::Crypto::GetRandU32();
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
-    ICDConfigurationData::GetInstance().SetICDCounter(temp);
-    temp += ICDConfigurationData::ICD_CHECK_IN_COUNTER_MIN_INCREMENT;
-
-    // Increment the count directly to minimize flash write.
-    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDCheckInCounter().KeyName(), &temp, size);
-}
-
-CHIP_ERROR ICDManager::IncrementCounter()
-{
-    uint32_t temp      = 0;
-    StorageKeyName key = DefaultStorageKeyAllocator::ICDCheckInCounter();
-    uint16_t size      = static_cast<uint16_t>(sizeof(uint32_t));
-
-    ICDConfigurationData::GetInstance().mICDCounter++;
-
-    if (mStorage == nullptr)
-    {
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    }
-
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key.KeyName(), &temp, size));
-
-    if (temp == ICDConfigurationData::GetInstance().mICDCounter)
-    {
-        temp = ICDConfigurationData::GetInstance().mICDCounter + ICDConfigurationData::ICD_CHECK_IN_COUNTER_MIN_INCREMENT;
-        return mStorage->SyncSetKeyValue(key.KeyName(), &temp, size);
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 void ICDManager::UpdateICDMode()
@@ -587,6 +542,20 @@ bool ICDManager::CheckInMessagesWouldBeSent()
 
     // None of the registrations would require a Check-In message
     return false;
+}
+
+void ICDManager::TriggerCheckInMessages()
+{
+    VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
+
+    // Only trigger Check-In messages when we are in IdleMode.
+    // If we are already in ActiveMode, Check-In messages have already been sent.
+    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
+
+    // If we don't have any Check-In messages to send, do nothing
+    VerifyOrReturn(CheckInMessagesWouldBeSent());
+
+    UpdateOperationState(OperationalState::ActiveMode);
 }
 
 } // namespace app

@@ -500,7 +500,7 @@ template("ti_simplelink_sdk") {
 
       defines += [
         "ONE_BLE_LIB_SIZE_OPTIMIZATION",
-        "NVOCMP_NVPAGES=3",
+        "NVOCMP_NVPAGES=5",
         "NVOCMP_NWSAMEITEM=1",
         "CC13X2P",
         "SYSCFG",

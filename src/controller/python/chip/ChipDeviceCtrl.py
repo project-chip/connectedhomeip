@@ -238,6 +238,7 @@ class DeviceProxyWrapper():
 
 
 DiscoveryFilterType = discovery.FilterType
+DiscoveryType = discovery.DiscoveryType
 
 
 class ChipDeviceControllerBase():
@@ -867,6 +868,9 @@ class ChipDeviceControllerBase():
             remoteMaxPathsPerInvoke: Overrides the number of batch commands we think can be sent to remote node.
             suppressTimedRequestMessage: When set to true, we suppress sending Timed Request Message.
             commandRefsOverride: List of commandRefs to use for each command with the same index in `commands`.
+
+        Returns:
+            - TestOnlyBatchCommandResponse
         '''
         self.CheckIsActive()
 
@@ -1621,7 +1625,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_ConnectIP.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_ConnectWithCode.argtypes = [
-                c_void_p, c_char_p, c_uint64, c_bool]
+                c_void_p, c_char_p, c_uint64, c_uint8]
             self._dmLib.pychip_DeviceController_ConnectWithCode.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_UnpairDevice.argtypes = [
@@ -1934,7 +1938,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return PyChipError(CHIP_ERROR_TIMEOUT)
         return self._ChipStack.commissioningEventRes
 
-    def CommissionWithCode(self, setupPayload: str, nodeid: int, networkOnly: bool = False) -> PyChipError:
+    def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> PyChipError:
         ''' Commission with the given nodeid from the setupPayload.
             setupPayload may be a QR or manual code.
         '''
@@ -1950,7 +1954,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
-                self.devCtrl, setupPayload, nodeid, networkOnly)
+                self.devCtrl, setupPayload, nodeid, discoveryType.value)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout

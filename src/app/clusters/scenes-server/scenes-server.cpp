@@ -25,7 +25,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/Span.h>
@@ -42,6 +41,7 @@ using GroupDataProvider = chip::Credentials::GroupDataProvider;
 using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
 using AuthMode          = chip::Access::AuthMode;
 using ScenesServer      = chip::app::Clusters::ScenesManagement::ScenesServer;
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -75,23 +75,23 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
     return err;
 }
 
-/// @brief Generate and add a response to a command handler context depending on an EmberAfStatus
+/// @brief Generate and add a response to a command handler context depending on an InteractionModel::Status
 /// @tparam ResponseType Type of response, depends on the command
 /// @param ctx Command Handler context where to add reponse
 /// @param resp Response to add in ctx
 /// @param status Status to verify
-/// @return EmberAfStatus -> CHIP_ERROR
+/// @return InteractionModel::Status -> CHIP_ERROR
 template <typename ResponseType>
-CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, EmberAfStatus status)
+CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, Status status)
 {
-    return AddResponseOnError(ctx, resp, StatusIB(ToInteractionModelStatus(status)).ToChipError());
+    return AddResponseOnError(ctx, resp, StatusIB(status).ToChipError());
 }
 
 template <typename ResponseType>
 CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
 {
     Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
-    EmberAfStatus status                 = EMBER_ZCL_STATUS_SUCCESS;
+    Status status                        = Status::Success;
 
     if (AuthMode::kCase == descriptor.authMode)
     {
@@ -103,7 +103,7 @@ CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
     }
 
     // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
-    VerifyOrReturnValue(!(EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
+    VerifyOrReturnValue(!(Status::Success == status || Status::UnsupportedAttribute == status), CHIP_NO_ERROR);
     return AddResponseOnError(ctx, resp, status);
 }
 
@@ -269,7 +269,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
     VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (index < ArraySize(mSceneInfoStructs))
     {
@@ -536,8 +536,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     ScenesServer::Instance().MakeSceneInvalid(endpointID, fabricIdx);
 
     uint16_t endpointTableSize = 0;
-    ReturnErrorOnFailure(
-        StatusIB(ToInteractionModelStatus(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize))).ToChipError());
+    ReturnErrorOnFailure(StatusIB(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize)).ToChipError());
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
@@ -567,8 +566,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     else
     {
         uint32_t featureMap = 0;
-        ReturnErrorOnFailure(
-            StatusIB(ToInteractionModelStatus(Attributes::FeatureMap::Get(endpointID, &featureMap))).ToChipError());
+        ReturnErrorOnFailure(StatusIB(Attributes::FeatureMap::Get(endpointID, &featureMap)).ToChipError());
         // Check if we still support scenes name in case an OTA changed that, if we don't, set name to empty
         if (!(featureMap & to_underlying(Feature::kSceneNames)))
         {
@@ -597,8 +595,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
     ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpointID);
 
     uint16_t endpointTableSize = 0;
-    ReturnErrorOnFailure(
-        StatusIB(ToInteractionModelStatus(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize))).ToChipError());
+    ReturnErrorOnFailure(StatusIB(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize)).ToChipError());
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
@@ -1112,8 +1109,8 @@ using namespace chip::app::Clusters::ScenesManagement;
 
 void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
-    EmberAfStatus status = Attributes::LastConfiguredBy::SetNull(endpoint);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    Status status = Attributes::LastConfiguredBy::SetNull(endpoint);
+    if (Status::Success != status)
     {
         ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
     }

@@ -2561,6 +2561,12 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)timeSnapshotWithParams:(MTRGeneralDiagnosticsClusterTimeSnapshotParams * _Nullable)params completion:(void (^)(MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)timeSnapshotWithCompletion:(void (^)(MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams * _Nullable data, NSError * _Nullable error))completion
     MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command PayloadTestRequest
+ *
+ * Request a variable length payload response.
+ */
+- (void)payloadTestRequestWithParams:(MTRGeneralDiagnosticsClusterPayloadTestRequestParams *)params completion:(void (^)(MTRGeneralDiagnosticsClusterPayloadTestResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeNetworkInterfacesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeNetworkInterfacesWithParams:(MTRSubscribeParams *)params
@@ -17059,6 +17065,10 @@ typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsRadioFaultType) {
     MTRGeneralDiagnosticsRadioFaultTypeEthernetFault MTR_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultEthernetFault", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x06,
 } MTR_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFault", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
+typedef NS_OPTIONS(uint32_t, MTRGeneralDiagnosticsFeature) {
+    MTRGeneralDiagnosticsFeatureDataModelTest MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_OPTIONS(uint32_t, MTRSoftwareDiagnosticsFeature) {
     MTRSoftwareDiagnosticsFeatureWatermarks MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x1,
     MTRSoftwareDiagnosticsFeatureWaterMarks MTR_DEPRECATED("Please use MTRSoftwareDiagnosticsFeatureWatermarks", ios(16.1, 17.4), macos(13.0, 14.4), watchos(9.1, 10.4), tvos(16.1, 17.4)) = 0x1,
@@ -19842,7 +19852,6 @@ typedef NS_OPTIONS(uint32_t, MTRContentLauncherFeature) {
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedProtocolsBitmap) {
     MTRContentLauncherSupportedProtocolsBitmapDASH MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x1,
     MTRContentLauncherSupportedProtocolsBitmapHLS MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x2,
-    MTRContentLauncherSupportedProtocolsBitmapWebRTC MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRContentLauncherSupportedStreamingProtocol) {

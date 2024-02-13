@@ -72,9 +72,20 @@ source_set("inet_config_header") {
   deps = [ ":inet_buildconfig" ]
 }
 
+source_set("impl_header") {
+  sources = [ "InetInterfaceImpl.h" ]
+  public_configs = [ "${chip_root}/src:includes" ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+}
+
 static_library("inet") {
   output_name = "libInetLayer"
 
+  # EndpointState header is one of:
+  #   - src/inet/EndPointStateLwIP.h
+  #   - src/inet/EndPointStateNetworkFramework.h
+  #   - src/inet/EndPointStateOpenThread.h
+  #   - src/inet/EndPointStateSockets.h
   sources = [
     "EndPointBasis.h",
     "EndPointState${chip_system_config_inet}.h",
@@ -98,6 +109,7 @@ static_library("inet") {
   ]
 
   public_deps = [
+    ":impl_header",
     ":inet_config_header",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
@@ -115,6 +127,13 @@ static_library("inet") {
   }
 
   if (chip_inet_config_enable_tcp_endpoint) {
+    # Possible TCPEndpointImpl files:
+    #  - TCPEndPointImplLwIP.cpp
+    #  - TCPEndPointImplLwIP.h
+    #  - TCPEndPointImplOpenThread.cpp
+    #  - TCPEndPointImplOpenThread.h
+    #  - TCPEndPointImplSockets.cpp
+    #  - TCPEndPointImplSockets.h
     sources += [
       "TCPEndPoint.cpp",
       "TCPEndPoint.h",
@@ -125,6 +144,15 @@ static_library("inet") {
   }
 
   if (chip_inet_config_enable_udp_endpoint) {
+    # Possible UDPEndpointImpl files:
+    #  - UDPEndPointImplLwIP.cpp
+    #  - UDPEndPointImplLwIP.h
+    #  - UDPEndPointImplNetworkFramework.cpp
+    #  - UDPEndPointImplNetworkFramework.h
+    #  - UDPEndPointImplOpenThread.cpp
+    #  - UDPEndPointImplOpenThread.h
+    #  - UDPEndPointImplSockets.cpp
+    #  - UDPEndPointImplSockets.h
     sources += [
       "BasicPacketFilters.h",
       "EndpointQueueFilter.h",
@@ -134,6 +162,12 @@ static_library("inet") {
       "UDPEndPointImpl${chip_system_config_inet}.h",
       "UDPEndPointImpl.h",
     ]
+
+    if (chip_system_config_inet == "Sockets") {
+      # TODO: dependency on this one is not clear as it is only ever
+      #       enabled through CMakeLists.txt. Added here for completeness
+      sources += [ "ZephyrSocket.h" ]
+    }
   }
 
   if (chip_with_nlfaultinjection) {

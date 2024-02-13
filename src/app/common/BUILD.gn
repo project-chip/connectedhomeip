@@ -44,11 +44,3 @@ source_set("enums") {
 
   public_configs = [ ":includes" ]
 }
-
-source_set("simulated") {
-  sources = [ "${chip_root}/zzz_generated/app-common/app-common/zap-generated/tests/simulated-cluster-objects.h" ]
-
-  public_deps = [ ":enums" ]
-
-  public_configs = [ ":includes" ]
-}

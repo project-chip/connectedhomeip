@@ -3336,6 +3336,28 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedGeneralDiagnosticsClusterPayloadTestResponseCallback implements ChipClusters.GeneralDiagnosticsCluster.PayloadTestResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] payload) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo payloadResponseValue = new CommandResponseInfo("payload", "byte[]");
+      responseValues.put(payloadResponseValue, payload);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedGeneralDiagnosticsClusterNetworkInterfacesAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.NetworkInterfacesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -22727,6 +22749,36 @@ public class ClusterInfoMapping {
         generalDiagnosticstimeSnapshotCommandParams
       );
     generalDiagnosticsClusterInteractionInfoMap.put("timeSnapshot", generalDiagnosticstimeSnapshotInteractionInfo);
+
+    Map<String, CommandParameterInfo> generalDiagnosticspayloadTestRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo generalDiagnosticspayloadTestRequestenableKeyCommandParameterInfo = new CommandParameterInfo("enableKey", byte[].class, byte[].class);
+    generalDiagnosticspayloadTestRequestCommandParams.put("enableKey",generalDiagnosticspayloadTestRequestenableKeyCommandParameterInfo);
+
+    CommandParameterInfo generalDiagnosticspayloadTestRequestvalueCommandParameterInfo = new CommandParameterInfo("value", Integer.class, Integer.class);
+    generalDiagnosticspayloadTestRequestCommandParams.put("value",generalDiagnosticspayloadTestRequestvalueCommandParameterInfo);
+
+    CommandParameterInfo generalDiagnosticspayloadTestRequestcountCommandParameterInfo = new CommandParameterInfo("count", Integer.class, Integer.class);
+    generalDiagnosticspayloadTestRequestCommandParams.put("count",generalDiagnosticspayloadTestRequestcountCommandParameterInfo);
+    InteractionInfo generalDiagnosticspayloadTestRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+          .payloadTestRequest((ChipClusters.GeneralDiagnosticsCluster.PayloadTestResponseCallback) callback
+           , (byte[])
+             commandArguments.get("enableKey")
+
+           , (Integer)
+             commandArguments.get("value")
+
+           , (Integer)
+             commandArguments.get("count")
+
+            );
+        },
+        () -> new DelegatedGeneralDiagnosticsClusterPayloadTestResponseCallback(),
+        generalDiagnosticspayloadTestRequestCommandParams
+      );
+    generalDiagnosticsClusterInteractionInfoMap.put("payloadTestRequest", generalDiagnosticspayloadTestRequestInteractionInfo);
 
     commandMap.put("generalDiagnostics", generalDiagnosticsClusterInteractionInfoMap);
 
