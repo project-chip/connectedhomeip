@@ -45,7 +45,7 @@ public:
 
     /**
      * Returns whether the write operation to the given path is conflicting with another write operation (i.e. another write
-     * transaction is in the middle of processing the chunked value of the given path.)
+     * transaction is in the middle of processing the chunked value of the given path).
      */
     virtual bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath) = 0;
 };
