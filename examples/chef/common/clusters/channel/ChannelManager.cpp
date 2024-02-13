@@ -186,7 +186,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
 
 bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
-    uint16_t index      = 0;
+    uint16_t index = 0;
     for (auto const & channel : mChannels)
     {
         // verify if major & minor matches one of the channel from the list

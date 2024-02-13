@@ -32,8 +32,10 @@ public:
     CHIP_ERROR HandleGetOutputList(chip::app::AttributeValueEncoder & aEncoder) override;
     bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) override;
     bool HandleSelectOutput(const uint8_t & index) override;
-    CHIP_ERROR GetOutputName(uint8_t index, chip::CharSpan & name) {
-        if (index < mOutputs.size()) {
+    CHIP_ERROR GetOutputName(uint8_t index, chip::CharSpan & name)
+    {
+        if (index < mOutputs.size())
+        {
             name = chip::CharSpan::fromCharString(mOutputName[index]);
             return CHIP_NO_ERROR;
         }

@@ -62,7 +62,7 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
     {
         if (output.index == index)
         {
-            const size_t len   = std::min(mNameLenMax, name.size());
+            const size_t len = std::min(mNameLenMax, name.size());
             memcpy(mOutputName[index], name.data(), len);
             output.name = mOutputName[index];
             return true;
@@ -78,7 +78,7 @@ bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
     {
         if (output.index == index)
         {
-            mCurrentOutput      = index;
+            mCurrentOutput = index;
             return true;
         }
     }

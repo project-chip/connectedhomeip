@@ -35,8 +35,10 @@ public:
     bool HandleShowInputStatus() override;
     bool HandleHideInputStatus() override;
     bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name) override;
-    CHIP_ERROR GetInputName(uint8_t index, chip::CharSpan & name) {
-        if (index < mInputs.size()) {
+    CHIP_ERROR GetInputName(uint8_t index, chip::CharSpan & name)
+    {
+        if (index < mInputs.size())
+        {
             name = chip::CharSpan::fromCharString(mInputName[index]);
             return CHIP_NO_ERROR;
         }

@@ -60,7 +60,7 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
     {
         if (input.index == index)
         {
-            mCurrentInput      = index;
+            mCurrentInput = index;
             return true;
         }
     }
@@ -94,7 +94,7 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     {
         if (input.index == index)
         {
-            const size_t len  = std::min(mNameLenMax, name.size());
+            const size_t len = std::min(mNameLenMax, name.size());
             memcpy(mInputName[index], name.data(), len);
             input.name = mInputName[index];
             return true;
