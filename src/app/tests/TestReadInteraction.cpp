@@ -2146,7 +2146,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         gMockClock.AdvanceMonotonic(System::Clock::Seconds16(maxInterval));
         ctx.GetIOContext().DriveIO();
 
-        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().TestOnly_IsRunScheduled());
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 
@@ -2243,7 +2243,7 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
 
         // Advance monotonic timestamp for min interval to elapse
         gMockClock.AdvanceMonotonic(Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
-        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().TestOnly_IsRunScheduled());
         // Service Timer expired event
         ctx.GetIOContext().DriveIO();
 
@@ -2255,7 +2255,7 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
         {
             // Verify the ReadHandler is considered as reportable even if its node's min timestamp has not expired
             NL_TEST_ASSERT(apSuite, gReportScheduler->IsReportableNow(delegate.mpReadHandler));
-            NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+            NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetReportingEngine().TestOnly_IsRunScheduled());
 
             // Service Engine Run
             ctx.GetIOContext().DriveIO();
@@ -2278,7 +2278,7 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
 
             // Service Timer expired event
             ctx.GetIOContext().DriveIO();
-            NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+            NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetReportingEngine().TestOnly_IsRunScheduled());
 
             // Service Engine Run
             ctx.GetIOContext().DriveIO();
@@ -2312,7 +2312,7 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
         // Advance monotonic timestamp for min interval to elapse
         gMockClock.AdvanceMonotonic(Seconds16(maxInterval));
 
-        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().TestOnly_IsRunScheduled());
         // Service Timer expired event
         ctx.GetIOContext().DriveIO();
 
@@ -2322,14 +2322,14 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
         NL_TEST_ASSERT(apSuite, gReportScheduler->IsReportableNow(delegate.mpReadHandler));
         NL_TEST_ASSERT(apSuite, !gReportScheduler->IsReportScheduled(delegate.mpReadHandler));
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+        NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetReportingEngine().TestOnly_IsRunScheduled());
         // Service Engine Run
         ctx.GetIOContext().DriveIO();
         // Service EventManagement event
         ctx.GetIOContext().DriveIO();
         ctx.GetIOContext().DriveIO();
         NL_TEST_ASSERT(apSuite, gReportScheduler->IsReportScheduled(delegate.mpReadHandler));
-        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().TestOnly_IsRunScheduled());
     }
     ctx.DrainAndServiceIO();
 
@@ -2489,7 +2489,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
             // There should be no reporting run scheduled.  This is very important;
             // otherwise we can get a false-positive pass below because the run was
             // already scheduled by here.
-            NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+            NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().TestOnly_IsRunScheduled());
 
             // Generate some events, which should get reported.
             GenerateEvents(apSuite, apContext);
@@ -2556,7 +2556,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
             // There should be no reporting run scheduled.  This is very important;
             // otherwise we can get a false-positive pass below because the run was
             // already scheduled by here.
-            NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+            NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().TestOnly_IsRunScheduled());
 
             // Generate some events, which should get reported.
             GenerateEvents(apSuite, apContext);
@@ -2996,8 +2996,8 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         gMockClock.AdvanceMonotonic(System::Clock::Seconds16(maxInterval));
         ctx.GetIOContext().DriveIO();
 
-        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
-        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().TestOnly_IsRunScheduled());
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().TestOnly_IsRunScheduled());
 
         ctx.DrainAndServiceIO();
 
@@ -3196,7 +3196,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = engine->GetReportingEngine().SetDirty(dirtyPath2);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().TestOnly_IsRunScheduled());
 
         ctx.DrainAndServiceIO();
 
