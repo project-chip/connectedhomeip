@@ -225,7 +225,7 @@ void AppTask::OnOffUpdateClusterState(void)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ASR_LOG("ERR: updating on/off %x", status);
+        ASR_LOG("ERR: updating on/off %x", to_underlying(status));
     }
 }
 

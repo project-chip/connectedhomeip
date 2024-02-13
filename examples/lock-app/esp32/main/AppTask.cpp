@@ -471,6 +471,6 @@ void AppTask::UpdateClusterState(intptr_t context)
     Protocols::InteractionModel::Status status = chip::app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ESP_LOGI(TAG, "ERR: updating on/off %x", status);
+        ESP_LOGI(TAG, "ERR: updating on/off %x", to_underlying(status));
     }
 }

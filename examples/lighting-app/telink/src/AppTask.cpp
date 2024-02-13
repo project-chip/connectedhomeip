@@ -242,13 +242,13 @@ void AppTask::UpdateClusterState(void)
     status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update OnOff fail: %x", status);
+        LOG_ERR("Update OnOff fail: %x", to_underlying(status));
     }
 
     status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kExampleEndpointId, setLevel);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update CurrentLevel fail: %x", status);
+        LOG_ERR("Update CurrentLevel fail: %x", to_underlying(status));
     }
 }
 
