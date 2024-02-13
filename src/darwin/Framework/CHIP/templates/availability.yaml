@@ -8608,6 +8608,10 @@
               # for now just start doing that for new additions to it.
               - TestDifferentVendorMeiRequest
               - TestDifferentVendorMeiResponse
+          GeneralDiagnostics:
+              # Targeting Spring 2024 Matter release
+              - PayloadTestRequest
+              - PayloadTestResponse
       structs:
           Thermostat:
               # Targeting Spring 2024 Matter release
@@ -8651,6 +8655,9 @@
               - PresetTypeFeaturesBitmap
               - ScheduleTypeFeaturesBitmap
               - TemperatureSetpointHoldPolicyBitmap
+          GeneralDiagnostics:
+              # Targeting Spring 2024 Matter release
+              - Feature
       bitmap values:
           DoorLock:
               Feature:
