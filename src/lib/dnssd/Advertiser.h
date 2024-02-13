@@ -125,7 +125,7 @@ private:
     size_t mMacLength                = 0;
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
     Optional<bool> mTcpSupported;
-    ICDModeAdvertise mICDModeAdvertise;
+    ICDModeAdvertise mICDModeAdvertise = ICDModeAdvertise::kNone;
 };
 
 /// Defines parameters required for advertising a CHIP node

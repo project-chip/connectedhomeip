@@ -195,8 +195,6 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         AddICDKeyToAdvertisement(advertiseParameters);
-#else
-        advertiseParameters.SetICDModeToAdvertise(Dnssd::ICDModeAdvertise::kNone);
 #endif
 
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
@@ -270,8 +268,6 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     AddICDKeyToAdvertisement(advertiseParameters);
-#else
-    advertiseParameters.SetICDModeToAdvertise(Dnssd::ICDModeAdvertise::kNone);
 #endif
 
     if (commissionableNode)
