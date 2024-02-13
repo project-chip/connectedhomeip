@@ -271,6 +271,26 @@ menu "CHIP Core"
                 Opens the commissioning window automatically at application boot time if
                 the node is not yet commissioned.
 
+        config ENABLE_SNTP_TIME_SYNC
+            bool "Enable sntp time synchronization"
+            default n
+            help
+                Enable this option to enable sntp time synchronization for example
+
+        config SNTP_SERVER_NAME
+            string "Name of the SNTP server"
+            depends on ENABLE_SNTP_TIME_SYNC
+            default "pool.ntp.org"
+            help
+                The name of the sntp server.
+
+        config SNTP_SYNC_INTERVAL_DAY
+            int "SNTP sync interval time in day"
+            depends on ENABLE_SNTP_TIME_SYNC
+            default 1
+            help
+                The interval between syncing device type with sntp server.
+
     endmenu # "System Options"
 
     menu "Security Options"

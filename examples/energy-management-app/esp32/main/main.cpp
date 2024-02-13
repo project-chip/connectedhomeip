@@ -22,6 +22,9 @@
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
+#if CONFIG_ENABLE_SNTP_TIME_SYNC
+#include <common/TimeSync.h>
+#endif
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
 #else
@@ -146,6 +149,10 @@ static void InitServer(intptr_t context)
 
     // Application code should always be initialised after the initialisation of server.
     ApplicationInit();
+
+#if CONFIG_ENABLE_SNTP_TIME_SYNC
+    Esp32Time::TimeSycnInit();
+#endif
 }
 
 extern "C" void app_main()
