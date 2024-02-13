@@ -98,10 +98,10 @@ private:
 
     enum class State : uint8_t
     {
-        kExpectingTimedAction, // Initial state: expecting a timed action.
-        kReceivedTimedAction,  // Have received the timed action.  This can
-        // be a terminal state if the action ends up
-        // malformed.
+        kExpectingTimedAction,     // Initial state: expecting a timed action.
+        kReceivedTimedAction,      // Have received the timed action.  This can
+                                   // be a terminal state if the action ends up
+                                   // malformed.
         kExpectingFollowingAction, // Expecting write or invoke.
     };
 
