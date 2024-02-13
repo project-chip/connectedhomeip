@@ -183,7 +183,7 @@
     <property name="ServiceData" type="a{sv}" access="read"/>
     <property name="Data" type="a{yay}" access="read"/>
     <property name="Discoverable" type="b" access="read"/>
-    <property name="DiscoverableTimeout" type="q" access="read"/>
+    <!-- <property name="DiscoverableTimeout" type="q" access="read"/> -->
     <property name="Includes" type="as" access="read"/>
     <property name="LocalName" type="s" access="read"/>
     <property name="Appearance" type="q" access="read"/>
