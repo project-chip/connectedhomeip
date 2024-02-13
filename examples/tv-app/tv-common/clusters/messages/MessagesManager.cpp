@@ -37,14 +37,17 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
     std::vector<MessageResponseOption *> optionToFree;
 
     uint8_t * messageIdBuffer = nullptr;
-    char * messageTextBuffer  = new char[messageText.size()];
+    // see MessagesManager.h "Note on memory management" for allocation/free rules
+    char * messageTextBuffer = new char[messageText.size() + 1];
     VerifyOrExit(messageTextBuffer != nullptr,
                  ChipLogProgress(Controller, "HandlePresentMessagesRequest messageTextBuffer alloc failed"));
     needToFree.push_back(messageTextBuffer);
     memcpy(messageTextBuffer, messageText.data(), messageText.size());
+    messageTextBuffer[messageText.size()] = '\0';
 
     ChipLogProgress(Controller, "HandlePresentMessagesRequest message:%s size:%lu", messageTextBuffer, messageText.size());
 
+    // see MessagesManager.h "Note on memory management" for allocation/free rules
     messageIdBuffer = new uint8_t[messageId.size()];
     VerifyOrExit(messageIdBuffer != nullptr,
                  ChipLogProgress(Controller, "HandlePresentMessagesRequest messageIdBuffer alloc failed"));
@@ -56,6 +59,7 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
         CHIP_ERROR err = responses.Value().ComputeSize(&size);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Controller, "HandlePresentMessagesRequest size check failed"));
 
+        // see MessagesManager.h "Note on memory management" for allocation/free rules
         MessageResponseOption * optionArray = new MessageResponseOption[size];
         VerifyOrExit(optionArray != nullptr,
                      ChipLogProgress(Controller, "HandlePresentMessagesRequest MessageResponseOption alloc failed"));
@@ -67,29 +71,24 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
         {
             auto & response = iter.GetValue();
 
-            ChipLogProgress(Controller, "HandlePresentMessagesRequest option id:%u", response.messageResponseID.ValueOr(0));
+            VerifyOrExit(response.messageResponseID.HasValue() && response.label.HasValue(),
+                         ChipLogProgress(Controller, "HandlePresentMessagesRequest missing respond id or label"));
 
-            if (response.messageResponseID.HasValue())
-            {
-                optionArray[counter].messageResponseID = Optional<uint32_t>(response.messageResponseID.ValueOr(0));
-            }
+            optionArray[counter].messageResponseID = Optional<uint32_t>(response.messageResponseID.Value());
 
-            if (response.label.HasValue())
-            {
-                char * labelBuffer = new char[response.label.Value().size()];
-                VerifyOrExit(labelBuffer != nullptr,
-                             ChipLogProgress(Controller, "HandlePresentMessagesRequest label alloc failed"));
-                needToFree.push_back(labelBuffer);
-                memcpy(labelBuffer, response.label.Value().data(), response.label.Value().size());
+            // see MessagesManager.h "Note on memory management" for allocation/free rules
+            char * labelBuffer = new char[response.label.Value().size() + 1];
+            VerifyOrExit(labelBuffer != nullptr, ChipLogProgress(Controller, "HandlePresentMessagesRequest label alloc failed"));
+            needToFree.push_back(labelBuffer);
+            memcpy(labelBuffer, response.label.Value().data(), response.label.Value().size());
+            labelBuffer[response.label.Value().size()] = '\0';
 
-                ChipLogProgress(Controller, "HandlePresentMessagesRequest option label:%s size:%lu", labelBuffer,
-                                response.label.Value().size());
+            optionArray[counter].label = Optional<CharSpan>(CharSpan::fromCharString(labelBuffer));
 
-                optionArray[counter].label = Optional<CharSpan>(CharSpan::fromCharString(labelBuffer));
-            }
             counter++;
         }
 
+        // see MessagesManager.h "Note on memory management" for allocation/free rules
         Message message{ ByteSpan(messageIdBuffer, messageId.size()),
                          priority,
                          messageControl,
@@ -103,6 +102,7 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
     }
     else
     {
+        // see MessagesManager.h "Note on memory management" for allocation/free rules
         Message message{ ByteSpan(messageIdBuffer, messageId.size()), priority, messageControl, startTime, duration,
                          CharSpan::fromCharString(messageTextBuffer) };
         mMessages.push_back(message);
@@ -141,6 +141,7 @@ void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList
             if (entry.messageID.data_equal(id))
             {
                 // free the memory allocated for this entry
+                // see MessagesManager.h "Note on memory management" for allocation/free rules
                 if (entry.responses.HasValue())
                 {
                     for (const MessageResponseOption & option : entry.responses.Value())
@@ -158,8 +159,8 @@ void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList
             }
             return false;
         });
+        // per spec, the command succeeds even when the message id does not match an existing message
     }
-    return;
 }
 
 // Attributes

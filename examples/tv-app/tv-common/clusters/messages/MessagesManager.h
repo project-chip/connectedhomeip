@@ -22,6 +22,17 @@
 #include <iostream>
 #include <list>
 
+/**
+ * Note on memory management:
+ *
+ * The mMessages vector contains a list of messages which include strings and objects
+ * allocated when messages are passed in (via HandlePresentMessagesRequest) and freed
+ * when the message is removed (via HandleCancelMessagesRequest).
+ *
+ * Any other logic added to expire or otherwise remove from mMessages needs to be sure
+ * to free these allocated objects as is done in HandleCancelMessagesRequest.
+ *
+ */
 class MessagesManager : public chip::app::Clusters::Messages::Delegate
 {
 public:
