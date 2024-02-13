@@ -31,7 +31,7 @@ class WriteHandler;
 /**
  * Returns the metadata of the attribute for the given path.
  *
- * @retval The metadata of the attribute, will return null if the given attribute does not exists.
+ * @retval The metadata of the attribute, will return null if the given attribute does not exist.
  */
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath);
 
