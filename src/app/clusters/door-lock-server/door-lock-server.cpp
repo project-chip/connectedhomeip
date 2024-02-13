@@ -1890,6 +1890,7 @@ Status DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricIndex
     if (UserStatusEnum::kAvailable != user.userStatus)
     {
         ChipLogProgress(Zcl, "[createUser] Unable to overwrite existing user [endpointId=%d,userIndex=%d]", endpointId, userIndex);
+        // TODO FixMe  https://github.com/project-chip/connectedhomeip/issues/32100
         return static_cast<Status>(DlStatus::kOccupied);
         ;
     }

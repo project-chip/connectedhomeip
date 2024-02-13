@@ -140,7 +140,7 @@ private:
      */
     template <typename T>
     bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
+                      chip::Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
 
     /**
      * @brief Set generic attribute value
@@ -155,7 +155,7 @@ private:
      */
     template <typename T>
     bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      Protocols::InteractionModel::Status (*setFn)(chip::EndpointId endpointId, T value), T value);
+                      chip::Protocols::InteractionModel::Status (*setFn)(chip::EndpointId endpointId, T value), T value);
 
     friend bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
