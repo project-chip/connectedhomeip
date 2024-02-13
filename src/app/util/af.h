@@ -96,9 +96,9 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * data type (as Accessors.h/cpp have this correct by default).
  * TODO: this not checking seems off - what if this is run without Accessors.h ?
  */
-chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                                chip::AttributeId attributeID, uint8_t * dataPtr,
-                                                                EmberAfAttributeType dataType);
+Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                          chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                          EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.
@@ -109,9 +109,8 @@ chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId
  * dataPtr may be NULL, signifying that we don't need the value, just the status
  * (i.e. whether the attribute can be read).
  */
-chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                               chip::AttributeId attributeID, uint8_t * dataPtr,
-                                                               uint16_t readLength);
+Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                         chip::AttributeId attributeID, uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief macro that returns size of attribute in bytes.

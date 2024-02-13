@@ -66,9 +66,9 @@ public:
     virtual MediaPlaybackDelegate * GetMediaPlaybackDelegate()             = 0;
     virtual TargetNavigatorDelegate * GetTargetNavigatorDelegate()         = 0;
 
-    chip::Protocols::InteractionModel::Status HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer,
-                                                                  uint16_t maxReadLength);
-    chip::Protocols::InteractionModel::Status HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
+    Protocols::InteractionModel::Status HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer,
+                                                            uint16_t maxReadLength);
+    Protocols::InteractionModel::Status HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
 
 protected:
     EndpointId mEndpointId = 0;

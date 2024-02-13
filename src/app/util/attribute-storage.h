@@ -71,9 +71,9 @@ void emAfCallInits(void);
 // Initial configuration
 void emberAfEndpointConfigure(void);
 
-chip::Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
-                                                                   const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
-                                                                   uint16_t readLength, bool write);
+Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
+                                                             const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
+                                                             uint16_t readLength, bool write);
 
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
@@ -133,9 +133,9 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, chip::EndpointId endpoin
 void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 // Calls the attribute changed callback for a specific cluster.
-chip::Protocols::InteractionModel::Status
-emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType,
-                                       uint16_t size, uint8_t * value);
+Protocols::InteractionModel::Status emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                           EmberAfAttributeType attributeType, uint16_t size,
+                                                                           uint8_t * value);
 
 // Note the difference in for server filtering.
 // This method will return the cluster count for BOTH client and server

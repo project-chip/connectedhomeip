@@ -36,16 +36,16 @@ class DishwasherAlarmServer
 public:
     static DishwasherAlarmServer & Instance();
 
-    chip::Protocols::InteractionModel::Status GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask);
-    chip::Protocols::InteractionModel::Status GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state);
-    chip::Protocols::InteractionModel::Status GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch);
-    chip::Protocols::InteractionModel::Status GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * suppported);
+    Protocols::InteractionModel::Status GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask);
+    Protocols::InteractionModel::Status GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state);
+    Protocols::InteractionModel::Status GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch);
+    Protocols::InteractionModel::Status GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * suppported);
 
     // Whenever there is change on Mask we should change State accordingly.
-    chip::Protocols::InteractionModel::Status SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask);
-    chip::Protocols::InteractionModel::Status SetLatchValue(EndpointId endpoint, const BitMask<AlarmMap> latch);
+    Protocols::InteractionModel::Status SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask);
+    Protocols::InteractionModel::Status SetLatchValue(EndpointId endpoint, const BitMask<AlarmMap> latch);
     // A change in supported value will result in a corresponding change in mask and state.
-    chip::Protocols::InteractionModel::Status SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported);
+    Protocols::InteractionModel::Status SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported);
 
     /**
      * @brief Set the value of the State attribute
@@ -61,8 +61,8 @@ public:
      * honoring the Mask and Supported attributes.
      * The default value for the ignoreLatchState parameter is false.
      */
-    chip::Protocols::InteractionModel::Status SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState,
-                                                            bool ignoreLatchState = false);
+    Protocols::InteractionModel::Status SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState,
+                                                      bool ignoreLatchState = false);
 
     /**
      * @brief Reset the value of latched alarms in the State attribute.
@@ -71,7 +71,7 @@ public:
      * @param[in] alarms Each bit set to a 1 in this parameter corresponds to a bit in the
      * State attribute will SHALL be reset to false.
      */
-    chip::Protocols::InteractionModel::Status ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
+    Protocols::InteractionModel::Status ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
 
     // check whether the Alarm featureMap has enabled Reset feature.
     bool HasResetFeature(EndpointId endpoint);

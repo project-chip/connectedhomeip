@@ -47,10 +47,9 @@ public:
     /**
      * API to set/get the SelectedDrynessLevel attribute
      */
-    chip::Protocols::InteractionModel::Status SetSelectedDrynessLevel(EndpointId endpointId,
-                                                                      DrynessLevelEnum newSelectedDrynessLevel);
-    chip::Protocols::InteractionModel::Status GetSelectedDrynessLevel(EndpointId endpointId,
-                                                                      DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel);
+    Protocols::InteractionModel::Status SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel);
+    Protocols::InteractionModel::Status GetSelectedDrynessLevel(EndpointId endpointId,
+                                                                DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel);
 
 private:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

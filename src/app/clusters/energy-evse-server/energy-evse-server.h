@@ -55,31 +55,31 @@ public:
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual chip::Protocols::InteractionModel::Status Disable() = 0;
+    virtual Protocols::InteractionModel::Status Disable() = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Charging.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual chip::Protocols::InteractionModel::Status EnableCharging(const DataModel::Nullable<uint32_t> & enableChargeTime,
-                                                                     const int64_t & minimumChargeCurrent,
-                                                                     const int64_t & maximumChargeCurrent) = 0;
+    virtual Protocols::InteractionModel::Status EnableCharging(const DataModel::Nullable<uint32_t> & enableChargeTime,
+                                                               const int64_t & minimumChargeCurrent,
+                                                               const int64_t & maximumChargeCurrent) = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Discharging.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual chip::Protocols::InteractionModel::Status EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
-                                                                        const int64_t & maximumDischargeCurrent) = 0;
+    virtual Protocols::InteractionModel::Status EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
+                                                                  const int64_t & maximumDischargeCurrent) = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Diagnostics.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual chip::Protocols::InteractionModel::Status StartDiagnostics() = 0;
+    virtual Protocols::InteractionModel::Status StartDiagnostics() = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods

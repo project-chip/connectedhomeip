@@ -137,7 +137,7 @@ public:
     chip::scenes::SceneHandler * GetSceneHandler();
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
-    chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
+    Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
     bool stopMoveStepCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                              uint8_t optionsMask, uint8_t optionsOverride);
 
@@ -210,10 +210,9 @@ private:
     void cancelEndpointTimerCallback(EmberEventControl * control);
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    chip::Protocols::InteractionModel::Status moveToSaturation(uint8_t saturation, uint16_t transitionTime,
-                                                               chip::EndpointId endpoint);
-    chip::Protocols::InteractionModel::Status moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTime,
-                                                                     bool isEnhanced, chip::EndpointId endpoint);
+    Protocols::InteractionModel::Status moveToSaturation(uint8_t saturation, uint16_t transitionTime, chip::EndpointId endpoint);
+    Protocols::InteractionModel::Status moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTime,
+                                                               bool isEnhanced, chip::EndpointId endpoint);
     ColorHueTransitionState * getColorHueTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getSaturationTransitionState(chip::EndpointId endpoint);
     uint8_t getSaturation(chip::EndpointId endpoint);
@@ -232,8 +231,8 @@ private:
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
-    chip::Protocols::InteractionModel::Status moveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTime,
-                                                          chip::EndpointId endpoint);
+    Protocols::InteractionModel::Status moveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTime,
+                                                    chip::EndpointId endpoint);
     Color16uTransitionState * getXTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getYTransitionState(chip::EndpointId endpoint);
     uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step);
@@ -242,8 +241,8 @@ private:
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState * getTempTransitionState(chip::EndpointId endpoint);
-    chip::Protocols::InteractionModel::Status moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature,
-                                                              uint16_t transitionTime);
+    Protocols::InteractionModel::Status moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature,
+                                                        uint16_t transitionTime);
     uint16_t getTemperatureCoupleToLevelMin(chip::EndpointId endpoint);
     EmberEventControl * configureTempEventControl(chip::EndpointId);
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP

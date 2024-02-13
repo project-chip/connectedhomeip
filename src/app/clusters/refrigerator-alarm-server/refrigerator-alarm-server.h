@@ -30,23 +30,23 @@ class RefrigeratorAlarmServer
 public:
     static RefrigeratorAlarmServer & Instance();
 
-    chip::Protocols::InteractionModel::Status GetMaskValue(chip::EndpointId endpoint,
-                                                           chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
-    chip::Protocols::InteractionModel::Status
-    GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
-    chip::Protocols::InteractionModel::Status
+    Protocols::InteractionModel::Status GetMaskValue(chip::EndpointId endpoint,
+                                                     chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
+    Protocols::InteractionModel::Status GetStateValue(chip::EndpointId endpoint,
+                                                      chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
+    Protocols::InteractionModel::Status
     GetSupportedValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
 
     // A change in mask value will result in a corresponding change in state.
-    chip::Protocols::InteractionModel::Status
-    SetMaskValue(chip::EndpointId endpoint, const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
+    Protocols::InteractionModel::Status SetMaskValue(chip::EndpointId endpoint,
+                                                     const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
 
     // When State changes we are generating Notify event.
-    chip::Protocols::InteractionModel::Status
-    SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
+    Protocols::InteractionModel::Status SetStateValue(chip::EndpointId endpoint,
+                                                      chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
 
     // A change in supported value will result in a corresponding change in mask and state.
-    chip::Protocols::InteractionModel::Status
+    Protocols::InteractionModel::Status
     SetSupportedValue(chip::EndpointId endpoint, const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> supported);
 
 private:

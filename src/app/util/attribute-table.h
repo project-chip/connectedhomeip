@@ -27,9 +27,9 @@
  * This will check attribute writeability and that
  * the provided data type matches the expected data type.
  */
-chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                                     chip::AttributeId attributeID, uint8_t * dataPtr,
-                                                                     EmberAfAttributeType dataType);
+Protocols::InteractionModel::Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                               chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                               EmberAfAttributeType dataType);
 
 /**
  * @brief write an attribute, performing all the checks.
@@ -61,6 +61,6 @@ chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(chip::Endpo
  *           the attribute
  * - Status::Success: if the attribute was found and successfully written
  */
-chip::Protocols::InteractionModel::Status emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                             chip::AttributeId attributeID, uint8_t * data,
-                                                             EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);
+Protocols::InteractionModel::Status emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                       chip::AttributeId attributeID, uint8_t * data, EmberAfAttributeType dataType,
+                                                       bool overrideReadOnlyAndDataType);
