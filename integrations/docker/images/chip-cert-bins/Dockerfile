@@ -193,7 +193,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-lit-icd-ipv6only \
     --target linux-x64-energy-management-ipv6only \
     --target linux-x64-microwave-oven-ipv6only \
-    --target linux-x64-rvc-app-ipv6only \
+    --target linux-x64-rvc-ipv6only \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -212,7 +212,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
     && mv out/linux-x64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
     && mv out/linux-x64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
-    && mv out/linux-x64-rvc-app-ipv6only/chip-tv-app out/chip-tv-app \
+    && mv out/linux-x64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
     ;; \
     "linux/arm64")\
     set -x \
