@@ -183,13 +183,33 @@
     <property name="ServiceData" type="a{sv}" access="read"/>
     <property name="Data" type="a{yay}" access="read"/>
     <property name="Discoverable" type="b" access="read"/>
-    <!-- <property name="DiscoverableTimeout" type="q" access="read"/> -->
+    <!--
+    Do not expose discoverable timeout property, so BlueZ will set it
+    internally to zero, effectively disabling the timeout. Becase of BlueZ
+    bug, which is not fixed until BlueZ 5.73, we can not set it to zero in
+    the application code.
+
+    <property name="DiscoverableTimeout" type="q" access="read"/>
+    -->
     <property name="Includes" type="as" access="read"/>
     <property name="LocalName" type="s" access="read"/>
     <property name="Appearance" type="q" access="read"/>
-    <!-- <property name="Duration" type="q" access="read"/> -->
-    <!-- <property name="Timeout" type="q" access="read"/> -->
-    <!-- <property name="SecondaryChannel" type="s" access="read"/> -->
+    <!--
+    Do not expose duration, so BlueZ will use the internal default value.
+
+    <property name="Duration" type="q" access="read"/>
+    -->
+    <!--
+    Do not expose timeout property, so BlueZ will not call the Release()
+    method after a timeout.
+
+    <property name="Timeout" type="q" access="read"/>
+    -->
+    <!--
+    We are not using SecondaryChannel property, so we do not expose it.
+
+    <property name="SecondaryChannel" type="s" access="read"/>
+    -->
     <property name="MinInterval" type="u" access="read"/>
     <property name="MaxInterval" type="u" access="read"/>
   </interface>
