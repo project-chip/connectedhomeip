@@ -137,14 +137,13 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
 
 bool ChannelManager::isChannelMatched(const ChannelInfoType & channel, const chip::CharSpan & match)
 {
-    std::stringstream ss;
-    ss << channel.majorNumber << "." << channel.minorNumber;
-    std::string number = ss.str();
+    StringBuilder<16> channelNum;
+    channelNum.AddFormat("%d.%d", channel.majorNumber, channel.minorNumber);
 
     auto isMatch = [&match](const Optional<chip::CharSpan> & a) { return a.HasValue() && a.Value().data_equal(match); };
 
     return isMatch(channel.name) || isMatch(channel.affiliateCallSign) || isMatch(channel.callSign) ||
-        match.data_equal(chip::CharSpan::fromCharString(number.c_str()));
+        match.data_equal(chip::CharSpan::fromCharString(channelNum.c_str()));
 }
 
 void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match)
