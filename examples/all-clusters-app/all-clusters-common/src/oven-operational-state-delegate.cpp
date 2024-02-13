@@ -91,7 +91,6 @@ void OvenCavityOperationalStateDelegate::HandlePauseStateCallback(OperationalSta
         return;
     }
 
-    // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
@@ -114,7 +113,6 @@ void OvenCavityOperationalStateDelegate::HandleResumeStateCallback(OperationalSt
         return;
     }
 
-    // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
@@ -137,7 +135,6 @@ void OvenCavityOperationalStateDelegate::HandleStartStateCallback(OperationalSta
         return;
     }
 
-    // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
@@ -151,7 +148,6 @@ void OvenCavityOperationalStateDelegate::HandleStartStateCallback(OperationalSta
 
 void OvenCavityOperationalStateDelegate::HandleStopStateCallback(OperationalState::GenericOperationalError & err)
 {
-    // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
     {

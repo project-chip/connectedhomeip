@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -624,14 +624,16 @@ class TC_OPSTATE_BASE():
 
         # STEP 9: TH reads from the DUT the CurrentPhase attribute
         self.step(9)
-        if self.pics_guard(self.check_pics("%s.S.A0001" % self.test_info.pics_code) and phase_list_len):
+        if self.pics_guard(self.check_pics("%s.S.A0001" % self.test_info.pics_code)):
             current_phase = await self.read_expect_success(endpoint=endpoint,
                                                            attribute=attributes.CurrentPhase)
             if (phase_list == NullValue) or (not phase_list):
-                asserts.assert_true(current_phase == NullValue, "CurrentPhase(%s) should be null" % current_phase)
+                asserts.assert_equal(current_phase, NullValue, "CurrentPhase(%s) should be null" % current_phase)
             else:
-                asserts.assert_true(0 <= current_phase and current_phase < phase_list_len,
-                                    "CurrentPhase(%s) must be between 0 and %s" % (current_phase, (phase_list_len - 1)))
+                asserts.assert_less_equal(0, current_phase,
+                                          "CurrentPhase(%s) must be greater or equal than 0" % current_phase)
+                asserts.assert_less(current_phase < phase_list_len,
+                                    "CurrentPhase(%s) must be less then %s" % (current_phase, (phase_list_len - 1)))
 
         # STEP 10: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(10)
