@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "darwin")
@@ -133,7 +134,7 @@ static_library("Darwin") {
 
 static_library("logging") {
   if (chip_force_stdio_logging) {
-    sources = [ "Logging.cpp" ]
+    sources = [ "LoggingStdio.cpp" ]
     deps = [
       "${chip_root}/src/lib/core:chip_config_header",
       "${chip_root}/src/lib/support:attributes",
