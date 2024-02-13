@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,41 +55,20 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0024" name="Content App" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0510" name="Electrical Sensor" revision="1">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
-    <revision revision="1" summary="Initial release of this document"/>
+    <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <classification class="simple" scope="endpoint"/>
+  <classification class="utility" scope="endpoint"/>
   <clusters>
-    <cluster id="0x0504" name="Channel" side="server">
-      <optionalConform/>
+    <cluster id="0x0090" name="Electrical Power Measurement" side="server">
+      <optionalConform choice="a" more="true"/>
     </cluster>
-    <cluster id="0x0505" name="Target Navigator" side="server">
-      <optionalConform/>
+    <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
+      <optionalConform choice="a" more="true"/>
     </cluster>
-    <cluster id="0x0506" name="Media Playback" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0509" name="Keypad Input" side="server">
+    <cluster id="0x009C" name="Power Topology" side="server">
       <mandatoryConform/>
-    </cluster>
-    <cluster id="0x050A" name="Content Launcher" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x050C" name="Application Launcher" side="server">
-      <mandatoryConform/>
-      <features>
-        <feature code="" name="Application">
-          <disallowConform/>
-        </feature>
-      </features>
-    </cluster>
-    <cluster id="0x050D" name="Application Basic" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x050E" name="Account Login" side="server">
-      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>
