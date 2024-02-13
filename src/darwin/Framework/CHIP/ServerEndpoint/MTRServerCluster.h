@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A representation of a server cluster implemented by an MTRDeviceController.
  */
+NS_SWIFT_SENDABLE
 MTR_NEWLY_AVAILABLE
 @interface MTRServerCluster : NSObject
 
