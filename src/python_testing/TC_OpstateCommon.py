@@ -153,8 +153,8 @@ class TC_OPSTATE_BASE():
 
     async def read_and_expect_value(self, endpoint, attribute, expected_value):
         attr_value = await self.read_expect_success(
-                                endpoint=endpoint,
-                                attribute=attribute)
+            endpoint=endpoint,
+            attribute=attribute)
 
         asserts.assert_equal(attr_value, expected_value,
                              "Current value not according expected. Expected %d, received %d!" %
@@ -162,8 +162,8 @@ class TC_OPSTATE_BASE():
 
     async def read_and_expect_property_value(self, endpoint, attribute, attr_property, expected_value):
         attr_value = await self.read_expect_success(
-                                endpoint=endpoint,
-                                attribute=attribute)
+            endpoint=endpoint,
+            attribute=attribute)
         attr_value = getattr(attr_value, attr_property)
 
         asserts.assert_equal(attr_value, expected_value,
@@ -172,8 +172,8 @@ class TC_OPSTATE_BASE():
 
     async def read_and_expect_array_contains(self, endpoint, attribute, expected_contains):
         attr_value = await self.read_expect_success(
-                                endpoint=endpoint,
-                                attribute=attribute)
+            endpoint=endpoint,
+            attribute=attribute)
         attr_value.sort()
         expected_contains.sort()
 
@@ -397,7 +397,8 @@ class TC_OPSTATE_BASE():
             # STEP 6a: Manually put the device in the Stopped(0x00) operational state
             self.step("6a")
             if self.pics_guard(self.check_pics(("%s.S.M.ST_STOPPED" % self.test_info.pics_code))):
-                self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Stop"}' % self.device)
+                self.send_manual_or_pipe_command(
+                    '{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Stop"}' % self.device)
                 # STEP 6b: TH reads from the DUT the OperationalState attribute
                 self.step("6b")
                 await self.read_and_expect_value(endpoint=endpoint,
@@ -409,7 +410,8 @@ class TC_OPSTATE_BASE():
             # STEP 6c: Manually put the device in the Running(0x01) operational state
             self.step("6c")
             if self.pics_guard(self.check_pics(("%s.S.M.ST_RUNNING" % self.test_info.pics_code))):
-                self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Start"}' % self.device)
+                self.send_manual_or_pipe_command(
+                    '{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Start"}' % self.device)
                 # STEP 6d: TH reads from the DUT the OperationalState attribute
                 self.step("6d")
                 await self.read_and_expect_value(endpoint=endpoint,
@@ -421,7 +423,8 @@ class TC_OPSTATE_BASE():
             # STEP 6e: Manually put the device in the Paused(0x02) operational state
             self.step("6e")
             if self.pics_guard(self.check_pics(("%s.S.M.ST_PAUSED" % self.test_info.pics_code))):
-                self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Pause"}' % self.device)
+                self.send_manual_or_pipe_command(
+                    '{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Pause"}' % self.device)
                 # STEP 6f: TH reads from the DUT the OperationalState attribute
                 self.step("6f")
                 await self.read_and_expect_value(endpoint=endpoint,
@@ -433,7 +436,8 @@ class TC_OPSTATE_BASE():
             # STEP 6g: Manually put the device in the Error(0x03) operational state
             self.step("6g")
             if self.pics_guard(self.check_pics(("%s.S.M.ST_ERROR" % self.test_info.pics_code))):
-                self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": 1}' % self.device)
+                self.send_manual_or_pipe_command(
+                    '{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": 1}' % self.device)
                 # STEP 6h: TH reads from the DUT the OperationalState attribute
                 self.step("6h")
                 await self.read_and_expect_value(endpoint=endpoint,
@@ -857,7 +861,8 @@ class TC_OPSTATE_BASE():
         # STEP 16: Manually put the device in the Error(0x03) operational state
         self.step(16)
         if self.pics_guard(self.check_pics(("%s.S.M.ST_ERROR" % self.test_info.pics_code))):
-            self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": 1}' % self.device)
+            self.send_manual_or_pipe_command(
+                '{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": 1}' % self.device)
 
         # STEP 17: TH sends Pause command to the DUT
         self.step(17)
@@ -915,7 +920,8 @@ class TC_OPSTATE_BASE():
 
             # STEP 3: At the DUT take the vendor defined action to generate an OperationalError event
             self.step(3)
-            self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": 1}' % self.device)
+            self.send_manual_or_pipe_command(
+                '{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": 1}' % self.device)
             event_data = events_callback.wait_for_event_report(events.OperationalError).errorState
 
             # Defined Errors

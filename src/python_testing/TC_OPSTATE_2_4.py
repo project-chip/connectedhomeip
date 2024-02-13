@@ -47,4 +47,3 @@ class TC_OPSTATE_2_4(MatterBaseTest, TC_OPSTATE_BASE):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
