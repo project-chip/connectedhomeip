@@ -242,10 +242,10 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
 void AppTask::UpdateClusterState(intptr_t context)
 {
     // Set On/Off state
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     bool onOffState = !PumpMgr().IsStopped();
     status          = chip::app::Clusters::OnOff::Attributes::OnOff::Set(PCC_CLUSTER_ENDPOINT, onOffState);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", status);
     }
