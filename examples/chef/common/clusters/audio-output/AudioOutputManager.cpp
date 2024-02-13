@@ -65,13 +65,12 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
         if (output.index == index)
         {
             audioOutputRenamed = true;
-            const size_t len   = std::min(mBufMax, name.size());
-            memcpy(this->Data(index), name.data(), len);
-            output.name = chip::CharSpan(this->Data(index), len);
+            const size_t len   = std::min(mNameLenMax, name.size());
+            memcpy(mOutputName[index], name.data(), len);
+            output.name = mOutputName[index];
             return audioOutputRenamed;
         }
     }
-
     return audioOutputRenamed;
 }
 

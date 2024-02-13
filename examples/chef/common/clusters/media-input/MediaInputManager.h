@@ -35,14 +35,20 @@ public:
     bool HandleShowInputStatus() override;
     bool HandleHideInputStatus() override;
     bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name) override;
-    char * Data(uint8_t index) { return mCharDataBuffer[index]; }
+    CHIP_ERROR GetInputName(uint8_t index, chip::CharSpan & name) {
+        if (index < mInputs.size()) {
+            name = chip::CharSpan::fromCharString(mInputName[index]);
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
 protected:
     uint8_t mCurrentInput;
-    std::vector<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type> mInputs;
+    std::vector<InputInfoType> mInputs;
     // Magic numbers are here on purpose, please allocate memory
-    static constexpr size_t mBufMax = 32;
-    char mCharDataBuffer[10][mBufMax];
+    static constexpr size_t mNameLenMax = 32;
+    char mInputName[10][mNameLenMax];
 
 private:
     static constexpr int mTotalInput = 3;

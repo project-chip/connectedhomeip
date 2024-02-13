@@ -32,12 +32,18 @@ public:
     CHIP_ERROR HandleGetOutputList(chip::app::AttributeValueEncoder & aEncoder) override;
     bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) override;
     bool HandleSelectOutput(const uint8_t & index) override;
-    char * Data(uint8_t index) { return mCharDataBuffer[index]; }
+    CHIP_ERROR GetOutputName(uint8_t index, chip::CharSpan & name) {
+        if (index < mOutputs.size()) {
+            name = chip::CharSpan::fromCharString(mOutputName[index]);
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
 protected:
     uint8_t mCurrentOutput = 1;
     std::vector<OutputInfoType> mOutputs;
     // Magic numbers are here on purpose, please allocate memory
-    static constexpr size_t mBufMax = 32;
-    char mCharDataBuffer[10][mBufMax];
+    static constexpr size_t mNameLenMax = 32;
+    char mOutputName[10][mNameLenMax];
 };
