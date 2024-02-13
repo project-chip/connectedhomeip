@@ -204,7 +204,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
     }
     else
     {
-        Platform::LogV(moduleName, category, msg, args);
+        chip::Logging::Platform::LogV(moduleName, category, msg, args);
     }
 }
 
