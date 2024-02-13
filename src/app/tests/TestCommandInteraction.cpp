@@ -1351,7 +1351,7 @@ void TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchCom
 
     // The specific values chosen here are arbitrary. This test primarily verifies that we can
     // use a larger command reference value followed by a smaller one for subsequent command.
-    uint16_t firstCommandRef = 40;
+    uint16_t firstCommandRef  = 40;
     uint16_t secondCommandRef = 2;
     prepareCommandParams.SetStartDataStruct(true).SetCommandRef(firstCommandRef);
     finishCommandParams.SetEndDataStruct(true).SetCommandRef(firstCommandRef);
