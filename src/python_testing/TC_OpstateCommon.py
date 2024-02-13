@@ -17,10 +17,13 @@
 
 import logging
 import time
+import queue
 
 import chip.clusters as Clusters
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError
+from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
 from dataclasses import dataclass
 from matter_testing_support import TestStep, EventChangeCallback
@@ -42,6 +45,43 @@ def get_pid(name):
 class TestInfo:
     pics_code: str
     cluster: Clusters
+
+
+class EventSpecificChangeCallback:
+    def __init__(self, expected_event: ClusterObjects.ClusterEvent):
+        """This class creates a queue to store received event callbacks, that can be checked by the test script
+           expected_event: is the expected event
+        """
+        self._q = queue.Queue()
+        self._expected_cluster_id = expected_event.cluster_id
+        self._expected_event = expected_event
+
+    async def start(self, dev_ctrl, node_id: int, endpoint: int):
+        """This starts a subscription for events on the specified node_id and endpoint. The event is specified when the class instance is created."""
+        self._subscription = await dev_ctrl.ReadEvent(node_id,
+                                                      events=[(endpoint, self._expected_event, True)], reportInterval=(1, 5),
+                                                      fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
+        self._subscription.SetEventUpdateCallback(self.__call__)
+
+    def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an event is received.
+           It checks the if the event is the expected one and then posts it into the queue for later processing."""
+        if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster_id and res.Header.EventId == self._expected_event.event_id:
+            logging.info(
+                f'Got subscription report for event {self._expected_event.event_id} on cluster {self._expected_cluster_id}: {res.Data}')
+            self._q.put(res)
+
+    def wait_for_event_report(self, timeout: int = 10):
+        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
+           It returns the event data so that the values can be checked."""
+        try:
+            res = self._q.get(block=True, timeout=timeout)
+        except queue.Empty:
+            asserts.fail("Failed to receive a report for the event {}".format(self._expected_event))
+
+        asserts.assert_equal(res.Header.ClusterId, self._expected_cluster_id, "Expected cluster ID not found in event report")
+        asserts.assert_equal(res.Header.EventId, self._expected_event.event_id, "Expected event ID not found in event report")
+        return res.Data
 
 
 class TC_OPSTATE_BASE():
@@ -605,9 +645,9 @@ class TC_OPSTATE_BASE():
                                                             attribute=attributes.CountdownTime)
 
             if (countdown_time is not NullValue) and (initial_countdown_time is not NullValue):
-                difference = (countdown_time - initial_countdown_time)
-                asserts.assert_greater(difference, wait_time,
-                                       "The countdown time shall have decreased at least %s since start command" % wait_time)
+                difference = abs(countdown_time - initial_countdown_time)
+                asserts.assert_greater_equal(difference, wait_time,
+                                             "The countdown time shall have decreased at least %s since start command" % wait_time)
 
         # STEP 12: TH sends Start command to the DUT
         self.step(12)
@@ -898,3 +938,246 @@ class TC_OPSTATE_BASE():
             self.skip_step(3)
             self.skip_step(4)
 
+    ############################
+    #   TEST CASE 2.5
+    ############################
+    def STEPS_TC_OPSTATE_BASE_2_5(self) -> list[TestStep]:
+        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                 TestStep(2, "Set up a subscription to the OperationCompletion event"),
+                 TestStep(3, "Manually put the DUT into a state wherein it can receive a Start Command"),
+                 TestStep(4, "TH sends Start command to the DUT"),
+                 TestStep(5, "TH reads from the DUT the CountdownTime attribute"),
+                 TestStep(6, "TH reads from the DUT the OperationalState attribute"),
+                 TestStep(7, "TH waits for initial-countdown-time"),
+                 TestStep(8, "TH sends Stop command to the DUT"),
+                 TestStep(9, "TH waits for OperationCompletion event"),
+                 TestStep(10, "TH reads from the DUT the OperationalState attribute"),
+                 TestStep(11, "Restart DUT"),
+                 TestStep(12, "TH waits for {PIXIT.WAITTIME.REBOOT}"),
+                 TestStep(13, "TH sends Start command to the DUT"),
+                 TestStep(14, "TH reads from the DUT the OperationalState attribute"),
+                 TestStep(15, "TH sends Pause command to the DUT"),
+                 TestStep(16, "TH reads from the DUT the OperationalState attribute"),
+                 TestStep(17, "TH waits for half of initial-countdown-time"),
+                 TestStep(18, "TH sends Resume command to the DUT"),
+                 TestStep(19, "TH reads from the DUT the OperationalState attribute"),
+                 TestStep(20, "TH waits for initial-countdown-time"),
+                 TestStep(21, "TH sends Stop command to the DUT"),
+                 TestStep(22, "TH waits for OperationCompletion event")
+                 ]
+        return steps
+
+    async def TEST_TC_OPSTATE_BASE_2_5(self, endpoint=1):
+        cluster = self.test_info.cluster
+        attributes = cluster.Attributes
+        commands = cluster.Commands
+        events = cluster.Events
+
+        self.init_test()
+
+        asserts.assert_true('PIXIT.WAITTIME.REBOOT' in self.matter_test_config.global_test_params,
+                            "PIXIT.WAITTIME.REBOOT must be included on the command line in "
+                            "the --int-arg flag as PIXIT.WAITTIME.REBOOT:<wait time>")
+
+        wait_time_reboot = self.matter_test_config.global_test_params['PIXIT.WAITTIME.REBOOT']
+
+        if wait_time_reboot == 0:
+            asserts.fail("PIXIT.WAITTIME.REBOOT shall be higher than 0.")
+
+        # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
+        self.step(1)
+
+        # STEP 2: Set up a subscription to the OperationCompletion event
+        self.step(2)
+        if self.pics_guard(self.check_pics("%s.S.E01" % self.test_info.pics_code)):
+            # Subscribe to Events and when they are sent push them to a queue for checking later
+            events_callback = EventSpecificChangeCallback(events.OperationCompletion)
+            await events_callback.start(self.default_controller,
+                                        self.dut_node_id,
+                                        endpoint)
+
+        # STEP 3: Manually put the DUT into a state wherein it can receive a Start Command
+        self.step(3)
+        self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"OnFault", "Param": %s}' %
+                                         (self.device, cluster.Enums.ErrorStateEnum.kNoError))
+        if self.is_ci:
+            time.sleep(1)
+            self.send_manual_or_pipe_command('{"Name":"OperationalStateChange", "Device":"%s", "Operation":"Stop"}' % self.device)
+
+        # STEP 4: TH sends Start command to the DUT
+        self.step(4)
+        if self.pics_guard(self.check_pics("%s.S.C02.Rsp" % self.test_info.pics_code) and
+                           self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+            await self.send_cmd_expect_response(endpoint=endpoint,
+                                                cmd=commands.Start(),
+                                                expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+        # STEP 5: TH reads from the DUT the CountdownTime attribute
+        self.step(5)
+        if self.pics_guard(self.check_pics("%s.S.A0002" % self.test_info.pics_code)):
+            initial_countdown_time = await self.read_expect_success(endpoint=endpoint,
+                                                                    attribute=attributes.CountdownTime)
+
+        if initial_countdown_time is not NullValue:
+            # STEP 6: TH reads from the DUT the OperationalState attribute
+            self.step(6)
+            if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
+                await self.read_and_expect_value(endpoint=endpoint,
+                                                 attribute=attributes.OperationalState,
+                                                 expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+
+            # STEP 7: TH waits for initial-countdown-time
+            self.step(7)
+            time.sleep(initial_countdown_time)
+
+            # STEP 8: TH sends Stop command to the DUT
+            self.step(8)
+            if self.pics_guard(self.check_pics("%s.S.C01.Rsp" % self.test_info.pics_code) and
+                               self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+                await self.send_cmd_expect_response(endpoint=endpoint,
+                                                    cmd=commands.Stop(),
+                                                    expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+            # STEP 9: TH waits for OperationCompletion event
+            self.step(9)
+            if self.pics_guard(self.check_pics("%s.S.E01" % self.test_info.pics_code)):
+                event_data = events_callback.wait_for_event_report()
+
+                asserts.assert_equal(event_data.completionErrorCode, cluster.Enums.ErrorStateEnum.kNoError,
+                                     "Completion event error code different than expected. Expected %s, received %s" %
+                                     (cluster.Enums.ErrorStateEnum.kNoError, event_data.completionErrorCode))
+
+                if event_data.totalOperationalTime is not NullValue:
+                    # Checks if the total operation time is close to initial_countdown_time
+                    # 'close' is being determined by having a difference lower / equal 2
+                    difference = abs(event_data.totalOperationalTime - initial_countdown_time)
+                    asserts.assert_less_equal(difference, 2,
+                                              "Total operation time (%s) shall be close to the initial coutdown time (%s)" %
+                                              (event_data.totalOperationalTime, initial_countdown_time))
+
+                asserts.assert_equal(event_data.pausedTime, 0,
+                                     "Completion event paused time expected to be zero, received %s" %
+                                     event_data.pausedTime)
+
+            # STEP 10: TH reads from the DUT the OperationalState attribute
+            self.step(10)
+            if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
+                await self.read_and_expect_value(endpoint=endpoint,
+                                                 attribute=attributes.OperationalState,
+                                                 expected_value=cluster.Enums.OperationalStateEnum.kStopped)
+
+            # STEP 11: Restart DUT
+            self.step(11)
+            # In CI environment, the STOP coommand (step 8) already resets the variables. Only ask for
+            # reboot outside CI environment.
+            if not self.is_ci:
+                input("Press Enter when done.\n")
+
+            # STEP 12: TH waits for {PIXIT.WAITTIME.REBOOT}
+            self.step(12)
+            time.sleep(wait_time_reboot)
+
+            # STEP 13: TH sends Start command to the DUT
+            self.step(13)
+            if self.pics_guard(self.check_pics("%s.S.C02.Rsp" % self.test_info.pics_code) and
+                               self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+                await self.send_cmd_expect_response(endpoint=endpoint,
+                                                    cmd=commands.Start(),
+                                                    expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+            # STEP 14: TH reads from the DUT the OperationalState attribute
+            self.step(14)
+            if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
+                await self.read_and_expect_value(endpoint=endpoint,
+                                                 attribute=attributes.OperationalState,
+                                                 expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+
+            # STEP 15: TH sends Pause command to the DUT
+            self.step(15)
+            if self.pics_guard(self.check_pics("%s.S.C00.Rsp" % self.test_info.pics_code) and
+                               self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+                await self.send_cmd_expect_response(endpoint=endpoint,
+                                                    cmd=commands.Pause(),
+                                                    expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+            # STEP 16: TH reads from the DUT the OperationalState attribute
+            self.step(16)
+            if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
+                await self.read_and_expect_value(endpoint=endpoint,
+                                                 attribute=attributes.OperationalState,
+                                                 expected_value=cluster.Enums.OperationalStateEnum.kPaused)
+
+            # STEP 17: TH waits for half of initial-countdown-time
+            self.step(17)
+            time.sleep((initial_countdown_time / 2))
+
+            # STEP 18: TH sends Resume command to the DUT
+            self.step(18)
+            if self.pics_guard(self.check_pics("%s.S.C03.Rsp" % self.test_info.pics_code) and
+                               self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+                await self.send_cmd_expect_response(endpoint=endpoint,
+                                                    cmd=commands.Resume(),
+                                                    expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+            # STEP 19: TH reads from the DUT the OperationalState attribute
+            self.step(19)
+            if self.pics_guard(self.check_pics("%s.S.A0004" % self.test_info.pics_code)):
+                await self.read_and_expect_value(endpoint=endpoint,
+                                                 attribute=attributes.OperationalState,
+                                                 expected_value=cluster.Enums.OperationalStateEnum.kRunning)
+
+            # STEP 20: TH waits for initial-countdown-time
+            self.step(20)
+            time.sleep(initial_countdown_time)
+
+            # STEP 21: TH sends Stop command to the DUT
+            self.step(21)
+            if self.pics_guard(self.check_pics("%s.S.C01.Rsp" % self.test_info.pics_code) and
+                               self.check_pics("%s.S.C04.Tx" % self.test_info.pics_code)):
+                await self.send_cmd_expect_response(endpoint=endpoint,
+                                                    cmd=commands.Stop(),
+                                                    expected_response=cluster.Enums.ErrorStateEnum.kNoError)
+
+            # STEP 22: TH waits for OperationCompletion event
+            self.step(22)
+            if self.pics_guard(self.check_pics("%s.S.E01" % self.test_info.pics_code)):
+                event_data = events_callback.wait_for_event_report()
+
+                asserts.assert_equal(event_data.completionErrorCode, cluster.Enums.ErrorStateEnum.kNoError,
+                                     "Completion event error code different than expected. Expected %s, received %s" %
+                                     (cluster.Enums.ErrorStateEnum.kNoError, event_data.completionErrorCode))
+
+                if event_data.totalOperationalTime is not NullValue:
+                    # Checks if the total operation time is close to 1.5 * initial_countdown_time
+                    # 'close' is being determined by having a difference lower / equal 2
+                    expected_value = (1.5 * initial_countdown_time)
+                    difference = abs(event_data.totalOperationalTime - expected_value)
+                    asserts.assert_less_equal(difference, 2,
+                                              "Total operation time (%s) shall be close to 1.5 times the initial coutdown time (%s)" %
+                                              (event_data.totalOperationalTime, initial_countdown_time))
+
+                # Checks if the paused operation time is close to 0.5 * initial_countdown_time
+                # 'close' is being determined by having a difference lower / equal 2
+                expected_value = (0.5 * initial_countdown_time)
+                difference = abs(event_data.pausedTime - expected_value)
+                asserts.assert_less_equal(difference, 2,
+                                          "Paused time (%s) shall be close to half of the initial coutdown time (%s)" %
+                                          (event_data.pausedTime, expected_value))
+        else:
+            self.skip_step(6)
+            self.skip_step(7)
+            self.skip_step(8)
+            self.skip_step(9)
+            self.skip_step(10)
+            self.skip_step(11)
+            self.skip_step(12)
+            self.skip_step(13)
+            self.skip_step(14)
+            self.skip_step(15)
+            self.skip_step(16)
+            self.skip_step(17)
+            self.skip_step(18)
+            self.skip_step(19)
+            self.skip_step(20)
+            self.skip_step(21)
+            self.skip_step(22)
