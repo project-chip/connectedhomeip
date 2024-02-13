@@ -50,7 +50,7 @@ void TestPendingResponseTracker_FillSingleEntryInTracker(nlTestSuite * inSuite, 
 {
     chip::app::PendingResponseTrackerImpl pendingResponseTracker;
 
-    // No real reason to choose 40 here. I just choose this value since we need a value to test.
+    // The value 40 is arbitrary; any value would work for this purpose.
     uint16_t commandRefToSet = 40;
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.AddPendingResponse(commandRefToSet));
 
@@ -65,7 +65,7 @@ void TestPendingResponseTracker_RemoveNonExistentEntryInTrackerFails(nlTestSuite
 {
     chip::app::PendingResponseTrackerImpl pendingResponseTracker;
 
-    // No real reason to choose 40 here. I just choose this value since we need a value to test.
+    // The value 40 is arbitrary; any value would work for this purpose.
     uint16_t commandRef = 40;
     NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));
     NL_TEST_ASSERT(inSuite, CHIP_ERROR_KEY_NOT_FOUND == pendingResponseTracker.ResponseReceived(commandRef));
@@ -75,7 +75,7 @@ void TestPendingResponseTracker_AddingSecondEntryFails(nlTestSuite * inSuite, vo
 {
     chip::app::PendingResponseTrackerImpl pendingResponseTracker;
 
-    // No real reason to choose 40 here. I just choose this value since we need a value to test.
+    // The value 40 is arbitrary; any value would work for this purpose.
     uint16_t commandRef = 40;
     NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.AddPendingResponse(commandRef));
@@ -87,8 +87,8 @@ void TestPendingResponseTracker_PopFindsAllPendingRequests(nlTestSuite * inSuite
 {
     chip::app::PendingResponseTrackerImpl pendingResponseTracker;
 
-    // No real reason why values in requestsToAdd are choosen. We just need values to use to test.
-    std::vector<uint16_t> requestsToAdd = { 0, 2, 50, 2000 };
+    // The specific values in requestsToAdd are not significant; they are chosen arbitrarily for testing purposes. 
+    std::vector<uint16_t> requestsToAdd = { 0, 50, 2, 2000 };
     for (const uint16_t & commandRef : requestsToAdd)
     {
         NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));

@@ -1349,8 +1349,12 @@ void TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchCom
     err = commandSender.SetCommandSenderConfig(config);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    prepareCommandParams.SetStartDataStruct(true).SetCommandRef(40);
-    finishCommandParams.SetEndDataStruct(true).SetCommandRef(40);
+    // The specific values chosen here are arbitrary. This test primarily verifies that we can
+    // use a larger command reference value followed by a smaller one for subsequent command.
+    uint16_t firstCommandRef = 40;
+    uint16_t secondCommandRef = 2;
+    prepareCommandParams.SetStartDataStruct(true).SetCommandRef(firstCommandRef);
+    finishCommandParams.SetEndDataStruct(true).SetCommandRef(firstCommandRef);
     auto commandPathParams = MakeTestCommandPath();
     err                    = commandSender.PrepareCommand(commandPathParams, prepareCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1360,8 +1364,8 @@ void TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchCom
     err = commandSender.FinishCommand(finishCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Preparing second command.
-    prepareCommandParams.SetCommandRef(2);
-    finishCommandParams.SetCommandRef(2);
+    prepareCommandParams.SetCommandRef(secondCommandRef);
+    finishCommandParams.SetCommandRef(secondCommandRef);
     err = commandSender.PrepareCommand(commandPathParams, prepareCommandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     writer = commandSender.GetCommandDataIBTLVWriter();

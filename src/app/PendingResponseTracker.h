@@ -38,7 +38,8 @@ public:
     /**
      * @brief Adds a pending response to the tracker. Tracked using CommandReference.
      *
-     * @param [in] aCommandRef The CommandReference associated with the response for which we are waiting.
+     * @param [in] aCommandRef The CommandReference associated with the response for which we are
+     *             waiting.
      * @return CHIP_NO_ERROR on success.
      * @return CHIP_ERROR_INVALID_ARGUMENT if aCommandRef is already being tracked.
      */
@@ -51,8 +52,8 @@ public:
      *
      * @param [in] aCommandRef The CommandReference of the response that is no longer pending.
      * @return CHIP_NO_ERROR on success.
-     * @return CHIP_ERROR_KEY_NOT_FOUND if aCommandRef is not found in the tracker. This indicates the tracker was not waiting for a
-     * response associated with this CommandReference.
+     * @return CHIP_ERROR_KEY_NOT_FOUND if aCommandRef is not found in the tracker. This indicates the
+     *             tracker was not waiting for a response associated with this CommandReference.
      */
     virtual CHIP_ERROR ResponseReceived(uint16_t aCommandRef) = 0;
 
@@ -74,11 +75,12 @@ public:
      * @brief Pops a CommandReference associated with a pending response.
      *
      * Used after the server indicates that it has finished sending responses to the client.
-     * Enables the client to report an error to upper layers if a response for the associated command was not received.
+     * Enables the client to report an error to upper layers if a response for the associated
+     * command was not received.
      *
-     * @return NullOptional if no more pending commands exist.
-     * @return Optional containing the CommandReference of a request that was not previously
-     *         removed from the tracker. This request is removed from the tracker.
+     * @return NullOptional if no more pending response exist.
+     * @return Optional containing the CommandReference of a pending response. This method
+     *         remove pending response returned from the tracker.
      */
     virtual Optional<uint16_t> PopPendingResponse() = 0;
 };
