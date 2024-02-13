@@ -22,7 +22,6 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -229,7 +228,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::SetCookingParameters::DecodableType & req)
 {
     ChipLogDetail(Zcl, "Microwave Oven Control: HandleSetCookingParameters");
-    Status status;
+    Status status = Status::Success;
     uint8_t opState;
     uint8_t modeValue;
     uint8_t reqCookMode;

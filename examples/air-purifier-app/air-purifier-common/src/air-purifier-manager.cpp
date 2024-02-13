@@ -17,7 +17,6 @@
  */
 
 #include <air-purifier-manager.h>
-#include <app/util/error-mapping.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -147,7 +146,7 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
         }
     }
 
-    return ToInteractionModelStatus(FanControl::Attributes::SpeedSetting::Set(mEndpointId, newSpeedSetting));
+    return FanControl::Attributes::SpeedSetting::Set(mEndpointId, newSpeedSetting);
 }
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)

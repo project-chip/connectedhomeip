@@ -23,7 +23,6 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
 #include <lib/support/BitFlags.h>
 
 using namespace chip;
@@ -355,7 +354,7 @@ static Status ResetHandler(const app::ConcreteCommandPath & commandPath, const B
     if (!DishwasherAlarmServer::Instance().HasResetFeature(endpoint))
     {
         ChipLogProgress(Zcl, "Dishwasher Alarm feature: Unsupport Reset Command");
-        return app::ToInteractionModelStatus(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        return EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND;
     }
 
     // A server that is unable to reset alarms SHALL respond with a status code of FAILURE
