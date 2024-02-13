@@ -107,7 +107,7 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
 // ****************************************
 void emberAfInit()
 {
-    emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
+    emberAfInitializeAttributes(kInvalidEndpointId);
 
     MATTER_PLUGINS_INIT
 
@@ -230,8 +230,7 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
             length = static_cast<decltype(length)>(size);
         }
         memmove(dest + 2, src + 2, length);
-        dest[0] = EMBER_LOW_BYTE(length);
-        dest[1] = EMBER_HIGH_BYTE(length);
+        Encoding::LittleEndian::Put16(dest, length);
     }
 }
 
