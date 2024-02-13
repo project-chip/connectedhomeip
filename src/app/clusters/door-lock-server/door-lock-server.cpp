@@ -2133,12 +2133,11 @@ DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId,
                    userStatus, userType, Nullable<CredentialRuleEnum>(), Nullable<CredentialStruct>(credential));
     if (!status.IsSuccess())
     {
-        uint8_t debugStatus = status.mClusterStatus.HasValue() ? status.mClusterStatus.Value() : (to_underlying(status.mStatus));
-
         ChipLogProgress(Zcl,
                         "[SetCredential] Unable to create new user for credential: internal error "
                         "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
-                        endpointId, credential.credentialIndex, availableUserIndex, debugStatus);
+                        endpointId, credential.credentialIndex, availableUserIndex,
+                        status.mClusterStatus.HasValue() ? status.mClusterStatus.Value() : (to_underlying(status.mStatus)));
         return DlStatus::kFailure;
     }
 

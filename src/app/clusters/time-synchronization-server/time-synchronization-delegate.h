@@ -44,7 +44,7 @@ public:
     inline bool HasFeature(Feature feature)
     {
         uint32_t map;
-        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == Protocol::InteractionModel::Status::Success);
+        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == Protocols::InteractionModel::Status::Success);
         return success ? (map & to_underlying(feature)) : false;
     }
 
