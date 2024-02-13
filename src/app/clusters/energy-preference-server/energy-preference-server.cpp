@@ -25,7 +25,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/AttributeAccessInterface.h> // added in case we ever don't need app/util/attribute-storage.h at some point.
-#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
