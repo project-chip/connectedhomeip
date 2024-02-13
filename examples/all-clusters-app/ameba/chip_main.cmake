@@ -181,6 +181,7 @@ list(
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp
 
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
