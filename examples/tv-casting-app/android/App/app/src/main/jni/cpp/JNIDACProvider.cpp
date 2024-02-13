@@ -34,9 +34,8 @@ JNIDACProvider::JNIDACProvider(jobject provider)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for JNIDACProvider"));
 
-    mJNIDACProviderObject = env->NewGlobalRef(provider);
-    VerifyOrReturn(mJNIDACProviderObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef JNIDACProvider"));
-
+    VerifyOrReturn(mJNIDACProviderObject.Init(provider) == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Failed to Init mJNIDACProviderObject"));
     jclass JNIDACProviderClass = env->GetObjectClass(provider);
     VerifyOrReturn(JNIDACProviderClass != nullptr, ChipLogError(Zcl, "Failed to get JNIDACProvider Java class"));
 
@@ -80,11 +79,11 @@ JNIDACProvider::JNIDACProvider(jobject provider)
 CHIP_ERROR JNIDACProvider::GetJavaByteByMethod(jmethodID method, MutableByteSpan & out_buffer)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturnLogError(mJNIDACProviderObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mJNIDACProviderObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(method != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
-    jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIDACProviderObject, method);
+    jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIDACProviderObject.ObjectRef(), method);
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Java exception in get Method");
@@ -106,14 +105,14 @@ CHIP_ERROR JNIDACProvider::GetJavaByteByMethod(jmethodID method, MutableByteSpan
 CHIP_ERROR JNIDACProvider::GetJavaByteByMethod(jmethodID method, const ByteSpan & in_buffer, MutableByteSpan & out_buffer)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturnLogError(mJNIDACProviderObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mJNIDACProviderObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(method != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
     jbyteArray in_buffer_jbyteArray = env->NewByteArray((jsize) (in_buffer.size()));
     env->SetByteArrayRegion(in_buffer_jbyteArray, 0, (int) in_buffer.size(), reinterpret_cast<const jbyte *>(in_buffer.data()));
 
-    jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIDACProviderObject, method, in_buffer_jbyteArray);
+    jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIDACProviderObject.ObjectRef(), method, in_buffer_jbyteArray);
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Java exception in get Method");

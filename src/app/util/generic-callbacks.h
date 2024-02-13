@@ -82,9 +82,9 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED. Any other return value indicates the
  * application was not able to read the attribute.
  */
-EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                               const EmberAfAttributeMetadata * attributeMetadata,
+                                                                               uint8_t * buffer, uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -126,15 +126,17 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
  * other return value indicates the application was not able to write the
  * attribute.
  */
-EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint,
+                                                                                chip::ClusterId clusterId,
+                                                                                const EmberAfAttributeMetadata * attributeMetadata,
+                                                                                uint8_t * buffer);
 
 /** @brief Pre Attribute Change
  *
  * This function is called by the application framework before it changes an
  * attribute value.  The value passed into this callback is the value to which
  * the attribute is to be set by the framework.  The application should return
- * chip::Protocols::InteractionModel::Status::Success to permit the change or
+ * Protocols::InteractionModel::Status::Success to permit the change or
  * any other code to reject it.
  */
 chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,

@@ -61,34 +61,34 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
 
     status = DoorLock::Attributes::LockType::Set(endpoint, DlLockType::kDeadBolt);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(Zcl, "Failed to set LockType %x", status);
     }
 
     status = DoorLock::Attributes::NumberOfTotalUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(Zcl, "Failed to set number of users %x", status);
     }
 
     status = DoorLock::Attributes::NumberOfPINUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(Zcl, "Failed to set number of PIN users %x", status);
     }
 
     status = DoorLock::Attributes::NumberOfRFIDUsersSupported::Set(endpoint, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(Zcl, "Failed to set number of RFID users %x", status);
     }
 
     status = DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(Zcl, "Failed to set number of credentials per user %x", status);
     }
@@ -97,7 +97,7 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     // at the same time.
     // Set FeatureMap to (kUser|kPinCredential)
     status = DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(Zcl, "Failed to set number of credentials per user %x", status);
     }

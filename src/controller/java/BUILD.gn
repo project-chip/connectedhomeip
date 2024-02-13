@@ -60,8 +60,10 @@ shared_library("jni") {
     "BaseCHIPCluster-JNI.cpp",
     "CHIPAttributeTLVValueDecoder.h",
     "CHIPDeviceController-JNI.cpp",
+    "CHIPEventTLVValueDecoder.h",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
+    "GroupDeviceProxy.h",
   ]
 
   deps = [
@@ -480,6 +482,7 @@ android_library("java") {
     "src/chip/devicecontroller/model/EventState.java",
     "src/chip/devicecontroller/model/InvokeElement.java",
     "src/chip/devicecontroller/model/NodeState.java",
+    "src/chip/devicecontroller/model/Status.java",
   ]
 
   if (matter_enable_tlv_decoder_api) {

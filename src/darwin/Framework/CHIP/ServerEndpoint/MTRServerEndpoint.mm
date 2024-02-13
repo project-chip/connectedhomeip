@@ -317,6 +317,9 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     _deviceController = controller;
 
+    MTR_LOG_DEFAULT("Associated %@, cluster count %llu, with controller",
+        self, static_cast<unsigned long long>(clusterCount));
+
     return YES;
 }
 
@@ -347,7 +350,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
         &_matterEndpointMetadata,
         Span<DataVersion>(_matterDataVersions.get(), _matterEndpointMetadata.clusterCount),
         Span<EmberAfDeviceType>(_matterDeviceTypes.get(), _deviceTypes.count));
-    if (status != EMBER_ZCL_STATUS_SUCCESS) {
+    if (status != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Unexpected failure to define our Matter endpoint");
     }
 
@@ -413,6 +416,11 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 - (NSArray<MTRServerCluster *> *)serverClusters
 {
     return [_serverClusters copy];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRServerEndpoint id %u>", static_cast<EndpointId>(_endpointID.unsignedLongLongValue)];
 }
 
 @end

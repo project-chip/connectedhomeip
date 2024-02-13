@@ -27,7 +27,6 @@
 
 #include <app/util/af.h>
 #include <app/util/common.h>
-#include <app/util/error-mapping.h>
 #include <array>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -201,8 +200,7 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const C
     auto & identifyTime = commandData.identifyTime;
 
     // cmd Identify
-    commandObj->AddStatus(commandPath,
-                          ToInteractionModelStatus(Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime)));
+    commandObj->AddStatus(commandPath, Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime));
     return true;
 }
 

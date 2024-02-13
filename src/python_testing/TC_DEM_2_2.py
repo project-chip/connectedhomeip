@@ -93,7 +93,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMBaseTestHelper):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
 
         self.step("3b")
-        await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutState.kNoOptOut)
+        await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
 
         self.step("4")
         power_adjustment = await self.self.read_dem_attribute_expect_success(attribute="PowerAdjustmentCapability")

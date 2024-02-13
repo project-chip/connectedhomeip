@@ -34,6 +34,7 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <controller/CHIPCluster.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
@@ -41,7 +42,6 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <zap-generated/CHIPClusters.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,10 +58,9 @@ void TvAppJNI::InitializeWithObjects(jobject app)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for TvAppJNI"));
 
-    mTvAppObject = env->NewGlobalRef(app);
-    VerifyOrReturn(mTvAppObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef TvAppJNI"));
+    VerifyOrReturn(mTvAppObject.Init(app) == CHIP_NO_ERROR, ChipLogError(Zcl, "Failed to init mTvAppObject"));
 
-    jclass managerClass = env->GetObjectClass(mTvAppObject);
+    jclass managerClass = env->GetObjectClass(app);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get TvAppJNI Java class"));
 
     mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(JI)V");
@@ -76,10 +75,11 @@ void TvAppJNI::PostClusterInit(int clusterId, int endpoint)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for TvAppJNI::PostClusterInit"));
-    VerifyOrReturn(mTvAppObject != nullptr, ChipLogError(Zcl, "TvAppJNI::mTvAppObject null"));
+    VerifyOrReturn(mTvAppObject.HasValidObjectRef(), ChipLogError(Zcl, "TvAppJNI::mTvAppObject is not valid"));
     VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(Zcl, "TvAppJNI::mPostClusterInitMethod null"));
 
-    env->CallVoidMethod(mTvAppObject, mPostClusterInitMethod, static_cast<jlong>(clusterId), static_cast<jint>(endpoint));
+    env->CallVoidMethod(mTvAppObject.ObjectRef(), mPostClusterInitMethod, static_cast<jlong>(clusterId),
+                        static_cast<jint>(endpoint));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call TvAppJNI 'postClusterInit' method");
@@ -216,7 +216,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
                                 const SessionHandle & sessionHandle) override
     {
         // read current binding list
-        chip::Controller::BindingCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+        chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
         cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
 
