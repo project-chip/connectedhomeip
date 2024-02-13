@@ -18,6 +18,7 @@
 
 #include <AppMain.h>
 #include <DeviceEnergyManagementManager.h>
+#include <DeviceEnergyManagementManufacturerImpl.h>
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementManager.h>
@@ -43,6 +44,12 @@ static std::unique_ptr<EnergyEvseManager> gEvseInstance;
 static std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
 static std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
 static std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
+static std::unique_ptr<DeviceEnergyManagementManufacturer> gDeviceEnergyManagementManufacturer;
+
+DeviceEnergyManagementManufacturer * DeviceEnergyManagement::GetDeviceEnergyManagementManufacturer()
+{
+    return gDeviceEnergyManagementManufacturer.get();
+}
 
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
 {
