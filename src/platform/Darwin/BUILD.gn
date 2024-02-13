@@ -133,32 +133,30 @@ static_library("Darwin") {
 }
 
 static_library("logging") {
+  sources = [
+    "Logging.h",
+    "Logging.mm",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:logging_constants",
+    "${chip_root}/src/lib/support:span",
+  ]
+
   if (chip_force_stdio_logging) {
-    sources = [ "LoggingStdio.cpp" ]
-    deps = [
+    sources += [ "LoggingStdio.cpp" ]
+    deps += [
       "${chip_root}/src/lib/core:chip_config_header",
-      "${chip_root}/src/lib/support:attributes",
-      "${chip_root}/src/lib/support:logging_constants",
       "${chip_root}/src/platform:platform_config_header",
       "${chip_root}/src/platform:platform_logging_header",
     ]
-  } else {
-    sources = [
-      "Logging.h",
-      "Logging.mm",
-    ]
-
-    deps = [
-      "${chip_root}/src/lib/support:attributes",
-      "${chip_root}/src/lib/support:logging_constants",
-      "${chip_root}/src/lib/support:span",
-    ]
-
-    configs += [ "${chip_root}/src:includes" ]
-    cflags = [
-      "-fobjc-arc",
-      "-Wconversion",
-    ]
-    frameworks = [ "Foundation.framework" ]
   }
+
+  configs += [ "${chip_root}/src:includes" ]
+  cflags = [
+    "-fobjc-arc",
+    "-Wconversion",
+  ]
+  frameworks = [ "Foundation.framework" ]
 }
