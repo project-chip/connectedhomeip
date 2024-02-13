@@ -94,8 +94,8 @@ public:
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetWriterReserved(uint32_t aReservedSize) { mReservedSize = aReservedSize; }
-
     void SetMaxAttributesPerChunk(uint32_t aMaxAttributesPerChunk) { mMaxAttributesPerChunk = aMaxAttributesPerChunk; }
+    bool IsRunScheduled() const { return mRunScheduled; }
 #endif
 
     /// Performs cleanup when the confirmation of a report is received.
