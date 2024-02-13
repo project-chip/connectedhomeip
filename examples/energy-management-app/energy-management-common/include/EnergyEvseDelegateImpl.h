@@ -143,18 +143,18 @@ public:
     /**
      * @brief    Called when EVSE cluster receives the SetTargets command
      */
-    Status
-    SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
+    Status SetTargets(
+        const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules) override;
 
     /**
      * @brief    Called when EVSE cluster receives GetTargets command
      */
-    Status GetTargets(Commands::GetTargetsResponse::Type & response);
+    Status GetTargets(Commands::GetTargetsResponse::Type & response) override;
 
     /**
      * @brief    Called when EVSE cluster receives ClearTargets command
      */
-    Status ClearTargets();
+    Status ClearTargets() override;
 
     /* Helper functions for managing targets*/
     Status
