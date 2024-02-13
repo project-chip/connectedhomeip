@@ -106,16 +106,28 @@ private:
     {
         kExpectingTimedAction,     // Initial state: expecting a timed action.
         kReceivedTimedAction,      // Have received the timed action.  This can
-                                   // be a terminal state if the action ends up
-                                   // malformed.
+        // be a terminal state if the action ends up
+        // malformed.
         kExpectingFollowingAction, // Expecting write or invoke.
     };
 
-    TimedHandlerDelegate * mDelegate;
     State mState = State::kExpectingTimedAction;
+    TimedHandlerDelegate * mDelegate;
+
     // We keep track of the time limit for message reception, in case our
     // exchange's "response expected" timer gets delayed and does not fire when
     // the time runs out.
+    //
+    // NOTE: mTimeLimit needs to be 8-byte aligned on ARM so we place this last,
+    //       to allow previous values to potentially use remaining packing space.
+    //       Rationale:
+    //         -   vtable is 4-byte aligned on 32-bit arm
+    //         -   mTimeLimit requires 8-byte aligment
+    //         =>  As a result we may gain 4 bytes if we place mTimeLimit last.
+    // Expectation of memory layout:
+    //   - vtable pointer (4 bytes & 4 byte alignment)
+    //   - other members
+    //   - mTimeLimit (8 bytes & 8 byte alignment)
     System::Clock::Timestamp mTimeLimit;
 };
 
