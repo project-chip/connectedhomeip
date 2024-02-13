@@ -28129,7 +28129,7 @@ public:
     Optional<chip::CharSpan> name;
     Optional<chip::ByteSpan> presetHandle;
     DataModel::List<const Structs::ScheduleTransitionStruct::Type> transitions;
-    Optional<DataModel::Nullable<bool>> builtIn;
+    DataModel::Nullable<bool> builtIn;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -28144,7 +28144,7 @@ public:
     Optional<chip::CharSpan> name;
     Optional<chip::ByteSpan> presetHandle;
     DataModel::DecodableList<Structs::ScheduleTransitionStruct::DecodableType> transitions;
-    Optional<DataModel::Nullable<bool>> builtIn;
+    DataModel::Nullable<bool> builtIn;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

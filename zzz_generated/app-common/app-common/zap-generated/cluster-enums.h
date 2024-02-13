@@ -3684,8 +3684,7 @@ enum class Feature : uint32_t
     kLocalTemperatureNotExposed  = 0x40,
     kMatterScheduleConfiguration = 0x80,
     kPresets                     = 0x100,
-    kSetpoints                   = 0x200,
-    kQueuedPresetsSupported      = 0x400,
+    kQueuedPresetsSupported      = 0x200,
 };
 
 // Bitmap for HVACSystemTypeBitmap

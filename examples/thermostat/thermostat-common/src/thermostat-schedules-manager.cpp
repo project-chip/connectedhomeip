@@ -57,7 +57,7 @@ static ScheduleStruct::Type BuiltInSchedules[] = {
         .name           = Optional<chip::CharSpan>(chip::CharSpan(kBuildInScheduleOneName, strlen(kBuildInScheduleOneName))),
         .presetHandle = Optional<chip::ByteSpan>(chip::ByteSpan(Uint8::from_const_char(kBuiltInPOneHandle),  strlen(kBuiltInPOneHandle))),
         .transitions = DataModel::List<const Structs::ScheduleTransitionStruct::Type>(),
-        .builtIn = Optional<DataModel::Nullable<bool>>(DataModel::Nullable<bool>(true))
+        .builtIn = DataModel::Nullable<bool>(true)
     },
 };
 

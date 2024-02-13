@@ -31,6 +31,8 @@
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
+#include <platform/CHIPDeviceLayer.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -761,86 +763,6 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     }
 }
 
-bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                         const app::ConcreteCommandPath & commandPath,
-                                                         const Commands::ClearWeeklySchedule::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GetWeeklySchedule::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::SetWeeklySchedule::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterSetActivePresetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterStartPresetsSchedulesEditRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterCancelSetActivePresetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
 int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint)
 {
     // Optional Mfg supplied limits
@@ -1252,7 +1174,7 @@ static bool StartEditRequest(chip::app::CommandHandler * commandObj, const chip:
 
     if (currentlyEditing && manager->mSession.Contains(commandObj->GetExchangeContext()->GetSessionHandle()))
     {
-        (void) chip::DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Seconds16(timeoutSeconds), onThermostatEditorTick, manager);
+        DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Seconds16(timeoutSeconds), onThermostatEditorTick, manager);
     }
     else
     {
@@ -1263,7 +1185,7 @@ static bool StartEditRequest(chip::app::CommandHandler * commandObj, const chip:
 
         manager->mSession = commandObj->GetExchangeContext()->GetSessionHandle();
         manager->mOnEditStartCb(manager);
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(timeoutSeconds), onThermostatEditorTick, manager);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(timeoutSeconds), onThermostatEditorTick, manager);
     }
 
 exit:

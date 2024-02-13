@@ -12007,14 +12007,10 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
                     }
                     newElement_0.transitions = array_2;
                 }
-                if (entry_0.builtIn.HasValue()) {
-                    if (entry_0.builtIn.Value().IsNull()) {
-                        newElement_0.builtIn = nil;
-                    } else {
-                        newElement_0.builtIn = [NSNumber numberWithBool:entry_0.builtIn.Value().Value()];
-                    }
-                } else {
+                if (entry_0.builtIn.IsNull()) {
                     newElement_0.builtIn = nil;
+                } else {
+                    newElement_0.builtIn = [NSNumber numberWithBool:entry_0.builtIn.Value()];
                 }
                 [array_0 addObject:newElement_0];
             }

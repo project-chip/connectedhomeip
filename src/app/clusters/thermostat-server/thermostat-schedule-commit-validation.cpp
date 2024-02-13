@@ -163,10 +163,10 @@ static EmberAfStatus CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, S
                 // make sure the preset exists (check 7)
                 {
                     size_t preset_index = 0;
-                    PresetStruct::Type preset;
                     bool presetFound = false;
-                    while (presetList[index] != CHIP_ERROR_NOT_FOUND)
+                    while (preset_index < presetList.size())
                     {
+                        auto &preset = presetList[preset_index];
                         VerifyOrDie(preset.presetHandle.IsNull() == false);
                         if (preset.presetHandle.Value().data_equal(schedule.presetHandle.Value()))
                         {
@@ -261,17 +261,17 @@ EmberAfStatus ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Sp
         VerifyOrDie(old_schedule.scheduleHandle.IsNull() == false);
 
         // Check 1. -- for each existing built in schedule, make sure it's still in the new list
-        if ((old_schedule.builtIn.HasValue() == true) && (old_schedule.builtIn.Value() == true))
+        if ((old_schedule.builtIn.IsNull() == false) && (old_schedule.builtIn.Value() == true))
         {
             status = FindScheduleByHandle(old_schedule.scheduleHandle.Value(), newlist, querySchedule);
             VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-            VerifyOrExit(querySchedule.builtIn.HasValue() == false, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(querySchedule.builtIn.IsNull() == false, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
             VerifyOrExit(querySchedule.builtIn.Value() == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
         }
 
         // Check 2 -- If the schedule is currently being referenced but would be deleted.
         // if its a builtin schedule we don't need to search again, we know it's there from the above check.
-        if ((old_schedule.builtIn.HasValue() == false || old_schedule.builtIn.Value() == false) && IsScheduleHandleReferenced(*this, old_schedule.scheduleHandle.Value()))
+        if ((old_schedule.builtIn.IsNull() == true || old_schedule.builtIn.Value() == false) && IsScheduleHandleReferenced(*this, old_schedule.scheduleHandle.Value()))
         {
             VerifyOrDie(old_schedule.scheduleHandle.IsNull() == false);
             status = FindScheduleByHandle(old_schedule.scheduleHandle.Value(), newlist, querySchedule);
@@ -296,13 +296,16 @@ EmberAfStatus ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Sp
             SuccessOrExit(status);
 
             // Check BuiltIn
-            VerifyOrExit(new_schedule.builtIn.HasValue() == existingSchedule.builtIn.HasValue(), status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
-            VerifyOrExit(new_schedule.builtIn.Value() == existingSchedule.builtIn.Value(), status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(new_schedule.builtIn.IsNull() == existingSchedule.builtIn.IsNull(), status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            if (new_schedule.builtIn.IsNull() == false)
+            {
+                VerifyOrExit(new_schedule.builtIn.Value() == existingSchedule.builtIn.Value(), status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            }
         }
         else
         {
             // new schedule checks
-            VerifyOrExit((new_schedule.builtIn.HasValue() == false) || (new_schedule.builtIn.Value() == false), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            VerifyOrExit((new_schedule.builtIn.IsNull() == true) || (new_schedule.builtIn.Value() == false), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
         }
 
         // Check for system mode in Schedule Types
