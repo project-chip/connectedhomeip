@@ -73,8 +73,8 @@ tests:
               contains: [1, 2, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4b: TH reads AttributeList optional attributes(global attribute
-          65531)"
+          "Step 4b: TH reads the LastConfiguredBy optional attribute from the
+          AttributeList (global attribute 65531)"
       PICS: S.S.A0000
       command: "readAttribute"
       attribute: "AttributeList"
