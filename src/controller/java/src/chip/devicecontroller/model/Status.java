@@ -31,7 +31,7 @@ public final class Status {
   }
 
   // Getters
-  public int getStatus() {
+  public Integer getStatus() {
     return status;
   }
 

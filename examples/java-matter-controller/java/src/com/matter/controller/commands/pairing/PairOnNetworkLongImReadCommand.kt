@@ -98,7 +98,7 @@ class PairOnNetworkLongImReadCommand(
 
       val unitTestCluster =
         requireNotNull(endpointOne.getClusterState(UNIT_TEST_CLUSTER)) {
-          "unit test cluster not found."
+          "Unit test cluster not found."
         }
 
       val startUpEvents =
