@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <DeviceEnergyManagementDelegateImpl.h>
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
@@ -48,6 +49,12 @@ CHIP_ERROR EVSEManufacturer::Init()
     dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(this));
 
     ReturnErrorOnFailure(InitializePowerMeasurementCluster());
+
+    DeviceEnergyManagementDelegate * dem = GetEvseManufacturer()->GetDEMDelegate();
+    VerifyOrReturnLogError(dem != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
+    dem->SetESAState(ESAStateEnum::kOnline);
 
     /*
      * This is an example implementation for manufacturers to consider
