@@ -29,6 +29,7 @@
 #define MATTER_TRACE_END(label, group) ::chip::Tracing::Internal::End(label, group)
 #define MATTER_TRACE_INSTANT(label, group) ::chip::Tracing::Internal::Instant(label, group)
 #define MATTER_TRACE_COUNTER(label) ::chip::Tracing::Internal::Counter(label)
+#define MATTER_TRACE_METRIC(label, value) ::chip::Tracing::Internal::Metric(label, value)
 
 namespace chip {
 namespace Tracing {

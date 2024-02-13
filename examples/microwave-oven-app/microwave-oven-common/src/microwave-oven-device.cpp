@@ -24,10 +24,9 @@ using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::ModeBase;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 template <typename T>
-using List                 = chip::app::DataModel::List<T>;
-using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
-using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
-using Status               = Protocols::InteractionModel::Status;
+using List              = chip::app::DataModel::List<T>;
+using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
+using Status            = Protocols::InteractionModel::Status;
 
 void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
 {

@@ -23,8 +23,6 @@
 #import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
-#import <app/util/af-enums.h>
-
 #import <math.h> // For INFINITY
 
 // system dependencies
@@ -203,34 +201,34 @@ static BOOL sNeedsStackShutdown = YES;
     // tests.
 }
 
-#define CHECK_RETURN_TYPE(sig, type)                                                                                               \
-    do {                                                                                                                           \
-        XCTAssertNotNil(sig);                                                                                                      \
-        XCTAssertTrue(strcmp([sig methodReturnType], @encode(type)) == 0);                                                         \
+#define CHECK_RETURN_TYPE(sig, type)                                       \
+    do {                                                                   \
+        XCTAssertNotNil(sig);                                              \
+        XCTAssertTrue(strcmp([sig methodReturnType], @encode(type)) == 0); \
     } while (0)
 
 /**
  * Arguments 0 and 1 are the implicit self and _cmd arguments; the real arguments begin at index 2.
  */
-#define CHECK_ARGUMENT(sig, index, type)                                                                                           \
-    do {                                                                                                                           \
-        XCTAssertTrue(strcmp([sig getArgumentTypeAtIndex:(index) + 2], @encode(type)) == 0);                                       \
+#define CHECK_ARGUMENT(sig, index, type)                                                     \
+    do {                                                                                     \
+        XCTAssertTrue(strcmp([sig getArgumentTypeAtIndex:(index) + 2], @encode(type)) == 0); \
     } while (0)
 
-#define CHECK_READONLY_PROPERTY(instance, propName, type)                                                                          \
-    do {                                                                                                                           \
-        NSMethodSignature * signature = [instance methodSignatureForSelector:@selector(propName)];                                 \
-        CHECK_RETURN_TYPE(signature, type);                                                                                        \
-        /* Check that getting the property directly compiles too */                                                                \
-        (void) instance.propName;                                                                                                  \
+#define CHECK_READONLY_PROPERTY(instance, propName, type)                                          \
+    do {                                                                                           \
+        NSMethodSignature * signature = [instance methodSignatureForSelector:@selector(propName)]; \
+        CHECK_RETURN_TYPE(signature, type);                                                        \
+        /* Check that getting the property directly compiles too */                                \
+        (void) instance.propName;                                                                  \
     } while (0)
 
-#define CHECK_PROPERTY(instance, propName, setterName, type)                                                                       \
-    do {                                                                                                                           \
-        CHECK_READONLY_PROPERTY(instance, propName, type);                                                                         \
-        NSMethodSignature * signature = [instance methodSignatureForSelector:@selector(setterName:)];                              \
-        CHECK_RETURN_TYPE(signature, void);                                                                                        \
-        CHECK_ARGUMENT(signature, 0, type);                                                                                        \
+#define CHECK_PROPERTY(instance, propName, setterName, type)                                          \
+    do {                                                                                              \
+        CHECK_READONLY_PROPERTY(instance, propName, type);                                            \
+        NSMethodSignature * signature = [instance methodSignatureForSelector:@selector(setterName:)]; \
+        CHECK_RETURN_TYPE(signature, void);                                                           \
+        CHECK_ARGUMENT(signature, 0, type);                                                           \
     } while (0)
 
 /**
