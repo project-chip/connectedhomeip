@@ -319,7 +319,7 @@ public:
      *             Device has not enabled batch command support. To enable:
      *               1. Enable the CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
      *                  configuration option.
-     *               2. Ensure you provide ExtendableCallback. 
+     *               2. Ensure you provide ExtendableCallback.
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
