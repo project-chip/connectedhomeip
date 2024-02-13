@@ -24,6 +24,7 @@
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPEncoding.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 // TODO: figure out a clear path for compile-time codegen

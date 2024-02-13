@@ -122,7 +122,11 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::Endpoi
 // cast it.
 EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * cluster, EmberAfClusterMask functionMask);
 
-// Loads attribute defaults and any non-volatile attributes stored
+/**
+ * @brief Loads attribute defaults and any non-volatile attributes stored
+ *
+ * @param endpoint EnpointId. Use chip::kInvalidEndpointId to initialize all endpoints
+ */
 void emberAfInitializeAttributes(chip::EndpointId endpoint);
 
 // After the RAM value has changed, code should call this function. If this
