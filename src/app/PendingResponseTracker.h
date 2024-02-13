@@ -28,7 +28,7 @@ namespace app {
  *
  * This interface enables clients to:
  *   * Verify that received responses correspond to issued InvokeRequests.
- *   * Detect outstanding responses after the server indicates completion, helpful for identifying potential response omissions.
+ *   * Detect outstanding responses after the server indicates completion, helpful for identifying response omissions.
  */
 class PendingResponseTracker
 {

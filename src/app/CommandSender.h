@@ -316,7 +316,8 @@ public:
      * @return CHIP_ERROR_INVALID_ARGUMENT
      *                      Invalid argument value.
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
-     *                      Device has not enabled CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS.
+     *                      Device has not enabled batch command. One possible solution is to enable
+     *                      CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS.
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
