@@ -26,7 +26,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -101,7 +100,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             EmberAfStatus status = RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing);
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
-                StatusIB statusIB(ToInteractionModelStatus(status));
+                StatusIB statusIB(status);
                 return statusIB.ToChipError();
             }
             valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature);
@@ -156,7 +155,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             }
 
             EmberAfStatus status = RemoteSensing::Set(aPath.mEndpointId, valueRemoteSensing);
-            StatusIB statusIB(ToInteractionModelStatus(status));
+            StatusIB statusIB(status);
             return statusIB.ToChipError();
         }
         break;
@@ -925,7 +924,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
         break;
     }
 
-    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 

@@ -89,12 +89,24 @@ tests:
       response:
           value: beforeRebootICDCounter + 101
 
+    - label: "Verify the ICD is operating as a LIT ICD"
+      command: "readAttribute"
+      attribute: OperatingMode
+      response:
+          value: 1
+
     - label: "Unregister Client Registered During Commissioning"
       command: "UnregisterClient"
       arguments:
           values:
               - name: "CheckInNodeID"
                 value: commissionerNodeId
+
+    - label: "Verify the ICD is operating as a SIT ICD"
+      command: "readAttribute"
+      attribute: OperatingMode
+      response:
+          value: 0
 
     - label: "Read Feature Map"
       command: "readAttribute"

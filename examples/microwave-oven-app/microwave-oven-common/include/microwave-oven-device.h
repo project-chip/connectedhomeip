@@ -230,7 +230,7 @@ private:
     static constexpr uint8_t kMaxPowerNum            = 90u;
     static constexpr uint8_t kPowerStepNum           = 10u;
     static constexpr uint32_t kMaxCookTimeSec        = 86400u;
-    static constexpr uint8_t kDefaultPowerSettingNum = 100u;
+    static constexpr uint8_t kDefaultPowerSettingNum = kMaxPowerNum;
 
     // define the mode value
     static constexpr uint8_t kModeNormal  = 0u;
