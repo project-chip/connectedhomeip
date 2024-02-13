@@ -26,7 +26,7 @@
 namespace chip {
 
 template <>
-app::reporting::EngineDelegate * GlobalInstanceProvider<app::reporting::EngineDelegate>::InstancePointer()
+app::TimedHandlerDelegate * GlobalInstanceProvider<app::TimedHandlerDelegate>::InstancePointer()
 {
     return app::InteractionModelEngine::GetInstance();
 }
