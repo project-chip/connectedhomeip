@@ -146,13 +146,15 @@ void Instance::SendNonConcurrentConnectNetworkResponse()
         return;
     }
 
+#if CONFIG_NETWORK_LAYER_BLE
     DeviceLayer::ConnectivityMgr().GetBleLayer()->mState = Ble::BleLayer::kState_Disconnecting;
+#endif // CONFIG_NETWORK_LAYER_BLE
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
     Commands::ConnectNetworkResponse::Type response;
     response.networkingStatus = NetworkCommissioning::Status::kSuccess;
     commandHandle->AddResponse(mPath, response);
 }
-#endif
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 void Instance::InvokeCommand(HandlerContext & ctxt)
 {
@@ -856,7 +858,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
         // We may receive the callback after it and should make it noop.
         return;
     }
-#endif
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
     Commands::ConnectNetworkResponse::Type response;
     response.networkingStatus = commissioningError;
@@ -882,7 +884,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     commandHandle->AddResponse(mPath, response);
-#endif
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
     if (commissioningError == Status::kSuccess)
     {
@@ -1084,7 +1086,9 @@ void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event
     {
         this_->OnFailSafeTimerExpired();
     }
-    else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkStarted)
+    else if ((event->Type == DeviceLayer::DeviceEventType::kWiFiDeviceAvailable) ||
+             (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkStarted))
+
     {
         // In Non-Concurrent mode connect the operational channel, as BLE has been stopped
         this_->HandleNonConcurrentConnectNetwork();
