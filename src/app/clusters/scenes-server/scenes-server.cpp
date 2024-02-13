@@ -25,7 +25,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/Span.h>
@@ -84,7 +83,7 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
 template <typename ResponseType>
 CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, EmberAfStatus status)
 {
-    return AddResponseOnError(ctx, resp, StatusIB(ToInteractionModelStatus(status)).ToChipError());
+    return AddResponseOnError(ctx, resp, StatusIB(status).ToChipError());
 }
 
 template <typename ResponseType>
@@ -536,8 +535,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     ScenesServer::Instance().MakeSceneInvalid(endpointID, fabricIdx);
 
     uint16_t endpointTableSize = 0;
-    ReturnErrorOnFailure(
-        StatusIB(ToInteractionModelStatus(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize))).ToChipError());
+    ReturnErrorOnFailure(StatusIB(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize)).ToChipError());
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
@@ -567,8 +565,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     else
     {
         uint32_t featureMap = 0;
-        ReturnErrorOnFailure(
-            StatusIB(ToInteractionModelStatus(Attributes::FeatureMap::Get(endpointID, &featureMap))).ToChipError());
+        ReturnErrorOnFailure(StatusIB(Attributes::FeatureMap::Get(endpointID, &featureMap)).ToChipError());
         // Check if we still support scenes name in case an OTA changed that, if we don't, set name to empty
         if (!(featureMap & to_underlying(Feature::kSceneNames)))
         {
@@ -597,8 +594,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
     ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpointID);
 
     uint16_t endpointTableSize = 0;
-    ReturnErrorOnFailure(
-        StatusIB(ToInteractionModelStatus(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize))).ToChipError());
+    ReturnErrorOnFailure(StatusIB(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize)).ToChipError());
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);

@@ -31,9 +31,10 @@
     defined(MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
     defined(MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                 \
     defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
-EmberAfStatus chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
-EmberAfStatus chefConcentrationMeasurementReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                       const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                       uint16_t maxReadLength);
+Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                              const EmberAfAttributeMetadata * attributeMetadata,
+                                                                              uint8_t * buffer);
+Protocols::InteractionModel::Status chefConcentrationMeasurementReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                             const EmberAfAttributeMetadata * attributeMetadata,
+                                                                             uint8_t * buffer, uint16_t maxReadLength);
 #endif
