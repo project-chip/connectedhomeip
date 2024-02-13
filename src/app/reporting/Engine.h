@@ -46,12 +46,18 @@ class TestReadInteraction;
 
 namespace reporting {
 
-// An object support for functionality required by reporting.
+/// Contains all required data and callbacks for `chip::app::reporting::Engine` to be able to
+/// do its job.
+///
+/// The reporting engine is managing dirty paths and report scheduling. The delegate provides
+/// active reader information (what readers exist on what path) and exchange support for
+/// message sending.
 class EngineDelegate
 {
 public:
-    virtual ~EngineDelegate()                                                                                     = default;
-    virtual Messaging::ExchangeManager * GetExchangeManagerForReportingEngine()                                   = 0;
+    virtual ~EngineDelegate() = default;
+
+    virtual Messaging::ExchangeManager * GetExchangeManager()                                                     = 0;
     virtual ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> & GetReadHandlerPool() = 0;
 
     /// Determine if any of the active readers are interseted in events (i.e. if any

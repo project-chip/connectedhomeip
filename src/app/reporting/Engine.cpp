@@ -614,7 +614,7 @@ CHIP_ERROR Engine::ScheduleRun()
 {
     ReturnErrorCodeIf(mRunScheduled, CHIP_NO_ERROR);
 
-    Messaging::ExchangeManager * exchangeManager = mDelegate->GetExchangeManagerForReportingEngine();
+    Messaging::ExchangeManager * exchangeManager = mDelegate->GetExchangeManager();
     ReturnErrorCodeIf(exchangeManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     SessionManager * sessionManager = exchangeManager->GetSessionManager();

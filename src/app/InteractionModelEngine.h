@@ -125,8 +125,6 @@ public:
 
     void Shutdown();
 
-    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
-
     /**
      * Returns a pointer to the CASESessionManager. This can return nullptr if one wasn't
      * provided in the call to Init().
@@ -134,7 +132,7 @@ public:
     CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
 
     // reporting::EngineDelegate implementation
-    Messaging::ExchangeManager * GetExchangeManagerForReportingEngine() override { return mpExchangeMgr; }
+    Messaging::ExchangeManager * GetExchangeManager() override { return mpExchangeMgr; }
     ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> & GetReadHandlerPool() override
     {
         return mReadHandlers;
