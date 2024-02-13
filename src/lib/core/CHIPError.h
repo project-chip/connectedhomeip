@@ -33,7 +33,6 @@
 
 #include <inttypes.h>
 #include <limits>
-#include <stdint.h>
 #include <type_traits>
 
 namespace chip {

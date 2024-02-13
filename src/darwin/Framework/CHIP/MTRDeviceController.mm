@@ -1313,12 +1313,17 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                             queue:(dispatch_queue_t)queue
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    [_factory downloadLogFromNodeWithID:nodeID
-                             controller:self
-                                   type:type
-                                timeout:timeout
-                                  queue:queue
-                             completion:completion];
+    [self asyncDispatchToMatterQueue:^() {
+        [self->_factory downloadLogFromNodeWithID:nodeID
+                                       controller:self
+                                             type:type
+                                          timeout:timeout
+                                            queue:queue
+                                       completion:completion];
+    }
+        errorHandler:^(NSError * error) {
+            completion(nil, error);
+        }];
 }
 
 - (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath
