@@ -180,7 +180,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
         .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
-        .SetICDOperatingAsLIT(chip::Optional<bool>(false))
+        .SetICDModeToAdvertise(ICDModeAdvertise::kSIT)
         // 3600005 is more than the max so should be adjusted down
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
 QNamePart txtCommissionableNodeParamsLargeEnhancedParts[] = { "D=22",          "VP=555+897",       "CM=2",       "DT=70000",
@@ -204,7 +204,7 @@ CommissionAdvertisingParameters commissionableNodeParamsEnhancedAsICDLIT =
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetICDOperatingAsLIT(chip::Optional<bool>(true))
+        .SetICDModeToAdvertise(ICDModeAdvertise::kLIT)
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600000_ms32, 65535_ms16));
 // With ICD Operation as LIT, SII key will not be added to the advertisement
 QNamePart txtCommissionableNodeParamsEnhancedAsICDLITParts[] = { "D=22",          "VP=555+897", "CM=2", "DT=70000",
