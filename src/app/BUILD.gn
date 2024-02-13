@@ -221,6 +221,8 @@ static_library("app") {
     "FailSafeContext.h",
     "OTAUserConsentCommon.h",
     "PendingResponseTrackerImpl.cpp",
+    "PendingResponseTrackerImpl.h",
+    "PendingResponseTracker.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
     "TimedRequest.cpp",

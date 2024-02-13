@@ -27,12 +27,12 @@
 #include <type_traits>
 
 #include "CommandSenderLegacyCallback.h"
-#include "PendingResponseTrackerImpl.h"
 
 #include <app/CommandPathParams.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/PendingResponseTrackerImpl.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Optional.h>

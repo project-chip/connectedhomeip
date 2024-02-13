@@ -19,7 +19,7 @@
 
 #include <unordered_set>
 
-#include "PendingResponseTracker.h"
+#include <app/PendingResponseTracker.h>
 
 namespace chip {
 namespace app {
