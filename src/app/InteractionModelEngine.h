@@ -143,9 +143,9 @@ public:
     reporting::ReportScheduler * GetReportScheduler() override { return mReportScheduler; }
     ObjectPool<ObjectList<EventPathParams>,
                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS> &
-    GetEventPathPool() override
-    {
-        return mEventPathPool;
+
+    bool IsInterestedInEvents() override {
+        return (mEventPathPool.Allocated() != 0);
     }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT

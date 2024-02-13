@@ -612,28 +612,20 @@ void Engine::Run(System::Layer * aSystemLayer, void * apAppState)
 
 CHIP_ERROR Engine::ScheduleRun()
 {
-    if (IsRunScheduled())
-    {
-        return CHIP_NO_ERROR;
-    }
+    ReturnErrorCodeIf(mRunScheduled, CHIP_NO_ERROR);
 
     Messaging::ExchangeManager * exchangeManager = mDelegate->GetExchangeManagerForReportingEngine();
-    if (exchangeManager == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    ReturnErrorCodeIf(exchangeManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     SessionManager * sessionManager = exchangeManager->GetSessionManager();
-    if (sessionManager == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     System::Layer * systemLayer = sessionManager->SystemLayer();
-    if (systemLayer == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    ReturnErrorCodeIf(systemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     ReturnErrorOnFailure(systemLayer->ScheduleWork(Run, this));
     mRunScheduled = true;
+
     return CHIP_NO_ERROR;
 }
 
@@ -933,7 +925,7 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
     // we don't need to call schedule run for event.
     // If schedule run is called, actually we would not delivery events as well.
     // Just wanna save one schedule run here
-    if (mDelegate->GetEventPathPool().Allocated() == 0)
+    if (!mDelegate->IsInterestedInEvents())
     {
         return CHIP_NO_ERROR;
     }

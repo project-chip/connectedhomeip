@@ -54,42 +54,34 @@ public:
     virtual Messaging::ExchangeManager * GetExchangeManagerForReportingEngine()                                   = 0;
     virtual ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> & GetReadHandlerPool() = 0;
 
-    virtual ObjectPool<ObjectList<EventPathParams>,
-                       CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS> &
-    GetEventPathPool() = 0;
+    /// Determine if any of the active readers are interseted in events (i.e. if any
+    /// active readers have event paths that they listen on).
+    ///
+    /// Returning false here shortcuts some of the report scheduling logic to loop
+    /// through all readers and determine event sending.
+    virtual bool IsInterestedInEvents() = 0;
 
-    /**
-     * Returns the handler at a particular index within the active handler list.
-     */
+    /// Returns the handler at a particular index within the active handler list.
     virtual ReadHandler * ActiveHandlerAt(unsigned int index) = 0;
 
     virtual reporting::ReportScheduler * GetReportScheduler() = 0;
 };
 
 /*
- *  @class Engine
+ * The reporting engine is responsible for generating reports to readers.
  *
- *  @brief The reporting engine is responsible for generating reports to reader. It is able to find the intersection
- * between the path interest set of each reader with what has changed in the publisher data store and generate tailored
- * reports for each reader.
+ * It is able to find the intersection between the path interest set of each reader with what has changed in
+ * the publisher data store and generate tailored reports for each reader.
  *
- *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
- * message before sending that to the reader. It continues to do so until it has no more work to do.
+ * It tries to gather and pack as many relevant attributes changes and/or events as possible into report
+ * message before sending that to the readers. It continues to do so until it has no more work to do.
  */
 class Engine
 {
 public:
-    /**
-     *  Constructor Engine with a valid InteractionModelEngine pointer.
-     */
     Engine(EngineDelegate * delegate) : mDelegate(delegate) {}
 
-    /**
-     * Initializes the reporting engine. Should only be called once.
-     *
-     * @retval #CHIP_NO_ERROR On success.
-     * @retval other           Was unable to retrieve data and write it into the writer.
-     */
+    /// Initializes the reporting engine. Should only be called once.
     CHIP_ERROR Init();
 
     void Shutdown();
@@ -100,28 +92,20 @@ public:
     void SetMaxAttributesPerChunk(uint32_t aMaxAttributesPerChunk) { mMaxAttributesPerChunk = aMaxAttributesPerChunk; }
 #endif
 
-    /**
-     * Should be invoked when the device receives a Status report, or when the Report data request times out.
-     * This allows the engine to do some clean-up.
-     *
-     */
+    /// Performs cleanup when the confirmation of a report is received.
+    ///
+    /// Should be invoked when the device either receives a status report
+    /// or if the report data request times out.
     void OnReportConfirm();
 
-    /**
-     * Main work-horse function that executes the run-loop asynchronously on the CHIP thread
-     */
+    /// Schedules a run-loop execution asynchronously on the CHIP thread.
     CHIP_ERROR ScheduleRun();
 
-    /**
-     * Application marks mutated change path and would be sent out in later report.
-     */
-    CHIP_ERROR SetDirty(AttributePathParams & aAttributePathParams);
+    /// Mark the specified `path` as changed.
+    ///
+    /// Paths that have been marked dirty will be sent in future reports
+    CHIP_ERROR SetDirty(AttributePathParams & path);
 
-    /**
-     * @brief
-     *  Schedule the event delivery
-     *
-     */
     CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten);
 
     /*
@@ -170,8 +154,6 @@ private:
 
     friend class TestReportingEngine;
     friend class ::chip::app::TestReadInteraction;
-
-    bool IsRunScheduled() const { return mRunScheduled; }
 
     struct AttributePathParamsWithGeneration : public AttributePathParams
     {
