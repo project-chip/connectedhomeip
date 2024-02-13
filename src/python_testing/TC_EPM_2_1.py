@@ -23,6 +23,9 @@ from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
 logger = logging.getLogger(__name__)
 
+MIN_INT64_ALLOWED = -pow(2, 62)  # -(2^62)
+MAX_INT64_ALLOWED = pow(2, 62)  # (2^62)
+
 
 class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
@@ -133,52 +136,52 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         self.step("6")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.Voltage.attribute_id in supported_attributes):
-            voltage = await self.check_epm_attribute_in_range("Voltage", -2 ^ 62, 2 ^ 62, allow_null=True)
+            voltage = await self.check_epm_attribute_in_range("Voltage", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd Voltage: {voltage}")
 
         self.step("7")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ActiveCurrent.attribute_id in supported_attributes):
-            active_current = await self.check_epm_attribute_in_range("ActiveCurrent", -2 ^ 62, 2 ^ 62, allow_null=True)
+            active_current = await self.check_epm_attribute_in_range("ActiveCurrent", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd ActiveCurrent: {active_current}")
 
         self.step("8")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ReactiveCurrent.attribute_id in supported_attributes):
-            reactive_current = await self.check_epm_attribute_in_range("ReactiveCurrent", -2 ^ 62, 2 ^ 62, allow_null=True)
+            reactive_current = await self.check_epm_attribute_in_range("ReactiveCurrent", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd ReactiveCurrent: {reactive_current}")
 
         self.step("9")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ApparentCurrent.attribute_id in supported_attributes):
-            apparent_current = await self.check_epm_attribute_in_range("ApparentCurrent", 0, 2 ^ 62, allow_null=True)
+            apparent_current = await self.check_epm_attribute_in_range("ApparentCurrent", 0, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd ApparentCurrent: {apparent_current}")
 
         self.step("10")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ActivePower.attribute_id in supported_attributes):
-            active_power = await self.check_epm_attribute_in_range("ActivePower", -2 ^ 62, 2 ^ 62, allow_null=True)
+            active_power = await self.check_epm_attribute_in_range("ActivePower", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd ActivePower: {active_power}")
 
         self.step("11")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ReactivePower.attribute_id in supported_attributes):
-            reactive_power = await self.check_epm_attribute_in_range("ReactivePower", -2 ^ 62, 2 ^ 62, allow_null=True)
+            reactive_power = await self.check_epm_attribute_in_range("ReactivePower", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd ReactivePower: {reactive_power}")
 
         self.step("12")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.ApparentPower.attribute_id in supported_attributes):
-            apparent_power = await self.check_epm_attribute_in_range("ApparentPower", -2 ^ 62, 2 ^ 62, allow_null=True)
+            apparent_power = await self.check_epm_attribute_in_range("ApparentPower", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd ApparentPower: {apparent_power}")
 
         self.step("13")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.RMSVoltage.attribute_id in supported_attributes):
-            rms_voltage = await self.check_epm_attribute_in_range("RMSVoltage", -2 ^ 62, 2 ^ 62, allow_null=True)
+            rms_voltage = await self.check_epm_attribute_in_range("RMSVoltage", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd RMSVoltage: {rms_voltage}")
 
         self.step("14")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.RMSCurrent.attribute_id in supported_attributes):
-            rms_current = await self.check_epm_attribute_in_range("RMSCurrent", -2 ^ 62, 2 ^ 62, allow_null=True)
+            rms_current = await self.check_epm_attribute_in_range("RMSCurrent", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd RMSCurrent: {rms_current}")
 
         self.step("15")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.RMSPower.attribute_id in supported_attributes):
-            rms_power = await self.check_epm_attribute_in_range("RMSPower", -2 ^ 62, 2 ^ 62, allow_null=True)
+            rms_power = await self.check_epm_attribute_in_range("RMSPower", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd RMSPower: {rms_power}")
 
         self.step("16")
@@ -191,12 +194,20 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             harmonic_currents = await self.read_epm_attribute_expect_success("HarmonicCurrents")
             logger.info(f"Rx'd HarmonicCurrents: {harmonic_currents}")
             asserts.assert_is(type(harmonic_currents), list)
+            for index, entry in enumerate(harmonic_currents):
+                logging.info(f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
+                asserts.assert_greater_equal(entry.order, 1)
+                self.check_value_in_range("Measurement", entry.measurement, MIN_INT64_ALLOWED, MAX_INT64_ALLOWED)
 
         self.step("18")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.HarmonicPhases.attribute_id in supported_attributes):
             harmonic_phases = await self.read_epm_attribute_expect_success("HarmonicPhases")
             logger.info(f"Rx'd HarmonicPhases: {harmonic_phases}")
             asserts.assert_is(type(harmonic_phases), list)
+            for index, entry in enumerate(harmonic_phases):
+                logging.info(f"   [{index}] order:{entry.order} measurement:{entry.measurement}")
+                asserts.assert_greater_equal(entry.order, 1)
+                self.check_value_in_range("Measurement", entry.measurement, MIN_INT64_ALLOWED, MAX_INT64_ALLOWED)
 
         self.step("19")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.PowerFactor.attribute_id in supported_attributes):
@@ -205,7 +216,7 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         self.step("20")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.NeutralCurrent.attribute_id in supported_attributes):
-            neutral_current = await self.check_epm_attribute_in_range("NeutralCurrent", -2 ^ 62, 2 ^ 62, allow_null=True)
+            neutral_current = await self.check_epm_attribute_in_range("NeutralCurrent", MIN_INT64_ALLOWED, MAX_INT64_ALLOWED, allow_null=True)
             logger.info(f"Rx'd NeutralCurrent: {neutral_current}")
 
 

@@ -152,9 +152,7 @@ CHIP_ERROR EnergyEvseInit()
     /* Manufacturer may optionally not support all features, commands & attributes */
     gEvseInstance = std::make_unique<EnergyEvseManager>(
         EndpointId(ENERGY_EVSE_ENDPOINT), *gEvseDelegate,
-        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kPlugAndCharge,
-                                               EnergyEvse::Feature::kRfid, EnergyEvse::Feature::kSoCReporting,
-                                               EnergyEvse::Feature::kV2x),
+        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kRfid),
         BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                           EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
                                                           EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),

@@ -1220,24 +1220,20 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                             queue:(dispatch_queue_t)queue
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    dispatch_sync(_chipWorkQueue, ^{
-        if (![self isRunning]) {
-            return;
-        }
+    assertChipStackLockedByCurrentThread();
 
-        if (_diagnosticLogsDownloader == nil) {
-            _diagnosticLogsDownloader = [[MTRDiagnosticLogsDownloader alloc] init];
-            auto systemState = _controllerFactory->GetSystemState();
-            systemState->BDXTransferServer()->SetDelegate([_diagnosticLogsDownloader getBridge]);
-        }
+    if (_diagnosticLogsDownloader == nil) {
+        _diagnosticLogsDownloader = [[MTRDiagnosticLogsDownloader alloc] init];
+        auto systemState = _controllerFactory->GetSystemState();
+        systemState->BDXTransferServer()->SetDelegate([_diagnosticLogsDownloader getBridge]);
+    }
 
-        [_diagnosticLogsDownloader downloadLogFromNodeWithID:nodeID
-                                                  controller:controller
-                                                        type:type
-                                                     timeout:timeout
-                                                       queue:queue
-                                                  completion:completion];
-    });
+    [_diagnosticLogsDownloader downloadLogFromNodeWithID:nodeID
+                                              controller:controller
+                                                    type:type
+                                                 timeout:timeout
+                                                   queue:queue
+                                              completion:completion];
 }
 
 - (void)operationalInstanceAdded:(chip::PeerId &)operationalID

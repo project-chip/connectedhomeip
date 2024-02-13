@@ -28,8 +28,6 @@
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
-using chip::Protocols::InteractionModel::Status;
-
 /** @brief Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -84,9 +82,9 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED. Any other return value indicates the
  * application was not able to read the attribute.
  */
-Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                            const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                            uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                               const EmberAfAttributeMetadata * attributeMetadata,
+                                                                               uint8_t * buffer, uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -128,15 +126,17 @@ Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::Clu
  * other return value indicates the application was not able to write the
  * attribute.
  */
-Status emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                             const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint,
+                                                                                chip::ClusterId clusterId,
+                                                                                const EmberAfAttributeMetadata * attributeMetadata,
+                                                                                uint8_t * buffer);
 
 /** @brief Pre Attribute Change
  *
  * This function is called by the application framework before it changes an
  * attribute value.  The value passed into this callback is the value to which
  * the attribute is to be set by the framework.  The application should return
- * chip::Protocols::InteractionModel::Status::Success to permit the change or
+ * Protocols::InteractionModel::Status::Success to permit the change or
  * any other code to reject it.
  */
 chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
