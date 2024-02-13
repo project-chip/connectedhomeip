@@ -98,8 +98,8 @@ private:
 
     enum class State : uint8_t
     {
-        kExpectingTimedAction, // Initial state: expecting a timed action.
-        kReceivedTimedAction,  // Have received the timed action.  This can
+        kExpectingTimedAction,     // Initial state: expecting a timed action.
+        kReceivedTimedAction,      // Have received the timed action.  This can
         // be a terminal state if the action ends up
         // malformed.
         kExpectingFollowingAction, // Expecting write or invoke.
@@ -108,7 +108,7 @@ private:
     State mState = State::kExpectingTimedAction;
 
     /// This may be "fake" pointer or a real delegate pointer, depending
-    /// on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting/
+    /// on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting.
     ///
     /// When this is not a real pointer, it checks that the value is always
     /// set to the global InteractionModelEngine and the size of this
