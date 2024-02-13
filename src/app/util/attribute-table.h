@@ -21,16 +21,15 @@
 
 #include <protocols/interaction_model/StatusCode.h>
 
-using chip::Protocols::InteractionModel::Status;
-
 /**
  * Write an attribute for a request arriving from external sources.
  *
  * This will check attribute writeability and that
  * the provided data type matches the expected data type.
  */
-Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                  uint8_t * dataPtr, EmberAfAttributeType dataType);
+chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                                     chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                                     EmberAfAttributeType dataType);
 
 /**
  * @brief write an attribute, performing all the checks.
@@ -62,5 +61,6 @@ Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId clu
  *           the attribute
  * - Status::Success: if the attribute was found and successfully written
  */
-Status emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
-                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);
+chip::Protocols::InteractionModel::Status emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                             chip::AttributeId attributeID, uint8_t * data,
+                                                             EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);

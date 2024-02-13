@@ -41,6 +41,7 @@ using GroupDataProvider = chip::Credentials::GroupDataProvider;
 using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
 using AuthMode          = chip::Access::AuthMode;
 using ScenesServer      = chip::app::Clusters::ScenesManagement::ScenesServer;
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -74,14 +75,14 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
     return err;
 }
 
-/// @brief Generate and add a response to a command handler context depending on an EmberAfStatus
+/// @brief Generate and add a response to a command handler context depending on an InteractionModel::Status
 /// @tparam ResponseType Type of response, depends on the command
 /// @param ctx Command Handler context where to add reponse
 /// @param resp Response to add in ctx
 /// @param status Status to verify
-/// @return EmberAfStatus -> CHIP_ERROR
+/// @return InteractionModel::Status -> CHIP_ERROR
 template <typename ResponseType>
-CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, EmberAfStatus status)
+CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, ResponseType & resp, Status status)
 {
     return AddResponseOnError(ctx, resp, StatusIB(status).ToChipError());
 }
@@ -90,7 +91,7 @@ template <typename ResponseType>
 CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
 {
     Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
-    EmberAfStatus status                 = EMBER_ZCL_STATUS_SUCCESS;
+    Status status                        = Status::Success;
 
     if (AuthMode::kCase == descriptor.authMode)
     {
@@ -102,7 +103,7 @@ CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
     }
 
     // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
-    VerifyOrReturnValue(!(EMBER_ZCL_STATUS_SUCCESS == status || EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status), CHIP_NO_ERROR);
+    VerifyOrReturnValue(!(Status::Success == status || Status::UnsupportedAttribute == status), CHIP_NO_ERROR);
     return AddResponseOnError(ctx, resp, status);
 }
 
@@ -1108,8 +1109,8 @@ using namespace chip::app::Clusters::ScenesManagement;
 
 void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
-    EmberAfStatus status = Attributes::LastConfiguredBy::SetNull(endpoint);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    Status status = Attributes::LastConfiguredBy::SetNull(endpoint);
+    if (Status::Success != status)
     {
         ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);
     }
