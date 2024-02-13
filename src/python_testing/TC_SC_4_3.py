@@ -20,7 +20,7 @@ import logging
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType, DNSRecordType
+from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 
 '''
@@ -179,7 +179,6 @@ class TC_SC_4_3(MatterBaseTest):
             log_output=True,
             load_from_cache=False
         )
-        
 
         # # *** STEP 9 ***
         # self.print_step("9", "TH verifies ICD, SII, SAI, SAT, and T TXT record keys/vales of the returned record.")
@@ -261,11 +260,9 @@ class TC_SC_4_3(MatterBaseTest):
         # asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}'")
 
         print("\n"*10)
-        
+
         # input()
 
 
 if __name__ == "__main__":
     default_matter_test_main()
-
-    

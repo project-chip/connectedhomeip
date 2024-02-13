@@ -23,10 +23,10 @@ from enum import Enum
 from time import sleep
 from typing import Dict, List, Optional
 
+from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
 
-from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
 
 @dataclass
 class MdnsServiceInfo:
@@ -226,12 +226,12 @@ class MdnsDiscovery:
         return discovered_services
 
     async def get_service_by_record_type(self, service_name: str,
-                                      service_type: str,
-                                      record_type: DNSRecordType,
-                                      load_from_cache: bool = True,
-                                      discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                                      log_output: bool = False
-                                      ) -> Optional[MdnsServiceInfo]:
+                                         service_type: str,
+                                         record_type: DNSRecordType,
+                                         load_from_cache: bool = True,
+                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                                         log_output: bool = False
+                                         ) -> Optional[MdnsServiceInfo]:
         """
         Asynchronously discovers an mDNS service within the network by service name, service type,
         and record type.
