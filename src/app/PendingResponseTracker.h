@@ -46,7 +46,7 @@ public:
 
     /**
      * @brief Removes the pending response from the tracker as a response is received.
-     * 
+     *
      * Responses are tracked using CommandReference.
      *
      * @param [in] aCommandRef The CommandReference of the response that is no longer pending.

@@ -89,7 +89,7 @@ void TestPendingResponseTracker_PopFindsAllPendingRequests(nlTestSuite * inSuite
 
     // No real reason why values in requestsToAdd are choosen. We just need values to use to test.
     std::vector<uint16_t> requestsToAdd = {0, 2, 50, 2000};
-    for(const uint16_t & commandRef : requestsToAdd) 
+    for(const uint16_t & commandRef : requestsToAdd)
     {
         NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));
         NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.AddPendingResponse(commandRef));
