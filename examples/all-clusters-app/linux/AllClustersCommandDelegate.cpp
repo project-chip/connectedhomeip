@@ -478,12 +478,6 @@ void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, 
         OperationalState::GenericOperationalError err(event_id);
         operationalStateInstance->OnOperationalErrorDetected(err);
     }
-    else if (operation == "OnCompletion")
-    {
-        Optional<DataModel::Nullable<uint32_t>> operationTime(DataModel::Nullable<uint32_t>(100));
-        Optional<DataModel::Nullable<uint32_t>> pausedTime(DataModel::Nullable<uint32_t>(10));
-        operationalStateInstance->OnOperationCompletionDetected(0, operationTime, pausedTime);
-    }
     else
     {
         ChipLogDetail(NotSpecified, "Invalid operation : %s", operation.c_str());
