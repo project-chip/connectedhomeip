@@ -30,19 +30,18 @@ namespace PowerTopology {
 class PowerTopologyDelegate : public Delegate
 {
 public:
-    PowerTopologyDelegate(EndpointId aEndpointId) : Delegate(aEndpointId) {}
     ~PowerTopologyDelegate() = default;
 
-    const CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override;
-    const CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override;
+    CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override;
+    CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override;
 };
 
-const CHIP_ERROR PowerTopologyDelegate::GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId)
+CHIP_ERROR PowerTopologyDelegate::GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId)
 {
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-const CHIP_ERROR PowerTopologyDelegate::GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId)
+CHIP_ERROR PowerTopologyDelegate::GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId)
 {
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
@@ -60,7 +59,7 @@ void emberAfPowerTopologyClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(!gInstance);
 
-    gDelegate = std::make_unique<PowerTopologyDelegate>(endpointId);
+    gDelegate = std::make_unique<PowerTopologyDelegate>();
     if (gDelegate)
     {
         gInstance = std::make_unique<Instance>(

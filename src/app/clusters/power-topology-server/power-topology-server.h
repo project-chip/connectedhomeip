@@ -28,21 +28,30 @@ namespace app {
 namespace Clusters {
 namespace PowerTopology {
 
-using namespace chip::app::Clusters::PowerTopology::Attributes;
-
 using chip::Protocols::InteractionModel::Status;
 
 class Delegate
 {
 public:
-    Delegate(EndpointId aEndpointId) : mEndpointId(aEndpointId) {}
     virtual ~Delegate() = default;
 
-    virtual CHIP_ERROR const GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) = 0;
-    virtual CHIP_ERROR const GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId)    = 0;
+    /**
+     * Get the Nth EndpointId in the list of available endpoints.
+     * @param index The index of the EndpointId to be returned.
+     * @param endpointId A reference to the EndpointId.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the EndpointId was returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is greater than or equal to the length of the list of available endpoints.
+     */
+    virtual CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) = 0;
 
-protected:
-    EndpointId mEndpointId = 0;
+    /**
+     * Get the Nth EndpointId in the list of active endpoints.
+     * @param index The index of the EndpointId to be returned.
+     * @param endpointId A reference to the EndpointId.
+     * @return Returns a CHIP_NO_ERROR if there was no error and the EndpointId was returned successfully.
+     * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is greater than or equal to the length of the list of active endpoints.
+     */
+    virtual CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) = 0;
 };
 
 enum class OptionalAttributes : uint32_t
