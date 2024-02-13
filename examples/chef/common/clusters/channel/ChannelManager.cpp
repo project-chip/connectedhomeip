@@ -186,7 +186,6 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
 
 bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
-    bool channelChanged = false;
     uint16_t index      = 0;
     for (auto const & channel : mChannels)
     {
@@ -196,15 +195,14 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
             // verify if channel changed by comparing values of current channel with the requested channel
             if (channel.minorNumber != mCurrentChannel.minorNumber || channel.majorNumber != mCurrentChannel.majorNumber)
             {
-                channelChanged       = true;
                 mCurrentChannelIndex = index;
                 mCurrentChannel      = channel;
-                return channelChanged;
+                return true;
             }
         }
         index++;
     }
-    return channelChanged;
+    return false;
 }
 
 bool ChannelManager::HandleSkipChannel(const int16_t & count)

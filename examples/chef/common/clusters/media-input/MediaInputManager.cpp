@@ -56,18 +56,16 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
-    bool mediaInputSelected = false;
     for (InputInfoType & input : mInputs)
     {
         if (input.index == index)
         {
-            mediaInputSelected = true;
             mCurrentInput      = index;
-            return mediaInputSelected;
+            return true;
         }
     }
 
-    return mediaInputSelected;
+    return false;
 }
 
 bool MediaInputManager::HandleShowInputStatus()
@@ -92,20 +90,17 @@ bool MediaInputManager::HandleHideInputStatus()
 
 bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
-    bool mediaInputRenamed = false;
-
     for (InputInfoType & input : mInputs)
     {
         if (input.index == index)
         {
-            mediaInputRenamed = true;
             const size_t len  = std::min(mNameLenMax, name.size());
             memcpy(mInputName[index], name.data(), len);
             input.name = mInputName[index];
-            return mediaInputRenamed;
+            return true;
         }
     }
 
-    return mediaInputRenamed;
+    return false;
 }
 #endif // MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER

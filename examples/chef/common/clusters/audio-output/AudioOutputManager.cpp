@@ -58,35 +58,31 @@ CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEnco
 
 bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)
 {
-    bool audioOutputRenamed = false;
-
     for (OutputInfoType & output : mOutputs)
     {
         if (output.index == index)
         {
-            audioOutputRenamed = true;
             const size_t len   = std::min(mNameLenMax, name.size());
             memcpy(mOutputName[index], name.data(), len);
             output.name = mOutputName[index];
-            return audioOutputRenamed;
+            return true;
         }
     }
-    return audioOutputRenamed;
+
+    return false;
 }
 
 bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
 {
-    bool audioOutputSelected = false;
     for (OutputInfoType & output : mOutputs)
     {
         if (output.index == index)
         {
-            audioOutputSelected = true;
             mCurrentOutput      = index;
-            return audioOutputSelected;
+            return true;
         }
     }
 
-    return audioOutputSelected;
+    return false;
 }
 #endif // MATTER_DM_PLUGIN_AUDIO_OUTPUT_SERVER
