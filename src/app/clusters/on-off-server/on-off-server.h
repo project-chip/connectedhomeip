@@ -62,10 +62,10 @@ public:
     bool OnWithTimedOffCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
-    Protocols::InteractionModel::Status getOnOffValue(chip::EndpointId endpoint, bool * currentOnOffValue);
-    Protocols::InteractionModel::Status setOnOffValue(chip::EndpointId endpoint, chip::CommandId command,
-                                                      bool initiatedByLevelChange);
-    Protocols::InteractionModel::Status getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp);
+    chip::Protocols::InteractionModel::Status getOnOffValue(chip::EndpointId endpoint, bool * currentOnOffValue);
+    chip::Protocols::InteractionModel::Status setOnOffValue(chip::EndpointId endpoint, chip::CommandId command,
+                                                            bool initiatedByLevelChange);
+    chip::Protocols::InteractionModel::Status getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp);
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     inline bool SupportsLightingApplications(chip::EndpointId endpointId) { return HasFeature(endpointId, Feature::kLighting); }

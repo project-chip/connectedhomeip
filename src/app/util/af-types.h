@@ -291,7 +291,7 @@ typedef void (*EmberAfClusterAttributeChangedCallback)(const chip::app::Concrete
  *
  * This function is called before an attribute changes.
  */
-typedef Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeChangedCallback)(
+typedef chip::Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeChangedCallback)(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 #define MAX_INT32U_VALUE (0xFFFFFFFFUL)

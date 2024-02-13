@@ -23,6 +23,7 @@
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT

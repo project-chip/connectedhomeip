@@ -49,7 +49,7 @@ bool LevelControlHasFeature(chip::EndpointId endpoint, chip::app::Clusters::Leve
 
 namespace LevelControlServer {
 
-Protocols::InteractionModel::Status
+chip::Protocols::InteractionModel::Status
 MoveToLevel(chip::EndpointId endpointId,
             const chip::app::Clusters::LevelControl::Commands::MoveToLevel::DecodableType & commandData);
 

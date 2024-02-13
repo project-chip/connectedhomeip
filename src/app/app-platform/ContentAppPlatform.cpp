@@ -32,6 +32,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -41,6 +42,7 @@ using namespace chip::app::Clusters;
 using namespace chip::Access;
 using ApplicationStatusEnum   = app::Clusters::ApplicationBasic::ApplicationStatusEnum;
 using GetSetupPINResponseType = app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
+using chip::Protocols::InteractionModel::Status;
 
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1

@@ -19,6 +19,7 @@
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 

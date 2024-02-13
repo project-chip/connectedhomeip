@@ -26,6 +26,7 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/util/attribute-storage.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app;

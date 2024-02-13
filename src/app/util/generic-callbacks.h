@@ -82,9 +82,9 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED. Any other return value indicates the
  * application was not able to read the attribute.
  */
-Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                         const EmberAfAttributeMetadata * attributeMetadata,
-                                                                         uint8_t * buffer, uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                               const EmberAfAttributeMetadata * attributeMetadata,
+                                                                               uint8_t * buffer, uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -126,9 +126,10 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::E
  * other return value indicates the application was not able to write the
  * attribute.
  */
-Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                          const EmberAfAttributeMetadata * attributeMetadata,
-                                                                          uint8_t * buffer);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint,
+                                                                                chip::ClusterId clusterId,
+                                                                                const EmberAfAttributeMetadata * attributeMetadata,
+                                                                                uint8_t * buffer);
 
 /** @brief Pre Attribute Change
  *
@@ -138,8 +139,8 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(chip::
  * Protocols::InteractionModel::Status::Success to permit the change or
  * any other code to reject it.
  */
-Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                                     uint8_t type, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                           uint8_t type, uint16_t size, uint8_t * value);
 
 /** @brief Post Attribute Change
  *

@@ -23,8 +23,6 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <stdint.h>
 
-typedef Protocols::InteractionModel::Status EmberAfStatus;
-
 #define EMBER_ZCL_STATUS_SUCCESS Protocols::InteractionModel::Status::Success
 #define EMBER_ZCL_STATUS_FAILURE Protocols::InteractionModel::Status::Failure
 #define EMBER_ZCL_STATUS_INVALID_SUBSCRIPTION Protocols::InteractionModel::Status::InvalidSubscription
