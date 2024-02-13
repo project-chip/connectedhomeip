@@ -87,7 +87,7 @@ void TestPendingResponseTracker_PopFindsAllPendingRequests(nlTestSuite * inSuite
 {
     chip::app::PendingResponseTrackerImpl pendingResponseTracker;
 
-    // The specific values in requestsToAdd are not significant; they are chosen arbitrarily for testing purposes. 
+    // The specific values in requestsToAdd are not significant; they are chosen arbitrarily for testing purposes.
     std::vector<uint16_t> requestsToAdd = { 0, 50, 2, 2000 };
     for (const uint16_t & commandRef : requestsToAdd)
     {
