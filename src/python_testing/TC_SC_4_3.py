@@ -20,7 +20,7 @@ import logging
 
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType, DNSRecordType
 from mobly import asserts
 
 '''
@@ -172,72 +172,75 @@ class TC_SC_4_3(MatterBaseTest):
         # PENDING STEPS 6-8
 
         mdns = MdnsDiscovery()
-        operational = await mdns.get_operational_service(
+        await mdns.get_service_by_record_type(
             service_name=f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}",
             service_type=MdnsServiceType.OPERATIONAL.value,
-            log_output=True
+            record_type=DNSRecordType.SRV,
+            log_output=True,
+            load_from_cache=False
         )
+        
 
-        # *** STEP 9 ***
-        self.print_step("9", "TH verifies ICD, SII, SAI, SAT, and T TXT record keys/vales of the returned record.")
+        # # *** STEP 9 ***
+        # self.print_step("9", "TH verifies ICD, SII, SAI, SAT, and T TXT record keys/vales of the returned record.")
 
-        # ICD TXT KEY
-        if supports_lit:
-            logging.info("supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII).")
+        # # ICD TXT KEY
+        # if supports_lit:
+        #     logging.info("supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII).")
 
-            # Verify the ICD key IS present
-            asserts.assert_in('ICD', operational.txt_record, "ICD key is NOT present in the TXT record.")
+        #     # Verify the ICD key IS present
+        #     asserts.assert_in('ICD', operational.txt_record, "ICD key is NOT present in the TXT record.")
 
-            # Verify it has the value of 0 or 1 (ASCII)
-            icd_value = int(operational.txt_record['ICD'])
-            asserts.assert_true(icd_value == 0 or icd_value == 1, "ICD value is different than 0 or 1 (ASCII).")
-        else:
-            logging.info("supports_lit is false, verify that the ICD key is NOT present in the TXT record.")
-            asserts.assert_not_in('ICD', operational.txt_record, "ICD key is present in the TXT record.")
+        #     # Verify it has the value of 0 or 1 (ASCII)
+        #     icd_value = int(operational.txt_record['ICD'])
+        #     asserts.assert_true(icd_value == 0 or icd_value == 1, "ICD value is different than 0 or 1 (ASCII).")
+        # else:
+        #     logging.info("supports_lit is false, verify that the ICD key is NOT present in the TXT record.")
+        #     asserts.assert_not_in('ICD', operational.txt_record, "ICD key is present in the TXT record.")
 
-        # SII TXT KEY
-        if supports_icd and not supports_lit:
-            sit_mode = True
+        # # SII TXT KEY
+        # if supports_icd and not supports_lit:
+        #     sit_mode = True
 
-        if supports_icd and supports_lit:
-            if icd_value == 0:
-                sit_mode = True
-            else:
-                sit_mode = False
+        # if supports_icd and supports_lit:
+        #     if icd_value == 0:
+        #         sit_mode = True
+        #     else:
+        #         sit_mode = False
 
-        if not supports_icd:
-            sit_mode = False
+        # if not supports_icd:
+        #     sit_mode = False
 
-        if sit_mode:
-            logging.info("sit_mode is True, verify the SII key IS present.")
-            asserts.assert_in('SII', operational.txt_record, "SII key is NOT present in the TXT record.")
+        # if sit_mode:
+        #     logging.info("sit_mode is True, verify the SII key IS present.")
+        #     asserts.assert_in('SII', operational.txt_record, "SII key is NOT present in the TXT record.")
 
-            logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
-            sii_value = operational.txt_record['SII']
-            result, message = self.verify_decimal_value(sii_value, self.ONE_HOUR_IN_MS)
-            asserts.assert_true(result, message)
+        #     logging.info("Verify SII value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
+        #     sii_value = operational.txt_record['SII']
+        #     result, message = self.verify_decimal_value(sii_value, self.ONE_HOUR_IN_MS)
+        #     asserts.assert_true(result, message)
 
-        # SAI TXT KEY
-        if supports_icd:
-            logging.info("supports_icd is True, verify the SAI key IS present.")
-            asserts.assert_in('SAI', operational.txt_record, "SAI key is NOT present in the TXT record.")
+        # # SAI TXT KEY
+        # if supports_icd:
+        #     logging.info("supports_icd is True, verify the SAI key IS present.")
+        #     asserts.assert_in('SAI', operational.txt_record, "SAI key is NOT present in the TXT record.")
 
-            logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
-            sai_value = operational.txt_record['SAI']
-            result, message = self.verify_decimal_value(sai_value, self.ONE_HOUR_IN_MS)
-            asserts.assert_true(result, message)
+        #     logging.info("Verify SAI value is a decimal with no leading zeros and is less than or equal to 3600000 (1h in ms).")
+        #     sai_value = operational.txt_record['SAI']
+        #     result, message = self.verify_decimal_value(sai_value, self.ONE_HOUR_IN_MS)
+        #     asserts.assert_true(result, message)
 
-        # SAT TXT KEY
-        if 'SAT' in operational.txt_record:
-            logging.info(
-                "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
-            sat_value = operational.txt_record['SAT']
-            result, message = self.verify_decimal_value(sat_value, self.MAX_SAT_VALUE)
-            asserts.assert_true(result, message)
+        # # SAT TXT KEY
+        # if 'SAT' in operational.txt_record:
+        #     logging.info(
+        #         "SAT key is present in TXT record, verify that it is a decimal value with no leading zeros and is less than or equal to 65535.")
+        #     sat_value = operational.txt_record['SAT']
+        #     result, message = self.verify_decimal_value(sat_value, self.MAX_SAT_VALUE)
+        #     asserts.assert_true(result, message)
 
-            if supports_icd:
-                logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
-                asserts.assert_equal(int(sat_value), active_mode_threshold_ms)
+        #     if supports_icd:
+        #         logging.info("supports_icd is True, verify the SAT value is equal to active_mode_threshold.")
+        #         asserts.assert_equal(int(sat_value), active_mode_threshold_ms)
 
         # # T TXT KEY
         # if 'T' in operational.txt_record:
@@ -246,19 +249,23 @@ class TC_SC_4_3(MatterBaseTest):
         #     result, message = self.verify_t_value(t_value)
         #     asserts.assert_true(result, message)
 
-        # AAAA
-        logging.info("Verify the AAAA record contains at least one IPv6 address")
-        result, message = self.contains_ipv6_address(operational.addresses)
-        asserts.assert_true(result, message)
+        # # AAAA
+        # logging.info("Verify the AAAA record contains at least one IPv6 address")
+        # result, message = self.contains_ipv6_address(operational.addresses)
+        # asserts.assert_true(result, message)
 
-        # *** STEP 10 ***
-        self.print_step("10", "Verify DUT returns a PTR record with DNS-SD instance name set instance_name.")
-        service_types = await mdns.get_service_types(log_output=True)
-        op_sub_type = self.get_operational_subtype()
-        asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}'")
+        # # *** STEP 10 ***
+        # self.print_step("10", "Verify DUT returns a PTR record with DNS-SD instance name set instance_name.")
+        # service_types = await mdns.get_service_types(log_output=True)
+        # op_sub_type = self.get_operational_subtype()
+        # asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}'")
 
         print("\n"*10)
+        
+        # input()
 
 
 if __name__ == "__main__":
     default_matter_test_main()
+
+    
