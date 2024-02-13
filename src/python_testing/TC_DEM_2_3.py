@@ -18,6 +18,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEM_Utils import DEMBaseTestHelper
@@ -101,16 +102,31 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
 
         self.step("3b")
-        forecast = await self.self.read_dem_attribute_expect_success(attribute="Forecast")
-        print(forecast)
-        for slots in forecast.slots:
-            print(f"slots : {slots}")
+        forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
+        logger.info(f"Forecast: {forecast}")
+
+        if forecast is not NullValue:
+            for index, slot in enumerate(forecast.slots):
+                logging.info(
+                    f"   [{index}] MinDuration: {slot.minDuration} MaxDuration: {slot.maxDuration} DefaultDuration: {slot.defaultDuration}")
+                logging.info(f"       ElapseSlotTime: {slot.elapsedSlotTime} RemainingSlotTime: {slot.remainingSlotTime}")
+                logging.info(
+                    f"       SlotIsPauseable: {slot.slotIsPauseable} MinPauseDuration: {slot.minPauseDuration} MaxPauseDuration: {slot.maxPauseDuration}")
+                logging.info(f"       ManufacturerESAState: {slot.manufacturerESAState}")
+                logging.info(f"       NominalPower: {slot.nominalPower} MinPower: {slot.minPower} MaxPower: {slot.maxPower}")
+                logging.info(f"       NominalEnergy: {slot.nominalEnergy} MinEnergy: {slot.minEnergy} MaxEnergy: {slot.maxEnergy}")
+                logging.info(f"       MinPowerAdjustment: {slot.minPowerAdjustment} MaxPowerAdjustment: {slot.maxPowerAdjustment}")
+                logging.info(
+                    f"       MinDurationAdjustment: {slot.minDurationAdjustment} MaxDurationAdjustment: {slot.maxDurationAdjustment}")
+                for cost_index, cost in enumerate(slot):
+                    logging.info(
+                        f"   Cost: [{cost_index}]  CostType:{cost.costType} Value: {cost.value} DecimalPoints: {cost.decimalPoints} Currency: {cost.currency}")
 
         # TODO check earliest starttime <= Starttime, latestEndTime >= EndTime
         # ForecastUpdateReason == InternalOptimization
 
         self.step("3c")
-        await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutState.kNoOptOut)
+        await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
 
 
 if __name__ == "__main__":
