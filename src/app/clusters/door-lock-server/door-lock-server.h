@@ -307,22 +307,22 @@ private:
     bool findUserIndexByCredential(chip::EndpointId endpointId, CredentialTypeEnum credentialType, chip::ByteSpan credentialData,
                                    uint16_t & userIndex, uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo);
 
-    Protocols::InteractionModel::Status
+    chip::Protocols::InteractionModel::Status
     createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId, uint16_t userIndex,
                const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
                const Nullable<CredentialRuleEnum> & credentialRule,
                const Nullable<CredentialStruct> & credential = Nullable<CredentialStruct>());
-    Protocols::InteractionModel::Status
+    chip::Protocols::InteractionModel::Status
     modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId, uint16_t userIndex,
                const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
                const Nullable<CredentialRuleEnum> & credentialRule);
-    Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
-                                                  chip::NodeId sourceNodeId, uint16_t userIndex, bool sendUserChangeEvent);
-    Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
-                                                  chip::NodeId sourceNodeId, uint16_t userIndex,
-                                                  const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
+                                                        chip::NodeId sourceNodeId, uint16_t userIndex, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
+                                                        chip::NodeId sourceNodeId, uint16_t userIndex,
+                                                        const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
 
     bool clearFabricFromUsers(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
@@ -352,13 +352,13 @@ private:
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
                               uint16_t userIndex, const Nullable<UserStatusEnum> & userStatus, Nullable<UserTypeEnum> userType);
 
-    Protocols::InteractionModel::Status clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier,
-                                                        chip::NodeId sourceNodeId, CredentialTypeEnum credentialType,
-                                                        uint16_t credentialIndex, bool sendUserChangeEvent);
-    Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
-                                                         chip::NodeId sourceNodeId);
-    Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
-                                                         chip::NodeId sourceNodeId, CredentialTypeEnum credentialType);
+    chip::Protocols::InteractionModel::Status clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                              chip::NodeId sourceNodeId, CredentialTypeEnum credentialType,
+                                                              uint16_t credentialIndex, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                               chip::NodeId sourceNodeId);
+    chip::Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                               chip::NodeId sourceNodeId, CredentialTypeEnum credentialType);
 
     bool clearFabricFromCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
                                     chip::FabricIndex fabricToRemove);
@@ -479,7 +479,7 @@ private:
     bool engageLockout(chip::EndpointId endpointId);
 
     static void sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                    Protocols::InteractionModel::Status status);
+                                    chip::Protocols::InteractionModel::Status status);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
@@ -546,7 +546,7 @@ private:
      */
     template <typename T>
     bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
+                      chip::Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
 
     /**
      * @brief Set generic attribute value
@@ -561,7 +561,7 @@ private:
      */
     template <typename T>
     bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      Protocols::InteractionModel::Status (*setFn)(chip::EndpointId endpointId, T value), T value);
+                      chip::Protocols::InteractionModel::Status (*setFn)(chip::EndpointId endpointId, T value), T value);
 
     // AttributeAccessInterface's Read API
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -944,7 +944,8 @@ DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t h
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-Protocols::InteractionModel::Status emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId, chip::CharSpan newLanguage);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId,
+                                                                                chip::CharSpan newLanguage);
 
 /** @brief 'AutoRelockTime' attribute pre-change callback
  *
@@ -954,7 +955,8 @@ Protocols::InteractionModel::Status emberAfPluginDoorLockOnLanguageChange(chip::
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-Protocols::InteractionModel::Status emberAfPluginDoorLockOnAutoRelockTimeChange(chip::EndpointId EndpointId, uint32_t newTime);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnAutoRelockTimeChange(chip::EndpointId EndpointId,
+                                                                                      uint32_t newTime);
 
 /** @brief 'SoundVolume' attribute pre-change callback
  *
@@ -964,7 +966,7 @@ Protocols::InteractionModel::Status emberAfPluginDoorLockOnAutoRelockTimeChange(
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-Protocols::InteractionModel::Status emberAfPluginDoorLockOnSoundVolumeChange(chip::EndpointId EndpointId, uint8_t newVolume);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnSoundVolumeChange(chip::EndpointId EndpointId, uint8_t newVolume);
 
 /** @brief 'OperatingMode' attribute pre-change callback
  *
@@ -974,7 +976,7 @@ Protocols::InteractionModel::Status emberAfPluginDoorLockOnSoundVolumeChange(chi
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-Protocols::InteractionModel::Status emberAfPluginDoorLockOnOperatingModeChange(chip::EndpointId EndpointId, uint8_t newMode);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnOperatingModeChange(chip::EndpointId EndpointId, uint8_t newMode);
 
 /** @brief 'EnableOneTouchLocking' attribute pre-change callback
  *
@@ -984,7 +986,8 @@ Protocols::InteractionModel::Status emberAfPluginDoorLockOnOperatingModeChange(c
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnableOneTouchLockingChange(chip::EndpointId EndpointId, bool enable);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnableOneTouchLockingChange(chip::EndpointId EndpointId,
+                                                                                             bool enable);
 
 /** @brief 'EnablePrivacyModeButton' attribute pre-change callback
  *
@@ -994,7 +997,8 @@ Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnableOneTouchLocking
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnablePrivacyModeButtonChange(chip::EndpointId EndpointId, bool enable);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnablePrivacyModeButtonChange(chip::EndpointId EndpointId,
+                                                                                               bool enable);
 
 /** @brief 'WrongCodeEntryLimit' attribute pre-change callback
  *
@@ -1004,7 +1008,8 @@ Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnablePrivacyModeButt
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-Protocols::InteractionModel::Status emberAfPluginDoorLockOnWrongCodeEntryLimitChange(chip::EndpointId EndpointId, uint8_t newLimit);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnWrongCodeEntryLimitChange(chip::EndpointId EndpointId,
+                                                                                           uint8_t newLimit);
 
 /** @brief 'UserCodeTemporaryDisableTime' attribute pre-change callback
  *
@@ -1014,8 +1019,8 @@ Protocols::InteractionModel::Status emberAfPluginDoorLockOnWrongCodeEntryLimitCh
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId EndpointId,
-                                                                                              uint8_t newTime);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId EndpointId,
+                                                                                                    uint8_t newTime);
 
 /** @note This callback is called for any cluster attribute that has no predefined callback above
  *
@@ -1030,7 +1035,7 @@ Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTemporaryDisa
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-Protocols::InteractionModel::Status
+chip::Protocols::InteractionModel::Status
 emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, const chip::app::ConcreteAttributePath & attributePath,
                                                 EmberAfAttributeType attrType, uint16_t attrSize, uint8_t * attrValue);
 
