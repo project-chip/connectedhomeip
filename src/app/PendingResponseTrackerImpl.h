@@ -17,9 +17,7 @@
 
 #pragma once
 
-// PendingResponseTrackerImpl is only used for platforms that enable
-// CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
-#include <unordered_set> // This is intended to be used by platforms that are not memory constrained
+#include <unordered_set>
 
 #include "PendingResponseTracker.h"
 

@@ -312,12 +312,14 @@ public:
      *                      based on how many paths the remote peer claims to support.
      *
      * @return CHIP_ERROR_INCORRECT_STATE
-     *                      If device has previously called `PrepareCommand`.
+     *             If device has previously called `PrepareCommand`.
      * @return CHIP_ERROR_INVALID_ARGUMENT
-     *                      Invalid argument value.
+     *             Invalid argument value.
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
-     *                      Device has not enabled batch command. One possible solution is to enable
-     *                      CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS.
+     *             Device has not enabled batch command support. To enable:
+     *               1. Enable the CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+     *                  configuration option.
+     *               2. Ensure you provide ExtendableCallback. 
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 

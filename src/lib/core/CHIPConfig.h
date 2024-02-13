@@ -1705,9 +1705,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @def CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
  *
- * @brief CommandSender will used built-in support to enable sending batch commands in a single Invoke Request Message.
- * 
- * This is code and ram intensive. As a result this should only be enabled on platforms that where this is not a constraint.
+ * @brief CommandSender will use built-in support to enable sending batch commands in a single Invoke Request Message.
+ *
+ * **Important:** This feature is code and RAM intensive. Enable only on platforms where these 
+ * resources are not constrained.
  */
 #ifndef CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
 #define CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS 0

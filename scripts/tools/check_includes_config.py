@@ -161,6 +161,9 @@ ALLOW: Dict[str, Set[str]] = {
     'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map'},
 
     # Not intended for embedded clients
+    'src/app/PendingResponseTrackerImpl.h' : {'unordered_set'},
+
+    # Not intended for embedded clients
     'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream'},
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
     'src/lib/support/jsontlv/TlvToJson.h': {'string'},
@@ -168,4 +171,5 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/icd/client/DefaultICDClientStorage.cpp': {'vector'},
     'src/app/icd/client/DefaultICDClientStorage.h': {'vector'},
     'src/app/icd/client/DefaultICDStorageKey.h': {'vector'}
+ 
 }
