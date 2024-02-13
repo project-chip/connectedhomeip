@@ -3628,6 +3628,9 @@ PICS:
     - label: "Indicates that node is configured for test event triggers."
       id: DGGEN.S.C00.Rsp
 
+    - label: "Indicates cluster supports Payload Test Request."
+      id: DGGEN.S.C03.Rsp
+
     #
     # server / Events
     #
@@ -3648,6 +3651,13 @@ PICS:
 
     - label: "Indicates the reason that caused the device to reboot start-up."
       id: DGGEN.S.E03
+
+    #
+    # server / features
+    #
+    - label:
+          "Support specific commands needed for extended Data Model features."
+      id: DGGEN.S.F00
 
     #
     # client / attributes
