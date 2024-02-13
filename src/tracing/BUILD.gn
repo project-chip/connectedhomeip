@@ -38,6 +38,7 @@ static_library("tracing") {
     "log_declares.h",
     "registry.cpp",
     "registry.h",
+    "scalar_event.h",
   ]
 
   public_deps = [

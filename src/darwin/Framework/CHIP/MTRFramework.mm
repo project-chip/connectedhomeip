@@ -19,6 +19,7 @@
 #include <dispatch/dispatch.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <MTRMetricsCollector.h>
 
 void MTRFrameworkInit()
 {
@@ -34,5 +35,8 @@ void MTRFrameworkInit()
         // Suppress CHIP logging until we actually need it for redirection
         // (see MTRSetLogCallback()). Logging to os_log is always enabled.
         chip::Logging::SetLogFilter(chip::Logging::kLogCategory_None);
+
+        // Setup metrics collection and tracing framework
+        InitializeMetricsCollection();
     });
 }

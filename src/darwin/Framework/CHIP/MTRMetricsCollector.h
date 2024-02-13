@@ -1,6 +1,6 @@
-/*
- *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
+/**
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,20 +14,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
 
-namespace chip {
-namespace Tracing {
+#import <Matter/MTRMetrics.h>
 
-// These structures are forward-declared so that tracing itself has no direct dependencies
-// on actual types. This allows tracing to be used anywhere lib/support could be used.
+NS_ASSUME_NONNULL_BEGIN
 
-struct MessageSendInfo;
-struct MessageReceivedInfo;
-struct NodeLookupInfo;
-struct NodeDiscoveredInfo;
-struct NodeDiscoveryFailedInfo;
-struct ScalarEvent;
+void InitializeMetricsCollection();
 
-} // namespace Tracing
-} // namespace chip
+/**
+ * A representation of metrics data for an operation.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRMetricsCollector : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Return the singleton MTRMetricsCollector to vend MTRMetric snapshots
+ */
++ (instancetype)sharedInstance;
+
+@end
+
+NS_ASSUME_NONNULL_END

@@ -18,6 +18,7 @@
 #pragma once
 
 #include <os/signpost.h>
+#include <tracing/backend.h>
 
 #define _MATTER_TRACE_DISABLE(...)                                                                                                 \
     do                                                                                                                             \
@@ -55,6 +56,15 @@ private:
     const char * mLabel;
     const char * mGroup;
 };
+
+class DarwinTracingBackend : public ::chip::Tracing::Backend
+{
+public:
+    DarwinTracingBackend() = default;
+
+    void LogEvent(ScalarEvent & event) override;
+};
+
 } // namespace signposts
 } // namespace Tracing
 } // namespace chip

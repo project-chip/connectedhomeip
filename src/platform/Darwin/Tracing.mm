@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <platform/Darwin/Tracing.h>
+#include <tracing/scalar_event.h>
 
 namespace chip {
 namespace Tracing {
@@ -29,6 +30,13 @@ namespace signposts {
             });
             return logger;
     }
+
+    void DarwinTracingBackend::LogEvent(ScalarEvent & event)
+    {
+        ChipLogProgress(DeviceLayer, "Receive scalar event, type: %u, value: %u",
+                        event.eventType, event.eventValue);
+    }
+
 } // namespace signposts
 } // namespace Tracing
 } // namespace chip
