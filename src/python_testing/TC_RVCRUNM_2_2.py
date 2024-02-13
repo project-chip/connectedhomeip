@@ -81,6 +81,12 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                             "Expected a ChangeToMode response status of %s, got %s" %
                             (error_enum_to_text(expected_error), error_enum_to_text(response.status)))
 
+    async def read_op_state_operational_state(self) -> Clusters.Objects.RvcOperationalState.Attributes.OperationalState:
+        ret = await self.read_mod_attribute_expect_success(
+            Clusters.RvcOperationalState,
+            Clusters.RvcOperationalState.Attributes.OperationalState)
+        return ret
+
     # Sends and out-of-band command to the rvc-app
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
@@ -181,12 +187,34 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         # This step is not described in the test plan, but it ought to be
         await self.read_current_mode_with_check(self.idle_mode_dut)
 
-        self.print_step(8, "Send ChangeToMode MODE_B command")
+        self.print_step(8, "Read RVCOPSTATE's OperationalState attribute")
+        op_state = await self.read_op_state_operational_state()
+
+        valid_op_states = [
+            Clusters.OperationalState.Enums.OperationalStateEnum.kStopped,
+            Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
+            Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCharging,
+            Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked]
+
+        if op_state not in valid_op_states:
+            self.print_step(9, "Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
+            if self.is_ci:
+                self.write_to_app_pipe('{"Name": "ChargerFound"}')
+            else:
+                input("Press Enter when done.\n")
+
+            self.print_step(10, "Read RVCOPSTATE's OperationalState attribute")
+            op_state = await self.read_op_state_operational_state()
+
+            asserts.assert_true(op_state in valid_op_states,
+                                "Expected RVCOPSTATE's OperationalState attribute to be one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
+
+        self.print_step(11, "Send ChangeToMode MODE_B command")
         await self.send_change_to_mode_with_check(self.mode_b, 0)
         # This step is not described in the test plan, but it ought to be
         await self.read_current_mode_with_check(self.mode_b)
 
-        self.print_step(9, "Send ChangeToMode idle command")
+        self.print_step(12, "Send ChangeToMode idle command")
         await self.send_change_to_mode_with_check(self.idle_mode_dut, 0)
         # This step is not described in the test plan, but it ought to be
         await self.read_current_mode_with_check(self.idle_mode_dut)
