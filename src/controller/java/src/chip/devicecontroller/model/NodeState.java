@@ -55,8 +55,13 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState = new ClusterState(new HashMap<>(), new HashMap<>());
+      clusterState =
+          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
+    }
+
+    if (clusterState.getAttributeStatuses().containsKey(attributeId)) {
+      clusterState.getAttributeStatuses().remove(attributeId);
     }
 
     // This will overwrite previous attributes.
@@ -72,14 +77,68 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState = new ClusterState(new HashMap<>(), new HashMap<>());
+      clusterState =
+          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
     if (!clusterState.getEventStates().containsKey(eventId)) {
       clusterState.getEventStates().put(eventId, new ArrayList<EventState>());
     }
+
+    if (clusterState.getEventStatuses().containsKey(eventId)) {
+      clusterState.getEventStatuses().remove(eventId);
+    }
+
     clusterState.getEventStates().get(eventId).add(eventStateToAdd);
+  }
+
+  // Called from native code only, which ignores access modifiers.
+  private void addAttributeStatus(
+      int endpointId, long clusterId, long attributeId, Status statusToAdd) {
+    EndpointState endpointState = getEndpointState(endpointId);
+    if (endpointState == null) {
+      endpointState = new EndpointState(new HashMap<>());
+      getEndpointStates().put(endpointId, endpointState);
+    }
+
+    ClusterState clusterState = endpointState.getClusterState(clusterId);
+    if (clusterState == null) {
+      clusterState =
+          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      endpointState.getClusterStates().put(clusterId, clusterState);
+    }
+
+    if (clusterState.getAttributeStates().containsKey(attributeId)) {
+      clusterState.getAttributeStates().remove(attributeId);
+    }
+
+    clusterState.getAttributeStatuses().put(attributeId, statusToAdd);
+  }
+
+  private void addEventStatus(int endpointId, long clusterId, long eventId, Status statusToAdd) {
+    EndpointState endpointState = getEndpointState(endpointId);
+    if (endpointState == null) {
+      endpointState = new EndpointState(new HashMap<>());
+      getEndpointStates().put(endpointId, endpointState);
+    }
+
+    ClusterState clusterState = endpointState.getClusterState(clusterId);
+    if (clusterState == null) {
+      clusterState =
+          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      endpointState.getClusterStates().put(clusterId, clusterState);
+    }
+
+    if (!clusterState.getEventStatuses().containsKey(eventId)) {
+      clusterState.getEventStatuses().put(eventId, new ArrayList<Status>());
+    }
+
+    if (clusterState.getEventStates().containsKey(eventId)) {
+      clusterState.getEventStates().remove(eventId);
+    }
+
+    clusterState.getEventStatuses().get(eventId).add(statusToAdd);
   }
 
   @Override

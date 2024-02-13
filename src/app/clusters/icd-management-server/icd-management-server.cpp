@@ -36,6 +36,8 @@ using namespace chip::app::Clusters::IcdManagement;
 using namespace Protocols;
 using namespace chip::Access;
 
+using chip::Protocols::InteractionModel::Status;
+
 namespace {
 
 /**

@@ -47,6 +47,8 @@
 #define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 32
 #endif
 
+#define CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER <lib/address_resolve/AddressResolve_DefaultImpl.h>
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the K32W platform.

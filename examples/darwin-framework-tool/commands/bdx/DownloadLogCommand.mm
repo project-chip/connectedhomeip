@@ -21,6 +21,7 @@
 #import "MTRError_Utils.h"
 
 #include "DownloadLogCommand.h"
+#include "RemoteDataModelLogger.h"
 
 CHIP_ERROR DownloadLogCommand::RunCommand()
 {
@@ -32,27 +33,62 @@ CHIP_ERROR DownloadLogCommand::RunCommand()
     auto logType = static_cast<MTRDiagnosticLogType>(mLogType);
     auto queue = dispatch_queue_create("com.chip.bdx.downloader", DISPATCH_QUEUE_SERIAL);
 
+    bool shouldWaitForDownload = !mIsAsyncCommand.ValueOr(false);
+    mIsAsyncCommand.ClearValue();
+
+    bool dumpToFile = mFilePath.HasValue();
+    auto * dumpFilePath = dumpToFile ? [NSString stringWithUTF8String:mFilePath.Value()] : nil;
+    mFilePath.ClearValue();
+
     auto * self = this;
     auto completion = ^(NSURL * url, NSError * error) {
         // A non-nil url indicates the presence of content, which can occur even in error scenarios like timeouts.
+        NSString * logContent = nil;
         if (nil != url) {
             NSError * readError = nil;
             auto * data = [NSData dataWithContentsOfURL:url options:NSDataReadingUncached error:&readError];
-            VerifyOrReturn(nil == readError, self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(readError)));
+            if (nil != readError) {
+                if (shouldWaitForDownload) {
+                    self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(readError));
+                }
+                return;
+            }
 
-            auto * content = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            NSLog(@"Content: %@", content);
+            logContent = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            NSLog(@"Content: %@", logContent);
+
+            if (dumpToFile) {
+                NSError * writeError = nil;
+                auto * fileManager = [NSFileManager defaultManager];
+                [fileManager copyItemAtPath:[url path] toPath:dumpFilePath error:&writeError];
+                if (nil != writeError) {
+                    if (shouldWaitForDownload) {
+                        self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(readError));
+                    }
+                    return;
+                }
+            }
         }
 
-        VerifyOrReturn(nil == error, self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(error)));
+        ChipLogProgress(chipTool, "Diagnostic logs transfer: %s", error ? "Error" : "Success");
+        auto err = RemoteDataModelLogger::LogBdxDownload(logContent, error);
 
-        // The url is nil when there are no logs on the target device.
-        if (nil == url) {
-            NSLog(@"No logs has been found onto node 0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
+        if (CHIP_NO_ERROR != err) {
+            if (shouldWaitForDownload) {
+                self->SetCommandExitStatus(err);
+            }
+            return;
         }
-        self->SetCommandExitStatus(CHIP_NO_ERROR);
+
+        if (shouldWaitForDownload) {
+            self->SetCommandExitStatus(MTRErrorToCHIPErrorCode(error));
+        }
     };
 
     [device downloadLogOfType:logType timeout:mTimeout queue:queue completion:completion];
+
+    if (!shouldWaitForDownload) {
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
     return CHIP_NO_ERROR;
 }

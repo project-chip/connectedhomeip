@@ -1,6 +1,7 @@
-/**
+/*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,21 +18,13 @@
 
 #pragma once
 
-#include <app/util/af-enums.h>
-#include <protocols/interaction_model/Constants.h>
-
 namespace chip {
-namespace app {
+namespace rpc {
 
-inline EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::Status code)
-{
-    return static_cast<EmberAfStatus>(code);
-}
+class LightingService;
 
-inline Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code)
-{
-    return static_cast<Protocols::InteractionModel::Status>(code);
-}
+void Init();
+void RunRpcService(void *);
 
-} // namespace app
+} // namespace rpc
 } // namespace chip
