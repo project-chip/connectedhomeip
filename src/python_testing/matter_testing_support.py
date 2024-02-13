@@ -413,8 +413,9 @@ class ClusterMapper:
             return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
 
     def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
-        if attribute_id in GlobalAttributeIds:
-            return f"Attribute {GlobalAttributeIds(attribute_id).name} {attribute_id}, 0x{attribute_id:04X}"
+        global_attrs = [item.value for item in GlobalAttributeIds]
+        if attribute_id in global_attrs:
+            return f"Attribute {GlobalAttributeIds(attribute_id).to_name()} {attribute_id}, 0x{attribute_id:04X}"
         mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
         if not mapping:
             return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
