@@ -21,7 +21,7 @@ import logging
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
-from mobly import asserts
+# from mobly import asserts
 
 '''
 Category
@@ -136,8 +136,8 @@ class TC_SC_4_3(MatterBaseTest):
         supports_lit = None
         active_mode_threshold_ms = None
         instance_name = None
-        icd_value = None
-        sit_mode = None
+        # icd_value = None
+        # sit_mode = None
 
         # *** STEP 1 ***
         self.print_step("1", "DUT is commissioned on the same fabric as TH.")
