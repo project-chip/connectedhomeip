@@ -34,7 +34,7 @@ class GenericOperationalStateDelegateImpl : public Delegate
 {
 public:
     uint32_t mRunningTime = 0;
-    uint32_t mPausedTime = 0;
+    uint32_t mPausedTime  = 0;
     app::DataModel::Nullable<uint32_t> mCountDownTime;
 
     /**
@@ -109,6 +109,7 @@ private:
     };
 
     const uint32_t kExampleCountDown = 30;
+
 public:
     OperationalStateDelegate()
     {

@@ -40,7 +40,8 @@ private:
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError))
     };
 
-    Span<const OperationalState::GenericOperationalState> mOperationalStateList = Span<const OperationalState::GenericOperationalState>(opStateList);
+    Span<const OperationalState::GenericOperationalState> mOperationalStateList =
+        Span<const OperationalState::GenericOperationalState>(opStateList);
     Span<const CharSpan> mOperationalPhaseList;
 
 public:

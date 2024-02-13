@@ -28,10 +28,10 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
 DataModel::Nullable<uint32_t> GenericOperationalStateDelegateImpl::GetCountdownTime()
 {
-    if(mCountDownTime.IsNull())
+    if (mCountDownTime.IsNull())
         return DataModel::NullNullable;
 
-    return DataModel::MakeNullable((uint32_t)(mCountDownTime.Value() - mRunningTime));
+    return DataModel::MakeNullable((uint32_t) (mCountDownTime.Value() - mRunningTime));
 }
 
 CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
@@ -55,9 +55,10 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_
 
 void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    OperationalState::OperationalStateEnum state = static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
 
-    if(state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
@@ -77,9 +78,10 @@ void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperat
 
 void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    OperationalState::OperationalStateEnum state = static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
 
-    if(state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
@@ -102,7 +104,7 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
     OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     GetInstance()->GetCurrentOperationalError(current_err);
 
-    if(current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
+    if (current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
         return;
@@ -135,12 +137,10 @@ void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperati
         Optional<DataModel::Nullable<uint32_t>> totalTime((DataModel::Nullable<uint32_t>(mRunningTime + mPausedTime)));
         Optional<DataModel::Nullable<uint32_t>> pausedTime((DataModel::Nullable<uint32_t>(mPausedTime)));
 
-        GetInstance()->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID),
-                                                    totalTime,
-                                                    pausedTime);
+        GetInstance()->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime, pausedTime);
 
         mRunningTime = 0;
-        mPausedTime = 0;
+        mPausedTime  = 0;
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     else
@@ -149,31 +149,29 @@ void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperati
     }
 }
 
-
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data)
 {
     GenericOperationalStateDelegateImpl * delegate = reinterpret_cast<GenericOperationalStateDelegateImpl *>(data);
 
     OperationalState::Instance * instance = OperationalState::GetOperationalStateInstance();
-    OperationalState::OperationalStateEnum state = static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
 
     auto countdown_time = delegate->GetCountdownTime();
 
-    if(countdown_time.IsNull() ||
-        (!countdown_time.IsNull() && countdown_time.Value() > 0))
+    if (countdown_time.IsNull() || (!countdown_time.IsNull() && countdown_time.Value() > 0))
     {
-        if(state == OperationalState::OperationalStateEnum::kRunning)
+        if (state == OperationalState::OperationalStateEnum::kRunning)
         {
             delegate->mRunningTime++;
         }
-        else if(state == OperationalState::OperationalStateEnum::kPaused)
+        else if (state == OperationalState::OperationalStateEnum::kPaused)
         {
             delegate->mPausedTime++;
         }
     }
 
-    if (state == OperationalState::OperationalStateEnum::kRunning ||
-        state == OperationalState::OperationalStateEnum::kPaused)
+    if (state == OperationalState::OperationalStateEnum::kRunning || state == OperationalState::OperationalStateEnum::kPaused)
     {
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, delegate);
     }
@@ -182,7 +180,6 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
         (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
     }
 }
-
 
 // Init Operational State cluster
 

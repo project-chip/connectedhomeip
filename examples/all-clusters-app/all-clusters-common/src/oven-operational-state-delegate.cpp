@@ -22,8 +22,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OvenCavityOperationalState;
 
-static OvenCavityOperationalState::Instance * gOvenCavityOperationalStateInstance         = nullptr;
-static OvenCavityOperationalStateDelegate * gOvenCavityOperationalStateDelegate = nullptr;
+static OvenCavityOperationalState::Instance * gOvenCavityOperationalStateInstance = nullptr;
+static OvenCavityOperationalStateDelegate * gOvenCavityOperationalStateDelegate   = nullptr;
 
 OvenCavityOperationalState::Instance * OvenCavityOperationalState::GetOperationalStateInstance()
 {
@@ -83,9 +83,10 @@ OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Mut
 
 void OvenCavityOperationalStateDelegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
 {
-    OperationalState::OperationalStateEnum state = static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
 
-    if(state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
@@ -105,9 +106,10 @@ void OvenCavityOperationalStateDelegate::HandlePauseStateCallback(OperationalSta
 void OvenCavityOperationalStateDelegate::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
 {
 
-    OperationalState::OperationalStateEnum state = static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
 
-    if(state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
@@ -129,7 +131,7 @@ void OvenCavityOperationalStateDelegate::HandleStartStateCallback(OperationalSta
     OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     GetInstance()->GetCurrentOperationalError(current_err);
 
-    if(current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
+    if (current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
         return;

@@ -30,10 +30,10 @@
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
-#include <oven-modes.h>
-#include <rvc-modes.h>
 #include <operational-state-delegate-impl.h>
+#include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
+#include <rvc-modes.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -183,8 +183,8 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "OperationalStateChange")
     {
-        std::string device   = self->mJsonValue["Device"].asString();
-        std::string operation     = self->mJsonValue["Operation"].asString();
+        std::string device    = self->mJsonValue["Device"].asString();
+        std::string operation = self->mJsonValue["Operation"].asString();
         self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
     }
     else
