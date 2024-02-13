@@ -35,6 +35,7 @@ public:
     bool IsResponsePending(uint16_t aCommandRef) override;
     size_t Count() override;
     Optional<uint16_t> PopPendingResponse() override;
+
 private:
     std::unordered_set<uint16_t> mCommandReferenceSet;
 };

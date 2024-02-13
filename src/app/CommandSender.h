@@ -294,7 +294,10 @@ public:
                   bool aSuppressResponse = false);
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
                   PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
-        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse) { mpPendingResponseTracker = apPendingResponseTracker; }
+        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+    {
+        mpPendingResponseTracker = apPendingResponseTracker;
+    }
     ~CommandSender();
 
     /**

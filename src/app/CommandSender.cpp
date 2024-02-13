@@ -77,7 +77,7 @@ CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messagin
     assertChipStackLockedByCurrentThread();
 #if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
     mpPendingResponseTracker = &mPendingResponseTracker;
-#endif //CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+#endif // CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
 }
 
 CommandSender::~CommandSender()
@@ -343,7 +343,7 @@ void CommandSender::Close()
     if (mpPendingResponseTracker)
     {
         Optional<uint16_t> commandRef = mpPendingResponseTracker->PopPendingResponse();
-        while(commandRef.HasValue())
+        while (commandRef.HasValue())
         {
             // TODO is it okay to not provide the actual path if we have only the CommandRef?
             const ConcreteCommandPath concretePath(0, 0, 0);
@@ -367,7 +367,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
     StatusIB statusIB;
 
     {
-        bool hasDataResponse    = false;
+        bool hasDataResponse = false;
         TLV::TLVReader commandDataReader;
         Optional<uint16_t> commandRef;
         bool commandRefExpected = false;

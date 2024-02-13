@@ -1297,13 +1297,15 @@ void TestCommandInteraction::TestCommandSenderLegacyCallbackBuildingBatchCommand
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-void TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchDuplicateCommandRefFails(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchDuplicateCommandRefFails(nlTestSuite * apSuite,
+                                                                                                      void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager(),
+                                     &pendingResponseTracker);
     app::CommandSender::PrepareCommandParameters prepareCommandParams;
     app::CommandSender::FinishCommandParameters finishCommandParams;
 
@@ -1337,7 +1339,8 @@ void TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchCom
     CHIP_ERROR err    = CHIP_NO_ERROR;
     mockCommandSenderExtendedDelegate.ResetCounter();
     PendingResponseTrackerImpl pendingResponseTracker;
-    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager(), &pendingResponseTracker);
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager(),
+                                     &pendingResponseTracker);
     app::CommandSender::PrepareCommandParameters prepareCommandParams;
     app::CommandSender::FinishCommandParameters finishCommandParams;
 

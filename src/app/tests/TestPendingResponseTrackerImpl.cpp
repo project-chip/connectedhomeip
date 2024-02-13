@@ -88,8 +88,8 @@ void TestPendingResponseTracker_PopFindsAllPendingRequests(nlTestSuite * inSuite
     chip::app::PendingResponseTrackerImpl pendingResponseTracker;
 
     // No real reason why values in requestsToAdd are choosen. We just need values to use to test.
-    std::vector<uint16_t> requestsToAdd = {0, 2, 50, 2000};
-    for(const uint16_t & commandRef : requestsToAdd)
+    std::vector<uint16_t> requestsToAdd = { 0, 2, 50, 2000 };
+    for (const uint16_t & commandRef : requestsToAdd)
     {
         NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));
         NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.AddPendingResponse(commandRef));
@@ -116,18 +116,16 @@ void TestPendingResponseTracker_PopFindsAllPendingRequests(nlTestSuite * inSuite
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
-    NL_TEST_DEF_FN(TestPendingResponseTracker_FillEntireTracker),
-    NL_TEST_DEF_FN(TestPendingResponseTracker_FillSingleEntryInTracker),
-    NL_TEST_DEF_FN(TestPendingResponseTracker_RemoveNonExistentEntryInTrackerFails),
-    NL_TEST_DEF_FN(TestPendingResponseTracker_AddingSecondEntryFails),
-    NL_TEST_DEF_FN(TestPendingResponseTracker_PopFindsAllPendingRequests),
-    NL_TEST_SENTINEL()
-};
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestPendingResponseTracker_FillEntireTracker),
+                                 NL_TEST_DEF_FN(TestPendingResponseTracker_FillSingleEntryInTracker),
+                                 NL_TEST_DEF_FN(TestPendingResponseTracker_RemoveNonExistentEntryInTrackerFails),
+                                 NL_TEST_DEF_FN(TestPendingResponseTracker_AddingSecondEntryFails),
+                                 NL_TEST_DEF_FN(TestPendingResponseTracker_PopFindsAllPendingRequests),
+                                 NL_TEST_SENTINEL() };
 
 int TestPendingResponseTracker()
 {
-    nlTestSuite theSuite = { "CHIP PendingResponseTrackerImpl tests", &sTests[0], nullptr, nullptr};
+    nlTestSuite theSuite = { "CHIP PendingResponseTrackerImpl tests", &sTests[0], nullptr, nullptr };
 
     // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);

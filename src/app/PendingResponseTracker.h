@@ -51,7 +51,8 @@ public:
      *
      * @param [in] aCommandRef The CommandReference of the response that is no longer pending.
      * @return CHIP_NO_ERROR on success.
-     * @return CHIP_ERROR_KEY_NOT_FOUND if aCommandRef is not found in the tracker. This indicates the tracker was not waiting for a response associated with this CommandReference.
+     * @return CHIP_ERROR_KEY_NOT_FOUND if aCommandRef is not found in the tracker. This indicates the tracker was not waiting for a
+     * response associated with this CommandReference.
      */
     virtual CHIP_ERROR ResponseReceived(uint16_t aCommandRef) = 0;
 
