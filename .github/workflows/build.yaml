@@ -393,7 +393,7 @@ jobs:
             - name: Setup and Build Simulated Device
               run: |
                   BUILD_TYPE=simulated
-                  GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false'
+                  GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false chip_force_stdio_logging=true'
                   CHIP_ROOT_PATH=examples/placeholder/linux
                   CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
                   scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
