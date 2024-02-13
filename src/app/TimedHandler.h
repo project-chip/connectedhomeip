@@ -15,15 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      Definition of a handler for timed interactions.
- *
- */
-
 #pragma once
 
+#include <app/InteractionModelDelegatePointers.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <system/SystemClock.h>
@@ -104,15 +98,22 @@ private:
 
     enum class State : uint8_t
     {
-        kExpectingTimedAction,     // Initial state: expecting a timed action.
-        kReceivedTimedAction,      // Have received the timed action.  This can
+        kExpectingTimedAction, // Initial state: expecting a timed action.
+        kReceivedTimedAction,  // Have received the timed action.  This can
         // be a terminal state if the action ends up
         // malformed.
         kExpectingFollowingAction, // Expecting write or invoke.
     };
 
     State mState = State::kExpectingTimedAction;
-    TimedHandlerDelegate * mDelegate;
+
+    /// This may be "fake" pointer or a real delegate pointer, depending
+    /// on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting/
+    ///
+    /// When this is not a real pointer, it checks that the value is always
+    /// set to the global InteractionModelEngine and the size of this
+    /// member is 1 byte.
+    InteractionModelDelegatePointer<TimedHandlerDelegate> mDelegate;
 
     // We keep track of the time limit for message reception, in case our
     // exchange's "response expected" timer gets delayed and does not fire when
@@ -126,8 +127,9 @@ private:
     //         =>  As a result we may gain 4 bytes if we place mTimeLimit last.
     // Expectation of memory layout:
     //   - vtable pointer (4 bytes & 4 byte alignment)
-    //   - other members
-    //   - mTimeLimit (8 bytes & 8 byte alignment)
+    //   - other members  (2 bytes on embedded "global pointer" arm)
+    //                    (2 bytes padding for 8-byte alignment)
+    //   - mTimeLimit     (8 bytes & 8 byte alignment)
     System::Clock::Timestamp mTimeLimit;
 };
 
