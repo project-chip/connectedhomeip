@@ -224,13 +224,27 @@ CHIP_ERROR EnergyMeterInit()
     }
 
     /* Manufacturer may optionally not support all features, commands & attributes */
+    /* Turning on all optional features and attributes for test certification purposes */
     gEPMInstance = std::make_unique<ElectricalPowerMeasurementInstance>(
         EndpointId(ENERGY_EVSE_ENDPOINT), *gEPMDelegate,
-        BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+        BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
+            ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
+            ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
+            ElectricalPowerMeasurement::Feature::kPowerQuality),
         BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
             ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
             ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent));
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactiveCurrent,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentCurrent,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactivePower,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentPower,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSVoltage,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
 
     if (!gEPMInstance)
     {

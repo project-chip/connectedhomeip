@@ -188,13 +188,15 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         self.step("17")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.HarmonicCurrents.attribute_id in supported_attributes):
-            harmonic_currents = await self.read_epm_attribute_expect_success("HarmonicCurrents", allow_null=True)
+            harmonic_currents = await self.read_epm_attribute_expect_success("HarmonicCurrents")
             logger.info(f"Rx'd HarmonicCurrents: {harmonic_currents}")
+            asserts.assert_is(type(harmonic_currents), list)
 
         self.step("18")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.HarmonicPhases.attribute_id in supported_attributes):
-            harmonic_phases = await self.read_epm_attribute_expect_success("HarmonicPhases", allow_null=True)
+            harmonic_phases = await self.read_epm_attribute_expect_success("HarmonicPhases")
             logger.info(f"Rx'd HarmonicPhases: {harmonic_phases}")
+            asserts.assert_is(type(harmonic_phases), list)
 
         self.step("19")
         if self.pics_guard(Clusters.ElectricalPowerMeasurement.Attributes.PowerFactor.attribute_id in supported_attributes):
