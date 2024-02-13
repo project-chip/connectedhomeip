@@ -29,7 +29,7 @@ namespace chip::app::Clusters::EnergyPreference
 
 struct Delegate
 {
-    //Note: This delegate does not handle the "Current Active" indexes attributes storage.  
+    //Note: This delegate does not handle the "Current Active" indexes attributes storage.
     //eg: Current Energy Balance and Current Low Power Mode Sensitivity.  These can be handled using
     //ember built in storage, or via the external callbacks as desired by the implementer.
 
