@@ -75,6 +75,47 @@
         ::chip::Tracing::Internal::LogNodeDiscoveryFailed(_trace_data);                                                            \
     } while (false)
 
+////////////////////// Metric LOGGING
+
+#define __GET_4TH_ARG(_a1,_a2,_a3,_a4,...) _a4
+
+#define __SELECT_MACRO_FOR_EVENT_METRIC(...) __GET_4TH_ARG(__VA_ARGS__,                                                            \
+        __MATTER_LOG_METRIC_3ARGS,                                                                                                 \
+        __MATTER_LOG_METRIC_2ARGS,                                                                                                 \
+        __MATTER_LOG_METRIC_1ARGS, )
+
+#define __MATTER_LOG_METRIC(...) __SELECT_MACRO_FOR_EVENT_METRIC(__VA_ARGS__)(__VA_ARGS__)
+
+#define __MATTER_LOG_METRIC_1ARGS(key)                                                                                             \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        using Tag = chip::Tracing::MetricEvent::Tag;                                                                               \
+        ::chip::Tracing::MetricEvent _metric_event(Tag::Instant, chip::Tracing::kMetric##key);                                     \
+        ::chip::Tracing::Internal::LogEvent(_metric_event);                                                                        \
+    } while (false)
+
+#define __MATTER_LOG_METRIC_2ARGS(tag,key)                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        using Tag = chip::Tracing::MetricEvent::Tag;                                                                               \
+        ::chip::Tracing::MetricEvent _metric_event(tag, chip::Tracing::kMetric##key);                                              \
+        ::chip::Tracing::Internal::LogEvent(_metric_event);                                                                        \
+    } while (false)
+
+#define __MATTER_LOG_METRIC_3ARGS(tag,key,value)                                                                                   \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        using Tag = chip::Tracing::MetricEvent::Tag;                                                                               \
+        ::chip::Tracing::MetricEvent _metric_event(tag, chip::Tracing::kMetric##key,value);                                        \
+        ::chip::Tracing::Internal::LogEvent(_metric_event);                                                                        \
+    } while (false)
+
+
+// Format for the args the metric macros: MATTER_LOG_METRIC_XYZ(key, [optional value])
+#define MATTER_LOG_METRIC(...) __MATTER_LOG_METRIC(Tag::Instant, __VA_ARGS__)
+#define MATTER_LOG_METRIC_BEGIN(...) __MATTER_LOG_METRIC(Tag::Begin, __VA_ARGS__)
+#define MATTER_LOG_METRIC_END(...) __MATTER_LOG_METRIC(Tag::End, __VA_ARGS__)
+
 #else // MATTER_TRACING_ENABLED
 
 #define _MATTER_TRACE_DISABLE(...)                                                                                                 \
@@ -87,7 +128,16 @@
 #define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_COUNTER(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_TRACE_METRIC(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+
+// Metric is not enabled, however allow the value to be evaluated
+#define MATTER_TRACE_METRIC(label,value)                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        _Pragma("GCC diagnostic push")                                                                                             \
+        _Pragma("GCC diagnostic ignored \"-Wunused-value\"")                                                                       \
+        value;                                                                                                                     \
+        _Pragma("GCC diagnostic pop")                                                                                              \
+    } while (0)
 
 #define MATTER_LOG_MESSAGE_SEND(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_MESSAGE_RECEIVED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
@@ -95,5 +145,6 @@
 #define MATTER_LOG_NODE_LOOKUP(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_NODE_DISCOVERED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_NODE_DISCOVERY_FAILED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_LOG_METRIC_EVENT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
 #endif // MATTER_TRACING_ENABLED

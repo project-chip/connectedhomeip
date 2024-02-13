@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #import "MTRLogging_Internal.h"
+#include <Foundation/Foundation.h>
 #import "MTRMetrics_Internal.h"
 #import <Matter/MTRDefines.h>
 
@@ -28,6 +29,24 @@
         _metricsData = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (instancetype)initWithDictionary:(NSDictionary *)metricsData
+{
+    if (self = [super init]) {
+        _metricsData = [NSMutableDictionary dictionary];
+        if (_metricsData) {
+            [_metricsData addEntriesFromDictionary:metricsData];
+        }
+    }
+    return self;
+}
+
+
++ (instancetype)metricsFromDictionary:(NSDictionary *)metricsData
+{
+    MTRMetrics *metrics = [[MTRMetrics alloc] initWithDictionary:metricsData];
+    return metrics;
 }
 
 - (NSArray<NSString *> *)allKeys

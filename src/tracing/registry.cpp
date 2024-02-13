@@ -132,6 +132,14 @@ void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo & info)
     }
 }
 
+void LogEvent(::chip::Tracing::MetricEvent & event)
+{
+    for (auto & backend : gTracingBackends)
+    {
+        backend.LogEvent(event);
+    }
+}
+
 } // namespace Internal
 
 #endif // MATTTER_TRACING_ENABLED
