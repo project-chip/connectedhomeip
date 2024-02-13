@@ -32,6 +32,6 @@ public:
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
 private:
-    static constexpr uint32_t mDynamicEndpointFeatureMap = static_cast<uint32_t>(
-        chip::BitMask<Feature, uint32_t>(Feature::kNavigationKeyCodes, Feature::kLocationKeys, Feature::kNumberKeys).Raw());
+    static constexpr uint32_t mDynamicEndpointFeatureMap =
+        chip::BitMask<Feature, uint32_t>(Feature::kNavigationKeyCodes, Feature::kLocationKeys, Feature::kNumberKeys).Raw();
 };

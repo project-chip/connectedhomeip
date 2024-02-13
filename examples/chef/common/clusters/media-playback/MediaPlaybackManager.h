@@ -112,6 +112,6 @@ protected:
 
 private:
     static constexpr uint32_t mDynamicEndpointFeatureMap =
-        static_cast<uint32_t>(chip::BitMask<Feature, uint32_t>(Feature::kAdvancedSeek, Feature::kVariableSpeed).Raw());
+        chip::BitMask<Feature, uint32_t>(Feature::kAdvancedSeek, Feature::kVariableSpeed).Raw();
     static constexpr uint16_t kClusterRevision = 2;
 };
