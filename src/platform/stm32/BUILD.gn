@@ -37,8 +37,8 @@ static_library("stm32") {
   if (stm32_board == "STM32WB5MM-DK") {
     sources = [
       "../FreeRTOS/SystemTimeSupport.cpp",
+      "../Logging.cpp",
       "../SingletonConfigurationManager.cpp",
-      "../logging/impl/stdio/Logging.cpp",
       "BLEManagerImpl.cpp",
       "BLEManagerImpl.h",
       "BlePlatformConfig.h",
