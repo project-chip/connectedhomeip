@@ -15,38 +15,38 @@
  *    limitations under the License.
  */
 
-#include "SentRequestTrackerImpl.h"
+#include "PendingResponseTrackerImpl.h"
 
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
 
-CHIP_ERROR SentRequestTrackerImpl::AddCommand(uint16_t aCommandRef)
+CHIP_ERROR PendingResponseTrackerImpl::AddPendingResponse(uint16_t aCommandRef)
 {
     VerifyOrReturnError(mCommandReferenceSet.find(aCommandRef) == mCommandReferenceSet.end(), CHIP_ERROR_INVALID_ARGUMENT);
     mCommandReferenceSet.insert(aCommandRef);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SentRequestTrackerImpl::RemoveCommand(uint16_t aCommandRef)
+CHIP_ERROR PendingResponseTrackerImpl::ResponseReceived(uint16_t aCommandRef)
 {
     VerifyOrReturnError(mCommandReferenceSet.find(aCommandRef) != mCommandReferenceSet.end(), CHIP_ERROR_KEY_NOT_FOUND);
     mCommandReferenceSet.erase(aCommandRef);
     return CHIP_NO_ERROR;
 }
 
-bool SentRequestTrackerImpl::IsCommandTracked(uint16_t aCommandRef)
+bool PendingResponseTrackerImpl::IsResponsePending(uint16_t aCommandRef)
 {
     return mCommandReferenceSet.find(aCommandRef) != mCommandReferenceSet.end();
 }
 
-size_t SentRequestTrackerImpl::Count()
+size_t PendingResponseTrackerImpl::Count()
 {
     return mCommandReferenceSet.size();
 }
 
-Optional<uint16_t> SentRequestTrackerImpl::PopCommand()
+Optional<uint16_t> PendingResponseTrackerImpl::PopPendingResponse()
 {
     if (Count() == 0)
     {

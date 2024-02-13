@@ -19,22 +19,22 @@
 
 #include <unordered_set>
 
-#include "SentRequestTracker.h"
+#include "PendingResponseTracker.h"
 
 namespace chip {
 namespace app {
 
 /**
- * @brief An implementation of SentRequestTracker.
+ * @brief An implementation of PendingResponseTracker.
  */
-class SentRequestTrackerImpl : public SentRequestTracker
+class PendingResponseTrackerImpl : public PendingResponseTracker
 {
 public:
-    CHIP_ERROR AddCommand(uint16_t aCommandRef) override;
-    CHIP_ERROR RemoveCommand(uint16_t aCommandRef) override;
-    bool IsCommandTracked(uint16_t aCommandRef) override;
+    CHIP_ERROR AddPendingResponse(uint16_t aCommandRef) override;
+    CHIP_ERROR ResponseReceived(uint16_t aCommandRef) override;
+    bool IsResponsePending(uint16_t aCommandRef) override;
     size_t Count() override;
-    Optional<uint16_t> PopCommand() override;
+    Optional<uint16_t> PopPendingResponse() override;
 private:
     std::unordered_set<uint16_t> mCommandReferenceSet;
 };

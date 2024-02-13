@@ -27,7 +27,7 @@
 #include <type_traits>
 
 #include "CommandSenderLegacyCallback.h"
-#include "SentRequestTrackerImpl.h"
+#include "PendingResponseTrackerImpl.h"
 
 #include <app/CommandPathParams.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
@@ -293,8 +293,8 @@ public:
     CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
-                  SentRequestTracker * apSentRequestTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
-        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse) { mpSentRequestTracker = apSentRequestTracker; }
+                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
+        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse) { mpPendingResponseTracker = apPendingResponseTracker; }
     ~CommandSender();
 
     /**
@@ -583,9 +583,9 @@ private:
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 
 #if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
-    SentRequestTrackerImpl mSentRequestTracker;
+    PendingResponseTrackerImpl mPendingResponseTracker;
 #endif // CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
-    SentRequestTracker * mpSentRequestTracker = nullptr;
+    PendingResponseTracker * mpPendingResponseTracker = nullptr;
 
     uint16_t mInvokeResponseMessageCount = 0;
     uint16_t mRemoteMaxPathsPerInvoke    = 1;

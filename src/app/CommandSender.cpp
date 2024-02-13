@@ -76,7 +76,7 @@ CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messagin
 {
     assertChipStackLockedByCurrentThread();
 #if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
-    mpSentRequestTracker = &mSentRequestTracker;
+    mpPendingResponseTracker = &mPendingResponseTracker;
 #endif //CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
 }
 
@@ -340,9 +340,9 @@ void CommandSender::Close()
     mTimedRequest     = false;
     MoveToState(State::AwaitingDestruction);
 
-    if (mpSentRequestTracker)
+    if (mpPendingResponseTracker)
     {
-        Optional<uint16_t> commandRef = mpSentRequestTracker->PopCommand();
+        Optional<uint16_t> commandRef = mpPendingResponseTracker->PopPendingResponse();
         while(commandRef.HasValue())
         {
             // TODO is it okay to not provide the actual path if we have only the CommandRef?
@@ -351,7 +351,7 @@ void CommandSender::Close()
             responseData.data         = nullptr;
             responseData.commandRef   = commandRef;
             OnResponseCallback(responseData);
-            commandRef = mpSentRequestTracker->PopCommand();
+            commandRef = mpPendingResponseTracker->PopPendingResponse();
         }
     }
     OnDoneCallback();
@@ -371,9 +371,9 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         TLV::TLVReader commandDataReader;
         Optional<uint16_t> commandRef;
         bool commandRefExpected = false;
-        if (mpSentRequestTracker)
+        if (mpPendingResponseTracker)
         {
-            commandRefExpected = (mpSentRequestTracker->Count() > 1);
+            commandRefExpected = (mpPendingResponseTracker->Count() > 1);
         }
 
         CommandStatusIB::Parser commandStatus;
@@ -430,9 +430,9 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         }
         ReturnErrorOnFailure(err);
 
-        if (commandRef.HasValue() && mpSentRequestTracker != nullptr)
+        if (commandRef.HasValue() && mpPendingResponseTracker != nullptr)
         {
-            err = mpSentRequestTracker->RemoveCommand(commandRef.Value());
+            err = mpPendingResponseTracker->ResponseReceived(commandRef.Value());
             if (err != CHIP_NO_ERROR)
             {
                 // This can happen for two reasons:
@@ -466,7 +466,7 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
 {
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mpSentRequestTracker != nullptr)
+    if (mpPendingResponseTracker != nullptr)
     {
 
         mRemoteMaxPathsPerInvoke = aConfigParams.remoteMaxPathsPerInvoke;
@@ -490,18 +490,18 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled && mUseExtendableCallback);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
 
-    if (mpSentRequestTracker != nullptr)
+    if (mpPendingResponseTracker != nullptr)
     {
-        size_t count = mpSentRequestTracker->Count();
+        size_t count = mpPendingResponseTracker->Count();
         VerifyOrReturnError(count < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
     }
 
     if (mBatchCommandsEnabled)
     {
-        VerifyOrReturnError(mpSentRequestTracker != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mpPendingResponseTracker != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(aPrepareCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         uint16_t commandRef = aPrepareCommandParams.commandRef.Value();
-        VerifyOrReturnError(!mpSentRequestTracker->IsCommandTracked(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!mpPendingResponseTracker->IsResponsePending(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
@@ -525,10 +525,10 @@ CHIP_ERROR CommandSender::FinishCommand(FinishCommandParameters & aFinishCommand
 {
     if (mBatchCommandsEnabled)
     {
-        VerifyOrReturnError(mpSentRequestTracker != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mpPendingResponseTracker != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(aFinishCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         uint16_t commandRef = aFinishCommandParams.commandRef.Value();
-        VerifyOrReturnError(!mpSentRequestTracker->IsCommandTracked(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!mpPendingResponseTracker->IsResponsePending(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     return FinishCommandInternal(aFinishCommandParams);
@@ -556,9 +556,9 @@ CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinis
 
     MoveToState(State::AddedCommand);
 
-    if (mpSentRequestTracker && aFinishCommandParams.commandRef.HasValue())
+    if (mpPendingResponseTracker && aFinishCommandParams.commandRef.HasValue())
     {
-        mpSentRequestTracker->AddCommand(aFinishCommandParams.commandRef.Value());
+        mpPendingResponseTracker->AddPendingResponse(aFinishCommandParams.commandRef.Value());
     }
 
     if (aFinishCommandParams.timedInvokeTimeoutMs.HasValue())
