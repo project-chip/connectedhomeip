@@ -24,14 +24,13 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 
-namespace chip::app::Clusters::EnergyPreference
-{
+namespace chip::app::Clusters::EnergyPreference {
 
 struct Delegate
 {
-    //Note: This delegate does not handle the "Current Active" indexes attributes storage.
-    //eg: Current Energy Balance and Current Low Power Mode Sensitivity.  These can be handled using
-    //ember built in storage, or via the external callbacks as desired by the implementer.
+    // Note: This delegate does not handle the "Current Active" indexes attributes storage.
+    // eg: Current Energy Balance and Current Low Power Mode Sensitivity.  These can be handled using
+    // ember built in storage, or via the external callbacks as desired by the implementer.
 
     virtual ~Delegate() {}
 
@@ -42,8 +41,9 @@ struct Delegate
      * @param aOutBalance The BalanceStruct to copy the data into.
      * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
      */
-    virtual CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
-                                               chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & aOutBalance) = 0;
+    virtual CHIP_ERROR
+    GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
+                            chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & aOutBalance) = 0;
 
     /**
      * Get an Energy Priority.
@@ -55,7 +55,6 @@ struct Delegate
     virtual CHIP_ERROR GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
                                                 chip::app::Clusters::EnergyPreference::EnergyPriorityEnum & aOutPriority) = 0;
 
-
     /**
      * Get a Power Sensitity Balance Struct.
      * @param aEndpoint The endpoint to query.
@@ -66,7 +65,6 @@ struct Delegate
     virtual CHIP_ERROR
     GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
                                       chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & aOutBalance) = 0;
-
 
     /**
      * Get the number of energy balances this endpoint has.
@@ -80,7 +78,7 @@ struct Delegate
      * @param aEndpoint The endpoint to query.
      * @return the number of balance structs in the list.
      */
-    virtual size_t GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint)  = 0;
+    virtual size_t GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint) = 0;
 };
 
 void SetDelegate(Delegate * aDelegate);

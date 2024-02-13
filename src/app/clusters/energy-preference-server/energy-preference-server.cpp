@@ -23,8 +23,8 @@
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/ConcreteAttributePath.h>
 #include <app/AttributeAccessInterface.h> // added in case we ever don't need app/util/attribute-storage.h at some point.
+#include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -54,8 +54,8 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     VerifyOrDie(aPath.mClusterId == EnergyPreference::Id);
     EndpointId endpoint = aPath.mEndpointId;
     uint32_t ourFeatureMap;
-    const bool featureMapIsGood = FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS;
-    const bool balanceSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
+    const bool featureMapIsGood  = FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS;
+    const bool balanceSupported  = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
     const bool lowPowerSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0);
 
     switch (aPath.mAttributeId)
@@ -144,8 +144,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
 } // anonymous namespace
 
-namespace chip::app::Clusters::EnergyPreference
-{
+namespace chip::app::Clusters::EnergyPreference {
 
 void SetDelegate(Delegate * aDelegate)
 {
@@ -157,17 +156,17 @@ Delegate * GetDelegate()
     return gsDelegate;
 }
 
-} // Set matter energy preferences delegate
+} // namespace chip::app::Clusters::EnergyPreference
 
-Status
-MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+Status MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
+                                                                      EmberAfAttributeType attributeType, uint16_t size,
+                                                                      uint8_t * value)
 {
-    EndpointId endpoint                 = attributePath.mEndpointId;
+    EndpointId endpoint = attributePath.mEndpointId;
     Delegate * delegate = GetDelegate();
     uint32_t ourFeatureMap;
-    const bool featureMapIsGood = FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS;
-    const bool balanceSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
+    const bool featureMapIsGood  = FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS;
+    const bool balanceSupported  = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
     const bool lowPowerSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0);
 
     if (delegate == nullptr)
