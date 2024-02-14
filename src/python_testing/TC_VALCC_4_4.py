@@ -100,6 +100,9 @@ class TC_VALCC_4_4(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
 
+        else:
+            logging.info("Test step skipped")
+
         self.step(4)
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(openDuration=60), endpoint=endpoint)
