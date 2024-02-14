@@ -271,8 +271,6 @@ private:
     /**
      * Allocates a new session out of the internal resource pool.
      *
-     * On failure, the output `entry` will be set to nullptr
-     *
      * @returns CHIP_NO_ERROR if new session created. May fail if maximum session count has been reached (with
      * CHIP_ERROR_NO_MEMORY).
      */
@@ -280,9 +278,10 @@ private:
     CHIP_ERROR AllocEntry(UnauthenticatedSession::SessionRole sessionRole, NodeId ephemeralInitiatorNodeID,
                           const ReliableMessageProtocolConfig & config, UnauthenticatedSession *& entry)
     {
-        entry = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
-        if (entry != nullptr)
+        auto entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
+        if (entryToUse != nullptr)
         {
+            entry = entryToUse;
             return CHIP_NO_ERROR;
         }
 
@@ -290,16 +289,20 @@ private:
         // permanent failure if heap was insufficient
         return CHIP_ERROR_NO_MEMORY;
 #else
-        entry = FindLeastRecentUsedEntry();
-        VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
+        entryToUse = FindLeastRecentUsedEntry();
+        VerifyOrReturnError(entryToUse != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        // make sure a clean reset is done
-        mEntries.ReleaseObject(static_cast<EntryType *>(entry));
-        entry = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
+        // clean the least recent entry to allow for a new alloc
+        mEntries.ReleaseObject(entryToUse);
+        entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
 
-        // entry being null is not expected as we released an object that could be reclaimed
-        VerifyOrReturnError(entry != nullptr, CHIP_ERROR_INTERNAL);
+        if (entryToUse == nullptr)
+        {
+            // this is NOT expected: we freed an object to have space
+            return CHIP_ERROR_INTERNAL;
+        }
 
+        entry = entryToUse;
         return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     }
