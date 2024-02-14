@@ -86,8 +86,8 @@ tests:
           GroupKeySet fields are as follows: 1)GroupKeySetID: 0x01a1
           2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
           a0a1a2a3a4a5a6a7a8a9aaabacadaeaf 4)EpochStartTime0: 1110000
-          5)EpochKey1: a1a1a2a3a4a5a6a7a8a9aaabacadaeaf 6)EpochStartTime1:
-          1110001 7)EpochKey2: a2a1a2a3a4a5a6a7a8a9aaabacadaeaf
+          5)EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf 6)EpochStartTime1:
+          1110001 7)EpochKey2: c0c1c2c3c4c5c6c7c8c9cacbcccdcecf
           8)EpochStartTime2: 1110002"
       cluster: "Group Key Management"
       endpoint: 0
@@ -113,8 +113,8 @@ tests:
           GroupKeySet fields are as follows: 1)GroupKeySetID: 0x01a2
           2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
           d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 2220000
-          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
-          2220001 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          5)EpochKey1: e0e1e2e3e4e5e6e7e8e9eaebecedeeef 6)EpochStartTime1:
+          2220001 7)EpochKey2: f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff
           8)EpochStartTime2: 2220002"
       cluster: "Group Key Management"
       endpoint: 0
@@ -130,12 +130,12 @@ tests:
                         EpochStartTime0: 2220000,
                         EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
                         EpochStartTime1: 2220001,
-                        EpochKey2: "\xf2\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
                         EpochStartTime2: 2220002,
                     }
 
     - label:
-          "Step 0b: TH binds GroupId G1 with GroupKeySetID 0x01a1 in the
+          "Step 0c: TH binds GroupId G1 with GroupKeySetID 0x01a1 in the
           GroupKeyMap attribute list on GroupKeyManagement cluster by writing
           the GroupKeyMap attribute with one entry as follows: List item 1:
           1)FabricIndex: 1 2)GroupId :_G1_ 3)GroupKeySetId: 0x01a1"
@@ -188,7 +188,7 @@ tests:
               - name: "GroupID"
                 value: G2
 
-    - label: "Install ACLs"
+    - label: "Step 1c: Install ACLs"
       cluster: "Access Control"
       endpoint: 0
       command: "writeAttribute"
@@ -214,7 +214,7 @@ tests:
               ]
 
     - label:
-          "Step 1c: TH sends a RemoveAllScenes command to DUT with the GroupID
+          "Step 1d: TH sends a RemoveAllScenes command to DUT with the GroupID
           field set to G1."
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
@@ -230,7 +230,7 @@ tests:
                 value: G1
 
     - label:
-          "Step 1d: TH sends a RemoveAllScenes command to DUT with the GroupID
+          "Step 1e: TH sends a RemoveAllScenes command to DUT with the GroupID
           field set to G2."
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
@@ -246,7 +246,7 @@ tests:
                 value: G2
 
     - label:
-          "Step 1e: TH sends a GetSceneMembership command to DUT with the
+          "Step 1f: TH sends a GetSceneMembership command to DUT with the
           GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"

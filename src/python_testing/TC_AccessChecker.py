@@ -198,7 +198,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
 
     async def run_access_test(self, test_type: AccessTestType):
-        # Step 1 and 2 are handled in the class setup, but need to be marked for every test
+        # Step precondition, 1 and 2 are handled in the class setup, but need to be marked for every test
+        self.step("precondition")
         self.step(1)
         self.step(2)
         # Read all the attributes on TH2 using admin access
@@ -234,7 +235,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test("One or more access violations was found")
 
     def steps_TC_ACE_2_1(self):
-        steps = [TestStep(1, "TH_commissioner performs a wildcard read"),
+        steps = [TestStep("precondition", "DUT is commissioned", is_commissioning=True),
+                 TestStep(1, "TH_commissioner performs a wildcard read"),
                  TestStep(2, "TH_commissioner reads the ACL attribute"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
@@ -254,7 +256,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         await self.run_access_test(AccessTestType.READ)
 
     def steps_TC_ACE_2_2(self):
-        steps = [TestStep(1, "TH_commissioner performs a wildcard read"),
+        steps = [TestStep("precondition", "DUT is commissioned", is_commissioning=True),
+                 TestStep(1, "TH_commissioner performs a wildcard read"),
                  TestStep(2, "TH_commissioner reads the ACL attribute"),
                  TestStep(3, "TH_commissioner grants TH_second_controller admin permission"),
                  TestStep(4, "TH_second_controller performs a wildcard read"),

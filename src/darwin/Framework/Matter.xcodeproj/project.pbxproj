@@ -22,7 +22,6 @@
 		037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D882991BD4F00B7EEE2 /* ModelCommandBridge.h */; };
 		037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D892991BD4F00B7EEE2 /* ClusterCommandBridge.h */; };
 		037C3DB92991BD5000B7EEE2 /* ReportCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */; };
-		037C3DBA2991BD5000B7EEE2 /* TestCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */; };
 		037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8E2991BD4F00B7EEE2 /* Commands.h */; };
 		037C3DBC2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D8F2991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.mm */; };
 		037C3DBD2991BD5000B7EEE2 /* OTAProviderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D902991BD4F00B7EEE2 /* OTAProviderDelegate.h */; };
@@ -68,9 +67,6 @@
 		039546A02991DFC5006D42A8 /* json_tool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0395469B2991DFC4006D42A8 /* json_tool.h */; };
 		039546A12991DFC5006D42A8 /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0395469C2991DFC4006D42A8 /* json_value.cpp */; };
 		039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546A52991E132006D42A8 /* InteractionModel.cpp */; };
-		039546BC2991E1CB006D42A8 /* LogCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546AF2991E193006D42A8 /* LogCommands.cpp */; };
-		039546BD2991E1CB006D42A8 /* SystemCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546B32991E194006D42A8 /* SystemCommands.cpp */; };
-		039546BE2991E1CB006D42A8 /* DelayCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546AC2991E185006D42A8 /* DelayCommands.cpp */; };
 		039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */; };
 		0395470F2992DB37006D42A8 /* complete.c in Sources */ = {isa = PBXBuildFile; fileRef = 0395470C2992DB37006D42A8 /* complete.c */; };
 		03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */; };
@@ -170,6 +166,7 @@
 		51565CB22A7AD77600469F18 /* MTRDeviceControllerDataStore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51565CB02A7AD77600469F18 /* MTRDeviceControllerDataStore.mm */; };
 		51565CB42A7AD78D00469F18 /* MTRDeviceControllerStorageDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 51565CB32A7AD78D00469F18 /* MTRDeviceControllerStorageDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51565CB62A7B0D6600469F18 /* MTRDeviceControllerParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 51565CB52A7B0D6600469F18 /* MTRDeviceControllerParameters.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		515BE4ED2B72C0C5000BC1FD /* MTRUnfairLock.h in Headers */ = {isa = PBXBuildFile; fileRef = 515BE4EC2B72C0C5000BC1FD /* MTRUnfairLock.h */; };
 		515C1C6F284F9FFB00A48F0C /* MTRFramework.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */; };
 		515C1C70284F9FFB00A48F0C /* MTRFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C1C6E284F9FFB00A48F0C /* MTRFramework.h */; };
 		516411312B6BF70300E67C05 /* DataModelHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 516415FE2B6B132200D5CE11 /* DataModelHandler.cpp */; };
@@ -257,6 +254,7 @@
 		7596A8512878709F004DAE0E /* MTRAsyncCallbackQueueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */; };
 		7596A85528788557004DAE0E /* MTRClusters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7596A85228788557004DAE0E /* MTRClusters.mm */; };
 		7596A85728788557004DAE0E /* MTRClusters.h in Headers */ = {isa = PBXBuildFile; fileRef = 7596A85428788557004DAE0E /* MTRClusters.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		75B0D01E2B71B47F002074DD /* MTRDeviceTestDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 75B0D01D2B71B47F002074DD /* MTRDeviceTestDelegate.m */; };
 		75B765C12A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h in Headers */ = {isa = PBXBuildFile; fileRef = 75B765C02A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h */; };
 		75B765C32A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm in Sources */ = {isa = PBXBuildFile; fileRef = 75B765C22A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm */; };
 		8874C1322B69C7060084BEFD /* MTRMetricsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8874C1312B69C7060084BEFD /* MTRMetricsTests.m */; };
@@ -398,7 +396,6 @@
 		037C3D882991BD4F00B7EEE2 /* ModelCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelCommandBridge.h; sourceTree = "<group>"; };
 		037C3D892991BD4F00B7EEE2 /* ClusterCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusterCommandBridge.h; sourceTree = "<group>"; };
 		037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReportCommandBridge.h; sourceTree = "<group>"; };
-		037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCommandBridge.h; sourceTree = "<group>"; };
 		037C3D8E2991BD4F00B7EEE2 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
 		037C3D8F2991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OTASoftwareUpdateInteractive.mm; sourceTree = "<group>"; };
 		037C3D902991BD4F00B7EEE2 /* OTAProviderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OTAProviderDelegate.h; sourceTree = "<group>"; };
@@ -443,15 +440,6 @@
 		0395469C2991DFC4006D42A8 /* json_value.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_value.cpp; sourceTree = "<group>"; };
 		0395469D2991DFC4006D42A8 /* json_valueiterator.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_valueiterator.inl; sourceTree = "<group>"; };
 		039546A52991E132006D42A8 /* InteractionModel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = InteractionModel.cpp; sourceTree = "<group>"; };
-		039546AC2991E185006D42A8 /* DelayCommands.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DelayCommands.cpp; sourceTree = "<group>"; };
-		039546AF2991E193006D42A8 /* LogCommands.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogCommands.cpp; sourceTree = "<group>"; };
-		039546B32991E194006D42A8 /* SystemCommands.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SystemCommands.cpp; sourceTree = "<group>"; };
-		039546B62991E194006D42A8 /* FactoryReset.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = FactoryReset.py; sourceTree = "<group>"; };
-		039546B72991E194006D42A8 /* Stop.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Stop.py; sourceTree = "<group>"; };
-		039546B82991E194006D42A8 /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
-		039546B92991E194006D42A8 /* CreateOtaImage.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CreateOtaImage.py; sourceTree = "<group>"; };
-		039546BA2991E194006D42A8 /* CompareFiles.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CompareFiles.py; sourceTree = "<group>"; };
-		039546BB2991E194006D42A8 /* Reboot.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Reboot.py; sourceTree = "<group>"; };
 		0395470B2992DB37006D42A8 /* editline.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = editline.c; path = repo/src/editline.c; sourceTree = "<group>"; };
 		0395470C2992DB37006D42A8 /* complete.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = complete.c; path = repo/src/complete.c; sourceTree = "<group>"; };
 		03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExamplePersistentStorage.cpp; sourceTree = "<group>"; };
@@ -566,6 +554,7 @@
 		51565CB02A7AD77600469F18 /* MTRDeviceControllerDataStore.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceControllerDataStore.mm; sourceTree = "<group>"; };
 		51565CB32A7AD78D00469F18 /* MTRDeviceControllerStorageDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerStorageDelegate.h; sourceTree = "<group>"; };
 		51565CB52A7B0D6600469F18 /* MTRDeviceControllerParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerParameters.h; sourceTree = "<group>"; };
+		515BE4EC2B72C0C5000BC1FD /* MTRUnfairLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRUnfairLock.h; sourceTree = "<group>"; };
 		515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRFramework.mm; sourceTree = "<group>"; };
 		515C1C6E284F9FFB00A48F0C /* MTRFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRFramework.h; sourceTree = "<group>"; };
 		516415FA2B6ACA8300D5CE11 /* MTRServerAccessControl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRServerAccessControl.mm; sourceTree = "<group>"; };
@@ -658,6 +647,8 @@
 		7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRAsyncCallbackQueueTests.m; sourceTree = "<group>"; };
 		7596A85228788557004DAE0E /* MTRClusters.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRClusters.mm; sourceTree = "<group>"; };
 		7596A85428788557004DAE0E /* MTRClusters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRClusters.h; sourceTree = "<group>"; };
+		75B0D01C2B71B46F002074DD /* MTRDeviceTestDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceTestDelegate.h; sourceTree = "<group>"; };
+		75B0D01D2B71B47F002074DD /* MTRDeviceTestDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceTestDelegate.m; sourceTree = "<group>"; };
 		75B765BF2A1D70F80014719B /* MTRAttributeSpecifiedCheck-src.zapt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MTRAttributeSpecifiedCheck-src.zapt"; sourceTree = "<group>"; };
 		75B765C02A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRAttributeSpecifiedCheck.h; sourceTree = "<group>"; };
 		75B765C22A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRAttributeSpecifiedCheck.mm; sourceTree = "<group>"; };
@@ -863,14 +854,6 @@
 			path = clusters;
 			sourceTree = "<group>";
 		};
-		037C3D8B2991BD4F00B7EEE2 /* tests */ = {
-			isa = PBXGroup;
-			children = (
-				037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */,
-			);
-			path = tests;
-			sourceTree = "<group>";
-		};
 		037C3D8D2991BD4F00B7EEE2 /* provider */ = {
 			isa = PBXGroup;
 			children = (
@@ -973,47 +956,6 @@
 			);
 			name = interaction_model;
 			path = ../../src/app/tests/suites/commands/interaction_model;
-			sourceTree = "<group>";
-		};
-		039546A72991E185006D42A8 /* delay */ = {
-			isa = PBXGroup;
-			children = (
-				039546AC2991E185006D42A8 /* DelayCommands.cpp */,
-			);
-			name = delay;
-			path = ../../src/app/tests/suites/commands/delay;
-			sourceTree = "<group>";
-		};
-		039546AD2991E193006D42A8 /* log */ = {
-			isa = PBXGroup;
-			children = (
-				039546AF2991E193006D42A8 /* LogCommands.cpp */,
-			);
-			name = log;
-			path = ../../src/app/tests/suites/commands/log;
-			sourceTree = "<group>";
-		};
-		039546B12991E194006D42A8 /* system */ = {
-			isa = PBXGroup;
-			children = (
-				039546B32991E194006D42A8 /* SystemCommands.cpp */,
-				039546B52991E194006D42A8 /* scripts */,
-			);
-			name = system;
-			path = ../../src/app/tests/suites/commands/system;
-			sourceTree = "<group>";
-		};
-		039546B52991E194006D42A8 /* scripts */ = {
-			isa = PBXGroup;
-			children = (
-				039546B62991E194006D42A8 /* FactoryReset.py */,
-				039546B72991E194006D42A8 /* Stop.py */,
-				039546B82991E194006D42A8 /* Start.py */,
-				039546B92991E194006D42A8 /* CreateOtaImage.py */,
-				039546BA2991E194006D42A8 /* CompareFiles.py */,
-				039546BB2991E194006D42A8 /* Reboot.py */,
-			);
-			path = scripts;
 			sourceTree = "<group>";
 		};
 		039547092992DB02006D42A8 /* editline */ = {
@@ -1161,6 +1103,8 @@
 				518D3F822AA132DC008E0007 /* MTRTestPerControllerStorage.h */,
 				518D3F812AA132DC008E0007 /* MTRTestPerControllerStorage.m */,
 				51C984602A61CE2A00B0AD9A /* MTRFabricInfoChecker.m */,
+				75B0D01C2B71B46F002074DD /* MTRDeviceTestDelegate.h */,
+				75B0D01D2B71B47F002074DD /* MTRDeviceTestDelegate.m */,
 			);
 			path = TestHelpers;
 			sourceTree = "<group>";
@@ -1353,6 +1297,7 @@
 				5173A47229C0E2ED00F67F48 /* MTRFabricInfo_Internal.h */,
 				5173A47429C0E2ED00F67F48 /* MTRFabricInfo.h */,
 				5173A47329C0E2ED00F67F48 /* MTRFabricInfo.mm */,
+				515BE4EC2B72C0C5000BC1FD /* MTRUnfairLock.h */,
 				3D69867E29382E58007314E7 /* Resources */,
 			);
 			path = CHIP;
@@ -1519,7 +1464,6 @@
 				037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */,
 				037C3DC52991BD5100B7EEE2 /* StorageManagementCommand.h in Headers */,
 				037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */,
-				037C3DBA2991BD5000B7EEE2 /* TestCommandBridge.h in Headers */,
 				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
 				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
 				03FB93DF2A46200A0048CB35 /* Commands.h in Headers */,
@@ -1617,6 +1561,7 @@
 				51E51FC0282AD37A00FC978D /* MTRDeviceControllerStartupParams_Internal.h in Headers */,
 				3DECCB702934AECD00585AEC /* MTRLogging.h in Headers */,
 				1E4D654E29C208DD00BC3478 /* MTRCommissionableBrowserResult.h in Headers */,
+				515BE4ED2B72C0C5000BC1FD /* MTRUnfairLock.h in Headers */,
 				998F286F26D55EC5001846C6 /* MTRP256KeypairBridge.h in Headers */,
 				2C222ADF255C811800E446B9 /* MTRBaseDevice_Internal.h in Headers */,
 				514C7A022B64223400DD6D7B /* MTRServerEndpoint_Internal.h in Headers */,
@@ -1703,7 +1648,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = CHIP;
 				TargetAttributes = {
 					037C3CA42991A44B00B7EEE2 = {
@@ -1974,6 +1919,7 @@
 				51339B1F2A0DA64D00C798C1 /* MTRCertificateValidityTests.m in Sources */,
 				5173A47929C0E82300F67F48 /* MTRFabricInfoTests.m in Sources */,
 				5143851E2A65885500EDC8E6 /* MTRSwiftPairingTests.swift in Sources */,
+				75B0D01E2B71B47F002074DD /* MTRDeviceTestDelegate.m in Sources */,
 				3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */,
 				3DA1A3582ABABF6A004F0BB9 /* MTRAsyncWorkQueueTests.m in Sources */,
 				51742B4A29CB5FC1009974FE /* MTRTestResetCommissioneeHelper.m in Sources */,

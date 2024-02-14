@@ -38,6 +38,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)invalidate;
 
 /**
+ * Add the attribute to a cluster with the given cluster path.  Will return NO
+ * if the attribute is already added to a cluster.
+ */
+- (BOOL)addToCluster:(const chip::app::ConcreteClusterPath &)cluster;
+
+/**
+ * Update the parent cluster path of the attribute.  Should only be done for
+ * attributes that are already added to a cluster, when the endpoint id needs to
+ * be updated.
+ */
+- (void)updateParentCluster:(const chip::app::ConcreteClusterPath &)cluster;
+
+/**
  * serializedValue is either an NSData or an NSArray<NSData *>, depending on
  * whether the attribute is list-typed.
  */
@@ -47,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
  * parentCluster will have kInvalidClusterId for the cluster ID until the
  * attribute is added to a cluster.
  */
-@property (nonatomic, assign) chip::app::ConcreteClusterPath parentCluster;
+@property (nonatomic, assign, readonly) const chip::app::ConcreteClusterPath & parentCluster;
 
 @end
 
