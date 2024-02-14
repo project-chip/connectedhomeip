@@ -414,6 +414,12 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, count == kSize);
         NL_TEST_ASSERT(inSuite, objIds.size() == kSize / 2);
 
+        // validate we iterate only over active objects
+        for (auto object : pool)
+        {
+            NL_TEST_ASSERT(inSuite, (object->mId % 2) == 1);
+        }
+
         for (size_t i = 0; i < kSize; ++i)
         {
             if ((i % 2) == 0)
