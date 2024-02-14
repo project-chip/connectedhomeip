@@ -271,6 +271,8 @@ private:
     /**
      * Allocates a new session out of the internal resource pool.
      *
+     * On failure, the output `entry` will be set to nullptr
+     *
      * @returns CHIP_NO_ERROR if new session created. May fail if maximum session count has been reached (with
      * CHIP_ERROR_NO_MEMORY).
      */
