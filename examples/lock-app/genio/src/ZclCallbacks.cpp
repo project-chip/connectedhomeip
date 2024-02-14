@@ -66,31 +66,31 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     status = DoorLock::Attributes::LockType::Set(endpoint, DlLockType::kDeadBolt);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(Zcl, "Failed to set LockType %x", status);
+        ChipLogError(Zcl, "Failed to set LockType %x", to_underlying(status));
     }
 
     status = DoorLock::Attributes::NumberOfTotalUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(Zcl, "Failed to set number of users %x", status);
+        ChipLogError(Zcl, "Failed to set number of users %x", to_underlying(status));
     }
 
     status = DoorLock::Attributes::NumberOfPINUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(Zcl, "Failed to set number of PIN users %x", status);
+        ChipLogError(Zcl, "Failed to set number of PIN users %x", to_underlying(status));
     }
 
     status = DoorLock::Attributes::NumberOfRFIDUsersSupported::Set(endpoint, 0);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(Zcl, "Failed to set number of RFID users %x", status);
+        ChipLogError(Zcl, "Failed to set number of RFID users %x", to_underlying(status));
     }
 
     status = DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(Zcl, "Failed to set number of credentials per user %x", status);
+        ChipLogError(Zcl, "Failed to set number of credentials per user %x", to_underlying(status));
     }
 
     // Note: Due to current logic of credential, do not enable PIN and RFID
@@ -99,7 +99,7 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     status = DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(Zcl, "Failed to set number of credentials per user %x", status);
+        ChipLogError(Zcl, "Failed to set number of credentials per user %x", to_underlying(status));
     }
 }
 

@@ -52,7 +52,8 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     Protocols::InteractionModel::Status status = DoorLock::Attributes::FeatureMap::Set(endpoint, 0);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogProgress(Zcl, "Device App::DoorLock::emberAfDoorLockClusterInitCallback()::Updating feature map %x", status);
+        ChipLogProgress(Zcl, "Device App::DoorLock::emberAfDoorLockClusterInitCallback()::Updating feature map %x",
+                        to_underlying(status));
     }
 }
 

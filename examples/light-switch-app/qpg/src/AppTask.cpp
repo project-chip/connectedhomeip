@@ -500,7 +500,7 @@ void AppTask::UpdateClusterState(void)
 
         if (status != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+            ChipLogError(NotSpecified, "ERR: updating on/off %x", to_underlying(status));
         }
     */
 }

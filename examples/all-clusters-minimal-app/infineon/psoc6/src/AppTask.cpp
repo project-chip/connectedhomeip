@@ -410,7 +410,7 @@ void AppTask::OnOffUpdateClusterState(intptr_t context)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        P6_LOG("ERR: updating on/off %x", status);
+        P6_LOG("ERR: updating on/off %x", to_underlying(status));
     }
 }
 

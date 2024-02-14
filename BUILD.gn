@@ -626,8 +626,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_linux_lit_icd_app_build) {
     group("linux_lit_icd_app") {
-      deps =
-          [ "${chip_root}/examples/lit-icd-app/linux(${standalone_toolchain})" ]
+      lit_icd_standalone_toolchain =
+          "${chip_root}/config/standalone/toolchain:lit_icd"
+
+      deps = [ "${chip_root}/examples/lit-icd-app/linux(${lit_icd_standalone_toolchain})" ]
     }
 
     extra_build_deps += [ ":linux_lit_icd_app" ]
