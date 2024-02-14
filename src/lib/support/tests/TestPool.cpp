@@ -268,10 +268,10 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
         // for (auto &v : pool) {
         for (auto v = pool.begin(); v != pool.end(); ++v)
         {
-            NL_TEST_ASSERT(inSuite, objIds.count(v->mId) == 1);
-            objIds.erase(v->mId);
+            NL_TEST_ASSERT(inSuite, objIds.count((*v)->mId) == 1);
+            objIds.erase((*v)->mId);
             ++count;
-            sum += v->mId;
+            sum += (*v)->mId;
         }
         NL_TEST_ASSERT(inSuite, count == kSize);
         NL_TEST_ASSERT(inSuite, sum == kSize * (kSize - 1) / 2);
@@ -312,9 +312,14 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
     // Verify that iteration can be nested for iterator types
     if constexpr (P == ObjectPoolMem::kInline)
     {
+        count = 0;
         for (auto v : pool)
         {
             objIds.insert(v->mId);
+            if (++count == kSize / 2)
+            {
+                break;
+            }
         }
 
         count = 0;
@@ -322,12 +327,12 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
         {
             if (objIds.count(outer->mId) != 1)
             {
-                continue
+                continue;
             }
 
             for (auto inner : pool)
             {
-                if (*inner == *outer)
+                if (inner == outer)
                 {
                     objIds.erase(inner->mId);
                 }

@@ -229,8 +229,7 @@ public:
             mIndex = mPool->NextActiveIndexAfter(mIndex);
             return *this;
         }
-        T * operator->() const { return static_cast<T *>(mPool->At(mIndex)); }
-        T & operator*() const { return *(*this); }
+        T * operator*() const { return static_cast<T *>(mPool->At(mIndex)); }
 
     protected:
         // allow construction by the pool only
