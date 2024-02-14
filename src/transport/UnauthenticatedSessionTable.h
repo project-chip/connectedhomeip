@@ -279,7 +279,7 @@ private:
                           const ReliableMessageProtocolConfig & config, UnauthenticatedSession *& entry)
     {
         auto entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
-        if (entryType != nullptr)
+        if (entryToUse != nullptr)
         {
             entry = entryToUse;
             return CHIP_NO_ERROR;
