@@ -395,6 +395,60 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, count >= kSize / 2);
     NL_TEST_ASSERT(inSuite, count <= kSize);
 
+    if constexpr (P == ObjectPoolMem::kInline)
+    {
+        count = 0;
+        for (auto object : pool)
+        {
+            ++count;
+            if ((object->mId % 2) == 0)
+            {
+                objArray[object->mId] = nullptr;
+                pool.ReleaseObject(object);
+            }
+            else
+            {
+                objIds.insert(object->mId);
+            }
+        }
+        NL_TEST_ASSERT(inSuite, count == kSize);
+        NL_TEST_ASSERT(inSuite, objIds.size() == kSize / 2);
+
+        for (size_t i = 0; i < kSize; ++i)
+        {
+            if ((i % 2) == 0)
+            {
+                NL_TEST_ASSERT(inSuite, objArray[i] == nullptr);
+            }
+            else
+            {
+                NL_TEST_ASSERT(inSuite, objArray[i] != nullptr);
+                NL_TEST_ASSERT(inSuite, objArray[i]->mId == i);
+            }
+        }
+
+        count = 0;
+        for (auto object : pool)
+        {
+            ++count;
+            if ((object->mId % 2) != 1)
+            {
+                continue;
+            }
+            size_t id = object->mId - 1;
+            NL_TEST_ASSERT(inSuite, objArray[id] == nullptr);
+            objArray[id] = pool.CreateObject(id);
+            NL_TEST_ASSERT(inSuite, objArray[id] != nullptr);
+        }
+        for (size_t i = 0; i < kSize; ++i)
+        {
+            NL_TEST_ASSERT(inSuite, objArray[i] != nullptr);
+            NL_TEST_ASSERT(inSuite, objArray[i]->mId == i);
+        }
+        NL_TEST_ASSERT(inSuite, count >= kSize / 2);
+        NL_TEST_ASSERT(inSuite, count <= kSize);
+    }
+
     pool.ReleaseAll();
 }
 
