@@ -41,7 +41,10 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     console.print(f"Handling PICS for {clusterName}")
 
     # Map clusters to common XML template if needed
-    if "OTA Software Update Provider" in clusterName or "OTA Software Update Requestor" in clusterName:
+    if "ICDManagement" == clusterName
+        clusterName = "ICD Management"
+
+    elif "OTA Software Update Provider" in clusterName or "OTA Software Update Requestor" in clusterName:
         clusterName = "OTA Software Update"
 
     elif "On/Off" == clusterName:
