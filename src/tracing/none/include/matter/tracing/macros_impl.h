@@ -32,4 +32,13 @@
 #define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_COUNTER(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_TRACE_METRIC(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+
+// Metric is not enabled, however allow the value to be evaluated
+#define MATTER_TRACE_METRIC(label,value)                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        _Pragma("GCC diagnostic push")                                                                                             \
+        _Pragma("GCC diagnostic ignored \"-Wunused-value\"")                                                                       \
+        value;                                                                                                                     \
+        _Pragma("GCC diagnostic pop")                                                                                              \
+    } while (0)
