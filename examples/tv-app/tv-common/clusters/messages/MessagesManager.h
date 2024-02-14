@@ -39,8 +39,8 @@ struct CachedMessageOption
     chip::app::Clusters::Messages::MessageResponseOption mOption;
 
     CachedMessageOption(uint32_t id, std::string label) :
-        mId(id), mLabel(label), mOption{ chip::Optional<uint32_t>(mId),
-                                         chip::Optional<chip::CharSpan>(chip::CharSpan::fromCharString(mLabel.c_str())) }
+        mId(id), mLabel(label),
+        mOption{ chip::Optional<uint32_t>(mId), chip::Optional<chip::CharSpan>(chip::CharSpan::fromCharString(mLabel.c_str())) }
     {
         // ChipLogProgress(Controller, "CachedMessageOption constructor id=%d label=%s", mId, mLabel.c_str());
     }
