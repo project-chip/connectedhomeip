@@ -33,9 +33,9 @@ public:
 
     virtual ~PoolInterface() {}
 
-    virtual U * CreateObject(ConstructorArguments... args)              = 0;
-    virtual void ReleaseObject(U * element)                             = 0;
-    virtual void ReleaseAll()                                           = 0;
+    virtual U * CreateObject(ConstructorArguments... args) = 0;
+    virtual void ReleaseObject(U * element)                = 0;
+    virtual void ReleaseAll()                              = 0;
 
     template <typename Function>
     Loop ForEachActiveObject(Function && function)
