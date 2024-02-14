@@ -339,6 +339,7 @@
         "TestScenesFabricRemoval",
         "TestScenesFabricSceneInfo",
         "TestScenesMultiFabric",
+        "TestScenesMaxCapacity",
         "Test_TC_S_1_1",
         "Test_TC_S_2_1",
         "Test_TC_S_2_2",
