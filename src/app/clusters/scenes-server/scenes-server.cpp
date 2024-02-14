@@ -928,7 +928,7 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
     CHIP_ERROR err = StoreSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
                                      req.sceneID, mGroupProvider);
 
-    VerifyOrReturn(CHIP_NO_ERROR == AddResponseOnError(ctx, response, err));
+    ReturnOnFailure(AddResponseOnError(ctx, response, err));
 
     ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
@@ -1072,10 +1072,10 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                 ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
 
             // Update SceneInfoStruct Attributes after each insert in case we hit max capacity in the middle of the loop
-            ReturnOnFailure(AddResponseOnError(ctx, response,
-                                               UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId,
-                                                                     ctx.mCommandHandler.GetAccessingFabricIndex(),
-                                                                     Optional<GroupId>(), Optional<SceneId>(), Optional<bool>())));
+            ReturnOnFailure(AddResponseOnError(
+                ctx, response,
+                UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                      Optional<GroupId>(), Optional<SceneId>(), Optional<bool>() /* = sceneValid*/)));
         }
 
         ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
