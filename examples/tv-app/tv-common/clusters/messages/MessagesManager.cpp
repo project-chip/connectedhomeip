@@ -33,15 +33,16 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
                                                    const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
                                                    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
-    std::vector<char *> needToFree;
-    std::vector<MessageResponseOption *> optionToFree;
+    std::unique_ptr<char[]> messageTextBufferPtr;
+    std::unique_ptr<uint8_t[]> messageIdBufferPtr;
 
     uint8_t * messageIdBuffer = nullptr;
     // see MessagesManager.h "Note on memory management" for allocation/free rules
     char * messageTextBuffer = new char[messageText.size() + 1];
     VerifyOrExit(messageTextBuffer != nullptr,
                  ChipLogProgress(Controller, "HandlePresentMessagesRequest messageTextBuffer alloc failed"));
-    needToFree.push_back(messageTextBuffer);
+    messageTextBufferPtr.reset(messageTextBuffer);
+
     memcpy(messageTextBuffer, messageText.data(), messageText.size());
     messageTextBuffer[messageText.size()] = '\0';
 
@@ -52,60 +53,54 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
     VerifyOrExit(messageIdBuffer != nullptr,
                  ChipLogProgress(Controller, "HandlePresentMessagesRequest messageIdBuffer alloc failed"));
     memcpy(messageIdBuffer, messageId.data(), messageId.size());
+    messageIdBufferPtr.reset(messageIdBuffer);
 
-    if (responses.HasValue())
     {
-        size_t size    = 0;
-        CHIP_ERROR err = responses.Value().ComputeSize(&size);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Controller, "HandlePresentMessagesRequest size check failed"));
+        messageTextBufferPtr.release();
+        messageIdBufferPtr.release();
+        CachedMessage * cachedMessage = new CachedMessage(messageIdBuffer, messageId.size(), priority, messageControl, startTime,
+                                                          duration, std::string(messageTextBuffer, messageText.size() + 1));
+        std::unique_ptr<CachedMessage *> cachedMessagePtr = std::make_unique<CachedMessage *>(cachedMessage);
 
-        // see MessagesManager.h "Note on memory management" for allocation/free rules
-        MessageResponseOption * optionArray = new MessageResponseOption[size];
-        VerifyOrExit(optionArray != nullptr,
-                     ChipLogProgress(Controller, "HandlePresentMessagesRequest MessageResponseOption alloc failed"));
-        optionToFree.push_back(optionArray);
-
-        int counter = 0;
-        auto iter   = responses.Value().begin();
-        while (iter.Next())
+        if (responses.HasValue())
         {
-            auto & response = iter.GetValue();
+            size_t size    = 0;
+            CHIP_ERROR err = responses.Value().ComputeSize(&size);
+            VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Controller, "HandlePresentMessagesRequest size check failed"));
 
-            VerifyOrExit(response.messageResponseID.HasValue() && response.label.HasValue(),
-                         ChipLogProgress(Controller, "HandlePresentMessagesRequest missing respond id or label"));
+            // set the array size on the CachedMessage
+            VerifyOrExit(cachedMessage->SetOptionArraySize(size) == CHIP_NO_ERROR,
+                         ChipLogProgress(Controller, "HandlePresentMessagesRequest SetOptionArraySize failed"));
 
-            optionArray[counter].messageResponseID = Optional<uint32_t>(response.messageResponseID.Value());
+            size_t counter = 0;
+            auto iter      = responses.Value().begin();
+            while (iter.Next())
+            {
+                std::unique_ptr<char[]> labelBufferPtr;
+                auto & response = iter.GetValue();
 
-            // see MessagesManager.h "Note on memory management" for allocation/free rules
-            char * labelBuffer = new char[response.label.Value().size() + 1];
-            VerifyOrExit(labelBuffer != nullptr, ChipLogProgress(Controller, "HandlePresentMessagesRequest label alloc failed"));
-            needToFree.push_back(labelBuffer);
-            memcpy(labelBuffer, response.label.Value().data(), response.label.Value().size());
-            labelBuffer[response.label.Value().size()] = '\0';
+                VerifyOrExit(response.messageResponseID.HasValue() && response.label.HasValue(),
+                             ChipLogProgress(Controller, "HandlePresentMessagesRequest missing respond id or label"));
 
-            optionArray[counter].label = Optional<CharSpan>(CharSpan::fromCharString(labelBuffer));
+                // see MessagesManager.h "Note on memory management" for allocation/free rules
+                char * labelBuffer = new char[response.label.Value().size() + 1];
+                VerifyOrExit(labelBuffer != nullptr,
+                             ChipLogProgress(Controller, "HandlePresentMessagesRequest label alloc failed"));
+                labelBufferPtr.reset(labelBuffer);
 
-            counter++;
+                memcpy(labelBuffer, response.label.Value().data(), response.label.Value().size());
+                labelBuffer[response.label.Value().size()] = '\0';
+
+                labelBufferPtr.release();
+                // set the option fields on the CachedMessage
+                cachedMessage->SetOption(counter, Optional<uint32_t>(response.messageResponseID.Value()),
+                                         Optional<CharSpan>(CharSpan::fromCharString(labelBuffer)));
+                counter++;
+            }
         }
 
-        // see MessagesManager.h "Note on memory management" for allocation/free rules
-        Message message{ ByteSpan(messageIdBuffer, messageId.size()),
-                         priority,
-                         messageControl,
-                         startTime,
-                         duration,
-                         CharSpan::fromCharString(messageTextBuffer),
-                         Optional<DataModel::List<MessageResponseOption>>(
-                             DataModel::List<MessageResponseOption>(optionArray, size)) };
-
-        mMessages.push_back(message);
-    }
-    else
-    {
-        // see MessagesManager.h "Note on memory management" for allocation/free rules
-        Message message{ ByteSpan(messageIdBuffer, messageId.size()), priority, messageControl, startTime, duration,
-                         CharSpan::fromCharString(messageTextBuffer) };
-        mMessages.push_back(message);
+        cachedMessagePtr.release();
+        mCachedMessages.push_back(*cachedMessage);
     }
 
     // Add your code to present Message
@@ -115,19 +110,6 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
 exit:
 
     ChipLogProgress(Controller, "HandlePresentMessagesRequest error exit");
-    // only reach here on errors
-    if (messageIdBuffer != nullptr)
-    {
-        delete[] messageIdBuffer;
-    }
-    for (MessageResponseOption * memloc : optionToFree)
-    {
-        delete[] memloc;
-    }
-    for (char * memloc : needToFree)
-    {
-        delete[] memloc;
-    }
 }
 
 void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
@@ -137,24 +119,9 @@ void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList
     {
         auto & id = iter.GetValue();
 
-        mMessages.remove_if([id](Clusters::Messages::Structs::MessageStruct::Type & entry) {
-            if (entry.messageID.data_equal(id))
+        mCachedMessages.remove_if([id](CachedMessage & entry) {
+            if (entry.mMessageId.data_equal(id))
             {
-                // free the memory allocated for this entry
-                // see MessagesManager.h "Note on memory management" for allocation/free rules
-                if (entry.responses.HasValue())
-                {
-                    for (const MessageResponseOption & option : entry.responses.Value())
-                    {
-                        if (option.label.HasValue())
-                        {
-                            delete[] option.label.Value().data();
-                        }
-                    }
-                    delete[] entry.responses.Value().data();
-                }
-                delete[] entry.messageID.data();
-                delete[] entry.messageText.data();
                 return true;
             }
             return false;
@@ -167,9 +134,9 @@ void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList
 CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (Message & entry : mMessages)
+        for (CachedMessage & entry : mCachedMessages)
         {
-            ReturnErrorOnFailure(encoder.Encode(entry));
+            ReturnErrorOnFailure(encoder.Encode(entry.GetMessage()));
         }
         return CHIP_NO_ERROR;
     });
@@ -178,9 +145,9 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
 CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (Message & entry : mMessages)
+        for (CachedMessage & entry : mCachedMessages)
         {
-            ReturnErrorOnFailure(encoder.Encode(entry.messageID));
+            ReturnErrorOnFailure(encoder.Encode(entry.GetMessage().messageID));
         }
         return CHIP_NO_ERROR;
     });

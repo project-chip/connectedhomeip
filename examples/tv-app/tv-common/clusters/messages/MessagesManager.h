@@ -25,14 +25,88 @@
 /**
  * Note on memory management:
  *
- * The mMessages vector contains a list of messages which include strings and objects
- * allocated when messages are passed in (via HandlePresentMessagesRequest) and freed
- * when the message is removed (via HandleCancelMessagesRequest).
- *
- * Any other logic added to expire or otherwise remove from mMessages needs to be sure
- * to free these allocated objects as is done in HandleCancelMessagesRequest.
+ * The CachedMessage contains strings and objects
+ * allocated when created (via HandlePresentMessagesRequest) and freed
+ * in the destructor (via HandleCancelMessagesRequest).
  *
  */
+
+struct CachedMessage
+{
+    chip::ByteSpan mMessageId;
+
+    const chip::app::Clusters::Messages::MessagePriorityEnum mPriority;
+    const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> mMessageControl;
+    const chip::app::DataModel::Nullable<uint32_t> mStartTime;
+    const chip::app::DataModel::Nullable<uint16_t> mDuration;
+
+    std::string mMessageText;
+
+    chip::app::Clusters::Messages::MessageResponseOption * mOptionArray = nullptr;
+    size_t mOptionArraySize                                             = 0;
+
+    CachedMessage(uint8_t * messageId, size_t messageIdSize, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
+                  const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
+                  const chip::app::DataModel::Nullable<uint32_t> & startTime,
+                  const chip::app::DataModel::Nullable<uint16_t> & duration, std::string messageText) :
+        mMessageId(messageId, messageIdSize),
+        mPriority(priority), mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText)
+    {}
+
+    CHIP_ERROR SetOptionArraySize(size_t size)
+    {
+        mOptionArray = new chip::app::Clusters::Messages::MessageResponseOption[size];
+        if (mOptionArray == nullptr)
+        {
+            ChipLogProgress(Controller, "HandlePresentMessagesRequest MessageResponseOption alloc failed");
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        mOptionArraySize = size;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetOption(size_t index, chip::Optional<uint32_t> id, chip::Optional<chip::CharSpan> label)
+    {
+        if (index < 0 || index >= mOptionArraySize)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        mOptionArray[index].messageResponseID = id;
+        mOptionArray[index].label             = label;
+        return CHIP_NO_ERROR;
+    }
+
+    chip::app::Clusters::Messages::Structs::MessageStruct::Type GetMessage()
+    {
+        chip::app::Clusters::Messages::Structs::MessageStruct::Type message{
+            mMessageId,
+            mPriority,
+            mMessageControl,
+            mStartTime,
+            mDuration,
+            chip::CharSpan::fromCharString(mMessageText.c_str()),
+            chip::Optional<chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption>>(
+                chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption>(mOptionArray, mOptionArraySize))
+        };
+        return message;
+    }
+
+    ~CachedMessage()
+    {
+        ChipLogProgress(Controller, "CachedMessage destructor start");
+        delete[] mMessageId.data();
+        for (size_t i = 0; i < mOptionArraySize; i++)
+        {
+            if (mOptionArray[i].label.HasValue())
+            {
+                delete[] mOptionArray[i].label.Value().data();
+            }
+        }
+        delete[] mOptionArray;
+        ChipLogProgress(Controller, "CachedMessage destructor done");
+    }
+};
+
 class MessagesManager : public chip::app::Clusters::Messages::Delegate
 {
 public:
@@ -55,5 +129,5 @@ public:
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
 protected:
-    std::list<chip::app::Clusters::Messages::Structs::MessageStruct::Type> mMessages;
+    std::list<CachedMessage> mCachedMessages;
 };
