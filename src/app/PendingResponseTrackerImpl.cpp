@@ -24,14 +24,14 @@ namespace app {
 
 CHIP_ERROR PendingResponseTrackerImpl::AddPendingResponse(uint16_t aCommandRef)
 {
-    VerifyOrReturnError(mCommandReferenceSet.find(aCommandRef) == mCommandReferenceSet.end(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!IsResponsePending(aCommandRef), CHIP_ERROR_INVALID_ARGUMENT);
     mCommandReferenceSet.insert(aCommandRef);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PendingResponseTrackerImpl::ResponseReceived(uint16_t aCommandRef)
 {
-    VerifyOrReturnError(mCommandReferenceSet.find(aCommandRef) != mCommandReferenceSet.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrReturnError(IsResponsePending(aCommandRef), CHIP_ERROR_KEY_NOT_FOUND);
     mCommandReferenceSet.erase(aCommandRef);
     return CHIP_NO_ERROR;
 }
@@ -54,7 +54,7 @@ Optional<uint16_t> PendingResponseTrackerImpl::PopPendingResponse()
     }
     uint16_t commandRef = *mCommandReferenceSet.begin();
     mCommandReferenceSet.erase(mCommandReferenceSet.begin());
-    return Optional<uint16_t>(commandRef);
+    return MakeOptional(commandRef);
 }
 
 } // namespace app

@@ -370,11 +370,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         bool hasDataResponse = false;
         TLV::TLVReader commandDataReader;
         Optional<uint16_t> commandRef;
-        bool commandRefExpected = false;
-        if (mpPendingResponseTracker)
-        {
-            commandRefExpected = (mpPendingResponseTracker->Count() > 1);
-        }
+        bool commandRefExpected = mpPendingResponseTracker && (mpPendingResponseTracker->Count() > 1);
 
         CommandStatusIB::Parser commandStatus;
         err = aInvokeResponse.GetStatus(&commandStatus);
@@ -438,7 +434,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
                 // This can happen for two reasons:
                 // 1. The current InvokeResponse is a duplicate (based on its commandRef).
                 // 2. The current InvokeResponse is for a request we never sent (based on its commandRef).
-                ChipLogError(DataManagement, "Recieved Unexpected Response, commandRef=%u", commandRef.Value());
+                ChipLogError(DataManagement, "Received Unexpected Response, commandRef=%u", commandRef.Value());
             }
             ReturnErrorOnFailure(err);
         }
@@ -492,7 +488,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
 
     if (mpPendingResponseTracker != nullptr)
     {
-        size_t count = mpPendingResponseTracker->Count();
+        size_t pendingCount = mpPendingResponseTracker->Count();
         VerifyOrReturnError(count < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
     }
 
