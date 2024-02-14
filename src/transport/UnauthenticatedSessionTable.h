@@ -278,10 +278,10 @@ private:
     CHIP_ERROR AllocEntry(UnauthenticatedSession::SessionRole sessionRole, NodeId ephemeralInitiatorNodeID,
                           const ReliableMessageProtocolConfig & config, UnauthenticatedSession *& entry)
     {
-        auto entryType = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
+        auto entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
         if (entryType != nullptr)
         {
-            entry = entryType;
+            entry = entryToUse;
             return CHIP_NO_ERROR;
         }
 
@@ -289,20 +289,20 @@ private:
         // permanent failure if heap was insufficient
         return CHIP_ERROR_NO_MEMORY;
 #else
-        entryType = FindLeastRecentUsedEntry();
-        VerifyOrReturnError(entryType != nullptr, CHIP_ERROR_NO_MEMORY);
+        entryToUse = FindLeastRecentUsedEntry();
+        VerifyOrReturnError(entryToUse != nullptr, CHIP_ERROR_NO_MEMORY);
 
         // clean the least recent entry to allow for a new alloc
-        mEntries.ReleaseObject(entryType);
-        entryType = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
+        mEntries.ReleaseObject(entryToUse);
+        entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
 
-        if (entryType == nullptr)
+        if (entryToUse == nullptr)
         {
             // this is NOT expected: we freed an object to have space
             return CHIP_ERROR_INTERNAL;
         }
 
-        entry = entryType;
+        entry = entryToUse;
         return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     }
