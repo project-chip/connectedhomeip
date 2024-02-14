@@ -80,6 +80,7 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
+                               public reporting::EngineDelegate,
                                public SubscriptionsInfoProvider
 {
 public:
@@ -124,13 +125,23 @@ public:
 
     void Shutdown();
 
-    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
-
     /**
      * Returns a pointer to the CASESessionManager. This can return nullptr if one wasn't
      * provided in the call to Init().
      */
     CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
+
+    // reporting::EngineDelegate implementation
+    Messaging::ExchangeManager * GetExchangeManager() override { return mpExchangeMgr; }
+    ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> & GetReadHandlerPool() override
+    {
+        return mReadHandlers;
+    }
+
+    unsigned int ActiveHandlerCount() const override { return static_cast<unsigned int>(mReadHandlers.Allocated()); }
+    ReadHandler * ActiveHandlerAt(unsigned int index) override;
+    reporting::ReportScheduler * GetReportScheduler() override { return mReportScheduler; }
+    bool IsInterestedInEvents() const override { return (mEventPathPool.Allocated() != 0); }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
@@ -168,11 +179,6 @@ public:
     uint32_t GetNumActiveWriteHandlers() const;
 
     /**
-     * Returns the handler at a particular index within the active handler list.
-     */
-    ReadHandler * ActiveHandlerAt(unsigned int aIndex);
-
-    /**
      * Returns the write handler at a particular index within the active handler list.
      */
     WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
@@ -183,8 +189,6 @@ public:
     uint32_t GetMagicNumber() const { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
-
-    reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
     void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
 
@@ -330,11 +334,6 @@ public:
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
-    // Get direct access to the underlying read handler pool
-    //
-    auto & GetReadHandlerPool() { return mReadHandlers; }
-
-    //
     // Override the maximal capacity of the fabric table only for interaction model engine
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
@@ -396,7 +395,6 @@ public:
 #endif
 
 private:
-    friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
     friend class SubscriptionResumptionSessionEstablisher;

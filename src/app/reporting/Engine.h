@@ -25,8 +25,10 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
+#include <app/reporting/ReportScheduler.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -40,66 +42,84 @@
 namespace chip {
 namespace app {
 
-class InteractionModelEngine;
 class TestReadInteraction;
 
 namespace reporting {
+
+/// Contains all required data and callbacks for `chip::app::reporting::Engine` to be able to
+/// do its job.
+///
+/// The reporting engine is managing dirty paths and report scheduling. The delegate provides
+/// active reader information (what readers exist on what path) and exchange support for
+/// message sending.
+class EngineDelegate
+{
+public:
+    virtual ~EngineDelegate() = default;
+
+    virtual Messaging::ExchangeManager * GetExchangeManager()                                                     = 0;
+    virtual ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> & GetReadHandlerPool() = 0;
+
+    /// Determine if any of the active readers are interseted in events (i.e. if any
+    /// active readers have event paths that they listen on).
+    ///
+    /// Returning false here shortcuts some of the report scheduling logic to loop
+    /// through all readers and determine event sending.
+    virtual bool IsInterestedInEvents() const = 0;
+
+    /// Get an allocated/active read handler that resides at the given index.
+    /// The index should be between 0 an ActiveHandlerCount(), otherwise
+    /// nullptr will be returned.
+    ///
+    /// NOTE: this method may be slow as it has to iterate through all
+    ///       active read handlers.
+    virtual ReadHandler * ActiveHandlerAt(unsigned int index) = 0;
+
+    virtual unsigned int ActiveHandlerCount() const = 0;
+
+    virtual reporting::ReportScheduler * GetReportScheduler() = 0;
+};
+
 /*
- *  @class Engine
+ * The reporting engine is responsible for generating reports to readers.
  *
- *  @brief The reporting engine is responsible for generating reports to reader. It is able to find the intersection
- * between the path interest set of each reader with what has changed in the publisher data store and generate tailored
- * reports for each reader.
+ * It is able to find the intersection between the path interest set of each reader with what has changed in
+ * the publisher data store and generate tailored reports for each reader.
  *
- *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
- * message before sending that to the reader. It continues to do so until it has no more work to do.
+ * It tries to gather and pack as many relevant attributes changes and/or events as possible into report
+ * message before sending that to the readers. It continues to do so until it has no more work to do.
  */
 class Engine
 {
 public:
-    /**
-     *  Constructor Engine with a valid InteractionModelEngine pointer.
-     */
-    Engine(InteractionModelEngine * apImEngine);
+    Engine(EngineDelegate * delegate) : mDelegate(delegate) {}
 
-    /**
-     * Initializes the reporting engine. Should only be called once.
-     *
-     * @retval #CHIP_NO_ERROR On success.
-     * @retval other           Was unable to retrieve data and write it into the writer.
-     */
+    /// Initializes the reporting engine. Should only be called once.
     CHIP_ERROR Init();
 
     void Shutdown();
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetWriterReserved(uint32_t aReservedSize) { mReservedSize = aReservedSize; }
-
     void SetMaxAttributesPerChunk(uint32_t aMaxAttributesPerChunk) { mMaxAttributesPerChunk = aMaxAttributesPerChunk; }
 #endif
 
-    /**
-     * Should be invoked when the device receives a Status report, or when the Report data request times out.
-     * This allows the engine to do some clean-up.
-     *
-     */
+    bool TestOnly_IsRunScheduled() const { return mRunScheduled; }
+
+    /// Performs cleanup when the confirmation of a report is received.
+    ///
+    /// Should be invoked when the device either receives a status report
+    /// or if the report data request times out.
     void OnReportConfirm();
 
-    /**
-     * Main work-horse function that executes the run-loop asynchronously on the CHIP thread
-     */
+    /// Schedules a run-loop execution asynchronously on the CHIP thread.
     CHIP_ERROR ScheduleRun();
 
-    /**
-     * Application marks mutated change path and would be sent out in later report.
-     */
-    CHIP_ERROR SetDirty(AttributePathParams & aAttributePathParams);
+    /// Mark the specified `path` as changed.
+    ///
+    /// Paths that have been marked dirty will be sent in future reports
+    CHIP_ERROR SetDirty(AttributePathParams & path);
 
-    /**
-     * @brief
-     *  Schedule the event delivery
-     *
-     */
     CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBytesWritten);
 
     /*
@@ -148,8 +168,6 @@ private:
 
     friend class TestReportingEngine;
     friend class ::chip::app::TestReadInteraction;
-
-    bool IsRunScheduled() const { return mRunScheduled; }
 
     struct AttributePathParamsWithGeneration : public AttributePathParams
     {
@@ -232,34 +250,29 @@ private:
 
     inline void BumpDirtySetGeneration() { mDirtyGeneration++; }
 
-    /**
-     * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
-     * within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
-     *
-     */
+    /// Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
+    /// within the same execution context to avoid applying too much pressure on platforms that use small, fixed size event queues.
     bool mRunScheduled = false;
 
-    /**
-     * The number of report date request in flight
-     *
-     */
+    /// This may be "fake" pointer or a real delegate pointer, depending
+    /// on CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE setting
+    ///
+    /// when this is not a real pointer, it checks that the value is always
+    /// set to the global InteractionModelEngine and the size of this
+    /// member is 1 byte (minimal size and due to alignment after mRunScheduled
+    /// it should have no size overhead within the class)
+    InteractionModelDelegatePointer<EngineDelegate> mDelegate;
+
+    /// The number of report date request in flight
     uint32_t mNumReportsInFlight = 0;
 
-    /**
-     *  Current read handler index
-     *
-     */
+    /// Current read handler index
     uint32_t mCurReadHandlerIdx = 0;
 
-    /**
-     * The read handler we're calling BuildAndSendSingleReportData on right now.
-     */
+    /// The read handler we're calling BuildAndSendSingleReportData on right now.
     ReadHandler * mRunningReadHandler = nullptr;
 
-    /**
-     *  mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
-     *
-     */
+    /// mGlobalDirtySet is used to track the set of attribute/event paths marked dirty for reporting purposes.
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // For unit tests, always use inline allocation for code coverage.
     ObjectPool<AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET, ObjectPoolMem::kInline> mGlobalDirtySet;
@@ -285,8 +298,6 @@ private:
     uint32_t mReservedSize          = 0;
     uint32_t mMaxAttributesPerChunk = UINT32_MAX;
 #endif
-
-    InteractionModelEngine * mpImEngine = nullptr;
 };
 
 }; // namespace reporting
