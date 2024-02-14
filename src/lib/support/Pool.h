@@ -143,9 +143,9 @@ struct HeapObjectListNode
         mPrev->mNext = mNext;
     }
 
-    void * mObject;
-    HeapObjectListNode * mNext;
-    HeapObjectListNode * mPrev;
+    void * mObject             = nullptr;
+    HeapObjectListNode * mNext = nullptr;
+    HeapObjectListNode * mPrev = nullptr;
 };
 
 struct HeapObjectList : HeapObjectListNode
@@ -222,7 +222,10 @@ public:
     public:
         ActiveObjectIterator() {}
 
-        bool operator==(const ActiveObjectIterator & other) const { return (mPool == other.mPool) && (mIndex == other.mIndex); }
+        bool operator==(const ActiveObjectIterator & other) const
+        {
+            return (AtEnd() && other.AtEnd()) || ((mPool == other.mPool) && (mIndex == other.mIndex));
+        }
         bool operator!=(const ActiveObjectIterator & other) const { return !(*this == other); }
         ActiveObjectIterator & operator++()
         {
@@ -236,6 +239,8 @@ public:
         friend class BitMapObjectPool<T, N>;
 
         explicit ActiveObjectIterator(BitMapObjectPool<T, N> * pool, size_t idx) : mPool(pool), mIndex(idx) {}
+
+        bool AtEnd() const { return (mIndex == N); }
 
     private:
         BitMapObjectPool * mPool = nullptr; // pool that this belongs to
@@ -376,6 +381,76 @@ public:
         }
 #endif // __SANITIZE_ADDRESS__
     }
+
+    /// Provides iteration over active objects in the pool.
+    ///
+    /// The iterator is valid only if the Pool is not changed (no objects are created
+    /// or released)/
+    class ActiveObjectIterator : public std::iterator<std::forward_iterator_tag, T>
+    {
+    public:
+        ActiveObjectIterator() {}
+        ActiveObjectIterator(const ActiveObjectIterator & other) : mCurrent(other.mCurrent), mEnd(other.mEnd)
+        {
+            if (mEnd != nullptr)
+            {
+                mEnd->mIterationDepth++;
+            }
+        }
+
+        ActiveObjectIterator & operator=(const ActiveObjectIterator & other)
+        {
+            if (mEnd != nullptr)
+            {
+                mEnd->mIterationDepth--;
+            }
+            mCurrent = other.mCurrent;
+            mEnd     = other.mEnd;
+            mEnd->mIterationDepth++;
+        }
+
+        ~ActiveObjectIterator()
+        {
+            if (mEnd != nullptr)
+            {
+                mEnd->mIterationDepth--;
+            }
+        }
+
+        bool operator==(const ActiveObjectIterator & other) const
+        {
+            // extra current/end compare is to have all "end iterators"
+            // compare as equal (in particular default active object iterator is the end
+            // of an iterator)
+            return (mCurrent == other.mCurrent) || ((mCurrent == mEnd) && (other.mCurrent == other.mEnd));
+        }
+        bool operator!=(const ActiveObjectIterator & other) const { return !(*this == other); }
+        ActiveObjectIterator & operator++()
+        {
+            do
+            {
+                mCurrent = mCurrent->mNext;
+            } while ((mCurrent != mEnd) && (mCurrent->mObject == nullptr));
+            return *this;
+        }
+        T * operator*() const { return static_cast<T *>(mCurrent->mObject); }
+
+    protected:
+        friend class HeapObjectPool<T>;
+
+        explicit ActiveObjectIterator(internal::HeapObjectListNode * current, internal::HeapObjectList * end) :
+            mCurrent(current), mEnd(end)
+        {
+            mEnd->mIterationDepth++;
+        }
+
+    private:
+        internal::HeapObjectListNode * mCurrent = nullptr;
+        internal::HeapObjectList * mEnd         = nullptr;
+    };
+
+    ActiveObjectIterator begin() { return ActiveObjectIterator(mObjects.mNext, &mObjects); }
+    ActiveObjectIterator end() { return ActiveObjectIterator(&mObjects, &mObjects); }
 
     template <typename... Args>
     T * CreateObject(Args &&... args)
