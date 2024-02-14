@@ -76,7 +76,7 @@ CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messagin
 {
     assertChipStackLockedByCurrentThread();
 #if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
-    mpPendingResponseTracker = &mPendingResponseTracker;
+    mpPendingResponseTracker = &mNonTestPendingResponseTracker;
 #endif // CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
 }
 
@@ -261,6 +261,10 @@ exit:
 
     if (mState != State::AwaitingResponse)
     {
+        if (err == CHIP_NO_ERROR)
+        {
+            FlushNoCommandResponse();
+        }
         Close();
     }
     // Else we got a response to a Timed Request and just sent the invoke.
@@ -334,12 +338,8 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
     Close();
 }
 
-void CommandSender::Close()
+void CommandSender::FlushNoCommandResponse()
 {
-    mSuppressResponse = false;
-    mTimedRequest     = false;
-    MoveToState(State::AwaitingDestruction);
-
     if (mpPendingResponseTracker)
     {
         Optional<uint16_t> commandRef = mpPendingResponseTracker->PopPendingResponse();
@@ -354,6 +354,13 @@ void CommandSender::Close()
             commandRef = mpPendingResponseTracker->PopPendingResponse();
         }
     }
+}
+
+void CommandSender::Close()
+{
+    mSuppressResponse = false;
+    mTimedRequest     = false;
+    MoveToState(State::AwaitingDestruction);
     OnDoneCallback();
 }
 
@@ -489,7 +496,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     if (mpPendingResponseTracker != nullptr)
     {
         size_t pendingCount = mpPendingResponseTracker->Count();
-        VerifyOrReturnError(count < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
+        VerifyOrReturnError(pendingCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
     }
 
     if (mBatchCommandsEnabled)

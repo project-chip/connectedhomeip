@@ -292,12 +292,14 @@ public:
     {}
     CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
                   PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
         CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse)
     {
         mpPendingResponseTracker = apPendingResponseTracker;
     }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
     ~CommandSender();
 
     /**
@@ -505,6 +507,7 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
+    void FlushNoCommandResponse();
     //
     // Called internally to signal the completion of all work on this object, gracefully close the
     // exchange (by calling into the base class) and finally, signal to the application that it's
@@ -589,7 +592,7 @@ private:
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 
 #if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
-    PendingResponseTrackerImpl mPendingResponseTracker;
+    PendingResponseTrackerImpl mNonTestPendingResponseTracker;
 #endif // CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
     PendingResponseTracker * mpPendingResponseTracker = nullptr;
 
