@@ -21,17 +21,34 @@
 
 #include <app/ConcreteClusterPath.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MTRServerAttribute ()
 
 /**
- * Mark this attribute as associated with a particular controller.
+ * Mark this attribute as associated with a particular controller.  The
+ * controller can be nil to indicate that the endpoint is not associated with a
+ * specific controller but rather with the controller factory.
  */
-- (BOOL)associateWithController:(MTRDeviceController *)controller;
+- (BOOL)associateWithController:(nullable MTRDeviceController *)controller;
 
 /**
- * Mark this attribute as part of an Defunct-state endpoint.
+ * Mark this attribute as part of an endpoint that is no longer being used.
  */
 - (void)invalidate;
+
+/**
+ * Add the attribute to a cluster with the given cluster path.  Will return NO
+ * if the attribute is already added to a cluster.
+ */
+- (BOOL)addToCluster:(const chip::app::ConcreteClusterPath &)cluster;
+
+/**
+ * Update the parent cluster path of the attribute.  Should only be done for
+ * attributes that are already added to a cluster, when the endpoint id needs to
+ * be updated.
+ */
+- (void)updateParentCluster:(const chip::app::ConcreteClusterPath &)cluster;
 
 /**
  * serializedValue is either an NSData or an NSArray<NSData *>, depending on
@@ -43,6 +60,8 @@
  * parentCluster will have kInvalidClusterId for the cluster ID until the
  * attribute is added to a cluster.
  */
-@property (nonatomic, assign) chip::app::ConcreteClusterPath parentCluster;
+@property (nonatomic, assign, readonly) const chip::app::ConcreteClusterPath & parentCluster;
 
 @end
+
+NS_ASSUME_NONNULL_END

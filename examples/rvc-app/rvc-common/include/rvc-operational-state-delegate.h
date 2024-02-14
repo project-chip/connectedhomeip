@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/util/af-enums.h>
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -53,6 +53,8 @@ private:
     HandleOpStateCommand mPauseCallback;
     RvcDevice * mResumeRvcDeviceInstance;
     HandleOpStateCommand mResumeCallback;
+    RvcDevice * mGoHomeRvcDeviceInstance;
+    HandleOpStateCommand mGoHomeCallback;
 
 public:
     /**
@@ -100,20 +102,10 @@ public:
     void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     /**
-     * Handle Command Callback in application: Start
+     * Handle Command Callback in application: GoHome
      * @param[out] get operational error after callback.
      */
-    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
-        // This command in not supported.
-    };
-
-    /**
-     * Handle Command Callback in application: Stop
-     * @param[out] get operational error after callback.
-     */
-    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
-        // This command in not supported.
-    };
+    void HandleGoHomeCommandCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     void SetPauseCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
     {
@@ -125,6 +117,12 @@ public:
     {
         mResumeCallback          = aCallback;
         mResumeRvcDeviceInstance = aInstance;
+    };
+
+    void SetGoHomeCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
+    {
+        mGoHomeCallback          = aCallback;
+        mGoHomeRvcDeviceInstance = aInstance;
     };
 };
 

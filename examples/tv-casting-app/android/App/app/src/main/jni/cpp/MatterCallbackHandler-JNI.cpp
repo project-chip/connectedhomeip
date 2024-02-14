@@ -25,10 +25,9 @@ CHIP_ERROR CallbackBaseJNI::SetUp(JNIEnv * env, jobject inHandler)
     ChipLogProgress(AppServer, "CallbackBaseJNI::SetUp called");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mObject = env->NewGlobalRef(inHandler);
-    VerifyOrExit(mObject != nullptr, ChipLogError(AppServer, "Failed to NewGlobalRef for handler object"));
+    VerifyOrExit(mObject.Init(inHandler) == CHIP_NO_ERROR, ChipLogError(AppServer, "Failed to Init mObject"));
 
-    mClazz = env->GetObjectClass(mObject);
+    mClazz = env->GetObjectClass(mObject.ObjectRef());
     VerifyOrExit(mClazz != nullptr, ChipLogError(AppServer, "Failed to get handler Java class"));
 
     mSuperClazz = env->GetSuperclass(mClazz);
@@ -60,9 +59,9 @@ void FailureHandlerJNI::Handle(CHIP_ERROR callbackErr)
 
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(mObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    env->CallVoidMethod(mObject, mMethod, static_cast<jint>(callbackErr.AsInteger()), jniCallbackErrString.jniValue());
+    env->CallVoidMethod(mObject.ObjectRef(), mMethod, static_cast<jint>(callbackErr.AsInteger()), jniCallbackErrString.jniValue());
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -78,10 +77,10 @@ void SubscriptionEstablishedHandlerJNI::Handle()
 
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(mObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    env->CallVoidMethod(mObject, mMethod);
+    env->CallVoidMethod(mObject.ObjectRef(), mMethod);
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -202,10 +201,12 @@ jobject CurrentStateSuccessHandlerJNI::ConvertToJObject(
 {
     ChipLogProgress(AppServer, "CurrentStateSuccessHandlerJNI::ConvertToJObject called");
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, nullptr);
+    JniLocalReferenceScope scope(env);
 
     jclass enumClass = nullptr;
     CHIP_ERROR err =
-        JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/MediaPlaybackTypes$PlaybackStateEnum", enumClass);
+        JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/MediaPlaybackTypes$PlaybackStateEnum", enumClass);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
@@ -251,6 +252,8 @@ jobject SampledPositionSuccessHandlerJNI::ConvertToJObject(
 {
     ChipLogProgress(AppServer, "SampledPositionSuccessHandlerJNI::ConvertToJObject called");
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, nullptr);
+    JniLocalReferenceScope scope(env);
 
     jobject jSampledPosition = nullptr;
     if (!responseData.IsNull())
@@ -259,8 +262,8 @@ jobject SampledPositionSuccessHandlerJNI::ConvertToJObject(
             responseData.Value();
 
         jclass responseTypeClass = nullptr;
-        CHIP_ERROR err = JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/MediaPlaybackTypes$PlaybackPositionStruct",
-                                                                  responseTypeClass);
+        CHIP_ERROR err           = JniReferences::GetInstance().GetLocalClassRef(
+            env, "com/chip/casting/MediaPlaybackTypes$PlaybackPositionStruct", responseTypeClass);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
@@ -318,6 +321,8 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
     ChipLogProgress(AppServer, "TargetListSuccessHandlerJNI::ConvertToJObject called");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, nullptr);
+    JniLocalReferenceScope scope(env);
 
     jobject jArrayList;
     chip::JniReferences::GetInstance().CreateArrayList(jArrayList);
@@ -327,8 +332,8 @@ jobject TargetListSuccessHandlerJNI::ConvertToJObject(
         const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & targetInfo = iter.GetValue();
 
         jclass responseTypeClass = nullptr;
-        CHIP_ERROR err =
-            JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/TargetNavigatorTypes$TargetInfo", responseTypeClass);
+        CHIP_ERROR err = JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/TargetNavigatorTypes$TargetInfo",
+                                                                       responseTypeClass);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");

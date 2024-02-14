@@ -23,9 +23,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
-#include <transport/TracingStructs.h>
-
 #include <log_json/log_json_build_config.h>
+#include <transport/TracingStructs.h>
 
 #include <json/json.h>
 
@@ -273,6 +272,35 @@ void JsonBackend::TraceInstant(const char * label, const char * group)
     value["event"] = "TraceInstant";
     value["label"] = label;
     value["group"] = group;
+    OutputValue(value);
+}
+
+void JsonBackend::TraceCounter(const char * label)
+{
+    std::string counterId = std::string(label);
+    if (mCounters.find(counterId) == mCounters.end())
+    {
+        mCounters[counterId] = 1;
+    }
+    else
+    {
+        mCounters[counterId]++;
+    }
+    ::Json::Value value;
+    value["event"] = "TraceCounter";
+    value["label"] = label;
+    value["count"] = mCounters[counterId];
+
+    // Output the counter event
+    OutputValue(value);
+}
+
+void JsonBackend::TraceMetric(const char * label, int32_t val)
+{
+    ::Json::Value value;
+    value["label"] = label;
+    value["value"] = val;
+
     OutputValue(value);
 }
 

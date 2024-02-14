@@ -284,6 +284,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_lock(&self->_lock);
 
+    _state = MTRDeviceStateUnknown;
+
     _weakDelegate = nil;
 
     // Make sure we don't try to resubscribe if we have a pending resubscribe
@@ -343,13 +345,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _state = state;
     if (lastState != state) {
         if (state != MTRDeviceStateReachable) {
-            MTR_LOG_INFO("%@ State change %lu => %lu, set estimated start time to nil", self, static_cast<unsigned long>(lastState),
+            MTR_LOG_INFO("%@ reachability state change %lu => %lu, set estimated start time to nil", self, static_cast<unsigned long>(lastState),
                 static_cast<unsigned long>(state));
             _estimatedStartTime = nil;
             _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
         } else {
             MTR_LOG_INFO(
-                "%@ State change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+                "%@ reachability state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
         }
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if (delegate) {
@@ -357,6 +359,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 [delegate device:self stateChanged:state];
             });
         }
+    } else {
+        MTR_LOG_INFO(
+            "%@ Not reporting reachability state change, since no change in state %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
     }
 }
 
@@ -592,14 +597,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // If event time is of MTREventTimeTypeSystemUpTime type, then update estimated start time as needed
         NSNumber * eventTimeTypeNumber = eventDict[MTREventTimeTypeKey];
         if (!eventTimeTypeNumber) {
-            MTR_LOG_ERROR("Event %@ missing event time type", eventDict);
+            MTR_LOG_ERROR("%@ Event %@ missing event time type", self, eventDict);
             continue;
         }
         MTREventTimeType eventTimeType = (MTREventTimeType) eventTimeTypeNumber.unsignedIntegerValue;
         if (eventTimeType == MTREventTimeTypeSystemUpTime) {
             NSNumber * eventTimeValueNumber = eventDict[MTREventSystemUpTimeKey];
             if (!eventTimeValueNumber) {
-                MTR_LOG_ERROR("Event %@ missing event time value", eventDict);
+                MTR_LOG_ERROR("%@ Event %@ missing event time value", self, eventDict);
                 continue;
             }
             NSTimeInterval eventTimeValue = eventTimeValueNumber.doubleValue;
@@ -792,7 +797,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                    CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
 
                    if (err != CHIP_NO_ERROR) {
-                       NSError * error = [MTRError errorForCHIPErrorCode:err];
+                       NSError * error = [MTRError errorForCHIPErrorCode:err logContext:self];
                        MTR_LOG_ERROR("%@ SendAutoResubscribeRequest error %@", self, error);
                        dispatch_async(self.queue, ^{
                            [self _handleSubscriptionError:error];
@@ -982,6 +987,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
+        NSNumber * nodeID = [self nodeID];
+
         [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
             mtr_hide(self); // don't capture self accidentally
             NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
@@ -991,14 +998,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             while (readRequestsNext.count) {
                 // Can only read up to 9 paths at a time, per spec
                 if (readRequestsCurrent.count >= 9) {
-                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, item is full", workItemID);
+                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, item is full [%@:%@:%@:%@]", workItemID, nodeID, endpointID, clusterID, attributeID);
                     return outcome;
                 }
 
                 // if params don't match then they cannot be merged
                 if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
                         isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
-                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch", workItemID);
+                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch [%@:%@:%@:%@]", workItemID, nodeID, endpointID, clusterID, attributeID);
                     return outcome;
                 }
 
@@ -1006,8 +1013,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 auto readItem = readRequestsNext.firstObject;
                 [readRequestsNext removeObjectAtIndex:0];
                 [readRequestsCurrent addObject:readItem];
-                MTR_LOG_INFO("Batching read attribute work item [%llu]: added %@ (now %tu requests total)",
-                    workItemID, readItem, readRequestsCurrent.count);
+                MTR_LOG_INFO("Batching read attribute work item [%llu]: added %@ (now %tu requests total) [%@:%@:%@:%@]",
+                    workItemID, readItem, readRequestsCurrent.count, nodeID, endpointID, clusterID, attributeID);
                 outcome = MTRBatchedPartially;
             }
             NSCAssert(readRequestsNext.count == 0, @"should have batched everything or returned early");
@@ -1017,7 +1024,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             mtr_hide(self); // don't capture self accidentally
             for (NSArray * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
-                    MTR_LOG_DEFAULT("Read attribute work item [%llu] report duplicate %@", workItemID, readItem);
+                    MTR_LOG_DEFAULT("Read attribute work item [%llu] report duplicate %@ [%@:%@:%@:%@]", workItemID, readItem, nodeID, endpointID, clusterID, attributeID);
                     *isDuplicate = YES;
                     *stop = YES;
                     return;
@@ -1053,23 +1060,23 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             if (values) {
                                 // Since the format is the same data-value dictionary, this looks like an
                                 // attribute report
-                                MTR_LOG_INFO("Read attribute work item [%llu] result: %@", workItemID, values);
+                                MTR_LOG_INFO("Read attribute work item [%llu] result: %@  [%@:%@:%@:%@]", workItemID, values, nodeID, endpointID, clusterID, attributeID);
                                 [self _handleAttributeReport:values];
                             }
 
                             // TODO: better retry logic
                             if (error && (retryCount < 2)) {
-                                MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@", workItemID, error);
+                                MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@   [%@:%@:%@:%@]", workItemID, error, nodeID, endpointID, clusterID, attributeID);
                                 completion(MTRAsyncWorkNeedsRetry);
                             } else {
                                 if (error) {
-                                    MTR_LOG_DEFAULT("Read attribute work item [%llu] failed (giving up): %@", workItemID, error);
+                                    MTR_LOG_DEFAULT("Read attribute work item [%llu] failed (giving up): %@   [%@:%@:%@:%@]", workItemID, error, nodeID, endpointID, clusterID, attributeID);
                                 }
                                 completion(MTRAsyncWorkComplete);
                             }
                         }];
         }];
-        [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ %@ %@", endpointID, clusterID, attributeID];
+        [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ %@ %@ %@", self.nodeID, endpointID, clusterID, attributeID];
     }
 
     return attributeValueToReturn;
@@ -1137,7 +1144,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                   completion(MTRAsyncWorkComplete);
                               }];
     }];
-    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ %@ %@", endpointID, clusterID, attributeID];
+    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ %@ %@ %@", self.nodeID, endpointID, clusterID, attributeID];
 }
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -1503,15 +1510,20 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     NSMutableArray * attributesToReport = [NSMutableArray array];
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
-    for (NSDictionary<NSString *, id> * attributeReponseValue in reportedAttributeValues) {
-        MTRAttributePath * attributePath = attributeReponseValue[MTRAttributePathKey];
-        NSDictionary * attributeDataValue = attributeReponseValue[MTRDataKey];
-        NSError * attributeError = attributeReponseValue[MTRErrorKey];
+    BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
+    NSMutableArray * attributesToPersist;
+    if (dataStoreExists) {
+        attributesToPersist = [NSMutableArray array];
+    }
+    for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
+        MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
+        NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
+        NSError * attributeError = attributeResponseValue[MTRErrorKey];
         NSDictionary * previousValue;
 
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {
-            MTR_LOG_INFO("%@ report %@ no data value or error: %@", self, attributePath, attributeReponseValue);
+            MTR_LOG_INFO("%@ report %@ no data value or error: %@", self, attributePath, attributeResponseValue);
             continue;
         }
 
@@ -1532,6 +1544,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             previousValue = _readCache[attributePath];
             _readCache[attributePath] = nil;
         } else {
+            BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:_readCache[attributePath]];
+            // Check if attribute needs to be persisted - compare only to read cache and disregard expected values
+            if (dataStoreExists && readCacheValueChanged) {
+                [attributesToPersist addObject:attributeResponseValue];
+            }
+
             // if expected values exists, purge and update read cache
             NSArray * expectedValue = _expectedValueCache[attributePath];
             if (expectedValue) {
@@ -1542,7 +1560,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 }
                 _expectedValueCache[attributePath] = nil;
                 _readCache[attributePath] = attributeDataValue;
-            } else if (![self _attributeDataValue:attributeDataValue isEqualToDataValue:_readCache[attributePath]]) {
+            } else if (readCacheValueChanged) {
                 // otherwise compare and update read cache
                 previousValue = _readCache[attributePath];
                 _readCache[attributePath] = attributeDataValue;
@@ -1580,11 +1598,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         if (shouldReportAttribute) {
             if (previousValue) {
-                NSMutableDictionary * mutableAttributeReponseValue = attributeReponseValue.mutableCopy;
-                mutableAttributeReponseValue[MTRPreviousDataKey] = previousValue;
-                [attributesToReport addObject:mutableAttributeReponseValue];
+                NSMutableDictionary * mutableAttributeResponseValue = attributeResponseValue.mutableCopy;
+                mutableAttributeResponseValue[MTRPreviousDataKey] = previousValue;
+                [attributesToReport addObject:mutableAttributeResponseValue];
             } else {
-                [attributesToReport addObject:attributeReponseValue];
+                [attributesToReport addObject:attributeResponseValue];
             }
             [attributePathsToReport addObject:attributePath];
         }
@@ -1592,7 +1610,26 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     MTR_LOG_INFO("%@ report from reported values %@", self, attributePathsToReport);
 
+    if (dataStoreExists && attributesToPersist.count) {
+        [_deviceController.controllerDataStore storeAttributeValues:attributesToPersist forNodeID:_nodeID];
+    }
+
     return attributesToReport;
+}
+
+- (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
+{
+    if (reportChanges) {
+        [self _handleAttributeReport:attributeValues];
+    } else {
+        os_unfair_lock_lock(&self->_lock);
+        for (NSDictionary * responseValue in attributeValues) {
+            MTRAttributePath * path = responseValue[MTRAttributePathKey];
+            NSDictionary * dataValue = responseValue[MTRDataKey];
+            _readCache[path] = dataValue;
+        }
+        os_unfair_lock_unlock(&self->_lock);
+    }
 }
 
 // If value is non-nil, associate with expectedValueID
@@ -1662,9 +1699,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     NSMutableArray * attributesToReport = [NSMutableArray array];
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
-    for (NSDictionary<NSString *, id> * attributeReponseValue in expectedAttributeValues) {
-        MTRAttributePath * attributePath = attributeReponseValue[MTRAttributePathKey];
-        NSDictionary * attributeDataValue = attributeReponseValue[MTRDataKey];
+    for (NSDictionary<NSString *, id> * attributeResponseValue in expectedAttributeValues) {
+        MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
+        NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
 
         BOOL shouldReportValue = NO;
         NSDictionary<NSString *, id> * attributeValueToReport;
@@ -1709,7 +1746,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     NSDate * expirationTime = [NSDate dateWithTimeIntervalSinceNow:expectedValueInterval.doubleValue / 1000];
 
     MTR_LOG_INFO(
-        "Setting expected values %@ with expiration time %f seconds from now", values, [expirationTime timeIntervalSinceNow]);
+        "%@ Setting expected values %@ with expiration time %f seconds from now", self, values, [expirationTime timeIntervalSinceNow]);
 
     os_unfair_lock_lock(&self->_lock);
 

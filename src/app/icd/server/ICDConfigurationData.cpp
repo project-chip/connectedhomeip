@@ -37,14 +37,24 @@ System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
     return mSlowPollingInterval;
 }
 
-CHIP_ERROR ICDConfigurationData::SetModeDurations(uint32_t activeModeDuration_ms, uint32_t idleModeInterval_s)
+CHIP_ERROR ICDConfigurationData::SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
+                                                  Optional<System::Clock::Milliseconds32> idleModeDuration)
 {
-    VerifyOrReturnError(activeModeDuration_ms <= (idleModeInterval_s * 1000), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(idleModeInterval_s <= kMaxIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(idleModeInterval_s >= kMinIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(activeModeDuration.HasValue() || idleModeDuration.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    mIdleModeDuration_s    = idleModeInterval_s;
-    mActiveModeDuration_ms = activeModeDuration_ms;
+    // Convert idleModeDuration to seconds for the correct precision
+    System::Clock::Seconds32 tmpIdleModeDuration = idleModeDuration.HasValue()
+        ? std::chrono::duration_cast<System::Clock::Seconds32>(idleModeDuration.Value())
+        : mIdleModeDuration;
+
+    System::Clock::Milliseconds32 tmpActiveModeDuration = activeModeDuration.ValueOr(mActiveModeDuration);
+
+    VerifyOrReturnError(tmpActiveModeDuration <= tmpIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(tmpIdleModeDuration <= kMaxIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(tmpIdleModeDuration >= kMinIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mIdleModeDuration   = tmpIdleModeDuration;
+    mActiveModeDuration = tmpActiveModeDuration;
 
     return CHIP_NO_ERROR;
 }
