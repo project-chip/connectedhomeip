@@ -164,8 +164,6 @@ tests:
           [1653485455.344141][11508:11513] CHIP:DMG:                              {
           [1653485455.344190][11508:11513] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1653485455.344236][11508:11513] CHIP:DMG:                              },
-
-          5. TH sends a AddGroup command to DUT with the GroupID field set to G1.
       disabled: true
 
     - label:
