@@ -359,6 +359,6 @@ void AppTask::UpdateClusterState(intptr_t context)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        SILABS_LOG("ERR: updating lock state %x", status);
+        SILABS_LOG("ERR: updating lock state %x", to_underlying(status));
     }
 }

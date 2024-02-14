@@ -19,15 +19,28 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
-#include <app/ConcreteAttributePath.h>
 #include <app/icd/server/ICDConfigurationData.h>
-#include <app/icd/server/ICDMonitoringTable.h>
 #include <app/util/basic-types.h>
 #include <crypto/SessionKeystore.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <app/icd/server/ICDServerConfig.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/ConcreteAttributePath.h>
+#include <app/icd/server/ICDMonitoringTable.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+using chip::Protocols::InteractionModel::Status;
+
+namespace chip {
+namespace Crypto {
+using SymmetricKeystore = SessionKeystore;
+} // namespace Crypto
+} // namespace chip
 
 class ICDManagementServer
 {
@@ -37,6 +50,7 @@ public:
     static void Init(chip::PersistentStorageDelegate & storage, chip::Crypto::SymmetricKeystore * symmetricKeystore,
                      chip::ICDConfigurationData & ICDConfigurationData);
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     /**
      * @brief Function that executes the business logic of the RegisterClient Command
      *
@@ -52,17 +66,23 @@ public:
     chip::Protocols::InteractionModel::Status
     UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                      const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     chip::Protocols::InteractionModel::Status StayActiveRequest(chip::FabricIndex fabricIndex);
 
 private:
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     /**
      * @brief Triggers table update events to notify subscribers that an entry was added or removed
      *        from the ICDMonitoringTable.
      */
     void TriggerICDMTableUpdatedEvent();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
+    static chip::ICDConfigurationData * mICDConfigurationData;
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     static chip::PersistentStorageDelegate * mStorage;
     static chip::Crypto::SymmetricKeystore * mSymmetricKeystore;
-    static chip::ICDConfigurationData * mICDConfigurationData;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 };

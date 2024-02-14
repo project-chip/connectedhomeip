@@ -485,7 +485,7 @@ void AppTask::UpdateCluster(intptr_t context)
         : Protocols::InteractionModel::Status::Failure;
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ASR_LOG("ERR: updating lock state %x", status);
+        ASR_LOG("ERR: updating lock state %x", to_underlying(status));
     }
 }
 

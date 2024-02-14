@@ -602,6 +602,6 @@ void AppTask::UpdateClusterState(intptr_t context)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        MT793X_LOG("ERR: updating lock state %x", status);
+        MT793X_LOG("ERR: updating lock state %x", to_underlying(status));
     }
 }

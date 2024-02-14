@@ -275,7 +275,7 @@ private:
 
     /**
      * Returns SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
-     * For an ICD publisher, this SHALL be set to the idle mode interval.
+     * For an ICD publisher, this SHALL be set to the idle mode duration.
      * Otherwise, this SHALL be set to 60 minutes.
      */
     uint16_t GetPublisherSelectedIntervalLimit();

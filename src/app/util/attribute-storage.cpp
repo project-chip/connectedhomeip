@@ -1177,7 +1177,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
     for (ep = 0; ep < epCount; ep++)
     {
         EmberAfDefinedEndpoint * de;
-        if (endpoint != EMBER_BROADCAST_ENDPOINT)
+        if (endpoint != chip::kInvalidEndpointId)
         {
             ep = emberAfIndexFromEndpoint(endpoint);
             if (ep == kEmberInvalidEndpointIndex)
@@ -1298,7 +1298,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
                 }
             }
         }
-        if (endpoint != EMBER_BROADCAST_ENDPOINT)
+        if (endpoint != chip::kInvalidEndpointId)
         {
             break;
         }

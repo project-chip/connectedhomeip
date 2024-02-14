@@ -22,7 +22,7 @@
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/util/af-enums.h>
+
 #include <app/util/config.h>
 #include <cstring>
 #include <protocols/interaction_model/StatusCode.h>
