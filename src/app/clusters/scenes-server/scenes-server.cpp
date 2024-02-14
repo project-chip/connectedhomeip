@@ -66,6 +66,10 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
         {
             resp.status = to_underlying(Protocols::InteractionModel::Status::NotFound);
         }
+        else if (CHIP_ERROR_NO_MEMORY == err)
+        {
+            resp.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
+        }
         else
         {
             resp.status = to_underlying(StatusIB(err).mStatus);
@@ -168,7 +172,6 @@ CHIP_ERROR UpdateFabricSceneInfo(EndpointId endpoint, FabricIndex fabric, Option
 
 /// @brief Gets the SceneInfoStruct array associated to an endpoint
 /// @param endpoint target endpoint
-/// @param fabric target fabric
 /// @return Optional with no value not found, Span of SceneInfoStruct
 Span<Structs::SceneInfoStruct::Type> ScenesServer::FabricSceneInfo::GetFabricSceneInfo(EndpointId endpoint)
 {
@@ -675,13 +678,21 @@ void ScenesServer::InvokeCommand(HandlerContext & ctxt)
 // AttributeAccessInterface
 CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    uint16_t endpointTableSize = 0;
+    ReturnErrorOnFailure(StatusIB(Attributes::SceneTableSize::Get(aPath.mEndpointId, &endpointTableSize)).ToChipError());
+
+    // Get Scene Table Instance
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(aPath.mEndpointId, endpointTableSize);
+
     switch (aPath.mAttributeId)
     {
     case Attributes::FabricSceneInfo::Id: {
-        return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        return aEncoder.EncodeList([&, sceneTable](const auto & encoder) -> CHIP_ERROR {
             Span<Structs::SceneInfoStruct::Type> fabricSceneInfoSpan = mFabricSceneInfo.GetFabricSceneInfo(aPath.mEndpointId);
             for (auto & info : fabricSceneInfoSpan)
             {
+                // Update the SceneInfoStruct's Capacity in case it's capacity was limited by other fabrics
+                sceneTable->GetRemainingCapacity(info.fabricIndex, info.remainingCapacity);
                 ReturnErrorOnFailure(encoder.Encode(info));
             }
             return CHIP_NO_ERROR;
@@ -918,12 +929,10 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
     CHIP_ERROR err = StoreSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
                                      req.sceneID, mGroupProvider);
 
-    if (CHIP_NO_ERROR == err)
-    {
-        ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-    }
+    ReturnOnFailure(AddResponseOnError(ctx, response, err));
 
-    response.status = to_underlying(StatusIB(err).mStatus);
+    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
+    response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
@@ -1031,6 +1040,13 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
     ReturnOnFailure(AddResponseOnError(ctx, response,
                                        sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
 
+    if (0 == capacity)
+    {
+        response.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+
     // Checks if we copy a single scene or all of them
     if (req.mode.GetField(app::Clusters::ScenesManagement::CopyModeBitmap::kCopyAllScenes))
     {
@@ -1042,13 +1058,6 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
         ReturnOnFailure(AddResponseOnError(
             ctx, response,
             sceneTable->GetAllSceneIdsInGroup(ctx.mCommandHandler.GetAccessingFabricIndex(), req.groupIdentifierFrom, sceneList)));
-
-        if (0 == capacity)
-        {
-            response.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
-            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-            return;
-        }
 
         for (auto & sceneId : sceneList)
         {
@@ -1062,13 +1071,13 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 
             ReturnOnFailure(AddResponseOnError(
                 ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
-        }
 
-        // Update SceneInfoStruct Attributes
-        ReturnOnFailure(
-            AddResponseOnError(ctx, response,
-                               UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
-                                                     Optional<GroupId>(), Optional<SceneId>(), Optional<bool>())));
+            // Update SceneInfoStruct Attributes after each insert in case we hit max capacity in the middle of the loop
+            ReturnOnFailure(AddResponseOnError(
+                ctx, response,
+                UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                      Optional<GroupId>(), Optional<SceneId>(), Optional<bool>() /* = sceneValid*/)));
+        }
 
         ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
 
