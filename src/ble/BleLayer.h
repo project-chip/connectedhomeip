@@ -244,6 +244,7 @@ public:
                     chip::System::Layer * systemLayer);
     CHIP_ERROR Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
                     BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
+    void IndicateBleClosing();
     void Shutdown();
 
     CHIP_ERROR CancelBleIncompleteConnection();
