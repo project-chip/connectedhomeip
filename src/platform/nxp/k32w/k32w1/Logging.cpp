@@ -12,6 +12,10 @@
 #include "fsl_debug_console.h"
 #include <cstring>
 
+#ifdef PW_RPC_ENABLED
+#include <examples/platform/nxp/PigweedLogger.h>
+#endif
+
 #define K32W_LOG_MODULE_NAME chip
 #define EOL_CHARS "\r\n" /* End of Line Characters */
 #define EOL_CHARS_LEN 2  /* Length of EOL */
@@ -109,7 +113,9 @@ void ENFORCE_FORMAT(1, 0) GenericLog(const char * format, va_list arg, const cha
     if (!isLogInitialized)
     {
         isLogInitialized = true;
+#ifndef PW_RPC_ENABLED
         otPlatUartEnable();
+#endif
     }
 
     /* Prefix is composed of [Time Reference][Debug String][Module Name String] */
@@ -121,7 +127,11 @@ void ENFORCE_FORMAT(1, 0) GenericLog(const char * format, va_list arg, const cha
     VerifyOrDie(writtenLen > 0);
     memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 
+#ifndef PW_RPC_ENABLED
     otPlatUartSendBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
+#else
+    PigweedLogger::PutString((const char *) formattedMsg, strlen(formattedMsg));
+#endif
 
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();

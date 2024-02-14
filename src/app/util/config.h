@@ -29,6 +29,6 @@
 
 // User options for plugin Binding Table Library
 // TODO: Make this a CHIP_CONFIG value.
-#ifndef EMBER_BINDING_TABLE_SIZE
-#define EMBER_BINDING_TABLE_SIZE 10
-#endif // EMBER_BINDING_TABLE_SIZE
+#ifndef MATTER_BINDING_TABLE_SIZE
+#define MATTER_BINDING_TABLE_SIZE 10
+#endif // MATTER_BINDING_TABLE_SIZE

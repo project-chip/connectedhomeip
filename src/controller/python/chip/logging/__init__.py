@@ -32,7 +32,7 @@ def _RedirectToPythonLogging(category, module, message):
     module = module.decode('utf-8')
     message = message.decode('utf-8')
 
-    logger = logging.getLogger('chip.%s' % module)
+    logger = logging.getLogger('chip.native.%s' % module)
 
     if category == ERROR_CATEGORY_ERROR:
         logger.error("%s", message)

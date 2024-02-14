@@ -19,6 +19,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
+-   [Manufacturing data](#manufacturing-data)
 -   [Flashing](#flashing)
     -   [Flashing the NBU image](#flashing-the-nbu-image)
     -   [Flashing the host image](#flashing-the-host-image)
@@ -108,7 +109,9 @@ initiate a reboot. The reset action can be cancelled by press SW2 button at any
 point before the 6 second limit.
 
 **Button SW3** can be used to change the state of the simulated contact sensor.
-The button behaves as a toggle, swapping the state every time it is pressed.
+The button behaves as a toggle, swapping the state every time it is short
+pressed. When long pressed, it does a clean soft reset that takes into account
+Matter shutdown procedure.
 
 ## Building
 
@@ -134,7 +137,16 @@ In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
 
 After a successful build, the `elf` and `srec` files are found in `out/debug/` -
+`see the files prefixed with chip-k32w1-contact-example`. After a successful
+build, the `elf` and `srec` files are found in `out/debug/` -
 `see the files prefixed with chip-k32w1-contact-example`.
+
+## Manufacturing data
+
+Use `chip_with_factory_data=1` in the gn build command to enable factory data.
+
+For a full guide on manufacturing flow, please see
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
 
 ## Flashing
 
