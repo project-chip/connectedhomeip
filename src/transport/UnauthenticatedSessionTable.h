@@ -294,7 +294,7 @@ private:
         VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
 
         // make sure a clean reset is done
-        mEntries.ReleaseObject(entry);
+        mEntries.ReleaseObject(static_cast<EntryType*>(entry));
         entry = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
 
         // entry being null is not expected as we released an object that could be reclaimed
