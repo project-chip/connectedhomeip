@@ -22,6 +22,7 @@ from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_PWRTL_2_1(MatterBaseTest):
 
     def pics_TC_PWRTL_2_1(self) -> list[str]:
@@ -49,7 +50,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
             logging.info("AvailableEndpoints: %s" % (available_endpoints))
 
             asserts.assert_less_equal(len(available_endpoints), 21,
-                                        "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
+                                      "AvailableEndpoints length %d must be less than 21!" % len(available_endpoints))
 
         if not self.check_pics("PWRTL.S.A0001"):
             logging.info("Test skipped because PICS PWRTL.S.A0001 is not set")
@@ -61,7 +62,6 @@ class TC_PWRTL_2_1(MatterBaseTest):
 
         if available_endpoints == NullValue:
             asserts.assert_true(active_endpoints == NullValue, "ActiveEndpoints should be null when AvailableEndpoints is null: %s" % active_endpoints)
-            
 
 
 if __name__ == "__main__":
