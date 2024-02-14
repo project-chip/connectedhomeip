@@ -142,6 +142,8 @@ tests:
           values:
               - name: "NetworkingStatus"
                 value: 0
+              - name: "NetworkIndex"
+                value: 0
 
     - label: "Step 5: TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
@@ -285,6 +287,8 @@ tests:
       response:
           values:
               - name: "NetworkingStatus"
+                value: 0
+              - name: "NetworkIndex"
                 value: 0
 
     - label: "Step 15: TH sends the CommissioningComplete command to the DUT"
