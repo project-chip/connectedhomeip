@@ -2691,6 +2691,7 @@ private:
 | Commands:                                                           |        |
 | * TestEventTrigger                                                  |   0x00 |
 | * TimeSnapshot                                                      |   0x01 |
+| * PayloadTestRequest                                                |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NetworkInterfaces                                                 | 0x0000 |
@@ -2790,6 +2791,46 @@ public:
 
 private:
     chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshot::Type mRequest;
+};
+
+/*
+ * Command PayloadTestRequest
+ */
+class GeneralDiagnosticsPayloadTestRequest : public ClusterCommand
+{
+public:
+    GeneralDiagnosticsPayloadTestRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("payload-test-request", credsIssuerConfig)
+    {
+        AddArgument("EnableKey", &mRequest.enableKey);
+        AddArgument("Value", 0, UINT8_MAX, &mRequest.value);
+        AddArgument("Count", 0, UINT16_MAX, &mRequest.count);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralDiagnostics::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralDiagnostics::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -16470,9 +16511,10 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
-        make_unique<GeneralDiagnosticsTestEventTrigger>(credsIssuerConfig), //
-        make_unique<GeneralDiagnosticsTimeSnapshot>(credsIssuerConfig),     //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
+        make_unique<GeneralDiagnosticsTestEventTrigger>(credsIssuerConfig),   //
+        make_unique<GeneralDiagnosticsTimeSnapshot>(credsIssuerConfig),       //
+        make_unique<GeneralDiagnosticsPayloadTestRequest>(credsIssuerConfig), //
         //
         // Attributes
         //

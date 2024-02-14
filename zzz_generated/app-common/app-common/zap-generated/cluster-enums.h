@@ -1183,6 +1183,12 @@ enum class RadioFaultEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kDataModelTest = 0x1,
+};
 } // namespace GeneralDiagnostics
 
 namespace SoftwareDiagnostics {
@@ -4700,9 +4706,8 @@ enum class Feature : uint32_t
 // Bitmap for SupportedProtocolsBitmap
 enum class SupportedProtocolsBitmap : uint32_t
 {
-    kDash   = 0x1,
-    kHls    = 0x2,
-    kWebRTC = 0x2,
+    kDash = 0x1,
+    kHls  = 0x2,
 };
 } // namespace ContentLauncher
 

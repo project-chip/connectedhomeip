@@ -27,7 +27,7 @@
 
 using namespace chip;
 
-static constexpr size_t kOnffManagerTableSize = EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT;
+static constexpr size_t kOnffManagerTableSize = MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT;
 
 namespace {
 
@@ -46,7 +46,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "Device App: OnOffManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::OnOff::Id,
-                                                       EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kOnffManagerTableSize, ChipLogError(Zcl, "Device App::OnOff::NewManager: endpoint %d not found", endpoint));
 
     VerifyOrReturn(gOnOffManagerTable[ep] == nullptr,
@@ -67,7 +67,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id, MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kOnffManagerTableSize ? nullptr : gOnOffManagerTable[ep]);
 }
 
@@ -82,17 +82,16 @@ void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
 
 jboolean OnOffManager::SetOnOff(jint endpoint, bool value)
 {
-    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status status =
+        app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
+    return status == Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    mOnOffManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mOnOffManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mOnOffManagerObject.Init(managerObject));
 
     jclass OnOffManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(OnOffManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -114,11 +113,11 @@ void OnOffManager::HandleOnOffChanged(bool value)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
-    VerifyOrReturn(mOnOffManagerObject != nullptr, ChipLogProgress(Zcl, "mOnOffManagerObject null"));
+    VerifyOrReturn(mOnOffManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mOnOffManagerObject null"));
     VerifyOrReturn(mHandleOnOffChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleOnOffChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mOnOffManagerObject, mHandleOnOffChangedMethod, static_cast<jboolean>(value));
+    env->CallVoidMethod(mOnOffManagerObject.ObjectRef(), mHandleOnOffChangedMethod, static_cast<jboolean>(value));
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in OnOffManager::HandleOnOffChanged");

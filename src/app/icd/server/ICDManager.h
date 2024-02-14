@@ -17,17 +17,31 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
+
+#include <app/icd/server/ICDServerConfig.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDCheckInSender.h>   // nogncheck
+#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
+#endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
+
 #include <app/SubscriptionsInfoProvider.h>
-#include <app/icd/server/ICDCheckInSender.h>
 #include <app/icd/server/ICDConfigurationData.h>
-#include <app/icd/server/ICDMonitoringTable.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
+#include <crypto/SessionKeystore.h>
 #include <lib/support/BitFlags.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <system/SystemClock.h>
+
+namespace chip {
+namespace Crypto {
+using SymmetricKeystore = SessionKeystore;
+}
+} // namespace chip
 
 namespace chip {
 namespace app {
@@ -94,7 +108,15 @@ public:
      */
     void postObserverEvent(ObserverEventType event);
     OperationalState GetOperationalState() { return mOperationalState; }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     void SendCheckInMsgs();
+
+    /**
+     * @brief Trigger the ICDManager to send Check-In message if necessary
+     */
+    void TriggerCheckInMessages();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
@@ -122,14 +144,14 @@ protected:
      */
     static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
 
-    // ICD Counter
-    CHIP_ERROR IncrementCounter();
-    CHIP_ERROR InitCounter();
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    uint8_t mCheckInRequestCount = 0;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     uint8_t mOpenExchangeContextCount = 0;
-    uint8_t mCheckInRequestCount      = 0;
 
 private:
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     /**
      * @brief Function checks if at least one client registration would require a Check-In message
      *
@@ -138,22 +160,23 @@ private:
      *               they all have associated subscriptions.
      */
     bool CheckInMessagesWouldBeSent();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     KeepActiveFlags mKeepActiveFlags{ 0 };
 
     // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.
     OperationalState mOperationalState = OperationalState::ActiveMode;
+    bool mTransitionToIdleCalled       = false;
+    ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
     Messaging::ExchangeManager * mExchangeManager  = nullptr;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
-    SubscriptionsInfoProvider * mSubManager        = nullptr;
-
-    bool mTransitionToIdleCalled = false;
-
-    ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
+    SubscriptionsInfoProvider * mSubInfoProvider   = nullptr;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // feature map that can be changed at runtime for testing purposes

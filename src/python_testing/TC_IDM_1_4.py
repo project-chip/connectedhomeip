@@ -16,21 +16,16 @@
 #
 
 import logging
-from dataclasses import dataclass
 
 import chip.clusters as Clusters
-from chip import ChipUtility
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-
-@dataclass
-class FakeInvalidBasicInformationCommand(Clusters.BasicInformation.Commands.MfgSpecificPing):
-    @ChipUtility.classproperty
-    def must_use_timed_invoke(cls) -> bool:
-        return False
+# If DUT supports `MaxPathsPerInvoke > 1`, additional command line argument
+# run with
+# --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:<key>
 
 
 class TC_IDM_1_4(MatterBaseTest):
@@ -44,7 +39,9 @@ class TC_IDM_1_4(MatterBaseTest):
                  TestStep(6, "Verify DUT responds to InvokeRequestMessage containing one valid paths, and one InvokeRequest to unsupported endpoint"),
                  TestStep(7, "Verify DUT responds to InvokeRequestMessage containing two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true, but never sending preceding Timed Invoke Action"),
                  TestStep(8, "Verify DUT responds to InvokeRequestMessage containing two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true"),
-                 TestStep(9, "Verify DUT capable of responding to request with multiple InvokeResponseMessages")]
+                 TestStep(9, "Verify DUT supports extended Data Model Testing feature in General Diagnostics Cluster"),
+                 TestStep(10, "Verify DUT has TestEventTriggersEnabled attribute set to true in General Diagnostics Cluster"),
+                 TestStep(11, "Verify DUT capable of responding to request with multiple InvokeResponseMessages")]
         return steps
 
     @async_test_body
@@ -118,9 +115,14 @@ class TC_IDM_1_4(MatterBaseTest):
         if max_paths_per_invoke == 1:
             self.skip_all_remaining_steps(3)
         else:
-            await self.steps_3_to_9(False)
+            asserts.assert_true('PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
+                                "PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY must be included on the command line in "
+                                "the --hex-arg flag as PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:<key>, "
+                                "e.g. --hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
 
-    async def steps_3_to_9(self, dummy_value):
+            await self.remaining_batch_commands_test_steps(False)
+
+    async def remaining_batch_commands_test_steps(self, dummy_value):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id
 
@@ -146,7 +148,7 @@ class TC_IDM_1_4(MatterBaseTest):
         invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
         commandRefsOverride = [1, 1]
         try:
-            result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], commandRefsOverride=commandRefsOverride)
+            await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], commandRefsOverride=commandRefsOverride)
             asserts.fail("Unexpected success return after sending two unique commands with identical CommandRef in the InvokeRequest")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidAction,
@@ -216,7 +218,7 @@ class TC_IDM_1_4(MatterBaseTest):
         # receiving a path-specific response to the same command, with the TimedRequestMessage sent before
         # the InvokeRequestMessage.
         try:
-            result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], suppressTimedRequestMessage=True)
+            await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], suppressTimedRequestMessage=True)
             asserts.fail("Unexpected success call to sending Batch command when non-path specific error expected")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.TimedRequestMismatch,
@@ -247,8 +249,66 @@ class TC_IDM_1_4(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("DUT failed with non-path specific error when path specific error was expected")
 
-        # Skipping test until https://github.com/project-chip/connectedhomeip/issues/31434 resolved
-        self.skip_step(9)
+        self.step(9)
+        try:
+            feature_map = await self.read_single_attribute(
+                dev_ctrl,
+                dut_node_id,
+                endpoint=0,
+                attribute=Clusters.GeneralDiagnostics.Attributes.FeatureMap
+            )
+        except InteractionModelError:
+            asserts.fail("DUT failed to respond reading FeatureMap attribute")
+        has_data_model_test_feature = (feature_map & Clusters.GeneralDiagnostics.Bitmaps.Feature.kDataModelTest) != 0
+        asserts.assert_true(has_data_model_test_feature, "DataModelTest Feature is not supported by DUT")
+
+        self.step(10)
+        try:
+            test_event_triggers_enabled = await self.read_single_attribute(
+                dev_ctrl,
+                dut_node_id,
+                endpoint=0,
+                attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+            )
+        except InteractionModelError:
+            asserts.fail("DUT failed to respond reading TestEventTriggersEnabled attribute")
+        asserts.assert_true(test_event_triggers_enabled, "Test Event Triggers must be enabled on DUT")
+
+        self.step(11)
+        enable_key = self.matter_test_config.global_test_params['PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY']
+        endpoint = 0
+        command = Clusters.GeneralDiagnostics.Commands.PayloadTestRequest(
+            enableKey=enable_key,
+            value=ord('A'),
+            count=800
+        )
+        invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+
+        command = Clusters.OperationalCredentials.Commands.CertificateChainRequest(
+            Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate)
+        invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+
+        try:
+            test_only_result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
+        except InteractionModelError:
+            asserts.fail("DUT failed to respond to batch commands, where response is expected to be too large to fit in a single ResponseMessage")
+
+        responses = test_only_result.Responses
+        # This check is validating the number of InvokeResponses we got
+        asserts.assert_equal(len(responses), 2, "Unexpected number of InvokeResponses sent back from DUT")
+        asserts.assert_true(type_matches(
+            responses[0], Clusters.GeneralDiagnostics.Commands.PayloadTestResponse), "Unexpected return type for first InvokeRequest")
+        asserts.assert_true(type_matches(
+            responses[1], Clusters.OperationalCredentials.Commands.CertificateChainResponse), "Unexpected return type for second InvokeRequest")
+        logging.info("DUT successfully responded to a InvokeRequest action with two valid commands")
+
+        asserts.assert_equal(responses[0].payload, b'A' * 800, "Expect response to match for count == 800")
+        # If this assert below fails then some assumptions we were relying on are now no longer true.
+        # This check is validating the number of InvokeResponsesMessages we got. This is different then the earlier
+        # `len(responses)` check as you can have multiple InvokeResponses in a single message. But this test step
+        # is explicitly making sure that we recieved multiple ResponseMessages.
+        asserts.assert_greater_equal(test_only_result.ResponseMessageCount, 2,
+                                     "DUT was expected to send multiple InvokeResponseMessages")
 
 
 if __name__ == "__main__":

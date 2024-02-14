@@ -7699,6 +7699,10 @@ class GeneralDiagnostics(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 7,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kDataModelTest = 0x1
+
     class Structs:
         @dataclass
         class NetworkInterface(ClusterObject):
@@ -7774,6 +7778,42 @@ class GeneralDiagnostics(Cluster):
 
             systemTimeMs: 'uint' = 0
             posixTimeMs: 'typing.Union[Nullable, uint]' = NullValue
+
+        @dataclass
+        class PayloadTestRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000033
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'PayloadTestResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="enableKey", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="count", Tag=2, Type=uint),
+                    ])
+
+            enableKey: 'bytes' = b""
+            value: 'uint' = 0
+            count: 'uint' = 0
+
+        @dataclass
+        class PayloadTestResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000033
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="payload", Tag=0, Type=bytes),
+                    ])
+
+            payload: 'bytes' = b""
 
     class Attributes:
         @dataclass
@@ -42576,7 +42616,6 @@ class ContentLauncher(Cluster):
         class SupportedProtocolsBitmap(IntFlag):
             kDash = 0x1
             kHls = 0x2
-            kWebRTC = 0x2
 
     class Structs:
         @dataclass

@@ -61,7 +61,6 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release of this document"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
-  <conditions/>
   <clusters>
     <cluster id="0x0504" name="Channel" side="server">
       <optionalConform/>

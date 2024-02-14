@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
-#include <app/icd/server/ICDMonitoringTable.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -37,18 +36,23 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 using namespace System::Clock;
 
+using chip::Protocols::InteractionModel::Status;
+
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * manager)
+                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider)
 {
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
     VerifyOrDie(exchangeManager != nullptr);
-    VerifyOrDie(manager != nullptr);
+    VerifyOrDie(subInfoProvider != nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
+#if CHIP_CONFIG_ENABLE_ICD_LIT
     // LIT ICD Verification Checks
     if (SupportsFeature(Feature::kLongIdleTimeSupport))
     {
@@ -63,16 +67,21 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
         // VerifyOrDieWithMsg((GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
         //                    "LIT support is required for slow polling intervals superior to 15 seconds");
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     mStorage           = storage;
     mFabricTable       = fabricTable;
     mSymmetricKeystore = symmetricKeystore;
     mExchangeManager   = exchangeManager;
-    mSubManager        = manager;
+    mSubInfoProvider   = subInfoProvider;
 
-    VerifyOrDie(InitCounter() == CHIP_NO_ERROR);
+    VerifyOrDie(ICDConfigurationData::GetInstance().GetICDCounter().Init(mStorage, DefaultStorageKeyAllocator::ICDCheckInCounter(),
+                                                                         ICDConfigurationData::kICDCounterPersistenceIncrement) ==
+                CHIP_NO_ERROR);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
@@ -89,13 +98,14 @@ void ICDManager::Shutdown()
 
     ICDConfigurationData::GetInstance().SetICDMode(ICDConfigurationData::ICDMode::SIT);
     mOperationalState = OperationalState::ActiveMode;
-
-    mStorage     = nullptr;
-    mFabricTable = nullptr;
-    mSubManager  = nullptr;
-
     mStateObserverPool.ReleaseAll();
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mStorage         = nullptr;
+    mFabricTable     = nullptr;
+    mSubInfoProvider = nullptr;
     mICDSenderPool.ReleaseAll();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 }
 
 bool ICDManager::SupportsFeature(Feature feature)
@@ -103,19 +113,21 @@ bool ICDManager::SupportsFeature(Feature feature)
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
     uint32_t featureMap = 0;
-    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == Status::Success);
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 #else
     return ((mFeatureMap & to_underlying(feature)) != 0);
 #endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
 void ICDManager::SendCheckInMsgs()
 {
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
     VerifyOrDie(mStorage != nullptr);
     VerifyOrDie(mFabricTable != nullptr);
-    uint32_t counter        = ICDConfigurationData::GetInstance().GetICDCounter();
+
+    uint32_t counterValue   = ICDConfigurationData::GetInstance().GetICDCounter().GetNextCheckInCounterValue();
     bool counterIncremented = false;
 
     for (const auto & fabricInfo : *mFabricTable)
@@ -145,7 +157,7 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            bool active = mSubManager->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
+            bool active = mSubInfoProvider->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
             if (active)
             {
                 continue;
@@ -156,7 +168,7 @@ void ICDManager::SendCheckInMsgs()
             {
                 counterIncremented = true;
 
-                if (CHIP_NO_ERROR != IncrementCounter())
+                if (CHIP_NO_ERROR != ICDConfigurationData::GetInstance().GetICDCounter().Advance())
                 {
                     ChipLogError(AppServer, "Incremented ICDCounter but failed to access/save to Persistent storage");
                 }
@@ -167,7 +179,7 @@ void ICDManager::SendCheckInMsgs()
             ICDCheckInSender * sender = mICDSenderPool.CreateObject(mExchangeManager);
             VerifyOrReturn(sender != nullptr, ChipLogError(AppServer, "Failed to allocate ICDCheckinSender"));
 
-            if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable, counter))
+            if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable, counterValue))
             {
                 ChipLogError(AppServer, "Failed to send ICD Check-In");
             }
@@ -176,53 +188,58 @@ void ICDManager::SendCheckInMsgs()
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
-CHIP_ERROR ICDManager::InitCounter()
+bool ICDManager::CheckInMessagesWouldBeSent()
 {
-    CHIP_ERROR err;
-    uint32_t temp;
-    uint16_t size = static_cast<uint16_t>(sizeof(uint32_t));
-
-    err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDCheckInCounter().KeyName(), &temp, size);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    for (const auto & fabricInfo : *mFabricTable)
     {
-        // First time retrieving the counter
-        temp = chip::Crypto::GetRandU32();
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-        return err;
+        uint16_t supported_clients = ICDConfigurationData::GetInstance().GetClientsSupportedPerFabric();
+
+        ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
+                                 mSymmetricKeystore);
+        if (table.IsEmpty())
+        {
+            continue;
+        }
+
+        for (uint16_t i = 0; i < table.Limit(); i++)
+        {
+            ICDMonitoringEntry entry(mSymmetricKeystore);
+            CHIP_ERROR err = table.Get(i, entry);
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                break;
+            }
+
+            if (err != CHIP_NO_ERROR)
+            {
+                // Try to fetch the next entry upon failure (should not happen).
+                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry, will try next entry.");
+                continue;
+            }
+
+            // At least one registration would require a Check-In message
+            VerifyOrReturnValue(mSubInfoProvider->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject), true);
+        }
     }
 
-    ICDConfigurationData::GetInstance().SetICDCounter(temp);
-    temp += ICDConfigurationData::ICD_CHECK_IN_COUNTER_MIN_INCREMENT;
-
-    // Increment the count directly to minimize flash write.
-    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDCheckInCounter().KeyName(), &temp, size);
+    // None of the registrations would require a Check-In message
+    return false;
 }
 
-CHIP_ERROR ICDManager::IncrementCounter()
+void ICDManager::TriggerCheckInMessages()
 {
-    uint32_t temp      = 0;
-    StorageKeyName key = DefaultStorageKeyAllocator::ICDCheckInCounter();
-    uint16_t size      = static_cast<uint16_t>(sizeof(uint32_t));
+    VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
 
-    ICDConfigurationData::GetInstance().mICDCounter++;
+    // Only trigger Check-In messages when we are in IdleMode.
+    // If we are already in ActiveMode, Check-In messages have already been sent.
+    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
 
-    if (mStorage == nullptr)
-    {
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    }
+    // If we don't have any Check-In messages to send, do nothing
+    VerifyOrReturn(CheckInMessagesWouldBeSent());
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key.KeyName(), &temp, size));
-
-    if (temp == ICDConfigurationData::GetInstance().mICDCounter)
-    {
-        temp = ICDConfigurationData::GetInstance().mICDCounter + ICDConfigurationData::ICD_CHECK_IN_COUNTER_MIN_INCREMENT;
-        return mStorage->SyncSetKeyValue(key.KeyName(), &temp, size);
-    }
-
-    return CHIP_NO_ERROR;
+    UpdateOperationState(OperationalState::ActiveMode);
 }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 void ICDManager::UpdateICDMode()
 {
@@ -230,6 +247,7 @@ void ICDManager::UpdateICDMode()
 
     ICDConfigurationData::ICDMode tempMode = ICDConfigurationData::ICDMode::SIT;
 
+#if CHIP_CONFIG_ENABLE_ICD_LIT
     // Device can only switch to the LIT operating mode if LIT support is present
     if (SupportsFeature(Feature::kLongIdleTimeSupport))
     {
@@ -247,6 +265,7 @@ void ICDManager::UpdateICDMode()
             }
         }
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
     if (ICDConfigurationData::GetInstance().GetICDMode() != tempMode)
     {
@@ -281,15 +300,21 @@ void ICDManager::UpdateOperationState(OperationalState state)
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
         // unless the device would need to send Check-In messages
         // TODO(#30281) : Verify how persistent subscriptions affects this at ICDManager::Init
-        if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero || CheckInMessagesWouldBeSent())
+        if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+            || CheckInMessagesWouldBeSent()
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+        )
         {
             DeviceLayer::SystemLayer().StartTimer(ICDConfigurationData::GetInstance().GetIdleModeDuration(), OnIdleModeDone, this);
         }
 
         Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
         // Going back to Idle, all Check-In messages are sent
         mICDSenderPool.ReleaseAll();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
@@ -330,10 +355,12 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
             if (SupportsFeature(Feature::kCheckInProtocolSupport))
             {
                 SendCheckInMsgs();
             }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
             postObserverEvent(ObserverEventType::EnterActiveMode);
         }
@@ -416,12 +443,14 @@ void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
         this->mOpenExchangeContextCount++;
     }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     if (request.Has(KeepActiveFlag::kCheckInInProgress))
     {
         // There can be multiple check-in at the same time.
         // Keep track of the requests count.
         this->mCheckInRequestCount++;
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     this->SetKeepActiveModeRequirements(request, true /* state */);
 }
@@ -451,6 +480,7 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
         }
     }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     if (request.Has(KeepActiveFlag::kCheckInInProgress))
     {
         // There can be multiple open exchange contexts at the same time.
@@ -469,6 +499,7 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
             this->SetKeepActiveModeRequirements(KeepActiveFlag::kCheckInInProgress, false /* state */);
         }
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     if (request.Has(KeepActiveFlag::kCommissioningWindowOpen) || request.Has(KeepActiveFlag::kFailSafeArmed))
     {
@@ -549,44 +580,6 @@ void ICDManager::postObserverEvent(ObserverEventType event)
         }
         }
     });
-}
-
-bool ICDManager::CheckInMessagesWouldBeSent()
-{
-    for (const auto & fabricInfo : *mFabricTable)
-    {
-        uint16_t supported_clients = ICDConfigurationData::GetInstance().GetClientsSupportedPerFabric();
-
-        ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
-                                 mSymmetricKeystore);
-        if (table.IsEmpty())
-        {
-            continue;
-        }
-
-        for (uint16_t i = 0; i < table.Limit(); i++)
-        {
-            ICDMonitoringEntry entry(mSymmetricKeystore);
-            CHIP_ERROR err = table.Get(i, entry);
-            if (err == CHIP_ERROR_NOT_FOUND)
-            {
-                break;
-            }
-
-            if (err != CHIP_NO_ERROR)
-            {
-                // Try to fetch the next entry upon failure (should not happen).
-                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry, will try next entry.");
-                continue;
-            }
-
-            // At least one registration would require a Check-In message
-            VerifyOrReturnValue(mSubManager->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject), true);
-        }
-    }
-
-    // None of the registrations would require a Check-In message
-    return false;
 }
 
 } // namespace app
