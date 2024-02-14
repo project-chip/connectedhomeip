@@ -33,83 +33,37 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
                                                    const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
                                                    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
-    std::unique_ptr<char[]> messageTextBufferPtr;
-    std::unique_ptr<uint8_t[]> messageIdBufferPtr;
+    ChipLogProgress(Controller, "HandlePresentMessagesRequest message:%s",
+                    std::string(messageText.data(), messageText.size()).c_str());
 
-    uint8_t * messageIdBuffer = nullptr;
-    // see MessagesManager.h "Note on memory management" for allocation/free rules
-    char * messageTextBuffer = new char[messageText.size() + 1];
-    VerifyOrExit(messageTextBuffer != nullptr,
-                 ChipLogProgress(Controller, "HandlePresentMessagesRequest messageTextBuffer alloc failed"));
-    messageTextBufferPtr.reset(messageTextBuffer);
+    CachedMessage * cachedMessage                     = new CachedMessage(messageId, priority, messageControl, startTime, duration,
+                                                                          std::string(messageText.data(), messageText.size()));
+    std::unique_ptr<CachedMessage *> cachedMessagePtr = std::make_unique<CachedMessage *>(cachedMessage);
 
-    memcpy(messageTextBuffer, messageText.data(), messageText.size());
-    messageTextBuffer[messageText.size()] = '\0';
-
-    ChipLogProgress(Controller, "HandlePresentMessagesRequest message:%s size:%lu", messageTextBuffer, messageText.size());
-
-    // see MessagesManager.h "Note on memory management" for allocation/free rules
-    messageIdBuffer = new uint8_t[messageId.size()];
-    VerifyOrExit(messageIdBuffer != nullptr,
-                 ChipLogProgress(Controller, "HandlePresentMessagesRequest messageIdBuffer alloc failed"));
-    memcpy(messageIdBuffer, messageId.data(), messageId.size());
-    messageIdBufferPtr.reset(messageIdBuffer);
-
+    if (responses.HasValue())
     {
-        messageTextBufferPtr.release();
-        messageIdBufferPtr.release();
-        CachedMessage * cachedMessage = new CachedMessage(messageIdBuffer, messageId.size(), priority, messageControl, startTime,
-                                                          duration, std::string(messageTextBuffer, messageText.size() + 1));
-        std::unique_ptr<CachedMessage *> cachedMessagePtr = std::make_unique<CachedMessage *>(cachedMessage);
-
-        if (responses.HasValue())
+        auto iter = responses.Value().begin();
+        while (iter.Next())
         {
-            size_t size    = 0;
-            CHIP_ERROR err = responses.Value().ComputeSize(&size);
-            VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(Controller, "HandlePresentMessagesRequest size check failed"));
+            auto & response = iter.GetValue();
 
-            // set the array size on the CachedMessage
-            VerifyOrExit(cachedMessage->SetOptionArraySize(size) == CHIP_NO_ERROR,
-                         ChipLogProgress(Controller, "HandlePresentMessagesRequest SetOptionArraySize failed"));
+            VerifyOrReturn(response.messageResponseID.HasValue() && response.label.HasValue(),
+                           ChipLogProgress(Controller, "HandlePresentMessagesRequest missing respond id or label"));
 
-            size_t counter = 0;
-            auto iter      = responses.Value().begin();
-            while (iter.Next())
-            {
-                std::unique_ptr<char[]> labelBufferPtr;
-                auto & response = iter.GetValue();
+            CachedMessageOption * option = new CachedMessageOption(
+                response.messageResponseID.Value(), std::string(response.label.Value().data(), response.label.Value().size()));
 
-                VerifyOrExit(response.messageResponseID.HasValue() && response.label.HasValue(),
-                             ChipLogProgress(Controller, "HandlePresentMessagesRequest missing respond id or label"));
-
-                // see MessagesManager.h "Note on memory management" for allocation/free rules
-                char * labelBuffer = new char[response.label.Value().size() + 1];
-                VerifyOrExit(labelBuffer != nullptr,
-                             ChipLogProgress(Controller, "HandlePresentMessagesRequest label alloc failed"));
-                labelBufferPtr.reset(labelBuffer);
-
-                memcpy(labelBuffer, response.label.Value().data(), response.label.Value().size());
-                labelBuffer[response.label.Value().size()] = '\0';
-
-                labelBufferPtr.release();
-                // set the option fields on the CachedMessage
-                cachedMessage->SetOption(counter, Optional<uint32_t>(response.messageResponseID.Value()),
-                                         Optional<CharSpan>(CharSpan::fromCharString(labelBuffer)));
-                counter++;
-            }
+            cachedMessage->AddOption(option);
         }
-
-        cachedMessagePtr.release();
-        mCachedMessages.push_back(*cachedMessage);
     }
+
+    cachedMessagePtr.release();
+    mCachedMessages.push_back(*cachedMessage);
 
     // Add your code to present Message
     ChipLogProgress(Controller, "HandlePresentMessagesRequest complete");
 
     return;
-exit:
-
-    ChipLogProgress(Controller, "HandlePresentMessagesRequest error exit");
 }
 
 void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
@@ -136,7 +90,9 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (CachedMessage & entry : mCachedMessages)
         {
+            ChipLogProgress(Controller, "--MessagesManager HandleGetMessages getting");
             ReturnErrorOnFailure(encoder.Encode(entry.GetMessage()));
+            ChipLogProgress(Controller, "-MessagesManager HandleGetMessages gotten");
         }
         return CHIP_NO_ERROR;
     });

@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <list>
+#include <vector>
 
 /**
  * Note on memory management:
@@ -31,10 +32,29 @@
  *
  */
 
+struct CachedMessageOption
+{
+    uint32_t mId;
+    std::string mLabel;
+    chip::app::Clusters::Messages::MessageResponseOption mOption;
+
+    CachedMessageOption(uint32_t id, std::string label) :
+        mId(id), mLabel(label), mOption{ chip::Optional<uint32_t>(mId),
+                                         chip::Optional<chip::CharSpan>(chip::CharSpan::fromCharString(mLabel.c_str())) }
+    {
+        // ChipLogProgress(Controller, "CachedMessageOption constructor id=%d label=%s", mId, mLabel.c_str());
+    }
+
+    chip::app::Clusters::Messages::MessageResponseOption GetMessageOption() { return mOption; }
+
+    ~CachedMessageOption()
+    {
+        // ChipLogProgress(Controller, "CachedMessageOption destructor");
+    }
+};
+
 struct CachedMessage
 {
-    chip::ByteSpan mMessageId;
-
     const chip::app::Clusters::Messages::MessagePriorityEnum mPriority;
     const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> mMessageControl;
     const chip::app::DataModel::Nullable<uint32_t> mStartTime;
@@ -42,42 +62,32 @@ struct CachedMessage
 
     std::string mMessageText;
 
-    chip::app::Clusters::Messages::MessageResponseOption * mOptionArray = nullptr;
-    size_t mOptionArraySize                                             = 0;
+    uint8_t * messageIdBuffer = nullptr;
+    chip::ByteSpan mMessageId;
 
-    CachedMessage(uint8_t * messageId, size_t messageIdSize, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
+    CachedMessage(const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
                   const chip::app::DataModel::Nullable<uint32_t> & startTime,
                   const chip::app::DataModel::Nullable<uint16_t> & duration, std::string messageText) :
-        mMessageId(messageId, messageIdSize),
-        mPriority(priority), mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText)
-    {}
-
-    CHIP_ERROR SetOptionArraySize(size_t size)
+        mPriority(priority),
+        mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText)
     {
-        mOptionArray = new chip::app::Clusters::Messages::MessageResponseOption[size];
-        if (mOptionArray == nullptr)
-        {
-            ChipLogProgress(Controller, "HandlePresentMessagesRequest MessageResponseOption alloc failed");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        mOptionArraySize = size;
-        return CHIP_NO_ERROR;
+        messageIdBuffer = new uint8_t[messageId.size()];
+        VerifyOrReturn(messageIdBuffer != nullptr, ChipLogProgress(Controller, "CachedMessage messageIdBuffer alloc failed"));
+        memcpy(messageIdBuffer, messageId.data(), messageId.size());
+        mMessageId = chip::ByteSpan(messageIdBuffer, messageId.size());
     }
 
-    CHIP_ERROR SetOption(size_t index, chip::Optional<uint32_t> id, chip::Optional<chip::CharSpan> label)
+    void AddOption(CachedMessageOption * option)
     {
-        if (index >= mOptionArraySize)
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-        mOptionArray[index].messageResponseID = id;
-        mOptionArray[index].label             = label;
-        return CHIP_NO_ERROR;
+        mOptions.push_back(*option);
+        mResponseOptions.push_back(option->GetMessageOption());
     }
 
     chip::app::Clusters::Messages::Structs::MessageStruct::Type GetMessage()
     {
+        chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption> options(mResponseOptions.data(),
+                                                                                                 mResponseOptions.size());
         chip::app::Clusters::Messages::Structs::MessageStruct::Type message{
             mMessageId,
             mPriority,
@@ -85,26 +95,22 @@ struct CachedMessage
             mStartTime,
             mDuration,
             chip::CharSpan::fromCharString(mMessageText.c_str()),
-            chip::Optional<chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption>>(
-                chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption>(mOptionArray, mOptionArraySize))
+            chip::Optional<chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption>>(options)
         };
         return message;
     }
 
     ~CachedMessage()
     {
-        ChipLogProgress(Controller, "CachedMessage destructor start");
-        delete[] mMessageId.data();
-        for (size_t i = 0; i < mOptionArraySize; i++)
+        if (messageIdBuffer != nullptr)
         {
-            if (mOptionArray[i].label.HasValue())
-            {
-                delete[] mOptionArray[i].label.Value().data();
-            }
+            delete[] messageIdBuffer;
         }
-        delete[] mOptionArray;
-        ChipLogProgress(Controller, "CachedMessage destructor done");
     }
+
+protected:
+    std::vector<chip::app::Clusters::Messages::MessageResponseOption> mResponseOptions;
+    std::list<CachedMessageOption> mOptions;
 };
 
 class MessagesManager : public chip::app::Clusters::Messages::Delegate
