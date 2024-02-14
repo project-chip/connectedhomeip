@@ -94,6 +94,8 @@ struct ConcreteReadAttributePath : public ConcreteAttributePath
 
     bool operator!=(const ConcreteReadAttributePath & aOther) const { return !(*this == aOther); }
 
+    bool operator<(const ConcreteReadAttributePath & path) const = delete;
+
     bool operator==(const ConcreteReadAttributePath & aOther) const = delete;
     bool operator!=(const ConcreteReadAttributePath & aOther) const = delete;
     bool operator<(const ConcreteReadAttributePath & aOther) const  = delete;
@@ -128,13 +130,11 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
 
     ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId,
                               const Optional<DataVersion> & aDataVersion) :
-        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId),
-        mDataVersion(aDataVersion)
+        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId), mDataVersion(aDataVersion)
     {}
 
     ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListOperation aListOp,
-                              uint16_t aListIndex) :
-        ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
+                              uint16_t aListIndex) : ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
     {
         mListOp    = aListOp;
         mListIndex = aListIndex;
@@ -149,6 +149,8 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
                         ChipLogValueMEI(mClusterId), ChipLogValueMEI(mAttributeId));
     }
 
+    bool MatchesConcreteAttributePath(const ConcreteAttributePath & path) { return ConcreteAttributePath::operator==(path); }
+
     bool operator==(const ConcreteDataAttributePath & aOther) const
     {
         return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex) && (mListOp == aOther.mListOp) &&
@@ -157,11 +159,7 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
 
     bool operator!=(const ConcreteDataAttributePath & aOther) const { return !(*this == aOther); }
 
-    bool MatchesConcreteAttributePath(const ConcreteAttributePath & aOther) { return ConcreteAttributePath::operator==(aOther); }
-
-    bool operator==(const ConcreteDataAttributePath & aOther) const = delete;
-    bool operator!=(const ConcreteDataAttributePath & aOther) const = delete;
-    bool operator<(const ConcreteDataAttributePath & aOther) const  = delete;
+    bool operator<(const ConcreteDataAttributePath & path) const = delete;
 
     //
     // This index is only valid if `mListOp` is set to a list item operation, i.e
