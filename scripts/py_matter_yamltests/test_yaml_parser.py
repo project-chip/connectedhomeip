@@ -20,20 +20,20 @@
 # is arguably better then no checks at all.
 
 import io
-import tempfile
 import unittest
 from unittest.mock import mock_open, patch
 
 from matter_yamltests.definitions import ParseSource, SpecDefinitions
+from matter_yamltests.errors import TestStepEnumError, TestStepEnumSpecifierNotUnknownError, TestStepEnumSpecifierWrongError
 from matter_yamltests.parser import TestParser, TestParserConfig
 
 simple_test_description = '''<?xml version="1.0"?>
   <configurator>
     <enum name="TestEnum" type="enum8">
-      <cluster code="0x1234"/>
-      <item name="A" value="0x0"/>
-      <item name="B" value="0x1"/>
-      <item name="C" value="0x2"/>
+        <cluster code="0x1234"/>
+        <item name="A" value="0x0"/>
+        <item name="B" value="0x1"/>
+        <item name="C" value="0x2"/>
     </enum>
 
     <struct name="TestStruct">
@@ -44,6 +44,8 @@ simple_test_description = '''<?xml version="1.0"?>
     <cluster>
       <name>Test</name>
       <code>0x1234</code>
+
+      <attribute side="server" code="0x0024" type="TestEnum" writable="true" optional="false">test_enum</attribute>
 
       <command source="client" code="1" name="test"></command>
     </cluster>
@@ -61,6 +63,116 @@ config:
 tests:
     - label: "Send Test Command"
       command: "test"
+'''
+
+enum_values_yaml = '''
+name: Test Enum Values
+
+config:
+    nodeId: 0x12344321
+    cluster: "Test"
+    endpoint: 1
+
+tests:
+    - label: "Read attribute test_enum Value"
+      command: "readAttribute"
+      attribute: "test_enum"
+      response:
+          value: 0
+
+    - label: "Read attribute test_enum Value"
+      command: "readAttribute"
+      attribute: "test_enum"
+      response:
+          value: TestEnum.A
+
+    - label: "Read attribute test_enum Value"
+      command: "readAttribute"
+      attribute: "test_enum"
+      response:
+          value: TestEnum.A(0)
+
+    - label: "Read attribute test_enum Value"
+      command: "readAttribute"
+      attribute: "test_enum"
+      response:
+          value: TestEnum.UnknownEnumValue
+
+    - label: "Read attribute test_enum Value"
+      command: "readAttribute"
+      attribute: "test_enum"
+      response:
+          value: TestEnum.UnknownEnumValue(255)
+
+    - label: "Write attribute test_enum Value"
+      command: "writeAttribute"
+      attribute: "test_enum"
+      arguments:
+          value: 0
+
+    - label: "Write attribute test_enum Value"
+      command: "writeAttribute"
+      attribute: "test_enum"
+      arguments:
+          value: TestEnum.A
+
+    - label: "Write attribute test_enum Value"
+      command: "writeAttribute"
+      attribute: "test_enum"
+      arguments:
+          value: TestEnum.A(0)
+
+    - label: "Write attribute test_enum Value"
+      command: "writeAttribute"
+      attribute: "test_enum"
+      arguments:
+          value: TestEnum.UnknownEnumValue
+
+    - label: "Write attribute test_enum Value"
+      command: "writeAttribute"
+      attribute: "test_enum"
+      arguments:
+          value: TestEnum.UnknownEnumValue(255)
+'''
+
+enum_value_read_response_wrong_code_yaml = '''
+tests:
+    - label: "Read attribute test_enum Value"
+      cluster: "Test"
+      command: "readAttribute"
+      attribute: "test_enum"
+      response:
+          value: 123
+'''
+
+enum_value_read_response_wrong_name_yaml = '''
+tests:
+    - label: "Read attribute test_enum Value"
+      cluster: "Test"
+      command: "readAttribute"
+      attribute: "test_enum"
+      response:
+          value: ThisIsWrong
+'''
+
+enum_value_read_response_wrong_code_specified_yaml = '''
+tests:
+    - label: "Read attribute test_enum Value"
+      cluster: "Test"
+      command: "readAttribute"
+      attribute: "test_enum"
+      response:
+          value: TestEnum.A(123)
+'''
+
+enum_value_read_response_not_unknown_code_specified_yaml = '''
+tests:
+    - label: "Read attribute test_enum Value"
+      cluster: "Test"
+      command: "readAttribute"
+      attribute: "test_enum"
+      response:
+          value: TestEnum.UnknownEnumValue(0)
 '''
 
 
@@ -113,6 +225,34 @@ class TestYamlParser(unittest.TestCase):
 
         yaml_parser = TestParser(simple_test_yaml, parser_config)
         self.assertIsInstance(yaml_parser, TestParser)
+
+    def test_config_valid_enum_values(self):
+        parser_config = TestParserConfig(None, self._definitions)
+        yaml_parser = TestParser(enum_values_yaml, parser_config)
+        self.assertIsInstance(yaml_parser, TestParser)
+
+        for idx, test_step in enumerate(yaml_parser.tests):
+            pass
+
+    def test_config_read_response_wrong_code(self):
+        parser_config = TestParserConfig(None, self._definitions)
+        self.assertRaises(TestStepEnumError, TestParser,
+                          enum_value_read_response_wrong_code_yaml, parser_config)
+
+    def test_config_read_response_wrong_name(self):
+        parser_config = TestParserConfig(None, self._definitions)
+        self.assertRaises(TestStepEnumError, TestParser,
+                          enum_value_read_response_wrong_name_yaml, parser_config)
+
+    def test_config_read_response_wrong_code_specified(self):
+        parser_config = TestParserConfig(None, self._definitions)
+        self.assertRaises(TestStepEnumSpecifierWrongError, TestParser,
+                          enum_value_read_response_wrong_code_specified_yaml, parser_config)
+
+    def test_config_read_response_not_unknown_code_specified(self):
+        parser_config = TestParserConfig(None, self._definitions)
+        self.assertRaises(TestStepEnumSpecifierNotUnknownError, TestParser,
+                          enum_value_read_response_not_unknown_code_specified_yaml, parser_config)
 
 
 def main():
