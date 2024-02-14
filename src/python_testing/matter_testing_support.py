@@ -1008,9 +1008,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                 test is more deliberately identifying where test skips are starting from, making
                 it easier to validate against the test plan for correctness.
         '''
-        last_step = len(self.get_test_steps(self.current_test_info.name)) + 1
-        for index in range(starting_step, last_step):
-            self.skip_step(index)
+        steps = self.get_test_steps(self.current_test_info.name)
+        starting_step = [idx for idx, step in enumerate(steps) if step.test_plan_number == starting_step][0]
+        remaining = steps[starting_step:]
+        for step in remaining:
+            self.skip_step(step.test_plan_number)
 
     def step(self, step: typing.Union[int, str]):
         test_name = self.current_test_info.name
