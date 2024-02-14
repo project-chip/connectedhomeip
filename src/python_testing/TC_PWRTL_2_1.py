@@ -61,7 +61,8 @@ class TC_PWRTL_2_1(MatterBaseTest):
         logging.info("ActiveEndpoints: %s" % (active_endpoints))
 
         if available_endpoints == NullValue:
-            asserts.assert_true(active_endpoints == NullValue, "ActiveEndpoints should be null when AvailableEndpoints is null: %s" % active_endpoints)
+            asserts.assert_true(active_endpoints == NullValue,
+                                "ActiveEndpoints should be null when AvailableEndpoints is null: %s" % active_endpoints)
 
 
 if __name__ == "__main__":

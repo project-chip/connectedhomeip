@@ -9985,14 +9985,19 @@ PICS:
 
     #  Features
 
-    - label: "Does the associated endpoint provide or consume power for the entire node?"
+    - label:
+          "Does the associated endpoint provide or consume power for the entire
+          node?"
       id: PWRTL.S.F00
 
     - label:
-          "Does the associated endpoint provide or consume power for itself and its child endpoints?"
+          "Does the associated endpoint provide or consume power for itself and
+          its child endpoints?"
       id: PWRTL.S.F01
 
-    - label: "Does the associated endpoint provide or consume power for a provided set of endpoints?"
+    - label:
+          "Does the associated endpoint provide or consume power for a provided
+          set of endpoints?"
       id: PWRTL.S.F02
 
     - label: "Can the provided set of endpoints change?"

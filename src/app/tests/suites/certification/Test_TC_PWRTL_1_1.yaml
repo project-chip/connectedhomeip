@@ -41,8 +41,8 @@ tests:
               type: int16u
 
     - label:
-          "Step 3a: Given PWRTL.S.F00(Node) ensure featuremap has the
-          correct bit set"
+          "Step 3a: Given PWRTL.S.F00(Node) ensure featuremap has the correct
+          bit set"
       PICS: PWRTL.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -53,8 +53,8 @@ tests:
               hasMasksClear: [0x2, 0x4, 0x8]
 
     - label:
-          "Step 3b: Given PWRTL.S.F01(Leaf) ensure featuremap has the
-          correct bit set"
+          "Step 3b: Given PWRTL.S.F01(Leaf) ensure featuremap has the correct
+          bit set"
       PICS: PWRTL.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -65,8 +65,8 @@ tests:
               hasMasksClear: [0x1, 0x4, 0x8]
 
     - label:
-          "Step 3c: Given PWRTL.S.F02(Set) ensure featuremap has the
-          correct bit set"
+          "Step 3c: Given PWRTL.S.F02(Set) ensure featuremap has the correct bit
+          set"
       PICS: PWRTL.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -77,8 +77,8 @@ tests:
               hasMasksClear: [0x1, 0x2]
 
     - label:
-          "Step 3d: Given PWRTL.S.F03(Dynamic Power Flow) ensure featuremap has the
-          correct bit set"
+          "Step 3d: Given PWRTL.S.F03(Dynamic Power Flow) ensure featuremap has
+          the correct bit set"
       PICS: PWRTL.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -96,7 +96,9 @@ tests:
               type: list
               contains: []
 
-    - label: "Step 4b: TH reads feature dependent attribute(AvailableEndpoints) AttributeList from DUT"
+    - label:
+          "Step 4b: TH reads feature dependent attribute(AvailableEndpoints)
+          AttributeList from DUT"
       PICS: "PICS_SF_SET && !PICS_SF_DYPF"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -105,7 +107,9 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 4c: TH reads feature dependent attribute(ActiveEndpoints) AttributeList from DUT"
+    - label:
+          "Step 4c: TH reads feature dependent attribute(ActiveEndpoints)
+          AttributeList from DUT"
       PICS: "PICS_SF_SET && PICS_SF_DYPF"
       command: "readAttribute"
       attribute: "AttributeList"
