@@ -16,10 +16,14 @@
  */
 #import "MTRMetricsCollector.h"
 #include <MTRMetrics.h>
+#include <tracing/scalar_event.h>
+#include <MTRDefines_Internal.h>
+#include <MTRMetrics_Internal.h>
 #import "MTRLogging_Internal.h"
 #import <Matter/MTRDefines.h>
 #include <platform/Darwin/Tracing.h>
 #include <tracing/registry.h>
+#import "MTRUnfairLock.h"
 
 void InitializeMetricsCollection()
 {
@@ -30,7 +34,8 @@ void InitializeMetricsCollection()
 }
 
 @implementation MTRMetricsCollector {
-    NSMutableDictionary<NSString *, id> * _metricsData;
+    os_unfair_lock _lock;
+    NSMutableDictionary<NSString *, NSNumber*> * _metricsData;
     chip::Tracing::signposts::DarwinTracingBackend _tracingBackend;
 }
 
@@ -43,6 +48,12 @@ void InitializeMetricsCollection()
         singleton = [[MTRMetricsCollector alloc] init];
         if (singleton) {
             chip::Tracing::Register(singleton->_tracingBackend);
+            singleton->_tracingBackend.SetLogEventClientCallback(^(chip::Tracing::ScalarEvent event) {
+                    MTR_LOG_INFO("RECEIVED scalar event, type: %u, value: %u", event.eventType, event.eventValue);
+                    if (singleton) {
+                        [singleton handleScalarEvent:event];
+                    }
+                });
         }
     });
     return singleton;
@@ -53,7 +64,42 @@ void InitializeMetricsCollection()
     if (!(self = [super init])) {
         return nil;
     }
+    _lock = OS_UNFAIR_LOCK_INIT;
+    _metricsData = [NSMutableDictionary dictionary];
     return self;
+}
+
+static NSString * convertEventTypeToString(chip::Tracing::ScalarEvent::EventType eventType)
+{
+    using chip::Tracing::ScalarEvent;
+    switch (eventType) {
+        case ScalarEvent::kDiscoveryOverBLE: return @"com.matter.metric.disovered-over-ble";
+        case ScalarEvent::kDiscoveryOnNetwork: return @"com.matter.metric.disovered-on-network";
+        case ScalarEvent::kPASEConnectionEstablished: return @"com.matter.metric.pase-connection-established";
+        case ScalarEvent::kPASEConnectionFailed: return @"com.matter.metric.pase-connection-failed";
+        case ScalarEvent::kAttestationResult: return @"com.matter.metric.attestation-result";
+        case ScalarEvent::kAttestationOverridden: return @"com.matter.metric.attestation-overridden";
+        case ScalarEvent::kCASEConnectionEstablished: return @"com.matter.metric.case-connection-established";
+        case ScalarEvent::kCASEConnectionFailed: return @"com.matter.metric.case-connection-failed";
+    }
+}
+
+- (void)handleScalarEvent:(chip::Tracing::ScalarEvent)event
+{
+    MTR_LOG_INFO("Received scalar event, type: %u, value: %u", event.eventType, event.eventValue);
+    std::lock_guard lock(_lock);
+    [_metricsData setValue:[NSNumber numberWithUnsignedInteger:event.eventValue]
+                    forKey:convertEventTypeToString(event.eventType)];
+}
+
+- (MTRMetrics *)metricSnapshot:(BOOL)resetCollection
+{
+    std::lock_guard lock(_lock);
+    MTRMetrics *metrics = [MTRMetrics metricsFromDictionary:_metricsData];
+    if (resetCollection) {
+       [_metricsData removeAllObjects];
+    }
+    return metrics;
 }
 
 @end

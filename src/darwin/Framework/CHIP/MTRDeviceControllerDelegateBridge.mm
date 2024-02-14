@@ -19,7 +19,7 @@
 #import "MTRDeviceController.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
-#import "MTRMetrics_Internal.h"
+#import "MTRMetricsCollector.h"
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
@@ -131,14 +131,16 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
                 }
 
                 if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
-                    MTRMetrics * metrics = [MTRMetrics new];
+                    MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshot:TRUE];
 
+                    /*
                     if (nsError) {
                         [metrics setValue:nsError forKey:MTRMetricCommissioningStatusKey];
                     } else {
                         auto * error = [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil];
                         [metrics setValue:error forKey:MTRMetricCommissioningStatusKey];
                     }
+                    */
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
                 } else {
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];

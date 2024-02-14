@@ -31,10 +31,23 @@ namespace signposts {
             return logger;
     }
 
+    DarwinTracingBackend::DarwinTracingBackend()
+        : mClientCallback(nullptr)
+    {}
+
+    void DarwinTracingBackend::SetLogEventClientCallback(LogEventClientCallback callback)
+    {
+        mClientCallback = callback;
+    }
+
     void DarwinTracingBackend::LogEvent(ScalarEvent & event)
     {
         ChipLogProgress(DeviceLayer, "Receive scalar event, type: %u, value: %u",
                         event.eventType, event.eventValue);
+        if (mClientCallback) {
+            ChipLogProgress(DeviceLayer, "Invoking client callback %p", mClientCallback);
+            mClientCallback(event);
+        }
     }
 
 } // namespace signposts

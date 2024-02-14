@@ -15,11 +15,11 @@
  */
 
 #import "MTRFramework.h"
+#include "MTRMetricsCollector.h"
 
 #include <dispatch/dispatch.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <MTRMetricsCollector.h>
 
 void MTRFrameworkInit()
 {

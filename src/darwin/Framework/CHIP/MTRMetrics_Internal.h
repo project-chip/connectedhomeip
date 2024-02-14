@@ -15,12 +15,15 @@
  *    limitations under the License.
  */
 #import "MTRMetrics.h"
+#include <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 #define MTRMetricCommissioningStatusKey @"com.matter.metric.commissioningStatus"
 
 @interface MTRMetrics ()
+
++ (instancetype)metricsFromDictionary:(NSDictionary *)metricsData;
 
 - (void)setValue:(id _Nullable)value forKey:(NSString *)key;
 

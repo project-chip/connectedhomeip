@@ -266,6 +266,7 @@
 		88EBF8D027FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 88EBF8CD27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.h */; };
 		88FA798D2B7B257100CD4B6F /* MTRMetricsCollector.h in Headers */ = {isa = PBXBuildFile; fileRef = 88FA798B2B7B257100CD4B6F /* MTRMetricsCollector.h */; };
 		88FA798E2B7B257100CD4B6F /* MTRMetricsCollector.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88FA798C2B7B257100CD4B6F /* MTRMetricsCollector.mm */; };
+		88FA79902B7BE42500CD4B6F /* MTRMetricsCollector.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88FA798C2B7B257100CD4B6F /* MTRMetricsCollector.mm */; };
 		93B2CF9A2B56E45C00E4D187 /* MTRClusterNames.mm in Sources */ = {isa = PBXBuildFile; fileRef = 93B2CF992B56E45C00E4D187 /* MTRClusterNames.mm */; };
 		93E610AA2B626E290077F02A /* MTRClusterNames.h in Headers */ = {isa = PBXBuildFile; fileRef = 93E610A92B626E290077F02A /* MTRClusterNames.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0842475F45400C13860 /* MTRDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* MTRDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -796,9 +797,6 @@
 				039145E02993102B00257B3E /* main.mm */,
 				03F430A52994100000166449 /* controller */,
 				039547092992DB02006D42A8 /* editline */,
-				039546AD2991E193006D42A8 /* log */,
-				039546B12991E194006D42A8 /* system */,
-				039546A72991E185006D42A8 /* delay */,
 				039546A22991E132006D42A8 /* interaction_model */,
 				039546972991DFC4006D42A8 /* lib_json */,
 				039546872991C400006D42A8 /* chip-tool */,
@@ -819,7 +817,6 @@
 				03FB93DA2A46200A0048CB35 /* discover */,
 				037C3D7C2991BD4F00B7EEE2 /* pairing */,
 				037C3D852991BD4F00B7EEE2 /* clusters */,
-				037C3D8B2991BD4F00B7EEE2 /* tests */,
 				037C3D8D2991BD4F00B7EEE2 /* provider */,
 				037C3D932991BD4F00B7EEE2 /* payload */,
 				037C3D972991BD4F00B7EEE2 /* storage */,
@@ -1741,6 +1738,7 @@
 				039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */,
 				B45373E72A9FEBA400807602 /* parsers.c in Sources */,
 				B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */,
+				88FA79902B7BE42500CD4B6F /* MTRMetricsCollector.mm in Sources */,
 				B45373BF2A9FEA9100807602 /* adopt.c in Sources */,
 				B45373F32A9FEC1A00807602 /* server-ws.c in Sources */,
 				03F430AA2994113500166449 /* sysunix.c in Sources */,
@@ -1760,7 +1758,6 @@
 				B45373EF2A9FEBFE00807602 /* ops-raw-skt.c in Sources */,
 				516411332B6BF77700E67C05 /* MTRServerAccessControl.mm in Sources */,
 				037C3DD52991C2E200B7EEE2 /* CHIPCommandBridge.mm in Sources */,
-				039546BC2991E1CB006D42A8 /* LogCommands.cpp in Sources */,
 				516411312B6BF70300E67C05 /* DataModelHandler.cpp in Sources */,
 				B45373E12A9FEB7F00807602 /* ops-h1.c in Sources */,
 				B45373EB2A9FEBDB00807602 /* ops-listen.c in Sources */,
@@ -1773,13 +1770,11 @@
 				B45373E62A9FEBA400807602 /* header.c in Sources */,
 				B45374002A9FEC4F00807602 /* unix-init.c in Sources */,
 				B45373DF2A9FEB6F00807602 /* system.c in Sources */,
-				039546BD2991E1CB006D42A8 /* SystemCommands.cpp in Sources */,
 				B45373FC2A9FEC4F00807602 /* unix-caps.c in Sources */,
 				B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */,
 				B45373ED2A9FEBEC00807602 /* ops-pipe.c in Sources */,
 				B45373C02A9FEA9100807602 /* output.c in Sources */,
 				0395470F2992DB37006D42A8 /* complete.c in Sources */,
-				039546BE2991E1CB006D42A8 /* DelayCommands.cpp in Sources */,
 				B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */,
 				B45373FF2A9FEC4F00807602 /* unix-misc.c in Sources */,
 				B45373D92A9FEB3800807602 /* poll.c in Sources */,

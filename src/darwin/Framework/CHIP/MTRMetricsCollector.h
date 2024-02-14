@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
+#include <MTRDefines.h>
 #import <Matter/MTRMetrics.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -34,6 +36,8 @@ MTR_NEWLY_AVAILABLE
  * Return the singleton MTRMetricsCollector to vend MTRMetric snapshots
  */
 + (instancetype)sharedInstance;
+
+- (MTRMetrics *)metricSnapshot:(BOOL)resetCollection;
 
 @end
 

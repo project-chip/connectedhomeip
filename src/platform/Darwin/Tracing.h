@@ -28,6 +28,7 @@
 #define MATTER_TRACE_BEGIN(label,group)         os_signpost_interval_begin(_DARWIN_MATTER_SIGNPOST_LOGGER, OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
 #define MATTER_TRACE_END(label,group)           os_signpost_interval_end(_DARWIN_MATTER_SIGNPOST_LOGGER, OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
 #define MATTER_TRACE_INSTANT(label,group)       os_signpost_event_emit(_DARWIN_MATTER_SIGNPOST_LOGGER, OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
+#define MATTER_TRACE_METRIC(label, value)       ::chip::Tracing::Internal::Metric(label, value)
 
 #define MATTER_TRACE_COUNTER(label)                                                                                                \
     do                                                                                                                             \
@@ -60,9 +61,15 @@ private:
 class DarwinTracingBackend : public ::chip::Tracing::Backend
 {
 public:
-    DarwinTracingBackend() = default;
+    DarwinTracingBackend();
 
+    typedef void (^LogEventClientCallback)(ScalarEvent event);
+
+    void SetLogEventClientCallback(LogEventClientCallback callback);
     void LogEvent(ScalarEvent & event) override;
+
+private:
+    LogEventClientCallback mClientCallback;
 };
 
 } // namespace signposts
