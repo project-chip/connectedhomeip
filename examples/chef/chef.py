@@ -730,7 +730,7 @@ def main() -> int:
             shell.run_cmd(" ".join(nrf_build_cmds))
 
         elif options.build_target == "silabs-thread":
-            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/silabs")
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
             efr32_cmd_args = []

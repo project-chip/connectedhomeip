@@ -54,6 +54,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
 #include "BluezConnection.h"
@@ -69,7 +70,8 @@ public:
     BluezEndpoint()  = default;
     ~BluezEndpoint() = default;
 
-    CHIP_ERROR Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr);
+    CHIP_ERROR Init(bool aIsCentral, uint32_t aAdapterId);
+    CHIP_ERROR Init(bool aIsCentral, const char * apBleAddr);
     void Shutdown();
 
     BluezAdapter1 * GetAdapter() const { return mpAdapter; }
@@ -81,16 +83,6 @@ public:
     void CancelConnect();
 
 private:
-    struct ConnectParams
-    {
-        ConnectParams(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice) : mEndpoint(aEndpoint), mpDevice(apDevice) {}
-        ~ConnectParams() = default;
-
-        const BluezEndpoint & mEndpoint;
-        BluezDevice1 * mpDevice;
-        uint16_t mNumRetries = 0;
-    };
-
     CHIP_ERROR StartupEndpointBindings();
 
     void SetupAdapter();
@@ -120,8 +112,7 @@ private:
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
-    static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
-    static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
+    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice);
 
     bool mIsCentral     = false;
     bool mIsInitialized = false;
@@ -137,7 +128,6 @@ private:
     // Objects (interfaces) subscribed to by this service
     GDBusObjectManager * mpObjMgr = nullptr;
     BluezAdapter1 * mpAdapter     = nullptr;
-    BluezDevice1 * mpDevice       = nullptr;
 
     // Objects (interfaces) published by this service
     GDBusObjectManagerServer * mpRoot = nullptr;
@@ -148,8 +138,8 @@ private:
     BluezGattCharacteristic1 * mpC3 = nullptr;
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
-    GCancellable * mpConnectCancellable = nullptr;
-    char * mpPeerDevicePath             = nullptr;
+    GAutoPtr<GCancellable> mConnectCancellable;
+    char * mpPeerDevicePath = nullptr;
 
     // Allow BluezConnection to access our private members
     friend class BluezConnection;

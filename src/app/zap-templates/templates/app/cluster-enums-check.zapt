@@ -19,7 +19,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::{{asType label}
     {{/zcl_enum_items}}
         return val;
     default:
-        return static_cast<EnumType>({{first_unused_enum_value mode="first_unused"}});
+        return EnumType::kUnknownEnumValue;
     }
 }
 {{/unless}}
@@ -39,7 +39,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue({{asUpperCamelCase ../n
     {{/zcl_enum_items}}
         return val;
     default:
-        return static_cast<EnumType>({{first_unused_enum_value mode="first_unused"}});
+        return EnumType::kUnknownEnumValue;
     }
 }
 {{/unless}}

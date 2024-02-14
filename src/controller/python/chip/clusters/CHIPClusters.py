@@ -2246,6 +2246,15 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "PayloadTestRequest",
+                "args": {
+                    "enableKey": "bytes",
+                    "value": "int",
+                    "count": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -7196,6 +7205,62 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
                 "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _POWER_TOPOLOGY_CLUSTER_INFO = {
+        "clusterName": "PowerTopology",
+        "clusterId": 0x0000009C,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "AvailableEndpoints",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "ActiveEndpoints",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -14544,6 +14609,7 @@ class ChipClusters:
         0x00000098: _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
         0x00000099: _ENERGY_EVSE_CLUSTER_INFO,
         0x0000009B: _ENERGY_PREFERENCE_CLUSTER_INFO,
+        0x0000009C: _POWER_TOPOLOGY_CLUSTER_INFO,
         0x0000009D: _ENERGY_EVSE_MODE_CLUSTER_INFO,
         0x0000009F: _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
@@ -14664,6 +14730,7 @@ class ChipClusters:
         "DeviceEnergyManagement": _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
         "EnergyEvse": _ENERGY_EVSE_CLUSTER_INFO,
         "EnergyPreference": _ENERGY_PREFERENCE_CLUSTER_INFO,
+        "PowerTopology": _POWER_TOPOLOGY_CLUSTER_INFO,
         "EnergyEvseMode": _ENERGY_EVSE_MODE_CLUSTER_INFO,
         "DeviceEnergyManagementMode": _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,

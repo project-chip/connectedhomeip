@@ -8,7 +8,7 @@ all of the EFR32 example applications.
 ## Running the OTA Download scenario
 
 -   For Matter with OpenThread: Bring up the OpenThread Border Router as
-    discussed in examples/lighting-app/efr32/README.md and get its operational
+    discussed in examples/lighting-app/silabs/README.md and get its operational
     dataset.
 
 -   On a Linux or Darwin platform build the chip-tool and the ota-provider-app

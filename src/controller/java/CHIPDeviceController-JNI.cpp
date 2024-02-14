@@ -34,7 +34,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
-#include <app/util/error-mapping.h>
 #include <atomic>
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
@@ -101,13 +100,9 @@ static CHIP_ERROR ParseDataVersionFilterList(jobject dataVersionFilterList,
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
 
 namespace {
-
-JavaVM * sJVM;
-
+JavaVM * sJVM       = nullptr;
 pthread_t sIOThread = PTHREAD_NULL;
-
-jclass sChipDeviceControllerExceptionCls = NULL;
-
+chip::JniGlobalReference sChipDeviceControllerExceptionCls;
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -131,14 +126,16 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 
     // Get a JNI environment object.
     env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+    VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     ChipLogProgress(Controller, "Loading Java class references.");
 
     // Get various class references need by the API.
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
-                                                   sChipDeviceControllerExceptionCls);
-    SuccessOrExit(err);
+    jclass controllerExceptionCls;
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
+                                                        controllerExceptionCls);
+    SuccessOrExit(err = sChipDeviceControllerExceptionCls.Init(controllerExceptionCls));
+
     ChipLogProgress(Controller, "Java class references loaded.");
 
 #ifndef JAVA_MATTER_CONTROLLER_TEST
@@ -171,7 +168,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     //             should be stopped before the library is unloaded.
     StopIOThread();
 
-    sJVM = NULL;
+    sJVM = nullptr;
 
     chip::Platform::MemoryShutdown();
 }
@@ -280,7 +277,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
-    AndroidDeviceControllerWrapper * wrapper = NULL;
+    AndroidDeviceControllerWrapper * wrapper = nullptr;
     jlong result                             = 0;
 
     ChipLogProgress(Controller, "newDeviceController() called");
@@ -321,6 +318,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     jmethodID getSkipCommissioningComplete;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getSkipCommissioningComplete", "()Z",
                                                         &getSkipCommissioningComplete);
+    SuccessOrExit(err);
+
+    jmethodID getSkipAttestationCertificateValidation;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getSkipAttestationCertificateValidation", "()Z",
+                                                        &getSkipAttestationCertificateValidation);
     SuccessOrExit(err);
 
     jmethodID getCountryCode;
@@ -372,9 +374,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         uint16_t failsafeTimerSeconds      = static_cast<uint16_t>(env->CallIntMethod(controllerParams, getFailsafeTimerSeconds));
         uint16_t caseFailsafeTimerSeconds =
             static_cast<uint16_t>(env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds));
-        bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
-        bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
-        bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
+        bool attemptNetworkScanWiFi    = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
+        bool attemptNetworkScanThread  = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
+        bool skipCommissioningComplete = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
+        bool skipAttestationCertificateValidation =
+            env->CallBooleanMethod(controllerParams, getSkipAttestationCertificateValidation);
         uint64_t adminSubject              = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getAdminSubject));
         jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
         jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
@@ -390,7 +394,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             sJVM, self, kLocalDeviceId, fabricId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(),
             DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
             rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
-            failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete, &err);
+            failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete,
+            skipAttestationCertificateValidation, &err);
         SuccessOrExit(err);
 
         if (caseFailsafeTimerSeconds > 0)
@@ -470,7 +475,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     // Create and start the IO thread. Must be called after Controller()->Init
     if (sIOThread == PTHREAD_NULL)
     {
-        int pthreadErr = pthread_create(&sIOThread, NULL, IOThreadMain, NULL);
+        int pthreadErr = pthread_create(&sIOThread, nullptr, IOThreadMain, nullptr);
         VerifyOrExit(pthreadErr == 0, err = CHIP_ERROR_POSIX(pthreadErr));
     }
 
@@ -479,7 +484,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (wrapper != NULL)
+        if (wrapper != nullptr)
         {
             delete wrapper;
         }
@@ -506,11 +511,8 @@ JNI_METHOD(void, setDeviceAttestationDelegate)
         chip::Optional<uint16_t> timeoutSecs  = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeoutSecs));
         bool shouldWaitAfterDeviceAttestation = false;
         jclass deviceAttestationDelegateCls   = nullptr;
-        jobject deviceAttestationDelegateRef  = env->NewGlobalRef(deviceAttestationDelegate);
-
-        VerifyOrExit(deviceAttestationDelegateRef != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
-        JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
-                                                 deviceAttestationDelegateCls);
+        JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate",
+                                                      deviceAttestationDelegateCls);
         VerifyOrExit(deviceAttestationDelegateCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
         if (env->IsInstanceOf(deviceAttestationDelegate, deviceAttestationDelegateCls))
@@ -518,9 +520,8 @@ JNI_METHOD(void, setDeviceAttestationDelegate)
             shouldWaitAfterDeviceAttestation = true;
         }
 
-        err = wrapper->UpdateDeviceAttestationDelegateBridge(deviceAttestationDelegateRef, timeoutSecs,
+        err = wrapper->UpdateDeviceAttestationDelegateBridge(deviceAttestationDelegate, timeoutSecs,
                                                              shouldWaitAfterDeviceAttestation);
-        SuccessOrExit(err);
     }
 
 exit:
@@ -542,8 +543,7 @@ JNI_METHOD(void, setAttestationTrustStoreDelegate)
 
     if (attestationTrustStoreDelegate != nullptr)
     {
-        jobject attestationTrustStoreDelegateRef = env->NewGlobalRef(attestationTrustStoreDelegate);
-        err = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef, cdTrustKeys);
+        err = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegate, cdTrustKeys);
         SuccessOrExit(err);
     }
 
@@ -1383,7 +1383,7 @@ JNI_METHOD(void, releaseOperationalDevicePointer)(JNIEnv * env, jobject self, jl
 {
     chip::DeviceLayer::StackLock lock;
     OperationalDeviceProxy * device = reinterpret_cast<OperationalDeviceProxy *>(devicePtr);
-    if (device != NULL)
+    if (device != nullptr)
     {
         delete device;
     }
@@ -1414,7 +1414,7 @@ JNI_METHOD(void, releaseGroupDevicePointer)(JNIEnv * env, jobject self, jlong de
 {
     chip::DeviceLayer::StackLock lock;
     GroupDeviceProxy * device = reinterpret_cast<GroupDeviceProxy *>(devicePtr);
-    if (device != NULL)
+    if (device != nullptr)
     {
         delete device;
     }
@@ -1902,6 +1902,7 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
 
     if (data == nullptr)
     {
+        ChipLogError(Controller, "GetDiscoveredDevice - not found");
         return nullptr;
     }
 
@@ -1910,6 +1911,7 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
 
     jfieldID discrminatorID = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");
     jfieldID ipAddressID    = env->GetFieldID(discoveredDeviceCls, "ipAddress", "Ljava/lang/String;");
+    jfieldID portID         = env->GetFieldID(discoveredDeviceCls, "port", "I");
 
     jobject discoveredObj = env->NewObject(discoveredDeviceCls, constructor);
 
@@ -1918,12 +1920,10 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     char ipAddress[100];
     data->resolutionData.ipAddress[0].ToString(ipAddress, 100);
     jstring jniipAdress = env->NewStringUTF(ipAddress);
-    env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
 
-    if (data == nullptr)
-    {
-        ChipLogError(Controller, "GetDiscoveredDevice - not found");
-    }
+    env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
+    env->SetIntField(discoveredObj, portID, static_cast<jint>(data->resolutionData.port));
+
     return discoveredObj;
 }
 
@@ -2109,7 +2109,7 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
 
     ChipLogProgress(Controller, "deleteDeviceController() called");
 
-    if (wrapper != NULL)
+    if (wrapper != nullptr)
     {
         delete wrapper;
     }
@@ -2154,6 +2154,33 @@ exit:
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
     return nullptr;
+}
+
+JNI_METHOD(jbyteArray, validateAndExtractCSR)(JNIEnv * env, jclass clazz, jbyteArray jCsrElements, jbyteArray jCsrNonce)
+{
+
+    chip::JniByteArray csrElements(env, jCsrElements);
+    chip::JniByteArray csrNonce(env, jCsrNonce);
+
+    chip::ByteSpan csrSpan;
+    chip::ByteSpan csrNonceSpan;
+    chip::ByteSpan vendor_reserved1, vendor_reserved2, vendor_reserved3;
+    CHIP_ERROR err = chip::Credentials::DeconstructNOCSRElements(csrElements.byteSpan(), csrSpan, csrNonceSpan, vendor_reserved1,
+                                                                 vendor_reserved2, vendor_reserved3);
+
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Controller, "CsrElement decoding error: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnValue(csrNonceSpan.size() == Controller::kCSRNonceLength, nullptr,
+                        ChipLogError(Controller, "csrNonce size is invalid"));
+
+    // Verify that Nonce matches with what we sent
+    VerifyOrReturnValue(csrNonceSpan.data_equal(csrNonce.byteSpan()), nullptr,
+                        ChipLogError(Controller, "csrNonce is not matched!"));
+
+    jbyteArray javaCsr;
+    chip::JniReferences::GetInstance().N2J_ByteArray(chip::JniReferences::GetInstance().GetEnvForCurrentThread(), csrSpan.data(),
+                                                     static_cast<jsize>(csrSpan.size()), javaCsr);
+    return javaCsr;
 }
 
 JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, jint jFabricIndex)
@@ -3032,7 +3059,7 @@ void * IOThreadMain(void * arg)
     // This allows the JVM to shutdown without waiting for this thread to exit.
     attachArgs.version = JNI_VERSION_1_6;
     attachArgs.name    = (char *) "CHIP Device Controller IO Thread";
-    attachArgs.group   = NULL;
+    attachArgs.group   = nullptr;
 #ifdef __ANDROID__
     sJVM->AttachCurrentThreadAsDaemon(&env, (void *) &attachArgs);
 #else
@@ -3046,7 +3073,7 @@ void * IOThreadMain(void * arg)
     // Detach the thread from the JVM.
     sJVM->DetachCurrentThread();
 
-    return NULL;
+    return nullptr;
 }
 
 // NOTE: This function SHALL be called with the stack lock held.
@@ -3059,7 +3086,7 @@ CHIP_ERROR StopIOThread()
 
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
-        pthread_join(sIOThread, NULL);
+        pthread_join(sIOThread, nullptr);
         sIOThread = PTHREAD_NULL;
     }
 

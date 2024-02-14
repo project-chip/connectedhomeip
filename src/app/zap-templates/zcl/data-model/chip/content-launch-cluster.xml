@@ -174,7 +174,6 @@ limitations under the License.
     <cluster code="0x050a"/>
     <field name="DASH" mask="0x1"/>
     <field name="HLS" mask="0x2"/>
-    <field name="WebRTC" mask="0x2"/>
   </bitmap>
 
   <bitmap name="Feature" type="bitmap32">

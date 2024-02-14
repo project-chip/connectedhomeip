@@ -40,6 +40,8 @@
 #include <lib/support/SafeInt.h>
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 
+#include "fsl_component_mem_manager.h"
+
 /* Assumes 8bit bytes! */
 #define heapBITS_PER_BYTE ((size_t) 8)
 
@@ -63,42 +65,6 @@ space. */
 static size_t xBlockAllocatedBit = ((size_t) 1) << ((sizeof(size_t) * heapBITS_PER_BYTE) - 1);
 
 extern "C" {
-
-/* xPortMallocUsableSize relies on heap4 implementation.
-It returns the size of an allocated block and it is
-called by __wrap_realloc.
-Thus it is validated in __wrap_realloc function that the allocated size
-of the old_ptr is smaller than the allocated size of new_ptr */
-size_t xPortMallocUsableSize(void * pv)
-{
-    uint8_t * puc = (uint8_t *) pv;
-    BlockLink_t * pxLink;
-    void * voidp;
-    size_t sz = 0;
-
-    if (pv != NULL)
-    {
-        vTaskSuspendAll();
-        {
-            /* The memory being checked will have an BlockLink_t structure immediately
-            before it. */
-            puc -= xHeapStructSize;
-
-            /* This casting is to keep the compiler from issuing warnings. */
-            voidp  = (void *) puc;
-            pxLink = (BlockLink_t *) voidp;
-
-            /* Check if the block is actually allocated. */
-            configASSERT((pxLink->xBlockSize & xBlockAllocatedBit) != 0);
-            configASSERT(pxLink->pxNextFreeBlock == NULL);
-
-            sz = (pxLink->xBlockSize & ~xBlockAllocatedBit) - xHeapStructSize;
-        }
-        (void) xTaskResumeAll();
-    }
-
-    return sz;
-}
 
 void * __wrap_malloc(size_t size)
 {
@@ -135,33 +101,21 @@ void * __wrap_calloc(size_t num, size_t size)
 
 void * __wrap_realloc(void * ptr, size_t new_size)
 {
-
     void * new_ptr = NULL;
 
     if (new_size)
     {
-        size_t old_ptr_size = xPortMallocUsableSize(ptr);
-        if (new_size <= old_ptr_size)
-        {
-            /* Return old pointer if the newly allocated size is smaller
-                    or equal to the allocated size for old_ptr */
-            return ptr;
-        }
-
-        /* if old_ptr is NULL, then old_ptr_size is zero and new_ptr will be returned */
-        new_ptr = pvPortMalloc(new_size);
+        /* MML will only realloc a new pointer if the size is greater than old pointer size.*/
+        vTaskSuspendAll();
+        new_ptr = MEM_BufferRealloc(ptr, new_size);
+        xTaskResumeAll();
 
         if (!new_ptr)
         {
             ChipLogError(DeviceLayer, "__wrap_realloc: Could not allocate memory!");
             return NULL;
         }
-
-        memset(reinterpret_cast<uint8_t *>(new_ptr) + old_ptr_size, 0, (new_size - old_ptr_size));
-        memcpy(new_ptr, ptr, old_ptr_size);
     }
-
-    vPortFree(ptr);
 
     return new_ptr;
 }

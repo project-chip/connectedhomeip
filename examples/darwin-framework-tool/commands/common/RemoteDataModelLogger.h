@@ -32,5 +32,6 @@ CHIP_ERROR LogCommandAsJSON(NSNumber * endpointId, NSNumber * clusterId, NSNumbe
 CHIP_ERROR LogAttributeErrorAsJSON(NSNumber * endpointId, NSNumber * clusterId, NSNumber * attributeId, NSError * error);
 CHIP_ERROR LogCommandErrorAsJSON(NSNumber * endpointId, NSNumber * clusterId, NSNumber * commandId, NSError * error);
 CHIP_ERROR LogGetCommissionerNodeId(NSNumber * nodeId);
+CHIP_ERROR LogBdxDownload(NSString * content, NSError * error);
 void SetDelegate(RemoteDataModelLoggerDelegate * delegate);
 }; // namespace RemoteDataModelLogger

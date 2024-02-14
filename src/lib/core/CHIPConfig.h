@@ -219,6 +219,19 @@
 #endif // CHIP_CONFIG_SHA256_CONTEXT_ALIGN
 
 /**
+ *  @def CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
+ *
+ *  @brief
+ *    Size of the statically allocated context for the HKDF key handle in CryptoPAL.
+ *
+ *  The default size is selected so that the key handle is able to fit 256-bit raw key
+ *  material along with the size information.
+ */
+#ifndef CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
+#define CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE (32 + 1)
+#endif // CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
+
+/**
  *  @def CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
  *
  *  @brief
@@ -1730,6 +1743,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 #define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 0
 #endif
+
+/**
+ *  @def CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+ *
+ *  @brief
+ *    Maximum number of simultaneously active bdx log transfers.
+ *
+ */
+#ifndef CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+#define CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS 5
+#endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
  * @}

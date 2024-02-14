@@ -28,12 +28,18 @@ public:
     /// Trace a zero-sized event
     void TraceInstant(const char * label, const char * group) override;
 
+    void TraceCounter(const char * label) override;
+    void TraceMetric(const char * label, int32_t value) override;
+
     void LogMessageSend(MessageSendInfo &) override;
     void LogMessageReceived(MessageReceivedInfo &) override;
 
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
+
+private:
+    bool mRegistered = false;
 };
 
 } // namespace Insights

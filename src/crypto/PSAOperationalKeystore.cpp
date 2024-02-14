@@ -16,6 +16,7 @@
  */
 
 #include "PSAOperationalKeystore.h"
+#include "PersistentStorageOperationalKeystore.h"
 
 #include <lib/support/CHIPMem.h>
 
@@ -135,6 +136,35 @@ CHIP_ERROR PSAOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256SerializedKeypair & input)
+{
+    CHIP_ERROR error                = CHIP_NO_ERROR;
+    psa_status_t status             = PSA_SUCCESS;
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_id_t keyId              = 0;
+    VerifyOrReturnError(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
+    Destroy();
+
+    // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
+    psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
+    psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
+    psa_set_key_id(&attributes, GetKeyId());
+
+    status = psa_import_key(&attributes, input.ConstBytes() + mPublicKey.Length(), kP256_PrivateKey_Length, &keyId);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+
+    memcpy(mPublicKey.Bytes(), input.ConstBytes(), mPublicKey.Length());
+
+exit:
+    psa_reset_key_attributes(&attributes);
+
+    return error;
+}
+
 CHIP_ERROR PSAOperationalKeystore::ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey)
 {
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && mPendingFabricIndex == fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -152,6 +182,40 @@ CHIP_ERROR PSAOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fabricIn
     ReleasePendingKeypair();
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PSAOperationalKeystore::ExportOpKeypairForFabric(FabricIndex fabricIndex, Crypto::P256SerializedKeypair & outKeypair)
+{
+    // Currently exporting the key is forbidden in PSAOperationalKeystore because the PSA_KEY_USAGE_EXPORT usage flag is not set, so
+    // there is no need to compile the code for the device, but there should be an implementation for test purposes to verify if
+    // the psa_export_key returns an error.
+#if CHIP_CONFIG_TEST
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(HasOpKeypairForFabric(fabricIndex), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    size_t outSize = 0;
+    psa_status_t status =
+        psa_export_key(PersistentP256Keypair(fabricIndex).GetKeyId(), outKeypair.Bytes(), outKeypair.Capacity(), &outSize);
+
+    if (status == PSA_ERROR_BUFFER_TOO_SMALL)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+    else if (status == PSA_ERROR_NOT_PERMITTED)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+    else if (status != PSA_SUCCESS)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    outKeypair.SetLength(outSize);
+
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 CHIP_ERROR PSAOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIndex)
@@ -207,6 +271,32 @@ void PSAOperationalKeystore::ReleasePendingKeypair()
     mPendingKeypair         = nullptr;
     mPendingFabricIndex     = kUndefinedFabricIndex;
     mIsPendingKeypairActive = false;
+}
+
+CHIP_ERROR PSAOperationalKeystore::MigrateOpKeypairForFabric(FabricIndex fabricIndex,
+                                                             OperationalKeystore & operationalKeystore) const
+{
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    P256SerializedKeypair serializedKeypair;
+
+    // Do not allow overwriting the existing key and just remove it from the previous Operational Keystore if needed.
+    if (!HasOpKeypairForFabric(fabricIndex))
+    {
+        ReturnErrorOnFailure(operationalKeystore.ExportOpKeypairForFabric(fabricIndex, serializedKeypair));
+
+        PersistentP256Keypair keypair(fabricIndex);
+        ReturnErrorOnFailure(keypair.Deserialize(serializedKeypair));
+
+        // Migrated key is not useful anymore, remove it from the previous keystore.
+        ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
+    }
+    else if (operationalKeystore.HasOpKeypairForFabric(fabricIndex))
+    {
+        ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Crypto
