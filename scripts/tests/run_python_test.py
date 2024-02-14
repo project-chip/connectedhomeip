@@ -137,7 +137,11 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
             log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, log_queue)
 
     script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-                      '--log-format', '%(message)s'] + shlex.split(script_args)
+                      '--log-format', '%(message)s']
+    if app:
+        script_command.extend(['--app-pid', str(app_process.pid)])
+    
+    script_command.extend(shlex.split(script_args))
 
     if script_gdb:
         #
