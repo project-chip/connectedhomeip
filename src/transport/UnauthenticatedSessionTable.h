@@ -271,6 +271,8 @@ private:
     /**
      * Allocates a new session out of the internal resource pool.
      *
+     * On failure, the output `entry` will be set to nullptr
+     *
      * @returns CHIP_NO_ERROR if new session created. May fail if maximum session count has been reached (with
      * CHIP_ERROR_NO_MEMORY).
      */
@@ -292,7 +294,7 @@ private:
         VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
 
         // make sure a clean reset is done
-        mEntries.ReleaseObject(entry);
+        mEntries.ReleaseObject(static_cast<EntryType *>(entry));
         entry = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
 
         // entry being null is not expected as we released an object that could be reclaimed
