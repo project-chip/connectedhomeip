@@ -18,8 +18,6 @@
 
 #include "DeviceEnergyManagementDelegateImpl.h"
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 
 using namespace chip;

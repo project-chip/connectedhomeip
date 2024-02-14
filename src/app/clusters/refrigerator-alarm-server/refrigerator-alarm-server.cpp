@@ -23,7 +23,6 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
 
 using namespace chip;
 using namespace chip::app;
