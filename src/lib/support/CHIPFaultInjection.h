@@ -60,7 +60,6 @@ typedef enum
     kFault_BDXBadBlockCounter,   /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,     /**< Fail the allocation of a BDXTransfer object */
     kFault_SecMgrBusy,           /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
-    // TODO find a better name for these
     kFault_IMInvoke_SeparateResponses, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2
                                         InvokeResponseMessages */
     kFault_IMInvoke_SeparateResponsesInvertResponseOrder, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2
