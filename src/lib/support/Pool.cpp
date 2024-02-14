@@ -187,36 +187,42 @@ Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
     Loop result            = Loop::Finish;
     HeapObjectListNode * p = mNext;
     while (p != this)
-    {
-        if (p->mObject != nullptr)
         {
-            if (lambda(context, p->mObject) == Loop::Break)
-            {
-                result = Loop::Break;
-                break;
-            }
+            if (p->mObject != nullptr)
+                {
+                    if (lambda(context, p->mObject) == Loop::Break)
+                        {
+                            result = Loop::Break;
+                            break;
+                        }
+                }
+            p = p->mNext;
         }
-        p = p->mNext;
-    }
     --mIterationDepth;
-    if (mIterationDepth == 0 && mHaveDeferredNodeRemovals)
-    {
-        // Remove nodes for released objects.
-        p = mNext;
-        while (p != this)
-        {
-            HeapObjectListNode * next = p->mNext;
-            if (p->mObject == nullptr)
-            {
-                p->Remove();
-                Platform::Delete(p);
-            }
-            p = next;
-        }
-
-        mHaveDeferredNodeRemovals = false;
-    }
+    CleanupDeferredReleases();
     return result;
+}
+
+void HeapObjectList::CleanupDeferredReleases()
+{
+    if (mIterationDepth != 0 || !mHaveDeferredNodeRemovals)
+        {
+            return;
+        }
+    // Remove nodes for released objects.
+    HeapObjectListNode * p = mNext;
+    while (p != this)
+    {
+        HeapObjectListNode * next = p->mNext;
+        if (p->mObject == nullptr)
+        {
+            p->Remove();
+            Platform::Delete(p);
+        }
+        p = next;
+    }
+
+    mHaveDeferredNodeRemovals = false;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP

@@ -169,6 +169,9 @@ struct HeapObjectList : HeapObjectListNode
         return const_cast<HeapObjectList *>(this)->ForEachNode(context, reinterpret_cast<Lambda>(lambda));
     }
 
+    /// Cleans up any deferred releases IFF iteration depth is 0
+    void CleanupDeferredReleases();
+
     size_t mIterationDepth         = 0;
     bool mHaveDeferredNodeRemovals = false;
 };
@@ -385,7 +388,13 @@ public:
     /// Provides iteration over active objects in the pool.
     ///
     /// The iterator is valid only if the Pool is not changed (no objects are created
-    /// or released)/
+    /// or released).
+    ///
+    /// NOTE: the iterator specifically attempts to allow releasing
+    ///       of objects from the pool while iteration is active. It achieves this
+    ///       by flagging an iteration depth whenever an active iterator exists.
+    ///       this also means that while a pool iterator exists, releasing
+    ///       may be deferred.
     class ActiveObjectIterator : public std::iterator<std::forward_iterator_tag, T>
     {
     public:
@@ -403,6 +412,7 @@ public:
             if (mEnd != nullptr)
             {
                 mEnd->mIterationDepth--;
+                mEnd->CleanupDeferredReleases();
             }
             mCurrent = other.mCurrent;
             mEnd     = other.mEnd;
@@ -414,6 +424,7 @@ public:
             if (mEnd != nullptr)
             {
                 mEnd->mIterationDepth--;
+                mEnd->CleanupDeferredReleases();
             }
         }
 
