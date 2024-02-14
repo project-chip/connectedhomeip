@@ -62,9 +62,9 @@ class DeviceEnergyManagementClusterForecastStruct(
       put(ContextSpecificTag(TAG_END_TIME), endTime)
       if (earliestStartTime != null) {
         if (earliestStartTime.isPresent) {
-          val optearliestStartTime = earliestStartTime.get()
-          put(ContextSpecificTag(TAG_EARLIEST_START_TIME), optearliestStartTime)
-        }
+        val optearliestStartTime = earliestStartTime.get()
+        put(ContextSpecificTag(TAG_EARLIEST_START_TIME), optearliestStartTime)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_EARLIEST_START_TIME))
       }
@@ -97,56 +97,42 @@ class DeviceEnergyManagementClusterForecastStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementClusterForecastStruct {
       tlvReader.enterStructure(tlvTag)
       val forecastId = tlvReader.getUShort(ContextSpecificTag(TAG_FORECAST_ID))
-      val activeSlotNumber =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_ACTIVE_SLOT_NUMBER))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ACTIVE_SLOT_NUMBER))
-          null
-        }
+      val activeSlotNumber = if (!tlvReader.isNull()) {
+      tlvReader.getUShort(ContextSpecificTag(TAG_ACTIVE_SLOT_NUMBER))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_ACTIVE_SLOT_NUMBER))
+      null
+    }
       val startTime = tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))
       val endTime = tlvReader.getUInt(ContextSpecificTag(TAG_END_TIME))
-      val earliestStartTime =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_EARLIEST_START_TIME))) {
-            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EARLIEST_START_TIME)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_EARLIEST_START_TIME))
-          null
-        }
-      val latestEndTime =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATEST_END_TIME))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_LATEST_END_TIME)))
-        } else {
-          Optional.empty()
-        }
+      val earliestStartTime = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_EARLIEST_START_TIME))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_EARLIEST_START_TIME)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_EARLIEST_START_TIME))
+      null
+    }
+      val latestEndTime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATEST_END_TIME))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_LATEST_END_TIME)))
+    } else {
+      Optional.empty()
+    }
       val isPauseable = tlvReader.getBoolean(ContextSpecificTag(TAG_IS_PAUSEABLE))
-      val slots =
-        buildList<DeviceEnergyManagementClusterSlotStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_SLOTS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(DeviceEnergyManagementClusterSlotStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
+      val slots = buildList<DeviceEnergyManagementClusterSlotStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_SLOTS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(DeviceEnergyManagementClusterSlotStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
       val forecastUpdateReason = tlvReader.getUByte(ContextSpecificTag(TAG_FORECAST_UPDATE_REASON))
-
+      
       tlvReader.exitContainer()
 
-      return DeviceEnergyManagementClusterForecastStruct(
-        forecastId,
-        activeSlotNumber,
-        startTime,
-        endTime,
-        earliestStartTime,
-        latestEndTime,
-        isPauseable,
-        slots,
-        forecastUpdateReason
-      )
+      return DeviceEnergyManagementClusterForecastStruct(forecastId, activeSlotNumber, startTime, endTime, earliestStartTime, latestEndTime, isPauseable, slots, forecastUpdateReason)
     }
   }
 }

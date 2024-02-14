@@ -16,13 +16,17 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandResponseLoadControlClusterAverageLoadControlStruct(val loadAdjustment: Byte) {
+class DemandResponseLoadControlClusterAverageLoadControlStruct(
+  val loadAdjustment: Byte
+) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterAverageLoadControlStruct {\n")
     append("\tloadAdjustment : $loadAdjustment\n")
@@ -40,13 +44,10 @@ class DemandResponseLoadControlClusterAverageLoadControlStruct(val loadAdjustmen
   companion object {
     private const val TAG_LOAD_ADJUSTMENT = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DemandResponseLoadControlClusterAverageLoadControlStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandResponseLoadControlClusterAverageLoadControlStruct {
       tlvReader.enterStructure(tlvTag)
       val loadAdjustment = tlvReader.getByte(ContextSpecificTag(TAG_LOAD_ADJUSTMENT))
-
+      
       tlvReader.exitContainer()
 
       return DemandResponseLoadControlClusterAverageLoadControlStruct(loadAdjustment)

@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -107,78 +108,55 @@ class ElectricalPowerMeasurementClusterMeasurementRangeStruct(
     private const val TAG_MIN_SYSTIME = 9
     private const val TAG_MAX_SYSTIME = 10
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): ElectricalPowerMeasurementClusterMeasurementRangeStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ElectricalPowerMeasurementClusterMeasurementRangeStruct {
       tlvReader.enterStructure(tlvTag)
       val measurementType = tlvReader.getUShort(ContextSpecificTag(TAG_MEASUREMENT_TYPE))
       val min = tlvReader.getLong(ContextSpecificTag(TAG_MIN))
       val max = tlvReader.getLong(ContextSpecificTag(TAG_MAX))
-      val startTimestamp =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_TIMESTAMP))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_START_TIMESTAMP)))
-        } else {
-          Optional.empty()
-        }
-      val endTimestamp =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_TIMESTAMP))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_END_TIMESTAMP)))
-        } else {
-          Optional.empty()
-        }
-      val minTimestamp =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_TIMESTAMP))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MIN_TIMESTAMP)))
-        } else {
-          Optional.empty()
-        }
-      val maxTimestamp =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_TIMESTAMP))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_TIMESTAMP)))
-        } else {
-          Optional.empty()
-        }
-      val startSystime =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_SYSTIME))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_START_SYSTIME)))
-        } else {
-          Optional.empty()
-        }
-      val endSystime =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_SYSTIME))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_END_SYSTIME)))
-        } else {
-          Optional.empty()
-        }
-      val minSystime =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_SYSTIME))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MIN_SYSTIME)))
-        } else {
-          Optional.empty()
-        }
-      val maxSystime =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_SYSTIME))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MAX_SYSTIME)))
-        } else {
-          Optional.empty()
-        }
-
+      val startTimestamp = if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_TIMESTAMP))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_START_TIMESTAMP)))
+    } else {
+      Optional.empty()
+    }
+      val endTimestamp = if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_TIMESTAMP))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_END_TIMESTAMP)))
+    } else {
+      Optional.empty()
+    }
+      val minTimestamp = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_TIMESTAMP))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MIN_TIMESTAMP)))
+    } else {
+      Optional.empty()
+    }
+      val maxTimestamp = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_TIMESTAMP))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_TIMESTAMP)))
+    } else {
+      Optional.empty()
+    }
+      val startSystime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_SYSTIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_START_SYSTIME)))
+    } else {
+      Optional.empty()
+    }
+      val endSystime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_SYSTIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_END_SYSTIME)))
+    } else {
+      Optional.empty()
+    }
+      val minSystime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_SYSTIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MIN_SYSTIME)))
+    } else {
+      Optional.empty()
+    }
+      val maxSystime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_SYSTIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MAX_SYSTIME)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return ElectricalPowerMeasurementClusterMeasurementRangeStruct(
-        measurementType,
-        min,
-        max,
-        startTimestamp,
-        endTimestamp,
-        minTimestamp,
-        maxTimestamp,
-        startSystime,
-        endSystime,
-        minSystime,
-        maxSystime
-      )
+      return ElectricalPowerMeasurementClusterMeasurementRangeStruct(measurementType, min, max, startTimestamp, endTimestamp, minTimestamp, maxTimestamp, startSystime, endSystime, minSystime, maxSystime)
     }
   }
 }

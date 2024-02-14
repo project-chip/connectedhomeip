@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -53,17 +54,15 @@ class EnergyEvseClusterChargingTargetScheduleStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterChargingTargetScheduleStruct {
       tlvReader.enterStructure(tlvTag)
-      val dayOfWeekForSequence =
-        tlvReader.getUByte(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE))
-      val chargingTargets =
-        buildList<EnergyEvseClusterChargingTargetStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_CHARGING_TARGETS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(EnergyEvseClusterChargingTargetStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val dayOfWeekForSequence = tlvReader.getUByte(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE))
+      val chargingTargets = buildList<EnergyEvseClusterChargingTargetStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_CHARGING_TARGETS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(EnergyEvseClusterChargingTargetStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return EnergyEvseClusterChargingTargetScheduleStruct(dayOfWeekForSequence, chargingTargets)

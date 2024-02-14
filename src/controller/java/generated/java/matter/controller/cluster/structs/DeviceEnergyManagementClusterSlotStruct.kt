@@ -110,10 +110,10 @@ class DeviceEnergyManagementClusterSlotStruct(
       if (costs.isPresent) {
         val optcosts = costs.get()
         startArray(ContextSpecificTag(TAG_COSTS))
-        for (item in optcosts.iterator()) {
-          item.toTlv(AnonymousTag, this)
-        }
-        endArray()
+      for (item in optcosts.iterator()) {
+        item.toTlv(AnonymousTag, this)
+      }
+      endArray()
       }
       if (minPowerAdjustment.isPresent) {
         val optminPowerAdjustment = minPowerAdjustment.get()
@@ -162,115 +162,81 @@ class DeviceEnergyManagementClusterSlotStruct(
       val defaultDuration = tlvReader.getUInt(ContextSpecificTag(TAG_DEFAULT_DURATION))
       val elapsedSlotTime = tlvReader.getUInt(ContextSpecificTag(TAG_ELAPSED_SLOT_TIME))
       val remainingSlotTime = tlvReader.getUInt(ContextSpecificTag(TAG_REMAINING_SLOT_TIME))
-      val slotIsPauseable =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE)))
-        } else {
-          Optional.empty()
-        }
-      val minPauseDuration =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_PAUSE_DURATION))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MIN_PAUSE_DURATION)))
-        } else {
-          Optional.empty()
-        }
-      val maxPauseDuration =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_PAUSE_DURATION))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_PAUSE_DURATION)))
-        } else {
-          Optional.empty()
-        }
-      val manufacturerESAState =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE)))
-        } else {
-          Optional.empty()
-        }
-      val nominalPower =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NOMINAL_POWER))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NOMINAL_POWER)))
-        } else {
-          Optional.empty()
-        }
-      val minPower =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_POWER))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MIN_POWER)))
-        } else {
-          Optional.empty()
-        }
-      val maxPower =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_POWER))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MAX_POWER)))
-        } else {
-          Optional.empty()
-        }
-      val nominalEnergy =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NOMINAL_ENERGY))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NOMINAL_ENERGY)))
-        } else {
-          Optional.empty()
-        }
-      val costs =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_COSTS))) {
-          Optional.of(
-            buildList<DeviceEnergyManagementClusterCostStruct> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_COSTS))
-              while (!tlvReader.isEndOfContainer()) {
-                add(DeviceEnergyManagementClusterCostStruct.fromTlv(AnonymousTag, tlvReader))
-              }
-              tlvReader.exitContainer()
-            }
-          )
-        } else {
-          Optional.empty()
-        }
-      val minPowerAdjustment =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_POWER_ADJUSTMENT))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MIN_POWER_ADJUSTMENT)))
-        } else {
-          Optional.empty()
-        }
-      val maxPowerAdjustment =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_POWER_ADJUSTMENT))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MAX_POWER_ADJUSTMENT)))
-        } else {
-          Optional.empty()
-        }
-      val minDurationAdjustment =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_DURATION_ADJUSTMENT))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MIN_DURATION_ADJUSTMENT)))
-        } else {
-          Optional.empty()
-        }
-      val maxDurationAdjustment =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_DURATION_ADJUSTMENT))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_DURATION_ADJUSTMENT)))
-        } else {
-          Optional.empty()
-        }
-
+      val slotIsPauseable = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE)))
+    } else {
+      Optional.empty()
+    }
+      val minPauseDuration = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_PAUSE_DURATION))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MIN_PAUSE_DURATION)))
+    } else {
+      Optional.empty()
+    }
+      val maxPauseDuration = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_PAUSE_DURATION))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_PAUSE_DURATION)))
+    } else {
+      Optional.empty()
+    }
+      val manufacturerESAState = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE)))
+    } else {
+      Optional.empty()
+    }
+      val nominalPower = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NOMINAL_POWER))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NOMINAL_POWER)))
+    } else {
+      Optional.empty()
+    }
+      val minPower = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_POWER))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MIN_POWER)))
+    } else {
+      Optional.empty()
+    }
+      val maxPower = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_POWER))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MAX_POWER)))
+    } else {
+      Optional.empty()
+    }
+      val nominalEnergy = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NOMINAL_ENERGY))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NOMINAL_ENERGY)))
+    } else {
+      Optional.empty()
+    }
+      val costs = if (tlvReader.isNextTag(ContextSpecificTag(TAG_COSTS))) {
+      Optional.of(buildList<DeviceEnergyManagementClusterCostStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_COSTS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(DeviceEnergyManagementClusterCostStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    })
+    } else {
+      Optional.empty()
+    }
+      val minPowerAdjustment = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_POWER_ADJUSTMENT))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MIN_POWER_ADJUSTMENT)))
+    } else {
+      Optional.empty()
+    }
+      val maxPowerAdjustment = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_POWER_ADJUSTMENT))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MAX_POWER_ADJUSTMENT)))
+    } else {
+      Optional.empty()
+    }
+      val minDurationAdjustment = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_DURATION_ADJUSTMENT))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MIN_DURATION_ADJUSTMENT)))
+    } else {
+      Optional.empty()
+    }
+      val maxDurationAdjustment = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_DURATION_ADJUSTMENT))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MAX_DURATION_ADJUSTMENT)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return DeviceEnergyManagementClusterSlotStruct(
-        minDuration,
-        maxDuration,
-        defaultDuration,
-        elapsedSlotTime,
-        remainingSlotTime,
-        slotIsPauseable,
-        minPauseDuration,
-        maxPauseDuration,
-        manufacturerESAState,
-        nominalPower,
-        minPower,
-        maxPower,
-        nominalEnergy,
-        costs,
-        minPowerAdjustment,
-        maxPowerAdjustment,
-        minDurationAdjustment,
-        maxDurationAdjustment
-      )
+      return DeviceEnergyManagementClusterSlotStruct(minDuration, maxDuration, defaultDuration, elapsedSlotTime, remainingSlotTime, slotIsPauseable, minPauseDuration, maxPauseDuration, manufacturerESAState, nominalPower, minPower, maxPower, nominalEnergy, costs, minPowerAdjustment, maxPowerAdjustment, minDurationAdjustment, maxDurationAdjustment)
     }
   }
 }

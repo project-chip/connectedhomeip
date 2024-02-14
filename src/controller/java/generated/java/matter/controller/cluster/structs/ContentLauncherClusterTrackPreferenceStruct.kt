@@ -44,10 +44,10 @@ class ContentLauncherClusterTrackPreferenceStruct(
       if (characteristics.isPresent) {
         val optcharacteristics = characteristics.get()
         startArray(ContextSpecificTag(TAG_CHARACTERISTICS))
-        for (item in optcharacteristics.iterator()) {
-          put(AnonymousTag, item)
-        }
-        endArray()
+      for (item in optcharacteristics.iterator()) {
+        put(AnonymousTag, item)
+      }
+      endArray()
       }
       put(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX), audioOutputIndex)
       endStructure()
@@ -62,29 +62,22 @@ class ContentLauncherClusterTrackPreferenceStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterTrackPreferenceStruct {
       tlvReader.enterStructure(tlvTag)
       val languageCode = tlvReader.getString(ContextSpecificTag(TAG_LANGUAGE_CODE))
-      val characteristics =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHARACTERISTICS))) {
-          Optional.of(
-            buildList<UByte> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_CHARACTERISTICS))
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUByte(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-          )
-        } else {
-          Optional.empty()
-        }
+      val characteristics = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHARACTERISTICS))) {
+      Optional.of(buildList<UByte> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_CHARACTERISTICS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUByte(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    })
+    } else {
+      Optional.empty()
+    }
       val audioOutputIndex = tlvReader.getUByte(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return ContentLauncherClusterTrackPreferenceStruct(
-        languageCode,
-        characteristics,
-        audioOutputIndex
-      )
+      return ContentLauncherClusterTrackPreferenceStruct(languageCode, characteristics, audioOutputIndex)
     }
   }
 }

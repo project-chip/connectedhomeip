@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -63,38 +64,23 @@ class ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct(
     private const val TAG_MAX_MEASURED_VALUE = 3
     private const val TAG_ACCURACY_RANGES = 4
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct {
       tlvReader.enterStructure(tlvTag)
       val measurementType = tlvReader.getUShort(ContextSpecificTag(TAG_MEASUREMENT_TYPE))
       val measured = tlvReader.getBoolean(ContextSpecificTag(TAG_MEASURED))
       val minMeasuredValue = tlvReader.getLong(ContextSpecificTag(TAG_MIN_MEASURED_VALUE))
       val maxMeasuredValue = tlvReader.getLong(ContextSpecificTag(TAG_MAX_MEASURED_VALUE))
-      val accuracyRanges =
-        buildList<ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ACCURACY_RANGES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(
-              ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct.fromTlv(
-                AnonymousTag,
-                tlvReader
-              )
-            )
-          }
-          tlvReader.exitContainer()
-        }
-
+      val accuracyRanges = buildList<ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_ACCURACY_RANGES))
+      while(!tlvReader.isEndOfContainer()) {
+        add(ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
-      return ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct(
-        measurementType,
-        measured,
-        minMeasuredValue,
-        maxMeasuredValue,
-        accuracyRanges
-      )
+      return ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct(measurementType, measured, minMeasuredValue, maxMeasuredValue, accuracyRanges)
     }
   }
 }

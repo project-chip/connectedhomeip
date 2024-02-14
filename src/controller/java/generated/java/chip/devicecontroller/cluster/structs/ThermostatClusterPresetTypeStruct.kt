@@ -17,17 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThermostatClusterPresetTypeStruct(
-  val presetScenario: UInt,
-  val numberOfPresets: UInt,
-  val presetTypeFeatures: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ThermostatClusterPresetTypeStruct (
+    val presetScenario: UInt,
+    val numberOfPresets: UInt,
+    val presetTypeFeatures: UInt) {
+  override fun toString(): String  = buildString {
     append("ThermostatClusterPresetTypeStruct {\n")
     append("\tpresetScenario : $presetScenario\n")
     append("\tnumberOfPresets : $numberOfPresets\n")
@@ -50,12 +53,12 @@ class ThermostatClusterPresetTypeStruct(
     private const val TAG_NUMBER_OF_PRESETS = 1
     private const val TAG_PRESET_TYPE_FEATURES = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterPresetTypeStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterPresetTypeStruct {
       tlvReader.enterStructure(tlvTag)
       val presetScenario = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_SCENARIO))
       val numberOfPresets = tlvReader.getUInt(ContextSpecificTag(TAG_NUMBER_OF_PRESETS))
       val presetTypeFeatures = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_TYPE_FEATURES))
-
+      
       tlvReader.exitContainer()
 
       return ThermostatClusterPresetTypeStruct(presetScenario, numberOfPresets, presetTypeFeatures)

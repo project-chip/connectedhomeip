@@ -16,13 +16,17 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class UnitTestingClusterTestDifferentVendorMeiEventEvent(val arg1: UByte) {
+class UnitTestingClusterTestDifferentVendorMeiEventEvent(
+  val arg1: UByte
+) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestDifferentVendorMeiEventEvent {\n")
     append("\targ1 : $arg1\n")
@@ -40,13 +44,10 @@ class UnitTestingClusterTestDifferentVendorMeiEventEvent(val arg1: UByte) {
   companion object {
     private const val TAG_ARG1 = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): UnitTestingClusterTestDifferentVendorMeiEventEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : UnitTestingClusterTestDifferentVendorMeiEventEvent {
       tlvReader.enterStructure(tlvTag)
       val arg1 = tlvReader.getUByte(ContextSpecificTag(TAG_ARG1))
-
+      
       tlvReader.exitContainer()
 
       return UnitTestingClusterTestDifferentVendorMeiEventEvent(arg1)
