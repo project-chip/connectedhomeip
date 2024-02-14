@@ -54,7 +54,7 @@ bool LightingManager::IsLightOn(void)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        printf("Error ReadServerAttribute 0x%02x\n", status);
+        printf("Error ReadServerAttribute 0x%02x\n", to_underlying(status));
     }
 
     return on != false;
@@ -103,7 +103,7 @@ void LightingManager::WriteClusterState(uint8_t value)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        printf("Error WriteServerAttribute 0x%02x\n", status);
+        printf("Error WriteServerAttribute 0x%02x\n", to_underlying(status));
     }
 }
 
@@ -113,6 +113,6 @@ void LightingManager::WriteClusterLevel(uint8_t value)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        printf("Error WriteServerAttribute 0x%02x\n", status);
+        printf("Error WriteServerAttribute 0x%02x\n", to_underlying(status));
     }
 }

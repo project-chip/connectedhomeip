@@ -119,7 +119,6 @@ jobs:
                      --known-failure app/reporting/tests/MockReportScheduler.h \
                      --known-failure app/server/AppDelegate.h \
                      --known-failure app/TestEventTriggerDelegate.h \
-                     --known-failure app/util/af-enums.h \
                      --known-failure app/util/af.h \
                      --known-failure app/util/af-types.h \
                      --known-failure app/util/attribute-metadata.h \

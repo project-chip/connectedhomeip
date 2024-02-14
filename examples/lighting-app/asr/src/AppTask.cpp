@@ -88,7 +88,7 @@ bool IsLightOn()
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ASR_LOG("Error Read OnOff Attribute 0x%02x\n", status);
+        ASR_LOG("Error Read OnOff Attribute 0x%02x\n", to_underlying(status));
     }
 
     return on != false;
@@ -103,7 +103,7 @@ uint8_t GetLightLevel()
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ASR_LOG("Error Read CurrentLevel Attribute 0x%02x\n", status);
+        ASR_LOG("Error Read CurrentLevel Attribute 0x%02x\n", to_underlying(status));
         return -1;
     }
 

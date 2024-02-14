@@ -297,7 +297,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
     ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, commandData.groupID);
 #endif
     response.groupID = commandData.groupID;
-    response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupID);
+    response.status  = to_underlying(GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupID));
 
     commandObj->AddResponse(commandPath, response);
     return true;

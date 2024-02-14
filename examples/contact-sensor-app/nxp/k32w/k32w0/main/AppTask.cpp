@@ -895,7 +895,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     Protocols::InteractionModel::Status status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", status);
+        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
     }
     logBooleanStateEvent(newValue);
 }

@@ -83,16 +83,6 @@ public:
     void CancelConnect();
 
 private:
-    struct ConnectParams
-    {
-        ConnectParams(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice) : mEndpoint(aEndpoint), mpDevice(apDevice) {}
-        ~ConnectParams() = default;
-
-        const BluezEndpoint & mEndpoint;
-        BluezDevice1 * mpDevice;
-        uint16_t mNumRetries = 0;
-    };
-
     CHIP_ERROR StartupEndpointBindings();
 
     void SetupAdapter();
@@ -122,8 +112,7 @@ private:
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
-    static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
-    static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
+    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice);
 
     bool mIsCentral     = false;
     bool mIsInitialized = false;
@@ -139,7 +128,6 @@ private:
     // Objects (interfaces) subscribed to by this service
     GDBusObjectManager * mpObjMgr = nullptr;
     BluezAdapter1 * mpAdapter     = nullptr;
-    BluezDevice1 * mpDevice       = nullptr;
 
     // Objects (interfaces) published by this service
     GDBusObjectManagerServer * mpRoot = nullptr;
