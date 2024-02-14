@@ -236,23 +236,47 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
 
     // Verify that iteration visits all objects.
     size_t count = 0;
-    size_t sum   = 0;
-    pool.ForEachActiveObject([&](S * object) {
-        NL_TEST_ASSERT(inSuite, object != nullptr);
-        if (object == nullptr)
-        {
-            // NL_TEST_ASSERT doesn't stop running the test and we want to avoid nullptr dereference.
+    {
+        size_t sum = 0;
+        pool.ForEachActiveObject([&](S * object) {
+            NL_TEST_ASSERT(inSuite, object != nullptr);
+            if (object == nullptr)
+            {
+                // NL_TEST_ASSERT doesn't stop running the test and we want to avoid nullptr dereference.
+                return Loop::Continue;
+            }
+            NL_TEST_ASSERT(inSuite, objIds.count(object->mId) == 1);
+            objIds.erase(object->mId);
+            ++count;
+            sum += object->mId;
             return Loop::Continue;
+        });
+        NL_TEST_ASSERT(inSuite, count == kSize);
+        NL_TEST_ASSERT(inSuite, sum == kSize * (kSize - 1) / 2);
+        NL_TEST_ASSERT(inSuite, objIds.size() == 0);
+    }
+
+    if constexpr (P == ObjectPoolMem::kInline)
+    {
+        // re-create the above test environment, this time using iterators
+        for (size_t i = 0; i < kSize; ++i)
+        {
+            objIds.insert(i);
         }
-        NL_TEST_ASSERT(inSuite, objIds.count(object->mId) == 1);
-        objIds.erase(object->mId);
-        ++count;
-        sum += object->mId;
-        return Loop::Continue;
-    });
-    NL_TEST_ASSERT(inSuite, count == kSize);
-    NL_TEST_ASSERT(inSuite, sum == kSize * (kSize - 1) / 2);
-    NL_TEST_ASSERT(inSuite, objIds.size() == 0);
+        count      = 0;
+        size_t sum = 0;
+        // for (auto &v : pool) {
+        for (auto v = pool.begin(); v != pool.end(); ++v)
+        {
+            NL_TEST_ASSERT(inSuite, objIds.count(v->mId) == 1);
+            objIds.erase(v->mId);
+            ++count;
+            sum += v->mId;
+        }
+        NL_TEST_ASSERT(inSuite, count == kSize);
+        NL_TEST_ASSERT(inSuite, sum == kSize * (kSize - 1) / 2);
+        NL_TEST_ASSERT(inSuite, objIds.size() == 0);
+    }
 
     // Verify that returning Loop::Break stops iterating.
     count = 0;

@@ -29,6 +29,7 @@
 #include <lib/support/Iterators.h>
 
 #include <atomic>
+#include <iterator>
 #include <limits>
 #include <new>
 #include <stddef.h>
@@ -90,6 +91,16 @@ protected:
     void Deallocate(void * element);
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
     size_t IndexOf(void * element);
+
+    /// Returns the first index that is allocated.
+    ///
+    /// If nothing is allocated, this will return mCapacity
+    size_t FirstAllocatedIndex();
+
+    /// Returns the next active index after `start`.
+    ///
+    /// If nothing else allocated, returns mCapacity
+    size_t NextActiveIndexAfter(size_t start);
 
     using Lambda = Loop (*)(void * context, void * object);
     Loop ForEachActiveObjectInner(void * context, Lambda lambda);
@@ -202,8 +213,41 @@ template <class T, size_t N>
 class BitMapObjectPool : public internal::StaticAllocatorBitmap
 {
 public:
+    /// Provides iteration over active objects in the pool.
+    ///
+    /// The iterator is valid only if the Pool is not changed (no objects are created
+    /// or released)/
+    class ActiveObjectIterator : public std::iterator<std::forward_iterator_tag, T>
+    {
+    public:
+        ActiveObjectIterator() {}
+
+        bool operator==(const ActiveObjectIterator & other) const { return (mPool == other.mPool) && (mIndex == other.mIndex); }
+        bool operator!=(const ActiveObjectIterator & other) const { return !(*this == other); }
+        ActiveObjectIterator & operator++()
+        {
+            mIndex = mPool->NextActiveIndexAfter(mIndex);
+            return *this;
+        }
+        T * operator->() const { return static_cast<T *>(mPool->At(mIndex)); }
+        T & operator*() const { return *(*this); }
+
+    protected:
+        // allow construction by the pool only
+        friend class BitMapObjectPool<T, N>;
+
+        explicit ActiveObjectIterator(BitMapObjectPool<T, N> * pool, size_t idx) : mPool(pool), mIndex(idx) {}
+
+    private:
+        BitMapObjectPool * mPool = nullptr; // pool that this belongs to
+        size_t mIndex            = N;       // index inside the pool.
+    };
+
     BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
     ~BitMapObjectPool() { VerifyOrDie(Allocated() == 0); }
+
+    ActiveObjectIterator begin() { return ActiveObjectIterator(this, FirstAllocatedIndex()); }
+    ActiveObjectIterator end() { return ActiveObjectIterator(this, N); }
 
     template <typename... Args>
     T * CreateObject(Args &&... args)
@@ -261,6 +305,9 @@ public:
     }
 
 private:
+    /// allow accessing direct At() calls
+    friend class ActiveObjectIterator;
+
     static Loop ReleaseObject(void * context, void * object)
     {
         static_cast<BitMapObjectPool *>(context)->ReleaseObject(static_cast<T *>(object));
