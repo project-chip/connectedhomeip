@@ -60,12 +60,13 @@ typedef enum
     kFault_BDXBadBlockCounter,   /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,     /**< Fail the allocation of a BDXTransfer object */
     kFault_SecMgrBusy,           /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
-    kFault_IMInvoke_SeparateResponses, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2
-                                        InvokeResponseMessages */
-    kFault_IMInvoke_SeparateResponsesInvertResponseOrder, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 2
-                                        InvokeResponseMessages where response are inverted order to the request order */
-    kFault_IMInvoke_SkipSecondResponse, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with 1
-                                        InvokeResponseMessages, dropping the response to the second request */
+    kFault_IMInvoke_SeparateResponses, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond with
+                                        2 InvokeResponseMessages */
+    kFault_IMInvoke_SeparateResponsesInvertResponseOrder, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid
+                                        command and respond with 2 InvokeResponseMessages where response are inverted order to the
+                                        request order */
+    kFault_IMInvoke_SkipSecondResponse, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid command and respond
+                                        with 1 InvokeResponseMessages, dropping the response to the second request */
 #if CONFIG_NETWORK_LAYER_BLE
     kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
 #endif                   // CONFIG_NETWORK_LAYER_BLE
@@ -73,8 +74,10 @@ typedef enum
 } Id;
 
 static_assert(kFault_IMInvoke_SeparateResponses == 12, "Test plan specification and automation code relies on this value being 12");
-static_assert(kFault_IMInvoke_SeparateResponsesInvertResponseOrder == 13, "Test plan specification and automation code relies on this value being 13");
-static_assert(kFault_IMInvoke_SkipSecondResponse == 14, "Test plan specification and automation code relies on this value being 14");
+static_assert(kFault_IMInvoke_SeparateResponsesInvertResponseOrder == 13,
+              "Test plan specification and automation code relies on this value being 13");
+static_assert(kFault_IMInvoke_SkipSecondResponse == 14,
+              "Test plan specification and automation code relies on this value being 14");
 
 DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 

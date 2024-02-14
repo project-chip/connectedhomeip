@@ -412,17 +412,19 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
         return Status::Busy;
     }
-    CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponses,
-                      commandHandler->TestOnlyTcIdm1_3FaultInjection(
-                          apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandler::NlFaultInjectionType::SeparateResponseMessages);
-                      return Status::Success;);
+    CHIP_FAULT_INJECT(
+        FaultInjection::kFault_IMInvoke_SeparateResponses,
+        commandHandler->TestOnlyTcIdm1_3FaultInjection(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                                                       CommandHandler::NlFaultInjectionType::SeparateResponseMessages);
+        return Status::Success;);
     CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponsesInvertResponseOrder,
                       commandHandler->TestOnlyTcIdm1_3FaultInjection(
-                          apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
+                          apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                          CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
                       return Status::Success;);
     CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SkipSecondResponse,
-                      commandHandler->TestOnlyTcIdm1_3FaultInjection(
-                          apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandler::NlFaultInjectionType::SkipSecondResponse);
+                      commandHandler->TestOnlyTcIdm1_3FaultInjection(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                                                                     CommandHandler::NlFaultInjectionType::SkipSecondResponse);
                       return Status::Success;);
     commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke);
     return Status::Success;

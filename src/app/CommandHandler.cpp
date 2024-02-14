@@ -932,9 +932,11 @@ const char * GetFaultInjectionTypeStr(CommandHandler::NlFaultInjectionType fault
     switch (faultType)
     {
     case CommandHandler::NlFaultInjectionType::SeparateResponseMessages:
-        return "Each response will be sent in a separate InvokeResponseMessage. The order of responses will be the same as the original request.";
+        return "Each response will be sent in a separate InvokeResponseMessage. The order of responses will be the same as the "
+               "original request.";
     case CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder:
-        return "Each response will be sent in a separate InvokeResponseMessage. The order of responses will be reversed from the original request.";
+        return "Each response will be sent in a separate InvokeResponseMessage. The order of responses will be reversed from the "
+               "original request.";
     case CommandHandler::NlFaultInjectionType::SkipSecondResponse:
         return "Single InvokeResponseMessages. Dropping response to second request";
     }
@@ -990,7 +992,8 @@ void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext *
 
     size_t commandCount = 0;
     VerifyOrDieWithMsg(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */) == CHIP_NO_ERROR,
-                       DataManagement, "TH Failure: Failed to get the length of InvokeRequests after InvokeRequestMessage validation");
+                       DataManagement,
+                       "TH Failure: Failed to get the length of InvokeRequests after InvokeRequestMessage validation");
     VerifyOrDieWithMsg(commandCount == 2, DataManagement, "DUT failure: We were strictly expecting exactly 2 InvokeRequests");
     mReserveSpaceForMoreChunkMessages = true;
 
@@ -998,12 +1001,12 @@ void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext *
         // Response path is the same as request path since we are reply with a failure message.
         ConcreteCommandPath concreteResponsePath1(0, 0, 0);
         ConcreteCommandPath concreteResponsePath2(0, 0, 0);
-        VerifyOrDieWithMsg(TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath1) ==
-                               CHIP_NO_ERROR,
-                           DataManagement, "DUT Failure: Issues encountered while extracting the ConcretePath from the first request");
-        VerifyOrDieWithMsg(TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath2) ==
-                               CHIP_NO_ERROR,
-                           DataManagement, "DUT Failure: Issues encountered while extracting the ConcretePath from the second request");
+        VerifyOrDieWithMsg(
+            TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath1) == CHIP_NO_ERROR,
+            DataManagement, "DUT Failure: Issues encountered while extracting the ConcretePath from the first request");
+        VerifyOrDieWithMsg(
+            TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath2) == CHIP_NO_ERROR,
+            DataManagement, "DUT Failure: Issues encountered while extracting the ConcretePath from the second request");
 
         if (faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
         {
@@ -1014,7 +1017,8 @@ void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext *
 
         VerifyOrDieWithMsg(FallibleAddStatus(concreteResponsePath1, Status::Failure) == CHIP_NO_ERROR, DataManagement,
                            "TH Failure: Error adding the first InvokeResponse");
-        if (faultType == NlFaultInjectionType::SeparateResponseMessages || faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
+        if (faultType == NlFaultInjectionType::SeparateResponseMessages ||
+            faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
         {
             VerifyOrDieWithMsg(FinalizeInvokeResponseMessageAndPrepareNext() == CHIP_NO_ERROR, DataManagement,
                                "TH Failure: Failed to create second InvokeResponseMessage");
