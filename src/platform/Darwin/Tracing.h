@@ -63,10 +63,10 @@ class DarwinTracingBackend : public ::chip::Tracing::Backend
 public:
     DarwinTracingBackend();
 
-    typedef void (^LogEventClientCallback)(ScalarEvent event);
+    typedef void (^LogEventClientCallback)(MetricEvent event);
 
     void SetLogEventClientCallback(LogEventClientCallback callback);
-    void LogEvent(ScalarEvent & event) override;
+    void LogEvent(MetricEvent & event) override;
 
 private:
     LogEventClientCallback mClientCallback;

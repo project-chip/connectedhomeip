@@ -66,7 +66,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <tracing/macros.h>
-#include <tracing/scalar_event.h>
+#include <tracing/metric_event.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
@@ -763,7 +763,7 @@ exit:
         }
     }
 
-    MATTER_LOG_SCALER_EVENT(PASEConnectionEstablished, CHIP_NO_ERROR);
+    MATTER_LOG_METRIC_EVENT(PASEConnectionEstablished, CHIP_NO_ERROR);
     return err;
 }
 

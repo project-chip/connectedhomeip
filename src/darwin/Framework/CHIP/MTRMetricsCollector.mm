@@ -16,7 +16,7 @@
  */
 #import "MTRMetricsCollector.h"
 #include <MTRMetrics.h>
-#include <tracing/scalar_event.h>
+#include <tracing/metric_event.h>
 #include <MTRDefines_Internal.h>
 #include <MTRMetrics_Internal.h>
 #import "MTRLogging_Internal.h"
@@ -48,10 +48,9 @@ void InitializeMetricsCollection()
         singleton = [[MTRMetricsCollector alloc] init];
         if (singleton) {
             chip::Tracing::Register(singleton->_tracingBackend);
-            singleton->_tracingBackend.SetLogEventClientCallback(^(chip::Tracing::ScalarEvent event) {
-                    MTR_LOG_INFO("RECEIVED scalar event, type: %u, value: %u", event.eventType, event.eventValue);
+            singleton->_tracingBackend.SetLogEventClientCallback(^(chip::Tracing::MetricEvent event) {
                     if (singleton) {
-                        [singleton handleScalarEvent:event];
+                        [singleton handleMetricEvent:event];
                     }
                 });
         }
@@ -69,27 +68,18 @@ void InitializeMetricsCollection()
     return self;
 }
 
-static NSString * convertEventTypeToString(chip::Tracing::ScalarEvent::EventType eventType)
+- (void)handleMetricEvent:(chip::Tracing::MetricEvent)event
 {
-    using chip::Tracing::ScalarEvent;
-    switch (eventType) {
-        case ScalarEvent::kDiscoveryOverBLE: return @"com.matter.metric.disovered-over-ble";
-        case ScalarEvent::kDiscoveryOnNetwork: return @"com.matter.metric.disovered-on-network";
-        case ScalarEvent::kPASEConnectionEstablished: return @"com.matter.metric.pase-connection-established";
-        case ScalarEvent::kPASEConnectionFailed: return @"com.matter.metric.pase-connection-failed";
-        case ScalarEvent::kAttestationResult: return @"com.matter.metric.attestation-result";
-        case ScalarEvent::kAttestationOverridden: return @"com.matter.metric.attestation-overridden";
-        case ScalarEvent::kCASEConnectionEstablished: return @"com.matter.metric.case-connection-established";
-        case ScalarEvent::kCASEConnectionFailed: return @"com.matter.metric.case-connection-failed";
-    }
-}
-
-- (void)handleScalarEvent:(chip::Tracing::ScalarEvent)event
-{
-    MTR_LOG_INFO("Received scalar event, type: %u, value: %u", event.eventType, event.eventValue);
+    MTR_LOG_INFO("Received metric event, type: %s, value: %u", event.key, event.value.uvalue);
     std::lock_guard lock(_lock);
-    [_metricsData setValue:[NSNumber numberWithUnsignedInteger:event.eventValue]
-                    forKey:convertEventTypeToString(event.eventType)];
+    if (event.isSigned) {
+        [_metricsData setValue:[NSNumber numberWithInteger:event.value.svalue]
+                        forKey:[NSString stringWithCString:event.key encoding:NSUTF8StringEncoding]];
+    }
+    else {
+        [_metricsData setValue:[NSNumber numberWithUnsignedInteger:event.value.uvalue]
+                        forKey:[NSString stringWithCString:event.key encoding:NSUTF8StringEncoding]];
+    }
 }
 
 - (MTRMetrics *)metricSnapshot:(BOOL)resetCollection

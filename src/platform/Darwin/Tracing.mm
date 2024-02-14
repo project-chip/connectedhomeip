@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 #include <platform/Darwin/Tracing.h>
-#include <tracing/scalar_event.h>
+#include <tracing/metric_event.h>
 
 namespace chip {
 namespace Tracing {
@@ -40,10 +40,10 @@ namespace signposts {
         mClientCallback = callback;
     }
 
-    void DarwinTracingBackend::LogEvent(ScalarEvent & event)
+    void DarwinTracingBackend::LogEvent(MetricEvent & event)
     {
-        ChipLogProgress(DeviceLayer, "Receive scalar event, type: %u, value: %u",
-                        event.eventType, event.eventValue);
+        ChipLogProgress(DeviceLayer, "Receive scalar event, type: %s, value: %u",
+                        event.key, event.value.uvalue);
         if (mClientCallback) {
             ChipLogProgress(DeviceLayer, "Invoking client callback %p", mClientCallback);
             mClientCallback(event);

@@ -132,7 +132,7 @@ void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo & info)
     }
 }
 
-void LogEvent(::chip::Tracing::ScalarEvent & event)
+void LogEvent(::chip::Tracing::MetricEvent & event)
 {
     for (auto & backend : gTracingBackends)
     {

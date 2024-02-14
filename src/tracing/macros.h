@@ -75,11 +75,11 @@
         ::chip::Tracing::Internal::LogNodeDiscoveryFailed(_trace_data);                                                            \
     } while (false)
 
-#define MATTER_LOG_SCALER_EVENT(eventType,eventValue)                                                                              \
+#define MATTER_LOG_METRIC_EVENT(key,value)                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        ::chip::Tracing::ScalarEvent _scalar_event(chip::Tracing::ScalarEvent::k##eventType, eventValue);                                                                 \
-        ::chip::Tracing::Internal::LogEvent(_scalar_event);                                                                        \
+        ::chip::Tracing::MetricEvent _metric_event(chip::Tracing::kMetric##key,value);                                                                 \
+        ::chip::Tracing::Internal::LogEvent(_metric_event);                                                                        \
     } while (false)
 
 #else // MATTER_TRACING_ENABLED
@@ -111,6 +111,6 @@
 #define MATTER_LOG_NODE_LOOKUP(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_NODE_DISCOVERED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_NODE_DISCOVERY_FAILED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_LOG_SCALER_EVENT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_LOG_METRIC_EVENT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
 #endif // MATTER_TRACING_ENABLED
