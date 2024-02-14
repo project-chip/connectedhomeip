@@ -147,7 +147,7 @@ void Instance::SendNonConcurrentConnectNetworkResponse()
     }
 
 #if CONFIG_NETWORK_LAYER_BLE
-     DeviceLayer::ConnectivityMgr().GetBleLayer()->IndicateBleClosing();
+    DeviceLayer::ConnectivityMgr().GetBleLayer()->IndicateBleClosing();
 #endif // CONFIG_NETWORK_LAYER_BLE
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
     Commands::ConnectNetworkResponse::Type response;
