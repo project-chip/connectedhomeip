@@ -140,7 +140,7 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
                       '--log-format', '%(message)s']
     if app:
         script_command.extend(['--app-pid', str(app_process.pid)])
-    
+
     script_command.extend(shlex.split(script_args))
 
     if script_gdb:
