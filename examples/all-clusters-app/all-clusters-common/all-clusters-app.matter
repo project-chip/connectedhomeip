@@ -7831,8 +7831,11 @@ endpoint 1 {
   }
 
   server cluster OvenCavityOperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
     callback attribute phaseList;
     callback attribute currentPhase;
+    callback attribute countdownTime;
     callback attribute operationalStateList;
     callback attribute operationalState;
     callback attribute operationalError;
@@ -7842,6 +7845,12 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command Pause;
+    handle command Stop;
+    handle command Start;
+    handle command Resume;
+    handle command OperationalCommandResponse;
   }
 
   server cluster OvenMode {
@@ -8076,7 +8085,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command Pause;
     handle command Stop;

@@ -21,27 +21,32 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
 
 
-class TC_OPSTATE_2_1(MatterBaseTest, TC_OPSTATE_BASE):
+class TC_OVENOPSTATE_1_1(MatterBaseTest, TC_OPSTATE_BASE):
     def __init__(self, *args):
         super().__init__(*args)
 
         test_info = TestInfo(
-            pics_code="OPSTATE",
-            cluster=Clusters.OperationalState
+            pics_code="OVENOPSTATE",
+            cluster=Clusters.OvenCavityOperationalState
         )
 
         super().setup_base(test_info=test_info)
 
-    def steps_TC_OPSTATE_2_1(self) -> list[TestStep]:
-        return self.STEPS_TC_OPSTATE_BASE_2_1()
+    def steps_TC_OVENOPSTATE_1_1(self) -> list[TestStep]:
+        return self.STEPS_TC_OPSTATE_BASE_1_1()
 
-    def pics_TC_OPSTATE_2_1(self) -> list[str]:
-        return ["OPSTATE.S"]
+    def pics_TC_OVENOPSTATE_1_1(self) -> list[str]:
+        return ["OVENOPSTATE.S"]
 
     @async_test_body
-    async def test_TC_OPSTATE_2_1(self):
+    async def test_TC_OVENOPSTATE_1_1(self):
         endpoint = self.matter_test_config.endpoint
-        await self.TEST_TC_OPSTATE_BASE_2_1(endpoint)
+        cluster_revision = 1
+        feature_map = 0
+
+        await self.TEST_TC_OPSTATE_BASE_1_1(endpoint=endpoint,
+                                            cluster_revision=cluster_revision,
+                                            feature_map=feature_map)
 
 
 if __name__ == "__main__":
