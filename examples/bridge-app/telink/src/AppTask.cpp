@@ -597,12 +597,12 @@ void AppTask::UpdateClusterState(void)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update OnOff fail: %x", status);
+        LOG_ERR("Update OnOff fail: %x", to_underlying(status));
     }
     uint8_t setLevel = sAppTask.mPwmRgbBlueLed.GetLevel();
     status           = Clusters::LevelControl::Attributes::CurrentLevel::Set(kExampleEndpointId, setLevel);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update CurrentLevel fail: %x", status);
+        LOG_ERR("Update CurrentLevel fail: %x", to_underlying(status));
     }
 }

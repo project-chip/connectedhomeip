@@ -21,7 +21,6 @@
 #import "MTRError_Internal.h"
 
 #import <app/MessageDef/StatusIB.h>
-#import <app/util/af-enums.h>
 #import <inet/InetError.h>
 #import <lib/support/TypeTraits.h>
 
