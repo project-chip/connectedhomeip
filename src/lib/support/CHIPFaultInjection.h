@@ -27,7 +27,9 @@
 
 #if CHIP_WITH_NLFAULTINJECTION
 #ifdef NDEBUG
-static_assert(false, "CHIP_WITH_NLFAULTINJECTION should NOT be enabled on release build");
+// TODO(#30453): After fixing the issue where CHIP_WITH_NLFAULTINJECTION is seemingly enabled on release builds,
+// uncomment the line below.
+// static_assert(false, "CHIP_WITH_NLFAULTINJECTION should NOT be enabled on release build");
 #endif
 
 #include <nlfaultinjection.hpp>

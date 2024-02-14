@@ -954,8 +954,9 @@ void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext *
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH Failure: state should be Idle, issue with TH");
 
+    const char * faultMsg = GetFaultInjectionTypeStr(faultType);
     ChipLogProgress(DataManagement, "Response to InvokeRequestMessage overridden by fault injection");
-    ChipLogProgress(DataManagement, "   Injecting the following response:%s", GetFaultInjectionTypeStr(faultType));
+    ChipLogProgress(DataManagement, "   Injecting the following response:%s", faultMsg);
 
     mResponseSender.SetExchangeContext(ec);
     Handle workHandle(this);
