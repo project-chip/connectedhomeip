@@ -76,7 +76,7 @@ void Light::UpdateState()
 
         if (status != chip::Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(AppServer, "Failed to set on/off value: %d", to_underlying(status));
+            ChipLogError(AppServer, "Failed to set on/off value: %d", chip::to_underlying(status));
         }
 
         mTargetLightIsOn.ClearValue();

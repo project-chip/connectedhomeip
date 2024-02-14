@@ -41,6 +41,7 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::DoorLock;
 using namespace chip::app::Clusters::DoorLock::Attributes;
+using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR     = 23;
@@ -401,7 +402,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
     if (!SupportsUSR(commandPath.mEndpointId))
     {
         ChipLogProgress(Zcl, "[SetUser] User management is not supported [endpointId=%d]", commandPath.mEndpointId);
-        sendClusterResponse(commandObj, commandPath, StatusIB(Status::UnsupportedCommand));
+        sendClusterResponse(commandObj, commandPath, ClusterStatusCode(Status::UnsupportedCommand));
         return;
     }
 
@@ -410,7 +411,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
     {
         ChipLogError(Zcl, "[SetUser] Unable to get the fabric IDX [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
                      userIndex);
-        sendClusterResponse(commandObj, commandPath, StatusIB(Status::Failure));
+        sendClusterResponse(commandObj, commandPath, ClusterStatusCode(Status::Failure));
         return;
     }
 
@@ -419,7 +420,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
     {
         ChipLogError(Zcl, "[SetUser] Unable to get the source node index [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
                      userIndex);
-        sendClusterResponse(commandObj, commandPath, StatusIB(Status::Failure));
+        sendClusterResponse(commandObj, commandPath, ClusterStatusCode(Status::Failure));
         return;
     }
 
@@ -433,7 +434,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
     if (!userIndexValid(commandPath.mEndpointId, userIndex))
     {
         ChipLogProgress(Zcl, "[SetUser] User index out of bounds [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
-        sendClusterResponse(commandObj, commandPath, StatusIB(Status::InvalidCommand));
+        sendClusterResponse(commandObj, commandPath, ClusterStatusCode(Status::InvalidCommand));
         return;
     }
 
@@ -443,7 +444,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
         ChipLogProgress(Zcl, "[SetUser] Unable to set user: userName too long [endpointId=%d,userIndex=%d,userNameSize=%u]",
                         commandPath.mEndpointId, userIndex, static_cast<unsigned int>(userName.Value().size()));
 
-        sendClusterResponse(commandObj, commandPath, StatusIB(Status::InvalidCommand));
+        sendClusterResponse(commandObj, commandPath, ClusterStatusCode(Status::InvalidCommand));
         return;
     }
 
@@ -453,7 +454,7 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
                         "[SetUser] Unable to set the user: user status is out of range [endpointId=%d,userIndex=%d,userStatus=%u]",
                         commandPath.mEndpointId, userIndex, to_underlying(userStatus.Value()));
 
-        sendClusterResponse(commandObj, commandPath, StatusIB(Status::InvalidCommand));
+        sendClusterResponse(commandObj, commandPath, ClusterStatusCode(Status::InvalidCommand));
         return;
     }
 
@@ -462,11 +463,11 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
         ChipLogProgress(Zcl, "[SetUser] Unable to set the user: user type is unknown [endpointId=%d,userIndex=%d,userType=%u]",
                         commandPath.mEndpointId, userIndex, to_underlying(userType.Value()));
 
-        sendClusterResponse(commandObj, commandPath, StatusIB(Status::InvalidCommand));
+        sendClusterResponse(commandObj, commandPath, ClusterStatusCode(Status::InvalidCommand));
         return;
     }
 
-    StatusIB status(Status::Success);
+    ClusterStatusCode status(Status::Success);
     switch (operationType)
     {
     case DataOperationTypeEnum::kAdd:
@@ -474,14 +475,14 @@ void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandOb
                             userType, credentialRule);
         break;
     case DataOperationTypeEnum::kModify:
-        status = StatusIB(modifyUser(commandPath.mEndpointId, fabricIdx, sourceNodeId, userIndex, userName, userUniqueId,
-                                     userStatus, userType, credentialRule));
+        status = ClusterStatusCode(modifyUser(commandPath.mEndpointId, fabricIdx, sourceNodeId, userIndex, userName, userUniqueId,
+                                              userStatus, userType, credentialRule));
         break;
     case DataOperationTypeEnum::kClear:
     default:
         // appclusters, 5.2.4.34: SetUser command allow only kAdd/kModify, we should respond with INVALID_COMMAND if we got kClear
         // or anything else
-        status = StatusIB(Status::InvalidCommand);
+        status = ClusterStatusCode(Status::InvalidCommand);
         ChipLogProgress(Zcl, "[SetUser] Invalid operation type [endpointId=%d,operationType=%u]", commandPath.mEndpointId,
                         to_underlying(operationType));
         break;
@@ -1873,25 +1874,25 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Cred
     return false;
 }
 
-StatusIB DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
-                                    uint16_t userIndex, const Nullable<chip::CharSpan> & userName,
-                                    const Nullable<uint32_t> & userUniqueId, const Nullable<UserStatusEnum> & userStatus,
-                                    const Nullable<UserTypeEnum> & userType, const Nullable<CredentialRuleEnum> & credentialRule,
-                                    const Nullable<CredentialStruct> & credential)
+ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx,
+                                             chip::NodeId sourceNodeId, uint16_t userIndex,
+                                             const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+                                             const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
+                                             const Nullable<CredentialRuleEnum> & credentialRule,
+                                             const Nullable<CredentialStruct> & credential)
 {
     EmberAfPluginDoorLockUserInfo user;
     if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
     {
         ChipLogError(Zcl, "[createUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", endpointId, userIndex);
-        return StatusIB(Status::Failure);
+        return ClusterStatusCode(Status::Failure);
     }
 
     // appclusters, 5.2.4.34: to modify user its status should be set to Available. If it is we should return OCCUPIED.
     if (UserStatusEnum::kAvailable != user.userStatus)
     {
         ChipLogProgress(Zcl, "[createUser] Unable to overwrite existing user [endpointId=%d,userIndex=%d]", endpointId, userIndex);
-        return StatusIB(Status::Failure, to_underlying(DlStatus::kOccupied));
-        ;
+        return ClusterStatusCode::ClusterSpecificFailure(DlStatus::kOccupied);
     }
 
     const auto & newUserName                = !userName.IsNull() ? userName.Value() : ""_span;
@@ -1917,7 +1918,7 @@ StatusIB DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricInd
                         endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
                         newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                         static_cast<unsigned int>(newTotalCredentials));
-        return StatusIB(Status::Failure);
+        return ClusterStatusCode(Status::Failure);
     }
 
     ChipLogProgress(Zcl,
@@ -1931,7 +1932,7 @@ StatusIB DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricInd
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kAdd, sourceNodeId, creatorFabricIdx,
                              userIndex, userIndex);
 
-    return StatusIB(Status::Success);
+    return ClusterStatusCode(Status::Success);
 }
 
 Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
@@ -2128,7 +2129,7 @@ DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId,
         return DlStatus::kOccupied;
     }
 
-    StatusIB status =
+    ClusterStatusCode status =
         createUser(endpointId, creatorFabricIdx, sourceNodeId, availableUserIndex, Nullable<CharSpan>(), Nullable<uint32_t>(),
                    userStatus, userType, Nullable<CredentialRuleEnum>(), Nullable<CredentialStruct>(credential));
     if (!status.IsSuccess())
@@ -2137,7 +2138,8 @@ DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId,
                         "[SetCredential] Unable to create new user for credential: internal error "
                         "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
                         endpointId, credential.credentialIndex, availableUserIndex,
-                        status.mClusterStatus.HasValue() ? status.mClusterStatus.Value() : (to_underlying(status.mStatus)));
+                        status.HasClusterSpecificCode() ? status.GetClusterSpecificCode().Value()
+                                                        : (to_underlying(status.GetStatus())));
         return DlStatus::kFailure;
     }
 
@@ -3406,17 +3408,17 @@ bool DoorLockServer::RemoteOperationEnabled(chip::EndpointId endpointId) const
 }
 
 void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                         StatusIB status)
+                                         ClusterStatusCode status)
 {
     VerifyOrDie(nullptr != commandObj);
 
-    if (status.mClusterStatus.HasValue())
+    if (status.HasClusterSpecificCode())
     {
-        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, status.mClusterStatus.Value()) == CHIP_NO_ERROR);
+        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, status.GetClusterSpecificCode().Value()) == CHIP_NO_ERROR);
     }
     else
     {
-        commandObj->AddStatus(commandPath, status.mStatus);
+        commandObj->AddStatus(commandPath, status.GetStatus());
     }
 }
 
@@ -3956,7 +3958,7 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
         ChipLogProgress(Zcl, "[SetAliroReaderConfig] Unable to set aliro reader config [endpointId=%d]", endpointID);
         status = Status::Failure;
     }
-    sendClusterResponse(commandObj, commandPath, StatusIB(status));
+    sendClusterResponse(commandObj, commandPath, ClusterStatusCode(status));
 }
 
 void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
@@ -3978,7 +3980,7 @@ void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * comma
         ChipLogProgress(Zcl, "[SetAliroReaderConfig] Unable to set aliro reader config [endpointId=%d]", endpointID);
         status = Status::Failure;
     }
-    sendClusterResponse(commandObj, commandPath, StatusIB(status));
+    sendClusterResponse(commandObj, commandPath, ClusterStatusCode(status));
 }
 
 // =============================================================================

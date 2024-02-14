@@ -102,7 +102,8 @@ public:
     template <typename T>
     static ClusterStatusCode ClusterSpecificFailure(T cluster_specific_code)
     {
-        static_assert(std::numeric_limits<T>::max() <= std::numeric_limits<ClusterStatus>::max(), "Type used must fit in uint8_t");
+        static_assert(std::numeric_limits<std::underlying_type_t<T>>::max() <= std::numeric_limits<ClusterStatus>::max(),
+                      "Type used must fit in uint8_t");
         return ClusterStatusCode(Status::Failure, chip::to_underlying(cluster_specific_code));
     }
 
@@ -118,7 +119,8 @@ public:
     template <typename T>
     static ClusterStatusCode ClusterSpecificSuccess(T cluster_specific_code)
     {
-        static_assert(std::numeric_limits<T>::max() <= std::numeric_limits<ClusterStatus>::max(), "Type used must fit in uint8_t");
+        static_assert(std::numeric_limits<std::underlying_type_t<T>>::max() <= std::numeric_limits<ClusterStatus>::max(),
+                      "Type used must fit in uint8_t");
         return ClusterStatusCode(Status::Success, chip::to_underlying(cluster_specific_code));
     }
 
