@@ -15,15 +15,23 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP System
- *          Layer on Zephyr platform.
- *
- */
+#include <lib/support/logging/CHIPLogging.h>
 
-#pragma once
+extern "C" {
 
-#include <platform/Zephyr/SystemPlatformConfig.h>
+uint8_t pychip_logging_GetLogFilter()
+{
+#if _CHIP_USE_LOGGING
+    return chip::Logging::GetLogFilter();
+#else
+    return chip::Logging::kLogCategory_None;
+#endif
+}
 
-#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
+void pychip_logging_SetLogFilter(uint8_t category)
+{
+#if _CHIP_USE_LOGGING
+    chip::Logging::SetLogFilter(category);
+#endif
+}
+}

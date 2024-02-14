@@ -1648,7 +1648,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = CHIP;
 				TargetAttributes = {
 					037C3CA42991A44B00B7EEE2 = {
