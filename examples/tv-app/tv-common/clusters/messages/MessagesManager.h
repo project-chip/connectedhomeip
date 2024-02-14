@@ -67,7 +67,7 @@ struct CachedMessage
 
     CHIP_ERROR SetOption(size_t index, chip::Optional<uint32_t> id, chip::Optional<chip::CharSpan> label)
     {
-        if (index < 0 || index >= mOptionArraySize)
+        if (index >= mOptionArraySize)
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
