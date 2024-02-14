@@ -278,7 +278,7 @@ private:
     CHIP_ERROR AllocEntry(UnauthenticatedSession::SessionRole sessionRole, NodeId ephemeralInitiatorNodeID,
                           const ReliableMessageProtocolConfig & config, UnauthenticatedSession *& entry)
     {
-        EntryType entryType = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
+        auto entryType = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
         if (entryType != nullptr)
         {
             entry = entryType;
