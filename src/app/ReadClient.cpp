@@ -799,9 +799,9 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             }
 
-            if (attributePath ==
+            if (attributePath.MatchesConcreteAttributePath(
                 ConcreteDataAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                          Clusters::IcdManagement::Attributes::OperatingMode::Id))
+                                          Clusters::IcdManagement::Attributes::OperatingMode::Id)))
             {
                 PeerType peerType;
                 TLV::TLVReader operatingModeTlvReader;

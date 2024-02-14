@@ -87,12 +87,15 @@ struct ConcreteReadAttributePath : public ConcreteAttributePath
         mListIndex.SetValue(aListIndex);
     }
 
-    bool operator==(const ConcreteReadAttributePath & aOther) const
-    {
+    bool operator==(const ConcreteReadAttributePath& aOther) const {
         return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex);
     }
 
-    bool operator!=(const ConcreteReadAttributePath & aOther) const { return !(*this == aOther); }
+    bool operator!=(const ConcreteReadAttributePath& aOther) const {
+      return !(*this == aOther);
+    }
+
+    bool operator<(const ConcreteReadAttributePath& path) const = delete;
 
     Optional<uint16_t> mListIndex;
 };
@@ -145,13 +148,19 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
                         ChipLogValueMEI(mClusterId), ChipLogValueMEI(mAttributeId));
     }
 
-    bool operator==(const ConcreteDataAttributePath & aOther) const
+    bool MatchesConcreteAttributePath(const ConcreteAttributePath& path) {
+      return ConcreteAttributePath::operator==(path);
+    }
+
+    bool operator==(const ConcreteDataAttributePath & aOther) const 
     {
         return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex) && (mListOp == aOther.mListOp) &&
             (mDataVersion == aOther.mDataVersion);
     }
 
     bool operator!=(const ConcreteDataAttributePath & aOther) const { return !(*this == aOther); }
+
+    bool operator<(const ConcreteDataAttributePath & path) const = delete;
 
     //
     // This index is only valid if `mListOp` is set to a list item operation, i.e
