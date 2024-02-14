@@ -430,32 +430,32 @@ public:
     }
 
 #if CHIP_WITH_NLFAULTINJECTION
+
+    enum class NlFaultInjectionType : uint8_t
+    {
+        SeparateResponseMessages,
+        SeparateResponseMessagesAndInvertedResponseOrder,
+        SkipSecondResponse
+    };
+
     /**
-     * @brief Crafts InvokeResponseMessages using fault injection for tests
+     * @brief Sends InvokeResponseMessages with injected faults for certification testing.
      *
-     * Used by the Test Harness (TH) during certification testing to simulate various server
-     * response behaviors. This helps verify that the client device under test (DUT) handles
-     * responses correctly, as outlined in the specifications.
+     * The Test Harness (TH) uses this to simulate various server response behaviors,
+     * ensuring the Device Under Test (DUT) handles responses per specification.
      *
-     * Ensures strict conformance of the DUT's InvokeRequestMessage with the test plan. If
-     * the DUT's request deviates from expectations, the TH will terminate with a detailed
-     * error message.
+     * This function strictly validates the DUT's InvokeRequestMessage against the test plan.
+     * If deviations occur, the TH terminates with a detailed error message.
      *
-     * @param [in] ec Exchange context for sending InvokeResponseMessages to the client.
-     * @param [in] payload Payload of the incoming InvokeRequestMessage from the client.
-     * @param [in] isTimedInvoke Indicates whether the interaction is timed.
-     * @param [in] oneResponsePerMessage If true, each InvokeResponse is encapsulated in a
-     *             separate InvokeResponseMessage.
-     * @param [in] invertResponseOrdering If true, inverts the order of InvokeResponses
-     *             compared to the order specified in the incoming InvokeRequest.
-     * @param [in] dropSecondResponse If true, prevents the second InvokeResponse from
-     *             being sent to the client.
+     * @param ec Exchange context for sending InvokeResponseMessages to the client.
+     * @param payload Payload of the incoming InvokeRequestMessage from the client.
+     * @param isTimedInvoke Indicates whether the interaction is timed.
+     * @param faultType The specific type of fault to inject into as the response.
      */
-    // TODO(#30453): Once handling InvokeRequestMessage is refactor such that components like
-    // CommandHandler is not reliant on an exchange context to unit test. Unit test will
-    // be created that checks for correct behavior for this method.
+    // TODO(#30453): After refactoring CommandHandler for better unit testability, create a
+    // unit test specifically for the fault injection behavior.
     void TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload, bool isTimedInvoke,
-                                        bool oneReponsePerMessage, bool invertResponseOrdering, bool dropSecondResponse);
+                                        NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
 
 private:
