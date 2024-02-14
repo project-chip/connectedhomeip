@@ -694,7 +694,7 @@ void AppTask::UpdateClusterState()
 
         if (status != Protocols::InteractionModel::Status::Success)
         {
-            LOG_ERR("Updating on/off cluster failed: %x", status);
+            LOG_ERR("Updating on/off cluster failed: %x", to_underlying(status));
         }
 
         // write the current level
@@ -702,7 +702,7 @@ void AppTask::UpdateClusterState()
 
         if (status != Protocols::InteractionModel::Status::Success)
         {
-            LOG_ERR("Updating level cluster failed: %x", status);
+            LOG_ERR("Updating level cluster failed: %x", to_underlying(status));
         }
     });
 }

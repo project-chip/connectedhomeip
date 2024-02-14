@@ -37,10 +37,7 @@ namespace chip {
 namespace Protocols {
 namespace InteractionModel {
 
-// This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
-// TODO: This needs to go back to being an enum class.
-// https://github.com/project-chip/connectedhomeip/issues/32025
-enum Status : uint8_t
+enum class Status : uint8_t
 {
 #define CHIP_IM_STATUS_CODE(name, spec_name, value) name = value,
 #include <protocols/interaction_model/StatusCodeList.h>
@@ -105,7 +102,8 @@ public:
     template <typename T>
     static ClusterStatusCode ClusterSpecificFailure(T cluster_specific_code)
     {
-        static_assert(std::numeric_limits<T>::max() <= std::numeric_limits<ClusterStatus>::max(), "Type used must fit in uint8_t");
+        static_assert(std::numeric_limits<std::underlying_type_t<T>>::max() <= std::numeric_limits<ClusterStatus>::max(),
+                      "Type used must fit in uint8_t");
         return ClusterStatusCode(Status::Failure, chip::to_underlying(cluster_specific_code));
     }
 
@@ -121,7 +119,8 @@ public:
     template <typename T>
     static ClusterStatusCode ClusterSpecificSuccess(T cluster_specific_code)
     {
-        static_assert(std::numeric_limits<T>::max() <= std::numeric_limits<ClusterStatus>::max(), "Type used must fit in uint8_t");
+        static_assert(std::numeric_limits<std::underlying_type_t<T>>::max() <= std::numeric_limits<ClusterStatus>::max(),
+                      "Type used must fit in uint8_t");
         return ClusterStatusCode(Status::Success, chip::to_underlying(cluster_specific_code));
     }
 

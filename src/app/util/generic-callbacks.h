@@ -76,10 +76,10 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * emberAfMainTickCallback.
         If the application was successfully able to
  * read the attribute and write it into the passed buffer, it should return a
- * value of EMBER_ZCL_STATUS_SUCCESS. Ensure that the size of the externally
+ * value of InteractionModel::Status::Success. Ensure that the size of the externally
  * managed attribute value is smaller than what the buffer can hold. In the case
  * of a buffer overflow throw an appropriate error such as
- * EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED. Any other return value indicates the
+ * InteractionModel::Status::ResourceExhausted. Any other return value indicates the
  * application was not able to read the attribute.
  */
 chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
@@ -122,7 +122,7 @@ chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(c
  * Framework and updated occasionally by the application code from within the
  * emberAfMainTickCallback.
         If the application was successfully able to
- * write the attribute, it returns a value of EMBER_ZCL_STATUS_SUCCESS. Any
+ * write the attribute, it returns a value of InteractionModel::Status::Success. Any
  * other return value indicates the application was not able to write the
  * attribute.
  */

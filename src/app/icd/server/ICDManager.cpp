@@ -37,6 +37,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 using namespace System::Clock;
 
+using chip::Protocols::InteractionModel::Status;
+
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
@@ -105,7 +107,7 @@ bool ICDManager::SupportsFeature(Feature feature)
     // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
     uint32_t featureMap = 0;
-    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == Status::Success);
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 #else
     return ((mFeatureMap & to_underlying(feature)) != 0);
