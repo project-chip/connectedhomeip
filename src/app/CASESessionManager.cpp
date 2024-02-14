@@ -18,6 +18,7 @@
 
 #include <app/CASESessionManager.h>
 #include <lib/address_resolve/AddressResolve.h>
+#include <system/DurationTimer.h>
 
 namespace chip {
 
@@ -87,6 +88,10 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 #endif
 )
 {
+    
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "CASESessionManager: FindOrEstablishSession" );
+    timer.start();
+
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
 
@@ -131,6 +136,8 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
     {
         session->Connect(onConnection, onSetupFailure);
     }
+    
+    timer.stop();
 }
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)

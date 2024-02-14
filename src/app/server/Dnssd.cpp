@@ -38,6 +38,8 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/TimeSource.h>
 
+#include <system/DurationTimer.h>
+
 namespace chip {
 namespace app {
 namespace {
@@ -412,6 +414,9 @@ void DnssdServer::StopServer()
 void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 {
     ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
+    
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "Discover: StartServer " );
+    timer.start();
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
 
@@ -481,6 +486,8 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
     {
         ChipLogError(Discovery, "Failed to finalize service update: %" CHIP_ERROR_FORMAT, err.Format());
     }
+
+    timer.stop();
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)

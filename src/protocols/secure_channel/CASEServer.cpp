@@ -23,6 +23,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
 #include <transport/SessionManager.h>
+#include <system/DurationTimer.h>
 
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -126,6 +127,9 @@ exit:
 
 void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer)
 {
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "Inet: CASE Session establishment" );
+    timer.start();
+
     GetSession().Clear();
 
     //
@@ -176,6 +180,8 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
     // there is a bug somewhere and we should raise attention to it by dying.
     //
     VerifyOrDie(mPinnedSecureSession.HasValue());
+
+    timer.stop();
 }
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
