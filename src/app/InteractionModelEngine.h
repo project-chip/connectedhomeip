@@ -137,9 +137,11 @@ public:
     {
         return mReadHandlers;
     }
-    ReadHandler * ActiveHandlerAt(unsigned int aIndex) override;
+
+    unsigned int ActiveHandlerCount() const override { return static_cast<unsigned int>(mReadHandlers.Allocated()); }
+    ReadHandler * ActiveHandlerAt(unsigned int index) override;
     reporting::ReportScheduler * GetReportScheduler() override { return mReportScheduler; }
-    bool IsInterestedInEvents() override { return (mEventPathPool.Allocated() != 0); }
+    bool IsInterestedInEvents() const override { return (mEventPathPool.Allocated() != 0); }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**

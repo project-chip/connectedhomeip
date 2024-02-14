@@ -635,11 +635,11 @@ void Engine::Run()
 
     // We may be deallocating read handlers as we go.  Track how many we had
     // initially, so we make sure to go through all of them.
-    size_t initialAllocated = mDelegate->GetReadHandlerPool().Allocated();
+    size_t initialAllocated = mDelegate->ActiveHandlerCount();
     while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < initialAllocated))
     {
         ReadHandler * readHandler =
-            mDelegate->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) mDelegate->GetReadHandlerPool().Allocated());
+            mDelegate->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) mDelegate->ActiveHandlerCount());
         VerifyOrDie(readHandler != nullptr);
 
         if (readHandler->ShouldReportUnscheduled() || mDelegate->GetReportScheduler()->IsReportableNow(readHandler))
@@ -666,7 +666,7 @@ void Engine::Run()
     // This isn't strictly necessary, but does make it easier to debug issues in this code if they
     // do arise.
     //
-    if (mCurReadHandlerIdx >= mDelegate->GetReadHandlerPool().Allocated())
+    if (mCurReadHandlerIdx >= mDelegate->ActiveHandlerCount())
     {
         mCurReadHandlerIdx = 0;
     }

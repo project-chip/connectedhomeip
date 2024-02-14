@@ -65,10 +65,17 @@ public:
     ///
     /// Returning false here shortcuts some of the report scheduling logic to loop
     /// through all readers and determine event sending.
-    virtual bool IsInterestedInEvents() = 0;
+    virtual bool IsInterestedInEvents() const = 0;
 
-    /// Returns the handler at a particular index within the active handler list.
+    /// Get an allocated/active read handler that resides at the given index.
+    /// The index should be between 0 an ActiveHandlerCount(), otherwise
+    /// nullptr will be returned.
+    ///
+    /// NOTE: this method may be slow as it has to iterate through all
+    ///       active read handlers.
     virtual ReadHandler * ActiveHandlerAt(unsigned int index) = 0;
+
+    virtual unsigned int ActiveHandlerCount() const = 0;
 
     virtual reporting::ReportScheduler * GetReportScheduler() = 0;
 };
