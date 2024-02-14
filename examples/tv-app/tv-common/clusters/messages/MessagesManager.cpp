@@ -62,8 +62,6 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
 
     // Add your code to present Message
     ChipLogProgress(Controller, "HandlePresentMessagesRequest complete");
-
-    return;
 }
 
 void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
@@ -90,9 +88,7 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         for (CachedMessage & entry : mCachedMessages)
         {
-            ChipLogProgress(Controller, "--MessagesManager HandleGetMessages getting");
             ReturnErrorOnFailure(encoder.Encode(entry.GetMessage()));
-            ChipLogProgress(Controller, "-MessagesManager HandleGetMessages gotten");
         }
         return CHIP_NO_ERROR;
     });
