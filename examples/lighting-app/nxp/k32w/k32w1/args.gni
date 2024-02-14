@@ -21,3 +21,9 @@ chip_config_dimmable_led = false
 chip_enable_ota_requestor = true
 chip_stack_lock_tracking = "fatal"
 chip_enable_ble = true
+
+is_debug = false
+
+chip_crypto = "platform"
+chip_openthread_ftd = true
+chip_with_ot_cli = 0
