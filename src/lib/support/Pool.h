@@ -387,9 +387,6 @@ public:
 
     /// Provides iteration over active objects in the pool.
     ///
-    /// The iterator is valid only if the Pool is not changed (no objects are created
-    /// or released).
-    ///
     /// NOTE: the iterator specifically attempts to allow releasing
     ///       of objects from the pool while iteration is active. It achieves this
     ///       by flagging an iteration depth whenever an active iterator exists.
