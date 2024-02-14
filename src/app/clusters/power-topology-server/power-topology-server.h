@@ -28,8 +28,6 @@ namespace app {
 namespace Clusters {
 namespace PowerTopology {
 
-using chip::Protocols::InteractionModel::Status;
-
 class Delegate
 {
 public:
