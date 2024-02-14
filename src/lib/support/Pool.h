@@ -195,8 +195,8 @@ class BitmapActiveObjectIterator
 {
 public:
     using value_type = T;
-    using pointer = T*;
-    using reference = T&;
+    using pointer    = T *;
+    using reference  = T &;
 
     explicit BitmapActiveObjectIterator(internal::StaticAllocatorBitmap * pool, size_t idx) : mPool(pool), mIndex(idx) {}
     BitmapActiveObjectIterator() {}
@@ -400,8 +400,8 @@ public:
     {
     public:
         using value_type = T;
-        using pointer = T*;
-        using reference = T&;
+        using pointer    = T *;
+        using reference  = T &;
 
         ActiveObjectIterator() {}
         ActiveObjectIterator(const ActiveObjectIterator & other) : mCurrent(other.mCurrent), mEnd(other.mEnd)
