@@ -74,19 +74,17 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
 
         if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest))
         {
-            auto * imEngine = InteractionModelEngine::GetInstance();
             ChipLogDetail(DataManagement, "Handing timed invoke to IM engine: handler %p exchange " ChipLogFormatExchange, this,
                           ChipLogValueExchange(aExchangeContext));
-            imEngine->OnTimedInvoke(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
+            mpImEngine->OnTimedInvoke(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
             return CHIP_NO_ERROR;
         }
 
         if (aPayloadHeader.HasMessageType(MsgType::WriteRequest))
         {
-            auto * imEngine = InteractionModelEngine::GetInstance();
             ChipLogDetail(DataManagement, "Handing timed write to IM engine: handler %p exchange " ChipLogFormatExchange, this,
                           ChipLogValueExchange(aExchangeContext));
-            imEngine->OnTimedWrite(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
+            mpImEngine->OnTimedWrite(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
             return CHIP_NO_ERROR;
         }
     }
@@ -101,7 +99,7 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
 
 void TimedHandler::OnExchangeClosing(Messaging::ExchangeContext *)
 {
-    InteractionModelEngine::GetInstance()->OnTimedInteractionFailed(this);
+    mpImEngine->OnTimedInteractionFailed(this);
 }
 
 CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * aExchangeContext,

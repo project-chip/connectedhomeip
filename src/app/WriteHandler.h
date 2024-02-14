@@ -35,13 +35,16 @@
 
 namespace chip {
 namespace app {
+
+class InteractionModelEngine;
+
 /**
  *  @brief The write handler is responsible for processing a write request and sending a write reply.
  */
 class WriteHandler : public Messaging::ExchangeDelegate
 {
 public:
-    WriteHandler() : mExchangeCtx(*this) {}
+    explicit WriteHandler() : mExchangeCtx(*this) {}
 
     /**
      *  Initialize the WriteHandler. Within the lifetime
@@ -49,11 +52,13 @@ public:
      *  construction until a call to Close is made to terminate the
      *  instance.
      *
+     *  @param[in]    apImEngine    A valid pointer to the InteractionModelEngine.
+     *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(InteractionModelEngine * apImEngine);
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
@@ -175,6 +180,8 @@ private:
     //  Where (1)-(3) will be consistent among the whole list write request, while (4) and (5) are not appliable to group writes.
     bool mAttributeWriteSuccessful                = false;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
+
+    InteractionModelEngine * mpImEngine = nullptr;
 };
 } // namespace app
 } // namespace chip

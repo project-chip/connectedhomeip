@@ -47,10 +47,15 @@
 namespace chip {
 namespace app {
 
+class InteractionModelEngine;
+
 class TimedHandler : public Messaging::ExchangeDelegate
 {
 public:
-    TimedHandler() {}
+    /**
+     *  Construct WriteHandler with a valid InteractionModelEngine pointer.
+     */
+    explicit TimedHandler(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
     ~TimedHandler() override {}
 
     // ExchangeDelegate implementation.
@@ -93,6 +98,8 @@ private:
     // exchange's "response expected" timer gets delayed and does not fire when
     // the time runs out.
     System::Clock::Timestamp mTimeLimit;
+
+    InteractionModelEngine * mpImEngine = nullptr;
 };
 
 } // namespace app
