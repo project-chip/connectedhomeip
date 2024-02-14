@@ -2732,7 +2732,7 @@ provisional cluster OvenMode = 73 {
 
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
-cluster LaundryDryerControls = 74 {
+provisional cluster LaundryDryerControls = 74 {
   revision 1;
 
   enum DrynessLevelEnum : enum8 {
@@ -7852,8 +7852,11 @@ endpoint 1 {
   }
 
   server cluster OvenCavityOperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
     callback attribute phaseList;
     callback attribute currentPhase;
+    callback attribute countdownTime;
     callback attribute operationalStateList;
     callback attribute operationalState;
     callback attribute operationalError;
@@ -7863,6 +7866,12 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command Pause;
+    handle command Stop;
+    handle command Start;
+    handle command Resume;
+    handle command OperationalCommandResponse;
   }
 
   server cluster OvenMode {
@@ -8097,7 +8106,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command Pause;
     handle command Stop;
@@ -8322,11 +8331,9 @@ endpoint 1 {
     callback attribute supplyState;
     callback attribute faultState;
     callback attribute chargingEnabledUntil;
-    callback attribute dischargingEnabledUntil;
     callback attribute circuitCapacity;
     callback attribute minimumChargeCurrent;
     callback attribute maximumChargeCurrent;
-    callback attribute maximumDischargeCurrent;
     callback attribute userMaximumChargeCurrent;
     callback attribute randomizationDelayWindow;
     callback attribute nextChargeStartTime;
@@ -8334,13 +8341,9 @@ endpoint 1 {
     callback attribute nextChargeRequiredEnergy;
     callback attribute nextChargeTargetSoC;
     callback attribute approximateEVEfficiency;
-    callback attribute stateOfCharge;
-    callback attribute batteryCapacity;
-    callback attribute vehicleID;
     callback attribute sessionID;
     callback attribute sessionDuration;
     callback attribute sessionEnergyCharged;
-    callback attribute sessionEnergyDischarged;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

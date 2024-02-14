@@ -1480,23 +1480,6 @@ class ChipDeviceControllerBase():
 
         return self._Cluster.ListClusterAttributes()
 
-    def SetLogFilter(self, category):
-        self.CheckIsActive()
-
-        if category < 0 or category > pow(2, 8):
-            raise ValueError("category must be an unsigned 8-bit integer")
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetLogFilter(category)
-        )
-
-    def GetLogFilter(self):
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_GetLogFilter()
-        )
-
     def SetBlockingCB(self, blockingCB):
         self.CheckIsActive()
 

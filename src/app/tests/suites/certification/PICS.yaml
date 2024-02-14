@@ -1905,6 +1905,30 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: DISHM.S.C01.Tx
 
+    #
+    # Microwave Oven Mode Cluster
+    #
+    - label:
+          "Does the device implement the Microwave Oven Mode cluster as a server"
+      id: MWOM.S
+
+    #
+    # Microwave Oven Control Cluster
+    #
+    - label:
+          "Does the device implement the Microwave Oven Control cluster as a
+          server"
+      id: MWOCTRL.S
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the power as a number feature"
+      id: MWOCTRL.S.F00
+
+    - label: "Does the device support the power number limits feature"
+      id: MWOCTRL.S.F02
+
     # Descriptor Cluster TestPlan
     - label: "Does the device implement the Descriptor cluster as a server?"
       id: DESC.S
@@ -3604,6 +3628,9 @@ PICS:
     - label: "Indicates that node is configured for test event triggers."
       id: DGGEN.S.C00.Rsp
 
+    - label: "Indicates cluster supports Payload Test Request."
+      id: DGGEN.S.C03.Rsp
+
     #
     # server / Events
     #
@@ -3624,6 +3651,13 @@ PICS:
 
     - label: "Indicates the reason that caused the device to reboot start-up."
       id: DGGEN.S.E03
+
+    #
+    # server / features
+    #
+    - label:
+          "Support specific commands needed for extended Data Model features."
+      id: DGGEN.S.F00
 
     #
     # client / attributes
@@ -8823,6 +8857,94 @@ PICS:
           "Does the device implement generating the OperationalCommandResponse
           command?"
       id: OPSTATE.S.C04.Tx
+
+    #
+    #Oven Operational State
+    #
+    - label:
+          "Does the device implement the Operational State cluster as a server?"
+      id: OVENOPSTATE.S
+
+    - label:
+          "Does the device implement the Operational State cluster as a client?"
+      id: OVENOPSTATE.C
+
+    #ManuallyControlled
+
+    - label: "Does the DUT support testing the Stopped(0x00) operational state"
+      id: OVENOPSTATE.S.M.ST_STOPPED
+
+    - label: "Does the DUT support testing the Running(0x01) operational state"
+      id: OVENOPSTATE.S.M.ST_RUNNING
+
+    - label: "Does the DUT support testing the Paused(0x02) operational state"
+      id: OVENOPSTATE.S.M.ST_PAUSED
+
+    - label: "Does the DUT support testing the Error(0x03) operational state?"
+      id: OVENOPSTATE.S.M.ST_ERROR
+
+    - label: "Does the DUT support testing the NoError(0x00) error state?"
+      id: OVENOPSTATE.S.M.ERR_NO_ERROR
+
+    - label:
+          "Does the DUT support testing the UnableToStartOrResume(0x01) error
+          state?"
+      id: OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
+
+    - label:
+          "Does the DUT support testing the UnableToCompleteOperation(0x02)
+          error state?"
+      id: OVENOPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION
+
+    - label:
+          "Does the DUT support testing the CommandInvalidInState(0x03) error
+          state?"
+      id: OVENOPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
+
+    #Server Attributes
+    - label: "Does the device implement the PhaseList attribute?"
+      id: OVENOPSTATE.S.A0000
+
+    - label: "Does the device implement the CurrentPhase attribute?"
+      id: OVENOPSTATE.S.A0001
+
+    - label: "Does the device implement the CountdownTime attribute?"
+      id: OVENOPSTATE.S.A0002
+
+    - label: "Does the device implement the OperationalStateList attribute?"
+      id: OVENOPSTATE.S.A0003
+
+    - label: "Does the device implement the OperationalState attribute?"
+      id: OVENOPSTATE.S.A0004
+
+    - label: "Does the device implement the OperationalError attribute?"
+      id: OVENOPSTATE.S.A0005
+    #Events Generated
+
+    - label: "Does the device generate the OperationalError event?"
+      id: OVENOPSTATE.S.E00
+
+    - label: "Does the device generate the OperationCompltion event?"
+      id: OVENOPSTATE.S.E01
+
+    #Server Commands Received
+    - label: "Does the device implement receiving the Pause command?"
+      id: OVENOPSTATE.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Stop command?"
+      id: OVENOPSTATE.S.C01.Rsp
+
+    - label: "Does the device implement receiving the Start command?"
+      id: OVENOPSTATE.S.C02.Rsp
+
+    - label: "Does the device implement receiving the Resume command?"
+      id: OVENOPSTATE.S.C03.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement generating the OperationalCommandResponse
+          command?"
+      id: OVENOPSTATE.S.C04.Tx
 
     # Smoke CO Alarm Cluster Test Plan
     - label: "Does the device implement the SMOKECO cluster as a server?"

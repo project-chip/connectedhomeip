@@ -19,7 +19,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/att-storage.h>
-#include <app/util/af-enums.h>
+
 #include <app/util/af-types.h>
 #include <app/util/privilege-storage.h>
 #include <lib/core/Optional.h>
@@ -39,14 +39,14 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // clusters dont use it.
 }
 
-EmberAfStatus emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
+Protocols::InteractionModel::Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
     EmberAfAttributeType dataType)
 {
     assertChipStackLockedByCurrentThread();
 
     // All of our attributes are handled via AttributeAccessInterface, so this
     // should be unreached.
-    return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
 namespace chip {
