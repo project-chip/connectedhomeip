@@ -278,24 +278,28 @@ private:
     CHIP_ERROR AllocEntry(UnauthenticatedSession::SessionRole sessionRole, NodeId ephemeralInitiatorNodeID,
                           const ReliableMessageProtocolConfig & config, UnauthenticatedSession *& entry)
     {
-        auto entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
-        if (entryToUse != nullptr)
+        entry = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
+        if (entry != nullptr)
         {
-            entry = entryToUse;
             return CHIP_NO_ERROR;
         }
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-        entryToUse = FindLeastRecentUsedEntry();
-#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-        if (entryToUse == nullptr)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        // permanent failure if heap was insufficient
+        return CHIP_ERROR_NO_MEMORY;
+#else
+        entry = FindLeastRecentUsedEntry();
+        VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        mEntries.ResetObject(entryToUse, sessionRole, ephemeralInitiatorNodeID, config, *this);
-        entry = entryToUse;
+        // make sure a clean reset is done
+        mEntries.ReleaseObject(entry);
+        entry = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
+
+        // entry being null is not expected as we released an object that could be reclaimed
+        VerifyOrReturnError(entry != nullptr, CHIP_ERROR_INTERNAL);
+
         return CHIP_NO_ERROR;
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     }
 
     CHECK_RETURN_VALUE UnauthenticatedSession * FindEntry(UnauthenticatedSession::SessionRole sessionRole,
