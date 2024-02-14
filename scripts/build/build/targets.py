@@ -80,6 +80,7 @@ def BuildHostFakeTarget():
         '-(chip-tool|all-clusters)')
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
+    target.AppendModifier('log-stdio', log_stdio=True)
 
     return target
 
