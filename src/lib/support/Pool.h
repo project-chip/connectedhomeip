@@ -387,11 +387,12 @@ public:
 
     /// Provides iteration over active objects in the pool.
     ///
-    /// NOTE: the iterator specifically attempts to allow releasing
-    ///       of objects from the pool while iteration is active. It achieves this
-    ///       by flagging an iteration depth whenever an active iterator exists.
-    ///       this also means that while a pool iterator exists, releasing
-    ///       may be deferred.
+    /// NOTE: There is extra logic to allow objects release WHILE the iterator is
+    ///       active while still allowing to advance the iterator.
+    ///       This is done by flagging an iteration depth whenever an active
+    ///       iterator exists. This also means that while a pool iterator exists, releasing
+    ///       of tracking memory objects may be deferred until the last active iterator is
+    ///       released.
     class ActiveObjectIterator : public std::iterator<std::forward_iterator_tag, T>
     {
     public:
