@@ -45,11 +45,16 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
 {
+    return [MTRError errorForCHIPErrorCode:errorCode logContext:nil];
+}
+
++ (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode logContext:(id)contextToLog
+{
     if (errorCode == CHIP_NO_ERROR) {
         return nil;
     }
 
-    ChipLogError(Controller, "Creating NSError from %" CHIP_ERROR_FORMAT, errorCode.Format());
+    ChipLogError(Controller, "Creating NSError from %" CHIP_ERROR_FORMAT " (context: %@)", errorCode.Format(), contextToLog);
 
     if (errorCode.IsIMStatus()) {
         chip::app::StatusIB status(errorCode);
