@@ -37,6 +37,9 @@
 
 namespace chip {
 
+template <class T>
+class BitmapActiveObjectIterator;
+
 namespace internal {
 
 class Statistics
@@ -113,6 +116,10 @@ private:
     void * mElements;
     const size_t mElementSize;
     std::atomic<tBitChunkType> * mUsage;
+
+    /// allow accessing direct At() calls
+    template <class T>
+    friend class ::chip::BitmapActiveObjectIterator;
 };
 
 template <typename T, typename Function>
@@ -180,6 +187,36 @@ struct HeapObjectList : HeapObjectListNode
 
 } // namespace internal
 
+/// Provides iteration over active objects in a Bitmap pool.
+///
+/// The iterator is valid only if the Pool is not changed (no objects are created
+/// or released)/
+template <class T>
+class BitmapActiveObjectIterator : public std::iterator<std::forward_iterator_tag, T>
+{
+public:
+    explicit BitmapActiveObjectIterator(internal::StaticAllocatorBitmap * pool, size_t idx) : mPool(pool), mIndex(idx) {}
+    BitmapActiveObjectIterator() {}
+
+    bool operator==(const BitmapActiveObjectIterator & other) const
+    {
+        return (AtEnd() && other.AtEnd()) || ((mPool == other.mPool) && (mIndex == other.mIndex));
+    }
+    bool operator!=(const BitmapActiveObjectIterator & other) const { return !(*this == other); }
+    BitmapActiveObjectIterator & operator++()
+    {
+        mIndex = mPool->NextActiveIndexAfter(mIndex);
+        return *this;
+    }
+    T * operator*() const { return static_cast<T *>(mPool->At(mIndex)); }
+
+private:
+    bool AtEnd() const { return (mPool == nullptr) || (mIndex >= mPool->Capacity()); }
+
+    internal::StaticAllocatorBitmap * mPool = nullptr; // pool that this belongs to
+    size_t mIndex                           = std::numeric_limits<size_t>::max();
+};
+
 /**
  * @class ObjectPool
  *
@@ -216,45 +253,11 @@ template <class T, size_t N>
 class BitMapObjectPool : public internal::StaticAllocatorBitmap
 {
 public:
-    /// Provides iteration over active objects in the pool.
-    ///
-    /// The iterator is valid only if the Pool is not changed (no objects are created
-    /// or released)/
-    class ActiveObjectIterator : public std::iterator<std::forward_iterator_tag, T>
-    {
-    public:
-        ActiveObjectIterator() {}
-
-        bool operator==(const ActiveObjectIterator & other) const
-        {
-            return (AtEnd() && other.AtEnd()) || ((mPool == other.mPool) && (mIndex == other.mIndex));
-        }
-        bool operator!=(const ActiveObjectIterator & other) const { return !(*this == other); }
-        ActiveObjectIterator & operator++()
-        {
-            mIndex = mPool->NextActiveIndexAfter(mIndex);
-            return *this;
-        }
-        T * operator*() const { return static_cast<T *>(mPool->At(mIndex)); }
-
-    protected:
-        // allow construction by the pool only
-        friend class BitMapObjectPool<T, N>;
-
-        explicit ActiveObjectIterator(BitMapObjectPool<T, N> * pool, size_t idx) : mPool(pool), mIndex(idx) {}
-
-        bool AtEnd() const { return (mIndex == N); }
-
-    private:
-        BitMapObjectPool * mPool = nullptr; // pool that this belongs to
-        size_t mIndex            = N;       // index inside the pool.
-    };
-
     BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
     ~BitMapObjectPool() { VerifyOrDie(Allocated() == 0); }
 
-    ActiveObjectIterator begin() { return ActiveObjectIterator(this, FirstAllocatedIndex()); }
-    ActiveObjectIterator end() { return ActiveObjectIterator(this, N); }
+    BitmapActiveObjectIterator<T> begin() { return BitmapActiveObjectIterator<T>(this, FirstAllocatedIndex()); }
+    BitmapActiveObjectIterator<T> end() { return BitmapActiveObjectIterator<T>(this, N); }
 
     template <typename... Args>
     T * CreateObject(Args &&... args)
@@ -312,9 +315,6 @@ public:
     }
 
 private:
-    /// allow accessing direct At() calls
-    friend class ActiveObjectIterator;
-
     static Loop ReleaseObject(void * context, void * object)
     {
         static_cast<BitMapObjectPool *>(context)->ReleaseObject(static_cast<T *>(object));
@@ -588,6 +588,15 @@ enum class ObjectPoolMem
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 };
 
+template <typename T, ObjectPoolMem P = ObjectPoolMem::kDefault>
+struct ObjectPoolIterator;
+
+template <typename T>
+struct ObjectPoolIterator<T, ObjectPoolMem::kInline>
+{
+    using Type = BitmapActiveObjectIterator<T>;
+};
+
 template <typename T, size_t N, ObjectPoolMem P = ObjectPoolMem::kDefault>
 class ObjectPool;
 
@@ -597,6 +606,13 @@ class ObjectPool<T, N, ObjectPoolMem::kInline> : public BitMapObjectPool<T, N>
 };
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
+template <typename T>
+struct ObjectPoolIterator<T, ObjectPoolMem::kHeap>
+{
+    using Type = typename HeapObjectPool<T>::ActiveObjectIterator;
+};
+
 template <typename T, size_t N>
 class ObjectPool<T, N, ObjectPoolMem::kHeap> : public HeapObjectPool<T>
 {

@@ -187,17 +187,17 @@ Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
     Loop result            = Loop::Finish;
     HeapObjectListNode * p = mNext;
     while (p != this)
+    {
+        if (p->mObject != nullptr)
         {
-            if (p->mObject != nullptr)
-                {
-                    if (lambda(context, p->mObject) == Loop::Break)
-                        {
-                            result = Loop::Break;
-                            break;
-                        }
-                }
-            p = p->mNext;
+            if (lambda(context, p->mObject) == Loop::Break)
+            {
+                result = Loop::Break;
+                break;
+            }
         }
+        p = p->mNext;
+    }
     --mIterationDepth;
     CleanupDeferredReleases();
     return result;
@@ -206,9 +206,9 @@ Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
 void HeapObjectList::CleanupDeferredReleases()
 {
     if (mIterationDepth != 0 || !mHaveDeferredNodeRemovals)
-        {
-            return;
-        }
+    {
+        return;
+    }
     // Remove nodes for released objects.
     HeapObjectListNode * p = mNext;
     while (p != this)

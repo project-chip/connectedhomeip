@@ -236,7 +236,7 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
 
     // Default constructor of an iterator should be pointing to the pool end.
     {
-        typename ObjectPool<S, kSize, P>::ActiveObjectIterator defaultIterator;
+        typename ObjectPoolIterator<S, P>::Type defaultIterator;
         NL_TEST_ASSERT(inSuite, defaultIterator == pool.end());
     }
 
