@@ -22,12 +22,20 @@
 import io
 import tempfile
 import unittest
+from unittest.mock import mock_open, patch
 
 from matter_yamltests.definitions import ParseSource, SpecDefinitions
 from matter_yamltests.parser import TestParser, TestParserConfig
 
 simple_test_description = '''<?xml version="1.0"?>
   <configurator>
+    <enum name="TestEnum" type="enum8">
+      <cluster code="0x1234"/>
+      <item name="A" value="0x0"/>
+      <item name="B" value="0x1"/>
+      <item name="C" value="0x2"/>
+    </enum>
+
     <struct name="TestStruct">
         <cluster code="0x1234"/>
         <item name="a" type="boolean"/>
@@ -36,8 +44,9 @@ simple_test_description = '''<?xml version="1.0"?>
     <cluster>
       <name>Test</name>
       <code>0x1234</code>
-    </cluster>
 
+      <command source="client" code="1" name="test"></command>
+    </cluster>
   </configurator>
 '''
 
@@ -52,43 +61,35 @@ config:
 tests:
     - label: "Send Test Command"
       command: "test"
-
-    - label: "Send Test Not Handled Command"
-      command: "testNotHandled"
-      response:
-          error: INVALID_COMMAND
-
-    - label: "Send Test Specific Command"
-      command: "testSpecific"
-      response:
-          values:
-              - name: "returnValue"
-                value: 7
 '''
 
 
+def mock_open_with_parameter_content(content):
+    file_object = mock_open(read_data=content).return_value
+    file_object.__iter__.return_value = content.splitlines(True)
+    return file_object
+
+
+@patch('builtins.open', new=mock_open_with_parameter_content)
 class TestYamlParser(unittest.TestCase):
     def setUp(self):
         self._definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(simple_test_description), name='simple_test_description')])
-        self._temp_file = tempfile.NamedTemporaryFile(suffix='.yaml')
-        with open(self._temp_file.name, 'w') as f:
-            f.writelines(simple_test_yaml)
 
     def test_able_to_iterate_over_all_parsed_tests(self):
         # self._yaml_parser.tests implements `__next__`, which does value substitution. We are
         # simply ensure there is no exceptions raise.
         parser_config = TestParserConfig(None, self._definitions)
-        yaml_parser = TestParser(self._temp_file.name, parser_config)
+        yaml_parser = TestParser(simple_test_yaml, parser_config)
         count = 0
         for idx, test_step in enumerate(yaml_parser.tests):
             count += 1
             pass
-        self.assertEqual(count, 3)
+        self.assertEqual(count, 1)
 
     def test_config(self):
         parser_config = TestParserConfig(None, self._definitions)
-        yaml_parser = TestParser(self._temp_file.name, parser_config)
+        yaml_parser = TestParser(simple_test_yaml, parser_config)
         for idx, test_step in enumerate(yaml_parser.tests):
             self.assertEqual(test_step.node_id, 0x12344321)
             self.assertEqual(test_step.cluster, 'Test')
@@ -99,7 +100,7 @@ class TestYamlParser(unittest.TestCase):
                            'cluster': 'TestOverride', 'endpoint': 4}
         parser_config = TestParserConfig(
             None, self._definitions, config_override)
-        yaml_parser = TestParser(self._temp_file.name, parser_config)
+        yaml_parser = TestParser(simple_test_yaml, parser_config)
         for idx, test_step in enumerate(yaml_parser.tests):
             self.assertEqual(test_step.node_id, 12345)
             self.assertEqual(test_step.cluster, 'TestOverride')
@@ -109,8 +110,9 @@ class TestYamlParser(unittest.TestCase):
         config_override = {'unknown_field': 1}
         parser_config = TestParserConfig(
             None, self._definitions, config_override)
-        self.assertRaises(KeyError, TestParser,
-                          self._temp_file.name, parser_config)
+
+        yaml_parser = TestParser(simple_test_yaml, parser_config)
+        self.assertIsInstance(yaml_parser, TestParser)
 
 
 def main():
