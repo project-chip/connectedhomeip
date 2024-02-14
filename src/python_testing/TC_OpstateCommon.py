@@ -15,11 +15,11 @@
 #    limitations under the License.
 #
 
+import json
 import logging
 import queue
 import time
 from dataclasses import dataclass
-import json
 from typing import Any
 
 import chip.clusters as Clusters
