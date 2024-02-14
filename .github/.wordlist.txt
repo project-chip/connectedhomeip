@@ -382,7 +382,6 @@ DefaultOTARequestor
 DefaultOTARequestorDriver
 DefaultOTARequestorStorage
 DefaultSuccess
-defaultValue
 definedValue
 DehumidificationControl
 DelayedActionTime
