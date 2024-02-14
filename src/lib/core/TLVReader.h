@@ -952,14 +952,14 @@ public:
 
 protected:
     Tag mElemTag;
-    uint64_t mElemLenOrVal = 0;
+    uint64_t mElemLenOrVal          = 0;
     TLVBackingStore * mBackingStore = nullptr;
-    const uint8_t * mReadPoint = nullptr;
-    const uint8_t * mBufEnd = nullptr;
-    uint32_t mLenRead = 0;
-    uint32_t mMaxLen = 0;
-    TLVType mContainerType = kTLVType_NotSpecified;
-    uint16_t mControlByte = kTLVControlByte_NotSpecified;
+    const uint8_t * mReadPoint      = nullptr;
+    const uint8_t * mBufEnd         = nullptr;
+    uint32_t mLenRead               = 0;
+    uint32_t mMaxLen                = 0;
+    TLVType mContainerType          = kTLVType_NotSpecified;
+    uint16_t mControlByte           = kTLVControlByte_NotSpecified;
 
 private:
     bool mContainerOpen = false;
