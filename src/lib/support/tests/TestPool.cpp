@@ -271,7 +271,6 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
         }
         count      = 0;
         size_t sum = 0;
-        // for (auto &v : pool) {
         for (auto v = pool.begin(); v != pool.end(); ++v)
         {
             NL_TEST_ASSERT(inSuite, objIds.count((*v)->mId) == 1);
