@@ -88,7 +88,7 @@ void asr_matter_onoff(int value)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: updating on/off %x", status);
+        ChipLogProgress(Zcl, "ERR: updating on/off %x", to_underlying(status));
     }
 }
 

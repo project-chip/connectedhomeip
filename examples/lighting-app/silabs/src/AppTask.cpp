@@ -250,6 +250,6 @@ void AppTask::UpdateClusterState(intptr_t context)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        SILABS_LOG("ERR: updating on/off %x", status);
+        SILABS_LOG("ERR: updating on/off %x", to_underlying(status));
     }
 }

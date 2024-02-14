@@ -27,7 +27,6 @@
 #include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
-#include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 

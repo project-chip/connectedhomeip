@@ -330,7 +330,7 @@ void UpdateClusterState(intptr_t context)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(Zcl, "ERR: updating lock state %x", status);
+        ChipLogError(Zcl, "ERR: updating lock state %x", to_underlying(status));
     }
 }
 
