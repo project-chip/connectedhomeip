@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - K32W
+name: Build example - NXP
 
 on:
     push:
@@ -58,33 +58,36 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target k32w-k32w0-light-crypto-platform-tokenizer \
-                      --target k32w-k32w0-contact-crypto-platform-tokenizer \
-                      --target k32w-k32w0-contact-crypto-platform-low-power-nologs \
-                      --target k32w-k32w1-light-crypto-platform-openthread-ftd \
-                      --target k32w-k32w1-contact-crypto-platform-low-power-nologs \
+                      --target nxp-k32w0-lighting \
+                      --target nxp-k32w0-lighting-factory \
+                      --target nxp-k32w0-lighting-rotating-id \
+                      --target nxp-k32w0-contact-sensor \
+                      --target nxp-k32w0-contact-sensor-low-power \
+                      --target nxp-k32w0-contact-sensor-low-power-factory \
+                      --target nxp-k32w1-lighting \
+                      --target nxp-k32w1-contact-sensor-low-power \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
-            - name: Get light size stats
+            - name: Get lighting app size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w0+release light \
-                    out/artifacts/k32w-k32w0-light-crypto-platform-tokenizer/chip-k32w0x-light-example.elf \
+                    nxp k32w0+release light \
+                    out/artifacts/nxp-k32w0-lighting/chip-k32w0x-light-example.elf \
                     /tmp/bloat_reports/
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w1+release light \
-                    out/artifacts/k32w-k32w1-light-crypto-platform-openthread-ftd/chip-k32w1-light-example.elf \
+                    nxp k32w1+release light \
+                    out/artifacts/nxp-k32w1-lighting/chip-k32w1-light-example.elf \
                     /tmp/bloat_reports/
-            - name: Get contact size stats
+            - name: Get contact sensor size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w0+release contact \
-                    out/artifacts/k32w-k32w0-contact-crypto-platform-tokenizer/chip-k32w0x-contact-example.elf \
+                    nxp k32w0+release contact \
+                    out/artifacts/nxp-k32w0-contact-sensor-low-power/chip-k32w0x-contact-example.elf \
                     /tmp/bloat_reports/
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w1+release contact \
-                    out/artifacts/k32w-k32w1-contact-crypto-platform-low-power-nologs/chip-k32w1-contact-example.elf \
+                    nxp k32w1+release contact \
+                    out/artifacts/nxp-k32w1-contact-sensor-low-power/chip-k32w1-contact-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
