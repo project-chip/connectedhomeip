@@ -29,7 +29,8 @@
 #include <openthread-system.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
-#include <platform/nxp/k32w/k32w0/DiagnosticDataProviderImpl.h>
+#include <platform/nxp/k32w/k32w1/ConfigurationManagerImpl.h>
+#include <platform/nxp/k32w/k32w1/DiagnosticDataProviderImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
@@ -38,6 +39,8 @@
 #include "fsl_component_mem_manager.h"
 #include "fwk_platform.h"
 #include <openthread/platform/entropy.h>
+
+extern "C" void HAL_ResetMCU(void);
 
 extern uint8_t __data_end__[], m_data0_end[];
 memAreaCfg_t data0Heap = { .start_address = (void *) __data_end__, .end_address = (void *) m_data0_end };
@@ -67,6 +70,15 @@ CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
     VerifyOrReturnError(memSt == kStatus_MemSuccess, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
+}
+void PlatformManagerImpl::CleanReset()
+{
+    StopEventLoopTask();
+    Shutdown();
+#if CHIP_PLAT_NVM_SUPPORT
+    NvCompletePendingOperations();
+#endif
+    HAL_ResetMCU();
 }
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)

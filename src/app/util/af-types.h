@@ -27,7 +27,6 @@
 #include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
-#include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
@@ -42,8 +41,6 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
-
-using chip::Protocols::InteractionModel::Status;
 
 /**
  * @brief Type for the cluster mask
@@ -293,8 +290,8 @@ typedef void (*EmberAfClusterAttributeChangedCallback)(const chip::app::Concrete
  *
  * This function is called before an attribute changes.
  */
-typedef Status (*EmberAfClusterPreAttributeChangedCallback)(const chip::app::ConcreteAttributePath & attributePath,
-                                                            EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+typedef chip::Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeChangedCallback)(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 #define MAX_INT32U_VALUE (0xFFFFFFFFUL)
 #define MAX_INT16U_VALUE (0xFFFF)

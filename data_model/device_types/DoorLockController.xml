@@ -63,16 +63,6 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
-    <cluster id="0x0003" name="Identify" side="server">
-      <optionalConform>
-        <condition name="EZ-Target"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x0003" name="Identify" side="client">
-      <optionalConform>
-        <condition name="EZ-Initiator"/>
-      </optionalConform>
-    </cluster>
     <cluster id="0x0004" name="Groups" side="client">
       <optionalConform/>
     </cluster>

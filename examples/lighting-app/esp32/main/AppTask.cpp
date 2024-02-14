@@ -193,7 +193,7 @@ void AppTask::UpdateClusterState()
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ESP_LOGE(TAG, "Updating on/off cluster failed: %x", status);
+        ESP_LOGE(TAG, "Updating on/off cluster failed: %x", to_underlying(status));
     }
 
     ESP_LOGI(TAG, "Writing to Current Level cluster");
@@ -201,6 +201,6 @@ void AppTask::UpdateClusterState()
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ESP_LOGE(TAG, "Updating level cluster failed: %x", status);
+        ESP_LOGE(TAG, "Updating level cluster failed: %x", to_underlying(status));
     }
 }

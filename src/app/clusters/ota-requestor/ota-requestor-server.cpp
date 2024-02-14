@@ -26,6 +26,7 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/util/attribute-storage.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -147,54 +148,54 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const 
 
 // -----------------------------------------------------------------------------
 // Global functions
-EmberAfStatus OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
+Status OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
     {
         OTAUpdateStateEnum currentValue;
         status = Attributes::UpdateState::Get(endpoint, &currentValue);
-        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+        VerifyOrDie(Status::Success == status);
 
         if (currentValue != value)
         {
             status = Attributes::UpdateState::Set(endpoint, value);
-            VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+            VerifyOrDie(Status::Success == status);
         }
     }
 
     return status;
 }
 
-EmberAfStatus OtaRequestorServerGetUpdateState(chip::EndpointId endpointId, OTAUpdateStateEnum & value)
+Status OtaRequestorServerGetUpdateState(chip::EndpointId endpointId, OTAUpdateStateEnum & value)
 {
     return Attributes::UpdateState::Get(endpointId, &value);
 }
 
-EmberAfStatus OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t> value)
+Status OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t> value)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Status status = Status::Success;
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
     {
         app::DataModel::Nullable<uint8_t> currentValue;
         status = Attributes::UpdateStateProgress::Get(endpoint, currentValue);
-        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+        VerifyOrDie(Status::Success == status);
 
         if (currentValue != value)
         {
             status = Attributes::UpdateStateProgress::Set(endpoint, value);
-            VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+            VerifyOrDie(Status::Success == status);
         }
     }
 
     return status;
 }
 
-EmberAfStatus OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> & value)
+Status OtaRequestorServerGetUpdateStateProgress(chip::EndpointId endpointId, DataModel::Nullable<uint8_t> & value)
 {
     return Attributes::UpdateStateProgress::Get(endpointId, value);
 }

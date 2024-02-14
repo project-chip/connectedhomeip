@@ -71,7 +71,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ScopedBuffer.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <system/SystemClock.h>
@@ -199,9 +198,6 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
 
 // BLE
 PyChipError pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
-
-uint8_t pychip_DeviceController_GetLogFilter();
-void pychip_DeviceController_SetLogFilter(uint8_t category);
 
 const char * pychip_Stack_ErrorToString(ChipError::StorageType err);
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
@@ -351,22 +347,6 @@ const char * pychip_DeviceController_StatusReportToString(uint32_t profileId, ui
 {
     // return chip::StatusReportStr(profileId, statusCode);
     return nullptr;
-}
-
-uint8_t pychip_DeviceController_GetLogFilter()
-{
-#if _CHIP_USE_LOGGING
-    return chip::Logging::GetLogFilter();
-#else
-    return chip::Logging::kLogCategory_None;
-#endif
-}
-
-void pychip_DeviceController_SetLogFilter(uint8_t category)
-{
-#if _CHIP_USE_LOGGING
-    chip::Logging::SetLogFilter(category);
-#endif
 }
 
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,

@@ -83,8 +83,8 @@ class App:
     def waitForAnyAdvertisement(self):
         self.__waitFor("mDNS service published:", self.process, self.outpipe)
 
-    def waitForMessage(self, message):
-        self.__waitFor(message, self.process, self.outpipe)
+    def waitForMessage(self, message, timeoutInSeconds=10):
+        self.__waitFor(message, self.process, self.outpipe, timeoutInSeconds)
         return True
 
     def kill(self):
@@ -124,7 +124,7 @@ class App:
                     self.kvsPathSet.add(value)
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
-    def __waitFor(self, waitForString, server_process, outpipe):
+    def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
         logging.debug('Waiting for %s' % waitForString)
 
         start_time = time.monotonic()
@@ -139,7 +139,7 @@ class App:
                             (waitForString, server_process.returncode))
                 logging.error(died_str)
                 raise Exception(died_str)
-            if time.monotonic() - start_time > 10:
+            if time.monotonic() - start_time > timeoutInSeconds:
                 raise Exception('Timeout while waiting for %s' % waitForString)
             time.sleep(0.1)
             ready, self.lastLogIndex = outpipe.CapturedLogContains(
@@ -338,6 +338,13 @@ class TestDefinition:
                     apps_register.add(key, app)
                     # Remove server application storage (factory reset),
                     # so it will be commissionable again.
+                    app.factoryReset()
+
+                    # It may sometimes be useful to run the same app multiple times depending
+                    # on the implementation. So this code creates a duplicate entry but with a different
+                    # key.
+                    app = App(runner, path)
+                    apps_register.add(f'{key}#2', app)
                     app.factoryReset()
 
             if dry_run:

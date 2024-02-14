@@ -207,18 +207,18 @@ inline constexpr size_t kMaxPairingInstructionLen = 128;
 /// Data that is specific to commisionable/commissioning node discovery
 struct CommissionNodeData
 {
-    char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
+    size_t rotatingIdLen                                      = 0;
+    uint32_t deviceType                                       = 0;
     uint16_t longDiscriminator                                = 0;
     uint16_t vendorId                                         = 0;
     uint16_t productId                                        = 0;
-    uint8_t commissioningMode                                 = 0;
-    uint32_t deviceType                                       = 0;
-    char deviceName[kMaxDeviceNameLen + 1]                    = {};
-    uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
-    size_t rotatingIdLen                                      = 0;
     uint16_t pairingHint                                      = 0;
-    char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+    uint8_t commissioningMode                                 = 0;
     uint8_t commissionerPasscode                              = 0;
+    uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
+    char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
+    char deviceName[kMaxDeviceNameLen + 1]                    = {};
+    char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
 
     CommissionNodeData() {}
 

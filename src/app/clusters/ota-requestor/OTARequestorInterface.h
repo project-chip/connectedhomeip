@@ -21,7 +21,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
+
 #include <lib/core/ClusterEnums.h>
 
 #pragma once

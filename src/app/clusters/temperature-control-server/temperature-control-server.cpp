@@ -99,7 +99,7 @@ bool TemperatureControlHasFeature(EndpointId endpoint, TemperatureControl::Featu
 {
     bool success;
     uint32_t featureMap;
-    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == Status::Success);
 
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
@@ -116,7 +116,6 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
     auto & targetTemperatureLevel = commandData.targetTemperatureLevel;
     EndpointId endpoint           = commandPath.mEndpointId;
     Status status                 = Status::Success;
-    EmberAfStatus emberAfStatus   = EMBER_ZCL_STATUS_SUCCESS;
 
     if (TemperatureControlHasFeature(endpoint, Feature::kTemperatureNumber) &&
         TemperatureControlHasFeature(endpoint, Feature::kTemperatureLevel))
@@ -130,17 +129,15 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
         {
             int16_t minTemperature = 0;
             int16_t maxTemperature = 0;
-            emberAfStatus          = MinTemperature::Get(endpoint, &minTemperature);
-            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+            status                 = MinTemperature::Get(endpoint, &minTemperature);
+            if (status != Status::Success)
             {
-                status = emberAfStatus;
                 goto exit;
             }
 
-            emberAfStatus = MaxTemperature::Get(endpoint, &maxTemperature);
-            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+            status = MaxTemperature::Get(endpoint, &maxTemperature);
+            if (status != Status::Success)
             {
-                status = emberAfStatus;
                 goto exit;
             }
 
@@ -151,11 +148,10 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
             }
             if (TemperatureControlHasFeature(endpoint, TemperatureControl::Feature::kTemperatureStep))
             {
-                int16_t step  = 0;
-                emberAfStatus = Step::Get(endpoint, &step);
-                if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+                int16_t step = 0;
+                status       = Step::Get(endpoint, &step);
+                if (status != Status::Success)
                 {
-                    status = emberAfStatus;
                     goto exit;
                 }
 
@@ -165,8 +161,8 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
                     goto exit;
                 }
             }
-            emberAfStatus = TemperatureSetpoint::Set(endpoint, targetTemperature.Value());
-            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+            status = TemperatureSetpoint::Set(endpoint, targetTemperature.Value());
+            if (status != Status::Success)
             {
                 /**
                  * If the server is unable to execute the command at the time the command is received
@@ -199,8 +195,8 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
 
             if (targetTemperatureLevel.Value() < size)
             {
-                emberAfStatus = SelectedTemperatureLevel::Set(endpoint, targetTemperatureLevel.Value());
-                if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+                status = SelectedTemperatureLevel::Set(endpoint, targetTemperatureLevel.Value());
+                if (status != Status::Success)
                 {
                     /**
                      * If the server is unable to execute the command at the time the command is received

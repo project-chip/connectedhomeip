@@ -558,7 +558,7 @@ void AppTask::UpdateClusterState(intptr_t context)
     Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        P6_LOG("ERR: updating on/off %x", status);
+        P6_LOG("ERR: updating on/off %x", to_underlying(status));
     }
 }
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR

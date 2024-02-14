@@ -465,7 +465,7 @@ void AppTask::UpdateClusterState()
     Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(1, onoff);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "Updating on/off cluster failed: %x", status);
+        ChipLogError(NotSpecified, "Updating on/off cluster failed: %x", to_underlying(status));
     }
 
     uint8_t level = LightingMgr().GetLevel();
@@ -474,6 +474,6 @@ void AppTask::UpdateClusterState()
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "Updating level cluster failed: %x", status);
+        ChipLogError(NotSpecified, "Updating level cluster failed: %x", to_underlying(status));
     }
 }
