@@ -29,8 +29,8 @@ config:
 tests:
     - label: "Precondition: Commission DUT to TH1"
       verification: |
-          Once DUT reach the  commissionable state pls send the :
-          ./chip-tool pairing onnetwork 1 20202021 command on TH1.
+          Once DUT reach the  commissionable state send the following command on TH1:
+          ./chip-tool pairing onnetwork 1 20202021
           Verify the commissioning completed with success on TH(chip-tool) from DUT
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
@@ -135,7 +135,7 @@ tests:
       verification: |
           ./chip-tool scenesmanagement read scene-table-size 1 1
 
-          Verify the "SceneTableSize" attribute value is 16 which is recorded into SceneTableSize on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+          Verify the "SceneTableSize" attribute value is SceneTableSize(minimum=16) which is recorded into SceneTableSize on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1700826614.634340][15990:15992] CHIP:DMG: }
           [1700826614.634390][15990:15992] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0006 DataVersion: 1908396086
@@ -472,7 +472,7 @@ tests:
           field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chipt-tool scenesmanagement add-scene 0x0000 0x08 0x0014 scene9 [] 1 1
+          ./chip-tool scenesmanagement add-scene 0x0000 0x08 0x0014 scene9 [] 1 1
 
           Verify the AddSceneResponse with following fields:
           Status is RESOURCE_EXHAUSTED(0x89) on the TH1(Chip-tool) log and below is the sample log provided for the raspi platform:
@@ -490,7 +490,7 @@ tests:
     - label: "Step 5a: Repeat Step 4a with TH2"
       PICS: S.S.C00.Rsp
       verification: |
-          ./chipt-tool scenesmanagement add-scene 0x0000 0x02 0x0014 scene1 [] 2 1 --commissioner-name beta
+          ./chip-tool scenesmanagement add-scene 0x0000 0x02 0x0014 scene1 [] 2 1 --commissioner-name beta
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
@@ -506,7 +506,7 @@ tests:
           [1700828173.261638][16115:16117] CHIP:TOO:     sceneID: 2
           [1700828173.261640][16115:16117] CHIP:TOO:    }
 
-          ./chipt-tool scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
+          ./chip-tool scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
 
           Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH2 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value on the TH2 (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -559,7 +559,7 @@ tests:
           .
           .
           .
-          ./chipt-tool scenesmanagement add-scene 0x0000 0x08 0x0014 scene7 [] 2 1 --commissioner-name beta
+          ./chip-tool scenesmanagement add-scene 0x0000 0x08 0x0014 scene7 [] 2 1 --commissioner-name beta
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
@@ -574,7 +574,7 @@ tests:
           [1700829509.052521][16198:16200] CHIP:TOO:     sceneID: 8
           [1700829509.052532][16198:16200] CHIP:TOO:    }
 
-          ./chipt-tool  scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
+          ./chip-tool  scenesmanagement subscribe fabric-scene-info 100 200 2 1 --commissioner-name beta
 
           Verify  the DUT sends a report data messages after the MinIntervalFloor time to TH2 for RemainingCapacity field in FabricSceneInfo for that fabric with updated value(decreasing to 0) on the TH2 (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -877,25 +877,25 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a CopyScene command to DUT with the mode field set to 0x00,
-          the group identifier from field set to 0x0000, the scene identifier
-          from field set to 0x01, the group identifier to field set to 0x0000
-          and the scene identifier to field set to 0xFE."
+          "Step 8: TH sends a CopyScene command to DUT with the mode field set
+          to 0x00, the group identifier from field set to 0x0000, the scene
+          identifier from field set to 0x01, the group identifier to field set
+          to 0x0000 and the scene identifier to field set to 0xFE."
       PICS: S.S.C40.Rsp
       verification: |
-          ./chip-tool scenesmanagement store-scene 0x0000 0x01 3 1 --commissioner-name gamma
+          ./chip-tool scenesmanagement copy-scene 0x00 0x0000 0x02 0x0000 0x00 3 1 --commissioner-name gamma
 
-          Verify the StoreSceneResponse with following fields:
-          Status is RESOURCE_EXHAUSTED(0x89) on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
+          Verify the CopySceneResponse with following fields:
+          Status is RESOURCE_EXHAUSTED(0x89) on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
 
-          [1705915551.740537][21417:21419] CHIP:DMG: },
-          [1705915551.740557][21417:21419] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0004
-          [1705915551.740566][21417:21419] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0004
-          [1705915551.740585][21417:21419] CHIP:TOO:   StoreSceneResponse: {
-          [1705915551.740590][21417:21419] CHIP:TOO:     status: 137
-          [1705915551.740593][21417:21419] CHIP:TOO:     groupID: 0
-          [1705915551.740596][21417:21419] CHIP:TOO:     sceneID: 1
-          [1705915551.740598][21417:21419] CHIP:TOO:    }
+          [1705915659.672801][21417:21419] CHIP:DMG: },
+          [1705915659.672875][21417:21419] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0040
+          [1705915659.672891][21417:21419] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0040
+          [1705915659.672923][21417:21419] CHIP:TOO:   CopySceneResponse: {
+          [1705915659.672937][21417:21419] CHIP:TOO:     status: 133
+          [1705915659.672950][21417:21419] CHIP:TOO:     groupIdentifierFrom: 0
+          [1705915659.672979][21417:21419] CHIP:TOO:     sceneIdentifierFrom: 2
+          [1705915659.672991][21417:21419] CHIP:TOO:    }
       disabled: true
 
     - label:

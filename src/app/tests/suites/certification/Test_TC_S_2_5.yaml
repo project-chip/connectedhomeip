@@ -165,7 +165,7 @@ tests:
       verification: |
           ./chip-tool scenesmanagement read scene-table-size 1 1
 
-          Verify the "SceneTableSize" attribute value is 16  on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+          Verify the "SceneTableSize" attribute value is SceneTableSize(minimum=16) on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1706764370.034843][4435:4437] CHIP:DMG: }
           [1706764370.034970][4435:4437] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Attribute 0x0000_0001 DataVersion: 3964423870
@@ -491,7 +491,7 @@ tests:
           set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C02.Rsp
       verification: |
-          ./chipt-tool scenesmanagement remove-scene 0x0001 0x01 1 1
+          ./chip-tool scenesmanagement remove-scene 0x0001 0x01 1 1
 
           Verify the RemoveScenesResponse with following fields:
           Status is SUCCESS
@@ -646,7 +646,7 @@ tests:
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a1"
       verification: |
-          ./chipt-tool groupkeymanagement key-set-remove 0x01a1 1 0
+          ./chip-tool groupkeymanagement key-set-remove 0x01a1 1 0
 
           Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
 
