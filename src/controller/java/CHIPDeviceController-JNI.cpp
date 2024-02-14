@@ -35,7 +35,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
-#include <app/util/error-mapping.h>
 #include <atomic>
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>

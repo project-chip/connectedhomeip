@@ -1,0 +1,53 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
+
+rpc_defines = [
+  "PW_RPC_ENABLED",
+  "PW_RPC_ATTRIBUTE_SERVICE=1",
+  "PW_RPC_BUTTON_SERVICE=1",
+  "PW_RPC_DESCRIPTOR_SERVICE=1",
+  "PW_RPC_DEVICE_SERVICE=1",
+  "PW_RPC_LIGHTING_SERVICE=1",
+  "PW_RPC_TRACING_SERVICE=1",
+]
+
+rpc_sources = [
+  "${chip_root}/examples/platform/linux/Rpc.cpp",
+  "${chip_root}/examples/platform/linux/system_rpc_server.cc",
+]
+
+rpc_deps = [
+  "$dir_pw_hdlc:pw_rpc",
+  "$dir_pw_hdlc:rpc_channel_output",
+  "$dir_pw_log",
+  "$dir_pw_rpc:server",
+  "$dir_pw_rpc/system_server:facade",
+  "$dir_pw_rpc/system_server:socket",
+  "$dir_pw_stream:socket_stream",
+  "$dir_pw_stream:sys_io_stream",
+  "$dir_pw_sync:mutex",
+  "$dir_pw_trace",
+  "$dir_pw_trace_tokenized",
+  "$dir_pw_trace_tokenized:trace_rpc_service",
+  "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+  "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+  "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+  "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+  "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+  "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+  "${chip_root}/examples/common/pigweed:rpc_services",
+]

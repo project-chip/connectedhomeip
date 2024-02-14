@@ -864,6 +864,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         if ([self isRunning]) {
             _nodeIDToDeviceMap[nodeID] = deviceToReturn;
         }
+
+        // Load persisted attributes if they exist.
+        NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
+        if (attributesFromCache) {
+            [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
+        }
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 
@@ -977,9 +983,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     [self asyncDispatchToMatterQueue:^() {
         [self->_serverEndpoints addObject:endpoint];
         [endpoint registerMatterEndpoint];
+        MTR_LOG_DEFAULT("Added server endpoint %u to controller %@", static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
+            self->_uniqueIdentifier);
     }
         errorHandler:^(NSError * error) {
-            MTR_LOG_ERROR("Unexpected failure dispatching to Matter queue on running controller in addServerEndpoint");
+            MTR_LOG_ERROR("Unexpected failure dispatching to Matter queue on running controller in addServerEndpoint, adding endpoint %u",
+                static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue));
         }];
     return YES;
 }
@@ -1002,12 +1011,16 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     // tearing it down.
     [self asyncDispatchToMatterQueue:^() {
         [self removeServerEndpointOnMatterQueue:endpoint];
+        MTR_LOG_DEFAULT("Removed server endpoint %u from controller %@", static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
+            self->_uniqueIdentifier);
         if (queue != nil && completion != nil) {
             dispatch_async(queue, completion);
         }
     }
         errorHandler:^(NSError * error) {
             // Error means we got shut down, so the endpoint is removed now.
+            MTR_LOG_DEFAULT("controller %@ already shut down, so endpoint %u has already been removed", self->_uniqueIdentifier,
+                static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue));
             if (queue != nil && completion != nil) {
                 dispatch_async(queue, completion);
             }
@@ -1300,12 +1313,17 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                             queue:(dispatch_queue_t)queue
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    [_factory downloadLogFromNodeWithID:nodeID
-                             controller:self
-                                   type:type
-                                timeout:timeout
-                                  queue:queue
-                             completion:completion];
+    [self asyncDispatchToMatterQueue:^() {
+        [self->_factory downloadLogFromNodeWithID:nodeID
+                                       controller:self
+                                             type:type
+                                          timeout:timeout
+                                            queue:queue
+                                       completion:completion];
+    }
+        errorHandler:^(NSError * error) {
+            completion(nil, error);
+        }];
 }
 
 - (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath

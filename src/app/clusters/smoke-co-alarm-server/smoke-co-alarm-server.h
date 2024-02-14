@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /**
  * @brief Smoke CO Alarm Server Plugin class
@@ -139,7 +140,7 @@ private:
      */
     template <typename T>
     bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      EmberAfStatus (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
+                      chip::Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
 
     /**
      * @brief Set generic attribute value
@@ -154,7 +155,7 @@ private:
      */
     template <typename T>
     bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      EmberAfStatus (*setFn)(chip::EndpointId endpointId, T value), T value);
+                      chip::Protocols::InteractionModel::Status (*setFn)(chip::EndpointId endpointId, T value), T value);
 
     friend bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

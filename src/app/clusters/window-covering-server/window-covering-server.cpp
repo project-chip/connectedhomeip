@@ -26,7 +26,6 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <lib/support/TypeTraits.h>
 #include <string.h>
 
@@ -119,8 +118,8 @@ bool HasFeature(chip::EndpointId endpoint, Feature feature)
     bool hasFeature     = false;
     uint32_t featureMap = 0;
 
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    Status status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (Status::Success == status)
     {
         hasFeature = (featureMap & chip::to_underlying(feature));
     }

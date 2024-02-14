@@ -228,8 +228,8 @@ class HostApp(Enum):
             yield 'dishwasher-app'
             yield 'dishwasher-app.map'
         elif self == HostApp.MICROWAVE_OVEN:
-            yield 'microwave-oven-app'
-            yield 'microwave-oven-app.map'
+            yield 'chip-microwave-oven-app'
+            yield 'chip-microwave-oven-app.map'
         elif self == HostApp.REFRIGERATOR:
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'

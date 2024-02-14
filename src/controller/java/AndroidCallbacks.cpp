@@ -125,6 +125,18 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context,
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
+CHIP_ERROR CreateOptional(chip::Optional<uint8_t> value, jobject & outObj)
+{
+    jobject jOptionalValue = nullptr;
+    jobject jValue = nullptr;
+    if (value.HasValue()) {
+        ReturnLogErrorOnFailure(JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", static_cast<jint>(value.Value()), jValue));
+    }
+    ReturnLogErrorOnFailure(JniReferences::GetInstance().CreateOptional(jValue, jOptionalValue));
+
+    return CHIP_NO_ERROR;
+}
+
 ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback,
                                jobject resubscriptionAttemptCallback) :
     mClusterCacheAdapter(*this, Optional<EventNumber>::Missing(), false /*cacheData*/)
@@ -253,10 +265,34 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
-
     VerifyOrReturn(!aPath.IsListItemOperation(), ChipLogError(Controller, "Expect non-list item operation"); aPath.LogPath());
-    VerifyOrReturn(aStatus.IsSuccess(), ChipLogError(Controller, "Receive bad status %s", ErrorStr(aStatus.ToChipError()));
-                   aPath.LogPath());
+
+    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
+                   ChipLogError(Controller, "mReportCallbackRef is not valid in %s", __func__));
+    jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
+
+    if (aStatus.IsFailure())
+    {
+        ChipLogError(Controller, "Receive bad status %s", ErrorStr(aStatus.ToChipError()));
+        // Add Attribute Status to wrapperCallback
+        jmethodID addAttributeStatusMethod = nullptr;
+        err                                = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "addAttributeStatus",
+                                                                                     "(IJJILjava/util/Optional;)V", &addAttributeStatusMethod);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(Controller, "Could not find addAttributeStatus method with error %" CHIP_ERROR_FORMAT, err.Format()));
+
+        jobject jClusterStateOptional = nullptr;
+        err = CreateOptional(aStatus.mClusterStatus, jClusterStateOptional);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(Controller, "Could not CreateOptional with error %" CHIP_ERROR_FORMAT, err.Format()));
+
+        env->CallVoidMethod(wrapperCallback, addAttributeStatusMethod, static_cast<jint>(aPath.mEndpointId),
+                            static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), static_cast<jint>(aStatus.mStatus), jClusterStateOptional);
+        VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+        return;
+    }
     VerifyOrReturn(apData != nullptr, ChipLogError(Controller, "Receive empty apData"); aPath.LogPath());
 
     TLV::TLVReader readerForJavaTLV;
@@ -302,11 +338,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
                    aPath.LogPath());
     UtfString jsonString(env, json.c_str());
 
-    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
-                   ChipLogError(Controller, "mReportCallbackRef is not valid in %s", __func__));
-    jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
-
-    // Add AttributeState to NodeState
+    // Add AttributeState to wrapperCallback
     jmethodID addAttributeMethod;
     err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "addAttribute",
                                                   "(IJJLjava/lang/Object;[BLjava/lang/String;)V", &addAttributeMethod);
@@ -365,6 +397,33 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
+                   ChipLogError(Controller, "mReportCallbackRef is not valid in %s", __func__));
+    jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
+    if (apStatus != nullptr && apStatus->IsFailure())
+    {
+        ChipLogError(Controller, "Receive bad status %s", ErrorStr(apStatus->ToChipError()));
+        // Add Event Status to NodeState
+        jmethodID addEventStatusMethod;
+        err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "addEventStatus",
+                                                      "(IJJILjava/util/Optional;)V", &addEventStatusMethod);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(Controller, "Could not find addEventStatus method with error %" CHIP_ERROR_FORMAT, err.Format()));
+        
+        jobject jClusterStateOptional = nullptr;
+        err = CreateOptional(apStatus->mClusterStatus, jClusterStateOptional);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(Controller, "Could not CreateOptional with error %" CHIP_ERROR_FORMAT, err.Format()));
+
+        env->CallVoidMethod(wrapperCallback, addEventStatusMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
+                            static_cast<jlong>(aEventHeader.mPath.mClusterId), static_cast<jlong>(aEventHeader.mPath.mEventId),
+                            static_cast<jint>(apStatus->mStatus), jClusterStateOptional);
+        VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+        return;
+    }
     VerifyOrReturn(apData != nullptr, ChipLogError(Controller, "Receive empty apData"); aEventHeader.LogPath());
 
     TLV::TLVReader readerForJavaTLV;
@@ -428,10 +487,6 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
                    ChipLogError(Controller, "Fail to convert report tlv to Json with error %s", ErrorStr(err));
                    aEventHeader.LogPath());
     UtfString jsonString(env, json.c_str());
-
-    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
-                   ChipLogError(Controller, "mReportCallbackRef is not valid in %s", __func__));
-    jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
 
     jmethodID addEventMethod;
     err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "addEvent",

@@ -25,7 +25,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <app/util/util.h>
 
 #include <app/reporting/reporting.h>
@@ -162,12 +161,12 @@ public:
         using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
 
         app::DataModel::Nullable<uint8_t> level;
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentLevel::Get(endpoint, level), CHIP_ERROR_READ_FAILED);
+        VerifyOrReturnError(Status::Success == Attributes::CurrentLevel::Get(endpoint, level), CHIP_ERROR_READ_FAILED);
 
         AttributeValuePair pairs[kLevelMaxScenableAttributes];
 
         uint8_t maxLevel;
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::MaxLevel::Get(endpoint, &maxLevel), CHIP_ERROR_READ_FAILED);
+        VerifyOrReturnError(Status::Success == Attributes::MaxLevel::Get(endpoint, &maxLevel), CHIP_ERROR_READ_FAILED);
 
         pairs[0].attributeID = Attributes::CurrentLevel::Id;
         if (!level.IsNull())
@@ -182,8 +181,7 @@ public:
         if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
         {
             uint16_t frequency;
-            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentFrequency::Get(endpoint, &frequency),
-                                CHIP_ERROR_READ_FAILED);
+            VerifyOrReturnError(Status::Success == Attributes::CurrentFrequency::Get(endpoint, &frequency), CHIP_ERROR_READ_FAILED);
             pairs[attributeCount].attributeID    = Attributes::CurrentFrequency::Id;
             pairs[attributeCount].attributeValue = frequency;
             attributeCount++;
@@ -338,10 +336,10 @@ static EmberAfLevelControlState * getState(EndpointId endpoint)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 {
     LevelControl::Attributes::Options::TypeInfo::Type options;
-    EmberAfStatus status = Attributes::Options::Get(endpoint, &options);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Status status = Attributes::Options::Get(endpoint, &options);
+    if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "Unable to read Options attribute: 0x%X", status);
+        ChipLogProgress(Zcl, "Unable to read Options attribute: 0x%X", to_underlying(status));
         return;
     }
 
@@ -358,7 +356,7 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 {
     EmberAfLevelControlState * state = getState(endpoint);
-    EmberAfStatus status;
+    Status status;
     app::DataModel::Nullable<uint8_t> currentLevel;
     const auto callbackStartTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
@@ -372,9 +370,9 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     // Read the attribute; print error message and return if it can't be read
     status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS || currentLevel.IsNull())
+    if (status != Status::Success || currentLevel.IsNull())
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", status);
+        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
         state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
@@ -405,9 +403,9 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     ChipLogDetail(Zcl, "(diff %c1)", state->increasing ? '+' : '-');
 
     status = Attributes::CurrentLevel::Set(endpoint, currentLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: writing current level %x", status);
+        ChipLogProgress(Zcl, "ERR: writing current level %x", to_underlying(status));
         state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
@@ -428,9 +426,9 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
         {
             uint8_t storedLevel8u = (uint8_t) state->storedLevel;
             status                = Attributes::CurrentLevel::Set(endpoint, storedLevel8u);
-            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            if (status != Status::Success)
             {
-                ChipLogProgress(Zcl, "ERR: writing current level %x", status);
+                ChipLogProgress(Zcl, "ERR: writing current level %x", to_underlying(status));
             }
             else
             {
@@ -470,10 +468,10 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
         // This is done to ensure that the attribute, in tenths of a second, only
         // goes to zero when the remaining time in milliseconds is actually zero.
         uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
-        EmberStatus status       = LevelControl::Attributes::RemainingTime::Set(endpoint, remainingTimeDs);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        Status status            = LevelControl::Attributes::RemainingTime::Set(endpoint, remainingTimeDs);
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: writing remaining time %x", status);
+            ChipLogProgress(Zcl, "ERR: writing remaining time %x", to_underlying(status));
         }
     }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
@@ -516,19 +514,19 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::O
         }
 
         LevelControl::Attributes::Options::TypeInfo::Type options;
-        EmberAfStatus status = Attributes::Options::Get(endpoint, &options);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        Status status = Attributes::Options::Get(endpoint, &options);
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "Unable to read Options attribute: 0x%X", status);
+            ChipLogProgress(Zcl, "Unable to read Options attribute: 0x%X", to_underlying(status));
             // If we can't read the attribute, then we should just assume that it has its
             // default value.
         }
 
         bool on;
         status = OnOff::Attributes::OnOff::Get(endpoint, &on);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "Unable to read OnOff attribute: 0x%X", status);
+            ChipLogProgress(Zcl, "Unable to read OnOff attribute: 0x%X", to_underlying(status));
             return true;
         }
         // The device is on - hence ExecuteIfOff does not matter
@@ -804,11 +802,11 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    EmberAfStatus status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Status status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
+    if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", status);
-        return app::ToInteractionModelStatus(status);
+        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+        return status;
     }
 
     if (currentLevel.IsNull())
@@ -870,10 +868,10 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
         {
             uint16_t onOffTransitionTime = 0;
             status                       = Attributes::OnOffTransitionTime::Get(endpoint, &onOffTransitionTime);
-            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            if (status != Status::Success)
             {
-                ChipLogProgress(Zcl, "ERR: reading on/off transition time %x", status);
-                return app::ToInteractionModelStatus(status);
+                ChipLogProgress(Zcl, "ERR: reading on/off transition time %x", to_underlying(status));
+                return status;
             }
 
             // Transition time comes in (or is stored, in the case of On/Off Transition
@@ -963,7 +961,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
         ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
@@ -1022,7 +1020,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     if (rate.IsNull())
     {
         app::DataModel::Nullable<uint8_t> defaultMoveRate;
-        status = app::ToInteractionModelStatus(Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate));
+        status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
         if (status != Status::Success || defaultMoveRate.IsNull())
         {
             ChipLogProgress(Zcl, "ERR: reading default move rate %x", to_underlying(status));
@@ -1093,7 +1091,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
         ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
@@ -1244,7 +1242,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     app::DataModel::Nullable<uint16_t> transitionTime;
 
     uint16_t currentOnOffTransitionTime;
-    EmberAfStatus status;
+    Status status;
     bool useOnLevel = false;
 
     EmberAfLevelControlState * state = getState(endpoint);
@@ -1258,9 +1256,9 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
     // "Temporarily store CurrentLevel."
     status = Attributes::CurrentLevel::Get(endpoint, temporaryCurrentLevelCache);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", status);
+        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
         return;
     }
 
@@ -1274,9 +1272,9 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnLevel::Id))
     {
         status = Attributes::OnLevel::Get(endpoint, resolvedLevel);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: reading on level %x", status);
+            ChipLogProgress(Zcl, "ERR: reading on level %x", to_underlying(status));
             return;
         }
 
@@ -1303,9 +1301,9 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id))
     {
         status = Attributes::OnOffTransitionTime::Get(endpoint, &currentOnOffTransitionTime);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: reading current level %x", status);
+            ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
             return;
         }
         transitionTime.SetNonNull(currentOnOffTransitionTime);
@@ -1323,9 +1321,9 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         // If newValue is OnOff::Commands::On::Id...
         // "Set CurrentLevel to minimum level allowed for the device."
         status = Attributes::CurrentLevel::Set(endpoint, minimumLevelAllowedForTheDevice);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: reading current level %x", status);
+            ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
             return;
         }
 
@@ -1387,8 +1385,8 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
     }
 
     app::DataModel::Nullable<uint8_t> currentLevel;
-    EmberAfStatus status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    Status status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
+    if (status == Status::Success)
     {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
         // StartUp behavior relies StartUpCurrentLevel attributes being Non Volatile.
@@ -1409,7 +1407,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 
             app::DataModel::Nullable<uint8_t> startUpCurrentLevel;
             status = Attributes::StartUpCurrentLevel::Get(endpoint, startUpCurrentLevel);
-            if (status == EMBER_ZCL_STATUS_SUCCESS)
+            if (status == Status::Success)
             {
                 if (!startUpCurrentLevel.IsNull())
                 {
@@ -1481,7 +1479,7 @@ bool LevelControlHasFeature(EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;
-    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == Status::Success);
 
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }

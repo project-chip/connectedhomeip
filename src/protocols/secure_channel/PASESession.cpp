@@ -93,7 +93,6 @@ void PASESession::Clear()
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
     memset(&mPASEVerifier, 0, sizeof(mPASEVerifier));
-    memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg.ClearValue();
 
     mSpake2p.Clear();
@@ -106,7 +105,6 @@ void PASESession::Clear()
         chip::Platform::MemoryFree(mSalt);
         mSalt = nullptr;
     }
-    mKeLen           = sizeof(mKe);
     mPairingComplete = false;
     PairingSession::Clear();
 }
@@ -263,8 +261,15 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
 CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
 {
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
-    return session.InitFromSecret(*mSessionManager->GetSessionKeystore(), ByteSpan(mKe, mKeLen), ByteSpan(),
-                                  CryptoContext::SessionInfoType::kSessionEstablishment, mRole);
+
+    SessionKeystore & keystore = *mSessionManager->GetSessionKeystore();
+    AutoReleaseSymmetricKey<HkdfKeyHandle> hkdfKey(keystore);
+
+    ReturnErrorOnFailure(mSpake2p.GetKeys(keystore, hkdfKey.KeyHandle()));
+    ReturnErrorOnFailure(session.InitFromSecret(keystore, hkdfKey.KeyHandle(), ByteSpan{} /* salt */,
+                                                CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
@@ -673,7 +678,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier, &verifier_len));
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
-    SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
     msg2 = nullptr;
 
     {
@@ -736,7 +740,6 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     VerifyOrExit(peer_verifier_len == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
-    SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
 
     // Send confirmation to peer that we succeeded so they can start using the session.
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
