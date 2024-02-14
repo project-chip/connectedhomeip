@@ -29,7 +29,6 @@
 #include <lib/support/Iterators.h>
 
 #include <atomic>
-#include <iterator>
 #include <limits>
 #include <new>
 #include <stddef.h>
@@ -192,9 +191,13 @@ struct HeapObjectList : HeapObjectListNode
 /// The iterator is valid only if the Pool is not changed (no objects are created
 /// or released)/
 template <class T>
-class BitmapActiveObjectIterator : public std::iterator<std::forward_iterator_tag, T>
+class BitmapActiveObjectIterator
 {
 public:
+    using value_type = T;
+    using pointer = T*;
+    using reference = T&;
+
     explicit BitmapActiveObjectIterator(internal::StaticAllocatorBitmap * pool, size_t idx) : mPool(pool), mIndex(idx) {}
     BitmapActiveObjectIterator() {}
 
@@ -393,9 +396,13 @@ public:
     ///       iterator exists. This also means that while a pool iterator exists, releasing
     ///       of tracking memory objects may be deferred until the last active iterator is
     ///       released.
-    class ActiveObjectIterator : public std::iterator<std::forward_iterator_tag, T>
+    class ActiveObjectIterator
     {
     public:
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+
         ActiveObjectIterator() {}
         ActiveObjectIterator(const ActiveObjectIterator & other) : mCurrent(other.mCurrent), mEnd(other.mEnd)
         {
