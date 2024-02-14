@@ -83,13 +83,13 @@ jboolean PowerSourceManager::SetBatPercentRemaining(jint endpoint, jint value)
 {
     using namespace chip::app::Clusters;
     using namespace chip::DeviceLayer;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
 
     status =
         PowerSource::Attributes::BatPercentRemaining::Set(static_cast<chip::EndpointId>(endpoint), static_cast<uint8_t>(value * 2));
 
     ChipLogDetail(Zcl, "Device App::PowerSource::SetBatPercentRemaining: endpoint:%d, percent:%d", endpoint, value);
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    return status == Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR PowerSourceManager::InitializeWithObjects(jobject managerObject)

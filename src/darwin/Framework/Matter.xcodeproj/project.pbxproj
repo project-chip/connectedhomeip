@@ -22,7 +22,6 @@
 		037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D882991BD4F00B7EEE2 /* ModelCommandBridge.h */; };
 		037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D892991BD4F00B7EEE2 /* ClusterCommandBridge.h */; };
 		037C3DB92991BD5000B7EEE2 /* ReportCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */; };
-		037C3DBA2991BD5000B7EEE2 /* TestCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */; };
 		037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8E2991BD4F00B7EEE2 /* Commands.h */; };
 		037C3DBC2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D8F2991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.mm */; };
 		037C3DBD2991BD5000B7EEE2 /* OTAProviderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D902991BD4F00B7EEE2 /* OTAProviderDelegate.h */; };
@@ -68,9 +67,6 @@
 		039546A02991DFC5006D42A8 /* json_tool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0395469B2991DFC4006D42A8 /* json_tool.h */; };
 		039546A12991DFC5006D42A8 /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0395469C2991DFC4006D42A8 /* json_value.cpp */; };
 		039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546A52991E132006D42A8 /* InteractionModel.cpp */; };
-		039546BC2991E1CB006D42A8 /* LogCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546AF2991E193006D42A8 /* LogCommands.cpp */; };
-		039546BD2991E1CB006D42A8 /* SystemCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546B32991E194006D42A8 /* SystemCommands.cpp */; };
-		039546BE2991E1CB006D42A8 /* DelayCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546AC2991E185006D42A8 /* DelayCommands.cpp */; };
 		039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */; };
 		0395470F2992DB37006D42A8 /* complete.c in Sources */ = {isa = PBXBuildFile; fileRef = 0395470C2992DB37006D42A8 /* complete.c */; };
 		03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */; };
@@ -400,7 +396,6 @@
 		037C3D882991BD4F00B7EEE2 /* ModelCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelCommandBridge.h; sourceTree = "<group>"; };
 		037C3D892991BD4F00B7EEE2 /* ClusterCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusterCommandBridge.h; sourceTree = "<group>"; };
 		037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReportCommandBridge.h; sourceTree = "<group>"; };
-		037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCommandBridge.h; sourceTree = "<group>"; };
 		037C3D8E2991BD4F00B7EEE2 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
 		037C3D8F2991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OTASoftwareUpdateInteractive.mm; sourceTree = "<group>"; };
 		037C3D902991BD4F00B7EEE2 /* OTAProviderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OTAProviderDelegate.h; sourceTree = "<group>"; };
@@ -445,15 +440,6 @@
 		0395469C2991DFC4006D42A8 /* json_value.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_value.cpp; sourceTree = "<group>"; };
 		0395469D2991DFC4006D42A8 /* json_valueiterator.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_valueiterator.inl; sourceTree = "<group>"; };
 		039546A52991E132006D42A8 /* InteractionModel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = InteractionModel.cpp; sourceTree = "<group>"; };
-		039546AC2991E185006D42A8 /* DelayCommands.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DelayCommands.cpp; sourceTree = "<group>"; };
-		039546AF2991E193006D42A8 /* LogCommands.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogCommands.cpp; sourceTree = "<group>"; };
-		039546B32991E194006D42A8 /* SystemCommands.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SystemCommands.cpp; sourceTree = "<group>"; };
-		039546B62991E194006D42A8 /* FactoryReset.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = FactoryReset.py; sourceTree = "<group>"; };
-		039546B72991E194006D42A8 /* Stop.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Stop.py; sourceTree = "<group>"; };
-		039546B82991E194006D42A8 /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
-		039546B92991E194006D42A8 /* CreateOtaImage.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CreateOtaImage.py; sourceTree = "<group>"; };
-		039546BA2991E194006D42A8 /* CompareFiles.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CompareFiles.py; sourceTree = "<group>"; };
-		039546BB2991E194006D42A8 /* Reboot.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Reboot.py; sourceTree = "<group>"; };
 		0395470B2992DB37006D42A8 /* editline.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = editline.c; path = repo/src/editline.c; sourceTree = "<group>"; };
 		0395470C2992DB37006D42A8 /* complete.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = complete.c; path = repo/src/complete.c; sourceTree = "<group>"; };
 		03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExamplePersistentStorage.cpp; sourceTree = "<group>"; };
@@ -868,14 +854,6 @@
 			path = clusters;
 			sourceTree = "<group>";
 		};
-		037C3D8B2991BD4F00B7EEE2 /* tests */ = {
-			isa = PBXGroup;
-			children = (
-				037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */,
-			);
-			path = tests;
-			sourceTree = "<group>";
-		};
 		037C3D8D2991BD4F00B7EEE2 /* provider */ = {
 			isa = PBXGroup;
 			children = (
@@ -978,47 +956,6 @@
 			);
 			name = interaction_model;
 			path = ../../src/app/tests/suites/commands/interaction_model;
-			sourceTree = "<group>";
-		};
-		039546A72991E185006D42A8 /* delay */ = {
-			isa = PBXGroup;
-			children = (
-				039546AC2991E185006D42A8 /* DelayCommands.cpp */,
-			);
-			name = delay;
-			path = ../../src/app/tests/suites/commands/delay;
-			sourceTree = "<group>";
-		};
-		039546AD2991E193006D42A8 /* log */ = {
-			isa = PBXGroup;
-			children = (
-				039546AF2991E193006D42A8 /* LogCommands.cpp */,
-			);
-			name = log;
-			path = ../../src/app/tests/suites/commands/log;
-			sourceTree = "<group>";
-		};
-		039546B12991E194006D42A8 /* system */ = {
-			isa = PBXGroup;
-			children = (
-				039546B32991E194006D42A8 /* SystemCommands.cpp */,
-				039546B52991E194006D42A8 /* scripts */,
-			);
-			name = system;
-			path = ../../src/app/tests/suites/commands/system;
-			sourceTree = "<group>";
-		};
-		039546B52991E194006D42A8 /* scripts */ = {
-			isa = PBXGroup;
-			children = (
-				039546B62991E194006D42A8 /* FactoryReset.py */,
-				039546B72991E194006D42A8 /* Stop.py */,
-				039546B82991E194006D42A8 /* Start.py */,
-				039546B92991E194006D42A8 /* CreateOtaImage.py */,
-				039546BA2991E194006D42A8 /* CompareFiles.py */,
-				039546BB2991E194006D42A8 /* Reboot.py */,
-			);
-			path = scripts;
 			sourceTree = "<group>";
 		};
 		039547092992DB02006D42A8 /* editline */ = {
@@ -1527,7 +1464,6 @@
 				037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */,
 				037C3DC52991BD5100B7EEE2 /* StorageManagementCommand.h in Headers */,
 				037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */,
-				037C3DBA2991BD5000B7EEE2 /* TestCommandBridge.h in Headers */,
 				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
 				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
 				03FB93DF2A46200A0048CB35 /* Commands.h in Headers */,
@@ -1712,7 +1648,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = CHIP;
 				TargetAttributes = {
 					037C3CA42991A44B00B7EEE2 = {

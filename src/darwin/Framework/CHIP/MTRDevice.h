@@ -338,8 +338,9 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *                   If the timeout is set to 0, the request will not expire and completion will not be called until
  *                   the log is fully retrieved or an error occurs.
  * @param queue      The queue on which completion will be called.
- * @param completion The completion that will be called to return the URL of the requested log if successful. Otherwise
- *                   returns an error.
+ * @param completion The completion handler that is called after attempting to retrieve the requested log.
+ *                     - In case of success, the completion handler is called with a non-nil URL and a nil error.
+ *                     - If there is an error, a non-nil error is used and the url can be non-nil too if some logs have already been downloaded.
  */
 - (void)downloadLogOfType:(MTRDiagnosticLogType)type
                   timeout:(NSTimeInterval)timeout

@@ -34,10 +34,8 @@ using namespace chip;
 
 MTR_DIRECT_MEMBERS
 @implementation MTRServerAttribute {
-    // _lock always protects access to _deviceController, _value, and
-    // _parentCluster.  _serializedValue is protected when we are modifying it
-    // directly while we have no _deviceController.  Once we have one,
-    // _serializedValue is only modified on the Matter thread.
+    // _lock always protects access to _deviceController, _value,
+    // _serializedValue, and _parentCluster.
     os_unfair_lock _lock;
     MTRDeviceController * __weak _deviceController;
     NSDictionary<NSString *, id> * _value;
@@ -137,6 +135,8 @@ MTR_DIRECT_MEMBERS
 
     _value = [value copy];
 
+    MTR_LOG_DEFAULT("Attribute value updated: %@", [self _descriptionWhileLocked]); // Logs new value as part of our description.
+
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController == nil) {
         // We're not bound to a controller, so safe to directly update
@@ -148,6 +148,7 @@ MTR_DIRECT_MEMBERS
         _serializedValue = serializedValue;
     } else {
         [deviceController asyncDispatchToMatterQueue:^{
+            std::lock_guard lock(self->_lock);
             auto changed = ![self->_serializedValue isEqual:serializedValue];
             self->_serializedValue = serializedValue;
             if (changed) {
@@ -183,6 +184,8 @@ MTR_DIRECT_MEMBERS
 
     _deviceController = controller;
 
+    MTR_LOG_DEFAULT("Associated %@ with controller", [self _descriptionWhileLocked]);
+
     return YES;
 }
 
@@ -212,10 +215,22 @@ MTR_DIRECT_MEMBERS
     _parentCluster = cluster;
 }
 
-- (const chip::app::ConcreteClusterPath &)parentCluster
+- (const app::ConcreteClusterPath &)parentCluster
 {
     std::lock_guard lock(_lock);
     return _parentCluster;
+}
+
+- (NSString *)description
+{
+    std::lock_guard lock(_lock);
+    return [self _descriptionWhileLocked];
+}
+
+- (NSString *)_descriptionWhileLocked
+{
+    os_unfair_lock_assert_owner(&_lock);
+    return [NSString stringWithFormat:@"<MTRServerAttribute endpoint %u, cluster " ChipLogFormatMEI ", id " ChipLogFormatMEI ", value '%@'>", static_cast<EndpointId>(_parentCluster.mEndpointId), ChipLogValueMEI(_parentCluster.mClusterId), ChipLogValueMEI(_attributeID.unsignedLongLongValue), _value];
 }
 
 @end
