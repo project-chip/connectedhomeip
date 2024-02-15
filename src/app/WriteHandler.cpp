@@ -60,7 +60,7 @@ void WriteHandler::Close()
     mExchangeCtx.Release();
     mSuppressResponse = false;
     MoveToState(State::Uninitialized);
-    mDelegate = nullptr;
+    mDelegate.Reset();
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -219,7 +219,7 @@ void WriteHandler::DeliverFinalListWriteEnd(bool writeWasSuccessful)
 CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful)
 {
     VerifyOrReturnError(mProcessingAttributePath.HasValue() && mProcessingAttributeIsList, CHIP_NO_ERROR);
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDelegate.IsValid(), CHIP_ERROR_INCORRECT_STATE);
 
     Credentials::GroupDataProvider::GroupEndpoint mapping;
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
@@ -278,7 +278,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
-    ReturnErrorCodeIf(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(mDelegate.IsValid(), CHIP_ERROR_INCORRECT_STATE);
     const Access::SubjectDescriptor subjectDescriptor = mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
@@ -377,7 +377,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
-    ReturnErrorCodeIf(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(mDelegate.IsValid(), CHIP_ERROR_INCORRECT_STATE);
     const Access::SubjectDescriptor subjectDescriptor =
         mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetSubjectDescriptor();
 

@@ -20,6 +20,7 @@
 #include <app/AttributeAccessToken.h>
 #include <app/AttributePathParams.h>
 #include <app/MessageDef/WriteResponseMessage.h>
+#include <app/InteractionModelDelegatePointers.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
@@ -56,7 +57,7 @@ public:
 class WriteHandler : public Messaging::ExchangeDelegate
 {
 public:
-    WriteHandler() : mExchangeCtx(*this) {}
+    WriteHandler() : mExchangeCtx(*this), mDelegate(nullptr) {}
 
     /**
      *  Initialize the WriteHandler. Within the lifetime
@@ -172,13 +173,12 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     Messaging::ExchangeHolder mExchangeCtx;
-    WriteHandlerDelegate * mDelegate;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     State mState           = State::Uninitialized;
+    InteractionModelDelegatePointer<WriteHandlerDelegate> mDelegate;
     bool mIsTimedRequest   = false;
     bool mSuppressResponse = false;
     bool mHasMoreChunks    = false;
-    Optional<ConcreteAttributePath> mProcessingAttributePath;
     bool mProcessingAttributeIsList = false;
     // We record the Status when AddStatus is called to determine whether all data of a list write is accepted.
     // This value will be used by DeliverListWriteEnd and DeliverFinalListWriteEnd but it won't be used by group writes based on the
@@ -190,6 +190,7 @@ private:
     //  (5) Not using timed write.
     //  Where (1)-(3) will be consistent among the whole list write request, while (4) and (5) are not appliable to group writes.
     bool mAttributeWriteSuccessful                = false;
+    Optional<ConcreteAttributePath> mProcessingAttributePath;
     Optional<AttributeAccessToken> mACLCheckCache = NullOptional;
 };
 } // namespace app

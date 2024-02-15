@@ -54,12 +54,17 @@ template <class T>
 class CheckedGlobalInstanceReference
 {
 public:
-    CheckedGlobalInstanceReference(T * e) { VerifyOrDie(e == GlobalInstanceProvider<T>::InstancePointer()); }
+    CheckedGlobalInstanceReference(T * e) {
+        VerifyOrDie(e == nullptr || e == GlobalInstanceProvider<T>::InstancePointer());
+    }
     CheckedGlobalInstanceReference & operator=(T * value)
     {
         VerifyOrDie(value == GlobalInstanceProvider<T>::InstancePointer());
         return *this;
     }
+
+    void Reset() {}
+    bool IsValid() const { return GlobalInstanceProvider<T>::InstancePointer() != nullptr; }
 
     inline T * operator->() { return GlobalInstanceProvider<T>::InstancePointer(); }
     inline const T * operator->() const { return GlobalInstanceProvider<T>::InstancePointer(); }
@@ -93,6 +98,9 @@ public:
         mValue = value;
         return *this;
     }
+
+    void Reset() { mValue = nullptr; }
+    bool IsValid() const { return mValue != nullptr; }
 
     T * operator->() { return mValue; }
     const T * operator->() const { return mValue; }
