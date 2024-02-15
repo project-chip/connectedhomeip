@@ -78,14 +78,14 @@ public:
         bool mFabricFiltered;
         Platform::ScopedMemoryBufferWithSize<AttributePathParamsValues> mAttributePaths;
         Platform::ScopedMemoryBufferWithSize<EventPathParamsValues> mEventPaths;
-        CHIP_ERROR SetAttributePaths(const ObjectList<AttributePathParams> * pAttributePathList)
+        CHIP_ERROR SetAttributePaths(const SingleLinkedListNode<AttributePathParams> * pAttributePathList)
         {
             mAttributePaths.Free();
             if (!pAttributePathList)
             {
                 return CHIP_NO_ERROR;
             }
-            const ObjectList<AttributePathParams> * attributePath = pAttributePathList;
+            const SingleLinkedListNode<AttributePathParams> * attributePath = pAttributePathList;
             size_t attributePathCount                             = 0;
             while (attributePath)
             {
@@ -103,14 +103,14 @@ public:
             }
             return CHIP_NO_ERROR;
         }
-        CHIP_ERROR SetEventPaths(const ObjectList<EventPathParams> * pEventPathList)
+        CHIP_ERROR SetEventPaths(const SingleLinkedListNode<EventPathParams> * pEventPathList)
         {
             mEventPaths.Free();
             if (!pEventPathList)
             {
                 return CHIP_NO_ERROR;
             }
-            const ObjectList<EventPathParams> * eventPath = pEventPathList;
+            const SingleLinkedListNode<EventPathParams> * eventPath = pEventPathList;
             size_t eventPathCount                         = 0;
             while (eventPath)
             {

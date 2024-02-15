@@ -224,9 +224,9 @@ public:
     ReadHandler(ManagementCallback & apCallback, Observer * observer);
 #endif
 
-    const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
-    const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
-    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
+    const SingleLinkedListNode<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
+    const SingleLinkedListNode<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
+    const SingleLinkedListNode<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
 
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
@@ -550,9 +550,9 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
 
-    ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
-    ObjectList<EventPathParams> * mpEventPathList           = nullptr;
-    ObjectList<DataVersionFilter> * mpDataVersionFilterList = nullptr;
+    SingleLinkedListNode<AttributePathParams> * mpAttributePathList   = nullptr;
+    SingleLinkedListNode<EventPathParams> * mpEventPathList           = nullptr;
+    SingleLinkedListNode<DataVersionFilter> * mpDataVersionFilterList = nullptr;
 
     ManagementCallback & mManagementCallback;
 

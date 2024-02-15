@@ -153,7 +153,7 @@ struct EventLoadOutContext
     Timestamp mCurrentTime;
     EventNumber mCurrentEventNumber                            = 0;
     size_t mEventCount                                         = 0;
-    const ObjectList<EventPathParams> * mpInterestedEventPaths = nullptr;
+    const SingleLinkedListNode<EventPathParams> * mpInterestedEventPaths = nullptr;
     bool mFirst                                                = true;
     Access::SubjectDescriptor mSubjectDescriptor;
 };
