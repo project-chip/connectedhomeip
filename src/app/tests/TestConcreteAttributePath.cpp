@@ -46,18 +46,23 @@ void TestConcreteAttributePathInequalityDifferentAttributeId(nlTestSuite * aSuit
     NL_TEST_ASSERT(aSuite, path_one != path_two);
 }
 
-void TestConcreteDataAttributePathMatchesConcreteAttributePathEquality(nlTestSuite* aSuite, void* aContext) {
+void TestConcreteDataAttributePathMatchesConcreteAttributePathEquality(nlTestSuite * aSuite, void * aContext)
+{
     ConcreteAttributePath path(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3);
     ConcreteDataAttributePath data_path(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3);
-    ConcreteDataAttributePath data_path_with_version(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aDataVersion=*/MakeOptional(4U));
-    ConcreteDataAttributePath data_path_with_list(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListOp=*/ ConcreteDataAttributePath::ListOperation::ReplaceAll, /*aListIndex=*/ 5U);
+    ConcreteDataAttributePath data_path_with_version(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3,
+                                                     /*aDataVersion=*/MakeOptional(4U));
+    ConcreteDataAttributePath data_path_with_list(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3,
+                                                  /*aListOp=*/ConcreteDataAttributePath::ListOperation::ReplaceAll,
+                                                  /*aListIndex=*/5U);
 
     NL_TEST_ASSERT(aSuite, data_path.MatchesConcreteAttributePath(path));
     NL_TEST_ASSERT(aSuite, data_path_with_version.MatchesConcreteAttributePath(path));
     NL_TEST_ASSERT(aSuite, data_path_with_list.MatchesConcreteAttributePath(path));
 }
 
-void TestConcreteDataAttributePathMatchesConcreteAttributePathInequality(nlTestSuite* aSuite, void* aContext) {
+void TestConcreteDataAttributePathMatchesConcreteAttributePathInequality(nlTestSuite * aSuite, void * aContext)
+{
     ConcreteAttributePath path(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3);
     ConcreteDataAttributePath data_path(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/4);
 
