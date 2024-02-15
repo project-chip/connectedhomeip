@@ -54,9 +54,7 @@ template <class T>
 class CheckedGlobalInstanceReference
 {
 public:
-    CheckedGlobalInstanceReference(T * e) {
-        VerifyOrDie(e == nullptr || e == GlobalInstanceProvider<T>::InstancePointer());
-    }
+    CheckedGlobalInstanceReference(T * e) { VerifyOrDie(e == nullptr || e == GlobalInstanceProvider<T>::InstancePointer()); }
     CheckedGlobalInstanceReference & operator=(T * value)
     {
         VerifyOrDie(value == GlobalInstanceProvider<T>::InstancePointer());
