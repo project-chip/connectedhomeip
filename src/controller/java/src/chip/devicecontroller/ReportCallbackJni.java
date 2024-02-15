@@ -17,23 +17,18 @@
  */
 package chip.devicecontroller;
 
-import chip.devicecontroller.model.AttributeState;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
-import chip.devicecontroller.model.EventState;
 import chip.devicecontroller.model.NodeState;
 import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link ReportCallback}. */
 public class ReportCallbackJni {
-  @Nullable
-  private SubscriptionEstablishedCallback wrappedSubscriptionEstablishedCallback;
-  @Nullable
-  private ResubscriptionAttemptCallback wrappedResubscriptionAttemptCallback;
+  @Nullable private SubscriptionEstablishedCallback wrappedSubscriptionEstablishedCallback;
+  @Nullable private ResubscriptionAttemptCallback wrappedResubscriptionAttemptCallback;
   private ReportCallback wrappedReportCallback;
   private long callbackHandle;
-  @Nullable
-  private NodeState nodeState;
+  @Nullable private NodeState nodeState;
 
   public ReportCallbackJni(
       @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
@@ -42,7 +37,8 @@ public class ReportCallbackJni {
     this.wrappedSubscriptionEstablishedCallback = subscriptionEstablishedCallback;
     this.wrappedReportCallback = reportCallback;
     this.wrappedResubscriptionAttemptCallback = resubscriptionAttemptCallback;
-    this.callbackHandle = newCallback(subscriptionEstablishedCallback, resubscriptionAttemptCallback);
+    this.callbackHandle =
+        newCallback(subscriptionEstablishedCallback, resubscriptionAttemptCallback);
   }
 
   long getCallbackHandle() {

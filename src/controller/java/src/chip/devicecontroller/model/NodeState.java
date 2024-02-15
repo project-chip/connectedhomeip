@@ -20,7 +20,6 @@ package chip.devicecontroller.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import javax.annotation.Nullable;
 
 /** Class for tracking CHIP node state in a hierarchical manner. */
@@ -73,12 +72,17 @@ public final class NodeState {
   }
 
   private void addAttributeStatus(
-      int endpointId, long clusterId, long attributeId, int status, @Nullable Integer clusterStatus) {
-    addAttributeStatus(endpointId, clusterId, attributeId, Status.newInstance(status, clusterStatus));
+      int endpointId,
+      long clusterId,
+      long attributeId,
+      int status,
+      @Nullable Integer clusterStatus) {
+    addAttributeStatus(
+        endpointId, clusterId, attributeId, Status.newInstance(status, clusterStatus));
   }
 
-  private void addEventStatus(int endpointId, long clusterId, long eventId, int status,
-      @Nullable Integer clusterStatus) {
+  private void addEventStatus(
+      int endpointId, long clusterId, long eventId, int status, @Nullable Integer clusterStatus) {
     addEventStatus(endpointId, clusterId, eventId, Status.newInstance(status, clusterStatus));
   }
 
@@ -101,7 +105,8 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState = new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      clusterState =
+          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
@@ -122,7 +127,8 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState = new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      clusterState =
+          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
@@ -147,7 +153,8 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState = new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      clusterState =
+          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
@@ -167,7 +174,8 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState = new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      clusterState =
+          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
