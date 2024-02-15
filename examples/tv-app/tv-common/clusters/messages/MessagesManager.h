@@ -23,47 +23,51 @@
 #include <list>
 #include <vector>
 
-/**
- * Note on memory management:
- *
- * The CachedMessage contains strings and objects
- * allocated when created (via HandlePresentMessagesRequest) and freed
- * in the destructor (via HandleCancelMessagesRequest).
- *
- */
-
 struct CachedMessageOption
 {
-    uint32_t mId;
-    std::string mLabel;
-    chip::app::Clusters::Messages::MessageResponseOption mOption;
+    constexpr static size_t kResponseIdMin  = 1;
+    constexpr static size_t kLabelMaxLength = 32;
 
     CachedMessageOption(uint32_t id, std::string label) :
-        mId(id), mLabel(label), mOption{ chip::Optional<uint32_t>(mId),
-                                         chip::Optional<chip::CharSpan>(chip::CharSpan::fromCharString(mLabel.c_str())) }
-    {
-        // ChipLogProgress(Controller, "CachedMessageOption constructor id=%d label=%s", mId, mLabel.c_str());
-    }
+        mLabel(label), mOption{ chip::MakeOptional(id), chip::MakeOptional(chip::CharSpan::fromCharString(mLabel.c_str())) }
+    {}
+
+    CachedMessageOption(const CachedMessageOption & option) :
+        mLabel(option.mLabel), mOption{ option.mOption.messageResponseID,
+                                        chip::MakeOptional(chip::CharSpan::fromCharString(mLabel.c_str())) } {};
+
+    CachedMessageOption & operator=(const CachedMessageOption & option) { return *this; };
 
     chip::app::Clusters::Messages::MessageResponseOption GetMessageOption() { return mOption; }
 
-    ~CachedMessageOption()
-    {
-        // ChipLogProgress(Controller, "CachedMessageOption destructor");
-    }
+    ~CachedMessageOption() {}
+
+protected:
+    std::string mLabel;
+    chip::app::Clusters::Messages::MessageResponseOption mOption;
 };
 
 struct CachedMessage
 {
-    const chip::app::Clusters::Messages::MessagePriorityEnum mPriority;
-    const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> mMessageControl;
-    const chip::app::DataModel::Nullable<uint32_t> mStartTime;
-    const chip::app::DataModel::Nullable<uint16_t> mDuration;
+    constexpr static size_t kMessageIdLength = 16;
+    constexpr static size_t kMaxOptionCount  = 4;
 
-    std::string mMessageText;
-
-    uint8_t * messageIdBuffer = nullptr;
     chip::ByteSpan mMessageId;
+
+    CachedMessage(const CachedMessage & message) :
+        mPriority(message.mPriority), mMessageControl(message.mMessageControl), mStartTime(message.mStartTime),
+        mDuration(message.mDuration), mMessageText(message.mMessageText), mOptions(message.mOptions)
+    {
+        memcpy(mMessageIdBuffer, message.mMessageIdBuffer, kMessageIdLength);
+        mMessageId = chip::ByteSpan(mMessageIdBuffer, kMessageIdLength);
+
+        for (CachedMessageOption & entry : mOptions)
+        {
+            mResponseOptions.push_back(entry.GetMessageOption());
+        }
+    };
+
+    CachedMessage & operator=(const CachedMessage & message) { return *this; };
 
     CachedMessage(const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
@@ -72,43 +76,57 @@ struct CachedMessage
         mPriority(priority),
         mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText)
     {
-        messageIdBuffer = new uint8_t[messageId.size()];
-        VerifyOrReturn(messageIdBuffer != nullptr, ChipLogProgress(Controller, "CachedMessage messageIdBuffer alloc failed"));
-        memcpy(messageIdBuffer, messageId.data(), messageId.size());
-        mMessageId = chip::ByteSpan(messageIdBuffer, messageId.size());
+        if (messageId.size() != kMessageIdLength)
+        {
+            ChipLogProgress(Zcl, "CachedMessage bad message id size, ignoring");
+            return;
+        }
+        memcpy(mMessageIdBuffer, messageId.data(), kMessageIdLength);
+        mMessageId = chip::ByteSpan(mMessageIdBuffer, kMessageIdLength);
     }
 
-    void AddOption(CachedMessageOption * option)
+    void AddOption(CachedMessageOption option)
     {
-        mOptions.push_back(*option);
-        mResponseOptions.push_back(option->GetMessageOption());
+        mOptions.push_back(option);
+        mResponseOptions.push_back(option.GetMessageOption());
     }
 
     chip::app::Clusters::Messages::Structs::MessageStruct::Type GetMessage()
     {
-        chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption> options(mResponseOptions.data(),
-                                                                                                 mResponseOptions.size());
-        chip::app::Clusters::Messages::Structs::MessageStruct::Type message{
-            mMessageId,
-            mPriority,
-            mMessageControl,
-            mStartTime,
-            mDuration,
-            chip::CharSpan::fromCharString(mMessageText.c_str()),
-            chip::Optional<chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption>>(options)
-        };
-        return message;
-    }
-
-    ~CachedMessage()
-    {
-        if (messageIdBuffer != nullptr)
+        if (mResponseOptions.size() > 0)
         {
-            delete[] messageIdBuffer;
+            chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption> options(mResponseOptions.data(),
+                                                                                                     mResponseOptions.size());
+            chip::app::Clusters::Messages::Structs::MessageStruct::Type message{ mMessageId,
+                                                                                 mPriority,
+                                                                                 mMessageControl,
+                                                                                 mStartTime,
+                                                                                 mDuration,
+                                                                                 chip::CharSpan::fromCharString(
+                                                                                     mMessageText.c_str()),
+                                                                                 chip::MakeOptional(options) };
+            return message;
+        }
+        else
+        {
+            chip::app::Clusters::Messages::Structs::MessageStruct::Type message{
+                mMessageId, mPriority, mMessageControl, mStartTime, mDuration, chip::CharSpan::fromCharString(mMessageText.c_str())
+            };
+            return message;
         }
     }
 
+    ~CachedMessage() {}
+
 protected:
+    const chip::app::Clusters::Messages::MessagePriorityEnum mPriority;
+    const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> mMessageControl;
+    const chip::app::DataModel::Nullable<uint32_t> mStartTime;
+    const chip::app::DataModel::Nullable<uint16_t> mDuration;
+
+    std::string mMessageText;
+    uint8_t mMessageIdBuffer[kMessageIdLength];
+
     std::vector<chip::app::Clusters::Messages::MessageResponseOption> mResponseOptions;
     std::list<CachedMessageOption> mOptions;
 };

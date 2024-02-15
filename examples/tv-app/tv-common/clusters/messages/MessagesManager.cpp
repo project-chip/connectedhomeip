@@ -33,35 +33,48 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
                                                    const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
                                                    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
-    ChipLogProgress(Controller, "HandlePresentMessagesRequest message:%s",
-                    std::string(messageText.data(), messageText.size()).c_str());
+    ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());
 
-    CachedMessage * cachedMessage                     = new CachedMessage(messageId, priority, messageControl, startTime, duration,
-                                                                          std::string(messageText.data(), messageText.size()));
-    std::unique_ptr<CachedMessage *> cachedMessagePtr = std::make_unique<CachedMessage *>(cachedMessage);
+    VerifyOrReturn(messageId.size() == CachedMessage::kMessageIdLength,
+                   ChipLogProgress(Zcl, "HandlePresentMessagesRequest invalid message id length:%zu", messageId.size()));
 
+    auto cachedMessage = CachedMessage(messageId, priority, messageControl, startTime, duration,
+                                       std::string(messageText.data(), messageText.size()));
     if (responses.HasValue())
     {
+        size_t size    = 0;
+        CHIP_ERROR err = responses.Value().ComputeSize(&size);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogProgress(Zcl, "HandlePresentMessagesRequest size check failed"));
+
+        VerifyOrReturn(size <= CachedMessage::kMaxOptionCount,
+                       ChipLogProgress(Zcl, "HandlePresentMessagesRequest too many options"));
+
         auto iter = responses.Value().begin();
         while (iter.Next())
         {
             auto & response = iter.GetValue();
 
             VerifyOrReturn(response.messageResponseID.HasValue() && response.label.HasValue(),
-                           ChipLogProgress(Controller, "HandlePresentMessagesRequest missing respond id or label"));
+                           ChipLogProgress(Zcl, "HandlePresentMessagesRequest missing response id or label"));
 
-            CachedMessageOption * option = new CachedMessageOption(
-                response.messageResponseID.Value(), std::string(response.label.Value().data(), response.label.Value().size()));
+            VerifyOrReturn(response.messageResponseID.Value() >= CachedMessageOption::kResponseIdMin,
+                           ChipLogProgress(Zcl, "HandlePresentMessagesRequest responseID value check failed"));
 
-            cachedMessage->AddOption(option);
+            VerifyOrReturn(response.label.Value().size() <= CachedMessageOption::kLabelMaxLength,
+                           ChipLogProgress(Zcl, "HandlePresentMessagesRequest label length check failed"));
+
+            CachedMessageOption option(response.messageResponseID.Value(),
+                                       std::string(response.label.Value().data(), response.label.Value().size()));
+
+            cachedMessage.AddOption(option);
         }
+        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR, ChipLogProgress(Zcl, "HandlePresentMessagesRequest TLV parsing error"));
     }
 
-    cachedMessagePtr.release();
-    mCachedMessages.push_back(*cachedMessage);
+    mCachedMessages.push_back(cachedMessage);
 
     // Add your code to present Message
-    ChipLogProgress(Controller, "HandlePresentMessagesRequest complete");
+    ChipLogProgress(Zcl, "HandlePresentMessagesRequest complete");
 }
 
 void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
@@ -108,7 +121,7 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aE
 // Global Attributes
 uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
 {
-    uint32_t featureMap = 0;
+    uint32_t featureMap = 15; // all features enabled by default
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
 }
