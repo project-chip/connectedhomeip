@@ -64,6 +64,9 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
         }
 
         mpCheckInDelegate->OnCheckInComplete(mICDClientInfo);
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(mICDClientInfo.peer_node);
+#endif
         mpCheckInDelegate->OnKeyRefreshDone(this, CHIP_NO_ERROR);
     };
 

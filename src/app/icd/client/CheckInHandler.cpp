@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/InteractionModelTimeout.h>
 #include <app/icd/client/CheckInHandler.h>
 #include <app/icd/client/RefreshKeySender.h>
@@ -127,6 +128,9 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
     else
     {
         mpCheckInDelegate->OnCheckInComplete(clientInfo);
+        #if CHIP_CONFIG_ENABLE_READ_CLIENT
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(clientInfo.peer_node);
+        #endif
     }
 
     return CHIP_NO_ERROR;
