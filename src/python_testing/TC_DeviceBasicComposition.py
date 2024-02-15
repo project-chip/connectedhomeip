@@ -261,7 +261,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                             success = False
                             continue
                         except KeyError:
-                            # This would have been caught already in the previous step
+                            # A KeyError here means the attribute does not exist. This problem was already recorded in step 2,
+                            # but we don't assert until the end of the test, so ignore this and don't re-record the error.
                             continue
 
         self.print_step(4, "Validate the attribute list exactly matches the set of reported attributes")
