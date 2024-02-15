@@ -23,6 +23,7 @@ from chip.clusters.Types import NullValue
 
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+from typing import Optional
 
 
 class TC_CNET_4_4(MatterBaseTest):
