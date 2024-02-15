@@ -89,10 +89,10 @@ static_library("nxp_zephyr") {
       "../../Zephyr/InetUtils.h",
       "../../Zephyr/wifi/ConnectivityManagerImplWiFi.cpp",
       "../../Zephyr/wifi/ConnectivityManagerImplWiFi.h",
-      "../../Zephyr/wifi/ZephyrWifiDriver.cpp",
-      "../../Zephyr/wifi/ZephyrWifiDriver.h",
       "../../Zephyr/wifi/WiFiManager.cpp",
       "../../Zephyr/wifi/WiFiManager.h",
+      "../../Zephyr/wifi/ZephyrWifiDriver.cpp",
+      "../../Zephyr/wifi/ZephyrWifiDriver.h",
     ]
   }
 
