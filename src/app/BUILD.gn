@@ -225,6 +225,7 @@ static_library("app") {
     "AttributePersistenceProvider.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
+    # TODO: cannot include "CommandHandler.h" because interaction-model backreference
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
@@ -233,6 +234,7 @@ static_library("app") {
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.h",
+    "EventManagement.h",
     "EventManagement.cpp",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
@@ -244,6 +246,7 @@ static_library("app") {
     "TimerDelegates.cpp",
     "TimerDelegates.h",
     "WriteClient.cpp",
+    # TODO: cannot include "WriteHandler.h" because interaction-model backreference
     "WriteHandler.cpp",
   ]
 
@@ -266,6 +269,7 @@ static_library("app") {
       "BufferedReadCallback.cpp",
       "ClusterStateCache.cpp",
       "ClusterStateCache.h",
+      # TODO: cannot include "ReadClient.h" because interaction-model backreference
       "ReadClient.cpp",
     ]
   }
