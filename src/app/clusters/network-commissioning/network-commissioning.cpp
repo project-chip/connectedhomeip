@@ -1098,7 +1098,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     }
 
     // If drivers are failing to respond NetworkNotFound on empty results, force it for them.
-    bool resultsMissing = !networks || (networks && (networks->Count() == 0));
+    bool resultsMissing = (0 == CountAndRelease(networks));
     if ((status == Status::kSuccess) && mScanningWasDirected && resultsMissing)
     {
         status = Status::kNetworkNotFound;
