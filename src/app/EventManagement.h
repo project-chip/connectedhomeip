@@ -31,7 +31,7 @@
 #include <access/SubjectDescriptor.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/ObjectList.h>
+#include <lib/support/LinkedList>
 #include <app/util/basic-types.h>
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>

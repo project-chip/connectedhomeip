@@ -79,7 +79,11 @@ source_set("revision_info") {
 source_set("paths") {
   sources = [
     "AttributePathParams.h",
+    "CommandPathParams.h",
+    "CommandPathRegistry.h",
+    "ConcreteAttributePath.h",
     "ConcreteClusterPath.h",
+    "ConcreteCommandPath.h",
     "ConcreteEventPath.h",
     "DataVersionFilter.h",
     "EventPathParams.h",
@@ -88,6 +92,7 @@ source_set("paths") {
   # This source sets also depends on basic-types.h that is not in any dependency we can use
   public_deps = [
     ":app_config",
+    "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
   ]

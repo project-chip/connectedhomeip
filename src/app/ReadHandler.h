@@ -36,7 +36,7 @@
 #include <app/MessageDef/DataVersionFilterIBs.h>
 #include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
-#include <app/ObjectList.h>
+#include <lib/support/LinkedList>
 #include <app/OperationalSessionSetup.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <app/SubscriptionResumptionStorage.h>

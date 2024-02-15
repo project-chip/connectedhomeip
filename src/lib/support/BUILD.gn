@@ -167,6 +167,10 @@ source_set("testing") {
   ]
 }
 
+source_set("linked-list") {
+  sources = [ "LinkedList.h" ]
+}
+
 source_set("type-traits") {
   sources = [ "TypeTraits.h" ]
 }

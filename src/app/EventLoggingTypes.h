@@ -19,7 +19,7 @@
 
 #include <access/SubjectDescriptor.h>
 #include <app/EventPathParams.h>
-#include <app/ObjectList.h>
+#include <lib/support/LinkedList>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Optional.h>
