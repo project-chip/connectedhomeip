@@ -263,8 +263,10 @@ private:
     char sWiFiIfName[IFNAMSIZ];
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
     uint8_t sInterestedSSIDLen;
+#endif
     NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
