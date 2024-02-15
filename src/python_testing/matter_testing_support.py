@@ -1009,8 +1009,13 @@ class MatterBaseTest(base_test.BaseTestClass):
                 it easier to validate against the test plan for correctness.
         '''
         steps = self.get_test_steps(self.current_test_info.name)
-        starting_step = [idx for idx, step in enumerate(steps) if step.test_plan_number == starting_step][0]
-        remaining = steps[starting_step:]
+        for idx, step in enumerate(steps):
+            if step.test_plan_number == starting_step:
+                starting_step_idx = idx
+                break
+        else:
+            raise TestingExpection("skip_all_remaining_steps was provided with invalid starting_step_num")
+        remaining = steps[starting_step_idx:]
         for step in remaining:
             self.skip_step(step.test_plan_number)
 
