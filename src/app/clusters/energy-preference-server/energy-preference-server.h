@@ -36,7 +36,7 @@ struct Delegate
 
     /**
      * Get an Energy Balance.
-     8
+     *
      * The delegate method is called by the cluster to fill out the
      * values for the list in EnergyBalances attribute. Storage for
      * both aOutStep and aOutLabel is provided by the caller.
