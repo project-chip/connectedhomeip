@@ -216,12 +216,11 @@ private:
     void _OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties);
     void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties);
-    void _OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changedProperties,
-                                 const char * const * invalidatedProperties);
+    void _OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * properties);
+    void _OnWpaInterfaceScanDone(WpaFiW1Wpa_supplicant1Interface * proxy, gboolean success);
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
-    void _OnWpaInterfaceScanDone(GObject * sourceObject, GAsyncResult * res);
 
     bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 

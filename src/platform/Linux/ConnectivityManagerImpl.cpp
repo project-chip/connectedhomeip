@@ -387,8 +387,7 @@ void ConnectivityManagerImpl::UpdateNetworkStatus()
         MakeOptional(GetDisconnectReason()));
 }
 
-void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changedProperties,
-                                                      const char * const * invalidatedProperties)
+void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changedProperties)
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
@@ -524,15 +523,15 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
 
-        g_signal_connect(mWpaSupplicant.iface, "properties-changed",
-                         G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changedProperties,
-                                        const char * const * invalidatedProperties, ConnectivityManagerImpl * self) {
-                             return self->_OnWpaPropertiesChanged(proxy, changedProperties, invalidatedProperties);
-                         }),
-                         this);
+        g_signal_connect(
+            mWpaSupplicant.iface, "properties-changed",
+            G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * properties, ConnectivityManagerImpl * self) {
+                return self->_OnWpaPropertiesChanged(proxy, properties);
+            }),
+            this);
         g_signal_connect(mWpaSupplicant.iface, "scan-done",
-                         G_CALLBACK(+[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
-                             return self->_OnWpaInterfaceScanDone(sourceObject_, res_);
+                         G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, gboolean success, ConnectivityManagerImpl * self) {
+                             return self->_OnWpaInterfaceScanDone(proxy, success);
                          }),
                          this);
     }
@@ -1848,7 +1847,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     return true;
 }
 
-void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * sourceObject, GAsyncResult * res)
+void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaFiW1Wpa_supplicant1Interface * proxy, gboolean success)
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
