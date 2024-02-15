@@ -46,7 +46,6 @@
 #include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
-#include <app/util/error-mapping.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>

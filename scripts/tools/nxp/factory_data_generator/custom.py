@@ -96,11 +96,14 @@ class DacPKey(FileArgument):
         assert (self.private_key is not None)
         return self.private_key
 
-    def generate_private_key(self, password):
-        keys = load_der_private_key(self.val, password, backend=default_backend())
-        self.private_key = keys.private_numbers().private_value.to_bytes(
-            32, byteorder='big'
-        )
+    def generate_private_key(self, password, use_sss_blob=False):
+        if use_sss_blob:
+            self.private_key = self.val
+        else:
+            keys = load_der_private_key(self.val, password, backend=default_backend())
+            self.private_key = keys.private_numbers().private_value.to_bytes(
+                32, byteorder='big'
+            )
 
 
 class DacCert(FileArgument):

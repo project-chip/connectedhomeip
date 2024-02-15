@@ -2401,13 +2401,10 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x050C</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
-            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Energy EVSE" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Energy EVSE Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Electrical Power Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Electrical Energy Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>

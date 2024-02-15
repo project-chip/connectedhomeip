@@ -30,6 +30,8 @@ OSA_EVENT_HANDLE_DEFINE(gHost_TaskEvent);
 
 #include <platform/nxp/k32w/k32w1/BLEManagerImpl.h>
 
+extern "C" bleResult_t Hci_Reset(void);
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -44,6 +46,8 @@ BLEManagerCommon * BLEManagerImpl::GetImplInstance()
 CHIP_ERROR BLEManagerImpl::InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(PLATFORM_InitTimerManager() >= 0, err = CHIP_ERROR_INCORRECT_STATE);
 
     PLATFORM_InitBle();
 
@@ -71,6 +75,21 @@ CHIP_ERROR BLEManagerImpl::InitHostController(BLECallbackDelegate::GapGenericCal
 
 exit:
     return err;
+}
+
+CHIP_ERROR BLEManagerImpl::ResetController()
+{
+    bleResult_t res = Hci_Reset();
+    if (res != gBleSuccess_c)
+    {
+        ChipLogProgress(DeviceLayer, "Failed to reset controller %d", res);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    /* Wait for function to complete */
+    PLATFORM_Delay(HCI_RESET_WAIT_TIME_US);
+
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::Host_Task(osaTaskParam_t argument)

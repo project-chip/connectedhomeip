@@ -38,6 +38,7 @@ public:
     CHIP_ERROR PostConnectedToOperationalNetworkEvent(ByteSpan networkID);
     CHIP_ERROR PostCloseAllBLEConnectionsToOperationalNetworkEvent();
     CHIP_ERROR PostWiFiDeviceAvailableNetworkEvent();
+    CHIP_ERROR PostOperationalNetworkStartedEvent();
     static DeviceControlServer & DeviceControlSvr();
 
 private:

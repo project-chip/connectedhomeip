@@ -204,10 +204,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     dispatch_queue_t _storageQueue;
 }
 
-+ (void)tearDown
-{
-}
-
 - (void)setUp
 {
     // Per-test setup, runs before each test.
