@@ -36,31 +36,31 @@ public:
     virtual ~PendingResponseTracker() = default;
 
     /**
-     * @brief Start tracking the given `aCommandRef`
+     * Start tracking the given `aCommandRef`
      *
      * @return CHIP_ERROR_INVALID_ARGUMENT if `aCommandRef` is already being tracked.
      */
     virtual CHIP_ERROR Add(uint16_t aCommandRef) = 0;
 
     /**
-     * @brief Removes tracking for the given `aCommandRef`
+     * Removes tracking for the given `aCommandRef`
      *
      * @return CHIP_ERROR_KEY_NOT_FOUND if aCommandRef is not currently tracked.
      */
     virtual CHIP_ERROR Remove(uint16_t aCommandRef) = 0;
 
     /**
-     * @brief Checks if the given `aCommandRef` is being tracked.
+     * Checks if the given `aCommandRef` is being tracked.
      */
     virtual bool IsTracked(uint16_t aCommandRef) = 0;
 
     /**
-     * @brief Returns the number of pending responses.
+     * Returns the number of pending responses.
      */
     virtual size_t Count() = 0;
 
     /**
-     * @brief Removes a pending response command reference from the tracker.
+     * Removes a pending response command reference from the tracker.
      *
      * Deletes an element from the tracker (order not guaranteed). This function can be called
      * repeatedly to remove all tracked pending responses.
