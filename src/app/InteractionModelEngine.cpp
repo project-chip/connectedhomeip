@@ -840,7 +840,7 @@ CHIP_ERROR InteractionModelEngine::OnTimedRequest(Messaging::ExchangeContext * a
                                                   const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                                   Protocols::InteractionModel::Status & aStatus)
 {
-    TimedHandler * handler = mTimedHandlers.CreateObject();
+    TimedHandler * handler = mTimedHandlers.CreateObject(this);
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Timed interaction");
