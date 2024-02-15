@@ -34,7 +34,7 @@ struct CachedMessageOption
         mOption{ option.mOption.messageResponseID, chip::MakeOptional(chip::CharSpan::fromCharString(mLabel.c_str())) }
     {}
 
-    // CachedMessageOption & operator=(const CachedMessageOption & option) { return *this; };
+    CachedMessageOption & operator=(const CachedMessageOption & option) { return *this; };
 
     chip::app::Clusters::Messages::MessageResponseOption GetMessageOption() { return mOption; }
 
@@ -62,7 +62,7 @@ struct CachedMessage
         }
     }
 
-    // CachedMessage & operator=(const CachedMessage & message) { return *this; };
+    CachedMessage & operator=(const CachedMessage & message) { return *this; };
 
     CachedMessage(const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
