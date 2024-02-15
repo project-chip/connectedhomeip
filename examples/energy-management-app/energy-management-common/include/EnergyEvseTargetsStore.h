@@ -91,11 +91,13 @@ public:
 protected:
     enum class TargetEntryTag : uint8_t
     {
-        kDayOfWeek       = 1,
-        kChargingTargets = 2,
-        kTargetTime      = 3,
-        kTargetSoC       = 4,
-        kAddedEnergy     = 5,
+        kTargetEntry           = 1,
+        kDayOfWeek             = 2,
+        kChargingTargetsArray  = 3,
+        kChargingTargetsStruct = 4,
+        kTargetTime            = 5,
+        kTargetSoC             = 6,
+        kAddedEnergy           = 7,
     };
 
     enum class CounterTag : uint8_t

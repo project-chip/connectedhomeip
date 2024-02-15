@@ -385,12 +385,14 @@ CHIP_ERROR EvseTargetsDelegate::SerializeToTlv(TLV::TLVWriter & writer, const st
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, EvseTargetEntryType));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TargetEntryTag::kDayOfWeek), targetEntry.dayOfWeekMap));
 
-        TLV::TLVType chargingTargetsArrayType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, chargingTargetsArrayType));
+        TLV::TLVType chargingTargetsListType;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(TargetEntryTag::kChargingTargetsArray), TLV::kTLVType_List,
+                                                   chargingTargetsListType));
         for (auto & chargingTarget : targetEntry.dailyChargingTargets)
         {
-            TLV::TLVType chargingTargetsStructType;
-            ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, chargingTargetsStructType));
+            TLV::TLVType chargingTargetsStructType = TLV::kTLVType_Structure;
+            ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(TargetEntryTag::kChargingTargetsStruct),
+                                                       TLV::kTLVType_Structure, chargingTargetsStructType));
             ReturnErrorOnFailure(
                 writer.Put(TLV::ContextTag(TargetEntryTag::kTargetTime), chargingTarget.targetTimeMinutesPastMidnight));
             if (chargingTarget.targetSoC.HasValue())
@@ -406,7 +408,7 @@ CHIP_ERROR EvseTargetsDelegate::SerializeToTlv(TLV::TLVWriter & writer, const st
 
             ReturnErrorOnFailure(writer.EndContainer(chargingTargetsStructType));
         }
-        ReturnErrorOnFailure(writer.EndContainer(chargingTargetsArrayType));
+        ReturnErrorOnFailure(writer.EndContainer(chargingTargetsListType));
         ReturnErrorOnFailure(writer.EndContainer(EvseTargetEntryType));
     }
     return writer.EndContainer(arrayType);
