@@ -927,7 +927,7 @@ CHIP_ERROR TestOnlyExtractCommandPathFromNextInvokeRequest(TLV::TLVReader & invo
     return commandPath.GetConcreteCommandPath(concretePath);
 }
 
-const char * GetFaultInjectionTypeStr(CommandHandler::NlFaultInjectionType faultType)
+[[maybe_unused]] const char * GetFaultInjectionTypeStr(CommandHandler::NlFaultInjectionType faultType)
 {
     switch (faultType)
     {
@@ -955,9 +955,8 @@ void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::E
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH Failure: state should be Idle, issue with TH");
 
-    [[maybe_unused]] const char * faultMsg = GetFaultInjectionTypeStr(faultType);
     ChipLogProgress(DataManagement, "Response to InvokeRequestMessage overridden by fault injection");
-    ChipLogProgress(DataManagement, "   Injecting the following response:%s", faultMsg);
+    ChipLogProgress(DataManagement, "   Injecting the following response:%s", GetFaultInjectionTypeStr(faultType));
 
     mResponseSender.SetExchangeContext(ec);
     Handle workHandle(this);
