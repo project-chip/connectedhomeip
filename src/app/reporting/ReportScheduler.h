@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/ReadHandler.h>
-#include <app/icd/ICDStateObserver.h>
+#include <app/icd/server/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemClock.h>
 

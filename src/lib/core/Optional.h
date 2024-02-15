@@ -25,9 +25,10 @@
 
 #include <new>
 #include <type_traits>
+#include <utility>
 
-#include <lib/core/CHIPCore.h>
 #include <lib/core/InPlace.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 

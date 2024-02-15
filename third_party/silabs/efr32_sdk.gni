@@ -50,6 +50,9 @@ declare_args() {
   sl_ot_idle_interval_ms = 15000  # 15s Idle Intervals
   sl_ot_active_interval_ms = 200  # 200ms Active Intervals
 
+  # SSED Specific configurations
+  sl_ot_csl_timeout_sec = 30  # 30s CSL timeout
+
   # ICD Matter Configuration flags
   sl_idle_mode_interval_s = 600  # 10min Idle Mode Interval
   sl_active_mode_interval_ms = 1000  # 1s Active Mode Interval
@@ -58,6 +61,9 @@ declare_args() {
   sl_use_subscription_synching = false
 
   silabs_log_enabled = true
+
+  # Enable Synchronized Sleepy End Device
+  enable_synchronized_sed = false
 
   # Argument to enable IPv4 for wifi
   # aligning to match chip_inet_config_enable_ipv4 default configuration
@@ -160,7 +166,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ieee802154",
       "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ble",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions",
-      "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init",
       "${efr32_sdk_root}/platform/service/device_init/inc",
@@ -296,13 +301,6 @@ template("efr32_sdk") {
       #"__STACK_SIZE=0",
     ]
 
-    if (!(use_silabs_thread_lib || use_silabs_thread_lib)) {
-      #Enabling this config temporarly to fix a build issue until
-      #official fix is pushed
-
-      defines += [ "OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE=1" ]
-    }
-
     # Temporary configuration to enable COAP specific configurations
     if (use_thread_coap_lib) {
       defines += [ "SL_USE_COAP_CONFIG=1" ]
@@ -433,6 +431,14 @@ template("efr32_sdk") {
           "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
           "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
         ]
+
+        if (enable_synchronized_sed) {
+          defines += [
+            "CHIP_DEVICE_CONFIG_THREAD_SSED=1",
+            "SL_CSL_ENABLE=1",
+            "SL_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
+          ]
+        }
       }
 
       if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {

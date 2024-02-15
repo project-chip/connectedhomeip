@@ -8548,6 +8548,7 @@
           # Targeting Spring 2024 Matter release
           - EnergyEVSEMode
           - DeviceEnergyManagementMode
+          - Messages
       attributes:
           DoorLock:
               # Aliro is not ready yet.
@@ -8661,3 +8662,13 @@
                   - Setpoints
                   - Presets
                   - MatterScheduleConfiguration
+          RVCRunMode:
+              Feature:
+                  # Not really part of the spec, need to think about whether to
+                  # expose this.
+                  - NoFeatures
+          RVCCleanMode:
+              Feature:
+                  # Not really part of the spec, need to think about whether to
+                  # expose this.
+                  - NoFeatures

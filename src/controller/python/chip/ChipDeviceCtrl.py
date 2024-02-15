@@ -594,6 +594,9 @@ class ChipDeviceControllerBase():
             else:
                 time.sleep(timeoutSecond)
 
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_StopCommissionableDiscovery(self.devCtrl)).raise_on_error()
+
         return self.GetDiscoveredDevices()
 
     def DiscoverCommissionableNodesLongDiscriminator(self, long_discriminator):
@@ -1566,6 +1569,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
                 c_void_p, c_uint8, c_char_p]
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_StopCommissionableDiscovery.argtypes = [
+                c_void_p]
+            self._dmLib.pychip_DeviceController_StopCommissionableDiscovery.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.argtypes = [
                 c_void_p, c_uint16]
