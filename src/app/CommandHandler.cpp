@@ -214,6 +214,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
         SetGroupRequest(true);
     }
 
+    // When updating this code, please remember to make corresponding changes to TestOnlyInvokeCommandRequestWithFaultsInjected.
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
@@ -918,10 +919,10 @@ namespace {
 CHIP_ERROR TestOnlyExtractCommandPathFromNextInvokeRequest(TLV::TLVReader & invokeRequestsReader,
                                                            ConcreteCommandPath & concretePath)
 {
-    CommandPathIB::Parser commandPath;
     ReturnErrorOnFailure(invokeRequestsReader.Next(TLV::AnonymousTag()));
     CommandDataIB::Parser commandData;
     ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
+    CommandPathIB::Parser commandPath;
     ReturnErrorOnFailure(commandData.GetPath(&commandPath));
     return commandPath.GetConcreteCommandPath(concretePath);
 }
@@ -947,14 +948,13 @@ const char * GetFaultInjectionTypeStr(CommandHandler::NlFaultInjectionType fault
 // This method intentionally duplicates code from other sections. While code consolidation
 // is generally preferred, here we prioritize generating a clear crash message to aid in
 // troubleshooting test failures.
-void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
-                                                    bool isTimedInvoke, NlFaultInjectionType faultType)
+void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
+                                                                    bool isTimedInvoke, NlFaultInjectionType faultType)
 {
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH Failure: state should be Idle, issue with TH");
 
-    const char * faultMsg = GetFaultInjectionTypeStr(faultType);
-    [[maybe_unused]] faultMsg;
+    [[maybe_unused]] const char * faultMsg = GetFaultInjectionTypeStr(faultType);
     ChipLogProgress(DataManagement, "Response to InvokeRequestMessage overridden by fault injection");
     ChipLogProgress(DataManagement, "   Injecting the following response:%s", faultMsg);
 
@@ -995,13 +995,16 @@ void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext *
     VerifyOrDieWithMsg(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */) == CHIP_NO_ERROR,
                        DataManagement,
                        "TH Failure: Failed to get the length of InvokeRequests after InvokeRequestMessage validation");
+    
+    // The command count check (specifically for a count of 2) is tied to IDM_1_3. This may need adjustment for
+    // compatibility with future test plans.
     VerifyOrDieWithMsg(commandCount == 2, DataManagement, "DUT failure: We were strictly expecting exactly 2 InvokeRequests");
     mReserveSpaceForMoreChunkMessages = true;
 
     {
         // Response path is the same as request path since we are replying with a failure message.
-        ConcreteCommandPath concreteResponsePath1(0, 0, 0);
-        ConcreteCommandPath concreteResponsePath2(0, 0, 0);
+        ConcreteCommandPath concreteResponsePath1;
+        ConcreteCommandPath concreteResponsePath2;
         VerifyOrDieWithMsg(
             TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath1) == CHIP_NO_ERROR,
             DataManagement, "DUT Failure: Issues encountered while extracting the ConcreteCommandPath from the first request");
