@@ -76,7 +76,7 @@ tests:
               type: list
               contains: [2]
 
-     - label: "Step 5: TH reads from the DUT the EventList attribute."
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
