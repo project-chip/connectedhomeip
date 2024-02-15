@@ -165,7 +165,7 @@ public:
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    static const char * GetWiFiIfName()
+    const char * GetWiFiIfName()
     {
         return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName;
     }
@@ -267,7 +267,7 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    static char sWiFiIfName[IFNAMSIZ];
+    char sWiFiIfName[IFNAMSIZ];
 #endif
 
     static uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];

@@ -98,10 +98,6 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-char ConnectivityManagerImpl::sWiFiIfName[];
-#endif
-
 WiFiDriver::ScanCallback * ConnectivityManagerImpl::mpScanCallback;
 NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * ConnectivityManagerImpl::mpConnectCallback;
 uint8_t ConnectivityManagerImpl::sInterestedSSID[Internal::kMaxWiFiSSIDLength];
