@@ -31,18 +31,24 @@ tests:
           Chip-repl commands used below are an example to verify the DUT as client test cases. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
-    - label: "Step 0 (Pre-Condition 1): Commission TH Client to TH device (Server), if not done so already."
+    - label:
+          "Step 0 (Pre-Condition 1): Commission TH Client to TH device (Server),
+          if not done so already."
       verification: |
           Ensure DUT is commissioned to TH device (Server).
       disabled: true
 
-    - label: "Step 0 (Pre-Condition 2): Commission DUT to TH device (Server), if not done so already."
+    - label:
+          "Step 0 (Pre-Condition 2): Commission DUT to TH device (Server), if
+          not done so already."
       verification: |
           Ensure DUT is commissioned to TH device (Server).
           This likely requires opening the commissioning window with TH Client."
       disabled: true
 
-    - label: "Step 0 (Pre-Condition 3): TH Client send `FailAtFault` command to `FaultInjection` cluster to TH device (Server)."
+    - label:
+          "Step 0 (Pre-Condition 3): TH Client send `FailAtFault` command to
+          `FaultInjection` cluster to TH device (Server)."
       cluster: "FaultInjection"
       command: "FailAtFault"
       arguments:
@@ -96,7 +102,9 @@ tests:
           CHIP:ZCL: FaultInjection: Configure a fault of type: 3 and Id: 12 to be triggered deterministically           <--------- Verify success with this message.
       disabled: true
 
-    - label: "Step 0 (Pre-Condition 4): TH Client send `FailAtFault` command to `FaultInjection` cluster to TH device (Server)."
+    - label:
+          "Step 0 (Pre-Condition 4): TH Client send `FailAtFault` command to
+          `FaultInjection` cluster to TH device (Server)."
       cluster: "FaultInjection"
       command: "FailAtFault"
       arguments:
@@ -150,7 +158,9 @@ tests:
           CHIP:ZCL: FaultInjection: Configure a fault of type: 3 and Id: 13 to be triggered deterministically           <--------- Verify success with this message.
       disabled: true
 
-    - label: "Step 0 (Pre-Condition 5): TH Client send `FailAtFault` command to `FaultInjection` cluster to TH device (Server)."
+    - label:
+          "Step 0 (Pre-Condition 5): TH Client send `FailAtFault` command to
+          `FaultInjection` cluster to TH device (Server)."
       cluster: "FaultInjection"
       command: "FailAtFault"
       arguments:
