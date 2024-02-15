@@ -44,6 +44,7 @@ using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 
 static std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
+static std::unique_ptr<EvseTargetsDelegate> gEvseTargetsDelegate;
 static std::unique_ptr<EnergyEvseManager> gEvseInstance;
 static std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
 static std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
@@ -136,16 +137,24 @@ CHIP_ERROR EnergyEvseInit()
 {
     CHIP_ERROR err;
 
-    if (gEvseDelegate || gEvseInstance)
+    if (gEvseDelegate || gEvseInstance || gEvseTargetsDelegate)
     {
-        ChipLogError(AppServer, "EVSE Instance or Delegate already exist.");
+        ChipLogError(AppServer, "EVSE Instance, Delegate or TargetsDelegate already exist.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    gEvseDelegate = std::make_unique<EnergyEvseDelegate>();
+    gEvseTargetsDelegate = std::make_unique<EvseTargetsDelegate>();
+    if (!gEvseTargetsDelegate)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for EvseTargetsDelegate");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    gEvseDelegate = std::make_unique<EnergyEvseDelegate>(*gEvseTargetsDelegate);
     if (!gEvseDelegate)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseDelegate");
+        gEvseTargetsDelegate.reset();
         return CHIP_ERROR_NO_MEMORY;
     }
 
@@ -163,6 +172,7 @@ CHIP_ERROR EnergyEvseInit()
     if (!gEvseInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseManager");
+        gEvseTargetsDelegate.reset();
         gEvseDelegate.reset();
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -171,6 +181,7 @@ CHIP_ERROR EnergyEvseInit()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Init failed on gEvseInstance");
+        gEvseTargetsDelegate.reset();
         gEvseInstance.reset();
         gEvseDelegate.reset();
         return err;

@@ -109,6 +109,7 @@ private:
 class EnergyEvseDelegate : public EnergyEvse::Delegate
 {
 public:
+    EnergyEvseDelegate(EvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate() { mEvseTargetsDelegate = &aDelegate; }
     ~EnergyEvseDelegate();
 
     /**
@@ -157,6 +158,8 @@ public:
     Status ClearTargets() override;
 
     /* Helper functions for managing targets*/
+    EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
+
     Status
     ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
 
@@ -342,8 +345,8 @@ private:
     /* Helper variable to hold meter val since last EnergyTransferStarted event */
     int64_t mMeterValueAtEnergyTransferStart;
 
-    /* Targets Object */
-    EvseTargets mChargingTargets;
+    /* Targets Delegate */
+    EvseTargetsDelegate * mEvseTargetsDelegate = nullptr;
 };
 
 } // namespace EnergyEvse

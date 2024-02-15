@@ -353,16 +353,21 @@ Status EnergyEvseDelegate::ValidateTargets(
 Status EnergyEvseDelegate::SaveTargets(
     const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules)
 {
+    Status status = Status::Success;
 
-    auto iter = chargingTargetSchedules.begin();
+    auto iter                     = chargingTargetSchedules.begin();
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrExit(targets != nullptr, status = Status::Failure);
+
     while (iter.Next())
     {
         auto & entry = iter.GetValue();
 
-        mChargingTargets.CopyTarget(entry);
+        targets->CopyTarget(entry);
     }
 
-    return Status::Success;
+exit:
+    return status;
 }
 
 /**
@@ -413,11 +418,21 @@ Status EnergyEvseDelegate::GetTargets(Commands::GetTargetsResponse::Type & respo
  */
 Status EnergyEvseDelegate::ClearTargets()
 {
+    Status status = Status::Success;
+    CHIP_ERROR err;
     ChipLogProgress(AppServer, "EnergyEvseDelegate::ClearTargets()");
 
-    // TODO clear targets
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrExit(targets != nullptr, status = Status::Failure);
 
-    return Status::Success;
+    err = targets->ClearTargets();
+    if (err != CHIP_NO_ERROR)
+    {
+        return Status::Failure;
+    }
+
+exit:
+    return status;
 }
 
 /* ---------------------------------------------------------------------------

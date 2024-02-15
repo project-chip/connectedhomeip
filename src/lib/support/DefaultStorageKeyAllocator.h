@@ -250,6 +250,7 @@ public:
     // Need a key to store the Charging Preference Targets which is a TLV of list of lists
     // Note not fabric scoped
     static StorageKeyName EVSETargets() { return StorageKeyName::FromConst("g/ev/targ"); }
+    static StorageKeyName EvseTargetEntryCounter() { return StorageKeyName::FromConst("g/ev/targc"); }
 };
 
 } // namespace chip
