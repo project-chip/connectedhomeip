@@ -512,12 +512,6 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
         }
 
-    # Workaround for incorrect parsing of access control cluster.
-    # Remove this workaround when https://github.com/csa-data-model/projects/issues/397 is fixed.
-    acl_id = Clusters.AccessControl.id
-    clusters[acl_id].attributes[Clusters.AccessControl.Attributes.Acl.attribute_id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
-    clusters[acl_id].attributes[Clusters.AccessControl.Attributes.Extension.attribute_id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
-
     check_clusters_for_unknown_commands(clusters, problems)
 
     return clusters, problems
