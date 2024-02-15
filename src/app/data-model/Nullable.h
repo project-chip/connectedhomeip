@@ -86,7 +86,7 @@ struct Nullable : protected Optional<T>
     constexpr bool SetToMatch(const Nullable<T> & other)
     {
         bool changed = *this != other;
-        *this = other;
+        *this        = other;
         return changed;
     }
 

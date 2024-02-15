@@ -123,7 +123,8 @@ Instance::Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) :
 
 Instance::Instance(EndpointId aEndpointId, ThreadDriver * apDelegate) :
     CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id), AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-    mEndpointId(aEndpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
+    mEndpointId(aEndpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(apDelegate),
+    mpBaseDriver(apDelegate)
 {
     mpDriver.Set<ThreadDriver *>(apDelegate);
 }
@@ -174,7 +175,8 @@ void Instance::SetLastNetworkingStatusValue(Attributes::LastNetworkingStatus::Ty
 {
     if (mLastNetworkingStatusValue.SetToMatch(networkingStatusValue))
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id, Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
+        MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
+                                               Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
     }
 }
 
@@ -182,24 +184,27 @@ void Instance::SetLastConnectErrorValue(Attributes::LastConnectErrorValue::TypeI
 {
     if (mLastConnectErrorValue.SetToMatch(connectErrorValue))
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id, Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId());
+        MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
+                                               Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId());
     }
 }
 
 void Instance::SetLastNetworkId(ByteSpan lastNetworkId)
 {
-    ByteSpan prevLastNetworkId{mLastNetworkID, mLastNetworkIDLen};
+    ByteSpan prevLastNetworkId{ mLastNetworkID, mLastNetworkIDLen };
     VerifyOrReturn(lastNetworkId.size() <= kMaxNetworkIDLen);
     VerifyOrReturn(!prevLastNetworkId.data_equal(lastNetworkId));
 
     memcpy(mLastNetworkID, lastNetworkId.data(), lastNetworkId.size());
     mLastNetworkIDLen = static_cast<uint8_t>(lastNetworkId.size());
-    MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id, Attributes::LastNetworkID::TypeInfo::GetAttributeId());
+    MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
+                                           Attributes::LastNetworkID::TypeInfo::GetAttributeId());
 }
 
 void Instance::ReportNetworksListChanged() const
 {
-    MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id, Attributes::Networks::TypeInfo::GetAttributeId());
+    MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
+                                           Attributes::Networks::TypeInfo::GetAttributeId());
 }
 
 void Instance::InvokeCommand(HandlerContext & ctxt)
@@ -478,7 +483,7 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
             return;
         }
 
-        mScanningWasDirected = !ssid.empty();
+        mScanningWasDirected        = !ssid.empty();
         mCurrentOperationBreadcrumb = req.breadcrumb;
         mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
         ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
@@ -948,7 +953,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
         SetLastConnectErrorValue(MakeNullable(interfaceStatus));
     }
 
-    SetLastNetworkId(ByteSpan{mConnectingNetworkID, mConnectingNetworkIDLen});
+    SetLastNetworkId(ByteSpan{ mConnectingNetworkID, mConnectingNetworkIDLen });
     SetLastNetworkingStatusValue(MakeNullable(commissioningError));
 
 #if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -1124,7 +1129,8 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     // Only encode results on success, to avoid stale contents on partial failure.
     if (status == Status::kSuccess)
     {
-        for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
+        for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse;
+             networksEncoded++)
         {
             Structs::WiFiInterfaceScanResultStruct::Type result;
             result.security = scanResponse.security;

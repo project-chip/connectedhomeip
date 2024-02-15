@@ -184,8 +184,8 @@ static void TestSetToMatch(nlTestSuite * inSuite, void * inContext)
     using SmallArray = std::array<uint8_t, 3>;
     // Arrays
     {
-        auto nullable1 = MakeNullable<SmallArray>({1,2,3});
-        auto nullable2 = MakeNullable<SmallArray>({1,2,3});
+        auto nullable1 = MakeNullable<SmallArray>({ 1, 2, 3 });
+        auto nullable2 = MakeNullable<SmallArray>({ 1, 2, 3 });
 
         NL_TEST_ASSERT(inSuite, !nullable1.IsNull());
         NL_TEST_ASSERT(inSuite, !nullable2.IsNull());
@@ -209,13 +209,11 @@ static void TestSetToMatch(nlTestSuite * inSuite, void * inContext)
             uint8_t a;
             uint8_t b;
 
-            bool operator==(const SomeObject & other) const {
-              return (a == other.a) && (b == other.b);
-            }
+            bool operator==(const SomeObject & other) const { return (a == other.a) && (b == other.b); }
         };
 
-        auto nullable1 = MakeNullable<SomeObject>({1, 2});
-        auto nullable2 = MakeNullable<SomeObject>({1, 2});
+        auto nullable1 = MakeNullable<SomeObject>({ 1, 2 });
+        auto nullable2 = MakeNullable<SomeObject>({ 1, 2 });
 
         NL_TEST_ASSERT(inSuite, !nullable1.IsNull());
         NL_TEST_ASSERT(inSuite, !nullable2.IsNull());
