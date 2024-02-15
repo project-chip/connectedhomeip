@@ -422,7 +422,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
         VerifyOrReturn(
             err == CHIP_NO_ERROR,
             ChipLogError(Controller, "Could not find addEventStatus method with error %" CHIP_ERROR_FORMAT, err.Format()));
-        
+
         jobject jClusterState = nullptr;
         if (apStatus->mClusterStatus.HasValue()) {
           err = JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", static_cast<jint>(apStatus->mClusterStatus.Value()), jClusterState);
