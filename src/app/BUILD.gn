@@ -284,10 +284,9 @@ static_library("app") {
       "BufferedReadCallback.h",
       "ClusterStateCache.cpp",
       "ClusterStateCache.h",
-
-      # TODO: cannot include "_ReadClient.h" because interaction-model backreference
+      "ReadClient.cpp",
+      # TODO: cannot include "ReadClient._h" because interaction-model backreference
       #       Name with _ so that linter does not recognize it
-      "ReadClient._cpp",
     ]
   }
 
