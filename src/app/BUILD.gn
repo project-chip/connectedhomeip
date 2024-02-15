@@ -250,16 +250,18 @@ static_library("app") {
 
     # TODO: the following items cannot be included due to interaction-model circularity
     #       (app depending on im and im including these headers):
-    # "CommandHandler.h"
-    # "CommandSender.h",
-    # "ReadClient.h",
-    # "ReadHandler.h",
-    # "WriteClient.h",
-    # "WriteHandler.h"
+    #       Name with _ so that linter does not recognize it
+    # "CommandHandler._h"
+    # "CommandSender._h",
+    # "ReadClient._h",
+    # "ReadHandler._h",
+    # "WriteClient._h",
+    # "WriteHandler._h"
 
     # TODO: the following items cannot be included due to platform includes not being
     #       able to depend on src/app
-    # "AttributeAccessInterface.h",
+    #       Name with _ so that linter does not recognize it
+    # "_AttributeAccessInterface._h",
   ]
 
   public_deps = [
@@ -283,8 +285,9 @@ static_library("app") {
       "ClusterStateCache.cpp",
       "ClusterStateCache.h",
 
-      # TODO: cannot include "ReadClient.h" because interaction-model backreference
-      "ReadClient.cpp",
+      # TODO: cannot include "_ReadClient.h" because interaction-model backreference
+      #       Name with _ so that linter does not recognize it
+      "ReadClient._cpp",
     ]
   }
 
