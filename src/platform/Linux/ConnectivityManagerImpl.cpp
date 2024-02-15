@@ -951,7 +951,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     // Clean up current network if exists
     if (mWpaSupplicant.networkPath)
     {
-        g_object_unref(mWpaSupplicant.networkPath);
+        g_free(mWpaSupplicant.networkPath);
         mWpaSupplicant.networkPath = nullptr;
     }
 
@@ -991,7 +991,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 
         if (mWpaSupplicant.networkPath)
         {
-            g_object_unref(mWpaSupplicant.networkPath);
+            g_free(mWpaSupplicant.networkPath);
             mWpaSupplicant.networkPath = nullptr;
         }
 
@@ -1081,7 +1081,7 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
 
         if (mWpaSupplicant.networkPath)
         {
-            g_object_unref(mWpaSupplicant.networkPath);
+            g_free(mWpaSupplicant.networkPath);
             mWpaSupplicant.networkPath = nullptr;
         }
 
