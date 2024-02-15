@@ -955,6 +955,7 @@ void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext *
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH Failure: state should be Idle, issue with TH");
 
     const char * faultMsg = GetFaultInjectionTypeStr(faultType);
+    (void) faultMsg; // On some builds, logs below are not compiled.
     ChipLogProgress(DataManagement, "Response to InvokeRequestMessage overridden by fault injection");
     ChipLogProgress(DataManagement, "   Injecting the following response:%s", faultMsg);
 
