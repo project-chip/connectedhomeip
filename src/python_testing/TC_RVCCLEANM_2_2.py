@@ -18,7 +18,7 @@
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
-
+from time import sleep
 
 class TC_RVCCLEANM_2_2(MatterBaseTest):
 
@@ -70,6 +70,9 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
+        # Allow some time for the command to take effect.
+        # This removes the test flakyness which is very annoying for everyone in CI.
+        sleep(0.001)
 
     @async_test_body
     async def test_TC_RVCCLEANM_2_2(self):

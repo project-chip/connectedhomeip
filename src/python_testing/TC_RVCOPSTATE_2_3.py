@@ -130,6 +130,9 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
+        # Allow some time for the command to take effect.
+        # This removes the test flakyness which is very annoying for everyone in CI.
+        sleep(0.001)
 
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):
