@@ -76,6 +76,16 @@ public:
         Optional<uint16_t> commandRef;
     };
 
+    // CommandSender::ExtendableCallback::OnNoResponse is public SDK API, so we cannot break
+    // source compatibility for it. To allow for additional values to be added at a future
+    // time without constantly changing the function's declaration parameter list, we are
+    // defining the struct NoResponseData and adding that to the parameter list to allow for
+    // future extendability.
+    struct NoResponseData
+    {
+        uint16_t commandRef;
+    };
+
     // CommandSender::ExtendableCallback::OnError is public SDK API, so we cannot break source
     // compatibility for it. To allow for additional values to be added at a future time
     // without constantly changing the function's declaration parameter list, we are
@@ -128,8 +138,20 @@ public:
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aResponseData   Information pertaining to the response.
          */
-        ;
         virtual void OnResponse(CommandSender * commandSender, const ResponseData & aResponseData) {}
+
+        /**
+         * Called for each request that failed to receive a response after the server indicates completion of all requests.
+         *
+         * This callback may be omitted if clients have alternative ways to track non-responses.
+         *
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param apCommandSender The CommandSender object that initiated the transaction.
+         * @param aNoResponseData Details about the request without a response.
+         */
+        virtual void OnNoResponse(CommandSender * commandSender, const NoResponseData & aNoResponseData) {}
 
         /**
          * OnError will be called when a non-path-specific error occurs *after* a successful call to SendCommandRequest().
@@ -292,14 +314,14 @@ public:
     {}
     CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // TODO(#32138): After there is a macro that is always defined for all unit tests, the constructor with
+    // TestOnlyMarker should only be compiled if that macro is defined.
     CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
                   PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
         CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse)
     {
         mpPendingResponseTracker = apPendingResponseTracker;
     }
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
     ~CommandSender();
 
     /**

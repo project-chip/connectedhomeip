@@ -340,17 +340,13 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 
 void CommandSender::FlushNoCommandResponse()
 {
-    if (mpPendingResponseTracker)
+    if (mpPendingResponseTracker && mUseExtendableCallback && mCallbackHandle.extendableCallback)
     {
         Optional<uint16_t> commandRef = mpPendingResponseTracker->PopPendingResponse();
         while (commandRef.HasValue())
         {
-            // TODO is it okay to not provide the actual path if we have only the CommandRef?
-            const ConcreteCommandPath concretePath(0, 0, 0);
-            ResponseData responseData = { concretePath, Protocols::InteractionModel::Status::NoCommandResponse };
-            responseData.data         = nullptr;
-            responseData.commandRef   = commandRef;
-            OnResponseCallback(responseData);
+            NoResponseData noResponseData = { commandRef.Value() };
+            mCallbackHandle.extendableCallback->OnNoResponse(this, noResponseData);
             commandRef = mpPendingResponseTracker->PopPendingResponse();
         }
     }
@@ -441,7 +437,13 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
                 // This can happen for two reasons:
                 // 1. The current InvokeResponse is a duplicate (based on its commandRef).
                 // 2. The current InvokeResponse is for a request we never sent (based on its commandRef).
-                ChipLogError(DataManagement, "Received Unexpected Response, commandRef=%u", commandRef.Value());
+                // Used when logging errors related to server violating spec.
+                ScopedNodeId remoteScopedNode;
+                if (mExchangeCtx.Get()->HasSessionHandle())
+                {
+                    remoteScopedNode = mExchangeCtx.Get()->GetSessionHandle()->GetPeer();
+                }
+                ChipLogError(DataManagement, "Received Unexpected Response from remote node [%u:" ChipLogFormatX64 "], commandRef=%u", remoteScopedNode.GetFabricIndex(), ChipLogValueX64(remoteScopedNode.GetNodeId()), commandRef.Value());
             }
             ReturnErrorOnFailure(err);
         }
