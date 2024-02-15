@@ -232,8 +232,6 @@ CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePt
 
     SuccessOrExit(err = readClient->SendRequest(params));
     callback->mReadClient = readClient;
-
-    return CHIP_NO_ERROR;
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -247,10 +245,12 @@ exit:
         if (readClient != nullptr)
         {
             Platform::Delete(readClient);
+            readClient = nullptr;
         }
         if (callback != nullptr)
         {
             Platform::Delete(callback);
+            callback = nullptr;
         }
     }
 
@@ -405,8 +405,6 @@ CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong deviceP
                                         imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero);
     SuccessOrExit(err);
     callback->mWriteClient = writeClient;
-
-    return CHIP_NO_ERROR;
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -420,10 +418,12 @@ exit:
         if (writeClient != nullptr)
         {
             Platform::Delete(writeClient);
+            writeClient = nullptr;
         }
         if (callback != nullptr)
         {
             Platform::Delete(callback);
+            callback = nullptr;
         }
     }
     return err;
@@ -555,8 +555,6 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
                                                               : Optional<System::Clock::Timeout>::Missing()));
 
     callback->mCommandSender = commandSender;
-
-    return CHIP_NO_ERROR;
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -570,10 +568,12 @@ exit:
         if (commandSender != nullptr)
         {
             Platform::Delete(commandSender);
+            commandSender = nullptr;
         }
         if (callback != nullptr)
         {
             Platform::Delete(callback);
+            callback = nullptr;
         }
     }
     return err;

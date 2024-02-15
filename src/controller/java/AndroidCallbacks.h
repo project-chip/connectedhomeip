@@ -129,8 +129,6 @@ struct InvokeCallback : public app::CommandSender::Callback
 
     void OnDone(app::CommandSender * apCommandSender) override;
 
-    // CHIP_ERROR CreateInvokeElement(JNIEnv * env, const app::ConcreteCommandPath & aPath, TLV::TLVReader * apData, jobject &
-    // outObj);
     void ReportError(CHIP_ERROR err);
     void ReportError(Protocols::InteractionModel::Status status);
     void ReportError(const char * message, ChipError::StorageType errorCode);
