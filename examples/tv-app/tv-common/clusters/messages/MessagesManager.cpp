@@ -96,12 +96,15 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aE
 // Global Attributes
 uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
 {
-    uint32_t featureMap = static_cast<uint32_t>(chip::app::Clusters::Messages::Feature::kReceivedConfirmation) |
-        static_cast<uint32_t>(chip::app::Clusters::Messages::Feature::kConfirmationResponse) |
-        static_cast<uint32_t>(chip::app::Clusters::Messages::Feature::kConfirmationReply) |
-        static_cast<uint32_t>(chip::app::Clusters::Messages::Feature::kProtectedMessages);
+    BitMask<Feature> FeatureMap;
+    FeatureMap.Set(Feature::kReceivedConfirmation);
+    FeatureMap.Set(Feature::kConfirmationResponse);
+    FeatureMap.Set(Feature::kConfirmationReply);
+    FeatureMap.Set(Feature::kProtectedMessages);
 
+    uint32_t featureMap = FeatureMap.Raw();
     ChipLogProgress(Zcl, "GetFeatureMap featureMap=%d", featureMap);
-    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    // forcing to all features since this implementation supports all
+    // Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
 }
