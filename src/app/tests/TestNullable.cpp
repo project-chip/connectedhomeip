@@ -70,7 +70,7 @@ public:
     MovableCtorDtorCounter & operator=(MovableCtorDtorCounter &&) = default;
 };
 
-int CtorDtorCounter::created = 0;
+int CtorDtorCounter::created   = 0;
 int CtorDtorCounter::destroyed = 0;
 
 } // namespace
