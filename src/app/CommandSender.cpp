@@ -431,7 +431,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
         if (commandRef.HasValue() && mpPendingResponseTracker != nullptr)
         {
-            err = mpPendingResponseTracker->ResponseReceived(commandRef.Value());
+            err = mpPendingResponseTracker->Remove(commandRef.Value());
             if (err != CHIP_NO_ERROR)
             {
                 // This can happen for two reasons:
@@ -446,8 +446,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
                 ChipLogError(DataManagement,
                              "Received Unexpected Response from remote node " ChipLogFormatScopedNodeId ", commandRef=%u",
                              ChipLogValueScopedNodeId(remoteScopedNode), commandRef.Value());
+                return err;
             }
-            ReturnErrorOnFailure(err);
         }
 
         // When using ExtendableCallbacks, we are adhering to a different API contract where path
@@ -508,7 +508,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
         VerifyOrReturnError(mpPendingResponseTracker != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(aPrepareCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         uint16_t commandRef = aPrepareCommandParams.commandRef.Value();
-        VerifyOrReturnError(!mpPendingResponseTracker->IsResponsePending(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!mpPendingResponseTracker->IsTracked(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
@@ -535,7 +535,7 @@ CHIP_ERROR CommandSender::FinishCommand(FinishCommandParameters & aFinishCommand
         VerifyOrReturnError(mpPendingResponseTracker != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(aFinishCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         uint16_t commandRef = aFinishCommandParams.commandRef.Value();
-        VerifyOrReturnError(!mpPendingResponseTracker->IsResponsePending(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!mpPendingResponseTracker->IsTracked(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     return FinishCommandInternal(aFinishCommandParams);
@@ -565,7 +565,7 @@ CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinis
 
     if (mpPendingResponseTracker && aFinishCommandParams.commandRef.HasValue())
     {
-        mpPendingResponseTracker->AddPendingResponse(aFinishCommandParams.commandRef.Value());
+        mpPendingResponseTracker->Add(aFinishCommandParams.commandRef.Value());
     }
 
     if (aFinishCommandParams.timedInvokeTimeoutMs.HasValue())

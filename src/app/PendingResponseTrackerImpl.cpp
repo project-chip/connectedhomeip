@@ -22,21 +22,21 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR PendingResponseTrackerImpl::AddPendingResponse(uint16_t aCommandRef)
+CHIP_ERROR PendingResponseTrackerImpl::Add(uint16_t aCommandRef)
 {
-    VerifyOrReturnError(!IsResponsePending(aCommandRef), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!IsTracked(aCommandRef), CHIP_ERROR_INVALID_ARGUMENT);
     mCommandReferenceSet.insert(aCommandRef);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PendingResponseTrackerImpl::ResponseReceived(uint16_t aCommandRef)
+CHIP_ERROR PendingResponseTrackerImpl::Remove(uint16_t aCommandRef)
 {
-    VerifyOrReturnError(IsResponsePending(aCommandRef), CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrReturnError(IsTracked(aCommandRef), CHIP_ERROR_KEY_NOT_FOUND);
     mCommandReferenceSet.erase(aCommandRef);
     return CHIP_NO_ERROR;
 }
 
-bool PendingResponseTrackerImpl::IsResponsePending(uint16_t aCommandRef)
+bool PendingResponseTrackerImpl::IsTracked(uint16_t aCommandRef)
 {
     return mCommandReferenceSet.find(aCommandRef) != mCommandReferenceSet.end();
 }

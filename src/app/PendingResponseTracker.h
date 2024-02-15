@@ -36,35 +36,23 @@ public:
     virtual ~PendingResponseTracker() = default;
 
     /**
-     * @brief Adds a pending response to the tracker. Tracked using CommandReference.
+     * @brief Start tracking the given `aCommandRef`
      *
-     * @param [in] aCommandRef The CommandReference associated with the response for which we are
-     *             waiting.
-     * @return CHIP_NO_ERROR on success.
-     * @return CHIP_ERROR_INVALID_ARGUMENT if aCommandRef is already being tracked.
+     * @return CHIP_ERROR_INVALID_ARGUMENT if `aCommandRef` is already being tracked.
      */
-    virtual CHIP_ERROR AddPendingResponse(uint16_t aCommandRef) = 0;
+    virtual CHIP_ERROR Add(uint16_t aCommandRef) = 0;
 
     /**
-     * @brief Removes the pending response from the tracker as a response is received.
+     * @brief Removes tracking for the given `aCommandRef`
      *
-     * Responses are tracked using CommandReference.
-     *
-     * @param [in] aCommandRef The CommandReference of the response that is no longer pending.
-     * @return CHIP_NO_ERROR on success.
-     * @return CHIP_ERROR_KEY_NOT_FOUND if aCommandRef is not found in the tracker. This indicates the
-     *             tracker was not waiting for a response associated with this CommandReference.
+     * @return CHIP_ERROR_KEY_NOT_FOUND if aCommandRef is not currently tracked.
      */
-    virtual CHIP_ERROR ResponseReceived(uint16_t aCommandRef) = 0;
+    virtual CHIP_ERROR Remove(uint16_t aCommandRef) = 0;
 
     /**
-     * @brief Indicates whether a response associated with a CommandReference is currently pending.
-     *
-     * @param [in] aCommandRef The CommandReference associated with the response to check if response
-     *             is pending.
-     * @return True if the response is pending, False otherwise.
+     * @brief Checks if the given `aCommandRef` is being tracked.
      */
-    virtual bool IsResponsePending(uint16_t aCommandRef) = 0;
+    virtual bool IsTracked(uint16_t aCommandRef) = 0;
 
     /**
      * @brief Returns the number of pending responses.
@@ -72,15 +60,13 @@ public:
     virtual size_t Count() = 0;
 
     /**
-     * @brief Pops a CommandReference associated with a pending response.
+     * @brief Removes a pending response command reference from the tracker.
      *
-     * Used after the server indicates that it has finished sending responses to the client.
-     * Enables the client to report an error to upper layers if a response for the associated
-     * command was not received.
+     * Deletes an element from the tracker (order not guaranteed). This function can be called
+     * repeatedly to remove all tracked pending responses.
      *
-     * @return NullOptional if no more pending response exist.
-     * @return Optional containing the CommandReference of a pending response. This method
-     *         remove pending response returned from the tracker.
+     * @return NullOptional if the tracker is empty.
+     * @return Optional containing the CommandReference of a removed pending response.
      */
     virtual Optional<uint16_t> PopPendingResponse() = 0;
 };

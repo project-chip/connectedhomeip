@@ -30,9 +30,9 @@ namespace app {
 class PendingResponseTrackerImpl : public PendingResponseTracker
 {
 public:
-    CHIP_ERROR AddPendingResponse(uint16_t aCommandRef) override;
-    CHIP_ERROR ResponseReceived(uint16_t aCommandRef) override;
-    bool IsResponsePending(uint16_t aCommandRef) override;
+    CHIP_ERROR Add(uint16_t aCommandRef) override;
+    CHIP_ERROR Remove(uint16_t aCommandRef) override;
+    bool IsTracked(uint16_t aCommandRef) override;
     size_t Count() override;
     Optional<uint16_t> PopPendingResponse() override;
 

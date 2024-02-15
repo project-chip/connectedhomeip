@@ -31,17 +31,17 @@ void TestPendingResponseTracker_FillEntireTracker(nlTestSuite * inSuite, void * 
     chip::app::PendingResponseTrackerImpl pendingResponseTracker;
     for (uint16_t commandRef = 0; commandRef < std::numeric_limits<uint16_t>::max(); commandRef++)
     {
-        NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));
-        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.AddPendingResponse(commandRef));
-        NL_TEST_ASSERT(inSuite, true == pendingResponseTracker.IsResponsePending(commandRef));
+        NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsTracked(commandRef));
+        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.Add(commandRef));
+        NL_TEST_ASSERT(inSuite, true == pendingResponseTracker.IsTracked(commandRef));
     }
 
     NL_TEST_ASSERT(inSuite, std::numeric_limits<uint16_t>::max() == pendingResponseTracker.Count());
 
     for (uint16_t commandRef = 0; commandRef < std::numeric_limits<uint16_t>::max(); commandRef++)
     {
-        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.ResponseReceived(commandRef));
-        NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));
+        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.Remove(commandRef));
+        NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsTracked(commandRef));
     }
     NL_TEST_ASSERT(inSuite, 0 == pendingResponseTracker.Count());
 }
@@ -52,12 +52,12 @@ void TestPendingResponseTracker_FillSingleEntryInTracker(nlTestSuite * inSuite, 
 
     // The value 40 is arbitrary; any value would work for this purpose.
     uint16_t commandRefToSet = 40;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.AddPendingResponse(commandRefToSet));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.Add(commandRefToSet));
 
     for (uint16_t commandRef = 0; commandRef < std::numeric_limits<uint16_t>::max(); commandRef++)
     {
         bool expectedIsSetResult = (commandRef == commandRefToSet);
-        NL_TEST_ASSERT(inSuite, expectedIsSetResult == pendingResponseTracker.IsResponsePending(commandRef));
+        NL_TEST_ASSERT(inSuite, expectedIsSetResult == pendingResponseTracker.IsTracked(commandRef));
     }
 }
 
@@ -67,8 +67,8 @@ void TestPendingResponseTracker_RemoveNonExistentEntryInTrackerFails(nlTestSuite
 
     // The value 40 is arbitrary; any value would work for this purpose.
     uint16_t commandRef = 40;
-    NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_KEY_NOT_FOUND == pendingResponseTracker.ResponseReceived(commandRef));
+    NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsTracked(commandRef));
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_KEY_NOT_FOUND == pendingResponseTracker.Remove(commandRef));
 }
 
 void TestPendingResponseTracker_AddingSecondEntryFails(nlTestSuite * inSuite, void * inContext)
@@ -77,10 +77,10 @@ void TestPendingResponseTracker_AddingSecondEntryFails(nlTestSuite * inSuite, vo
 
     // The value 40 is arbitrary; any value would work for this purpose.
     uint16_t commandRef = 40;
-    NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.AddPendingResponse(commandRef));
-    NL_TEST_ASSERT(inSuite, true == pendingResponseTracker.IsResponsePending(commandRef));
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_INVALID_ARGUMENT == pendingResponseTracker.AddPendingResponse(commandRef));
+    NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsTracked(commandRef));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.Add(commandRef));
+    NL_TEST_ASSERT(inSuite, true == pendingResponseTracker.IsTracked(commandRef));
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_INVALID_ARGUMENT == pendingResponseTracker.Add(commandRef));
 }
 
 void TestPendingResponseTracker_PopFindsAllPendingRequests(nlTestSuite * inSuite, void * inContext)
@@ -91,9 +91,9 @@ void TestPendingResponseTracker_PopFindsAllPendingRequests(nlTestSuite * inSuite
     std::vector<uint16_t> requestsToAdd = { 0, 50, 2, 2000 };
     for (const uint16_t & commandRef : requestsToAdd)
     {
-        NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsResponsePending(commandRef));
-        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.AddPendingResponse(commandRef));
-        NL_TEST_ASSERT(inSuite, true == pendingResponseTracker.IsResponsePending(commandRef));
+        NL_TEST_ASSERT(inSuite, false == pendingResponseTracker.IsTracked(commandRef));
+        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == pendingResponseTracker.Add(commandRef));
+        NL_TEST_ASSERT(inSuite, true == pendingResponseTracker.IsTracked(commandRef));
     }
 
     NL_TEST_ASSERT(inSuite, requestsToAdd.size() == pendingResponseTracker.Count());
