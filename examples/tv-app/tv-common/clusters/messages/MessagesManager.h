@@ -33,8 +33,8 @@ struct CachedMessageOption
     {}
 
     CachedMessageOption(const CachedMessageOption & option) :
-        mLabel(option.mLabel), mOption{ option.mOption.messageResponseID,
-                                        chip::MakeOptional(chip::CharSpan::fromCharString(mLabel.c_str())) } {};
+        mLabel(option.mLabel),
+        mOption{ option.mOption.messageResponseID, chip::MakeOptional(chip::CharSpan::fromCharString(mLabel.c_str())) } {};
 
     CachedMessageOption & operator=(const CachedMessageOption & option) { return *this; };
 
