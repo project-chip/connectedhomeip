@@ -143,6 +143,7 @@ chip_test_suite_using_nltest("tests") {
     "TestFabricScopedEventLogging.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
+    "TestNullable.cpp",
     "TestNumericAttributeTraits.cpp",
     "TestOperationalStateClusterObjects.cpp",
     "TestPendingNotificationMap.cpp",

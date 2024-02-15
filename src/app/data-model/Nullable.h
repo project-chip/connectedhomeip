@@ -80,6 +80,16 @@ struct Nullable : protected Optional<T>
         return true;
     }
 
+    // Set the nullable to the `other` nullable, returning true if something actually changed.
+    // This can be used to determine if changes occurred on assignment, so that reporting can be triggered
+    // only on actual changes.
+    constexpr bool SetToMatch(const Nullable<T> & other)
+    {
+        bool changed = *this != other;
+        *this = other;
+        return changed;
+    }
+
     // The only fabric-scoped objects in the spec are commands, events and structs inside lists, and none of those can be nullable.
     static constexpr bool kIsFabricScoped = false;
 
