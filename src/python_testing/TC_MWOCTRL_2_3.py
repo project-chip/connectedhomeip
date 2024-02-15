@@ -115,7 +115,7 @@ class TC_MWOCTRL_2_3(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=commands.SetCookingParameters(powerSetting=newPowerValue), endpoint=endpoint)
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a difference response.")
+            asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different response.")
 
 
 if __name__ == "__main__":
