@@ -40,7 +40,6 @@ tests:
           in a single InvokeResponseMessage, the ordering of CommandDataIBs in
           the InvokeResponseMessage SHALL be in the same order as provided in
           the request."
-
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
@@ -104,7 +103,6 @@ tests:
           contain a response to the first CommandDataIB in the
           InvokeRequestMessage. The second InvokeReponseMessage SHALL contains a
           response to the second CommandDataIB in the InvokeRequestMessage."
-
       verification: |
           Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
@@ -125,7 +123,6 @@ tests:
           contain a response to the second CommandDataIB in the
           InvokeRequestMessage. The second InvokeReponseMessage SHALL contains a
           response to the first CommandDataIB in the InvokeRequestMessage."
-
       verification: |
           Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
@@ -146,7 +143,6 @@ tests:
           InvokeResponseMessage SHALL contain a response to the first
           CommandDataIB in the InvokeRequestMessage. The second response to
           second CommandDataIB will intentionally be left out."
-
       verification: |
           Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
@@ -163,7 +159,6 @@ tests:
 
           TH should be configured such that it responds regularly to single
           invoke request."
-
       verification: |
           Product maker needs to provide instructions for how to trigger the command this on the DUT that is capable of fitting into a single InvokeResponseMessage. For comparison, the DUT behavior for this
           test step can be simulated using chip-repl (when DUT is a commissioner/Client).
