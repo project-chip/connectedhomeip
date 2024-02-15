@@ -438,7 +438,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
                 // 1. The current InvokeResponse is a duplicate (based on its commandRef).
                 // 2. The current InvokeResponse is for a request we never sent (based on its commandRef).
                 // Used when logging errors related to server violating spec.
-                ScopedNodeId remoteScopedNode;
+                [[maybe_unused]] ScopedNodeId remoteScopedNode;
                 if (mExchangeCtx.Get()->HasSessionHandle())
                 {
                     remoteScopedNode = mExchangeCtx.Get()->GetSessionHandle()->GetPeer();
