@@ -202,8 +202,8 @@
     <!--
     Do not expose discoverable timeout property, so BlueZ will set it
     internally to zero, effectively disabling the timeout. Becase of BlueZ
-    bug, which is not fixed until BlueZ 5.73, we can not set it to zero in
-    the application code.
+    bug, which is not fixed until BlueZ 5.73, exposing discoverable timeout
+    as zero will timout the advertisement immediately.
 
     <property name="DiscoverableTimeout" type="q" access="read"/>
     -->
