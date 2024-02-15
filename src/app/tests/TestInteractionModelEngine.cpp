@@ -57,7 +57,7 @@ public:
 
 int TestInteractionModelEngine::GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apAttributePathParamsList)
 {
-    int length                               = 0;
+    int length                                         = 0;
     SingleLinkedListNode<AttributePathParams> * runner = apAttributePathParamsList;
     while (runner != nullptr)
     {

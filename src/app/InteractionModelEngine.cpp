@@ -1517,7 +1517,7 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
 void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)
 {
     SingleLinkedListNode<AttributePathParams> * prev = nullptr;
-    auto * path1                           = aAttributePaths;
+    auto * path1                                     = aAttributePaths;
 
     while (path1 != nullptr)
     {
@@ -1604,7 +1604,8 @@ CHIP_ERROR InteractionModelEngine::PushFrontDataVersionFilterList(SingleLinkedLi
 }
 
 template <typename T, size_t N>
-void InteractionModelEngine::ReleasePool(SingleLinkedListNode<T> *& aObjectList, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool)
+void InteractionModelEngine::ReleasePool(SingleLinkedListNode<T> *& aObjectList,
+                                         ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool)
 {
     SingleLinkedListNode<T> * current = aObjectList;
     while (current != nullptr)
@@ -1618,7 +1619,8 @@ void InteractionModelEngine::ReleasePool(SingleLinkedListNode<T> *& aObjectList,
 }
 
 template <typename T, size_t N>
-CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectList, T & aData, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool)
+CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectList, T & aData,
+                                             ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool)
 {
     SingleLinkedListNode<T> * object = aObjectPool.CreateObject();
     if (object == nullptr)

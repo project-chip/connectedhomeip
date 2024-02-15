@@ -86,7 +86,7 @@ public:
                 return CHIP_NO_ERROR;
             }
             const SingleLinkedListNode<AttributePathParams> * attributePath = pAttributePathList;
-            size_t attributePathCount                             = 0;
+            size_t attributePathCount                                       = 0;
             while (attributePath)
             {
                 attributePathCount++;
@@ -111,7 +111,7 @@ public:
                 return CHIP_NO_ERROR;
             }
             const SingleLinkedListNode<EventPathParams> * eventPath = pEventPathList;
-            size_t eventPathCount                         = 0;
+            size_t eventPathCount                                   = 0;
             while (eventPath)
             {
                 eventPathCount++;
