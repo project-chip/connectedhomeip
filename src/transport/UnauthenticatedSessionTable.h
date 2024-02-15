@@ -292,7 +292,7 @@ private:
         entryToUse = FindLeastRecentUsedEntry();
         VerifyOrReturnError(entryToUse != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        // clean the least recent entry to allow for a new alloc
+        // Drop the least recent entry to allow for a new alloc.
         mEntries.ReleaseObject(entryToUse);
         entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
 
