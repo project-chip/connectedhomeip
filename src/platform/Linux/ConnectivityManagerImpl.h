@@ -155,14 +155,20 @@ private:
     CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
-    static void _ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    void _ConnectWiFiNetworkAsyncCallback(GObject * sourceObject, GAsyncResult * res);
 #endif
 
 public:
-    const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
+    const char * GetEthernetIfName()
+    {
+        return (mEthIfName[0] == '\0') ? nullptr : mEthIfName;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    static const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
+    static const char * GetWiFiIfName()
+    {
+        return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName;
+    }
 #endif
 
 private:
@@ -207,16 +213,15 @@ private:
     void UpdateNetworkStatus();
     static CHIP_ERROR StopAutoScan();
 
-    static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
-    static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
-                                       gpointer user_data);
-    static void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties, gpointer user_data);
-    static void _OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changed_properties,
-                                        const gchar * const * invalidated_properties, gpointer user_data);
-    static void _OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
-    static void _OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
-    static void _OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
-    static void _OnWpaInterfaceScanDone(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    void _OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
+    void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties);
+    void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties);
+    void _OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changedProperties,
+                                 const char * const * invalidatedProperties);
+    void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
+    void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
+    void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
+    void _OnWpaInterfaceScanDone(GObject * sourceObject, GAsyncResult * res);
 
     static bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 

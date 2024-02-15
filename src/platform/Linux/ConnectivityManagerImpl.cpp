@@ -391,12 +391,12 @@ void ConnectivityManagerImpl::UpdateNetworkStatus()
         MakeOptional(GetDisconnectReason()));
 }
 
-void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changed_properties,
-                                                      const gchar * const * invalidated_properties, gpointer user_data)
+void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changedProperties,
+                                                      const char * const * invalidatedProperties)
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (g_variant_n_children(changed_properties) > 0)
+    if (g_variant_n_children(changedProperties) > 0)
     {
         GAutoPtr<GVariantIter> iter;
         const gchar * key;
@@ -404,7 +404,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
 
         WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
 
-        g_variant_get(changed_properties, "a{sv}", &MakeUniquePointerReceiver(iter).Get());
+        g_variant_get(changedProperties, "a{sv}", &MakeUniquePointerReceiver(iter).Get());
 
         while (g_variant_iter_loop(iter.get(), "{&sv}", &key, &value))
         {
@@ -500,7 +500,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
     }
 }
 
-void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
+void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res)
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
@@ -525,8 +525,17 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
 
-        g_signal_connect(mWpaSupplicant.iface, "properties-changed", G_CALLBACK(_OnWpaPropertiesChanged), NULL);
-        g_signal_connect(mWpaSupplicant.iface, "scan-done", G_CALLBACK(_OnWpaInterfaceScanDone), NULL);
+        g_signal_connect(mWpaSupplicant.iface, "properties-changed",
+                         G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changedProperties,
+                                        const char * const * invalidatedProperties, ConnectivityManagerImpl * self) {
+                             return self->_OnWpaPropertiesChanged(proxy, changedProperties, invalidatedProperties);
+                         }),
+                         this);
+        g_signal_connect(mWpaSupplicant.iface, "scan-done",
+                         G_CALLBACK(+[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+                             return self->_OnWpaInterfaceScanDone(sourceObject_, res_);
+                         }),
+                         this);
     }
     else
     {
@@ -546,7 +555,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
     });
 }
 
-void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
+void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res)
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
@@ -577,7 +586,7 @@ void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * source_object, GAsyn
     }
 }
 
-void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
+void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res)
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
@@ -594,12 +603,21 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath);
 
-        wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                              mWpaSupplicant.interfacePath, nullptr, _OnWpaInterfaceProxyReady,
-                                                              nullptr);
+        wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(
+            G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
+            reinterpret_cast<GAsyncReadyCallback>(
+                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+                    return self->_OnWpaInterfaceProxyReady(sourceObject_, res_);
+                }),
+            this);
 
-        wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                        mWpaSupplicant.interfacePath, nullptr, _OnWpaBssProxyReady, nullptr);
+        wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(
+            G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
+            reinterpret_cast<GAsyncReadyCallback>(
+                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+                    return self->_OnWpaBssProxyReady(sourceObject_, res_);
+                }),
+            this);
     }
     else
     {
@@ -626,12 +644,21 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
 
             Platform::CopyString(sWiFiIfName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
 
-            wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
-                                                                  kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
-                                                                  _OnWpaInterfaceProxyReady, nullptr);
+            wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(
+                G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
+                reinterpret_cast<GAsyncReadyCallback>(
+                    +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+                        return self->_OnWpaInterfaceProxyReady(sourceObject_, res_);
+                    }),
+                this);
 
-            wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                            mWpaSupplicant.interfacePath, nullptr, _OnWpaBssProxyReady, nullptr);
+            wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(
+                G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
+                reinterpret_cast<GAsyncReadyCallback>(
+                    +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+                        return self->_OnWpaBssProxyReady(sourceObject_, res_);
+                    }),
+                this);
         }
         else
         {
@@ -649,8 +676,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
     }
 }
 
-void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
-                                                   gpointer user_data)
+void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties)
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
@@ -669,17 +695,25 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * prox
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface added: %s", mWpaSupplicant.interfacePath);
 
-        wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                              mWpaSupplicant.interfacePath, nullptr, _OnWpaInterfaceProxyReady,
-                                                              nullptr);
+        wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(
+            G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
+            reinterpret_cast<GAsyncReadyCallback>(
+                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+                    return self->_OnWpaInterfaceProxyReady(sourceObject_, res_);
+                }),
+            this);
 
-        wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                        mWpaSupplicant.interfacePath, nullptr, _OnWpaBssProxyReady, nullptr);
+        wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus(
+            G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
+            reinterpret_cast<GAsyncReadyCallback>(
+                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+                    return self->_OnWpaBssProxyReady(sourceObject_, res_);
+                }),
+            this);
     }
 }
 
-void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
-                                                     gpointer user_data)
+void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties)
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
@@ -716,7 +750,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
     }
 }
 
-void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
+void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res)
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
@@ -732,11 +766,24 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant proxy");
 
-        g_signal_connect(mWpaSupplicant.proxy, "interface-added", G_CALLBACK(_OnWpaInterfaceAdded), NULL);
+        g_signal_connect(
+            mWpaSupplicant.proxy, "interface-added",
+            G_CALLBACK(+[](WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties,
+                           ConnectivityManagerImpl * self) { return self->_OnWpaInterfaceAdded(proxy, path, properties); }),
+            this);
+        g_signal_connect(
+            mWpaSupplicant.proxy, "interface-removed",
+            G_CALLBACK(+[](WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties,
+                           ConnectivityManagerImpl * self) { return self->_OnWpaInterfaceRemoved(proxy, path, properties); }),
+            this);
 
-        g_signal_connect(mWpaSupplicant.proxy, "interface-removed", G_CALLBACK(_OnWpaInterfaceRemoved), NULL);
-
-        wpa_fi_w1_wpa_supplicant1_call_get_interface(mWpaSupplicant.proxy, sWiFiIfName, nullptr, _OnWpaInterfaceReady, nullptr);
+        wpa_fi_w1_wpa_supplicant1_call_get_interface(
+            mWpaSupplicant.proxy, sWiFiIfName, nullptr,
+            reinterpret_cast<GAsyncReadyCallback>(
+                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+                    return self->_OnWpaInterfaceReady(sourceObject_, res_);
+                }),
+            this);
     }
     else
     {
@@ -1030,8 +1077,14 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
         wpa_fi_w1_wpa_supplicant1_interface_call_disconnect_sync(mWpaSupplicant.iface, nullptr, nullptr);
         ChipLogProgress(DeviceLayer, "wpa_supplicant: added network: %s", mWpaSupplicant.networkPath);
 
-        wpa_fi_w1_wpa_supplicant1_interface_call_select_network(mWpaSupplicant.iface, mWpaSupplicant.networkPath, nullptr,
-                                                                _ConnectWiFiNetworkAsyncCallback, this);
+        wpa_fi_w1_wpa_supplicant1_interface_call_select_network(
+            mWpaSupplicant.iface, mWpaSupplicant.networkPath, nullptr,
+            reinterpret_cast<GAsyncReadyCallback>(
+                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+                    return self->_ConnectWiFiNetworkAsyncCallback(sourceObject_, res_);
+                }),
+            this);
+
         mpConnectCallback = apCallback;
     }
     else
@@ -1191,9 +1244,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
-void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data)
+void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * sourceObject, GAsyncResult * res)
 {
-    ConnectivityManagerImpl * this_ = reinterpret_cast<ConnectivityManagerImpl *>(user_data);
     GAutoPtr<GError> err;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -1204,12 +1256,12 @@ void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_
         if (!result)
         {
             ChipLogError(DeviceLayer, "Failed to perform connect network: %s", err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 if (mpConnectCallback != nullptr)
                 {
                     // TODO(#14175): Replace this with actual thread attach result.
-                    this_->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
-                    this_->mpConnectCallback = nullptr;
+                    mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
+                    mpConnectCallback = nullptr;
                 }
                 mpConnectCallback = nullptr;
             });
@@ -1796,7 +1848,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     return true;
 }
 
-void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, GAsyncResult * res, gpointer user_data)
+void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * sourceObject, GAsyncResult * res)
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
@@ -1857,8 +1909,12 @@ CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement(ConnectivityManagerImpl
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
     ChipLogProgress(DeviceLayer, "wpa_supplicant: Start WiFi management");
-    wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                kWpaSupplicantObjectPath, nullptr, self->_OnWpaProxyReady, nullptr);
+    wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(
+        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, kWpaSupplicantObjectPath, nullptr,
+        reinterpret_cast<GAsyncReadyCallback>(+[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self_) {
+            return self_->_OnWpaProxyReady(sourceObject_, res_);
+        }),
+        self);
 
     return CHIP_NO_ERROR;
 }
