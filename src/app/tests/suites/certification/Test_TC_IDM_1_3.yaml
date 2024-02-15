@@ -57,7 +57,7 @@ tests:
                 value: 3
               - name: "Id"
                 value: 12
-              - name: "NumberCallsToSkip"
+              - name: "NumCallsToSkip"
                 value: 3
               - name: "NumCallsToFail"
                 value: 1
@@ -113,7 +113,7 @@ tests:
                 value: 3
               - name: "Id"
                 value: 13
-              - name: "NumberCallsToSkip"
+              - name: "NumCallsToSkip"
                 value: 2
               - name: "NumCallsToFail"
                 value: 1
@@ -169,7 +169,7 @@ tests:
                 value: 3
               - name: "Id"
                 value: 14
-              - name: "NumberCallsToSkip"
+              - name: "NumCallsToSkip"
                 value: 1
               - name: "NumCallsToFail"
                 value: 1
