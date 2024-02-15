@@ -70,14 +70,14 @@ void InitializeMetricsCollection()
 
 - (void)handleMetricEvent:(chip::Tracing::MetricEvent)event
 {
-    MTR_LOG_INFO("Received metric event, type: %s, value: %u", event.key, event.value.uvalue);
+    MTR_LOG_INFO("Received metric event, type: %s, value: %u", event.key, event.value.store.uvalue);
     std::lock_guard lock(_lock);
-    if (event.isSigned) {
-        [_metricsData setValue:[NSNumber numberWithInteger:event.value.svalue]
+    if (event.value.type == ::chip::Tracing::MetricEvent::Value::ValueType::SignedValue) {
+        [_metricsData setValue:[NSNumber numberWithInteger:event.value.store.svalue]
                         forKey:[NSString stringWithCString:event.key encoding:NSUTF8StringEncoding]];
     }
     else {
-        [_metricsData setValue:[NSNumber numberWithUnsignedInteger:event.value.uvalue]
+        [_metricsData setValue:[NSNumber numberWithUnsignedInteger:event.value.store.uvalue]
                         forKey:[NSString stringWithCString:event.key encoding:NSUTF8StringEncoding]];
     }
 }

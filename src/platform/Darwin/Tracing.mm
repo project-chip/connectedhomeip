@@ -43,7 +43,7 @@ namespace signposts {
     void DarwinTracingBackend::LogEvent(MetricEvent & event)
     {
         ChipLogProgress(DeviceLayer, "Receive scalar event, type: %s, value: %u",
-                        event.key, event.value.uvalue);
+                        event.key, event.value.store.uvalue);
         if (mClientCallback) {
             ChipLogProgress(DeviceLayer, "Invoking client callback %p", mClientCallback);
             mClientCallback(event);

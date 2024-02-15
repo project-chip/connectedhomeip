@@ -16,14 +16,25 @@
  */
 #pragma once
 
+#include <matter/tracing/build_config.h>
+
+#if MATTER_TRACING_ENABLED
+
 #include <lib/core/CHIPError.h>
 #include <stdint.h>
+#include <chrono>
 
 namespace chip {
 namespace Tracing {
 
+/**
+ * Defines the key type use to identity a specific metric
+ */
 typedef const char* MetricKey;
 
+/**
+ * List of supported metric keys
+ */
 constexpr MetricKey kMetricDiscoveryOverBLE = "discovery-over-ble";
 constexpr MetricKey kMetricDiscoveryOnNetwork = "discovery-on-nw";
 constexpr MetricKey kMetricPASEConnectionEstablished = "pase-conn-est";
@@ -34,21 +45,64 @@ constexpr MetricKey kMetricCASEConnectionEstablished = "case-conn-est";
 constexpr MetricKey kMetricCASEConnectionFailed = "case-conn-failed";
 constexpr MetricKey kMetricWiFiRSSI = "wifi-rssi";
 
+/**
+ * Define a metric that can be logged. A metric consists of a key-value pair. The value is
+ * currently limited to simple scalar values. The value is interpreted based on the key type.
+ *
+ * Additionally a metric is tagged as either an instant type or marked with a begin and end 
+ * for the event. When the latter is used, a duration can be associated between the two events.
+ */
 struct MetricEvent
 {
-    MetricKey key;
-    union Value {
-        uint32_t uvalue;
-        int32_t svalue;
-        Value(uint32_t v) : uvalue(v) {}
-        Value(int32_t v) : svalue(v) {}
-    } value;
-    bool isSigned;
+    // Metric tag type
+    enum class Tag {
+        Begin,    // Implies a duration
+        End,      // Implies a duration
+        Instant   // No duration
+    };
 
-    MetricEvent(MetricKey k, uint32_t val = 0) : key(k), value(val), isSigned(false) {}
-    MetricEvent(MetricKey k, int32_t val = 0) : key(k), value(val), isSigned(true) {}
-    MetricEvent(MetricKey k, ChipError err) : key(k), value(err.AsInteger()), isSigned(false) {}
+    // Value for the metric
+    struct Value {
+        enum class ValueType {
+            SignedValue,
+            UnsignedValue,
+            ErrorValue
+        };
+
+        union ValueStore {
+            uint32_t uvalue;
+            int32_t svalue;
+            ValueStore(uint32_t v) : uvalue(v) {}
+            ValueStore(int32_t v) : svalue(v) {}
+        } store;
+        ValueType type;
+
+        Value(uint32_t value) : store(value), type(ValueType::UnsignedValue) {}
+
+        Value(int32_t value) : store(value), type(ValueType::SignedValue) {}
+
+        Value(const ChipError & err) : store(err.AsInteger()), type(ValueType::ErrorValue) {}
+    };
+
+    Tag tag;
+    MetricKey key;
+    Value value;
+    std::chrono::steady_clock::time_point timePoint;
+
+    MetricEvent(Tag tg, MetricKey k, uint32_t val = 0)
+        : tag(tg), key(k), value(val), timePoint(std::chrono::steady_clock::now())
+    {}
+
+    MetricEvent(Tag tg, MetricKey k, int32_t val)
+        : tag(tg), key(k), value(val), timePoint(std::chrono::steady_clock::now())
+    {}
+
+    MetricEvent(Tag tg, MetricKey k, const ChipError & err)
+        : tag(tg), key(k), value(err.AsInteger()), timePoint(std::chrono::steady_clock::now())
+    {}
 };
 
 } // namespace Tracing
 } // namespace chip
+
+#endif // MATTER_TRACING_ENABLED

@@ -630,6 +630,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, co
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
+    MATTER_LOG_METRIC_BEGIN(PASEConnectionEstablished); // Emit start of event (-begin), Emit Signpost
+    MATTER_LOG_METRIC_INSTANT(PASEConnectionEstablished); // Emit event (-event), Emit Signpost
 
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     CommissioneeDeviceProxy * device   = nullptr;
@@ -748,7 +750,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     // exchange context right before calling Pair ensures that if allocation
     // succeeds, PASESession has taken ownership.
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
-    VerifyOrExit(exchangeCtxt != nullptr, MATTER_LOG_METRIC_EVENT(PASEConnectionFailed, err = CHIP_ERROR_INTERNAL));
+    //VerifyOrExit(exchangeCtxt != nullptr, MATTER_LOG_METRIC_EVENT(PASEConnectionFailed, err = CHIP_ERROR_INTERNAL));
+    VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetSetupPINCode(), GetLocalMRPConfig(), exchangeCtxt, this);
     SuccessOrExit(err);
@@ -762,7 +765,10 @@ exit:
         }
     }
 
-    MATTER_LOG_METRIC_EVENT(PASEConnectionEstablished, CHIP_NO_ERROR);
+    MATTER_LOG_METRIC_INSTANT(PASEConnectionEstablished, 2); // Emit event (-event)
+    MATTER_LOG_METRIC_INSTANT(PASEConnectionEstablished); // Emit event (-event)
+    MATTER_LOG_METRIC_END(PASEConnectionEstablished, err); // Emit end of event with duration (-duration), Emit event (-end), Emit event error separately (-error), Emit Signpost
+    MATTER_LOG_METRIC_END(PASEConnectionEstablished); // Emit end of event with duration (-duration), Emit event (-end), Emit Signpost
     return err;
 }
 
