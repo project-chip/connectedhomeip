@@ -307,6 +307,7 @@ complexity:
             - "**/src/controller/java/src/matter/controller/CompletionListenerAdapter.kt"
             - "**/src/controller/java/src/matter/controller/MatterController.kt"
             - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
+            - "**/src/controller/java/src/matter/controller/model/States.kt"
             - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
@@ -323,6 +324,7 @@ complexity:
             - "**/src/controller/java/src/matter/controller/MatterControllerImpl.kt"
             - "**/src/controller/java/src/matter/controller/InvokeCallbackJni.kt"
             - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
+            - "**/src/controller/java/src/matter/controller/model/States.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
     LongMethod:
         excludes:
