@@ -18,12 +18,12 @@
 import logging
 import random
 import string
+from typing import Optional
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
-from typing import Optional
 
 
 class TC_CNET_4_4(MatterBaseTest):
@@ -64,7 +64,7 @@ class TC_CNET_4_4(MatterBaseTest):
 
         self.step(3)
         networks = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.Networks)
-        connected = [network for network in networks if network.connected == True]
+        connected = [network for network in networks if network.connected is True]
         asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
         known_ssid = connected[0].networkID
 
