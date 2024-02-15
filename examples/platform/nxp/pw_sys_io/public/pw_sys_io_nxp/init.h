@@ -1,8 +1,6 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,3 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#pragma once
+
+#include "pw_preprocessor/util.h"
+
+PW_EXTERN_C_START
+
+// The actual implement of PreMainInit() in sys_io_BACKEND.
+void pw_sys_io_Init();
+
+PW_EXTERN_C_END

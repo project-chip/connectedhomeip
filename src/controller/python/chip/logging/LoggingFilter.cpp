@@ -1,6 +1,6 @@
-/**
+/*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,23 +15,23 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <lib/support/logging/CHIPLogging.h>
 
-#include <app/util/af-enums.h>
-#include <protocols/interaction_model/Constants.h>
+extern "C" {
 
-namespace chip {
-namespace app {
-
-inline EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::Status code)
+uint8_t pychip_logging_GetLogFilter()
 {
-    return static_cast<EmberAfStatus>(code);
+#if _CHIP_USE_LOGGING
+    return chip::Logging::GetLogFilter();
+#else
+    return chip::Logging::kLogCategory_None;
+#endif
 }
 
-inline Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code)
+void pychip_logging_SetLogFilter(uint8_t category)
 {
-    return static_cast<Protocols::InteractionModel::Status>(code);
+#if _CHIP_USE_LOGGING
+    chip::Logging::SetLogFilter(category);
+#endif
 }
-
-} // namespace app
-} // namespace chip
+}

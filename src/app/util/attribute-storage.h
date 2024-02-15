@@ -28,6 +28,8 @@
 #include <app/att-storage.h>
 #include <zap-generated/endpoint_config.h>
 
+#include <protocols/interaction_model/StatusCode.h>
+
 // If we have fixed number of endpoints, then max is the same.
 #ifdef FIXED_ENDPOINT_COUNT
 #define MAX_ENDPOINT_COUNT (FIXED_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -69,8 +71,9 @@ void emAfCallInits(void);
 // Initial configuration
 void emberAfEndpointConfigure(void);
 
-EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
-                                       uint8_t * buffer, uint16_t readLength, bool write);
+chip::Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
+                                                                   const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
+                                                                   uint16_t readLength, bool write);
 
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
@@ -118,7 +121,11 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::Endpoi
 // cast it.
 EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * cluster, EmberAfClusterMask functionMask);
 
-// Loads attribute defaults and any non-volatile attributes stored
+/**
+ * @brief Loads attribute defaults and any non-volatile attributes stored
+ *
+ * @param endpoint EnpointId. Use chip::kInvalidEndpointId to initialize all endpoints
+ */
 void emberAfInitializeAttributes(chip::EndpointId endpoint);
 
 // After the RAM value has changed, code should call this function. If this
@@ -130,8 +137,9 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, chip::EndpointId endpoin
 void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 // Calls the attribute changed callback for a specific cluster.
-EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType,
+                                       uint16_t size, uint8_t * value);
 
 // Note the difference in for server filtering.
 // This method will return the cluster count for BOTH client and server

@@ -32,7 +32,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
-#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -83,12 +82,12 @@ LaundryDryerControlsServer & LaundryDryerControlsServer::Instance()
     return sInstance;
 }
 
-EmberAfStatus LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel)
+Status LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel)
 {
     DataModel::Nullable<DrynessLevelEnum> selectedDrynessLevel;
-    EmberAfStatus res = SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
+    Status res = SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
 
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (selectedDrynessLevel != newSelectedDrynessLevel))
+    if ((res == Status::Success) && (selectedDrynessLevel != newSelectedDrynessLevel))
     {
         res = SelectedDrynessLevel::Set(endpointId, newSelectedDrynessLevel);
     }
@@ -96,8 +95,8 @@ EmberAfStatus LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId end
     return res;
 }
 
-EmberAfStatus LaundryDryerControlsServer::GetSelectedDrynessLevel(EndpointId endpointId,
-                                                                  DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel)
+Status LaundryDryerControlsServer::GetSelectedDrynessLevel(EndpointId endpointId,
+                                                           DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel)
 {
     return SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
 }

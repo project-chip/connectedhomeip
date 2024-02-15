@@ -22,7 +22,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -147,7 +146,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
         }
     }
 
-    return ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
+    return SpeedSetting::Set(mEndpoint, newSpeedSetting);
 }
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)

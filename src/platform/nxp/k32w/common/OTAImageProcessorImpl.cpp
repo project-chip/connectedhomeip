@@ -308,7 +308,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (block.empty())
+    if (!IsSpanUsable(block))
     {
         return CHIP_NO_ERROR;
     }

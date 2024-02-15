@@ -27,7 +27,6 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
@@ -137,8 +136,8 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
         // attribute are listed below.
 
         DataModel::Nullable<uint8_t> startUpMode;
-        EmberAfStatus status = Attributes::StartUpMode::Get(endpointId, startUpMode);
-        if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpMode.IsNull())
+        Status status = Attributes::StartUpMode::Get(endpointId, startUpMode);
+        if (status == Status::Success && !startUpMode.IsNull())
         {
 #ifdef MATTER_DM_PLUGIN_ON_OFF
             // OnMode with Power Up
@@ -151,9 +150,9 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             {
                 Attributes::OnMode::TypeInfo::Type onMode;
                 bool onOffValueForStartUp = false;
-                if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
+                if (Attributes::OnMode::Get(endpointId, onMode) == Status::Success &&
                     !emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-                    OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
+                    OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == Status::Success)
                 {
                     if (onOffValueForStartUp && !onMode.IsNull())
                     {
@@ -183,12 +182,12 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             uint8_t currentMode = 0;
             status              = Attributes::CurrentMode::Get(endpointId, &currentMode);
 
-            if ((status == EMBER_ZCL_STATUS_SUCCESS) && (startUpMode.Value() != currentMode))
+            if ((status == Status::Success) && (startUpMode.Value() != currentMode))
             {
                 status = Attributes::CurrentMode::Set(endpointId, startUpMode.Value());
-                if (status != EMBER_ZCL_STATUS_SUCCESS)
+                if (status != Status::Success)
                 {
-                    ChipLogError(Zcl, "ModeSelect: Error initializing CurrentMode, EmberAfStatus code 0x%02x", status);
+                    ChipLogError(Zcl, "ModeSelect: Error initializing CurrentMode, Status code 0x%02x", to_underlying(status));
                 }
                 else
                 {
