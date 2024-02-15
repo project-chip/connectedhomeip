@@ -44,8 +44,8 @@ public:
         const chip::BitMask<MessageControlBitmap> & messageControl, const DataModel::Nullable<uint32_t> & startTime,
         const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
         const chip::Optional<DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
-            responses)                                                                                              = 0;
-    virtual CHIP_ERROR HandleCancelMessagesRequest(const DataModel::DecodableList<chip::ByteSpan> & messageIds)     = 0;
+            responses)                                                                                          = 0;
+    virtual CHIP_ERROR HandleCancelMessagesRequest(const DataModel::DecodableList<chip::ByteSpan> & messageIds) = 0;
 
     // Attributes
     virtual CHIP_ERROR HandleGetMessages(app::AttributeValueEncoder & aEncoder)         = 0;

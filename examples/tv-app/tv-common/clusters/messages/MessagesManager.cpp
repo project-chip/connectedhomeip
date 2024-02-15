@@ -24,7 +24,7 @@ using namespace std;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Messages;
-using Message = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
+using Message               = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
 using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type;
 
 // Commands
