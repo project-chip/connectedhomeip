@@ -225,8 +225,6 @@ static_library("app") {
     "AttributePersistenceProvider.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
-
-    # TODO: cannot include "CommandHandler.h" because interaction-model backreference
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
@@ -248,9 +246,20 @@ static_library("app") {
     "TimerDelegates.cpp",
     "TimerDelegates.h",
     "WriteClient.cpp",
-
-    # TODO: cannot include "WriteHandler.h" because interaction-model backreference
     "WriteHandler.cpp",
+
+    # TODO: the following items cannot be included due to interaction-model circularity
+    #       (app depending on im and im including these headers):
+    # "CommandHandler.h"
+    # "CommandSender.h",
+    # "ReadClient.h",
+    # "ReadHandler.h",
+    # "WriteClient.h",
+    # "WriteHandler.h"
+
+    # TODO: the following items cannot be included due to platform includes not being
+    #       able to depend on src/app
+    # "AttributeAccessInterface.h",
   ]
 
   public_deps = [
@@ -270,6 +279,7 @@ static_library("app") {
   if (chip_enable_read_client) {
     sources += [
       "BufferedReadCallback.cpp",
+      "BufferedReadCallback.h",
       "ClusterStateCache.cpp",
       "ClusterStateCache.h",
 
