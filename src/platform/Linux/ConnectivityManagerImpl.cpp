@@ -420,6 +420,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
 
                     if (delegate)
                     {
+                        chip::DeviceLayer::StackLock stackLock;
                         delegate->OnDisconnectionDetected(reason);
                         delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kConnected));
                     }
@@ -459,6 +460,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
 
                         if (delegate)
                         {
+                            chip::DeviceLayer::StackLock stackLock;
                             delegate->OnAssociationFailureDetected(associationFailureCause, status);
                         }
                     }
@@ -471,6 +473,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                 {
                     if (delegate)
                     {
+                        chip::DeviceLayer::StackLock stackLock;
                         delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kNotConnected));
                     }
 
