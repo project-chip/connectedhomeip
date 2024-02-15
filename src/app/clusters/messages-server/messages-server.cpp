@@ -204,7 +204,7 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
             delegate->HasFeature(endpoint, Feature::kConfirmationResponse),
             ChipLogProgress(
                 Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback responses sent but response feature not supported");
-            status = Status::ConstraintError);
+            status = Status::InvalidCommand);
 
         VerifyOrExit(size <= kMessageMaxOptionCount,
                      ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback too many options");
