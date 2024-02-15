@@ -36,7 +36,7 @@ void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, c
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());
 
     VerifyOrReturn(messageId.size() == CachedMessage::kMessageIdLength,
-                   ChipLogProgress(Zcl, "HandlePresentMessagesRequest invalid message id length:%zu", messageId.size()));
+                   ChipLogProgress(Zcl, "HandlePresentMessagesRequest invalid message id length"));
 
     auto cachedMessage = CachedMessage(messageId, priority, messageControl, startTime, duration,
                                        std::string(messageText.data(), messageText.size()));
