@@ -54,7 +54,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     VerifyOrDie(aPath.mClusterId == EnergyPreference::Id);
     EndpointId endpoint = aPath.mEndpointId;
     uint32_t ourFeatureMap;
-    const bool featureMapIsGood  = FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS;
+    const bool featureMapIsGood  = FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == Status::Success;
     const bool balanceSupported  = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
     const bool lowPowerSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0);
 
@@ -171,7 +171,7 @@ Status MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const Conc
     EndpointId endpoint = attributePath.mEndpointId;
     Delegate * delegate = GetDelegate();
     uint32_t ourFeatureMap;
-    const bool featureMapIsGood  = FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS;
+    const bool featureMapIsGood  = FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == Status::Success;
     const bool balanceSupported  = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
     const bool lowPowerSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0);
 
