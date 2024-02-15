@@ -1004,7 +1004,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def skip_all_remaining_steps(self, starting_step_number):
         ''' Skips all remaining test steps starting with provided starting step
 
-            starting_step_number gives the first step to be skipped, as definted in the TestStep.test_plan_number
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
             starting_step_number must be provided, and is not derived intentionally. By providing argument
                 test is more deliberately identifying where test skips are starting from, making
                 it easier to validate against the test plan for correctness.
