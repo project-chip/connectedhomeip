@@ -60,6 +60,8 @@ Davis, CA 95616, USA
     <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="New data model format and notation, added Clusters required for Matter support, restricted legacy elements to Zigbee only"/>
+    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
+    <!-- TODO Replace by: "<revision revision="3" summary="Addition of Energy Preference cluster and updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>" if the Energy Preference cluster is included in 1.3-->
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
