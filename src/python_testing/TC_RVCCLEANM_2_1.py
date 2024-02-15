@@ -61,7 +61,6 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         # This removes the test flakyness which is very annoying for everyone in CI.
         sleep(0.001)
 
-
     def pics_TC_RVCCLEANM_2_1(self) -> list[str]:
         return ["RVCCLEANM.S"]
 

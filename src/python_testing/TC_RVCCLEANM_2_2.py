@@ -20,6 +20,7 @@ from matter_testing_support import MatterBaseTest, async_test_body, default_matt
 from mobly import asserts
 from time import sleep
 
+
 class TC_RVCCLEANM_2_2(MatterBaseTest):
 
     def __init__(self, *args):
