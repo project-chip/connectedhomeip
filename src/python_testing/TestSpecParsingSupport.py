@@ -223,7 +223,7 @@ class TestSpecParsingSupport(MatterBaseTest):
 
     def test_derived_clusters(self):
         clusters: dict[int, XmlCluster] = {}
-        derived_clusters: dict[str, XmlCluster] = {}
+        pure_base_clusters: dict[str, XmlCluster] = {}
         ids_by_name: dict[str, int] = {}
         problems: list[ProblemNotice] = []
         base_cluster_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
@@ -231,11 +231,11 @@ class TestSpecParsingSupport(MatterBaseTest):
         expected_global_attrs = [GlobalAttributeIds.FEATURE_MAP_ID, GlobalAttributeIds.ATTRIBUTE_LIST_ID,
                                  GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID, GlobalAttributeIds.GENERATED_COMMAND_LIST_ID, GlobalAttributeIds.CLUSTER_REVISION_ID]
 
-        add_cluster_data_from_xml(base_cluster_xml, clusters, derived_clusters, ids_by_name, problems)
-        add_cluster_data_from_xml(derived_cluster_xml, clusters, derived_clusters, ids_by_name, problems)
+        add_cluster_data_from_xml(base_cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
+        add_cluster_data_from_xml(derived_cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
 
         asserts.assert_equal(len(clusters), 1, "Unexpected number of clusters")
-        asserts.assert_equal(len(derived_clusters), 1, "Unexpected number of derived clusters")
+        asserts.assert_equal(len(pure_base_clusters), 1, "Unexpected number of derived clusters")
         asserts.assert_equal(len(ids_by_name), 1, "Unexpected number of IDs per name")
         asserts.assert_equal(len(problems), 0, "Unexpected number of problems")
         asserts.assert_equal(ids_by_name["Test Derived"], 0xFFFF, "Test derived name not added to IDs")
@@ -246,22 +246,23 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(set(clusters[0xFFFF].accepted_commands.keys()), set([]), "Unexpected accepted commands")
         asserts.assert_equal(set(clusters[0xFFFF].generated_commands.keys()), set([]), "Unexpected generated commands")
 
-        asserts.assert_true("Test Base" in derived_clusters, "Base ID not found in derived clusters")
-        asserts.assert_equal(set(derived_clusters["Test Base"].attributes.keys()), set(
+        asserts.assert_true("Test Base" in pure_base_clusters, "Base ID not found in derived clusters")
+        asserts.assert_equal(set(pure_base_clusters["Test Base"].attributes.keys()), set(
             [0, 1, 2, 3] + expected_global_attrs), "Unexpected attribute list")
-        asserts.assert_equal(set(derived_clusters["Test Base"].accepted_commands.keys()), set([0]), "Unexpected accepted commands")
-        asserts.assert_equal(set(derived_clusters["Test Base"].generated_commands.keys()),
+        asserts.assert_equal(set(pure_base_clusters["Test Base"].accepted_commands.keys()),
+                             set([0]), "Unexpected accepted commands")
+        asserts.assert_equal(set(pure_base_clusters["Test Base"].generated_commands.keys()),
                              set([1]), "Unexpected generated commands")
-        asserts.assert_equal(str(derived_clusters["Test Base"].accepted_commands[0].conformance),
+        asserts.assert_equal(str(pure_base_clusters["Test Base"].accepted_commands[0].conformance),
                              "M", "Unexpected conformance on base accepted command")
-        asserts.assert_equal(str(derived_clusters["Test Base"].generated_commands[1].conformance),
+        asserts.assert_equal(str(pure_base_clusters["Test Base"].generated_commands[1].conformance),
                              "M", "Unexpected conformance on base generated command")
 
-        asserts.assert_equal(len(derived_clusters["Test Base"].unknown_commands),
+        asserts.assert_equal(len(pure_base_clusters["Test Base"].unknown_commands),
                              0, "Unexpected number of unknown commands in base")
         asserts.assert_equal(len(clusters[0xFFFF].unknown_commands), 2, "Unexpected number of unknown commands in derived cluster")
 
-        combine_derived_clusters_with_base(clusters, derived_clusters, ids_by_name)
+        combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name)
         # Ensure the base-only attribute (1) was added to the derived cluster
         asserts.assert_equal(set(clusters[0xFFFF].attributes.keys()), set(
             [0, 1, 2, 3] + expected_global_attrs), "Unexpected attribute list")
@@ -284,12 +285,12 @@ class TestSpecParsingSupport(MatterBaseTest):
 
     def test_missing_command_direction(self):
         clusters: dict[int, XmlCluster] = {}
-        derived_clusters: dict[str, XmlCluster] = {}
+        pure_base_clusters: dict[str, XmlCluster] = {}
         ids_by_name: dict[str, int] = {}
         problems: list[ProblemNotice] = []
         cluster_xml = ElementTree.fromstring(CLUSTER_WITH_UNKNOWN_COMMAND)
 
-        add_cluster_data_from_xml(cluster_xml, clusters, derived_clusters, ids_by_name, problems)
+        add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
         check_clusters_for_unknown_commands(clusters, problems)
         asserts.assert_equal(len(problems), 1, "Unexpected number of problems found")
         asserts.assert_equal(problems[0].location.cluster_id, 0xFFFE, "Unexpected problem location (cluster id)")

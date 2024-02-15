@@ -348,7 +348,7 @@ class ClusterParser:
             ), read_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView, write_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue, write_optional=False)
         return attributes
 
-    def get_command_direction(self, element: ElementTree.Element) -> CommandType:
+    def get_command_type(self, element: ElementTree.Element) -> CommandType:
         try:
             if element.attrib['direction'].lower() == 'responsefromserver':
                 return CommandType.GENERATED
@@ -360,7 +360,7 @@ class ClusterParser:
     def parse_unknown_commands(self) -> list[XmlCommand]:
         commands = []
         for element, conformance_xml, access_xml in self.command_elements:
-            if self.get_command_direction(element) != CommandType.UNKNOWN:
+            if self.get_command_type(element) != CommandType.UNKNOWN:
                 continue
             code = int(element.attrib['id'], 0)
             conformance = self.parse_conformance(conformance_xml)
@@ -370,7 +370,7 @@ class ClusterParser:
     def parse_commands(self, command_type: CommandType) -> dict[uint, XmlCommand]:
         commands = {}
         for element, conformance_xml, access_xml in self.command_elements:
-            if self.get_command_direction(element) != command_type:
+            if self.get_command_type(element) != command_type:
                 continue
             code = int(element.attrib['id'], 0)
             conformance = self.parse_conformance(conformance_xml)
@@ -412,7 +412,16 @@ class ClusterParser:
         return self._problems
 
 
-def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlCluster], derived_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int], problems: list[ProblemNotice]) -> None:
+def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int], problems: list[ProblemNotice]) -> None:
+    ''' Adds cluster data to the supplied dicts as appropriate
+
+        xml: XML element read from from the XML cluster file
+        clusters: dict of id -> XmlCluster. This function will append new clusters as appropriate to this dict.
+        pure_base_clusters: dict of base name -> XmlCluster. This data structure is used to hold pure base clusters that don't have
+                            an ID. This function will append new pure base clusters as approrpriate to this dict.
+        ids_by_name: dict of cluster name -> ID. This function will append new IDs as appropriate to this dict.
+        problems: list of any problems encountered during spec parsing. This function will append problems as appropriate to this list.
+    '''
     cluster = xml.iter('cluster')
     for c in cluster:
         name = c.attrib['name']
@@ -433,7 +442,7 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlC
         if cluster_id:
             clusters[cluster_id] = new
         else:
-            derived_clusters[name] = new
+            pure_base_clusters[name] = new
 
 
 def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problems: list[ProblemNotice]):
@@ -446,14 +455,14 @@ def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problem
 def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'clusters')
     clusters: dict[int, XmlCluster] = {}
-    derived_clusters: dict[str, XmlCluster] = {}
+    pure_base_clusters: dict[str, XmlCluster] = {}
     ids_by_name: dict[str, int] = {}
     problems: list[ProblemNotice] = []
     for xml in glob.glob(f"{dir}/*.xml"):
         logging.info(f'Parsing file {xml}')
         tree = ElementTree.parse(f'{xml}')
         root = tree.getroot()
-        add_cluster_data_from_xml(root, clusters, derived_clusters, ids_by_name, problems)
+        add_cluster_data_from_xml(root, clusters, pure_base_clusters, ids_by_name, problems)
 
     # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
     # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
@@ -475,11 +484,11 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
         clusters[action_id].accepted_commands[c].conformance = optional()
         remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
 
-    combine_derived_clusters_with_base(clusters, derived_clusters, ids_by_name)
+    combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name)
 
     for alias_base_name, aliased_clusters in CLUSTER_ALIASES.items():
         for id, (alias_name, pics) in aliased_clusters.items():
-            base = derived_clusters[alias_base_name]
+            base = pure_base_clusters[alias_base_name]
             new = deepcopy(base)
             new.derived = alias_base_name
             new.name = alias_name
@@ -514,7 +523,7 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     return clusters, problems
 
 
-def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], derived_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int]) -> None:
+def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int]) -> None:
     ''' Overrides base elements with the derived cluster values for derived clusters. '''
 
     def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint) -> dict[uint, XmlAttribute]:
@@ -547,7 +556,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], deri
             if base_name in ids_by_name:
                 base = xml_clusters[ids_by_name[c.derived]]
             else:
-                base = derived_clusters[base_name]
+                base = pure_base_clusters[base_name]
 
             feature_map = deepcopy(base.feature_map)
             feature_map.update(c.feature_map)
