@@ -197,6 +197,7 @@ class _TestStepWithPlaceholders:
         self.event = _value_or_none(test, 'event')
         self.endpoint = _value_or_config(test, 'endpoint', config)
         self.pics = _value_or_none(test, 'PICS')
+        self.pics_checker = pics_checker
         self.is_pics_enabled = pics_checker.check(_value_or_none(test, 'PICS'))
 
         self.identity = _value_or_none(test, 'identity')
@@ -466,6 +467,10 @@ class _TestStepWithPlaceholders:
         values = container['values']
         if values is None:
             return
+
+        values = [value for value in values if value.get('PICS') is None or (
+            value.get('PICS') and self.pics_checker.check(value.get('PICS')))]
+        container['values'] = values
 
         for value in list(values):
             for key, item_value in list(value.items()):
