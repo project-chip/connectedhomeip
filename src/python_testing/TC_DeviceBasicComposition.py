@@ -196,7 +196,6 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         except KeyError:
             attr_ret = None
 
-        print(attr_ret)
 
         error_type_ok = attr_ret is not None and isinstance(
             attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
