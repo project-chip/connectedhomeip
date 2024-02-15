@@ -26,11 +26,14 @@ import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link ReportCallback}. */
 public class ReportCallbackJni {
-  @Nullable private SubscriptionEstablishedCallback wrappedSubscriptionEstablishedCallback;
-  @Nullable private ResubscriptionAttemptCallback wrappedResubscriptionAttemptCallback;
+  @Nullable
+  private SubscriptionEstablishedCallback wrappedSubscriptionEstablishedCallback;
+  @Nullable
+  private ResubscriptionAttemptCallback wrappedResubscriptionAttemptCallback;
   private ReportCallback wrappedReportCallback;
   private long callbackHandle;
-  @Nullable private NodeState nodeState;
+  @Nullable
+  private NodeState nodeState;
 
   public ReportCallbackJni(
       @Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback,
@@ -39,8 +42,7 @@ public class ReportCallbackJni {
     this.wrappedSubscriptionEstablishedCallback = subscriptionEstablishedCallback;
     this.wrappedReportCallback = reportCallback;
     this.wrappedResubscriptionAttemptCallback = resubscriptionAttemptCallback;
-    this.callbackHandle =
-        newCallback(subscriptionEstablishedCallback, resubscriptionAttemptCallback);
+    this.callbackHandle = newCallback(subscriptionEstablishedCallback, resubscriptionAttemptCallback);
   }
 
   long getCallbackHandle() {
@@ -65,50 +67,8 @@ public class ReportCallbackJni {
     nodeState = null;
   }
 
-  private void setDataVersion(int endpointId, long clusterId, long dataVersion) {
-    if (nodeState != null) {
-      nodeState.setDataVersion(endpointId, clusterId, dataVersion);
-    }
-  }
-
-  private void addAttribute(
-      int endpointId,
-      long clusterId,
-      long attributeId,
-      Object valueObject,
-      byte[] tlv,
-      String jsonString) {
-    if (nodeState != null) {
-      nodeState.addAttribute(
-          endpointId, clusterId, attributeId, new AttributeState(valueObject, tlv, jsonString));
-    }
-  }
-
-  private void addEvent(
-      int endpointId,
-      long clusterId,
-      long eventId,
-      long eventNumber,
-      int priorityLevel,
-      int timestampType,
-      long timestampValue,
-      Object valueObject,
-      byte[] tlv,
-      String jsonString) {
-    if (nodeState != null) {
-      nodeState.addEvent(
-          endpointId,
-          clusterId,
-          eventId,
-          new EventState(
-              eventNumber,
-              priorityLevel,
-              timestampType,
-              timestampValue,
-              valueObject,
-              tlv,
-              jsonString));
-    }
+  private NodeState getNodeState() {
+    return nodeState;
   }
 
   private void onError(

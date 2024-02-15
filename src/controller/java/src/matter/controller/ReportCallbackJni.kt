@@ -18,9 +18,7 @@
 package matter.controller
 
 import matter.controller.model.AttributePath
-import matter.controller.model.AttributeState
 import matter.controller.model.EventPath
-import matter.controller.model.EventState
 import matter.controller.model.NodeState
 
 /** JNI wrapper callback class for [ReportCallback]. */
@@ -67,60 +65,8 @@ class ReportCallbackJni(
     nodeState = null
   }
 
-  private fun setDataVersion(endpointId: Int, clusterId: Long, dataVersion: Long) {
-    nodeState?.setDataVersion(endpointId.toUShort(), clusterId.toUInt(), dataVersion.toUInt())
-  }
-
-  private fun addAttribute(
-    endpointId: Int,
-    clusterId: Long,
-    attributeId: Long,
-    valueObject: Any,
-    tlv: ByteArray,
-    jsonString: String
-  ) {
-    nodeState?.addAttribute(
-      endpointId.toUShort(),
-      clusterId.toUInt(),
-      attributeId.toUInt(),
-      AttributeState(
-        attributeId,
-        tlv,
-        jsonString,
-        AttributePath(endpointId.toUShort(), clusterId.toUInt(), attributeId.toUInt()),
-        valueObject
-      )
-    )
-  }
-
-  private fun addEvent(
-    endpointId: Int,
-    clusterId: Long,
-    eventId: Long,
-    eventNumber: Long,
-    priorityLevel: Int,
-    timestampType: Int,
-    timestampValue: Long,
-    valueObject: Any,
-    tlv: ByteArray,
-    jsonString: String
-  ) {
-    nodeState?.addEvent(
-      endpointId.toUShort(),
-      clusterId.toUInt(),
-      eventId.toUInt(),
-      EventState(
-        eventId,
-        eventNumber,
-        priorityLevel,
-        timestampType,
-        timestampValue,
-        tlv,
-        EventPath(endpointId.toUShort(), clusterId.toUInt(), eventId.toUInt()),
-        jsonString,
-        valueObject
-      )
-    )
+  private fun getNodeState(): NodeState? {
+    return nodeState
   }
 
   private fun onError(

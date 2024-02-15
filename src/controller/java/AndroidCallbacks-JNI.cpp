@@ -39,7 +39,7 @@ JNI_METHOD(void, GetConnectedDeviceCallbackJni, deleteCallback)(JNIEnv * env, jo
 JNI_METHOD(jlong, ReportCallbackJni, newCallback)
 (JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject resubscriptionAttemptCallbackJava)
 {
-    return newReportCallback(env, self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava);
+    return newReportCallback(env, self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava, "()Lchip/devicecontroller/model/NodeState;");
 }
 
 JNI_METHOD(void, ReportCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)

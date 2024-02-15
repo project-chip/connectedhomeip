@@ -23,7 +23,7 @@ package matter.controller.model
  * @param endpoints A mapping of endpoint IDs with the associated cluster data.
  */
 class NodeState(val endpoints: MutableMap<Int, EndpointState> = mutableMapOf()) {
-  fun addAttribute(
+  private fun addAttribute(
     endpointId: UShort,
     clusterId: UInt,
     attributeId: UInt,
@@ -32,12 +32,43 @@ class NodeState(val endpoints: MutableMap<Int, EndpointState> = mutableMapOf()) 
     getEndpointState(endpointId).addAttribute(clusterId, attributeId, attributeState)
   }
 
-  fun addEvent(endpointId: UShort, clusterId: UInt, eventId: UInt, eventState: EventState) {
+  private fun addEvent(endpointId: UShort, clusterId: UInt, eventId: UInt, eventState: EventState) {
     getEndpointState(endpointId).addEvent(clusterId, eventId, eventState)
   }
 
-  fun setDataVersion(endpointId: UShort, clusterId: UInt, dataVersion: UInt) {
+  private fun setDataVersion(endpointId: UShort, clusterId: UInt, dataVersion: UInt) {
     getEndpointState(endpointId).clusters[clusterId.toLong()]?.dataVersion = dataVersion
+  }
+
+  private fun addAttributeStatus(
+    endpointId: UShort,
+    clusterId: UInt,
+    attributeId: UInt,
+    statusToAdd: Status
+  ) {
+    val endpointState = getEndpointState(endpointId)
+    val clusterState = endpointState.getClusterState(clusterId)
+    if (clusterState.attributes[attributeId.toLong()] != null) {
+      clusterState.attributes.remove(attributeId.toLong())
+    }
+    clusterState.attributeStatuses[attributeId.toLong()] = statusToAdd
+  }
+
+  private fun addEventStatus(
+    endpointId: UShort,
+    clusterId: UInt,
+    eventId: UInt,
+    statusToAdd: Status
+  ) {
+    val endpointState = getEndpointState(endpointId)
+    val clusterState = endpointState.getClusterState(clusterId)
+    if (clusterState.events[eventId.toLong()] != null) {
+      clusterState.events.remove(eventId.toLong())
+    }
+    val eventStatuses = clusterState.eventStatuses.getOrDefault(eventId.toLong(), mutableListOf())
+    eventStatuses.add(statusToAdd)
+
+    clusterState.eventStatuses[eventId.toLong()] = eventStatuses
   }
 
   private fun getEndpointState(endpointId: UShort): EndpointState {
@@ -47,6 +78,92 @@ class NodeState(val endpoints: MutableMap<Int, EndpointState> = mutableMapOf()) 
       endpoints[endpointId.toInt()] = endpointState
     }
     return endpointState
+  }
+
+  private fun addAttribute(
+    endpointId: Int,
+    clusterId: Long,
+    attributeId: Long,
+    valueObject: Any,
+    tlv: ByteArray,
+    jsonString: String
+  ) {
+    addAttribute(
+      endpointId.toUShort(),
+      clusterId.toUInt(),
+      attributeId.toUInt(),
+      AttributeState(
+        attributeId,
+        tlv,
+        jsonString,
+        AttributePath(endpointId.toUShort(), clusterId.toUInt(), attributeId.toUInt()),
+        valueObject
+      )
+    )
+  }
+
+  private fun addEvent(
+    endpointId: Int,
+    clusterId: Long,
+    eventId: Long,
+    eventNumber: Long,
+    priorityLevel: Int,
+    timestampType: Int,
+    timestampValue: Long,
+    valueObject: Any,
+    tlv: ByteArray,
+    jsonString: String
+  ) {
+    addEvent(
+      endpointId.toUShort(),
+      clusterId.toUInt(),
+      eventId.toUInt(),
+      EventState(
+        eventId,
+        eventNumber,
+        priorityLevel,
+        timestampType,
+        timestampValue,
+        tlv,
+        EventPath(endpointId.toUShort(), clusterId.toUInt(), eventId.toUInt()),
+        jsonString,
+        valueObject
+      )
+    )
+  }
+
+  private fun setDataVersion(endpointId: Int, clusterId: Long, dataVersion: Long) {
+    setDataVersion(endpointId.toUShort(), clusterId.toUInt(), dataVersion.toUInt())
+  }
+
+  private fun addAttributeStatus(
+    endpointId: Int,
+    clusterId: Long,
+    attributeId: Long,
+    status: Int,
+    clusterStatus: Int?
+  ) {
+    addAttributeStatus(
+      endpointId.toUShort(),
+      clusterId.toUInt(),
+      attributeId.toUInt(),
+      Status(status, clusterStatus)
+    )
+  }
+
+  private fun addEventStatus(
+    endpointId: Int,
+    clusterId: Long,
+    eventId: Long,
+    status: Int,
+    clusterStatus: Int?
+  ) {
+    addEventStatus(
+      endpointId.toUShort(),
+      clusterId.toUInt(),
+      eventId.toUInt(),
+      Status(status, clusterStatus)
+    )
   }
 }
 
@@ -65,7 +182,7 @@ class EndpointState(val id: Int, val clusters: MutableMap<Long, ClusterState> = 
     getClusterState(clusterId).addEvent(eventId, eventState)
   }
 
-  private fun getClusterState(clusterId: UInt): ClusterState {
+  internal fun getClusterState(clusterId: UInt): ClusterState {
     var clusterState: ClusterState? = clusters[clusterId.toLong()]
     if (clusterState == null) {
       clusterState = ClusterState(clusterId.toLong())
@@ -87,7 +204,9 @@ class ClusterState(
   val id: Long,
   val attributes: MutableMap<Long, AttributeState> = mutableMapOf(),
   val events: MutableMap<Long, MutableList<EventState>> = mutableMapOf(),
-  var dataVersion: UInt? = null
+  var dataVersion: UInt? = null,
+  val attributeStatuses: MutableMap<Long, Status> = mutableMapOf(),
+  val eventStatuses: MutableMap<Long, MutableList<Status>> = mutableMapOf()
 ) {
   fun addAttribute(attributeId: UInt, attributeState: AttributeState) {
     attributes[attributeId.toLong()] = attributeState
@@ -154,3 +273,5 @@ data class EventState(
     return null
   }
 }
+
+data class Status(val status: Int, val clusterStatus: Int?)

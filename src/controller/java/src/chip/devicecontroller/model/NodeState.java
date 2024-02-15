@@ -20,6 +20,7 @@ package chip.devicecontroller.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /** Class for tracking CHIP node state in a hierarchical manner. */
@@ -34,7 +35,54 @@ public final class NodeState {
     return endpoints;
   }
 
-  public void setDataVersion(int endpointId, long clusterId, long dataVersion) {
+  // Called from native code only, which ignores access modifiers.
+  private void addAttribute(
+      int endpointId,
+      long clusterId,
+      long attributeId,
+      Object valueObject,
+      byte[] tlv,
+      String jsonString) {
+    addAttribute(
+        endpointId, clusterId, attributeId, new AttributeState(valueObject, tlv, jsonString));
+  }
+
+  private void addEvent(
+      int endpointId,
+      long clusterId,
+      long eventId,
+      long eventNumber,
+      int priorityLevel,
+      int timestampType,
+      long timestampValue,
+      Object valueObject,
+      byte[] tlv,
+      String jsonString) {
+    addEvent(
+        endpointId,
+        clusterId,
+        eventId,
+        new EventState(
+            eventNumber,
+            priorityLevel,
+            timestampType,
+            timestampValue,
+            valueObject,
+            tlv,
+            jsonString));
+  }
+
+  private void addAttributeStatus(
+      int endpointId, long clusterId, long attributeId, int status, @Nullable Integer clusterStatus) {
+    addAttributeStatus(endpointId, clusterId, attributeId, Status.newInstance(status, clusterStatus));
+  }
+
+  private void addEventStatus(int endpointId, long clusterId, long eventId, int status,
+      @Nullable Integer clusterStatus) {
+    addEventStatus(endpointId, clusterId, eventId, Status.newInstance(status, clusterStatus));
+  }
+
+  private void setDataVersion(int endpointId, long clusterId, long dataVersion) {
     EndpointState endpointState = getEndpointState(endpointId);
     ClusterState clusterState = endpointState.getClusterState(clusterId);
 
@@ -43,7 +91,7 @@ public final class NodeState {
     }
   }
 
-  public void addAttribute(
+  private void addAttribute(
       int endpointId, long clusterId, long attributeId, AttributeState attributeStateToAdd) {
     EndpointState endpointState = getEndpointState(endpointId);
     if (endpointState == null) {
@@ -53,8 +101,7 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState =
-          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      clusterState = new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
@@ -66,7 +113,7 @@ public final class NodeState {
     clusterState.getAttributeStates().put(attributeId, attributeStateToAdd);
   }
 
-  public void addEvent(int endpointId, long clusterId, long eventId, EventState eventStateToAdd) {
+  private void addEvent(int endpointId, long clusterId, long eventId, EventState eventStateToAdd) {
     EndpointState endpointState = getEndpointState(endpointId);
     if (endpointState == null) {
       endpointState = new EndpointState(new HashMap<>());
@@ -75,8 +122,7 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState =
-          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      clusterState = new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
@@ -91,7 +137,6 @@ public final class NodeState {
     clusterState.getEventStates().get(eventId).add(eventStateToAdd);
   }
 
-  // Called from native code only, which ignores access modifiers.
   private void addAttributeStatus(
       int endpointId, long clusterId, long attributeId, Status statusToAdd) {
     EndpointState endpointState = getEndpointState(endpointId);
@@ -102,15 +147,14 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState =
-          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      clusterState = new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
     if (clusterState.getAttributeStates().containsKey(attributeId)) {
       clusterState.getAttributeStates().remove(attributeId);
     }
-
+    System.out.println("put : " + attributeId + ", " + statusToAdd);
     clusterState.getAttributeStatuses().put(attributeId, statusToAdd);
   }
 
@@ -123,8 +167,7 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState =
-          new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
+      clusterState = new ClusterState(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 

@@ -55,7 +55,7 @@ private:
 struct ReportCallback : public app::ClusterStateCache::Callback
 {
     /** Subscription established callback can be nullptr. */
-    ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject resubscriptionAttemptCallback);
+    ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject resubscriptionAttemptCallback, const char * nodeStateClassSignature);
     ~ReportCallback();
 
     void OnReportBegin() override;
@@ -91,6 +91,8 @@ struct ReportCallback : public app::ClusterStateCache::Callback
     JniGlobalReference mWrapperCallbackRef;
     JniGlobalReference mSubscriptionEstablishedCallbackRef;
     JniGlobalReference mResubscriptionAttemptCallbackRef;
+
+    const char * mNodeStateClassSignature;
 };
 
 struct WriteAttributesCallback : public app::WriteClient::Callback
@@ -140,7 +142,7 @@ struct InvokeCallback : public app::CommandSender::Callback
 jlong newConnectedDeviceCallback(JNIEnv * env, jobject self, jobject callback);
 void deleteConnectedDeviceCallback(JNIEnv * env, jobject self, jlong callbackHandle);
 jlong newReportCallback(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava,
-                        jobject resubscriptionAttemptCallbackJava);
+                        jobject resubscriptionAttemptCallbackJava, const char * nodeStateClassSignature);
 void deleteReportCallback(JNIEnv * env, jobject self, jlong callbackHandle);
 jlong newWriteAttributesCallback(JNIEnv * env, jobject self);
 void deleteWriteAttributesCallback(JNIEnv * env, jobject self, jlong callbackHandle);
