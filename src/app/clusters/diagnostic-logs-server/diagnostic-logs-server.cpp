@@ -24,9 +24,9 @@
 
 #include "BDXDiagnosticLogsProvider.h"
 
-#ifdef EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
+#ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
 static constexpr size_t kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize =
-    EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize < kEmberInvalidEndpointIndex,
               "DiagnosticLogs: log provider delegate table size error");
 
@@ -49,7 +49,7 @@ DiagnosticLogsProviderDelegate * gDiagnosticLogsProviderDelegateTable[kDiagnosti
 
 DiagnosticLogsProviderDelegate * GetDiagnosticLogsProviderDelegate(EndpointId endpoint)
 {
-    uint16_t ep   = emberAfGetClusterServerEndpointIndex(endpoint, Id, EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep   = emberAfGetClusterServerEndpointIndex(endpoint, Id, MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
     auto delegate = (ep >= ArraySize(gDiagnosticLogsProviderDelegateTable) ? nullptr : gDiagnosticLogsProviderDelegateTable[ep]);
 
     if (delegate == nullptr)
@@ -89,7 +89,7 @@ DiagnosticLogsServer DiagnosticLogsServer::sInstance;
 
 void DiagnosticLogsServer::SetDiagnosticLogsProviderDelegate(EndpointId endpoint, DiagnosticLogsProviderDelegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Id, EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Id, MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (ep < kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize)
     {
         gDiagnosticLogsProviderDelegateTable[ep] = delegate;
@@ -187,4 +187,4 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandH
 }
 
 void MatterDiagnosticLogsPluginServerInitCallback() {}
-#endif // #ifdef EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
+#endif // #ifdef MATTER_DM_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT

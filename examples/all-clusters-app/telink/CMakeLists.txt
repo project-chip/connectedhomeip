@@ -85,6 +85,7 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/device-energy-management-stub.cpp               
                ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ElectricalPowerMeasurementDelegate.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp

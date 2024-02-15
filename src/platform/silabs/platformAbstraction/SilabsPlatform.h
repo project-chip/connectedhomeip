@@ -49,6 +49,7 @@ public:
 #endif
 
     inline void SetButtonsCb(SilabsButtonCb callback) override { mButtonCallback = callback; }
+    inline uint32_t GetRebootCause() { return mRebootCause; }
 
     static SilabsButtonCb mButtonCallback;
 
@@ -64,6 +65,7 @@ private:
     SilabsPlatform(){};
     virtual ~SilabsPlatform() = default;
 
+    uint32_t mRebootCause = 0;
     static SilabsPlatform sSilabsPlatformAbstractionManager;
 };
 

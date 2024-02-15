@@ -224,6 +224,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     {
         err = ProcessInvokeResponse(std::move(aPayload), moreChunkedMessages);
         SuccessOrExit(err);
+        mInvokeResponseMessageCount++;
         if (moreChunkedMessages)
         {
             StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);
@@ -442,7 +443,8 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
 #endif
 }
 
-CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs)
+CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams,
+                                         PrepareCommandParameters & aPrepareCommandParams)
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
@@ -453,10 +455,10 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
-    VerifyOrReturnError(!aOptionalArgs.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     if (mBatchCommandsEnabled)
     {
-        aOptionalArgs.commandRef.SetValue(mFinishedCommandCount);
+        VerifyOrReturnError(aPrepareCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aPrepareCommandParams.commandRef.Value() == mFinishedCommandCount, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
@@ -466,7 +468,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     ReturnErrorOnFailure(invokeRequest.GetError());
     ReturnErrorOnFailure(path.Encode(aCommandPathParams));
 
-    if (aOptionalArgs.startOrEndDataStruct)
+    if (aPrepareCommandParams.startDataStruct)
     {
         ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
@@ -476,7 +478,18 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::FinishCommand(const AdditionalCommandParameters & aOptionalArgs)
+CHIP_ERROR CommandSender::FinishCommand(FinishCommandParameters & aFinishCommandParams)
+{
+    if (mBatchCommandsEnabled)
+    {
+        VerifyOrReturnError(aFinishCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aFinishCommandParams.commandRef.Value() == mFinishedCommandCount, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    return FinishCommandInternal(aFinishCommandParams);
+}
+
+CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinishCommandParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -484,20 +497,14 @@ CHIP_ERROR CommandSender::FinishCommand(const AdditionalCommandParameters & aOpt
 
     CommandDataIB::Builder & commandData = mInvokeRequestBuilder.GetInvokeRequests().GetCommandData();
 
-    if (aOptionalArgs.startOrEndDataStruct)
+    if (aFinishCommandParams.endDataStruct)
     {
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
 
-    if (mBatchCommandsEnabled)
+    if (aFinishCommandParams.commandRef.HasValue())
     {
-        // If error below occurs, aOptionalArgs.commandRef was modified since PerpareCommand was called.
-        VerifyOrReturnError(aOptionalArgs.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    if (aOptionalArgs.commandRef.HasValue())
-    {
-        ReturnErrorOnFailure(commandData.Ref(aOptionalArgs.commandRef.Value()));
+        ReturnErrorOnFailure(commandData.Ref(aFinishCommandParams.commandRef.Value()));
     }
 
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
@@ -505,6 +512,12 @@ CHIP_ERROR CommandSender::FinishCommand(const AdditionalCommandParameters & aOpt
     MoveToState(State::AddedCommand);
 
     mFinishedCommandCount++;
+
+    if (aFinishCommandParams.timedInvokeTimeoutMs.HasValue())
+    {
+        SetTimedInvokeTimeoutMs(aFinishCommandParams.timedInvokeTimeoutMs);
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -518,10 +531,8 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
-CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                        const AdditionalCommandParameters & aOptionalArgs)
+void CommandSender::SetTimedInvokeTimeoutMs(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
 {
-    ReturnErrorOnFailure(FinishCommand(aOptionalArgs));
     if (!mTimedInvokeTimeoutMs.HasValue())
     {
         mTimedInvokeTimeoutMs = aTimedInvokeTimeoutMs;
@@ -531,7 +542,11 @@ CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeT
         uint16_t newValue = std::min(mTimedInvokeTimeoutMs.Value(), aTimedInvokeTimeoutMs.Value());
         mTimedInvokeTimeoutMs.SetValue(newValue);
     }
-    return CHIP_NO_ERROR;
+}
+
+size_t CommandSender::GetInvokeResponseMessageCount()
+{
+    return static_cast<size_t>(mInvokeResponseMessageCount);
 }
 
 CHIP_ERROR CommandSender::Finalize(System::PacketBufferHandle & commandPacket)

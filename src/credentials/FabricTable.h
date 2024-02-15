@@ -116,15 +116,15 @@ public:
 private:
     struct InitParams
     {
-        NodeId nodeId                         = kUndefinedNodeId;
-        FabricId fabricId                     = kUndefinedFabricId;
-        FabricIndex fabricIndex               = kUndefinedFabricIndex;
-        CompressedFabricId compressedFabricId = kUndefinedCompressedFabricId;
-        Crypto::P256PublicKey rootPublicKey;
-        VendorId vendorId                        = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
+        CompressedFabricId compressedFabricId    = kUndefinedCompressedFabricId;
+        NodeId nodeId                            = kUndefinedNodeId;
+        FabricIndex fabricIndex                  = kUndefinedFabricIndex;
         Crypto::P256Keypair * operationalKeypair = nullptr;
-        bool hasExternallyOwnedKeypair           = false;
-        bool advertiseIdentity                   = false;
+        FabricId fabricId                        = kUndefinedFabricId;
+        Crypto::P256PublicKey rootPublicKey;
+        VendorId vendorId              = VendorId::NotSpecified; /**< Vendor ID for commissioner of fabric */
+        bool hasExternallyOwnedKeypair = false;
+        bool advertiseIdentity         = false;
 
         CHIP_ERROR AreValid() const
         {

@@ -54,7 +54,7 @@ namespace Silabs {
 
 void OnSoftwareFaultEventHandler(const char * faultRecordString)
 {
-#ifdef EMBER_AF_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
+#ifdef MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
     EnabledEndpointsWithServerCluster enabledEndpoints(SoftwareDiagnostics::Id);
     VerifyOrReturn(enabledEndpoints.begin() != enabledEndpoints.end());
 
@@ -71,7 +71,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
 
     SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
-#endif // EMBER_AF_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
+#endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 }
 
 } // namespace Silabs

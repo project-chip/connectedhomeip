@@ -34,5 +34,5 @@ public:
 
 private:
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 7;
+    static constexpr uint32_t kEndpointFeatureMap = 7;
 };

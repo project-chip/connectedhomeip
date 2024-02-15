@@ -46,7 +46,7 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return static_cast<uint16_t>(ICDConfigurationData::GetInstance().GetIdleModeDurationSec());
+    return std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif

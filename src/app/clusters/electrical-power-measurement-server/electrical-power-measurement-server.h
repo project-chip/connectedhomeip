@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/CommonIterator.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -31,8 +32,6 @@ namespace ElectricalPowerMeasurement {
 using namespace chip::app::Clusters::ElectricalPowerMeasurement::Attributes;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement::Structs;
 
-using chip::Protocols::InteractionModel::Status;
-
 class Delegate
 {
 public:
@@ -40,29 +39,46 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    using AccuracyIterator            = CommonIterator<Structs::MeasurementAccuracyStruct::Type>;
-    using RangeIterator               = CommonIterator<Structs::MeasurementRangeStruct::Type>;
     using HarmonicMeasurementIterator = CommonIterator<Structs::HarmonicMeasurementStruct::Type>;
 
-    virtual PowerModeEnum GetPowerMode()                            = 0;
-    virtual uint8_t GetNumberOfMeasurementTypes()                   = 0;
-    virtual AccuracyIterator * IterateAccuracy()                    = 0;
-    virtual RangeIterator * IterateRanges()                         = 0;
-    virtual DataModel::Nullable<int64_t> GetVoltage()               = 0;
-    virtual DataModel::Nullable<int64_t> GetActiveCurrent()         = 0;
-    virtual DataModel::Nullable<int64_t> GetReactiveCurrent()       = 0;
-    virtual DataModel::Nullable<int64_t> GetApparentCurrent()       = 0;
-    virtual DataModel::Nullable<int64_t> GetActivePower()           = 0;
-    virtual DataModel::Nullable<int64_t> GetReactivePower()         = 0;
-    virtual DataModel::Nullable<int64_t> GetApparentPower()         = 0;
-    virtual DataModel::Nullable<int64_t> GetRMSVoltage()            = 0;
-    virtual DataModel::Nullable<int64_t> GetRMSCurrent()            = 0;
-    virtual DataModel::Nullable<int64_t> GetRMSPower()              = 0;
-    virtual DataModel::Nullable<int64_t> GetFrequency()             = 0;
-    virtual HarmonicMeasurementIterator * IterateHarmonicCurrents() = 0;
-    virtual HarmonicMeasurementIterator * IterateHarmonicPhases()   = 0;
-    virtual DataModel::Nullable<int64_t> GetPowerFactor()           = 0;
-    virtual DataModel::Nullable<int64_t> GetNeutralCurrent()        = 0;
+    virtual PowerModeEnum GetPowerMode()          = 0;
+    virtual uint8_t GetNumberOfMeasurementTypes() = 0;
+
+    /* These functions are called by the ReadAttribute handler to iterate through lists
+     * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
+     * lock on the data.
+     * The delegate is expected to not change these values once Start<Type>Read has been called
+     * until the End<Type>Read() has been called (e.g. releasing a lock on the data)
+     */
+    virtual CHIP_ERROR StartAccuracyRead()                                                     = 0;
+    virtual CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) = 0;
+    virtual CHIP_ERROR EndAccuracyRead()                                                       = 0;
+
+    virtual CHIP_ERROR StartRangesRead()                                                 = 0;
+    virtual CHIP_ERROR GetRangeByIndex(uint8_t, Structs::MeasurementRangeStruct::Type &) = 0;
+    virtual CHIP_ERROR EndRangesRead()                                                   = 0;
+
+    virtual CHIP_ERROR StartHarmonicCurrentsRead()                                                     = 0;
+    virtual CHIP_ERROR GetHarmonicCurrentsByIndex(uint8_t, Structs::HarmonicMeasurementStruct::Type &) = 0;
+    virtual CHIP_ERROR EndHarmonicCurrentsRead()                                                       = 0;
+
+    virtual CHIP_ERROR StartHarmonicPhasesRead()                                                     = 0;
+    virtual CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t, Structs::HarmonicMeasurementStruct::Type &) = 0;
+    virtual CHIP_ERROR EndHarmonicPhasesRead()                                                       = 0;
+
+    virtual DataModel::Nullable<int64_t> GetVoltage()         = 0;
+    virtual DataModel::Nullable<int64_t> GetActiveCurrent()   = 0;
+    virtual DataModel::Nullable<int64_t> GetReactiveCurrent() = 0;
+    virtual DataModel::Nullable<int64_t> GetApparentCurrent() = 0;
+    virtual DataModel::Nullable<int64_t> GetActivePower()     = 0;
+    virtual DataModel::Nullable<int64_t> GetReactivePower()   = 0;
+    virtual DataModel::Nullable<int64_t> GetApparentPower()   = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSVoltage()      = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSCurrent()      = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSPower()        = 0;
+    virtual DataModel::Nullable<int64_t> GetFrequency()       = 0;
+    virtual DataModel::Nullable<int64_t> GetPowerFactor()     = 0;
+    virtual DataModel::Nullable<int64_t> GetNeutralCurrent()  = 0;
 
 protected:
     EndpointId mEndpointId = 0;
@@ -112,10 +128,10 @@ private:
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-    CHIP_ERROR ReadAccuracy(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadRanges(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadHarmonicCurrents(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadHarmonicPhases(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR EncodeRanges(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR EncodeHarmonicCurrents(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR EncodeHarmonicPhases(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 };
 
 } // namespace ElectricalPowerMeasurement

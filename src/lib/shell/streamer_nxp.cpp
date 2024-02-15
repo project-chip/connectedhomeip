@@ -25,7 +25,6 @@
 /*                                  Includes                                  */
 /* -------------------------------------------------------------------------- */
 
-#include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 
 #include <stdio.h>
@@ -65,6 +64,25 @@
 #endif
 #endif
 
+// pw RPC uses UART DMA by default
+#ifdef PW_RPC_ENABLED
+#define CONSUMER_TASK_HANDLE RpcTaskHandle
+#ifndef STREAMER_UART_USE_DMA
+#define STREAMER_UART_USE_DMA 1
+#endif
+#else
+#define CONSUMER_TASK_HANDLE AppMatterCliTaskHandle
+#ifndef STREAMER_UART_USE_DMA
+#define STREAMER_UART_USE_DMA 0
+#endif
+#endif // PW_RPC_ENABLED
+
+#if STREAMER_UART_USE_DMA
+typedef serial_port_uart_dma_config_t streamer_serial_port_uart_config_t;
+#else
+typedef serial_port_uart_config_t streamer_serial_port_uart_config_t;
+#endif
+
 /* -------------------------------------------------------------------------- */
 /*                             Private prototypes                             */
 /* -------------------------------------------------------------------------- */
@@ -82,23 +100,33 @@ static SERIAL_MANAGER_READ_HANDLE_DEFINE(streamerSerialReadHandle);
 static volatile int txCount = 0;
 static bool readDone        = true;
 
-static serial_port_uart_config_t uartConfig = { .clockRate    = BOARD_APP_UART_CLK_FREQ,
-                                                .baudRate     = BOARD_DEBUG_UART_BAUDRATE,
-                                                .parityMode   = kSerialManager_UartParityDisabled,
-                                                .stopBitCount = kSerialManager_UartOneStopBit,
-                                                .enableRx     = 1,
-                                                .enableTx     = 1,
-                                                .enableRxRTS  = 0,
-                                                .enableTxCTS  = 0,
-                                                .instance     = BOARD_APP_UART_INSTANCE };
+static streamer_serial_port_uart_config_t uartConfig = { .clockRate    = BOARD_APP_UART_CLK_FREQ,
+                                                         .baudRate     = BOARD_DEBUG_UART_BAUDRATE,
+                                                         .parityMode   = kSerialManager_UartParityDisabled,
+                                                         .stopBitCount = kSerialManager_UartOneStopBit,
+                                                         .enableRx     = 1,
+                                                         .enableTx     = 1,
+                                                         .enableRxRTS  = 0,
+                                                         .enableTxCTS  = 0,
+                                                         .instance     = BOARD_APP_UART_INSTANCE,
+#if STREAMER_UART_USE_DMA
+                                                         .dma_instance = 0,
+                                                         .rx_channel   = 1,
+                                                         .tx_channel   = 0
+#endif
+};
 
 static uint8_t s_ringBuffer[STREAMER_UART_SERIAL_MANAGER_RING_BUFFER_SIZE];
 static const serial_manager_config_t s_serialManagerConfig = {
     .ringBuffer     = &s_ringBuffer[0],
     .ringBufferSize = STREAMER_UART_SERIAL_MANAGER_RING_BUFFER_SIZE,
-    .type           = BOARD_DEBUG_UART_TYPE,
-    .blockType      = kSerialManager_NonBlocking,
-    .portConfig     = (serial_port_uart_config_t *) &uartConfig,
+#if STREAMER_UART_USE_DMA
+    .type = kSerialPort_UartDma,
+#else
+    .type = BOARD_DEBUG_UART_TYPE,
+#endif
+    .blockType  = kSerialManager_NonBlocking,
+    .portConfig = (serial_port_uart_config_t *) &uartConfig,
 };
 
 /* -------------------------------------------------------------------------- */
@@ -107,7 +135,6 @@ static const serial_manager_config_t s_serialManagerConfig = {
 
 namespace chip {
 namespace Shell {
-namespace {
 
 int streamer_nxp_init(streamer_t * streamer)
 {
@@ -119,7 +146,12 @@ int streamer_nxp_init(streamer_t * streamer)
     BOARD_CLIAttachClk();
 #endif
 
-    uartConfig.clockRate = BOARD_APP_UART_CLK_FREQ;
+#if STREAMER_UART_USE_DMA
+    dma_channel_mux_configure_t dma_channel_mux;
+    dma_channel_mux.dma_dmamux_configure.dma_tx_channel_mux = kDmaRequestLPUART1Tx;
+    dma_channel_mux.dma_dmamux_configure.dma_rx_channel_mux = kDmaRequestLPUART1Rx;
+    uartConfig.dma_channel_mux_configure                    = &dma_channel_mux;
+#endif
 
     /*
      * Make sure to disable interrupts while initializating the serial manager interface
@@ -192,8 +224,8 @@ ssize_t streamer_nxp_write(streamer_t * streamer, const char * buffer, size_t le
 
     intMask = DisableGlobalIRQ();
     txCount++;
-    status =
-        SerialManager_WriteNonBlocking((serial_write_handle_t) streamerSerialWriteHandle, (uint8_t *) buffer, (uint32_t) length);
+    status = SerialManager_WriteNonBlocking((serial_write_handle_t) streamerSerialWriteHandle,
+                                            (uint8_t *) (const_cast<char *>(buffer)), (uint32_t) length);
     EnableGlobalIRQ(intMask);
     if (status == kStatus_SerialManager_Success)
     {
@@ -214,7 +246,6 @@ static streamer_t streamer_nxp = {
     .read_cb  = streamer_nxp_read,
     .write_cb = streamer_nxp_write,
 };
-} // namespace
 
 streamer_t * streamer_get(void)
 {
@@ -227,13 +258,14 @@ streamer_t * streamer_get(void)
 /* -------------------------------------------------------------------------- */
 /*                              Private functions                             */
 /* -------------------------------------------------------------------------- */
-extern TaskHandle_t AppMatterCliTaskHandle;
+extern TaskHandle_t CONSUMER_TASK_HANDLE;
+
 static void Uart_RxCallBack(void * pData, serial_manager_callback_message_t * message, serial_manager_status_t status)
 {
-    if (AppMatterCliTaskHandle != NULL)
+    if (CONSUMER_TASK_HANDLE != NULL)
     {
         /* notify the main loop that a RX buffer is available */
-        xTaskNotifyGive(AppMatterCliTaskHandle);
+        xTaskNotifyGive(CONSUMER_TASK_HANDLE);
     }
 }
 

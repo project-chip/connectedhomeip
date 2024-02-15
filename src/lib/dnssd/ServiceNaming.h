@@ -20,7 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Constants.h>
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/Types.h>
 #include <lib/support/Span.h>
 
 #include <cstddef>

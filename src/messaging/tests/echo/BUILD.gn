@@ -17,15 +17,29 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 
-assert(chip_build_tools)
-
-executable("chip-echo-requester") {
+source_set("common") {
   sources = [
     "common.cpp",
-    "echo_requester.cpp",
+    "common.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
+    "${chip_root}/src/transport",
+  ]
+}
+
+executable("chip-echo-requester") {
+  sources = [ "echo_requester.cpp" ]
+
+  public_deps = [
+    ":common",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
@@ -37,12 +51,10 @@ executable("chip-echo-requester") {
 }
 
 executable("chip-echo-responder") {
-  sources = [
-    "common.cpp",
-    "echo_responder.cpp",
-  ]
+  sources = [ "echo_responder.cpp" ]
 
   public_deps = [
+    ":common",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",

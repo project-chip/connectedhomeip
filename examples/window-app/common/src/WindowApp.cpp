@@ -455,7 +455,7 @@ void WindowApp::Cover::Finish()
 
 void WindowApp::Cover::LiftStepToward(OperationalState direction)
 {
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     chip::Percent100ths percent100ths;
     NPercent100ths current;
 
@@ -463,7 +463,7 @@ void WindowApp::Cover::LiftStepToward(OperationalState direction)
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+    if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
     }
@@ -519,7 +519,7 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
 
 void WindowApp::Cover::TiltStepToward(OperationalState direction)
 {
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     chip::Percent100ths percent100ths;
     NPercent100ths current;
 
@@ -527,7 +527,7 @@ void WindowApp::Cover::TiltStepToward(OperationalState direction)
     status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+    if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
     }
@@ -595,7 +595,7 @@ void WindowApp::Cover::StepToward(OperationalState direction, bool isTilt)
 
 void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isTilt)
 {
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     NPercent100ths current;
     chip::Percent100ths target;
 
@@ -604,7 +604,7 @@ void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isT
     if (isTilt)
     {
         status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
         {
 
             target = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
@@ -614,7 +614,7 @@ void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isT
     else
     {
         status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        if ((status == Protocols::InteractionModel::Status::Success) && !current.IsNull())
         {
 
             target = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);

@@ -48,10 +48,6 @@ using namespace TLV;
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
-    if ((mJavaVM != nullptr) && (mJavaObjectRef != nullptr))
-    {
-        JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mJavaObjectRef);
-    }
     mController->Shutdown();
 
 #ifndef JAVA_MATTER_CONTROLLER_TEST
@@ -83,14 +79,17 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
 {
-    mJavaVM        = vm;
-    mJavaObjectRef = JniReferences::GetInstance().GetEnvForCurrentThread()->NewGlobalRef(obj);
+    mJavaVM = vm;
+    if (mJavaObjectRef.Init(obj) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Fail to init mJavaObjectRef");
+    }
 }
 
 void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jint argument)
 {
-    JniReferences::GetInstance().CallVoidInt(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef, methodName,
-                                             argument);
+    JniReferences::GetInstance().CallVoidInt(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef.ObjectRef(),
+                                             methodName, argument);
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
@@ -235,7 +234,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     err = opCredsIssuer->Initialize(wrapper->mExampleStorage);
 #else
     // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
-    err = opCredsIssuer->Initialize(*wrapper.get(), &wrapper->mAutoCommissioner, wrapper.get()->mJavaObjectRef);
+    err = opCredsIssuer->Initialize(*wrapper.get(), &wrapper->mAutoCommissioner, wrapper.get()->mJavaObjectRef.ObjectRef());
 #endif
     if (err != CHIP_NO_ERROR)
     {
@@ -534,21 +533,18 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateDeviceAttestationDelegateBridge
                                                                                  chip::Optional<uint16_t> expiryTimeoutSecs,
                                                                                  bool shouldWaitAfterDeviceAttestation)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    DeviceAttestationDelegateBridge * delegateBridge =
-        new DeviceAttestationDelegateBridge(deviceAttestationDelegate, expiryTimeoutSecs, shouldWaitAfterDeviceAttestation);
-    VerifyOrExit(delegateBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
+    chip::JniGlobalReference deviceAttestationDelegateRef;
+    ReturnErrorOnFailure(deviceAttestationDelegateRef.Init(deviceAttestationDelegate));
+    DeviceAttestationDelegateBridge * delegateBridge = new DeviceAttestationDelegateBridge(
+        std::move(deviceAttestationDelegateRef), expiryTimeoutSecs, shouldWaitAfterDeviceAttestation);
+    VerifyOrReturnError(delegateBridge != nullptr, CHIP_ERROR_NO_MEMORY);
     if (mDeviceAttestationDelegateBridge != nullptr)
     {
         delete mDeviceAttestationDelegateBridge;
     }
 
     mDeviceAttestationDelegateBridge = delegateBridge;
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate,
@@ -556,8 +552,11 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(job
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    DeviceAttestationVerifier * deviceAttestationVerifier     = nullptr;
-    AttestationTrustStoreBridge * attestationTrustStoreBridge = new AttestationTrustStoreBridge(attestationTrustStoreDelegate);
+    DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
+    chip::JniGlobalReference attestationTrustStoreDelegateRef;
+    ReturnErrorOnFailure(attestationTrustStoreDelegateRef.Init(attestationTrustStoreDelegate));
+    AttestationTrustStoreBridge * attestationTrustStoreBridge =
+        new AttestationTrustStoreBridge(std::move(attestationTrustStoreDelegateRef));
     VerifyOrExit(attestationTrustStoreBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     deviceAttestationVerifier = new Credentials::DefaultDACVerifier(attestationTrustStoreBridge);
@@ -568,12 +567,14 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(job
         delete mAttestationTrustStoreBridge;
     }
     mAttestationTrustStoreBridge = attestationTrustStoreBridge;
+    attestationTrustStoreBridge  = nullptr;
 
     if (mDeviceAttestationVerifier != nullptr)
     {
         delete mDeviceAttestationVerifier;
     }
     mDeviceAttestationVerifier = deviceAttestationVerifier;
+    deviceAttestationVerifier  = nullptr;
 
     if (cdTrustKeys != nullptr)
     {
@@ -606,6 +607,7 @@ exit:
         if (attestationTrustStoreBridge != nullptr)
         {
             delete attestationTrustStoreBridge;
+            attestationTrustStoreBridge = nullptr;
         }
     }
 
@@ -692,10 +694,10 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningCompleteMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningComplete", "(JI)V",
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningComplete", "(JI)V",
                                                              &onCommissioningCompleteMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
-    env->CallVoidMethod(mJavaObjectRef, onCommissioningCompleteMethod, static_cast<jlong>(deviceId),
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onCommissioningCompleteMethod, static_cast<jlong>(deviceId),
                         static_cast<jint>(error.AsInteger()));
 
     if (ssidStr != nullptr)
@@ -726,12 +728,12 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
     jmethodID onCommissioningStatusUpdateMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningStatusUpdate",
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningStatusUpdate",
                                                              "(JLjava/lang/String;I)V", &onCommissioningStatusUpdateMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
     UtfString jStageCompleted(env, StageToString(stageCompleted));
-    env->CallVoidMethod(mJavaObjectRef, onCommissioningStatusUpdateMethod, static_cast<jlong>(peerId.GetNodeId()),
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onCommissioningStatusUpdateMethod, static_cast<jlong>(peerId.GetNodeId()),
                         jStageCompleted.jniValue(), static_cast<jint>(error.AsInteger()));
 }
 
@@ -741,7 +743,7 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
     chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onReadCommissioningInfoMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onReadCommissioningInfo", "(IIII)V",
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onReadCommissioningInfo", "(IIII)V",
                                                              &onReadCommissioningInfoMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -749,7 +751,7 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
     mUserActiveModeTriggerHint = info.icd.userActiveModeTriggerHint;
     CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction, mUserActiveModeTriggerInstruction);
 
-    env->CallVoidMethod(mJavaObjectRef, onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),
                         static_cast<jint>(info.basic.productId), static_cast<jint>(info.network.wifi.endpoint),
                         static_cast<jint>(info.network.thread.endpoint));
 }
@@ -767,7 +769,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
     err = JniReferences::GetInstance().FindMethod(
-        env, mJavaObjectRef, "onScanNetworksSuccess",
+        env, mJavaObjectRef.ObjectRef(), "onScanNetworksSuccess",
         "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
@@ -923,7 +925,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
         chip::JniReferences::GetInstance().CreateOptional(ThreadScanResultsInsideOptional, ThreadScanResults);
     }
 
-    env->CallVoidMethod(mJavaObjectRef, javaMethod, NetworkingStatus, DebugText, WiFiScanResults, ThreadScanResults);
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), javaMethod, NetworkingStatus, DebugText, WiFiScanResults, ThreadScanResults);
 }
 
 void AndroidDeviceControllerWrapper::OnScanNetworksFailure(CHIP_ERROR error)
@@ -938,11 +940,11 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationInfoRequired()
     chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onICDRegistrationInfoRequiredMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationInfoRequired", "()V",
-                                                             &onICDRegistrationInfoRequiredMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onICDRegistrationInfoRequired",
+                                                             "()V", &onICDRegistrationInfoRequiredMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationInfoRequiredMethod);
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationInfoRequiredMethod);
 }
 
 void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdNodeId, uint32_t icdCounter)
@@ -985,7 +987,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     jobject icdDeviceInfoObj          = nullptr;
     jbyteArray jSymmetricKey          = nullptr;
     CHIP_ERROR methodErr =
-        JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete",
+        JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onICDRegistrationComplete",
                                                 "(ILchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR,
                    ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, methodErr.Format()));
@@ -1009,7 +1011,8 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
         static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()),
         static_cast<jlong>(Controller()->GetFabricId()), static_cast<jint>(Controller()->GetFabricIndex()));
 
-    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()), icdDeviceInfoObj);
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()),
+                        icdDeviceInfoObj);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)

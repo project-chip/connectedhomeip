@@ -19,14 +19,17 @@
 
 #include <app/util/af.h>
 
+#include <protocols/interaction_model/StatusCode.h>
+
 /**
  * Write an attribute for a request arriving from external sources.
  *
  * This will check attribute writeability and that
  * the provided data type matches the expected data type.
  */
-EmberAfStatus emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                         uint8_t * dataPtr, EmberAfAttributeType dataType);
+chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                                     chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                                     EmberAfAttributeType dataType);
 
 /**
  * @brief write an attribute, performing all the checks.
@@ -48,15 +51,16 @@ EmberAfStatus emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::Cluste
  * testing or setting the initial value of the attribute on the device.
  *
  * this returns:
- * - EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT: if endpoint isn't supported by the device.
- * - EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER: if cluster isn't supported on the endpoint.
- * - EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isn't supported in the cluster.
- * - EMBER_ZCL_STATUS_INVALID_DATA_TYPE: if the data type passed in doesnt match the type
+ * - Status::UnsupportedEndpoint: if endpoint isn't supported by the device.
+ * - Status::UnsupportedCluster: if cluster isn't supported on the endpoint.
+ * - Status::UnsupportedAttribute: if attribute isn't supported in the cluster.
+ * - Status::InvalidDataType: if the data type passed in doesnt match the type
  *           stored in the attribute table
- * - EMBER_ZCL_STATUS_UNSUPPORTED_WRITE: if the attribute isnt writable
- * - EMBER_ZCL_STATUS_CONSTRAINT_ERROR: if the value is set out of the allowable range for
+ * - Status::UnsupportedWrite: if the attribute isnt writable
+ * - Status::ConstraintError: if the value is set out of the allowable range for
  *           the attribute
- * - EMBER_ZCL_STATUS_SUCCESS: if the attribute was found and successfully written
+ * - Status::Success: if the attribute was found and successfully written
  */
-EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
-                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);
+chip::Protocols::InteractionModel::Status emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                             chip::AttributeId attributeID, uint8_t * data,
+                                                             EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);

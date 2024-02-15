@@ -2464,6 +2464,22 @@
               "source": "server",
               "isIncoming": 0,
               "isEnabled": 1
+            },
+            {
+              "name": "PayloadTestRequest",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "PayloadTestResponse",
+              "code": 4,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
             }
           ],
           "attributes": [

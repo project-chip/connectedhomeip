@@ -238,7 +238,6 @@ public class ChipClusters {
 
     @Deprecated
     public void deleteCluster(long chipClusterPtr) {}
-    
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
       super.finalize();
@@ -415,7 +414,7 @@ public class ChipClusters {
       elements.add(new StructElement({{field.name | lowfirst_except_acronym}}FieldID, {{field.name | lowfirst_except_acronym}}tlvValue));
 {% endfor -%}
 {%- endif %}
-      StructType value = new StructType(elements);
+      StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
@@ -456,7 +455,7 @@ public class ChipClusters {
 {%- else %}
           callback.onSuccess();
 {%- endif %}
-        }}, commandId, value, timedInvokeTimeoutMs);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 {% endfor %}
 {%- set already_handled_command = [] -%}

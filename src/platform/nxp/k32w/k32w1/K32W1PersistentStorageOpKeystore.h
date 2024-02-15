@@ -41,47 +41,17 @@ typedef Crypto::SensitiveDataBuffer<SSS_KEY_PAIR_BLOB_SIZE> P256SerializedKeypai
 class P256KeypairSSS : public Crypto::P256Keypair
 {
 public:
-    P256KeypairSSS() {}
-    ~P256KeypairSSS() override;
-
     /**
-     * @brief Initialize the keypair.
+     * @brief Export an encrypted blob.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Initialize(Crypto::ECPKeyTarget key_target) override;
-
     CHIP_ERROR ExportBlob(P256SerializedKeypairSSS & output) const;
 
+    /**
+     * @brief Import an encrypted blob.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
     CHIP_ERROR ImportBlob(P256SerializedKeypairSSS & input);
-
-    /**
-     * @brief Generate a new Certificate Signing Request (CSR).
-     * @param csr Newly generated CSR in DER format
-     * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
-     *CSR.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const override;
-
-    /**
-     * @brief A function to sign a msg using ECDSA
-     * @param msg Message that needs to be signed
-     * @param msg_length Length of message
-     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     * in raw <r,s> point form (see SEC1).
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Crypto::P256ECDSASignature & out_signature) const override;
-
-    const Crypto::P256PublicKey & Pubkey() const override { return mPublicKey; }
-
-    /** Release resources associated with this key pair */
-    void Clear();
-
-private:
-    Crypto::P256PublicKey mPublicKey;
-    mutable sss_sscp_object_t mKeyObj;
-    bool mInitialized = false;
 };
 
 /**

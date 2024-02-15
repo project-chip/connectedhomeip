@@ -20,4 +20,5 @@ package chip.devicecontroller;
 public class DiscoveredDevice {
   public long discriminator;
   public String ipAddress;
+  public int port;
 }

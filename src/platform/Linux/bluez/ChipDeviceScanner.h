@@ -23,6 +23,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <system/SystemLayer.h>
 
@@ -106,13 +107,13 @@ private:
 
     GDBusObjectManager * mManager         = nullptr;
     BluezAdapter1 * mAdapter              = nullptr;
-    GCancellable * mCancellable           = nullptr;
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
     ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
     /// Used to track if timer has already expired and doesn't need to be canceled.
     ScannerTimerState mTimerState = ScannerTimerState::TIMER_CANCELED;
+    GAutoPtr<GCancellable> mCancellable;
 };
 
 } // namespace Internal

@@ -451,27 +451,16 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <bitmap name="TemperatureSetpointHoldPolicy">
-      <bitfield name="HoldDurationElapsed" bit="0" summary="Hold will be cleared when the hold duration has elapsed">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HoldDurationElapsedOrPresetChanged" bit="1" summary="Hold will be cleared when either the hold duration has elapsed or the preset changes">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
     <struct name="WeeklyScheduleTransitionStruct">
       <field id="0" name="TransitionTime" type="uint16">
-        <access read="true" write="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="0" to="1439"/>
+        <constraint type="max" value="1439"/>
       </field>
       <field id="1" name="HeatSetpoint" type="temperature">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="CoolSetpoint" type="temperature">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -701,7 +690,7 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="1440"/>
+      <constraint type="max" value="1440"/>
     </attribute>
     <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="ProgrammingOperationModeBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -742,7 +731,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="OccupiedSetbackMax"/>
+      <constraint type="max" value="OccupiedSetbackMax"/>
     </attribute>
     <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
@@ -772,7 +761,7 @@ Davis, CA 95616, USA
           <feature name="OCC"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="0" to="UnoccupiedSetbackMax"/>
+      <constraint type="max" value="UnoccupiedSetbackMax"/>
     </attribute>
     <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
@@ -898,7 +887,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="TimeOfDay" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="1439"/>
+        <constraint type="max" value="1439"/>
       </field>
       <field id="1" name="RelayStatus" type="RelayStateBitmap">
         <mandatoryConform/>

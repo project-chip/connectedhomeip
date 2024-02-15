@@ -21,6 +21,9 @@
 
 #include "AppTv.h"
 
+#include <cstdio>
+#include <inttypes.h>
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -28,8 +31,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
-#include <cstdio>
-#include <inttypes.h>
+#include <controller/CHIPCluster.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -38,7 +40,6 @@
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <zap-generated/CHIPClusters.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <controller/CHIPDeviceController.h>
@@ -126,7 +127,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
                                 const SessionHandle & sessionHandle) override
     {
         // read current binding list
-        chip::Controller::BindingCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+        chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
         cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
 

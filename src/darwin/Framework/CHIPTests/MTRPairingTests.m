@@ -26,6 +26,10 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1 \
+    --dac_provider credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json \
+    --product-id 32768 --discriminator 3839
+
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static uint64_t sDeviceId = 0x12344321;
@@ -118,106 +122,32 @@ static MTRTestKeys * sTestKeys = nil;
 
 @end
 
-// attestationDelegate and failSafeExtension can both be nil
-static void DoPairingTest(XCTestCase * testcase, id<MTRDeviceAttestationDelegate> attestationDelegate, NSNumber * failSafeExtension)
-{
-    // Don't reuse node ids, because that will confuse us.
-    ++sDeviceId;
-    XCTestExpectation * expectation = [testcase expectationWithDescription:@"Commissioning Complete"];
-    __auto_type * controller = sController;
-
-    __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation
-                                                                                 attestationDelegate:attestationDelegate
-                                                                                   failSafeExtension:failSafeExtension];
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
-
-    [controller setDeviceControllerDelegate:controllerDelegate queue:callbackQueue];
-
-    NSError * error;
-    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
-    XCTAssertNotNil(payload);
-    XCTAssertNil(error);
-
-    [controller setupCommissioningSessionWithPayload:payload newNodeID:@(sDeviceId) error:&error];
-    XCTAssertNil(error);
-
-    [testcase waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
-
-    ResetCommissionee([MTRBaseDevice deviceWithNodeID:@(sDeviceId) controller:controller], dispatch_get_main_queue(), testcase,
-        kTimeoutInSeconds);
-}
-
 @interface MTRPairingTests : XCTestCase
 @end
 
-static BOOL sStackInitRan = NO;
-static BOOL sNeedsStackShutdown = YES;
-
 @implementation MTRPairingTests
 
-+ (void)tearDown
++ (void)setUp
 {
-    // Global teardown, runs once
-    if (sNeedsStackShutdown) {
-        // We don't need to worry about ResetCommissionee.  If we get here,
-        // we're running only one of our test methods (using
-        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
-        // we did not run test999_TearDown.
-        [self shutdownStack];
-    }
-}
-
-- (void)setUp
-{
-    // Per-test setup, runs before each test.
-    [super setUp];
-    [self setContinueAfterFailure:NO];
-
-    if (sStackInitRan == NO) {
-        [self initStack];
-    }
-}
-
-- (void)tearDown
-{
-    // Per-test teardown, runs after each test.
-    [super tearDown];
-}
-
-- (void)initStack
-{
-    sStackInitRan = YES;
-
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
     __auto_type * storage = [[MTRTestStorage alloc] init];
     __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
     factoryParams.port = @(kLocalPort);
+    XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
 
-    BOOL ok = [factory startControllerFactory:factoryParams error:nil];
-    XCTAssertTrue(ok);
-
-    __auto_type * testKeys = [[MTRTestKeys alloc] init];
-    XCTAssertNotNil(testKeys);
-
-    sTestKeys = testKeys;
+    XCTAssertNotNil(sTestKeys = [[MTRTestKeys alloc] init]);
 
     // Needs to match what startControllerOnExistingFabric calls elsewhere in
     // this file do.
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:sTestKeys.ipk fabricID:@(1) nocSigner:sTestKeys];
     params.vendorID = @(kTestVendorId);
-
-    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
-    XCTAssertNotNil(controller);
-
-    sController = controller;
+    XCTAssertNotNil(sController = [factory createControllerOnNewFabric:params error:nil]);
 }
 
-+ (void)shutdownStack
++ (void)tearDown
 {
-    sNeedsStackShutdown = NO;
-
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
@@ -227,23 +157,51 @@ static BOOL sNeedsStackShutdown = YES;
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
-- (void)test000_SetUp
+- (void)setUp
 {
-    // Nothing to do here; our setUp method handled this already.  This test
-    // just exists to make the setup not look like it's happening inside other
-    // tests.
+    [super setUp];
+    [self setContinueAfterFailure:NO];
+}
+
+// attestationDelegate and failSafeExtension can both be nil
+- (void)doPairingTestWithAttestationDelegate:(id<MTRDeviceAttestationDelegate>)attestationDelegate failSafeExtension:(NSNumber *)failSafeExtension
+{
+    // Don't reuse node ids, because that will confuse us.
+    ++sDeviceId;
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning Complete"];
+
+    __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation
+                                                                                 attestationDelegate:attestationDelegate
+                                                                                   failSafeExtension:failSafeExtension];
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+
+    [sController setDeviceControllerDelegate:controllerDelegate queue:callbackQueue];
+
+    NSError * error;
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(sDeviceId) error:&error]);
+    XCTAssertNil(error);
+
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+
+    ResetCommissionee([MTRBaseDevice deviceWithNodeID:@(sDeviceId) controller:sController], dispatch_get_main_queue(), self,
+        kTimeoutInSeconds);
 }
 
 - (void)test001_PairWithoutAttestationDelegate
 {
-    DoPairingTest(self, nil, nil);
+    [self doPairingTestWithAttestationDelegate:nil failSafeExtension:nil];
 }
 
 - (void)test002_PairWithAttestationDelegateNoFailsafeExtension
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Attestation delegate called"];
 
-    DoPairingTest(self, [[NoOpAttestationDelegate alloc] initWithExpectation:expectation], nil);
+    [self doPairingTestWithAttestationDelegate:[[NoOpAttestationDelegate alloc] initWithExpectation:expectation]
+                             failSafeExtension:nil];
 
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
@@ -255,7 +213,8 @@ static BOOL sNeedsStackShutdown = YES;
     // Extend by a time that is going to be smaller than the 60s default we
     // already have set via CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC on the
     // server side, minus whatever time that has likely passed.
-    DoPairingTest(self, [[NoOpAttestationDelegate alloc] initWithExpectation:expectation], @(30));
+    [self doPairingTestWithAttestationDelegate:[[NoOpAttestationDelegate alloc] initWithExpectation:expectation]
+                             failSafeExtension:@(30)];
 
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
@@ -267,14 +226,10 @@ static BOOL sNeedsStackShutdown = YES;
     // Extend by a time that is going to be larger than the 60s default we
     // already have set via CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC on the
     // server side.
-    DoPairingTest(self, [[NoOpAttestationDelegate alloc] initWithExpectation:expectation], @(90));
+    [self doPairingTestWithAttestationDelegate:[[NoOpAttestationDelegate alloc] initWithExpectation:expectation]
+                             failSafeExtension:@(90)];
 
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
-}
-
-- (void)test999_TearDown
-{
-    [[self class] shutdownStack];
 }
 
 @end

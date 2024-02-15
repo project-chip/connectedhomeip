@@ -51,10 +51,6 @@
 #define APP_DBG_LOG(...)
 #endif
 
-#if (configUSE_TICKLESS_IDLE != 0)
-extern uint64_t PWR_TryEnterLowPower(uint64_t timeoutUs);
-#endif
-
 static inline void mutex_init(mbedtls_threading_mutex_t * p_mutex)
 {
     assert(p_mutex != NULL);
@@ -123,7 +119,7 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
     if (abortIdle == false)
     {
         /* Enter low power with a maximal timeout */
-        actualIdleTimeUs = PWR_TryEnterLowPower(expectedIdleTimeUs);
+        actualIdleTimeUs = PWR_EnterLowPower(expectedIdleTimeUs);
 
         /* Re enable systicks and compensate systick timebase */
         PWR_SysticksPostProcess(expectedIdleTimeUs, actualIdleTimeUs);

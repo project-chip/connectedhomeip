@@ -1,0 +1,55 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 263.1.1. [TC-MWOCTRL-2.5] Add more time command with DUT as Server
+
+PICS:
+    - MWOCTRL.S
+    - MWOCTRL.S.C01.Rsp
+
+config:
+    nodeId: 0x12344321
+    cluster: "Microwave Oven Control"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: Send the SetCookingParameters command"
+      command: "SetCookingParameters"
+      arguments:
+          values:
+              - name: CookTime
+                value: 60
+
+    - label: "Step 3: Send the AddMoreTime command"
+      command: "AddMoreTime"
+      arguments:
+          values:
+              - name: TimeToAdd
+                value: 30
+
+    - label: "Step 4: Read the CookTime attribute"
+      command: "readAttribute"
+      attribute: "CookTime"
+      response:
+          value: 90
+          constraints:
+              type: elapsed_s

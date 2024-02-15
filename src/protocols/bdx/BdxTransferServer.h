@@ -18,97 +18,41 @@
 
 #pragma once
 
-#include "BdxTransferServerDelegate.h"
+#include <protocols/bdx/BdxTransferDiagnosticLogPool.h>
 
+#include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
-#include <protocols/bdx/BdxTransferProxyDiagnosticLog.h>
-#include <protocols/bdx/TransferFacilitator.h>
-#include <system/SystemLayer.h>
+#include <protocols/bdx/BdxTransferDiagnosticLog.h>
 
 namespace chip {
 namespace bdx {
 
-class BDXTransferServer : public Responder
+class BdxTransferDiagnosticLog;
+
+class BDXTransferServer : public Messaging::UnsolicitedMessageHandler
 {
 public:
     BDXTransferServer(){};
 
     ~BDXTransferServer() { Shutdown(); };
 
-    CHIP_ERROR ListenForSendInit(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr);
+    CHIP_ERROR Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr);
 
     void Shutdown();
 
     void SetDelegate(BDXTransferServerDelegate * delegate) { mDelegate = delegate; }
 
-    /**
-     * This method handles BDX messages and other TransferSession events.
-     *
-     * @param[in] event An OutputEvent that contains output from the TransferSession object.
-     */
-    void HandleTransferSessionOutput(TransferSession::OutputEvent & event) override;
-
-    void OnExchangeClosing(Messaging::ExchangeContext * ec) override;
-
 protected:
-    /**
-     * Called when a BDX message is received over the exchange context
-     *
-     * @param[in] ec The exchange context
-     *
-     * @param[in] payloadHeader The payload header of the message
-     *
-     * @param[in] payload The payload of the message
-     */
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                            Messaging::ExchangeDelegate *& newDelegate) override;
+    void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
 private:
-    /**
-     * Called to send a BDX MsgToSend message over the exchange
-     *
-     *
-     * @param[in] event The output event to be send
-     */
-    CHIP_ERROR OnMessageToSend(TransferSession::OutputEvent & event);
-
-    /**
-     * Called to begin the transfer session when an init message has been received
-     *
-     * @param[in] event The output event received
-     */
-    CHIP_ERROR OnTransferSessionBegin(TransferSession::OutputEvent & event);
-
-    /**
-     * Called to end the transfer session when a BlockAckEOF message has been sent over the exchange
-     * or an error has occurred during the BDX session
-     *
-     * @param[in] error The error type
-     */
-    CHIP_ERROR OnTransferSessionEnd(CHIP_ERROR error);
-
-    /**
-     * Called when a block has been received from the Sender. The block is processed
-     * and written to a file and a block ack is sent back to the sender.
-     *
-     * @param[in] event The output event received
-     */
-    CHIP_ERROR OnBlockReceived(TransferSession::OutputEvent & event);
-
-    /**
-     * This method is called to reset state. It resets the transfer and cleans up the
-     * exchange and the fabric index and peer node id.
-     */
-    void Reset();
-
-    void AbortTransferOnFailure(CHIP_ERROR error);
-
     System::Layer * mSystemLayer;
     Messaging::ExchangeManager * mExchangeMgr;
-    BDXTransferServerDelegate * mDelegate;
 
-    BDXTransferProxyDiagnosticLog mTransferProxy;
-    bool mIsExchangeClosing = false;
+    BDXTransferServerDelegate * mDelegate;
+    BdxTransferDiagnosticLogPool<CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS> mPoolDelegate;
 };
 
 } // namespace bdx

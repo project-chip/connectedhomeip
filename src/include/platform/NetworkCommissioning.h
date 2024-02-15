@@ -351,7 +351,8 @@ public:
     /**
      * @brief Signs the specified message with the private key of a Network Client Identity.
      */
-    virtual CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, ByteSpan & message, Crypto::P256ECDSASignature & outSignature)
+    virtual CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
+                                              Crypto::P256ECDSASignature & outSignature)
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }

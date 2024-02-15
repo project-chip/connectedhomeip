@@ -86,6 +86,52 @@ CHIP_ERROR StoreOperationalKey(FabricIndex fabricIndex, PersistentStorageDelegat
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ExportStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegate * storage,
+                             Crypto::P256SerializedKeypair & serializedOpKey)
+{
+    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    // Use a SensitiveDataBuffer to get RAII secret data clearing on scope exit.
+    Crypto::SensitiveDataBuffer<OpKeyTLVMaxSize()> buf;
+
+    // Load up the operational key structure from storage
+    uint16_t size = static_cast<uint16_t>(buf.Capacity());
+    ReturnErrorOnFailure(
+        storage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf.Bytes(), size));
+
+    buf.SetLength(static_cast<size_t>(size));
+
+    // Read-out the operational key TLV entry.
+    TLV::ContiguousBufferTLVReader reader;
+    reader.Init(buf.Bytes(), buf.Length());
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+    TLV::TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(reader.Next(kOpKeyVersionTag));
+    uint16_t opKeyVersion;
+    ReturnErrorOnFailure(reader.Get(opKeyVersion));
+    VerifyOrReturnError(opKeyVersion == kOpKeyVersion, CHIP_ERROR_VERSION_MISMATCH);
+
+    ReturnErrorOnFailure(reader.Next(kOpKeyDataTag));
+    {
+        ByteSpan keyData;
+        ReturnErrorOnFailure(reader.GetByteView(keyData));
+
+        // Unfortunately, we have to copy the data into a P256SerializedKeypair.
+        VerifyOrReturnError(keyData.size() <= serializedOpKey.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        ReturnErrorOnFailure(reader.ExitContainer(containerType));
+
+        memcpy(serializedOpKey.Bytes(), keyData.data(), keyData.size());
+        serializedOpKey.SetLength(keyData.size());
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 /** WARNING: This can leave the operational key on the stack somewhere, since many of the platform
  *           APIs use stack buffers and do not sanitize! This implementation is for example purposes
  *           only of the API and it is recommended to avoid directly accessing raw private key bits
@@ -106,55 +152,16 @@ CHIP_ERROR SignWithStoredOpKey(FabricIndex fabricIndex, PersistentStorageDelegat
     }
 
     // Scope 1: Load up the keypair data from storage
+    P256SerializedKeypair serializedOpKey;
+    CHIP_ERROR err = ExportStoredOpKey(fabricIndex, storage, serializedOpKey);
+    if (CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err)
     {
-        // Use a SensitiveDataBuffer to get RAII secret data clearing on scope exit.
-        Crypto::SensitiveDataBuffer<OpKeyTLVMaxSize()> buf;
-
-        // Load up the operational key structure from storage
-        uint16_t size = static_cast<uint16_t>(buf.Capacity());
-        CHIP_ERROR err =
-            storage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf.Bytes(), size);
-        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-        {
-            err = CHIP_ERROR_INVALID_FABRIC_INDEX;
-        }
-        ReturnErrorOnFailure(err);
-        buf.SetLength(static_cast<size_t>(size));
-
-        // Read-out the operational key TLV entry.
-        TLV::ContiguousBufferTLVReader reader;
-        reader.Init(buf.Bytes(), buf.Length());
-
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-        TLV::TLVType containerType;
-        ReturnErrorOnFailure(reader.EnterContainer(containerType));
-
-        ReturnErrorOnFailure(reader.Next(kOpKeyVersionTag));
-        uint16_t opKeyVersion;
-        ReturnErrorOnFailure(reader.Get(opKeyVersion));
-        VerifyOrReturnError(opKeyVersion == kOpKeyVersion, CHIP_ERROR_VERSION_MISMATCH);
-
-        ReturnErrorOnFailure(reader.Next(kOpKeyDataTag));
-        {
-            ByteSpan keyData;
-            Crypto::P256SerializedKeypair serializedOpKey;
-            ReturnErrorOnFailure(reader.GetByteView(keyData));
-
-            // Unfortunately, we have to copy the data into a P256SerializedKeypair.
-            VerifyOrReturnError(keyData.size() <= serializedOpKey.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-            // Before doing anything with the key, validate format further.
-            ReturnErrorOnFailure(reader.ExitContainer(containerType));
-            ReturnErrorOnFailure(reader.VerifyEndOfContainer());
-
-            memcpy(serializedOpKey.Bytes(), keyData.data(), keyData.size());
-            serializedOpKey.SetLength(keyData.size());
-
-            // Load-up key material
-            // WARNING: This makes use of the raw key bits
-            ReturnErrorOnFailure(transientOperationalKeypair->Deserialize(serializedOpKey));
-        }
+        return CHIP_ERROR_INVALID_FABRIC_INDEX;
     }
+
+    // Load-up key material
+    // WARNING: This makes use of the raw key bits
+    ReturnErrorOnFailure(transientOperationalKeypair->Deserialize(serializedOpKey));
 
     // Scope 2: Sign message with the keypair
     return transientOperationalKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
@@ -251,6 +258,13 @@ CHIP_ERROR PersistentStorageOperationalKeystore::CommitOpKeypairForFabric(Fabric
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PersistentStorageOperationalKeystore::ExportOpKeypairForFabric(FabricIndex fabricIndex,
+                                                                          Crypto::P256SerializedKeypair & outKeypair)
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return ExportStoredOpKey(fabricIndex, mStorage, outKeypair);
+}
+
 CHIP_ERROR PersistentStorageOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIndex)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -308,6 +322,38 @@ void PersistentStorageOperationalKeystore::ReleaseEphemeralKeypair(Crypto::P256K
     // DO NOT CUT AND PASTE without considering the AllocateEphemeralKeypairForCASE().
     // This must delete the same concrete class as allocated in `AllocateEphemeralKeypairForCASE`
     Platform::Delete<Crypto::P256Keypair>(keypair);
+}
+
+CHIP_ERROR PersistentStorageOperationalKeystore::MigrateOpKeypairForFabric(FabricIndex fabricIndex,
+                                                                           OperationalKeystore & operationalKeystore) const
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    P256SerializedKeypair serializedKeypair;
+
+    // Do not allow overwriting the existing key and just remove it from the previous Operational Keystore if needed.
+    if (!HasOpKeypairForFabric(fabricIndex))
+    {
+        ReturnErrorOnFailure(operationalKeystore.ExportOpKeypairForFabric(fabricIndex, serializedKeypair));
+
+        auto operationalKeypair = Platform::MakeUnique<P256Keypair>();
+        if (!operationalKeypair)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        ReturnErrorOnFailure(operationalKeypair->Deserialize(serializedKeypair));
+        ReturnErrorOnFailure(StoreOperationalKey(fabricIndex, mStorage, operationalKeypair.get()));
+
+        ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
+    }
+    else if (operationalKeystore.HasOpKeypairForFabric(fabricIndex))
+    {
+        ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

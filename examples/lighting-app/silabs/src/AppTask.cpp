@@ -246,10 +246,10 @@ void AppTask::UpdateClusterState(intptr_t context)
     uint8_t newValue = LightMgr().IsLightOn();
 
     // write the new on/off value
-    EmberAfStatus status = OnOffServer::Instance().setOnOffValue(1, newValue, false);
+    Protocols::InteractionModel::Status status = OnOffServer::Instance().setOnOffValue(1, newValue, false);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        SILABS_LOG("ERR: updating on/off %x", status);
+        SILABS_LOG("ERR: updating on/off %x", to_underlying(status));
     }
 }

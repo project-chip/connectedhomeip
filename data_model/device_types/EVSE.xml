@@ -68,12 +68,6 @@ Davis, CA 95616, USA
     <cluster id="0x0011" name="Power Source" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0090" name="Electrical Power Measurement" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
-      <mandatoryConform/>
-    </cluster>
     <cluster id="0x0098" name="Device Energy Management" side="server">
       <mandatoryConform/>
       <features>

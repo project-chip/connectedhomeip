@@ -36,7 +36,8 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
-            TestStep("2b", "Read AttributeList attribute"),
+            TestStep("2b", "Verify SENS feature is supported"),
+            TestStep("2c", "Read AttributeList attribute"),
             TestStep(3, "Read SupportedSensitivityLevels attribute"),
             TestStep(4, "Read DefaultSensitivityLevel attribute, if supported"),
             TestStep(5, "Read CurrentSensitivityLevel attribute"),
@@ -65,19 +66,26 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
         self.step("2a")
         feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-
-        self.step("2b")
-        attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-
         is_sens_level_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kSensitivityLevel
 
-        self.step(3)
-        if is_sens_level_feature_supported:
-            numberOfSupportedLevels = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
+        self.step("2b")
+        if not is_sens_level_feature_supported:
+            logging.info("SENS feature not supported, skipping test case")
+
+            # Skipping all remainig steps
+            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
+                self.step(step.test_plan_number)
+                logging.info("Test step skipped")
+
+            return
         else:
             logging.info("Test step skipped")
 
-        default_level = 0
+        self.step("2c")
+        attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+
+        self.step(3)
+        numberOfSupportedLevels = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
 
         self.step(4)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
@@ -85,20 +93,14 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
-        current_level = 0
-
         self.step(5)
-        if is_sens_level_feature_supported:
-            current_level = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentSensitivityLevel)
-        else:
-            logging.info("Test step skipped")
+        current_level = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentSensitivityLevel)
 
         self.step(6)
-        if is_sens_level_feature_supported:
-            for sens_level in range(numberOfSupportedLevels):
-                logging.info(f"Write sensitivity level ({sens_level}) to CurrentSensitivityLevel)")
-                result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(sens_level))])
-                asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
+        for sens_level in range(numberOfSupportedLevels):
+            logging.info(f"Write sensitivity level ({sens_level}) to CurrentSensitivityLevel)")
+            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(sens_level))])
+            asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
         self.step(7)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
@@ -114,21 +116,18 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
         self.step(9)
-        if is_sens_level_feature_supported:
-            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(numberOfSupportedLevels))])
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "CurrentSensitivityLevel did not return CONSTRAINT_ERROR")
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(numberOfSupportedLevels))])
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                             "CurrentSensitivityLevel did not return CONSTRAINT_ERROR")
 
         self.step(10)
-        if is_sens_level_feature_supported:
-            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(255))])
-            asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "CurrentSensitivityLevel did not return CONSTRAINT_ERROR")
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(255))])
+        asserts.assert_equal(result[0].Status, Status.ConstraintError,
+                             "CurrentSensitivityLevel did not return CONSTRAINT_ERROR")
 
         self.step(11)
-        if is_sens_level_feature_supported:
-            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(current_level))])
-            asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(current_level))])
+        asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
 
 if __name__ == "__main__":

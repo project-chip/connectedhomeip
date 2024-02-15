@@ -28,11 +28,11 @@ from chip.exceptions import ChipStackException
 
 from .delegate import (AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct,
                        PyInvokeRequestData, PyWriteAttributeData, SessionParameters, SessionParametersStruct,
-                       TestOnlyPyBatchCommandsOverrides)
+                       TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo)
 
 __all__ = ["AttributePath", "AttributePathIBstruct", "DataVersionFilterIBstruct",
            "EventPath", "EventPathIBstruct", "InteractionModelError", "PyInvokeRequestData",
-           "PyWriteAttributeData", "SessionParameters", "SessionParametersStruct", "Status", "TestOnlyPyBatchCommandsOverrides"]
+           "PyWriteAttributeData", "SessionParameters", "SessionParametersStruct", "Status", "TestOnlyPyBatchCommandsOverrides", "TestOnlyPyOnDoneInfo"]
 
 
 # defined src/controller/python/chip/interaction_model/Delegate.h

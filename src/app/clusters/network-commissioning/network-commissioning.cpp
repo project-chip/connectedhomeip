@@ -34,6 +34,7 @@
 #include <lib/support/SortUtils.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/ConnectivityManager.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -135,6 +136,26 @@ void Instance::Shutdown()
     mpBaseDriver->Shutdown();
 }
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+void Instance::SendNonConcurrentConnectNetworkResponse()
+{
+    auto commandHandleRef = std::move(mAsyncCommandHandle);
+    auto commandHandle    = commandHandleRef.Get();
+    if (commandHandle == nullptr)
+    {
+        return;
+    }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    DeviceLayer::ConnectivityMgr().GetBleLayer()->IndicateBleClosing();
+#endif // CONFIG_NETWORK_LAYER_BLE
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
+    Commands::ConnectNetworkResponse::Type response;
+    response.networkingStatus = NetworkCommissioning::Status::kSuccess;
+    commandHandle->AddResponse(mPath, response);
+}
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+
 void Instance::InvokeCommand(HandlerContext & ctxt)
 {
     if (mAsyncCommandHandle.Get() != nullptr)
@@ -177,12 +198,7 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
 
     case Commands::ConnectNetwork::Id: {
         VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
-#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        // If commissionee does not support Concurrent Connections, request the BLE to be stopped.
-        // Start the ConnectNetwork, but this will not complete until the BLE is off.
-        ChipLogProgress(NetworkProvisioning, "Closing BLE connections due to non-concurrent mode");
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
-#endif
+
         HandleCommand<Commands::ConnectNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleConnectNetwork(ctx, req); });
         return;
@@ -708,18 +724,22 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
     mCurrentOperationBreadcrumb = req.breadcrumb;
 
-    // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
-    // network has been fully brought up and kWiFiDeviceAvailable is delivered.
-    // mConnectingNetworkIDLen and mConnectingNetworkID contains the received SSID
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
+#else
+    // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
+    // network has been fully brought up and kOperationalNetworkStarted is delivered.
+    // mConnectingNetworkIDLen and mConnectingNetworkID contain the received SSID
+    // As per spec, send the ConnectNetworkResponse(Success) prior to releasing the commissioning channel
+    SendNonConcurrentConnectNetworkResponse();
 #endif
 }
 
 void Instance::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-    ChipLogProgress(NetworkProvisioning, "HandleNonConcurrentConnectNetwork() SSID=%s", mConnectingNetworkID);
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%.*s", mConnectingNetworkIDLen,
+                    mConnectingNetworkID);
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
 }
 
@@ -826,13 +846,19 @@ exit:
 void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t interfaceStatus)
 {
     auto commandHandleRef = std::move(mAsyncCommandHandle);
-    auto commandHandle    = commandHandleRef.Get();
+
+    // In Non-concurrent mode the commandHandle will be null here, the ConnectNetworkResponse
+    // has already been sent and the BLE will have been stopped, however the other functionality
+    // is still required
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    auto commandHandle = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
         // When the platform shutted down, interaction model engine will invalidate all commandHandle to avoid dangling references.
         // We may receive the callback after it and should make it noop.
         return;
     }
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
     Commands::ConnectNetworkResponse::Type response;
     response.networkingStatus = commissioningError;
@@ -856,13 +882,10 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
     mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
-#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse will NOT be sent");
-    // Do not send the ConnectNetworkResponse if in non-concurrent mode
-    // Issue #30576 raised to modify CommandHandler to notify it if no response required
-#else
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     commandHandle->AddResponse(mPath, response);
-#endif
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+
     if (commissioningError == Status::kSuccess)
     {
         CommitSavedBreadcrumb();
@@ -1063,8 +1086,11 @@ void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event
     {
         this_->OnFailSafeTimerExpired();
     }
-    else if (event->Type == DeviceLayer::DeviceEventType::kWiFiDeviceAvailable)
+    else if ((event->Type == DeviceLayer::DeviceEventType::kWiFiDeviceAvailable) ||
+             (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkStarted))
+
     {
+        // In Non-Concurrent mode connect the operational channel, as BLE has been stopped
         this_->HandleNonConcurrentConnectNetwork();
     }
 }

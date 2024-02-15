@@ -48,7 +48,7 @@ if [ "$#" == "0" ]; then
     $USAGE
 
     <AppRootFolder>
-        Root Location of the app e.g: examples/lighting-app/efr32/
+        Root Location of the app e.g: examples/lighting-app/silabs/
 
     <outputFolder>
         Desired location for the output files

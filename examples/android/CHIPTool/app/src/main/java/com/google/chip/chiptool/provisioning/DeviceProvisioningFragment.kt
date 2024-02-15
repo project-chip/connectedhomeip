@@ -160,7 +160,6 @@ class DeviceProvisioningFragment : Fragment() {
 
   private fun pairDeviceWithAddress() {
     // IANA CHIP port
-    val port = 5540
     val id = DeviceIdUtil.getNextAvailableId(requireContext())
 
     DeviceIdUtil.setNextAvailableId(requireContext(), id + 1)
@@ -171,7 +170,7 @@ class DeviceProvisioningFragment : Fragment() {
     deviceController.pairDeviceWithAddress(
       id,
       deviceInfo.ipAddress,
-      port,
+      deviceInfo.port,
       deviceInfo.discriminator,
       deviceInfo.setupPinCode,
       null

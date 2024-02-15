@@ -130,12 +130,16 @@
         MTRTypeKey : MTRArrayValueType,
         MTRValueKey : @[
             @{
-                MTRTypeKey : MTRUTF8StringValueType,
-                MTRValueKey : @"str1",
+                MTRDataKey : @ {
+                    MTRTypeKey : MTRUTF8StringValueType,
+                    MTRValueKey : @"str1",
+                },
             },
             @{
-                MTRTypeKey : MTRUTF8StringValueType,
-                MTRValueKey : @"str2",
+                MTRDataKey : @ {
+                    MTRTypeKey : MTRUTF8StringValueType,
+                    MTRValueKey : @"str2",
+                },
             },
         ],
     };

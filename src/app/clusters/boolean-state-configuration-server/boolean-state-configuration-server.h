@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -46,7 +47,7 @@ CHIP_ERROR EmitSensorFault(EndpointId ep, chip::BitMask<BooleanStateConfiguratio
 inline bool HasFeature(EndpointId ep, Feature feature)
 {
     uint32_t map;
-    bool success = (Attributes::FeatureMap::Get(ep, &map) == EMBER_ZCL_STATUS_SUCCESS);
+    bool success = (Attributes::FeatureMap::Get(ep, &map) == Protocols::InteractionModel::Status::Success);
     return success ? (map & to_underlying(feature)) : false;
 }
 

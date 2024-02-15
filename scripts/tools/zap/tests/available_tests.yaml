@@ -12,7 +12,6 @@
 #     and the expected content for those output files.
 inputs/all-clusters-app.zap:
     ../../../../src/app/zap-templates/app-templates.json:
-        CHIPClusters.h: outputs/all-clusters-app/app-templates/CHIPClusters.h
         endpoint_config.h: outputs/all-clusters-app/app-templates/endpoint_config.h
         gen_config.h: outputs/all-clusters-app/app-templates/gen_config.h
         access.h: outputs/all-clusters-app/app-templates/access.h
@@ -20,7 +19,6 @@ inputs/all-clusters-app.zap:
 
 inputs/lighting-app.zap:
     ../../../../src/app/zap-templates/app-templates.json:
-        CHIPClusters.h: outputs/lighting-app/app-templates/CHIPClusters.h
         endpoint_config.h: outputs/lighting-app/app-templates/endpoint_config.h
         gen_config.h: outputs/lighting-app/app-templates/gen_config.h
         access.h: outputs/lighting-app/app-templates/access.h

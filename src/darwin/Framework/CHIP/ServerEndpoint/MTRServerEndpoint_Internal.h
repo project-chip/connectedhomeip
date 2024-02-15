@@ -18,17 +18,48 @@
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRServerEndpoint.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MTRServerEndpoint ()
 
 /**
- * Mark this endpoint as associated with a particular controller.
+ * Mark this endpoint as associated with a particular controller.  The
+ * controller can be nil to indicate that the endpoint is not associated with a
+ * specific controller but rather with the controller factory.
+ *
+ * On failure, this method ensures that it undoes any state changes it made.
  */
-- (BOOL)associateWithController:(MTRDeviceController *)controller;
+- (BOOL)associateWithController:(nullable MTRDeviceController *)controller;
 
 /**
- * Mark this endpoint as being in a Defunct state.
+ * Register this endpoint.  Always called on the Matter queue.
+ */
+- (void)registerMatterEndpoint;
+
+/**
+ * Unregister this endpoint.  Always called on the Matter queue.
+ */
+- (void)unregisterMatterEndpoint;
+
+/**
+ * Mark this endpoint as no longer being in use.  Can run on any thread, but
+ * will either be called before registerMatterEndpoint or after
+ * unregisterMatterEndpoint.  This undoes anything associateWithController did.
  */
 - (void)invalidate;
+
+/**
+ * Get an MTRServerEndpoint for the root node endpoint.  This can't be done via
+ * the public initializer, since we don't allow that to create an
+ * MTRServerEndpoint for endpoint 0.
+ */
++ (MTRServerEndpoint *)rootNodeEndpoint;
+
+/**
+ * Returns the list of access grants applicable to the given cluster ID on this
+ * endpoint.  Only called on the Matter queue.
+ */
+- (NSArray<MTRAccessGrant *> *)matterAccessGrantsForCluster:(NSNumber *)clusterID;
 
 /**
  * The access grants the Matter stack can observe.  Only modified while in
@@ -37,3 +68,5 @@
 @property (nonatomic, strong, readonly) NSSet<MTRAccessGrant *> * matterAccessGrants;
 
 @end
+
+NS_ASSUME_NONNULL_END

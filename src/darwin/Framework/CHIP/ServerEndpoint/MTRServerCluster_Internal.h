@@ -21,15 +21,38 @@
 
 #include <lib/core/DataModelTypes.h>
 
+// TODO: These attribute-*.h and Span bits are a hack that should eventually go away.
+#include <app/util/attribute-metadata.h>
+#include <lib/support/Span.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface MTRServerCluster ()
 
 /**
- * Mark this cluster as associated with a particular controller.
+ * Mark this cluster as associated with a particular controller.  The
+ * controller can be nil to indicate that the endpoint is not associated with a
+ * specific controller but rather with the controller factory.  This method does
+ * NOT perform any cleanup on failure; it's the caller's responsibility to call
+ * invalidate if it fails.
  */
-- (BOOL)associateWithController:(MTRDeviceController *)controller;
+- (BOOL)associateWithController:(nullable MTRDeviceController *)controller;
 
 /**
- * Mark this cluster as part of an Defunct-state endpoint.
+ * Register this cluster.  Always called on the Matter queue.
+ */
+- (void)registerMatterCluster;
+
+/**
+ * Unregister this cluster.  Always called on the Matter queue.
+ */
+- (void)unregisterMatterCluster;
+
+/**
+ * Mark this cluster as part of an endpoint that is no longer being used.  Can
+ * run on any thread, but will either be called before registerMatterCluster or
+ * after unregisterMatterCluster.  This undoes anything associateWithController
+ * did.
  */
 - (void)invalidate;
 
@@ -44,4 +67,31 @@
  */
 @property (nonatomic, assign) chip::EndpointId parentEndpoint;
 
+/**
+ * The attribute metadata for the cluster.  Only valid after associateWithController: has succeeded.
+ */
+@property (nonatomic, assign, readonly) chip::Span<const EmberAfAttributeMetadata> matterAttributeMetadata;
+
+/**
+ * The list of accepted command IDs.
+ */
+@property (nonatomic, copy, nullable) NSArray<NSNumber *> * acceptedCommands;
+
+/**
+ * The list of generated command IDs.
+ */
+@property (nonatomic, copy, nullable) NSArray<NSNumber *> * generatedCommands;
+
+/**
+ * The list of accepted commands IDs in the format the Matter stack needs.
+ */
+@property (nonatomic, assign, nullable, readonly) chip::CommandId * matterAcceptedCommands;
+
+/**
+ * The list of generated commands IDs in the format the Matter stack needs.
+ */
+@property (nonatomic, assign, nullable, readonly) chip::CommandId * matterGeneratedCommands;
+
 @end
+
+NS_ASSUME_NONNULL_END

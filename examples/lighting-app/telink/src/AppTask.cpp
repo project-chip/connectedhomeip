@@ -204,7 +204,7 @@ void AppTask::ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor)
 
 void AppTask::UpdateClusterState(void)
 {
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     bool isTurnedOn;
     uint8_t setLevel;
 
@@ -240,15 +240,15 @@ void AppTask::UpdateClusterState(void)
 
     // write the new on/off value
     status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update OnOff fail: %x", status);
+        LOG_ERR("Update OnOff fail: %x", to_underlying(status));
     }
 
     status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kExampleEndpointId, setLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update CurrentLevel fail: %x", status);
+        LOG_ERR("Update CurrentLevel fail: %x", to_underlying(status));
     }
 }
 

@@ -55,7 +55,7 @@ namespace Internal {
 #define CHIP_PLAT_NVM_STATIC_ALLOC 1
 #endif
 
-#define CHIP_CONFIG_RAM_BUFFER_SIZE 10240
+#define CHIP_CONFIG_RAM_BUFFER_SIZE 14336
 
 #ifndef NVM_ID_CHIP_CONFIG_DATA
 #define NVM_ID_CHIP_CONFIG_DATA 0xf104
@@ -378,6 +378,7 @@ CHIP_ERROR K32WConfig::FactoryResetConfig(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
+    FactoryResetConfigInternal(kMinConfigKey_ChipCounter, kMaxConfigKey_ChipCounter);
     FactoryResetConfigInternal(kMinConfigKey_KVSKey, kMaxConfigKey_KVSKey);
     FactoryResetConfigInternal(kMinConfigKey_KVSValue, kMaxConfigKey_KVSValue);
 

@@ -51,7 +51,7 @@ void SynchronizedReportSchedulerImpl::OnTransitionToIdle()
     VerifyOrReturn(now >= mNextReportTimestamp);
     if (((mNextReportTimestamp - now) < Seconds16(targetIdleInterval)) && (now > mNextMinTimestamp))
     {
-        // If the next report is due in less than the idle mode interval and we are past the min interval, we can just send it now
+        // If the next report is due in less than the idle mode duration and we are past the min interval, we can just send it now
         CancelReport();
         TimerFired();
     }

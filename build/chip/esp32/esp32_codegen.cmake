@@ -61,7 +61,6 @@ macro(chip_app_component_zapgen ZAP_NAME)
       GENERATOR "app-templates"
       OUTPUTS
             "zap-generated/access.h"
-            "zap-generated/CHIPClusters.h"
             "zap-generated/endpoint_config.h"
             "zap-generated/gen_config.h"
             "zap-generated/IMClusterCommandHandler.cpp"

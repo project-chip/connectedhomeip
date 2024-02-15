@@ -109,6 +109,12 @@ struct GAutoPtrDeleter<GBytes>
 };
 
 template <>
+struct GAutoPtrDeleter<GCancellable>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<GDBusConnection>
 {
     using deleter = GObjectDeleter;

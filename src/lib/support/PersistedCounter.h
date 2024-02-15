@@ -92,13 +92,12 @@ public:
         ReturnErrorOnFailure(ReadStartValue(startValue));
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        // Compiler should optimize these branches.
-        if (is_same_v<decltype(T), uint64_t>)
+        if constexpr (std::is_same_v<decltype(startValue), uint64_t>)
         {
             ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x" ChipLogFormatX64 " startValue 0x" ChipLogFormatX64,
                           ChipLogValueX64(aEpoch), ChipLogValueX64(startValue));
         }
-        else if (is_same_v<decltype(T), uint32_t>)
+        else if (std::is_same_v<decltype(startValue), uint32_t>)
         {
             ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%" PRIx32 " startValue 0x%" PRIx32,
                           static_cast<uint32_t>(aEpoch), static_cast<uint32_t>(startValue));
@@ -151,8 +150,7 @@ private:
     {
         mNextEpoch = aStartValue;
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        // Compiler should optimize these branches.
-        if (is_same_v<decltype(T), uint64_t>)
+        if constexpr (std::is_same_v<decltype(aStartValue), uint64_t>)
         {
             ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x" ChipLogFormatX64,
                           ChipLogValueX64(aStartValue));
@@ -178,7 +176,7 @@ private:
      */
     CHIP_ERROR ReadStartValue(T & aStartValue)
     {
-        T valueLE     = 0;
+        T valueLE     = GetInitialCounterValue();
         uint16_t size = sizeof(valueLE);
 
         VerifyOrReturnError(mKey.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
@@ -206,11 +204,27 @@ private:
         aStartValue = Encoding::LittleEndian::HostSwap<T>(valueLE);
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x%x", aStartValue);
+        if constexpr (std::is_same_v<decltype(aStartValue), uint64_t>)
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x" ChipLogFormatX64,
+                          ChipLogValueX64(aStartValue));
+        }
+        else
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x%" PRIx32,
+                          static_cast<uint32_t>(aStartValue));
+        }
 #endif
 
         return CHIP_NO_ERROR;
     }
+
+    /**
+     * @brief Get the Initial Counter Value
+     *
+     * By default, persisted counters start off at 0.
+     */
+    virtual inline T GetInitialCounterValue() { return 0; }
 
     PersistentStorageDelegate * mStorage = nullptr; // start value is stored here
     StorageKeyName mKey;

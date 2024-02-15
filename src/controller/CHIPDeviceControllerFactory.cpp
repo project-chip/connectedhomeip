@@ -226,7 +226,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
-    ReturnErrorOnFailure(stateParams.bdxTransferServer->ListenForSendInit(stateParams.systemLayer, stateParams.exchangeMgr));
+    ReturnErrorOnFailure(stateParams.bdxTransferServer->Init(stateParams.systemLayer, stateParams.exchangeMgr));
 
     InitDataModelHandler();
 

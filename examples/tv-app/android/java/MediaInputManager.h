@@ -21,6 +21,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/media-input-server/media-input-server.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate
 {
@@ -36,7 +37,7 @@ public:
     bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name) override;
 
 private:
-    jobject mMediaInputManagerObject = nullptr;
+    chip::JniGlobalReference mMediaInputManagerObject;
     jmethodID mGetInputListMethod    = nullptr;
     jmethodID mGetCurrentInputMethod = nullptr;
     jmethodID mSelectInputMethod     = nullptr;

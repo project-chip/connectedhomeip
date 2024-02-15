@@ -689,19 +689,20 @@ void AppTask::UpdateClusterState()
 {
     SystemLayer().ScheduleLambda([this] {
         // write the new on/off value
-        EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, mPWMDevice.IsTurnedOn());
+        Protocols::InteractionModel::Status status =
+            Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, mPWMDevice.IsTurnedOn());
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            LOG_ERR("Updating on/off cluster failed: %x", status);
+            LOG_ERR("Updating on/off cluster failed: %x", to_underlying(status));
         }
 
         // write the current level
         status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, mPWMDevice.GetLevel());
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            LOG_ERR("Updating level cluster failed: %x", status);
+            LOG_ERR("Updating level cluster failed: %x", to_underlying(status));
         }
     });
 }

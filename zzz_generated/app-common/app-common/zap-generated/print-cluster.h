@@ -490,6 +490,12 @@
 #define CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER
 #endif
 
+#if defined(ZCL_USING_POWER_TOPOLOGY_CLUSTER_SERVER) || defined(ZCL_USING_POWER_TOPOLOGY_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_POWER_TOPOLOGY_CLUSTER { chip::app::Clusters::PowerTopology::Id, "Power Topology" },
+#else
+#define CHIP_PRINTCLUSTER_POWER_TOPOLOGY_CLUSTER
+#endif
+
 #if defined(ZCL_USING_ENERGY_EVSE_MODE_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_EVSE_MODE_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ENERGY_EVSE_MODE_CLUSTER { chip::app::Clusters::EnergyEvseMode::Id, "Energy EVSE Mode" },
 #else
@@ -865,6 +871,7 @@
     CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_POWER_TOPOLOGY_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_ENERGY_EVSE_MODE_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \

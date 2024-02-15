@@ -46,7 +46,13 @@ public:
         CopyString(setupPin, setupPinSize, mSetupPin);
     };
 
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
+
 protected:
     static const size_t kSetupPinSize = 12;
     char mSetupPin[kSetupPinSize];
+
+private:
+    // TODO: set this based upon meta data from app
+    static constexpr uint16_t kClusterRevision = 2;
 };

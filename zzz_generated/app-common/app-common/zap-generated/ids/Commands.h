@@ -368,6 +368,14 @@ namespace TimeSnapshotResponse {
 static constexpr CommandId Id = 0x00000002;
 } // namespace TimeSnapshotResponse
 
+namespace PayloadTestRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace PayloadTestRequest
+
+namespace PayloadTestResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace PayloadTestResponse
+
 } // namespace Commands
 } // namespace GeneralDiagnostics
 

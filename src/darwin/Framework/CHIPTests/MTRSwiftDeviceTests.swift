@@ -3,6 +3,8 @@ import XCTest
 
 // This should eventually grow into a Swift copy of MTRDeviceTests
 
+// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
+
 struct DeviceConstants {
     static let testVendorID = 0xFFF1
     static let onboardingPayload = "MT:-24J0AFN00KA0648G00"
@@ -93,41 +95,10 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
 }
 
 class MTRSwiftDeviceTests : XCTestCase {
-    static var sStackInitRan : Bool = false
-    static var sNeedsStackShutdown : Bool = true
-    
-    static override func tearDown() {
-        // Global teardown, runs once
-        if (sNeedsStackShutdown) {
-            // We don't need to worry about ResetCommissionee.  If we get here,
-            // we're running only one of our test methods (using
-            // -only-testing:MatterTests/MTRSwiftDeviceTests/testMethodName), since
-            // we did not run test999_TearDown.
-            shutdownStack()
-        }
-    }
-    
-    override func setUp()
+    static override func setUp()
     {
-        // Per-test setup, runs before each test.
         super.setUp()
-        self.continueAfterFailure = false
-        
-        if (!MTRSwiftDeviceTests.sStackInitRan) {
-            initStack()
-        }
-    }
-    
-    override func tearDown()
-    {
-        // Per-test teardown, runs after each test.
-        super.tearDown()
-    }
-    
-    func initStack()
-    {
-        MTRSwiftDeviceTests.sStackInitRan = true
-        
+
         let factory = MTRDeviceControllerFactory.sharedInstance()
         
         let storage = MTRTestStorage()
@@ -141,7 +112,6 @@ class MTRSwiftDeviceTests : XCTestCase {
         XCTAssertTrue(factory.isRunning)
         
         let testKeys = MTRTestKeys()
-        
         sTestKeys = testKeys
         
         // Needs to match what startControllerOnExistingFabric calls elsewhere in
@@ -160,8 +130,8 @@ class MTRSwiftDeviceTests : XCTestCase {
         
         sController = controller
         
-        let expectation = expectation(description : "Commissioning Complete")
-        
+        let expectation = XCTestExpectation(description : "Commissioning Complete")
+
         let controllerDelegate = MTRSwiftDeviceTestControllerDelegate(withExpectation: expectation)
         let serialQueue = DispatchQueue(label: "com.chip.device_controller_delegate")
         
@@ -180,30 +150,29 @@ class MTRSwiftDeviceTests : XCTestCase {
         } catch {
             XCTFail("Could not start setting up PASE session: \(error)")
             return        }
-        
-        wait(for: [expectation], timeout: DeviceConstants.pairingTimeoutInSeconds)
+
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: DeviceConstants.pairingTimeoutInSeconds), XCTWaiter.Result.completed)
     }
     
-    static func shutdownStack()
-    {
-        sNeedsStackShutdown = false
-        
+    static override func tearDown() {
+        ResetCommissionee(sConnectedDevice, DispatchQueue.main, nil, UInt16(DeviceConstants.timeoutInSeconds))
+
         let controller = sController
         XCTAssertNotNil(controller)
-        
         controller!.shutdown()
         XCTAssertFalse(controller!.isRunning)
         
         MTRDeviceControllerFactory.sharedInstance().stop()
+
+        super.tearDown()
     }
-    
-    func test000_SetUp()
+
+    override func setUp()
     {
-        // Nothing to do here; our setUp method handled this already.  This test
-        // just exists to make the setup not look like it's happening inside other
-        // tests.
+        super.setUp()
+        self.continueAfterFailure = false
     }
-    
+
     func test017_TestMTRDeviceBasics()
     {
         let device = MTRDevice(nodeID: DeviceConstants.deviceID as NSNumber, controller:sController!)
@@ -544,11 +513,5 @@ class MTRSwiftDeviceTests : XCTestCase {
         let cluster = MTRClusterOperationalCredentials(device: device, endpointID: 0, queue: queue)!
         XCTAssertEqual(cluster.device, device)
         XCTAssertEqual(cluster.__endpointID, 0 as NSNumber)
-    }
-
-    func test999_TearDown()
-    {
-        ResetCommissionee(sConnectedDevice, DispatchQueue.main, self, UInt16(DeviceConstants.timeoutInSeconds))
-        type(of: self).shutdownStack()
     }
 }

@@ -46,7 +46,7 @@ CHIP_REPO = os.path.join(os.path.abspath(
 TEST_EXTPANID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
-TEST_END_DEVICE_APP = "lit-icd-app"
+TEST_END_DEVICE_APP = "chip-all-clusters-app"
 
 DEVICE_CONFIG = {
     'device0': {

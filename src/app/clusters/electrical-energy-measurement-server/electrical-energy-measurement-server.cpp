@@ -35,8 +35,8 @@ using namespace chip;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 
-MeasurementData
-    gMeasurements[EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+MeasurementData gMeasurements[MATTER_DM_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT +
+                              CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
 CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
 {
@@ -143,14 +143,14 @@ bool ElectricalEnergyMeasurementAttrAccess::SupportsOptAttr(OptionalAttributes a
 MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
 {
     auto index = emberAfGetClusterServerEndpointIndex(endpointId, app::Clusters::ElectricalEnergyMeasurement::Id,
-                                                      EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                      MATTER_DM_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (index == kEmberInvalidEndpointIndex)
     {
         return nullptr;
     }
 
-    if (index >= EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (index >= ArraySize(gMeasurements))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected energy measurement index.");
         return nullptr;

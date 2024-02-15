@@ -609,7 +609,7 @@ private:
     FabricTable mFabrics;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     // specifically, the commissioner declaration message (sent by commissioner to commissionee)
     UdcTransportMgr * mUdcTransportMgr = nullptr;

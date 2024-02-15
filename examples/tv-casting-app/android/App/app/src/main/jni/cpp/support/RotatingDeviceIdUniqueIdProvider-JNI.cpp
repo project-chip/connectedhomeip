@@ -36,9 +36,7 @@ CHIP_ERROR RotatingDeviceIdUniqueIdProviderJNI::Initialize(jobject provider)
     VerifyOrReturnValue(env != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(AppServer, "Failed to GetEnvForCurrentThread for RotatingDeviceIdUniqueIdProviderJNI"));
 
-    mJNIProviderObject = env->NewGlobalRef(provider);
-    VerifyOrReturnValue(mJNIProviderObject != nullptr, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(AppServer, "Failed to NewGlobalRef JNIProvider"));
+    ReturnLogErrorOnFailure(mJNIProviderObject.Init(provider));
 
     jclass JNIProviderClass = env->GetObjectClass(provider);
     VerifyOrReturnValue(JNIProviderClass != nullptr, CHIP_ERROR_INCORRECT_STATE,
@@ -56,11 +54,11 @@ CHIP_ERROR RotatingDeviceIdUniqueIdProviderJNI::Initialize(jobject provider)
 CHIP_ERROR RotatingDeviceIdUniqueIdProviderJNI::GetJavaByteByMethod(jmethodID method, MutableByteSpan & out_buffer)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturnLogError(mJNIProviderObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mJNIProviderObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(method != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
-    jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIProviderObject, method);
+    jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIProviderObject.ObjectRef(), method);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in get Method");

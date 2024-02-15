@@ -49,7 +49,7 @@ using chip::Protocols::InteractionModel::Status;
 using TargetUpdatedEvent = chip::app::Clusters::TargetNavigator::Events::TargetUpdated::Type;
 
 static constexpr size_t kTargetNavigatorDelegateTableSize =
-    EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kTargetNavigatorDelegateTableSize <= kEmberInvalidEndpointIndex, "TargetNavigator Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogProgress(Zcl, "TargetNavigator NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
-                                                       EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kTargetNavigatorDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -97,7 +97,7 @@ namespace TargetNavigator {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
-                                                       EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kTargetNavigatorDelegateTableSize)
     {
@@ -128,6 +128,7 @@ public:
 private:
     CHIP_ERROR ReadTargetListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadCurrentTargetAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 TargetNavigatorAttrAccess gTargetNavigatorAttrAccess;
@@ -155,9 +156,10 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
 
         return ReadCurrentTargetAttribute(aEncoder, delegate);
     }
-    default: {
+    case app::Clusters::TargetNavigator::Attributes::ClusterRevision::Id:
+        return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    default:
         break;
-    }
     }
 
     return CHIP_NO_ERROR;
@@ -172,6 +174,13 @@ CHIP_ERROR TargetNavigatorAttrAccess::ReadCurrentTargetAttribute(app::AttributeV
 {
     uint8_t currentTarget = delegate->HandleGetCurrentTarget();
     return aEncoder.Encode(currentTarget);
+}
+
+CHIP_ERROR TargetNavigatorAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                            Delegate * delegate)
+{
+    uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
+    return aEncoder.Encode(clusterRevision);
 }
 
 } // anonymous namespace

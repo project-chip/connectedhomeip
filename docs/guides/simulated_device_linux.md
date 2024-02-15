@@ -11,11 +11,6 @@ If some parameters need to be overridden, a `CHIPProjectConfig.h` file can be
 placed under an ‘include’ folder into the app folder. For example
 `examples/placeholder/linux/apps/app1/include/CHIPProjectConfig.h`
 
-In order to generate specific tests for a given accessory, a
-[examples/placeholder/linux/apps/app1/tests.js](../../examples/placeholder/linux/apps/app1/tests.js)
-file can be added into the application directory. The tests listed there are the
-one that will be executed once the application has been commissioned.
-
 Simulated Device: simulation of an application in which tests can be added. It
 is defined by a ZAP config file and tests can be added with a
 [YAML file](../../src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml).
@@ -66,7 +61,7 @@ Now that the building is completed there is a `chip-app1` binary created. This
 binary can be executed on a linux os with test commands.
 
 ```
-./out/debug/simulated/chip-app1 --command [TEST NAME]
+./scripts/tests/yaml/runner.py [TEST NAME] app1
 ```
 
 ## Interacting with the simulated app
@@ -99,8 +94,7 @@ interact with it using chip-tool
 ## Adding simulated Tests via YAML
 
 In order to validate commissioner/controller behavior, tests need to be added to
-the simulated device test framework. To achieve this, YAML files are created and
-new code is generated.
+the simulated device test framework. To achieve this, YAML files are created.
 
 1. YAML test file are located in
    [YAML folder](../../src/app/tests/suites/certification/)
@@ -124,26 +118,3 @@ new code is generated.
 
 5. [Test_TC_DM_1_3_Simulated](../../src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml)
    is an example of a written test that runs on the simulated device.
-
-6. Next, it will need to be added to
-   [examples/placeholder/linux/apps/app1/tests.js](../../examples/placeholder/linux/apps/app1/tests.js)
-   in the following array:
-
-    ```javascript
-    const tests = ["Test_TC_DM_1_3_Simulated"];
-    ```
-
-7. Then, the code will be generated using ZAP.
-
-    ```
-    ./scripts/tools/zap/generate.py examples/placeholder/linux/apps/app1/config.zap -t examples/placeholder/templates/templates.json -o zzz_generated/placeholder/app1/zap-generated
-    ```
-
-    The following command can be used to generate and compile:
-
-    ```
-    ./scripts/examples/gn_build_test_example.sh app1
-    ```
-
-8) When submitting code for review, create 2 commits. One for YAML changes and
-   second for generated code.

@@ -122,17 +122,23 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
-public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+public:
     void
     SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
     {
         mpStatusChangeCallback = statusChangeCallback;
     }
+
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    CHIP_ERROR ConnectWiFiNetworkWithPDCAsync(ByteSpan ssid, ByteSpan networkIdentity, ByteSpan clientIdentity,
+                                              const Crypto::P256Keypair & clientIdentityKeypair,
+                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
     void PostNetworkConnect();
-    static void _ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data);
     CHIP_ERROR CommitConfig();
 
     void StartWiFiManagement();
@@ -144,8 +150,15 @@ public:
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
+
+private:
+    CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
+                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
+        CHIP_REQUIRES(mWpaSupplicantMutex);
+    static void _ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data);
 #endif
 
+public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

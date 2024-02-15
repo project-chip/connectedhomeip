@@ -15,18 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file contains definitions for working with CHIP TLV tags.
- *
- */
-
 #pragma once
 
-#include <cstdint>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/TypeTraits.h>
+
+#include <cstdint>
 #include <type_traits>
 
 namespace chip {

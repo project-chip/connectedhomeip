@@ -37,6 +37,7 @@
 #include "low-power/LowPowerManager.h"
 #include "media-input/MediaInputManager.h"
 #include "media-playback/MediaPlaybackManager.h"
+#include "messages/MessagesManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
 #include "wake-on-lan/WakeOnLanManager.h"
 
@@ -56,6 +57,7 @@ static KeypadInputManager keypadInputManager;
 static LowPowerManager lowPowerManager;
 static MediaInputManager mediaInputManager;
 static MediaPlaybackManager mediaPlaybackManager;
+static MessagesManager messagesManager;
 static TargetNavigatorManager targetNavigatorManager;
 static WakeOnLanManager wakeOnLanManager;
 } // namespace
@@ -168,6 +170,12 @@ void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: MediaPlayback::SetDefaultDelegate");
     MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
+}
+
+void emberAfMessagesClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: Messages::SetDefaultDelegate");
+    Messages::SetDefaultDelegate(endpoint, &messagesManager);
 }
 
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)

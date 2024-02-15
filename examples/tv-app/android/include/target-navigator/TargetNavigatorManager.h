@@ -39,6 +39,7 @@ public:
     uint8_t HandleGetCurrentTarget() override;
     void HandleNavigateTarget(CommandResponseHelper<NavigateTargetResponseType> & responser, const uint64_t & target,
                               const CharSpan & data) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
     void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
 
@@ -51,4 +52,8 @@ protected:
     EndpointId mEndpointId;
 
     ContentAppAttributeDelegate * mAttributeDelegate;
+
+private:
+    // TODO: set this based upon meta data from app
+    static constexpr uint16_t kClusterRevision = 2;
 };

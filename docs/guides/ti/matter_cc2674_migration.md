@@ -11,8 +11,6 @@ project accordingly. Example projects can be found in the following location:
 The following must be installed on your system before proceeding:
 
 -   [SysConfig](https://www.ti.com/tool/SYSCONFIG) v1.16.2 or later
--   [SIMPLELINK-LOWPOWER-F2-SDK](https://www.ti.com/tool/SIMPLELINK-LOWPOWER-SDK)
-    v7.10.01.24
 
 ## Matter source code changes
 
@@ -22,12 +20,20 @@ CC2674P10 device
 
 -   `examples/[application]/cc13x4_26x4/args.gni`, modify/add the following
     defines for the CC2674
-    -   `ti_simplelink_board = CC2674`
-    -   `ti_simplelink_device = CC2674P10RGZ`
--   `third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx`, replace this folder
-    contents with the 7.10.01.24 version from
-    [TI's downloads page](https://www.ti.com/tool/download/SIMPLELINK-LOWPOWER-F2-SDK/7.10.01.24)
-    which is required to add support SDK for the CC2674P10 device.
+    -   `ti_simplelink_board = "CC2674"`
+    -   `ti_simplelink_device = "CC2674P10RGZ"`
+-   `third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/ti/common/flash/no_rtos/extFlash/bsp.h`,
+    modify the SPI GPIO pins to the value below:
+
+```
+#define BSP_IOID_FLASH_CS       IOID_20
+#define BSP_SPI_MOSI            IOID_9
+#define BSP_SPI_MISO            IOID_8
+#define BSP_SPI_CLK_FLASH       IOID_10
+
+```
+
+The GPIO pin values for SPI will need to be adjusted based on your design.
 
 ## Configuring `chip.syscfg` in the SysConfig GUI
 

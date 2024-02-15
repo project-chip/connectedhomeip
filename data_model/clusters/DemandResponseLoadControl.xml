@@ -248,17 +248,14 @@ Davis, CA 95616, USA
     </struct>
     <struct name="LoadControlProgramStruct">
       <field id="0" name="ProgramID" type="octstr" default="0">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
       <field id="1" name="Name" type="string">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="32"/>
       </field>
       <field id="2" name="EnrollmentGroup" type="uint8" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="ENRLG"/>
@@ -266,13 +263,11 @@ Davis, CA 95616, USA
         <constraint type="between" from="0x01" to="0xFF"/>
       </field>
       <field id="3" name="RandomStartMinutes" type="uint8" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint type="between" from="0x00" to="0x3C"/>
       </field>
       <field id="4" name="RandomDurationMinutes" type="uint8" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint type="between" from="0x00" to="0x3C"/>
@@ -286,7 +281,6 @@ Davis, CA 95616, USA
     </struct>
     <struct name="TemperatureControlStruct">
       <field id="0" name="CoolingTempOffset" type="ref_TempDiff" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="TEMPO"/>
@@ -294,7 +288,6 @@ Davis, CA 95616, USA
         <constraint type="between" from="0x00" to="0x0FE"/>
       </field>
       <field id="1" name="HeatingTempOffset" type="ref_TempDiff" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="TEMPO"/>
@@ -302,7 +295,6 @@ Davis, CA 95616, USA
         <constraint type="between" from="0x00" to="0x0FE"/>
       </field>
       <field id="2" name="CoolingTempSetpoint" type="temperature" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="TEMPS"/>
@@ -310,7 +302,6 @@ Davis, CA 95616, USA
         <constraint type="between" from="0x954D" to="0x7FFF"/>
       </field>
       <field id="3" name="HeatingTempSetpoint" type="temperature" default="null">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="TEMPS"/>

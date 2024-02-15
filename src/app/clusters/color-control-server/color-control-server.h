@@ -141,7 +141,7 @@ public:
     bool stopMoveStepCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                              uint8_t optionsMask, uint8_t optionsOverride);
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     bool moveHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                         HueMoveMode moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride, bool isEnhanced);
     bool moveToHueCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, uint16_t hue,
@@ -162,9 +162,9 @@ public:
     bool colorLoopCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                           const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::DecodableType & commandData);
     void updateHueSatCommand(chip::EndpointId endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
     bool moveToColorCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                             const chip::app::Clusters::ColorControl::Commands::MoveToColor::DecodableType & commandData);
     bool moveColorCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -172,9 +172,9 @@ public:
     bool stepColorCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                           const chip::app::Clusters::ColorControl::Commands::StepColor::DecodableType & commandData);
     void updateXYCommand(chip::EndpointId endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     bool moveColorTempCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                               const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & commandData);
     bool
@@ -185,7 +185,7 @@ public:
     void levelControlColorTempChangeCommand(chip::EndpointId endpoint);
     void startUpColorTempCommand(chip::EndpointId endpoint);
     void updateTempCommand(chip::EndpointId endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     void cancelEndpointTimerCallback(chip::EndpointId endpoint);
 
@@ -209,7 +209,7 @@ private:
     void scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs);
     void cancelEndpointTimerCallback(EmberEventControl * control);
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     chip::Protocols::InteractionModel::Status moveToSaturation(uint8_t saturation, uint16_t transitionTime,
                                                                chip::EndpointId endpoint);
     chip::Protocols::InteractionModel::Status moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTime,
@@ -229,46 +229,46 @@ private:
     void SetHSVRemainingTime(chip::EndpointId endpoint);
     bool computeNewHueValue(ColorHueTransitionState * p);
     EmberEventControl * configureHSVEventControl(chip::EndpointId);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
     chip::Protocols::InteractionModel::Status moveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTime,
                                                           chip::EndpointId endpoint);
     Color16uTransitionState * getXTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getYTransitionState(chip::EndpointId endpoint);
     uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step);
     EmberEventControl * configureXYEventControl(chip::EndpointId);
-#endif // #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#endif // #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState * getTempTransitionState(chip::EndpointId endpoint);
     chip::Protocols::InteractionModel::Status moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature,
                                                               uint16_t transitionTime);
     uint16_t getTemperatureCoupleToLevelMin(chip::EndpointId endpoint);
     EmberEventControl * configureTempEventControl(chip::EndpointId);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     /**********************************************************
      * Attributes Declaration
      *********************************************************/
     static ColorControlServer instance;
     static constexpr size_t kColorControlClusterServerMaxEndpointCount =
-        EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+        MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
     static_assert(kColorControlClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "ColorControl endpoint count error");
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     ColorHueTransitionState colorHueTransitionStates[kColorControlClusterServerMaxEndpointCount];
     Color16uTransitionState colorSatTransitionStates[kColorControlClusterServerMaxEndpointCount];
 #endif
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
     Color16uTransitionState colorXtransitionStates[kColorControlClusterServerMaxEndpointCount];
     Color16uTransitionState colorYtransitionStates[kColorControlClusterServerMaxEndpointCount];
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState colorTempTransitionStates[kColorControlClusterServerMaxEndpointCount];
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];
 
@@ -279,18 +279,18 @@ private:
  * Callbacks
  *********************************************************/
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 void emberAfPluginColorControlServerTempTransitionEventHandler(chip::EndpointId endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 void emberAfPluginColorControlServerXyTransitionEventHandler(chip::EndpointId endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 void emberAfPluginColorControlServerHueSatTransitionEventHandler(chip::EndpointId endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 void emberAfPluginLevelControlCoupledColorTempChangeCallback(chip::EndpointId endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP

@@ -29,6 +29,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
 #include <lib/support/SafeInt.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /** @name Attribute Storage */
 // @{
@@ -95,8 +96,9 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * data type (as Accessors.h/cpp have this correct by default).
  * TODO: this not checking seems off - what if this is run without Accessors.h ?
  */
-EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                    uint8_t * dataPtr, EmberAfAttributeType dataType);
+chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                                chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                                EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.
@@ -107,8 +109,9 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
  * dataPtr may be NULL, signifying that we don't need the value, just the status
  * (i.e. whether the attribute can be read).
  */
-EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                   uint8_t * dataPtr, uint16_t readLength);
+chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                               chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                               uint16_t readLength);
 
 /**
  * @brief macro that returns size of attribute in bytes.
@@ -176,7 +179,7 @@ uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId end
  * @param endpoint Endpoint number
  * @param cluster Id the of the Cluster server you are interrested on
  * @param fixedClusterServerEndpointCount The number of fixed endpoints containing this cluster server.  Typically one of the
- EMBER_AF_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
+ MATTER_DM_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
  */
 uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                               uint16_t fixedClusterServerEndpointCount);

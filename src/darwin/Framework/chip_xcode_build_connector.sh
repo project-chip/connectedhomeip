@@ -93,7 +93,7 @@ done
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="boringssl"'
-    'chip_build_controller_dynamic_server=true'
+    'chip_build_controller_dynamic_server=false'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_enable_wifi=false'

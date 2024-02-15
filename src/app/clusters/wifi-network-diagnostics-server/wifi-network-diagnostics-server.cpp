@@ -163,6 +163,7 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiRssi(AttributeValueEncoder & aEncod
     {
         rssi.SetNonNull(value);
         ChipLogProgress(Zcl, "The current RSSI of the Node’s Wi-Fi radio in dB: %d", value);
+        MATTER_TRACE_METRIC("wifi_rssi", value);
     }
     else
     {

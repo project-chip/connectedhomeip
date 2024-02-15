@@ -35,6 +35,6 @@ sl_ot_idle_interval_ms = 5000  # 5s Idle Intervals
 sl_ot_active_interval_ms = 500  # 500ms Active Intervals
 
 # ICD Matter Configuration flags
-sl_idle_mode_interval_s = 600  # 10min Idle Mode Interval
-sl_active_mode_interval_ms = 10000  # 10s Active Mode Interval
+sl_idle_mode_duration_s = 600  # 10min Idle Mode Duration
+sl_active_mode_duration_ms = 10000  # 10s Active Mode Duration
 sl_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold

@@ -57,11 +57,11 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleGetInputList");
-    VerifyOrExit(mMediaInputManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetInputListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
-        jobjectArray inputArray = (jobjectArray) env->CallObjectMethod(mMediaInputManagerObject, mGetInputListMethod);
+        jobjectArray inputArray = (jobjectArray) env->CallObjectMethod(mMediaInputManagerObject.ObjectRef(), mGetInputListMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(AppServer, "Java exception in MediaInputManager::HandleGetInputList");
@@ -128,12 +128,12 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleGetCurrentInput");
-    VerifyOrExit(mMediaInputManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetCurrentInputMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        index = env->CallIntMethod(mMediaInputManagerObject, mGetCurrentInputMethod);
+        index = env->CallIntMethod(mMediaInputManagerObject.ObjectRef(), mGetCurrentInputMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(AppServer, "Java exception in MediaInputManager::HandleGetCurrentInput");
@@ -160,11 +160,11 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleSelectInput %d", index);
-    VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
+    VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mMediaInputManagerObject is not valid"));
     VerifyOrExit(mSelectInputMethod != nullptr, ChipLogError(Zcl, "mSelectInputMethod null"));
 
     env->ExceptionClear();
-    ret = env->CallBooleanMethod(mMediaInputManagerObject, mSelectInputMethod, static_cast<jint>(index));
+    ret = env->CallBooleanMethod(mMediaInputManagerObject.ObjectRef(), mSelectInputMethod, static_cast<jint>(index));
     if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in MediaInputManager::HandleSelectInput");
@@ -185,11 +185,11 @@ bool MediaInputManager::HandleShowInputStatus()
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleShowInputStatus");
-    VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
+    VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mMediaInputManagerObject is not valid"));
     VerifyOrExit(mShowInputStatusMethod != nullptr, ChipLogError(Zcl, "mShowInputStatusMethod null"));
 
     env->ExceptionClear();
-    ret = env->CallBooleanMethod(mMediaInputManagerObject, mShowInputStatusMethod);
+    ret = env->CallBooleanMethod(mMediaInputManagerObject.ObjectRef(), mShowInputStatusMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in MediaInputManager::HandleShowInputStatus");
@@ -210,11 +210,11 @@ bool MediaInputManager::HandleHideInputStatus()
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleHideInputStatus");
-    VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
+    VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mMediaInputManagerObject is not valid"));
     VerifyOrExit(mHideInputStatusMethod != nullptr, ChipLogError(Zcl, "mHideInputStatusMethod null"));
 
     env->ExceptionClear();
-    ret = env->CallBooleanMethod(mMediaInputManagerObject, mHideInputStatusMethod);
+    ret = env->CallBooleanMethod(mMediaInputManagerObject.ObjectRef(), mHideInputStatusMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in MediaInputManager::HandleHideInputStatus");
@@ -236,14 +236,14 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleRenameInput %d to %s", index, name.data());
-    VerifyOrExit(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "mMediaInputManagerObject null"));
+    VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mMediaInputManagerObject is not valid"));
     VerifyOrExit(mRenameInputMethod != nullptr, ChipLogError(Zcl, "mHideInputStatusMethod null"));
 
     {
         UtfString jniInputname(env, inputname.data());
         env->ExceptionClear();
-        ret =
-            env->CallBooleanMethod(mMediaInputManagerObject, mRenameInputMethod, static_cast<jint>(index), jniInputname.jniValue());
+        ret = env->CallBooleanMethod(mMediaInputManagerObject.ObjectRef(), mRenameInputMethod, static_cast<jint>(index),
+                                     jniInputname.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in MediaInputManager::HandleRenameInput");
@@ -262,8 +262,8 @@ void MediaInputManager::InitializeWithObjects(jobject managerObject)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for MediaInputManager"));
 
-    mMediaInputManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturn(mMediaInputManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef MediaInputManager"));
+    VerifyOrReturn(mMediaInputManagerObject.Init(managerObject) == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Failed to init mMediaInputManagerObject"));
 
     jclass MediaInputManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(MediaInputManagerClass != nullptr, ChipLogError(Zcl, "Failed to get MediaInputManager Java class"));

@@ -38,7 +38,7 @@
 
 #include "LEDWidget.h"
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 #include <app/clusters/identify-server/identify-server.h>
 #endif
 
@@ -134,7 +134,7 @@ public:
     static void StartFactoryResetSequence(void);
     static void CancelFactoryResetSequence(void);
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
     // Idenfiy server command callbacks.
     static void OnIdentifyStart(Identify * identify);
     static void OnIdentifyStop(Identify * identify);

@@ -87,16 +87,13 @@ Davis, CA 95616, USA
     </enum>
     <struct name="GroupInfoMapStruct">
       <field id="1" name="GroupId" type="ref_DataTypeGroupId">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="Endpoints" type="ref_DataTypeList[ref_DataTypeEndpointNumber]">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="min" value="1"/>
       </field>
       <field id="3" name="GroupName" type="ref_DataTypeString">
-        <access read="true"/>
         <optionalConform/>
         <constraint type="max" value="16"/>
       </field>

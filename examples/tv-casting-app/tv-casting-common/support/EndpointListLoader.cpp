@@ -53,7 +53,7 @@ void EndpointListLoader::Initialize(chip::Messaging::ExchangeManager * exchangeM
 
     for (const auto & binding : chip::BindingTable::GetInstance())
     {
-        if (binding.type == EMBER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
+        if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
         {
             // check to see if we discovered a new endpoint in the bindings
             chip::EndpointId endpointId                     = binding.remote;
@@ -86,7 +86,7 @@ CHIP_ERROR EndpointListLoader::Load()
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-        if (binding.type == EMBER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
+        if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
         {
             // if we discovered a new Endpoint from the bindings, read its EndpointAttributes
             chip::EndpointId endpointId                     = binding.remote;

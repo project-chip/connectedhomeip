@@ -99,8 +99,8 @@ tests:
           responderSessionID is of uint16
            sigma2ResumeMIC is of Octet String maximum of length 16 bytes
           responderSEDParams is from any one of the following:
-                SLEEPY_IDLE_INTERVAL - Verify that it is of uint32
-                SLEEPY_ACTIVE_INTERVAL - Verify that it is of uint32
+                SESSION_IDLE_INTERVAL - Verify that it is of uint32
+                SESSION_ACTIVE_INTERVAL - Verify that it is of uint32
 
 
           [1683973658.044236][21637:21637] CHIP:EM: Rxd Ack; Removing MessageCounter:113416101 from Retrans Table on exchange 32995r

@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/util/af-enums.h>
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -89,18 +89,6 @@ public:
      * @param[out] get operational error after callback.
      */
     void HandleResumeStateCallback(OperationalState::GenericOperationalError & err) override;
-
-    /**
-     * Handle Command Callback in application: Start
-     * @param[out] get operational error after callback.
-     */
-    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override;
-
-    /**
-     * Handle Command Callback in application: Stop
-     * @param[out] get operational error after callback.
-     */
-    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle the GoHome command.

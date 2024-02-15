@@ -39,7 +39,7 @@ using namespace chip::AppPlatform;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kChannelDelegateTableSize =
-    EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kChannelDelegateTableSize <= kEmberInvalidEndpointIndex, "Channel Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(Zcl, "Channel NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kChannelDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -85,7 +85,7 @@ namespace Channel {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kChannelDelegateTableSize)
     {
@@ -124,6 +124,7 @@ private:
     CHIP_ERROR ReadLineupAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadCurrentChannelAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 ChannelAttrAccess gChannelAttrAccess;
@@ -167,9 +168,10 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
-    default: {
+    case app::Clusters::Channel::Attributes::ClusterRevision::Id:
+        return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    default:
         break;
-    }
     }
 
     return CHIP_NO_ERROR;
@@ -195,6 +197,12 @@ CHIP_ERROR ChannelAttrAccess::ReadLineupAttribute(app::AttributeValueEncoder & a
 CHIP_ERROR ChannelAttrAccess::ReadCurrentChannelAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     return delegate->HandleGetCurrentChannel(aEncoder);
+}
+
+CHIP_ERROR ChannelAttrAccess::ReadRevisionAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    uint16_t clusterRevision = delegate->GetClusterRevision(endpoint);
+    return aEncoder.Encode(clusterRevision);
 }
 
 } // anonymous namespace

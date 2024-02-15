@@ -58,9 +58,8 @@ CHIP_ERROR ChipDeviceScanner::Init(BluezAdapter1 * adapter, ChipDeviceScannerDel
     // Make this function idempotent by shutting down previously initialized state if any.
     Shutdown();
 
-    mAdapter     = BLUEZ_ADAPTER1(g_object_ref(adapter));
-    mCancellable = g_cancellable_new();
-    mDelegate    = delegate;
+    mAdapter  = BLUEZ_ADAPTER1(g_object_ref(adapter));
+    mDelegate = delegate;
 
     // Create the D-Bus object manager client object on the glib thread, so that all D-Bus signals
     // will be delivered to the glib thread.
@@ -73,7 +72,7 @@ CHIP_ERROR ChipDeviceScanner::Init(BluezAdapter1 * adapter, ChipDeviceScannerDel
             self->mManager = g_dbus_object_manager_client_new_for_bus_sync(
                 G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
                 bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-                nullptr /* destroy notify */, self->mCancellable, &MakeUniquePointerReceiver(err).Get());
+                nullptr /* destroy notify */, nullptr /* cancellable */, &MakeUniquePointerReceiver(err).Get());
             VerifyOrReturnError(self->mManager != nullptr, CHIP_ERROR_INTERNAL,
                                 ChipLogError(Ble, "Failed to get D-Bus object manager for device scanning: %s", err->message));
             return CHIP_NO_ERROR;
@@ -100,8 +99,6 @@ void ChipDeviceScanner::Shutdown()
                 g_object_unref(self->mManager);
             if (self->mAdapter != nullptr)
                 g_object_unref(self->mAdapter);
-            if (self->mCancellable != nullptr)
-                g_object_unref(self->mCancellable);
             return CHIP_NO_ERROR;
         },
         this);
@@ -115,6 +112,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     VerifyOrReturnError(mScannerState != ChipDeviceScannerState::SCANNER_SCANNING, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mTimerState == ScannerTimerState::TIMER_CANCELED, CHIP_ERROR_INCORRECT_STATE);
 
+    mCancellable.reset(g_cancellable_new());
     if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStartScan, this) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan start.");
@@ -191,7 +189,9 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
 {
     GAutoPtr<GError> error;
 
-    g_cancellable_cancel(self->mCancellable); // in case we are currently running a scan
+    // In case we are currently running a scan
+    g_cancellable_cancel(self->mCancellable.get());
+    self->mCancellable.reset();
 
     if (self->mObjectAddedSignal)
     {
@@ -303,7 +303,7 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     g_variant_builder_add(&filterBuilder, "{sv}", "Transport", g_variant_new_string("le"));
     GVariant * filter = g_variant_builder_end(&filterBuilder);
 
-    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mAdapter, filter, self->mCancellable,
+    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mAdapter, filter, self->mCancellable.get(),
                                                        &MakeUniquePointerReceiver(error).Get()))
     {
         // Not critical: ignore if fails
@@ -312,7 +312,8 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     }
 
     ChipLogProgress(Ble, "BLE initiating scan.");
-    if (!bluez_adapter1_call_start_discovery_sync(self->mAdapter, self->mCancellable, &MakeUniquePointerReceiver(error).Get()))
+    if (!bluez_adapter1_call_start_discovery_sync(self->mAdapter, self->mCancellable.get(),
+                                                  &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);
         return CHIP_ERROR_INTERNAL;

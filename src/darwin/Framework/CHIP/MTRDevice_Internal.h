@@ -68,6 +68,11 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 
+// Method to insert attribute values
+//   attributeValues : array of response-value dictionaries with non-null MTRAttributePathKey value
+//   reportChanges : if set to YES, attribute reports will also sent to the delegate if new values are different
+- (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges;
+
 @end
 
 #pragma mark - Utility for clamping numbers

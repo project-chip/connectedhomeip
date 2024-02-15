@@ -18,6 +18,7 @@
 
 #include "lib/support/logging/CHIPLogging.h"
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 class DeviceCallbacks
 {
@@ -28,7 +29,7 @@ public:
     void InitializeWithObjects(jobject manager);
 
 private:
-    jobject mProvider                      = nullptr;
+    chip::JniGlobalReference mProvider;
     jmethodID mCommissioningCompleteMethod = nullptr;
     void OnCommissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event);
 };

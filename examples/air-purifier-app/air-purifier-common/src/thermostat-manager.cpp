@@ -17,6 +17,9 @@
  */
 
 #include "thermostat-manager.h"
+#include <protocols/interaction_model/StatusCode.h>
+
+using chip::Protocols::InteractionModel::Status;
 
 using namespace chip;
 using namespace chip::app;
@@ -26,19 +29,19 @@ void ThermostatManager::Init()
 {
     BitMask<Thermostat::Feature> FeatureMap;
     FeatureMap.Set(Thermostat::Feature::kHeating);
-    EmberAfStatus status = Thermostat::Attributes::FeatureMap::Set(mEndpointId, FeatureMap.Raw());
+    Status status = Thermostat::Attributes::FeatureMap::Set(mEndpointId, FeatureMap.Raw());
 
     status = Thermostat::Attributes::ControlSequenceOfOperation::Set(mEndpointId,
                                                                      Thermostat::ControlSequenceOfOperationEnum::kHeatingOnly);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+    VerifyOrReturn(Status::Success == status,
                    ChipLogError(NotSpecified, "Failed to set Thermostat ControlSequenceOfOperation attribute"));
 
     status = Thermostat::Attributes::AbsMinHeatSetpointLimit::Set(mEndpointId, 500);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+    VerifyOrReturn(Status::Success == status,
                    ChipLogError(NotSpecified, "Failed to set Thermostat MinHeatSetpointLimit attribute"));
 
     status = Thermostat::Attributes::AbsMaxHeatSetpointLimit::Set(mEndpointId, 3000);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+    VerifyOrReturn(Status::Success == status,
                    ChipLogError(NotSpecified, "Failed to set Thermostat MaxHeatSetpointLimit attribute"));
 }
 
@@ -46,8 +49,8 @@ void ThermostatManager::HeatingSetpointWriteCallback(int16_t newValue)
 {
     ChipLogDetail(NotSpecified, "ThermostatManager::HeatingSetpointWriteCallback: %d", newValue);
     Thermostat::SystemModeEnum systemMode;
-    EmberAfStatus status = Thermostat::Attributes::SystemMode::Get(mEndpointId, &systemMode);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to get Thermostat SystemMode attribute"));
+    Status status = Thermostat::Attributes::SystemMode::Get(mEndpointId, &systemMode);
+    VerifyOrReturn(Status::Success == status, ChipLogError(NotSpecified, "Failed to get Thermostat SystemMode attribute"));
 
     // A new setpoint has been set, so we shall infer that the we want to be in Heating mode
     if (systemMode == Thermostat::SystemModeEnum::kOff)
@@ -58,7 +61,7 @@ void ThermostatManager::HeatingSetpointWriteCallback(int16_t newValue)
     // Check the current temperature and turn on the heater if needed
     DataModel::Nullable<int16_t> localTemperature;
     status = Thermostat::Attributes::LocalTemperature::Get(mEndpointId, localTemperature);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+    VerifyOrReturn(Status::Success == status,
                    ChipLogError(NotSpecified, "Failed to get TemperatureMeasurement MeasuredValue attribute"));
 
     if (localTemperature.Value() < newValue)
@@ -81,14 +84,13 @@ void ThermostatManager::SystemModeWriteCallback(uint8_t newValue)
     else if ((Thermostat::SystemModeEnum) newValue == Thermostat::SystemModeEnum::kHeat)
     {
         DataModel::Nullable<int16_t> localTemperature;
-        EmberAfStatus status = Thermostat::Attributes::LocalTemperature::Get(mEndpointId, localTemperature);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+        Status status = Thermostat::Attributes::LocalTemperature::Get(mEndpointId, localTemperature);
+        VerifyOrReturn(Status::Success == status,
                        ChipLogError(NotSpecified, "Failed to get TemperatureMeasurement MeasuredValue attribute"));
 
         int16_t heatingSetpoint;
         status = Thermostat::Attributes::OccupiedHeatingSetpoint::Get(mEndpointId, &heatingSetpoint);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(NotSpecified, "Failed to get Thermostat HeatingSetpoint attribute"));
+        VerifyOrReturn(Status::Success == status, ChipLogError(NotSpecified, "Failed to get Thermostat HeatingSetpoint attribute"));
 
         if (localTemperature.Value() < heatingSetpoint)
         {
@@ -99,8 +101,8 @@ void ThermostatManager::SystemModeWriteCallback(uint8_t newValue)
 
 void ThermostatManager::OnLocalTemperatureChangeCallback(int16_t temperature)
 {
-    EmberAfStatus status = Thermostat::Attributes::LocalTemperature::Set(mEndpointId, temperature);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+    Status status = Thermostat::Attributes::LocalTemperature::Set(mEndpointId, temperature);
+    VerifyOrReturn(Status::Success == status,
                    ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValue attribute"));
 }
 
@@ -122,14 +124,13 @@ void ThermostatManager::SetHeating(bool isHeating)
         runningState.Clear(Thermostat::RelayStateBitmap::kHeat);
     }
 
-    EmberAfStatus status = Thermostat::Attributes::ThermostatRunningState::Set(mEndpointId, runningState);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                   ChipLogError(NotSpecified, "Failed to set Thermostat RunningState attribute"));
+    Status status = Thermostat::Attributes::ThermostatRunningState::Set(mEndpointId, runningState);
+    VerifyOrReturn(Status::Success == status, ChipLogError(NotSpecified, "Failed to set Thermostat RunningState attribute"));
 }
 
 void ThermostatManager::SetHeatMode(bool heat)
 {
-    EmberAfStatus status = Thermostat::Attributes::SystemMode::Set(
+    Status status = Thermostat::Attributes::SystemMode::Set(
         mEndpointId, heat ? Thermostat::SystemModeEnum::kHeat : Thermostat::SystemModeEnum::kOff);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set Thermostat SystemMode attribute"));
+    VerifyOrReturn(Status::Success == status, ChipLogError(NotSpecified, "Failed to set Thermostat SystemMode attribute"));
 }

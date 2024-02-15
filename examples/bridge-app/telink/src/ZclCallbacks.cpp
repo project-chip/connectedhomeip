@@ -43,12 +43,12 @@ using namespace chip::app::Clusters::OnOff;
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     bool storedValue;
 
     // Read storedValue on/off value
     status = Attributes::OnOff::Get(1, &storedValue);
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    if (status == Protocols::InteractionModel::Status::Success)
     {
         // Set actual state to stored before reboot
         GetAppTask().GetPWMDevice().Set(storedValue);

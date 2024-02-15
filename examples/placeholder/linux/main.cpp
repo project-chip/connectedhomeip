@@ -28,12 +28,6 @@ int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) == 0);
 
-    auto test = GetTargetTest();
-    if (test != nullptr)
-    {
-        test->NextTest();
-    }
-
     LinuxDeviceOptions::GetInstance().dacProvider = AppOptions::GetDACProvider();
 
     auto & server = InteractiveServer::GetInstance();
@@ -43,11 +37,6 @@ int main(int argc, char * argv[])
     }
 
     ChipLinuxAppMainLoop();
-
-    if (test != nullptr)
-    {
-        return test->GetCommandExitCode();
-    }
 
     return 0;
 }

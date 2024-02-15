@@ -104,18 +104,6 @@ private:
     std::atomic<tBitChunkType> * mUsage;
 };
 
-template <class T>
-class PoolCommon
-{
-public:
-    template <typename... Args>
-    void ResetObject(T * element, Args &&... args)
-    {
-        element->~T();
-        new (element) T(std::forward<Args>(args)...);
-    }
-};
-
 template <typename T, typename Function>
 class LambdaProxy
 {
@@ -211,7 +199,7 @@ struct HeapObjectList : HeapObjectListNode
  *  @tparam     N   a positive integer max number of elements the pool provides.
  */
 template <class T, size_t N>
-class BitMapObjectPool : public internal::StaticAllocatorBitmap, public internal::PoolCommon<T>
+class BitMapObjectPool : public internal::StaticAllocatorBitmap
 {
 public:
     BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
@@ -314,7 +302,7 @@ private:
  *  @tparam     T   type to be allocated.
  */
 template <class T>
-class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<T>, public HeapObjectPoolExitHandling
+class HeapObjectPool : public internal::Statistics, public HeapObjectPoolExitHandling
 {
 public:
     HeapObjectPool() {}

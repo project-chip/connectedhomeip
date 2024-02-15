@@ -22,6 +22,8 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/util/af.h>
 
+#include <protocols/interaction_model/StatusCode.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -48,14 +50,14 @@ public:
     /**
      * API to set/get the SpinSpeedCurrent attribute
      */
-    EmberAfStatus SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent);
-    EmberAfStatus GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent);
+    Protocols::InteractionModel::Status SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent);
+    Protocols::InteractionModel::Status GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent);
 
     /**
      * API to set/get the NumberOfRinses attribute
      */
-    EmberAfStatus SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
-    EmberAfStatus GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
+    Protocols::InteractionModel::Status SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses);
+    Protocols::InteractionModel::Status GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses);
 
 private:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

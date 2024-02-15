@@ -69,7 +69,6 @@ CHIP_ERROR CryptoContext::InitFromSecret(SessionKeystore & keystore, const ByteS
                                          SessionInfoType infoType, SessionRole role)
 {
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(secret.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     ByteSpan info = (infoType == SessionInfoType::kSessionResumption) ? ByteSpan(RSEKeysInfo) : ByteSpan(SEKeysInfo);
 
@@ -79,30 +78,34 @@ CHIP_ERROR CryptoContext::InitFromSecret(SessionKeystore & keystore, const ByteS
     auto & r2iKey = (role == SessionRole::kInitiator) ? mDecryptionKey : mEncryptionKey;
 
 #if CHIP_CONFIG_SECURITY_TEST_MODE
-
-    // If enabled, override the generated session key with a known key pair
-    // to allow man-in-the-middle session key recovery for testing purposes.
-
-    constexpr uint8_t kTestSharedSecret[CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
-    static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH,
-                  "CHIP_CONFIG_TEST_SHARED_SECRET_VALUE must be 32 bytes");
-    const ByteSpan & testSalt = ByteSpan();
-    (void) info;
-
-#warning                                                                                                                           \
-    "Warning: CHIP_CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, and NodeID=0 in NONCE. Node can only communicate with other nodes built with this flag set. Requires build flag 'treat_warnings_as_errors=false'."
-    ChipLogError(
-        SecureChannel,
-        "Warning: CHIP_CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, "
-        "and NodeID=0 in NONCE. "
-        "Node can only communicate with other nodes built with this flag set.");
-
-    ReturnErrorOnFailure(keystore.DeriveSessionKeys(ByteSpan(kTestSharedSecret), testSalt, ByteSpan(SEKeysInfo), i2rKey, r2iKey,
-                                                    mAttestationChallenge));
+    ReturnErrorOnFailure(InitTestMode(keystore, i2rKey, r2iKey));
 #else
-
     ReturnErrorOnFailure(keystore.DeriveSessionKeys(secret, salt, info, i2rKey, r2iKey, mAttestationChallenge));
+#endif
 
+    mKeyAvailable = true;
+    mSessionRole  = role;
+    mKeystore     = &keystore;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CryptoContext::InitFromSecret(Crypto::SessionKeystore & keystore, const Crypto::HkdfKeyHandle & hkdfKey,
+                                         const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
+{
+    VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
+
+    ByteSpan info = (infoType == SessionInfoType::kSessionResumption) ? ByteSpan(RSEKeysInfo) : ByteSpan(SEKeysInfo);
+
+    // If the secure session is created by session initiator, use the I2R key to encrypt
+    // messages being transmitted. Otherwise, use the R2I key.
+    auto & i2rKey = (role == SessionRole::kInitiator) ? mEncryptionKey : mDecryptionKey;
+    auto & r2iKey = (role == SessionRole::kInitiator) ? mDecryptionKey : mEncryptionKey;
+
+#if CHIP_CONFIG_SECURITY_TEST_MODE
+    ReturnErrorOnFailure(InitTestMode(keystore, i2rKey, r2iKey));
+#else
+    ReturnErrorOnFailure(keystore.DeriveSessionKeys(hkdfKey, salt, info, i2rKey, r2iKey, mAttestationChallenge));
 #endif
 
     mKeyAvailable = true;
@@ -124,6 +127,28 @@ CHIP_ERROR CryptoContext::InitFromKeyPair(SessionKeystore & keystore, const Cryp
 
     return InitFromSecret(keystore, secret.Span(), salt, infoType, role);
 }
+
+#if CHIP_CONFIG_SECURITY_TEST_MODE
+CHIP_ERROR CryptoContext::InitTestMode(Crypto::SessionKeystore & keystore, Crypto::Aes128KeyHandle & i2rKey,
+                                       Crypto::Aes128KeyHandle & r2iKey)
+{
+    // If enabled, override the generated session key with a known key pair
+    // to allow man-in-the-middle session key recovery for testing purposes.
+
+    constexpr uint8_t kTestSharedSecret[CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
+
+#warning                                                                                                                           \
+    "Warning: CHIP_CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, and NodeID=0 in NONCE. Node can only communicate with other nodes built with this flag set. Requires build flag 'treat_warnings_as_errors=false'."
+    ChipLogError(
+        SecureChannel,
+        "Warning: CHIP_CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, "
+        "and NodeID=0 in NONCE. "
+        "Node can only communicate with other nodes built with this flag set.");
+
+    return keystore.DeriveSessionKeys(ByteSpan(kTestSharedSecret), ByteSpan{} /* salt */, ByteSpan(SEKeysInfo), i2rKey, r2iKey,
+                                      mAttestationChallenge);
+}
+#endif // CHIP_CONFIG_SECURITY_TEST_MODE
 
 CHIP_ERROR CryptoContext::BuildNonce(NonceView nonce, uint8_t securityFlags, uint32_t messageCounter, NodeId nodeId)
 {

@@ -295,6 +295,15 @@ void JsonBackend::TraceCounter(const char * label)
     OutputValue(value);
 }
 
+void JsonBackend::TraceMetric(const char * label, int32_t val)
+{
+    ::Json::Value value;
+    value["label"] = label;
+    value["value"] = val;
+
+    OutputValue(value);
+}
+
 void JsonBackend::LogMessageSend(MessageSendInfo & info)
 {
     ::Json::Value value;

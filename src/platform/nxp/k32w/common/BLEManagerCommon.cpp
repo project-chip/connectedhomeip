@@ -949,7 +949,7 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
     mDeviceConnected = false;
 
     ChipDeviceEvent event;
-    event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
+    event.Type                           = DeviceEventType::kCHIPoBLEConnectionClosed;
     event.CHIPoBLEConnectionError.ConId  = deviceId;
     event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
 

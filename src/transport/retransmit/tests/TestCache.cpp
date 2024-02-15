@@ -14,9 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "TestRetransmit.h"
-
 #include <lib/support/UnitTestRegistration.h>
 #include <transport/retransmit/Cache.h>
 
@@ -271,7 +268,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestCache(void)
+int TestCache()
 {
     nlTestSuite theSuite = { "Retransmit-Cache", &sTests[0], nullptr, nullptr };
     gPayloadTracker.Init(&theSuite);

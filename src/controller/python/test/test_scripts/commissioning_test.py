@@ -39,6 +39,7 @@ TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
 # Network id, for the thread network, current a const value, will be changed to XPANID of the thread network.
 TEST_THREAD_NETWORK_ID = "fedcba9876543210"
 TEST_DISCRIMINATOR = 3840
+TEST_DISCOVERY_TYPE = 2
 
 ENDPOINT_ID = 0
 LIGHTING_ENDPOINT_ID = 1
@@ -104,6 +105,15 @@ def main():
         help="Path that contains valid and trusted PAA Root Certificates.",
         metavar="<paa-trust-store-path>"
     )
+    optParser.add_option(
+        "--discovery-type",
+        action="store",
+        dest="discoveryType",
+        default=TEST_DISCOVERY_TYPE,
+        type=int,
+        help="Discovery type of commissioning. (0: networkOnly 1: networkOnlyWithoutPASEAutoRetry 2: All<Ble & Network>)",
+        metavar="<discovery-type>"
+    )
 
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
@@ -129,7 +139,8 @@ def main():
     elif options.setupPayload:
         logger.info("Testing commissioning (w/ Setup Payload)")
         FailIfNot(test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
-                                                         nodeid=options.nodeid),
+                                                         nodeid=options.nodeid,
+                                                         discoveryType=options.discoveryType),
                   "Failed to finish commissioning")
     else:
         TestFail("Must provide device address or setup payload to commissioning the device")

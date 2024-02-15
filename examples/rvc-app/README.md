@@ -48,16 +48,14 @@ Below are the PIXIT definitions required for the different python tests.
 
 #### TC 1.2
 
-PIXIT: `PIXIT_ENDPOINT:1`  
 Example command:
-`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_1_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_1_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint=1"`
 
 #### TC 2.1
 
-PIXIT:
-`PIXIT_ENDPOINT:1 PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2`  
+PIXIT: `PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2`  
 Example command:
-`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1 PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2"`
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:1 PIXIT.RVCCLEANM.MODE_CHANGE_OK:2"`
 
 When asked "Manually put the device in a state from which it will FAIL to
 transition to mode 1", set the `RvcRunMode` to 1.
@@ -67,24 +65,23 @@ When asked "Manually put the device in a state from which it will SUCCESSFULLY
 transition to mode 2", set the `RvcRunMode` to 0.
 `chip-tool rvcrunmode change-to-mode 0`
 
-#### TC 3.2
+#### TC 2.2
 
-This is not applicable because this RVC device does not support the
-`StartUpMode` attribute.
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_2_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint=1"`
 
 ### RVC Run Mode cluster
 
 #### TC 1.2
 
-PIXIT: `PIXIT_ENDPOINT:1` Example command:
-`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCRUNM_1_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCRUNM_1_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint=1"`
 
 #### TC 2.1
 
-PIXIT:
-`PIXIT_ENDPOINT:1 PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2 PIXIT.RVCRUNM.MODE_CHANGE_OK:0`  
+PIXIT: `PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2 PIXIT.RVCRUNM.MODE_CHANGE_OK:0`  
 Example command:
-`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCRUNM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1 PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2 PIXIT.RVCRUNM.MODE_CHANGE_OK:0"`
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCRUNM_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:0 PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2"`
 
 When asked "Manually put the device in a state from which it will FAIL to
 transition to mode 2", set the `RvcRunMode` to 1.
@@ -93,27 +90,34 @@ transition to mode 2", set the `RvcRunMode` to 1.
 When asked "Manually put the device in a state from which it will SUCCESSFULLY
 transition to mode 0", do nothing.
 
-#### TC 3.2
+#### TC 2.2
 
-This is not applicable because this RVC device does not support the
-`StartUpMode` attribute.
+PIXIT: `PIXIT.RVCRUNM.MODE_A:1 PIXIT.RVCRUNM.MODE_B:2`  
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCRUNM_2_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --int-arg PIXIT.RVCRUNM.MODE_A:1 PIXIT.RVCRUNM.MODE_B:2"`
 
 ### RVC Operational State cluster
 
 #### TC 2.1
 
-PIXIT: `PIXIT_ENDPOINT:1`  
 Example command:
-`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCOPSTATE_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCOPSTATE_2_1.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1"`
 
 Use the out-of-band messages, chip-tool messages and the state machine diagram
 to navigate to the required states.
 
 #### TC 2.3
 
-PIXIT: `PIXIT_ENDPOINT:1`  
 Example command:
-`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCOPSTATE_2_3.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCOPSTATE_2_3.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1"`
+
+Use the out-of-band messages, chip-tool messages and the state machine diagram
+to transition to the required states.
+
+#### TC 2.4
+
+Example command:
+`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCOPSTATE_2_4.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1"`
 
 Use the out-of-band messages, chip-tool messages and the state machine diagram
 to transition to the required states.

@@ -19,6 +19,7 @@
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 
@@ -34,18 +35,18 @@ bool __attribute__((weak)) emberAfAttributeWriteAccessCallback(EndpointId endpoi
     return true;
 }
 
-EmberAfStatus __attribute__((weak))
+chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                      uint8_t * buffer, uint16_t maxReadLength)
 {
-    return EMBER_ZCL_STATUS_FAILURE;
+    return chip::Protocols::InteractionModel::Status::Failure;
 }
 
-EmberAfStatus __attribute__((weak))
+chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                       uint8_t * buffer)
 {
-    return EMBER_ZCL_STATUS_FAILURE;
+    return chip::Protocols::InteractionModel::Status::Failure;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))

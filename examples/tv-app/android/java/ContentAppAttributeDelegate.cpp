@@ -47,9 +47,9 @@ std::string ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttri
     ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read being called for endpoint %d cluster %d attribute %d",
                     aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
-    jstring resp =
-        (jstring) env->CallObjectMethod(mContentAppEndpointManager, mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
-                                        static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId));
+    jstring resp = static_cast<jstring>(
+        env->CallObjectMethod(mContentAppEndpointManager.ObjectRef(), mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
+                              static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId)));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Java exception in ContentAppAttributeDelegate::Read");

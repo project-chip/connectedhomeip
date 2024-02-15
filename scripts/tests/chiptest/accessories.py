@@ -98,12 +98,12 @@ class AppsRegister:
             return accessory.factoryReset()
         return False
 
-    def waitForMessage(self, name, message):
+    def waitForMessage(self, name, message, timeoutInSeconds=10):
         accessory = self.__accessories[name]
         if accessory:
             # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
             # comprise the entire message to wait for
-            return accessory.waitForMessage(' '.join(message))
+            return accessory.waitForMessage(' '.join(message), timeoutInSeconds)
         return False
 
     def createOtaImage(self, otaImageFilePath, rawImageFilePath, rawImageContent, vid='0xDEAD', pid='0xBEEF'):

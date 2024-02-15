@@ -11,10 +11,10 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-    - uses: github/issue-labeler@v3.3 #May not be the latest version
+    - uses: github/issue-labeler@v3.4 #May not be the latest version
       with:
         configuration-path: .github/issue-labeler.yml
-        not-before: 2020-01-15T02:54:32Z
+        not-before: 2020-01-15T02:54:34Z
         enable-versioned-regex: 0
         sync-labels: 1
         repo-token: ${{ github.token }}

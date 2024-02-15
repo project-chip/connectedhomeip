@@ -97,9 +97,6 @@ Davis, CA 95616, USA
     <cluster id="0x0062" name="Scenes Management" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x009B" name="Energy Preference" side="server">
-      <optionalConform/>
-    </cluster>
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>
     </cluster>

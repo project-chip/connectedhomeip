@@ -22,6 +22,7 @@
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/util/attribute-storage.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 /**
  * @brief Handles interfacing between java code and C++ code for the purposes of DoorLock clusters.
@@ -62,6 +63,6 @@ public:
 private:
     // init with java objects
     CHIP_ERROR InitializeWithObjects(jobject managerObject);
-    jobject mDoorLockManagerObject          = nullptr;
+    chip::JniGlobalReference mDoorLockManagerObject;
     jmethodID mHandleLockStateChangedMethod = nullptr;
 };

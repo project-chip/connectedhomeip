@@ -76,12 +76,14 @@ if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
 } else if (ti_simplelink_board == "CC3220SF_LAUNCHXL") {
   ti_simplelink_device_family = "cc32xx"
   ti_simplelink_soc_family = "cc32xx"
+  ti_simplelink_isa = "m4"
 
   # set -DDeviceFamily_CC3220
   ti_simplelink_soc = "cc32xxSF"
 } else if (ti_simplelink_board == "CC3235SF_LAUNCHXL") {
   ti_simplelink_device_family = "cc32xx"
   ti_simplelink_soc_family = "cc32xx"
+  ti_simplelink_isa = "m4"
 
   # set -DDeviceFamily_CC3220
   ti_simplelink_soc = "cc32xxSF"

@@ -91,6 +91,10 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     {
         self->OnClearErrorHandler();
     }
+    else if (name == "Reset")
+    {
+        self->OnResetHandler();
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command: Should never happens");
@@ -143,6 +147,11 @@ void RvcAppCommandHandler::OnErrorEventHandler(const std::string & error)
 void RvcAppCommandHandler::OnClearErrorHandler()
 {
     mRvcDevice->HandleClearErrorMessage();
+}
+
+void RvcAppCommandHandler::OnResetHandler()
+{
+    mRvcDevice->HandleResetMessage();
 }
 
 void RvcAppCommandDelegate::SetRvcDevice(chip::app::Clusters::RvcDevice * aRvcDevice)

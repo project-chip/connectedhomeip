@@ -361,7 +361,7 @@ CHIP_ERROR GroupBindCommandHandler(int argc, char ** argv)
     VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
     EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = EMBER_MULTICAST_BINDING;
+    entry->type                    = MATTER_MULTICAST_BINDING;
     entry->local                   = 1; // Hardcoded to endpoint 1 for now
     entry->fabricIndex             = atoi(argv[0]);
     entry->groupId                 = atoi(argv[1]);
@@ -379,7 +379,7 @@ CHIP_ERROR UnicastBindCommandHandler(int argc, char ** argv)
     VerifyOrReturnError(argc == 4, CHIP_ERROR_INVALID_ARGUMENT);
 
     EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = EMBER_UNICAST_BINDING;
+    entry->type                    = MATTER_UNICAST_BINDING;
     entry->local                   = 1; // Hardcoded to endpoint 1 for now
     entry->fabricIndex             = atoi(argv[0]);
     entry->nodeId                  = atoi(argv[1]);

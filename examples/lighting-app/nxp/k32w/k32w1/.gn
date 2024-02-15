@@ -25,4 +25,7 @@ default_args = {
   target_os = "freertos"
 
   import("//args.gni")
+
+  # Import default platform configs
+  import("${chip_root}/src/platform/nxp/k32w/k32w1/args.gni")
 }

@@ -36,10 +36,15 @@ public:
     uint8_t HandleGetCurrentTarget() override;
     void HandleNavigateTarget(CommandResponseHelper<NavigateTargetResponseType> & responser, const uint64_t & target,
                               const CharSpan & data) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
     // NOTE: the ids for each target start at 1 so that we can reserve 0 as "no current target"
     static const uint8_t kNoCurrentTarget = 0;
     std::list<std::string> mTargets;
     uint8_t mCurrentTarget;
+
+private:
+    // TODO: set this based upon meta data from app
+    static constexpr uint16_t kClusterRevision = 2;
 };

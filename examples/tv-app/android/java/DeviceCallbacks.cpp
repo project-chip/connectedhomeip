@@ -58,9 +58,9 @@ void DeviceCallbacks::InitializeWithObjects(jobject provider)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(AppServer, "Failed to GetEnvForCurrentThread for DeviceEventProvider"));
 
-    mProvider = env->NewGlobalRef(provider);
-    VerifyOrReturn(mProvider != nullptr, ChipLogError(AppServer, "Failed to NewGlobalRef DeviceEventProvider"));
-    jclass deviceEventProviderCls = env->GetObjectClass(mProvider);
+    VerifyOrReturn(mProvider.Init(provider) == CHIP_NO_ERROR, ChipLogError(Zcl, "Failed to init mProvider"));
+
+    jclass deviceEventProviderCls = env->GetObjectClass(provider);
     VerifyOrReturn(deviceEventProviderCls != nullptr, ChipLogError(AppServer, "Failed to get KeypadInputManager Java class"));
 
     mCommissioningCompleteMethod = env->GetMethodID(deviceEventProviderCls, "onCommissioningComplete", "()V");
@@ -85,7 +85,10 @@ void DeviceCallbacks::OnCommissioningComplete(const ChipDeviceEvent * event)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for DeviceEventProvider"));
-    env->CallVoidMethod(mProvider, mCommissioningCompleteMethod);
+
+    VerifyOrReturn(mProvider.HasValidObjectRef(), ChipLogError(Zcl, "mProvider is not valid"));
+
+    env->CallVoidMethod(mProvider.ObjectRef(), mCommissioningCompleteMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in DeviceEventProvider::onCommissioningComplete");

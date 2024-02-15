@@ -57,6 +57,9 @@ static constexpr uint32_t kMaxDERCertLength  = 600;
 // As per spec section 11.24 (Wi-Fi Authentication with Per-Device Credentials)
 inline constexpr uint32_t kMaxCHIPCompactNetworkIdentityLength = 137;
 
+// Length of a ASN.1 DER encoded ECPrivateKey structure (RFC 5915) for a P256 key pair.
+inline constexpr uint32_t kP256ECPrivateKeyDERLength = 121;
+
 /** Data Element Tags for the CHIP Certificate
  */
 enum
@@ -729,6 +732,17 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1::AS
  * @retval  #CHIP_NO_ERROR  If the signature value was successfully converted.
  */
 CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::TLVWriter & writer, uint64_t tag);
+
+/**
+ * @brief Convert a raw ECDSA P256 key pair to an ASN.1 DER encoded ECPrivateKey structure (RFC 5915).
+ *
+ * @param rawKeypair    The raw P256 key pair.
+ * @param outDerKeypair Output buffer to receive the ASN.1 DER encoded key pair.
+ *                      Must have a capacity of at least `kP256ECPrivateKeyDERLength` bytes.
+ *
+ * @retval  #CHIP_NO_ERROR If the key pair was successfully converted, or a CHIP_ERROR otherwise.
+ */
+CHIP_ERROR ConvertECDSAKeypairRawToDER(const Crypto::P256SerializedKeypair & rawKeypair, MutableByteSpan & outDerKeypair);
 
 /**
  * Extract the Fabric ID from an operational certificate that has already been

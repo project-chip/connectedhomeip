@@ -39,9 +39,9 @@ namespace Dnssd {
 using namespace chip::Platform;
 
 namespace {
-jobject sResolverObject           = nullptr;
-jobject sBrowserObject            = nullptr;
-jobject sMdnsCallbackObject       = nullptr;
+JniGlobalReference sResolverObject;
+JniGlobalReference sBrowserObject;
+JniGlobalReference sMdnsCallbackObject;
 jmethodID sResolveMethod          = nullptr;
 jmethodID sBrowseMethod           = nullptr;
 jmethodID sGetTextEntryKeysMethod = nullptr;
@@ -70,12 +70,12 @@ void ChipDnssdShutdown() {}
 CHIP_ERROR ChipDnssdRemoveServices()
 {
 
-    VerifyOrReturnError(sResolverObject != nullptr && sRemoveServicesMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sResolverObject.HasValidObjectRef() && sRemoveServicesMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     {
         DeviceLayer::StackUnlock unlock;
-        env->CallVoidMethod(sResolverObject, sRemoveServicesMethod);
+        env->CallVoidMethod(sResolverObject.ObjectRef(), sRemoveServicesMethod);
     }
 
     if (env->ExceptionCheck())
@@ -92,7 +92,7 @@ CHIP_ERROR ChipDnssdRemoveServices()
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(sResolverObject != nullptr && sPublishMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sResolverObject.HasValidObjectRef() && sPublishMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(CanCastTo<uint32_t>(service->mTextEntrySize), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(CanCastTo<uint32_t>(service->mSubTypeSize), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -134,8 +134,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
     {
         DeviceLayer::StackUnlock unlock;
-        env->CallVoidMethod(sResolverObject, sPublishMethod, jniName.jniValue(), jniHostName.jniValue(), jniServiceType.jniValue(),
-                            service->mPort, keys, datas, subTypes);
+        env->CallVoidMethod(sResolverObject.ObjectRef(), sPublishMethod, jniName.jniValue(), jniHostName.jniValue(),
+                            jniServiceType.jniValue(), service->mPort, keys, datas, subTypes);
     }
 
     if (env->ExceptionCheck())
@@ -185,15 +185,15 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
                            Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context, intptr_t * browseIdentifier)
 {
     VerifyOrReturnError(type != nullptr && callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(sBrowserObject != nullptr && sBrowseMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(sMdnsCallbackObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sBrowserObject.HasValidObjectRef() && sBrowseMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(sMdnsCallbackObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
 
     std::string serviceType = GetFullTypeWithSubTypes(type, protocol);
     JNIEnv * env            = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jniServiceType(env, serviceType.c_str());
 
-    env->CallVoidMethod(sBrowserObject, sBrowseMethod, jniServiceType.jniValue(), reinterpret_cast<jlong>(callback),
-                        reinterpret_cast<jlong>(context), sMdnsCallbackObject);
+    env->CallVoidMethod(sBrowserObject.ObjectRef(), sBrowseMethod, jniServiceType.jniValue(), reinterpret_cast<jlong>(callback),
+                        reinterpret_cast<jlong>(context), sMdnsCallbackObject.ObjectRef());
 
     if (env->ExceptionCheck())
     {
@@ -247,8 +247,8 @@ CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
 {
     VerifyOrReturnError(service != nullptr && callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(sResolverObject != nullptr && sResolveMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(sMdnsCallbackObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sResolverObject.HasValidObjectRef() && sResolveMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sMdnsCallbackObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
 
     std::string serviceType = GetFullType(service);
     JNIEnv * env            = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -257,8 +257,8 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface,
 
     {
         DeviceLayer::StackUnlock unlock;
-        env->CallVoidMethod(sResolverObject, sResolveMethod, jniInstanceName.jniValue(), jniServiceType.jniValue(),
-                            reinterpret_cast<jlong>(callback), reinterpret_cast<jlong>(context), sMdnsCallbackObject);
+        env->CallVoidMethod(sResolverObject.ObjectRef(), sResolveMethod, jniInstanceName.jniValue(), jniServiceType.jniValue(),
+                            reinterpret_cast<jlong>(callback), reinterpret_cast<jlong>(context), sMdnsCallbackObject.ObjectRef());
     }
 
     if (env->ExceptionCheck())
@@ -283,13 +283,16 @@ CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress
 
 void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobject mdnsCallbackObject)
 {
-    JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
-    sResolverObject      = env->NewGlobalRef(resolverObject);
-    sBrowserObject       = env->NewGlobalRef(browserObject);
-    sMdnsCallbackObject  = env->NewGlobalRef(mdnsCallbackObject);
-    jclass resolverClass = env->GetObjectClass(sResolverObject);
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(sResolverObject.Init(resolverObject) == CHIP_NO_ERROR,
+                   ChipLogError(Discovery, "Failed to init sResolverObject"));
+    VerifyOrReturn(sBrowserObject.Init(browserObject) == CHIP_NO_ERROR, ChipLogError(Discovery, "Failed to init sBrowserObject"));
+    VerifyOrReturn(sMdnsCallbackObject.Init(mdnsCallbackObject) == CHIP_NO_ERROR,
+                   ChipLogError(Discovery, "Failed to init sMdnsCallbackObject"));
+
+    jclass resolverClass = env->GetObjectClass(resolverObject);
     jclass browserClass  = env->GetObjectClass(browserObject);
-    sMdnsCallbackClass   = env->GetObjectClass(sMdnsCallbackObject);
+    sMdnsCallbackClass   = env->GetObjectClass(mdnsCallbackObject);
 
     VerifyOrReturn(browserClass != nullptr, ChipLogError(Discovery, "Failed to get Browse Java class"));
     VerifyOrReturn(resolverClass != nullptr, ChipLogError(Discovery, "Failed to get Resolver Java class"));
@@ -390,7 +393,8 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
     // so we free these in the exit section
     if (textEntries != nullptr)
     {
-        jobjectArray keys   = (jobjectArray) env->CallObjectMethod(sMdnsCallbackObject, sGetTextEntryKeysMethod, textEntries);
+        jobjectArray keys =
+            (jobjectArray) env->CallObjectMethod(sMdnsCallbackObject.ObjectRef(), sGetTextEntryKeysMethod, textEntries);
         auto size           = env->GetArrayLength(keys);
         TextEntry * entries = new (std::nothrow) TextEntry[size];
         VerifyOrExit(entries != nullptr, ChipLogError(Discovery, "entries alloc failure"));
@@ -403,8 +407,8 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
             JniUtfString key(env, jniKeyObject);
             entries[i].mKey = strdup(key.c_str());
 
-            jbyteArray datas =
-                (jbyteArray) env->CallObjectMethod(sMdnsCallbackObject, sGetTextEntryDataMethod, textEntries, jniKeyObject);
+            jbyteArray datas = (jbyteArray) env->CallObjectMethod(sMdnsCallbackObject.ObjectRef(), sGetTextEntryDataMethod,
+                                                                  textEntries, jniKeyObject);
             if (datas != nullptr)
             {
                 size_t dataSize = env->GetArrayLength(datas);

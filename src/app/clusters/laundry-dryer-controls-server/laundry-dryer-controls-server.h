@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/util/af.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -46,8 +47,9 @@ public:
     /**
      * API to set/get the SelectedDrynessLevel attribute
      */
-    EmberAfStatus SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel);
-    EmberAfStatus GetSelectedDrynessLevel(EndpointId endpointId, DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel);
+    Protocols::InteractionModel::Status SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel);
+    Protocols::InteractionModel::Status GetSelectedDrynessLevel(EndpointId endpointId,
+                                                                DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel);
 
 private:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

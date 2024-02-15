@@ -22,7 +22,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/EventLogging.h>
-#include <app/util/af-enums.h>
+
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -33,13 +33,15 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 
+using chip::Protocols::InteractionModel::Status;
+
 namespace {
 
 void ReachableChanged(EndpointId endpointId)
 {
     MATTER_TRACE_INSTANT("ReachableChanged", "BridgeBasicInfo");
     bool reachable = false;
-    if (EMBER_ZCL_STATUS_SUCCESS != Attributes::Reachable::Get(endpointId, &reachable))
+    if (Status::Success != Attributes::Reachable::Get(endpointId, &reachable))
     {
         ChipLogError(Zcl, "ReachabledChanged: Failed to get Reachable value");
     }

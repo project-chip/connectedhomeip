@@ -6066,6 +6066,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::PowerTopology::Id: {
+        using namespace app::Clusters::PowerTopology;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::EnergyEvseMode::Id: {
         using namespace app::Clusters::EnergyEvseMode;
         switch (aPath.mEventId)

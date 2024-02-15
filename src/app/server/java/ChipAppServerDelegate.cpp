@@ -29,7 +29,9 @@ void ChipAppServerDelegate::OnCommissioningSessionEstablishmentStarted()
                    ChipLogError(AppServer, "mOnCommissioningSessionEstablishmentStartedMethod is nullptr"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionEstablishmentStartedMethod);
+    VerifyOrReturn(mChipAppServerDelegateObject.HasValidObjectRef(),
+                   ChipLogError(AppServer, "mChipAppServerDelegateObject is not valid"));
+    env->CallVoidMethod(mChipAppServerDelegateObject.ObjectRef(), mOnCommissioningSessionEstablishmentStartedMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in OnCommissioningSessionEstablishmentStartedMethod");
@@ -46,7 +48,9 @@ void ChipAppServerDelegate::OnCommissioningSessionStarted()
                    ChipLogError(AppServer, "mOnCommissioningSessionStartedMethod is nullptr"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionStartedMethod);
+    VerifyOrReturn(mChipAppServerDelegateObject.HasValidObjectRef(),
+                   ChipLogError(AppServer, "mChipAppServerDelegateObject is not valid"));
+    env->CallVoidMethod(mChipAppServerDelegateObject.ObjectRef(), mOnCommissioningSessionStartedMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in OnCommissioningSessionStartedMethod");
@@ -63,7 +67,9 @@ void ChipAppServerDelegate::OnCommissioningSessionEstablishmentError(CHIP_ERROR 
                    ChipLogError(AppServer, "mOnCommissioningSessionEstablishmentErrorMethod is nullptr"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionEstablishmentErrorMethod,
+    VerifyOrReturn(mChipAppServerDelegateObject.HasValidObjectRef(),
+                   ChipLogError(AppServer, "mChipAppServerDelegateObject is not valid"));
+    env->CallVoidMethod(mChipAppServerDelegateObject.ObjectRef(), mOnCommissioningSessionEstablishmentErrorMethod,
                         static_cast<jint>(err.AsInteger()));
     if (env->ExceptionCheck())
     {
@@ -81,7 +87,9 @@ void ChipAppServerDelegate::OnCommissioningSessionStopped()
                    ChipLogError(AppServer, "mOnCommissioningSessionStoppedMethod is nullptr"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningSessionStoppedMethod);
+    VerifyOrReturn(mChipAppServerDelegateObject.HasValidObjectRef(),
+                   ChipLogError(AppServer, "mChipAppServerDelegateObject is not valid"));
+    env->CallVoidMethod(mChipAppServerDelegateObject.ObjectRef(), mOnCommissioningSessionStoppedMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in OnCommissioningSessionStoppedMethod");
@@ -98,7 +106,9 @@ void ChipAppServerDelegate::OnCommissioningWindowOpened()
                    ChipLogError(AppServer, "mOnCommissioningWindowOpenedMethod is nullptr"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningWindowOpenedMethod);
+    VerifyOrReturn(mChipAppServerDelegateObject.HasValidObjectRef(),
+                   ChipLogError(AppServer, "mChipAppServerDelegateObject is not valid"));
+    env->CallVoidMethod(mChipAppServerDelegateObject.ObjectRef(), mOnCommissioningWindowOpenedMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in OnCommissioningWindowOpenedMethod");
@@ -115,7 +125,9 @@ void ChipAppServerDelegate::OnCommissioningWindowClosed()
                    ChipLogError(AppServer, "mOnCommissioningWindowClosedMethod is nullptr"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mChipAppServerDelegateObject, mOnCommissioningWindowClosedMethod);
+    VerifyOrReturn(mChipAppServerDelegateObject.HasValidObjectRef(),
+                   ChipLogError(AppServer, "mChipAppServerDelegateObject is not valid"));
+    env->CallVoidMethod(mChipAppServerDelegateObject.ObjectRef(), mOnCommissioningWindowClosedMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in OnCommissioningWindowClosedMethod");
@@ -128,11 +140,9 @@ CHIP_ERROR ChipAppServerDelegate::InitializeWithObjects(jobject appDelegateObjec
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
+    ReturnLogErrorOnFailure(mChipAppServerDelegateObject.Init(appDelegateObject));
 
-    mChipAppServerDelegateObject = env->NewGlobalRef(appDelegateObject);
-    VerifyOrReturnLogError(mChipAppServerDelegateObject != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-
-    jclass chipAppServerDelegateClass = env->GetObjectClass(mChipAppServerDelegateObject);
+    jclass chipAppServerDelegateClass = env->GetObjectClass(mChipAppServerDelegateObject.ObjectRef());
     VerifyOrReturnLogError(chipAppServerDelegateClass != nullptr, CHIP_JNI_ERROR_JAVA_ERROR);
 
     mOnCommissioningSessionEstablishmentStartedMethod =

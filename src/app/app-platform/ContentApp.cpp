@@ -29,11 +29,14 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 using namespace chip;
 using namespace chip::AppPlatform;
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace AppPlatform {
@@ -41,23 +44,22 @@ namespace AppPlatform {
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
 #define ZCL_APPLICATION_BASIC_CLUSTER_REVISION (1u)
 
-EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer,
-                                              uint16_t maxReadLength)
+Status ContentApp::HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
 {
     ChipLogProgress(DeviceLayer,
                     "Read Attribute for endpoint " ChipLogFormatMEI " cluster " ChipLogFormatMEI " attribute " ChipLogFormatMEI,
                     ChipLogValueMEI(mEndpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return Status::Failure;
 }
 
-EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer)
+Status ContentApp::HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer)
 {
     ChipLogProgress(DeviceLayer,
                     "Read Attribute for endpoint " ChipLogFormatMEI " cluster " ChipLogFormatMEI " attribute " ChipLogFormatMEI,
                     ChipLogValueMEI(mEndpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return Status::Failure;
 }
 
 } // namespace AppPlatform

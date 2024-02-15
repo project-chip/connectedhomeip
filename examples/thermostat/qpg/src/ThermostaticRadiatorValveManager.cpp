@@ -304,7 +304,7 @@ void ThermostaticRadiatorValveManager::UpdateLocalTemperature(int16_t aLocalTemp
 {
     SystemLayer().ScheduleLambda([aLocalTemperature] {
         ChipLogProgress(NotSpecified, "UpdateLocalTemperature with value (0.01 degC) %u", aLocalTemperature);
-        if (EMBER_ZCL_STATUS_SUCCESS !=
+        if (Protocols::InteractionModel::Status::Success !=
             Thermostat::Attributes::LocalTemperature::Set(QPG_THERMOSTATIC_ENDPOINT_ID, aLocalTemperature))
         {
             ChipLogProgress(NotSpecified, "UpdateLocalTemperature failure");

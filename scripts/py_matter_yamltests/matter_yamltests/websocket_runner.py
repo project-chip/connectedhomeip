@@ -13,6 +13,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import logging
+import re
+import select
 import subprocess
 import time
 from dataclasses import dataclass
@@ -24,6 +27,10 @@ from .runner import TestRunner
 
 _KEEP_ALIVE_TIMEOUT_IN_SECONDS = 120
 _MAX_MESSAGE_SIZE_IN_BYTES = 10485760  # 10 MB
+_CONNECT_MAX_RETRIES_DEFAULT = 4
+_WEBSOCKET_SERVER_MESSAGE = '== WebSocket Server Ready'
+_WEBSOCKET_SERVER_MESSAGE_TIMEOUT = 60  # seconds
+_WEBSOCKET_SERVER_TERMINATE_TIMEOUT = 10  # seconds
 
 
 @dataclass
@@ -54,7 +61,7 @@ class WebSocketRunner(TestRunner):
         return self._client.state == websockets.protocol.State.OPEN
 
     async def start(self):
-        self._server = await self._start_server(self._server_startup_command)
+        self._server = await self._start_server(self._server_startup_command, self._server_connection_url)
         self._client = await self._start_client(self._server_connection_url)
 
     async def stop(self):
@@ -70,7 +77,7 @@ class WebSocketRunner(TestRunner):
             return await instance.recv()
         return None
 
-    async def _start_client(self, url, max_retries=4, interval_between_retries=1):
+    async def _start_client(self, url, max_retries=_CONNECT_MAX_RETRIES_DEFAULT, interval_between_retries=1):
         if max_retries:
             start = time.time()
             try:
@@ -93,15 +100,48 @@ class WebSocketRunner(TestRunner):
         if instance:
             await instance.close()
 
-    async def _start_server(self, command):
+    async def _start_server(self, command, url):
         instance = None
         if command:
-            instance = subprocess.Popen(command, stdout=subprocess.DEVNULL)
+            start_time = time.time()
+
+            command = ['stdbuf', '-o0', '-e0'] + command  # disable buffering
+            instance = subprocess.Popen(
+                command, text=False, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+            # Loop to read the subprocess output with a timeout
+            lines = []
+            while True:
+                if time.time() - start_time > _WEBSOCKET_SERVER_MESSAGE_TIMEOUT:
+                    for line in lines:
+                        print(line.decode('utf-8'), end='')
+                    self._hooks.abort(url)
+                    await self._stop_server(instance)
+                    raise Exception(
+                        f'Connecting to {url} failed. WebSocket startup has not been detected.')
+
+                ready, _, _ = select.select([instance.stdout], [], [], 1)
+                if ready:
+                    line = instance.stdout.readline()
+                    if len(line):
+                        lines.append(line)
+                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line.decode('utf-8')):
+                            break  # Exit the loop if the pattern is found
+                else:
+                    continue
+            instance.stdout.close()
+
         return instance
 
     async def _stop_server(self, instance):
         if instance:
-            instance.kill()
+            instance.terminate()  # sends SIGTERM
+            try:
+                instance.wait(_WEBSOCKET_SERVER_TERMINATE_TIMEOUT)
+            except subprocess.TimeoutExpired:
+                logging.debug(
+                    'Subprocess did not terminate on SIGTERM, killing it now')
+                instance.kill()
 
     def _make_server_connection_url(self, address: str, port: int):
         return 'ws://' + address + ':' + str(port)

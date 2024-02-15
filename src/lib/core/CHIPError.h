@@ -33,7 +33,6 @@
 
 #include <inttypes.h>
 #include <limits>
-#include <stdint.h>
 #include <type_traits>
 
 namespace chip {
@@ -1259,7 +1258,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_FABRIC_EXISTS                               CHIP_CORE_ERROR(0x7e)
 
-// AVAILABLE: 0x7f
+/**
+ *  @def CHIP_ERROR_ENDPOINT_EXISTS
+ *
+ *  @brief
+ *    The endpoint with the given endpoint id already exists.
+ *
+ */
+#define CHIP_ERROR_ENDPOINT_EXISTS                               CHIP_CORE_ERROR(0x7f)
 
 /**
  *  @def CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER

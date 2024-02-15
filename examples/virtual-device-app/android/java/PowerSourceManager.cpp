@@ -35,7 +35,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PowerSource;
 
 static constexpr size_t kPowerSourceManagerTableSize =
-    EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 namespace {
 
@@ -53,7 +53,7 @@ void PowerSourceManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "Device App: PowerSourceManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::PowerSource::Id,
-                                                       EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kPowerSourceManagerTableSize,
                    ChipLogError(Zcl, "Device App::PowerSource::NewManager: endpoint %d not found", endpoint));
 
@@ -75,7 +75,7 @@ void PowerSourceManager::NewManager(jint endpoint, jobject manager)
 PowerSourceManager * GetPowerSourceManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::PowerSource::Id,
-                                                       EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT);
     return ((ep >= kPowerSourceManagerTableSize) ? nullptr : gPowerSourceManagerTable[ep]);
 }
 
@@ -83,22 +83,20 @@ jboolean PowerSourceManager::SetBatPercentRemaining(jint endpoint, jint value)
 {
     using namespace chip::app::Clusters;
     using namespace chip::DeviceLayer;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
 
     status =
         PowerSource::Attributes::BatPercentRemaining::Set(static_cast<chip::EndpointId>(endpoint), static_cast<uint8_t>(value * 2));
 
     ChipLogDetail(Zcl, "Device App::PowerSource::SetBatPercentRemaining: endpoint:%d, percent:%d", endpoint, value);
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    return status == Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR PowerSourceManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    mPowerSourceManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mPowerSourceManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mPowerSourceManagerObject.Init(managerObject));
 
     jclass PowerSourceManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(PowerSourceManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

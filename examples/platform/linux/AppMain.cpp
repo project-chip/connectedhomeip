@@ -19,7 +19,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include "app/clusters/network-commissioning/network-commissioning.h"
+#include <app/InteractionModelEngine.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>

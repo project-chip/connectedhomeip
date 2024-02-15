@@ -16,9 +16,12 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
@@ -60,25 +63,25 @@ CHIP_ERROR ManualRefrigeratorAlarmCommandHandler(int argc, char ** argv)
 CHIP_ERROR ManualRefrigeratorAlarmDoorOpenCommandHandler(int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
 
     status = serverInstance.SetMaskValue(1, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, 1);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetSupportedValue(1, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
@@ -96,25 +99,25 @@ exit:
 CHIP_ERROR ManualRefrigeratorAlarmDoorCloseCommandHandler(int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
 
     status = serverInstance.SetMaskValue(1, 1);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetSupportedValue(1, 1);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
@@ -132,18 +135,18 @@ exit:
 CHIP_ERROR ManualRefrigeratorAlarmSuppressCommandHandler(int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
     RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
 
     status = serverInstance.SetSupportedValue(1, 1);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, 0);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;

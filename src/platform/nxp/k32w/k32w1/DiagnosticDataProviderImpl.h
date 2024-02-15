@@ -43,6 +43,7 @@ public:
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
+    CHIP_ERROR ResetWatermarks() override;
     CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
     void ReleaseThreadMetrics(ThreadMetrics * threadMetrics) override;
 

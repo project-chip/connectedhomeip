@@ -23,16 +23,11 @@ chip_test_suite_using_nltest("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  sources = [
-    "TestCache.cpp",
-    "TestRetransmit.h",
-  ]
+  test_sources = [ "TestCache.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/transport/retransmit",
     "${nlunit_test_root}:nlunit-test",
   ]
-
-  tests = [ "TestCache" ]
 }

@@ -55,7 +55,7 @@
 #error "This file must be used with TI_BOOT_USE_EXTERNAL_FLASH enabled"
 #endif
 
-#ifdef DeviceFamily_CC13X4
+#if defined(DeviceFamily_CC13X4) || defined(DeviceFamily_CC26X4)
 #if (MCUBOOT_IMAGE_NUMBER == 2)
 #define BOOT_SLOT_1_SIZE 0x0002B000
 #define BOOT_SLOT_2_SIZE 0x000CC800

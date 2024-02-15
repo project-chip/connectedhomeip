@@ -23,7 +23,7 @@ using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::Change
 using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type;
 using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
 // Include Channel Cluster Server callbacks only when the server is enabled
-#ifdef EMBER_AF_PLUGIN_CHANNEL_SERVER
+#ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include <chef-channel-manager.h>
 
 using namespace chip;
@@ -213,7 +213,7 @@ bool ChefChannelManager::HandleSkipChannel(const int16_t & count)
 
 uint32_t ChefChannelManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint > EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint > MATTER_DM_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return 0;
     }
@@ -223,4 +223,4 @@ uint32_t ChefChannelManager::GetFeatureMap(chip::EndpointId endpoint)
     return featureMap;
 }
 
-#endif /* EMBER_AF_PLUGIN_CHANNEL_SERVER */
+#endif /* MATTER_DM_PLUGIN_CHANNEL_SERVER */

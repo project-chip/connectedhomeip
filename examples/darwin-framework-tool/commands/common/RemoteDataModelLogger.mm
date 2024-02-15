@@ -35,6 +35,7 @@ constexpr char kErrorIdKey[] = "error";
 constexpr char kClusterErrorIdKey[] = "clusterError";
 constexpr char kValueKey[] = "value";
 constexpr char kNodeIdKey[] = "nodeId";
+constexpr char kLogContentIdKey[] = "logContent";
 
 constexpr char kBase64Header[] = "base64:";
 
@@ -199,6 +200,34 @@ CHIP_ERROR LogGetCommissionerNodeId(NSNumber * value)
     Json::Value rootValue;
     rootValue[kValueKey] = Json::Value();
     rootValue[kValueKey][kNodeIdKey] = [value unsignedLongLongValue];
+
+    auto valueStr = JsonToString(rootValue);
+    return gDelegate->LogJSON(valueStr.c_str());
+}
+
+CHIP_ERROR LogBdxDownload(NSString * content, NSError * error)
+{
+    VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
+
+    Json::Value rootValue;
+    rootValue[kValueKey] = Json::Value();
+
+    Json::Value jsonValue;
+    VerifyOrDie(CHIP_NO_ERROR == AsJsonValue(content, jsonValue));
+    rootValue[kValueKey][kLogContentIdKey] = jsonValue;
+
+    if (error) {
+        auto err = MTRErrorToCHIPErrorCode(error);
+        auto status = chip::app::StatusIB(err);
+
+#if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+        auto statusName = chip::Protocols::InteractionModel::StatusName(status.mStatus);
+        rootValue[kValueKey][kErrorIdKey] = statusName;
+#else
+        auto statusName = status.mStatus;
+        rootValue[kValueKey][kErrorIdKey] = chip::to_underlying(statusName);
+#endif // CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+    }
 
     auto valueStr = JsonToString(rootValue);
     return gDelegate->LogJSON(valueStr.c_str());
