@@ -25,6 +25,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Messages;
 using Message = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
+using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type;
 
 // Commands
 CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
@@ -64,7 +65,7 @@ CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::Decodab
     {
         auto & id = iter.GetValue();
 
-        mCachedMessages.remove_if([id](CachedMessage & entry) { return entry.mMessageId.data_equal(id); });
+        mCachedMessages.remove_if([id](CachedMessage & entry) { return entry.MessageIdMatches(id); });
         // per spec, the command succeeds even when the message id does not match an existing message
     }
     return CHIP_NO_ERROR;

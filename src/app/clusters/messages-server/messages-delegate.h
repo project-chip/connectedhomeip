@@ -29,8 +29,6 @@ namespace app {
 namespace Clusters {
 namespace Messages {
 
-using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type;
-
 constexpr static size_t kMessageIdLength               = 16;
 constexpr static size_t kMessageTextLengthMax          = 256;
 constexpr static size_t kMessageMaxOptionCount         = 4;
@@ -41,12 +39,12 @@ class Delegate
 {
 public:
     // Commands
-    virtual CHIP_ERROR
-    HandlePresentMessagesRequest(const ByteSpan & messageId, const MessagePriorityEnum & priority,
-                                 const chip::BitMask<MessageControlBitmap> & messageControl,
-                                 const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration,
-                                 const CharSpan & messageText,
-                                 const chip::Optional<DataModel::DecodableList<MessageResponseOption>> & responses) = 0;
+    virtual CHIP_ERROR HandlePresentMessagesRequest(
+        const ByteSpan & messageId, const MessagePriorityEnum & priority,
+        const chip::BitMask<MessageControlBitmap> & messageControl, const DataModel::Nullable<uint32_t> & startTime,
+        const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
+        const chip::Optional<DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
+            responses)                                                                                              = 0;
     virtual CHIP_ERROR HandleCancelMessagesRequest(const DataModel::DecodableList<chip::ByteSpan> & messageIds)     = 0;
 
     // Attributes

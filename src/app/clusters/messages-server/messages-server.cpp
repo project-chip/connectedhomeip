@@ -200,6 +200,12 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
                      ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback size check failed");
                      status = Status::ConstraintError);
 
+        VerifyOrExit(
+            delegate->HasFeature(endpoint, Feature::kConfirmationResponse),
+            ChipLogProgress(
+                Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback responses sent but response feature not supported");
+            status = Status::ConstraintError);
+
         VerifyOrExit(size <= kMessageMaxOptionCount,
                      ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback too many options");
                      status = Status::ConstraintError);
@@ -209,9 +215,10 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
         {
             auto & response = iter.GetValue();
 
+            // response feature is checked above
             VerifyOrExit(response.messageResponseID.HasValue() && response.label.HasValue(),
                          ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback missing response id or label");
-                         status = Status::InvalidDataType);
+                         status = Status::InvalidCommand);
 
             VerifyOrExit(response.messageResponseID.Value() >= kMessageResponseIdMin,
                          ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback responseID value check failed");
@@ -223,7 +230,7 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
         }
         VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR,
                      ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback TLV parsing error");
-                     status = Status::InvalidDataType);
+                     status = Status::InvalidAction);
     }
 
     err = delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses);
@@ -267,7 +274,7 @@ bool emberAfMessagesClusterCancelMessagesRequestCallback(
         }
         VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR,
                      ChipLogProgress(Zcl, "emberAfMessagesClusterCancelMessagesRequestCallback TLV parsing error");
-                     status = Status::InvalidDataType);
+                     status = Status::InvalidAction);
     }
 
     err = delegate->HandleCancelMessagesRequest(messageIds);

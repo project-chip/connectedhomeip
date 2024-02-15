@@ -34,27 +34,24 @@ struct CachedMessageOption
         mOption{ option.mOption.messageResponseID, chip::MakeOptional(chip::CharSpan::fromCharString(mLabel.c_str())) }
     {}
 
-    CachedMessageOption & operator=(const CachedMessageOption & option) { return *this; };
+    CachedMessageOption & operator=(const CachedMessageOption & option) = delete;
 
-    chip::app::Clusters::Messages::MessageResponseOption GetMessageOption() { return mOption; }
+    chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type GetMessageOption() { return mOption; }
 
     ~CachedMessageOption() {}
 
 protected:
     std::string mLabel;
-    chip::app::Clusters::Messages::MessageResponseOption mOption;
+    chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type mOption;
 };
 
 struct CachedMessage
 {
-    chip::ByteSpan mMessageId;
-
     CachedMessage(const CachedMessage & message) :
         mPriority(message.mPriority), mMessageControl(message.mMessageControl), mStartTime(message.mStartTime),
         mDuration(message.mDuration), mMessageText(message.mMessageText), mOptions(message.mOptions)
     {
         memcpy(mMessageIdBuffer, message.mMessageIdBuffer, sizeof(mMessageIdBuffer));
-        mMessageId = chip::ByteSpan(mMessageIdBuffer);
 
         for (CachedMessageOption & entry : mOptions)
         {
@@ -62,7 +59,7 @@ struct CachedMessage
         }
     }
 
-    CachedMessage & operator=(const CachedMessage & message) { return *this; };
+    CachedMessage & operator=(const CachedMessage & message) = delete;
 
     CachedMessage(const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
@@ -72,8 +69,9 @@ struct CachedMessage
         mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText)
     {
         memcpy(mMessageIdBuffer, messageId.data(), sizeof(mMessageIdBuffer));
-        mMessageId = chip::ByteSpan(mMessageIdBuffer);
     }
+
+    bool MessageIdMatches(const chip::ByteSpan & id) { return chip::ByteSpan(mMessageIdBuffer).data_equal(id); }
 
     void AddOption(CachedMessageOption option)
     {
@@ -85,9 +83,9 @@ struct CachedMessage
     {
         if (mResponseOptions.size() > 0)
         {
-            chip::app::DataModel::List<chip::app::Clusters::Messages::MessageResponseOption> options(mResponseOptions.data(),
-                                                                                                     mResponseOptions.size());
-            chip::app::Clusters::Messages::Structs::MessageStruct::Type message{ mMessageId,
+            chip::app::DataModel::List<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type> options(
+                mResponseOptions.data(), mResponseOptions.size());
+            chip::app::Clusters::Messages::Structs::MessageStruct::Type message{ chip::ByteSpan(mMessageIdBuffer),
                                                                                  mPriority,
                                                                                  mMessageControl,
                                                                                  mStartTime,
@@ -97,9 +95,12 @@ struct CachedMessage
                                                                                  chip::MakeOptional(options) };
             return message;
         }
-        chip::app::Clusters::Messages::Structs::MessageStruct::Type message{
-            mMessageId, mPriority, mMessageControl, mStartTime, mDuration, chip::CharSpan::fromCharString(mMessageText.c_str())
-        };
+        chip::app::Clusters::Messages::Structs::MessageStruct::Type message{ chip::ByteSpan(mMessageIdBuffer),
+                                                                             mPriority,
+                                                                             mMessageControl,
+                                                                             mStartTime,
+                                                                             mDuration,
+                                                                             chip::CharSpan::fromCharString(mMessageText.c_str()) };
         return message;
     }
 
@@ -114,7 +115,7 @@ protected:
     std::string mMessageText;
     uint8_t mMessageIdBuffer[chip::app::Clusters::Messages::kMessageIdLength];
 
-    std::vector<chip::app::Clusters::Messages::MessageResponseOption> mResponseOptions;
+    std::vector<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type> mResponseOptions;
     std::list<CachedMessageOption> mOptions;
 };
 
