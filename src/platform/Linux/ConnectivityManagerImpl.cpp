@@ -546,7 +546,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
     }
 
     // We need to stop auto scan or it will block our network scan.
-    DeviceLayer::SystemLayer().ScheduleLambda([]() {
+    DeviceLayer::SystemLayer().ScheduleLambda([this]() {
         CHIP_ERROR errInner = StopAutoScan();
         if (errInner != CHIP_NO_ERROR)
         {
@@ -800,7 +800,8 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     mConnectivityFlag.ClearAll();
     mWpaSupplicant = GDBusWpaSupplicant{};
 
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(_StartWiFiManagement, this);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](ConnectivityManagerImpl * self) { return self->_StartWiFiManagement(); }, this);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
 
@@ -1902,7 +1903,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * sourceObject, GA
     g_strfreev(oldBsss);
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement(ConnectivityManagerImpl * self)
+CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
@@ -1911,10 +1912,10 @@ CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement(ConnectivityManagerImpl
     ChipLogProgress(DeviceLayer, "wpa_supplicant: Start WiFi management");
     wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(
         G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, kWpaSupplicantObjectPath, nullptr,
-        reinterpret_cast<GAsyncReadyCallback>(+[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self_) {
-            return self_->_OnWpaProxyReady(sourceObject_, res_);
+        reinterpret_cast<GAsyncReadyCallback>(+[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
+            return self->_OnWpaProxyReady(sourceObject_, res_);
         }),
-        self);
+        this);
 
     return CHIP_NO_ERROR;
 }

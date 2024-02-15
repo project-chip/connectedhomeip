@@ -211,7 +211,7 @@ private:
     System::Clock::Timeout _GetWiFiAPIdleTimeout();
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
     void UpdateNetworkStatus();
-    static CHIP_ERROR StopAutoScan();
+    CHIP_ERROR StopAutoScan();
 
     void _OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties);
@@ -223,9 +223,9 @@ private:
     void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceScanDone(GObject * sourceObject, GAsyncResult * res);
 
-    static bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
+    bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
-    static CHIP_ERROR _StartWiFiManagement(ConnectivityManagerImpl * self);
+    CHIP_ERROR _StartWiFiManagement();
 
     static bool mAssociationStarted;
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
