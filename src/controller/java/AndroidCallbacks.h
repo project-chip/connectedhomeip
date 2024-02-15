@@ -55,7 +55,8 @@ private:
 struct ReportCallback : public app::ClusterStateCache::Callback
 {
     /** Subscription established callback can be nullptr. */
-    ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject resubscriptionAttemptCallback, const char * nodeStateClassSignature);
+    ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject resubscriptionAttemptCallback,
+                   const char * nodeStateClassSignature);
     ~ReportCallback();
 
     void OnReportBegin() override;

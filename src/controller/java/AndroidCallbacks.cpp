@@ -70,7 +70,8 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
     JniGlobalReference globalRef(std::move(self->mWrapperCallbackRef));
 
     jclass getConnectedDeviceCallbackCls = nullptr;
-    CHIP_ERROR err = JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
+    CHIP_ERROR err =
+        JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "GetLocalClassRef Error! : %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
                    ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
@@ -128,14 +129,13 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context,
 CHIP_ERROR CreateOptional(chip::Optional<uint8_t> value, jobject & outObj)
 {
 
-
-
     return CHIP_NO_ERROR;
 }
-jobject GetNodeStateObj(JNIEnv * env, const char* nodeStateClassSignature, jobject wrapperCallback)
+jobject GetNodeStateObj(JNIEnv * env, const char * nodeStateClassSignature, jobject wrapperCallback)
 {
     jmethodID getNodeStateMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "getNodeState", nodeStateClassSignature, &getNodeStateMethod);
+    CHIP_ERROR err =
+        JniReferences::GetInstance().FindMethod(env, wrapperCallback, "getNodeState", nodeStateClassSignature, &getNodeStateMethod);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Could not find getNodeState method"));
 
     DeviceLayer::StackUnlock unlock;
@@ -147,7 +147,8 @@ jobject GetNodeStateObj(JNIEnv * env, const char* nodeStateClassSignature, jobje
 
 ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback,
                                jobject resubscriptionAttemptCallback, const char * nodeStateClassSignature) :
-    mClusterCacheAdapter(*this, Optional<EventNumber>::Missing(), false /*cacheData*/), mNodeStateClassSignature(nodeStateClassSignature)
+    mClusterCacheAdapter(*this, Optional<EventNumber>::Missing(), false /*cacheData*/),
+    mNodeStateClassSignature(nodeStateClassSignature)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -285,20 +286,24 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
         ChipLogError(Controller, "Receive bad status %s", ErrorStr(aStatus.ToChipError()));
         // Add Attribute Status to wrapperCallback
         jmethodID addAttributeStatusMethod = nullptr;
-        err                                = JniReferences::GetInstance().FindMethod(env, nodeState, "addAttributeStatus",
-                                                                                     "(IJJILjava/lang/Integer;)V", &addAttributeStatusMethod);
+        err = JniReferences::GetInstance().FindMethod(env, nodeState, "addAttributeStatus", "(IJJILjava/lang/Integer;)V",
+                                                      &addAttributeStatusMethod);
         VerifyOrReturn(
             err == CHIP_NO_ERROR,
             ChipLogError(Controller, "Could not find addAttributeStatus method with error %" CHIP_ERROR_FORMAT, err.Format()));
 
         jobject jClusterState = nullptr;
-        if (aStatus.mClusterStatus.HasValue()) {
-          err = JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", static_cast<jint>(aStatus.mClusterStatus.Value()), jClusterState);
-          VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not CreateBoxedObject with error %" CHIP_ERROR_FORMAT, err.Format()));
+        if (aStatus.mClusterStatus.HasValue())
+        {
+            err = JniReferences::GetInstance().CreateBoxedObject<jint>(
+                "java/lang/Integer", "(I)V", static_cast<jint>(aStatus.mClusterStatus.Value()), jClusterState);
+            VerifyOrReturn(err == CHIP_NO_ERROR,
+                           ChipLogError(Controller, "Could not CreateBoxedObject with error %" CHIP_ERROR_FORMAT, err.Format()));
         }
 
         env->CallVoidMethod(nodeState, addAttributeStatusMethod, static_cast<jint>(aPath.mEndpointId),
-                            static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), static_cast<jint>(aStatus.mStatus), jClusterState);
+                            static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId),
+                            static_cast<jint>(aStatus.mStatus), jClusterState);
         VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
         return;
     }
@@ -349,13 +354,12 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
 
     // Add AttributeState to wrapperCallback
     jmethodID addAttributeMethod;
-    err = JniReferences::GetInstance().FindMethod(env, nodeState, "addAttribute",
-                                                  "(IJJLjava/lang/Object;[BLjava/lang/String;)V", &addAttributeMethod);
+    err = JniReferences::GetInstance().FindMethod(env, nodeState, "addAttribute", "(IJJLjava/lang/Object;[BLjava/lang/String;)V",
+                                                  &addAttributeMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(Controller, "Could not find addAttribute method with error %s", ErrorStr(err)));
-    env->CallVoidMethod(nodeState, addAttributeMethod, static_cast<jint>(aPath.mEndpointId),
-                        static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), value,
-                        jniByteArray.jniValue(), jsonString.jniValue());
+    env->CallVoidMethod(nodeState, addAttributeMethod, static_cast<jint>(aPath.mEndpointId), static_cast<jlong>(aPath.mClusterId),
+                        static_cast<jlong>(aPath.mAttributeId), value, jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 
     UpdateClusterDataVersion();
@@ -390,12 +394,11 @@ void ReportCallback::UpdateClusterDataVersion()
     VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
                    ChipLogError(Controller, "mReportCallbackRef is not valid in %s", __func__));
     jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
-    jobject nodeState = GetNodeStateObj(env, mNodeStateClassSignature, wrapperCallback);
+    jobject nodeState       = GetNodeStateObj(env, mNodeStateClassSignature, wrapperCallback);
 
     // SetDataVersion to NodeState
     jmethodID setDataVersionMethod;
-    CHIP_ERROR err =
-        JniReferences::GetInstance().FindMethod(env, nodeState, "setDataVersion", "(IJJ)V", &setDataVersionMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, nodeState, "setDataVersion", "(IJJ)V", &setDataVersionMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find setDataVersion method"));
     env->CallVoidMethod(nodeState, setDataVersionMethod, static_cast<jint>(lastConcreteClusterPath.mEndpointId),
                         static_cast<jlong>(lastConcreteClusterPath.mClusterId), static_cast<jlong>(committedDataVersion.Value()));
@@ -411,22 +414,25 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
                    ChipLogError(Controller, "mReportCallbackRef is not valid in %s", __func__));
     jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
-    jobject nodeState = GetNodeStateObj(env, mNodeStateClassSignature, wrapperCallback);
+    jobject nodeState       = GetNodeStateObj(env, mNodeStateClassSignature, wrapperCallback);
     if (apStatus != nullptr && apStatus->IsFailure())
     {
         ChipLogError(Controller, "Receive bad status %s", ErrorStr(apStatus->ToChipError()));
         // Add Event Status to NodeState
         jmethodID addEventStatusMethod;
-        err = JniReferences::GetInstance().FindMethod(env, nodeState, "addEventStatus",
-                                                      "(IJJILjava/lang/Integer;)V", &addEventStatusMethod);
+        err = JniReferences::GetInstance().FindMethod(env, nodeState, "addEventStatus", "(IJJILjava/lang/Integer;)V",
+                                                      &addEventStatusMethod);
         VerifyOrReturn(
             err == CHIP_NO_ERROR,
             ChipLogError(Controller, "Could not find addEventStatus method with error %" CHIP_ERROR_FORMAT, err.Format()));
 
         jobject jClusterState = nullptr;
-        if (apStatus->mClusterStatus.HasValue()) {
-          err = JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", static_cast<jint>(apStatus->mClusterStatus.Value()), jClusterState);
-          VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not CreateBoxedObject with error %" CHIP_ERROR_FORMAT, err.Format()));
+        if (apStatus->mClusterStatus.HasValue())
+        {
+            err = JniReferences::GetInstance().CreateBoxedObject<jint>(
+                "java/lang/Integer", "(I)V", static_cast<jint>(apStatus->mClusterStatus.Value()), jClusterState);
+            VerifyOrReturn(err == CHIP_NO_ERROR,
+                           ChipLogError(Controller, "Could not CreateBoxedObject with error %" CHIP_ERROR_FORMAT, err.Format()));
         }
 
         env->CallVoidMethod(nodeState, addEventStatusMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
@@ -500,8 +506,8 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     UtfString jsonString(env, json.c_str());
 
     jmethodID addEventMethod;
-    err = JniReferences::GetInstance().FindMethod(env, nodeState, "addEvent",
-                                                  "(IJJJIIJLjava/lang/Object;[BLjava/lang/String;)V", &addEventMethod);
+    err = JniReferences::GetInstance().FindMethod(env, nodeState, "addEvent", "(IJJJIIJLjava/lang/Object;[BLjava/lang/String;)V",
+                                                  &addEventMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addEvent method with error %s", ErrorStr(err));
                    aEventHeader.LogPath());
     env->CallVoidMethod(nodeState, addEventMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
@@ -550,8 +556,10 @@ void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
     DeviceLayer::StackUnlock unlock;
     VerifyOrReturn(mSubscriptionEstablishedCallbackRef.HasValidObjectRef(),
                    ChipLogError(Controller, " mSubscriptionEstablishedCallbackRef is not valid in %s", __func__));
-    CHIP_ERROR err = JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef.ObjectRef(), aSubscriptionId);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "CallSubscriptionEstablished error! : %" CHIP_ERROR_FORMAT, err.Format()));
+    CHIP_ERROR err =
+        JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef.ObjectRef(), aSubscriptionId);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "CallSubscriptionEstablished error! : %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
 CHIP_ERROR ReportCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
@@ -914,8 +922,8 @@ jlong newReportCallback(JNIEnv * env, jobject self, jobject subscriptionEstablis
                         jobject resubscriptionAttemptCallbackJava, const char * nodeStateClassSignature)
 {
     chip::DeviceLayer::StackLock lock;
-    ReportCallback * reportCallback =
-        chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava, nodeStateClassSignature);
+    ReportCallback * reportCallback = chip::Platform::New<ReportCallback>(
+        self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava, nodeStateClassSignature);
     return reinterpret_cast<jlong>(reportCallback);
 }
 
