@@ -55,19 +55,19 @@ static std::map<int, Instance<true, true, true, true, true, true> *>
 
 template <bool NumericMeasurementEnabled, bool LevelIndicationEnabled, bool MediumLevelEnabled, bool CriticalLevelEnabled,
           bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
-EmberAfStatus chefConcentrationMeasurementWriteCallback(
+Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(
     std::map<int,
              Instance<NumericMeasurementEnabled, LevelIndicationEnabled, MediumLevelEnabled, CriticalLevelEnabled,
                       PeakMeasurementEnabled, LevelIndicationEnabled> *> & map,
     AttributeId measuredValueId, chip::EndpointId endpoint, chip::ClusterId clusterId,
     const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
-    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
     if (map.find(endpoint) == map.end())
     {
         ChipLogError(DeviceLayer, "Invalid Endpoind ID: %d", endpoint);
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
 
     Instance<NumericMeasurementEnabled, LevelIndicationEnabled, MediumLevelEnabled, CriticalLevelEnabled, PeakMeasurementEnabled,
@@ -95,23 +95,24 @@ EmberAfStatus chefConcentrationMeasurementWriteCallback(
         }
         else
         {
-            ret = EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+            ret = Protocols::InteractionModel::Status::UnsupportedWrite;
             ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else
     {
-        ret = EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        ret = Protocols::InteractionModel::Status::UnsupportedAttribute;
         ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
     }
 
     return ret;
 }
 
-EmberAfStatus chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                              const EmberAfAttributeMetadata * attributeMetadata,
+                                                                              uint8_t * buffer)
 {
-    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
     switch (clusterId)
     {
@@ -174,11 +175,11 @@ EmberAfStatus chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoin
     return ret;
 }
 
-EmberAfStatus chefConcentrationMeasurementReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                       const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                       uint16_t maxReadLength)
+Protocols::InteractionModel::Status chefConcentrationMeasurementReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                             const EmberAfAttributeMetadata * attributeMetadata,
+                                                                             uint8_t * buffer, uint16_t maxReadLength)
 {
-    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
     return ret;
 }

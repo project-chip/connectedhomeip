@@ -294,7 +294,7 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
     {
         const char * entries[] = {
             "foo=bar", // unused data
-            "SII=23"   // sleepy idle interval
+            "SII=23"   // session idle interval
         };
 
         CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestOperationalName.Full(), entries));
@@ -369,7 +369,7 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
     {
         const char * entries[] = {
             "some", "foo=bar", "x=y=z", "a=", // unused data
-            "SII=123"                         // Sleepy idle interval
+            "SII=123"                         // session idle interval
         };
 
         CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestHostName.Full(), entries));
@@ -381,7 +381,7 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
     {
         const char * entries[] = {
             "foo=bar",    // unused data
-            "SAI=321",    // sleepy active interval
+            "SAI=321",    // session active interval
             "D=22345",    // Long discriminator
             "VP=321+654", // VendorProduct
             "DN=mytest"   // Device name

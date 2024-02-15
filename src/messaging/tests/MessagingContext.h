@@ -78,7 +78,7 @@ public:
     enum MRPMode
     {
         kDefault = 1, // This adopts the default MRP values for idle/active as per the spec.
-                      //      i.e IDLE = 4s, ACTIVE = 300ms
+                      //      i.e IDLE = 500ms, ACTIVE = 300ms
 
         kResponsive = 2, // This adopts values that are better suited for loopback tests that
                          // don't actually go over a network interface, and are tuned much lower
