@@ -67,53 +67,56 @@ class TC_CNET_4_4(MatterBaseTest):
         asserts.assert_greater_equal(len(connected), 1, "Did not find any connected networks on a commissioned device")
         known_ssid = connected[0].networkID
 
-        async def scan_and_check(scan_for_known_ssid: bool, breadcrumb: int):
+        async def scan_and_check(ssid_to_scan: Optional[bytes], breadcrumb: int, expect_results: bool = True):
             all_security = 0
             for security_bitmask in cnet.Bitmaps.WiFiSecurityBitmap:
                 all_security |= security_bitmask
 
-            if scan_for_known_ssid:
-                ssid = known_ssid
-            else:
-                ssid = NullValue
+            ssid = ssid_to_scan if ssid_to_scan is not None else NullValue
             cmd = cnet.Commands.ScanNetworks(ssid=ssid, breadcrumb=breadcrumb)
             scan_results = await self.send_single_cmd(cmd=cmd)
             asserts.assert_true(type_matches(scan_results, cnet.Commands.ScanNetworksResponse),
                                 "Unexpected value returned from scan network")
-            found_known_ssid = False
-            for scan_result in scan_results:
-                asserts.assert_equal(s.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess)
-                if s.debugText:
-                    asserts.assert_less_equal(len(scan_result.debug_text))
-                asserts.assert_greater_equal(len(scan_result.wiFiScanResults), 1, "No responses returned from ScanNetwork command")
-                ssid_found = False
-                for network in scan_result.wiFiScanResults:
-                    asserts.assert_true((network.security & ~all_security) == 0, "Unexpected bitmap in the security field")
-                    asserts.assert_less_equal(len(network.ssid), 32, f"Returned SSID {network.ssid} is too long")
-                    if network.ssid == known_ssid:
-                        found_known_ssid = True
-                    if scan_for_known_ssid:
-                        asserts.assert_equal(network.ssid, known_ssid, "Unexpected SSID returned in directed scan")
-                    asserts.assert_true(type_matches(network.bssid, bytes), "Incorrect type for BSSID")
-                    asserts.assert_equal(len(network.bssid), 6, "Unexpected length of BSSID")
-                    # TODO: this is inherited from the old test plan, but we should match the channel to the supported band. This range is unreasonably large.
-                    asserts.asserts_less_equal(len(network.channel), 65535, "Unexpected channel value")
-                    if network.wiFiBand:
-                        asserts.assert_true(network.wiFiBand in supported_wifi_bands,
-                                            "Listed wiFiBand is not in supported_wifi_bands")
-                    if network.rssi:
-                        asserts.assert_greater_equal(network.rssi, -120, "RSSI out of range")
-                        asserts.assert_less_equal(network.rssi, 0, "RSSI out of range")
+            logging.info(f"Scan results: {scan_results}")
+
+            if scan_results.debugText:
+                debug_text_len = len(scan_results.debug_text)
+                asserts.assert_less_equal(debug_text_len, 512, f"DebugText length {debug_text_len} was out of range")
+
+            if expect_results:
+                asserts.assert_equal(scan_results.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                                     f"ScanNetworks was expected to have succeeded, got {scan_results.networkingStatus} instead")
+                asserts.assert_greater_equal(len(scan_results.wiFiScanResults), 1, "No responses returned from ScanNetwork command")
+            else:
+                asserts.assert_equal(scan_results.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
+                                     f"ScanNetworks was expected to received NetworkNotFound, got {scan_results.networkingStatus} instead")
+                return
+
+            for network in scan_results.wiFiScanResults:
+                asserts.assert_true((network.security & ~all_security) == 0, "Unexpected bitmap in the security field")
+                asserts.assert_less_equal(len(network.ssid), 32, f"Returned SSID {network.ssid} is too long")
+                if ssid_to_scan is not None:
+                    asserts.assert_equal(network.ssid, ssid_to_scan, "Unexpected SSID returned in directed scan")
+                asserts.assert_true(type_matches(network.bssid, bytes), "Incorrect type for BSSID")
+                asserts.assert_equal(len(network.bssid), 6, "Unexpected length of BSSID")
+                # TODO: this is inherited from the old test plan, but we should match the channel to the supported band. This range is unreasonably large.
+                asserts.assert_less_equal(network.channel, 65535, "Unexpected channel value")
+                if network.wiFiBand:
+                    asserts.assert_true(network.wiFiBand in supported_wifi_bands,
+                                        "Listed wiFiBand is not in supported_wifi_bands")
+                if network.rssi:
+                    asserts.assert_greater_equal(network.rssi, -120, "RSSI out of range")
+                    asserts.assert_less_equal(network.rssi, 0, "RSSI out of range")
 
         self.step(4)
-        await scan_and_check(scan_for_known_id=False, breadcrumb=1)
+        await scan_and_check(ssid_to_scan=None, breadcrumb=1)
 
         self.step(5)
         breadcrumb = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
         asserts.assert_equal(breadcrumb, 1, "Incorrect breadcrumb value")
 
         self.step(6)
-        await scan_and_check(scan_for_known_ssid=True, breadcrumb=2)
+        await scan_and_check(ssid_to_scan=known_ssid, breadcrumb=2)
 
         self.step(7)
         breadcrumb = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb, endpoint=0)
@@ -121,15 +124,9 @@ class TC_CNET_4_4(MatterBaseTest):
 
         self.step(8)
         random_ssid = ''.join(random.choice(string.ascii_letters) for _ in range(31)).encode("utf-8")
-        cmd = cnet.Commands.ScanNetworks(ssid=random_ssid, breadcrumb=2)
-        scan_results = await self.send_single_cmd(cmd=cmd)
-        asserts.assert_true(type_matches(scan_results, cnet.Commands.ScanNetworksResponse),
-                            "Unexpected value returned from scan network")
-        asserts.assert_equal(s.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound)
+
+        await scan_and_check(ssid_to_scan=random_ssid, breadcrumb=2, expect_results=False)
 
 
 if __name__ == "__main__":
     default_matter_test_main()
-# The above code is likely importing or using a module or library called "ScanNet" in
-# Python. However, without more context or code, it is difficult to determine the exact
-# purpose or functionality of the code.
