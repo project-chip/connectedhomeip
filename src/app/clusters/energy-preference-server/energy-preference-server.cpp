@@ -76,7 +76,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
                 CHIP_ERROR err = CHIP_NO_ERROR;
                 while ((err = gsDelegate->GetEnergyBalanceAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
                 {
-                    BalanceStruct::Type balance = {step, Optional<CharSpan>(label)};
+                    BalanceStruct::Type balance = { step, Optional<CharSpan>(label) };
                     ReturnErrorOnFailure(encoder.Encode(balance));
                     index++;
                 }
@@ -129,7 +129,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
                 CHIP_ERROR err = CHIP_NO_ERROR;
                 while ((err = gsDelegate->GetLowPowerModeSensitivityAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
                 {
-                    BalanceStruct::Type balance = {step, Optional<CharSpan>(label)};
+                    BalanceStruct::Type balance = { step, Optional<CharSpan>(label) };
                     ReturnErrorOnFailure(encoder.Encode(balance));
                     index++;
                 }

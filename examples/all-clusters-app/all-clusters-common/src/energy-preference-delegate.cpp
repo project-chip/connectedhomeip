@@ -29,9 +29,11 @@ struct EPrefDelegate : public Delegate
     EPrefDelegate();
     virtual ~EPrefDelegate();
 
-    CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep, chip::MutableCharSpan & aOutLabel) override;
+    CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
+                                       chip::MutableCharSpan & aOutLabel) override;
     CHIP_ERROR GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, EnergyPriorityEnum & priority) override;
-    CHIP_ERROR GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep, chip::MutableCharSpan & aOutLabel) override;
+    CHIP_ERROR GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
+                                                 chip::MutableCharSpan & aOutLabel) override;
 
     size_t GetNumEnergyBalances(chip::EndpointId aEndpoint) override;
     size_t GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint) override;
@@ -60,7 +62,8 @@ size_t EPrefDelegate::GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint
 }
 
 CHIP_ERROR
-EPrefDelegate::GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep, chip::MutableCharSpan & aOutLabel)
+EPrefDelegate::GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
+                                       chip::MutableCharSpan & aOutLabel)
 {
     if (aIndex < GetNumEnergyBalances(aEndpoint))
     {
@@ -86,7 +89,8 @@ EPrefDelegate::GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aInde
 }
 
 CHIP_ERROR
-EPrefDelegate::GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep, chip::MutableCharSpan & aOutLabel)
+EPrefDelegate::GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
+                                                 chip::MutableCharSpan & aOutLabel)
 {
     if (aIndex < GetNumLowPowerModeSensitivities(aEndpoint))
     {

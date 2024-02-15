@@ -52,9 +52,8 @@ struct Delegate
      *
      * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
      */
-    virtual CHIP_ERROR
-    GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
-                            chip::Percent & aOutStep, chip::MutableCharSpan & aOutLabel) = 0;
+    virtual CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
+                                               chip::MutableCharSpan & aOutLabel) = 0;
 
     /**
      * Get an Energy Priority.
@@ -84,9 +83,8 @@ struct Delegate
      *
      * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
      */
-    virtual CHIP_ERROR
-    GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
-                                      chip::Percent & aOutStep, chip::MutableCharSpan & aOutLabel) = 0;
+    virtual CHIP_ERROR GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
+                                                         chip::MutableCharSpan & aOutLabel) = 0;
 
     /**
      * Get the number of energy balances this endpoint has.
