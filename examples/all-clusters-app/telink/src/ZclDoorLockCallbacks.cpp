@@ -58,6 +58,6 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     Protocols::InteractionModel::Status status = DoorLock::Attributes::FeatureMap::Set(endpoint, 0);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Updating feature map %x", status);
+        LOG_ERR("Updating feature map %x", to_underlying(status));
     }
 }

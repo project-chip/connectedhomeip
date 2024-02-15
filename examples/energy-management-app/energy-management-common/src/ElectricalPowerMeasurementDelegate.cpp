@@ -246,12 +246,17 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::EndRangesRead()
     return CHIP_NO_ERROR;
 }
 
+static const Structs::HarmonicMeasurementStruct::Type kHarmonicCurrentMeasurements[] = {
+    { .order = 1, .measurement = MakeNullable(static_cast<int64_t>(100000)) }
+};
+
 /* @brief This function is called by the cluster server at the start of read cycle
  *        This could take a semaphore to stop a background update of the data
  */
-CHIP_ERROR ElectricalPowerMeasurementDelegate::StartHarmonicCurrentsRead()
+CHIP_ERROR
+ElectricalPowerMeasurementDelegate::StartHarmonicCurrentsRead()
 {
-    /* Since we don't an implementation here we don't need to do anything here */
+    /* Since we have a static array we don't need to do anything here */
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR
@@ -269,34 +274,34 @@ ElectricalPowerMeasurementDelegate::GetHarmonicCurrentsByIndex(uint8_t harmonicC
      *  MatterReportingAttributeChangeCallback(mEndpointId, ElectricalPowerMeasurement::Id, HarmonicCurrents::Id);
      */
 
-    /*   if (rangeIndex >= ArraySize(mHarmonicCurrentMeasurements))
-     *   {
-     *       return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-     *   }
-     *
-     *   range = mHarmonicCurrentMeasurements[rangeIndex];
-     *
-     *   return CHIP_NO_ERROR;
-     */
+    /* Added to support testing using a static array for now */
+    if (harmonicCurrentsIndex >= ArraySize(kHarmonicCurrentMeasurements))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
 
-    /* Return an empty list for now */
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    harmonicCurrent = kHarmonicCurrentMeasurements[harmonicCurrentsIndex];
+    return CHIP_NO_ERROR;
 }
 /* @brief This function is called by the cluster server at the end of read cycle
  *        This could release a semaphore to allow a background update of the data
  */
 CHIP_ERROR ElectricalPowerMeasurementDelegate::EndHarmonicCurrentsRead()
 {
-    /* Since we don't an implementation here we don't need to do anything here */
+    /* Since we have a static array we don't need to do anything here */
     return CHIP_NO_ERROR;
 }
+
+static const Structs::HarmonicMeasurementStruct::Type kHarmonicPhaseMeasurements[] = {
+    { .order = 1, .measurement = MakeNullable(static_cast<int64_t>(100000)) }
+};
 
 /* @brief This function is called by the cluster server at the start of read cycle
  *        This could take a semaphore to stop a background update of the data
  */
 CHIP_ERROR ElectricalPowerMeasurementDelegate::StartHarmonicPhasesRead()
 {
-    /* Since we don't an implementation here we don't need to do anything here */
+    /* Since we have a static array we don't need to do anything here */
     return CHIP_NO_ERROR;
 }
 
@@ -314,25 +319,21 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::GetHarmonicPhasesByIndex(uint8_t 
      *  MatterReportingAttributeChangeCallback(mEndpointId, ElectricalPowerMeasurement::Id, HarmonicPhases::Id);
      */
 
-    /*   if (rangeIndex >= ArraySize(mHarmonicPhaseMeasurements))
-     *   {
-     *       return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-     *   }
-     *
-     *   range = mHarmonicPhaseMeasurements[rangeIndex];
-     *
-     *   return CHIP_NO_ERROR;
-     */
+    /* Added to support testing using a static array for now */
+    if (harmonicPhaseIndex >= ArraySize(kHarmonicPhaseMeasurements))
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
 
-    /* Return an empty list for now */
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    harmonicPhase = kHarmonicPhaseMeasurements[harmonicPhaseIndex];
+    return CHIP_NO_ERROR;
 }
 /* @brief This function is called by the cluster server at the end of read cycle
  *        This could release a semaphore to allow a background update of the data
  */
 CHIP_ERROR ElectricalPowerMeasurementDelegate::EndHarmonicPhasesRead()
 {
-    /* Since we don't an implementation here we don't need to do anything here */
+    /* Since we have a static array we don't need to do anything here */
     return CHIP_NO_ERROR;
 }
 

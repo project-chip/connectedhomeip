@@ -665,7 +665,7 @@ void AppTask::UpdateCluster(intptr_t context)
         : Protocols::InteractionModel::Status::Failure;
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        P6_LOG("ERR: updating lock state %x", status);
+        P6_LOG("ERR: updating lock state %x", to_underlying(status));
     }
 }
 
