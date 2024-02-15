@@ -98,11 +98,6 @@ namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
-WiFiDriver::ScanCallback * ConnectivityManagerImpl::mpScanCallback;
-NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * ConnectivityManagerImpl::mpConnectCallback;
-uint8_t ConnectivityManagerImpl::sInterestedSSID[Internal::kMaxWiFiSSIDLength];
-uint8_t ConnectivityManagerImpl::sInterestedSSIDLen;
-
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -161,12 +156,6 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-
-bool ConnectivityManagerImpl::mAssociationStarted = false;
-BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>::ConnectivityFlags>
-    ConnectivityManagerImpl::mConnectivityFlag;
-struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
-std::mutex ConnectivityManagerImpl::mWpaSupplicantMutex;
 
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
 {
@@ -449,7 +438,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                             break;
                         }
 
-                        DeviceLayer::SystemLayer().ScheduleLambda([reason]() {
+                        DeviceLayer::SystemLayer().ScheduleLambda([this, reason]() {
                             if (mpConnectCallback != nullptr)
                             {
                                 mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason);
@@ -482,7 +471,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                 {
                     if (mAssociationStarted)
                     {
-                        DeviceLayer::SystemLayer().ScheduleLambda([]() {
+                        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                             if (mpConnectCallback != nullptr)
                             {
                                 mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
@@ -1857,7 +1846,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaFiW1Wpa_supplicant1Inte
     if (bsss == nullptr)
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: no network found");
-        DeviceLayer::SystemLayer().ScheduleLambda([]() {
+        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
             if (mpScanCallback != nullptr)
             {
                 mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), nullptr);
@@ -1884,7 +1873,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaFiW1Wpa_supplicant1Inte
         }
     }
 
-    DeviceLayer::SystemLayer().ScheduleLambda([networkScanned]() {
+    DeviceLayer::SystemLayer().ScheduleLambda([this, networkScanned]() {
         // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
         // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
         // lambda.

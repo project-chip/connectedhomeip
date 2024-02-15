@@ -226,12 +226,12 @@ private:
 
     CHIP_ERROR _StartWiFiManagement();
 
-    static bool mAssociationStarted;
-    static BitFlags<ConnectivityFlags> mConnectivityFlag;
-    static GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
+    bool mAssociationStarted = false;
+    BitFlags<ConnectivityFlags> mConnectivityFlag;
+    GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
     // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
     // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.
-    static std::mutex mWpaSupplicantMutex;
+    std::mutex mWpaSupplicantMutex;
 
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 #endif
@@ -269,10 +269,10 @@ private:
     char sWiFiIfName[IFNAMSIZ];
 #endif
 
-    static uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
-    static uint8_t sInterestedSSIDLen;
-    static NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
-    static NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
+    uint8_t sInterestedSSIDLen;
+    NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
