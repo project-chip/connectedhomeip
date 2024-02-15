@@ -17,10 +17,8 @@ import("${chip_root}/src/app/common_flags.gni")
 
 source_set("types") {
   sources = [
-    "af-enums.h",
     "attribute-metadata.h",
-    "basic_types.h",
-    "error_mapping.h",
+    "basic-types.h",
     "types_stub.h",
   ]
 }

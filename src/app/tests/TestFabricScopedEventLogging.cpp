@@ -36,7 +36,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/EnforceFormat.h>
-#include <lib/support/LinkedList>
+#include <lib/support/LinkedList.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/Constants.h>

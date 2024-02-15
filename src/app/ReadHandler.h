@@ -44,7 +44,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/LinkedList>
+#include <lib/support/LinkedList.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>

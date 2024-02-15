@@ -23,7 +23,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
-#include <lib/support/LinkedList>
+#include <lib/support/LinkedList.h>
 #include <system/SystemPacketBuffer.h>
 
 inline constexpr size_t kNumPriorityLevel = 3;

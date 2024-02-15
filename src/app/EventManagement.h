@@ -34,7 +34,7 @@
 #include <app/util/basic-types.h>
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
-#include <lib/support/LinkedList>
+#include <lib/support/LinkedList.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <system/SystemClock.h>

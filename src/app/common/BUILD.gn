@@ -27,7 +27,9 @@ static_library("cluster-objects") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app:paths",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",
