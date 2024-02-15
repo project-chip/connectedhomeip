@@ -166,6 +166,7 @@ static_library("interaction-model") {
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:linked-list",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
