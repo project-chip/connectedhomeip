@@ -62,11 +62,11 @@ typedef enum
     kFault_BDXBadBlockCounter,   /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
     kFault_BDXAllocTransfer,     /**< Fail the allocation of a BDXTransfer object */
     kFault_SecMgrBusy,           /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
-    kFault_IMInvoke_SeparateResponses, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond with
-                                        2 InvokeResponseMessages */
+    kFault_IMInvoke_SeparateResponses, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond
+                                        with 2 InvokeResponseMessages */
     kFault_IMInvoke_SeparateResponsesInvertResponseOrder, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid
-                                        commands and respond with 2 InvokeResponseMessages where the response order is inverted compared to the
-                                        request order */
+                                        commands and respond with 2 InvokeResponseMessages where the response order is inverted
+                                        compared to the request order */
     kFault_IMInvoke_SkipSecondResponse, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond
                                         with 1 InvokeResponseMessage, dropping the response to the second request */
 #if CONFIG_NETWORK_LAYER_BLE

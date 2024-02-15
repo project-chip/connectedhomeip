@@ -414,18 +414,19 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
     }
     CHIP_FAULT_INJECT(
         FaultInjection::kFault_IMInvoke_SeparateResponses,
-        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
-                                                       CommandHandler::NlFaultInjectionType::SeparateResponseMessages);
+        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
+            apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandler::NlFaultInjectionType::SeparateResponseMessages);
         return Status::Success;);
     CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponsesInvertResponseOrder,
                       commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
                           apExchangeContext, std::move(aPayload), aIsTimedInvoke,
                           CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
                       return Status::Success;);
-    CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SkipSecondResponse,
-                      commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
-                                                                     CommandHandler::NlFaultInjectionType::SkipSecondResponse);
-                      return Status::Success;);
+    CHIP_FAULT_INJECT(
+        FaultInjection::kFault_IMInvoke_SkipSecondResponse,
+        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                                                                       CommandHandler::NlFaultInjectionType::SkipSecondResponse);
+        return Status::Success;);
     commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke);
     return Status::Success;
 }

@@ -33,9 +33,7 @@ struct ConcreteCommandPath : public ConcreteClusterPath
         ConcreteClusterPath(aEndpointId, aClusterId), mCommandId(aCommandId)
     {}
 
-    ConcreteCommandPath() :
-        ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId), mCommandId(kInvalidCommandId)
-    {}
+    ConcreteCommandPath() : ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId), mCommandId(kInvalidCommandId) {}
 
     bool operator==(const ConcreteCommandPath & aOther) const
     {

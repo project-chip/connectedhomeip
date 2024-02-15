@@ -454,8 +454,8 @@ public:
      */
     // TODO(#30453): After refactoring CommandHandler for better unit testability, create a
     // unit test specifically for the fault injection behavior.
-    void TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload, bool isTimedInvoke,
-                                        NlFaultInjectionType faultType);
+    void TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
+                                                        bool isTimedInvoke, NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
 
 private:

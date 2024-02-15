@@ -948,8 +948,9 @@ const char * GetFaultInjectionTypeStr(CommandHandler::NlFaultInjectionType fault
 // This method intentionally duplicates code from other sections. While code consolidation
 // is generally preferred, here we prioritize generating a clear crash message to aid in
 // troubleshooting test failures.
-void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
-                                                                    bool isTimedInvoke, NlFaultInjectionType faultType)
+void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
+                                                                    System::PacketBufferHandle && payload, bool isTimedInvoke,
+                                                                    NlFaultInjectionType faultType)
 {
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH Failure: state should be Idle, issue with TH");
