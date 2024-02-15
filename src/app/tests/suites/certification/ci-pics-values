@@ -2475,7 +2475,7 @@ REFALM.S.C00.Rsp=1
 REFALM.S.C01.Rsp=1
 
 # PICS for the RVC app
-# These are required to be here because currently there isn't a way to select a differet PICS
+# These are required to be here because currently there isn't a way to select a different PICS
 #  file when running the yaml tests in CI
 RVCCLEANM.S=1
 RVCCLEANM.S.A0000=1
