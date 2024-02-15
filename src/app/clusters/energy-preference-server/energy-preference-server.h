@@ -36,14 +36,25 @@ struct Delegate
 
     /**
      * Get an Energy Balance.
+     8
+     * The delegate method is called by the cluster to fill out the
+     * values for the list in EnergyBalances attribute. Storage for
+     * both aOutStep and aOutLabel is provided by the caller.
+     *
      * @param aEndpoint The endpoint to query.
      * @param aIndex The index of the balance, with 0 representing the first one.
-     * @param aOutBalance The BalanceStruct to copy the data into.
+     * @param aOutStep The Step value from BalanceStruct
+     *
+     * @param aOutLabel The Label value from BalanceStruct. Storage is
+     * provided by the caller, and is large enough to accomodate the
+     * longest label (64 chars), on return the size of the span is
+     * adjusted to reflect the length of the value.
+     *
      * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
      */
     virtual CHIP_ERROR
     GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
-                            chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & aOutBalance) = 0;
+                            chip::Percent & aOutStep, chip::MutableCharSpan & aOutLabel) = 0;
 
     /**
      * Get an Energy Priority.
@@ -56,15 +67,26 @@ struct Delegate
                                                 chip::app::Clusters::EnergyPreference::EnergyPriorityEnum & aOutPriority) = 0;
 
     /**
-     * Get a Power Sensitity Balance Struct.
+     * Get a Power Sensitity Balance Struct data at the specified index.
+     *
+     * The delegate method is called by the cluster to fill out the
+     * values for the list in LowPowerSensitivities attribute. Storage for
+     * both aOutStep and aOutLabel is provided by the caller.
+     *
      * @param aEndpoint The endpoint to query.
      * @param aIndex The index of the priority, with 0 representing the first one.
-     * @param aOutBalance The BalanceStruct to copy the data into.
+     * @param aOutStep The Step value from BalanceStruct
+     *
+     * @param aOutLabel The Label value from BalanceStruct. Storage is
+     * provided by the caller, and is large enough to accomodate the
+     * longest label (64 chars), on return the size of the span is
+     * adjusted to reflect the length of the value.
+     *
      * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
      */
     virtual CHIP_ERROR
     GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
-                                      chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & aOutBalance) = 0;
+                                      chip::Percent & aOutStep, chip::MutableCharSpan & aOutLabel) = 0;
 
     /**
      * Get the number of energy balances this endpoint has.
