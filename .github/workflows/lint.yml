@@ -135,9 +135,6 @@ jobs:
                      --known-failure app/util/im-client-callbacks.h \
                      --known-failure app/util/MatterCallbacks.h \
                      --known-failure app/util/message.cpp \
-                     --known-failure app/util/mock/Constants.h \
-                     --known-failure app/util/mock/Functions.h \
-                     --known-failure app/util/mock/MockNodeConfig.h \
                      --known-failure app/util/odd-sized-integers.h \
                      --known-failure app/util/util.cpp \
                      --known-failure app/util/util.h \
