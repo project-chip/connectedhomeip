@@ -63,8 +63,8 @@ tests:
 
           CHIP:DMG: InvokeRequestMessage =
           CHIP:DMG: {
-          CHIP:DMG:       suppressResponse = false, 
-          CHIP:DMG:       timedRequest = false, 
+          CHIP:DMG:       suppressResponse = false,
+          CHIP:DMG:       timedRequest = false,
           CHIP:DMG:       InvokeRequests =
           CHIP:DMG:       [
           CHIP:DMG:               CommandDataIB =
@@ -75,19 +75,19 @@ tests:
           CHIP:DMG:                               ClusterId = 0xfff1fc06,
           CHIP:DMG:                               CommandId = 0x0,
           CHIP:DMG:                       },
-          CHIP:DMG: 
-          CHIP:DMG:                       CommandFields = 
+          CHIP:DMG:
+          CHIP:DMG:                       CommandFields =
           CHIP:DMG:                       {
-          CHIP:DMG:                               0x0 = 3, 
-          CHIP:DMG:                               0x1 = 12, 
-          CHIP:DMG:                               0x2 = 3, 
-          CHIP:DMG:                               0x3 = 1, 
-          CHIP:DMG:                               0x4 = false, 
+          CHIP:DMG:                               0x0 = 3,
+          CHIP:DMG:                               0x1 = 12,
+          CHIP:DMG:                               0x2 = 3,
+          CHIP:DMG:                               0x3 = 1,
+          CHIP:DMG:                               0x4 = false,
           CHIP:DMG:                       },
           CHIP:DMG:               },
-          CHIP:DMG: 
+          CHIP:DMG:
           CHIP:DMG:       ],
-          CHIP:DMG: 
+          CHIP:DMG:
           CHIP:DMG:       InteractionModelRevision = 11
           CHIP:DMG: },
           CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0xFFF1_FC06 e=0 p=m
@@ -117,8 +117,8 @@ tests:
 
           CHIP:DMG: InvokeRequestMessage =
           CHIP:DMG: {
-          CHIP:DMG:       suppressResponse = false, 
-          CHIP:DMG:       timedRequest = false, 
+          CHIP:DMG:       suppressResponse = false,
+          CHIP:DMG:       timedRequest = false,
           CHIP:DMG:       InvokeRequests =
           CHIP:DMG:       [
           CHIP:DMG:               CommandDataIB =
@@ -129,19 +129,19 @@ tests:
           CHIP:DMG:                               ClusterId = 0xfff1fc06,
           CHIP:DMG:                               CommandId = 0x0,
           CHIP:DMG:                       },
-          CHIP:DMG: 
-          CHIP:DMG:                       CommandFields = 
+          CHIP:DMG:
+          CHIP:DMG:                       CommandFields =
           CHIP:DMG:                       {
-          CHIP:DMG:                               0x0 = 3, 
-          CHIP:DMG:                               0x1 = 13, 
-          CHIP:DMG:                               0x2 = 2, 
-          CHIP:DMG:                               0x3 = 1, 
-          CHIP:DMG:                               0x4 = false, 
+          CHIP:DMG:                               0x0 = 3,
+          CHIP:DMG:                               0x1 = 13,
+          CHIP:DMG:                               0x2 = 2,
+          CHIP:DMG:                               0x3 = 1,
+          CHIP:DMG:                               0x4 = false,
           CHIP:DMG:                       },
           CHIP:DMG:               },
-          CHIP:DMG: 
+          CHIP:DMG:
           CHIP:DMG:       ],
-          CHIP:DMG: 
+          CHIP:DMG:
           CHIP:DMG:       InteractionModelRevision = 11
           CHIP:DMG: },
           CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0xFFF1_FC06 e=0 p=m
@@ -171,8 +171,8 @@ tests:
 
           CHIP:DMG: InvokeRequestMessage =
           CHIP:DMG: {
-          CHIP:DMG:       suppressResponse = false, 
-          CHIP:DMG:       timedRequest = false, 
+          CHIP:DMG:       suppressResponse = false,
+          CHIP:DMG:       timedRequest = false,
           CHIP:DMG:       InvokeRequests =
           CHIP:DMG:       [
           CHIP:DMG:               CommandDataIB =
@@ -183,19 +183,19 @@ tests:
           CHIP:DMG:                               ClusterId = 0xfff1fc06,
           CHIP:DMG:                               CommandId = 0x0,
           CHIP:DMG:                       },
-          CHIP:DMG: 
-          CHIP:DMG:                       CommandFields = 
+          CHIP:DMG:
+          CHIP:DMG:                       CommandFields =
           CHIP:DMG:                       {
-          CHIP:DMG:                               0x0 = 3, 
-          CHIP:DMG:                               0x1 = 14, 
-          CHIP:DMG:                               0x2 = 1, 
-          CHIP:DMG:                               0x3 = 1, 
-          CHIP:DMG:                               0x4 = false, 
+          CHIP:DMG:                               0x0 = 3,
+          CHIP:DMG:                               0x1 = 14,
+          CHIP:DMG:                               0x2 = 1,
+          CHIP:DMG:                               0x3 = 1,
+          CHIP:DMG:                               0x4 = false,
           CHIP:DMG:                       },
           CHIP:DMG:               },
-          CHIP:DMG: 
+          CHIP:DMG:
           CHIP:DMG:       ],
-          CHIP:DMG: 
+          CHIP:DMG:
           CHIP:DMG:       InteractionModelRevision = 11
           CHIP:DMG: },
           CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0xFFF1_FC06 e=0 p=m
@@ -288,7 +288,7 @@ tests:
           * Verify DUT doesn't crash by seeing next step execute.
           * On TH(all-clusters-app), Verify following logs are seen:
             CHIP:DMG: Response to InvokeRequestMessage overridden by fault injection
-            CHIP:DMG:    Injecting the following response:Each response will be sent in a separate InvokeResponseMessage. The order of responses will be the same as the original request. 
+            CHIP:DMG:    Injecting the following response:Each response will be sent in a separate InvokeResponseMessage. The order of responses will be the same as the original request.
       disabled: true
 
     - label: "Step 3: DUT sends the Invoke Request Message to the TH. The
