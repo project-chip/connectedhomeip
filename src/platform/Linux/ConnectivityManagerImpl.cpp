@@ -309,7 +309,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
         ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
         mWiFiAPMode = val;
 
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, nullptr);
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveAPState(); });
     }
 
 exit:
@@ -322,7 +322,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP");
         mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, nullptr);
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveAPState(); });
     }
     else
     {
@@ -336,7 +336,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
     {
         ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
         mLastAPDemandTime = System::Clock::kZero;
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, nullptr);
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveAPState(); });
     }
     else
     {
@@ -358,7 +358,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
     mWiFiAPIdleTimeout = val;
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, nullptr);
+    DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveAPState(); });
 }
 
 void ConnectivityManagerImpl::UpdateNetworkStatus()
@@ -876,7 +876,7 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 System::Clock::Timeout apTimeout = (mLastAPDemandTime + mWiFiAPIdleTimeout) - now;
-                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, nullptr);
+                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, this);
                 SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s",
                                 std::chrono::duration_cast<System::Clock::Seconds32>(apTimeout).count());
@@ -1024,7 +1024,7 @@ void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
 
 void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState)
 {
-    sInstance.DriveAPState();
+    reinterpret_cast<ConnectivityManagerImpl *>(aAppState)->DriveAPState();
 }
 
 CHIP_ERROR
