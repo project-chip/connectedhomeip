@@ -235,7 +235,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         add_cluster_data_from_xml(derived_cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
 
         asserts.assert_equal(len(clusters), 1, "Unexpected number of clusters")
-        asserts.assert_equal(len(pure_base_clusters), 1, "Unexpected number of derived clusters")
+        asserts.assert_equal(len(pure_base_clusters), 1, "Unexpected number of pure base clusters")
         asserts.assert_equal(len(ids_by_name), 1, "Unexpected number of IDs per name")
         asserts.assert_equal(len(problems), 0, "Unexpected number of problems")
         asserts.assert_equal(ids_by_name["Test Derived"], 0xFFFF, "Test derived name not added to IDs")
