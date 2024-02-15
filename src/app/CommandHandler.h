@@ -450,7 +450,7 @@ public:
      * @param ec Exchange context for sending InvokeResponseMessages to the client.
      * @param payload Payload of the incoming InvokeRequestMessage from the client.
      * @param isTimedInvoke Indicates whether the interaction is timed.
-     * @param faultType The specific type of fault to inject into as the response.
+     * @param faultType The specific type of fault to inject into the response.
      */
     // TODO(#30453): After refactoring CommandHandler for better unit testability, create a
     // unit test specifically for the fault injection behavior.

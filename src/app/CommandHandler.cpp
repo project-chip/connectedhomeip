@@ -919,8 +919,7 @@ CHIP_ERROR TestOnlyExtractCommandPathFromNextInvokeRequest(TLV::TLVReader & invo
                                                            ConcreteCommandPath & concretePath)
 {
     CommandPathIB::Parser commandPath;
-    ReturnErrorOnFailure(invokeRequestsReader.Next());
-    VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(invokeRequestsReader.Next(TLV::AnonymousTag()));
     CommandDataIB::Parser commandData;
     ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
     ReturnErrorOnFailure(commandData.GetPath(&commandPath));
@@ -1000,15 +999,15 @@ void CommandHandler::TestOnlyTcIdm1_3FaultInjection(Messaging::ExchangeContext *
     mReserveSpaceForMoreChunkMessages = true;
 
     {
-        // Response path is the same as request path since we are reply with a failure message.
+        // Response path is the same as request path since we are replying with a failure message.
         ConcreteCommandPath concreteResponsePath1(0, 0, 0);
         ConcreteCommandPath concreteResponsePath2(0, 0, 0);
         VerifyOrDieWithMsg(
             TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath1) == CHIP_NO_ERROR,
-            DataManagement, "DUT Failure: Issues encountered while extracting the ConcretePath from the first request");
+            DataManagement, "DUT Failure: Issues encountered while extracting the ConcreteCommandPath from the first request");
         VerifyOrDieWithMsg(
             TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath2) == CHIP_NO_ERROR,
-            DataManagement, "DUT Failure: Issues encountered while extracting the ConcretePath from the second request");
+            DataManagement, "DUT Failure: Issues encountered while extracting the ConcreteCommandPath from the second request");
 
         if (faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
         {
