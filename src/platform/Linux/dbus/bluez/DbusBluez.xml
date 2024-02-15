@@ -108,6 +108,10 @@
     </method>
   </interface>
 
+  <!--
+  This interface shall be exported by Matter GATT application and registered
+  with org.bluez.GattManager1.RegisterApplication method.
+  -->
   <interface name="org.bluez.GattService1">
     <property name="UUID" type="s" access="read" />
     <property name="Device" type="o" access="read" />
@@ -115,6 +119,10 @@
     <!-- <property name="Includes" type="ao" access="read" /> -->
   </interface>
 
+  <!--
+  This interface shall be exported by Matter GATT application and linked
+  with org.bluez.GattService1 object via the Service property.
+  -->
   <interface name="org.bluez.GattCharacteristic1">
     <method name="ReadValue">
       <arg name="options" type="a{sv}" direction="in"/>
@@ -152,6 +160,10 @@
     <property name="NotifyAcquired" type="b" access="read" />
   </interface>
 
+  <!--
+  This interface shall be exported by Matter GATT application and linked
+  with org.bluez.GattCharacteristic1 object via the Characteristic property.
+  -->
   <interface name="org.bluez.GattDescriptor1">
     <method name="ReadValue">
       <arg name="options" type="a{sv}" direction="in"/>
@@ -172,6 +184,10 @@
     </property>
   </interface>
 
+  <!--
+  This interface shall be exported by Matter GATT application and registered
+  with org.bluez.LEAdvertisingManager1.RegisterAdvertisement method.
+  -->
   <interface name="org.bluez.LEAdvertisement1">
     <method name="Release"/>
     <property name="Type" type="s" access="read"/>
