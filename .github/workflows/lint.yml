@@ -109,7 +109,6 @@ jobs:
                      --known-failure app/ReadPrepareParams.h \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
-                     --known-failure app/server/AppDelegate.h \
                      --known-failure app/TestEventTriggerDelegate.h \
                      --known-failure app/util/af.h \
                      --known-failure app/util/af-types.h \
