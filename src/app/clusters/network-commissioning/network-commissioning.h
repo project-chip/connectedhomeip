@@ -78,6 +78,9 @@ private:
     void OnCommissioningComplete();
     void OnFailSafeTimerExpired();
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    void SendNonConcurrentConnectNetworkResponse();
+#endif
     const BitFlags<Feature> mFeatureFlags;
 
     DeviceLayer::NetworkCommissioning::Internal::WirelessDriver * const mpWirelessDriver;

@@ -42,6 +42,13 @@ declare_args() {
   chip_im_force_fabric_quota_check = false
 
   enable_eventlist_attribute = false
+
+  # Systems that can spare a bit of RAM for InteractionModelEngine/delegate
+  # pointers should do so (allows InteractionModelEngine decoupling and less usage
+  # of global pointers)
+  chip_im_static_global_interaction_model_engine =
+      current_os != "linux" && current_os != "mac" && current_os != "ios" &&
+      current_os != "android"
 }
 
 buildconfig_header("app_buildconfig") {
@@ -57,6 +64,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
+    "CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE=${chip_im_static_global_interaction_model_engine}",
   ]
 
   visibility = [ ":app_config" ]
@@ -110,93 +118,6 @@ source_set("subscription-manager") {
   public_deps = [ "${chip_root}/src/lib/core" ]
 }
 
-source_set("message-def") {
-  sources = [
-    "MessageDef/ArrayBuilder.cpp",
-    "MessageDef/ArrayParser.cpp",
-    "MessageDef/AttributeDataIB.cpp",
-    "MessageDef/AttributeDataIB.h",
-    "MessageDef/AttributeDataIBs.cpp",
-    "MessageDef/AttributeDataIBs.h",
-    "MessageDef/AttributePathIB.cpp",
-    "MessageDef/AttributePathIB.h",
-    "MessageDef/AttributePathIBs.cpp",
-    "MessageDef/AttributePathIBs.h",
-    "MessageDef/AttributeReportIB.cpp",
-    "MessageDef/AttributeReportIB.h",
-    "MessageDef/AttributeReportIBs.cpp",
-    "MessageDef/AttributeReportIBs.h",
-    "MessageDef/AttributeStatusIB.cpp",
-    "MessageDef/AttributeStatusIB.h",
-    "MessageDef/AttributeStatusIBs.cpp",
-    "MessageDef/AttributeStatusIBs.h",
-    "MessageDef/Builder.cpp",
-    "MessageDef/Builder.h",
-    "MessageDef/ClusterPathIB.cpp",
-    "MessageDef/ClusterPathIB.h",
-    "MessageDef/CommandDataIB.cpp",
-    "MessageDef/CommandPathIB.cpp",
-    "MessageDef/CommandStatusIB.cpp",
-    "MessageDef/DataVersionFilterIB.cpp",
-    "MessageDef/DataVersionFilterIB.h",
-    "MessageDef/DataVersionFilterIBs.cpp",
-    "MessageDef/DataVersionFilterIBs.h",
-    "MessageDef/EventDataIB.cpp",
-    "MessageDef/EventDataIB.h",
-    "MessageDef/EventFilterIB.cpp",
-    "MessageDef/EventFilterIBs.cpp",
-    "MessageDef/EventPathIB.cpp",
-    "MessageDef/EventPathIB.h",
-    "MessageDef/EventPathIBs.cpp",
-    "MessageDef/EventPathIBs.h",
-    "MessageDef/EventReportIB.cpp",
-    "MessageDef/EventReportIB.h",
-    "MessageDef/EventReportIBs.cpp",
-    "MessageDef/EventReportIBs.h",
-    "MessageDef/EventStatusIB.cpp",
-    "MessageDef/EventStatusIB.h",
-    "MessageDef/InvokeRequestMessage.cpp",
-    "MessageDef/InvokeRequests.cpp",
-    "MessageDef/InvokeResponseIB.cpp",
-    "MessageDef/InvokeResponseIBs.cpp",
-    "MessageDef/InvokeResponseMessage.cpp",
-    "MessageDef/ListBuilder.cpp",
-    "MessageDef/ListParser.cpp",
-    "MessageDef/MessageBuilder.cpp",
-    "MessageDef/MessageBuilder.h",
-    "MessageDef/MessageDefHelper.cpp",
-    "MessageDef/MessageDefHelper.h",
-    "MessageDef/MessageParser.cpp",
-    "MessageDef/MessageParser.h",
-    "MessageDef/Parser.cpp",
-    "MessageDef/Parser.h",
-    "MessageDef/ReadRequestMessage.cpp",
-    "MessageDef/ReadRequestMessage.h",
-    "MessageDef/ReportDataMessage.cpp",
-    "MessageDef/ReportDataMessage.h",
-    "MessageDef/StatusIB.cpp",
-    "MessageDef/StatusIB.h",
-    "MessageDef/StatusResponseMessage.cpp",
-    "MessageDef/StructBuilder.cpp",
-    "MessageDef/StructParser.cpp",
-    "MessageDef/SubscribeRequestMessage.cpp",
-    "MessageDef/SubscribeResponseMessage.cpp",
-    "MessageDef/TimedRequestMessage.cpp",
-    "MessageDef/WriteRequestMessage.cpp",
-    "MessageDef/WriteResponseMessage.cpp",
-  ]
-
-  deps = [
-    ":app_config",
-    ":paths",
-    ":revision_info",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/protocols/interaction_model",
-    "${chip_root}/src/protocols/secure_channel",
-  ]
-}
-
 config("config-controller-dynamic-server") {
   defines = [
     "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
@@ -216,6 +137,8 @@ static_library("interaction-model") {
     "CASESessionManager.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
+    "InteractionModelDelegatePointers.cpp",
+    "InteractionModelDelegatePointers.h",
     "InteractionModelEngine.cpp",
     "InteractionModelEngine.h",
     "InteractionModelTimeout.h",
@@ -241,13 +164,14 @@ static_library("interaction-model") {
 
   public_deps = [
     ":app_config",
-    ":message-def",
     ":paths",
     ":subscription-manager",
+    "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:static-support",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",

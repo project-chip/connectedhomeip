@@ -171,6 +171,10 @@ source_set("type-traits") {
   sources = [ "TypeTraits.h" ]
 }
 
+source_set("static-support") {
+  sources = [ "static_support_smart_ptr.h" ]
+}
+
 static_library("support") {
   output_name = "libSupportLayer"
 
@@ -188,6 +192,7 @@ static_library("support") {
     "BytesToHex.cpp",
     "BytesToHex.h",
     "CHIPArgParser.cpp",
+    "CHIPArgParser.hpp",
     "CHIPCounter.h",
     "CHIPMemString.h",
     "CommonIterator.h",

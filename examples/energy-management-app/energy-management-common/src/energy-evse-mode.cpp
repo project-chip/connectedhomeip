@@ -91,7 +91,6 @@ void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(!gEnergyEvseModeDelegate && !gEnergyEvseModeInstance);
     gEnergyEvseModeDelegate = std::make_unique<EnergyEvseMode::EnergyEvseModeDelegate>();
-    gEnergyEvseModeInstance = std::make_unique<ModeBase::Instance>(gEnergyEvseModeDelegate.get(), 0x1, EnergyEvseMode::Id,
-                                                                   chip::to_underlying(EnergyEvseMode::Feature::kOnOff));
+    gEnergyEvseModeInstance = std::make_unique<ModeBase::Instance>(gEnergyEvseModeDelegate.get(), 0x1, EnergyEvseMode::Id, 0);
     gEnergyEvseModeInstance->Init();
 }

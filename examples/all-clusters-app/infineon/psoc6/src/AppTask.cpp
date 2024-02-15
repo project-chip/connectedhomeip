@@ -409,11 +409,11 @@ void AppTask::OnOffUpdateClusterState(intptr_t context)
     uint8_t onoff = sLightLED.Get();
 
     // write the new on/off value
-    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(2, onoff);
+    Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(2, onoff);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        P6_LOG("ERR: updating on/off %x", status);
+        P6_LOG("ERR: updating on/off %x", to_underlying(status));
     }
 }
 

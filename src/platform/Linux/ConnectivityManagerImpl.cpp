@@ -28,6 +28,7 @@
 #include <platform/Linux/WirelessDefs.h>
 #include <platform/internal/BLEManager.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <new>
 #include <string>
@@ -40,6 +41,7 @@
 #include <string.h>
 #include <sys/types.h>
 
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -59,12 +61,14 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#include <credentials/CHIPCert.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
 using namespace ::chip;
 using namespace ::chip::TLV;
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
@@ -770,7 +774,7 @@ void ConnectivityManagerImpl::StartNonConcurrentWiFiManagement()
     {
         if (IsWiFiManagementStarted())
         {
-            DeviceControlServer::DeviceControlSvr().PostWiFiDeviceAvailableNetworkEvent();
+            DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent();
             ChipLogProgress(DeviceLayer, "Non-concurrent mode Wi-Fi Management Started.");
             return;
         }
@@ -977,25 +981,14 @@ void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void 
 }
 
 CHIP_ERROR
-ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
-                                                 NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback)
+ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
+                                                  NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback)
 {
+    GAutoPtr<GVariant> argsDeleter(g_variant_ref_sink(args)); // args may be floating, ensure we don't leak it
+
     CHIP_ERROR ret = CHIP_NO_ERROR;
     GAutoPtr<GError> err;
-    GVariant * args = nullptr;
-    GVariantBuilder builder;
     gboolean result;
-    char ssidStr[kMaxWiFiSSIDLength + 1u] = { 0 };
-    char keyStr[kMaxWiFiKeyLength + 1u]   = { 0 };
-
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
-    VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(credentials.size() <= kMaxWiFiKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    // There is another ongoing connect request, reject the new one.
-    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     const gchar * networkPath = wpa_fi_w1_wpa_supplicant1_interface_get_current_network(mWpaSupplicant.iface);
 
@@ -1026,14 +1019,6 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
         SuccessOrExit(ret);
     }
 
-    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
-    memcpy(ssidStr, ssid.data(), ssid.size());
-    memcpy(keyStr, credentials.data(), credentials.size());
-    g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssidStr));
-    g_variant_builder_add(&builder, "{sv}", "psk", g_variant_new_string(keyStr));
-    g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("SAE WPA-PSK"));
-    args = g_variant_builder_end(&builder);
-
     result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args, &mWpaSupplicant.networkPath,
                                                                        nullptr, &MakeUniquePointerReceiver(err).Get());
 
@@ -1051,7 +1036,7 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to add network: %s", err ? err->message : "unknown error");
+        ChipLogError(DeviceLayer, "wpa_supplicant: failed to add network: %s", err ? err->message : "unknown error");
 
         if (mWpaSupplicant.networkPath)
         {
@@ -1065,6 +1050,146 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
 exit:
     return ret;
 }
+
+CHIP_ERROR
+ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
+                                                 NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
+{
+    char ssidStr[kMaxWiFiSSIDLength + 1] = { 0 };
+    char keyStr[kMaxWiFiKeyLength + 1]   = { 0 };
+
+    VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(credentials.size() <= kMaxWiFiKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // There is another ongoing connect request, reject the new one.
+    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    GVariantBuilder builder;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    memcpy(ssidStr, ssid.data(), ssid.size());
+    memcpy(keyStr, credentials.data(), credentials.size());
+    g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssidStr));
+    g_variant_builder_add(&builder, "{sv}", "psk", g_variant_new_string(keyStr));
+    g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("SAE WPA-PSK"));
+    GVariant * args = g_variant_builder_end(&builder);
+    return _ConnectWiFiNetworkAsync(args, connectCallback);
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+static CHIP_ERROR AddOrReplaceBlob(WpaFiW1Wpa_supplicant1Interface * iface, const char * nameOrRef, ByteSpan data)
+{
+    // Strip the blob:// prefix off the name (if present), so we don't need as many string constants.
+    constexpr auto refPrefix = "blob://"_span;
+    const char * name = (strncmp(nameOrRef, refPrefix.data(), refPrefix.size()) == 0) ? nameOrRef + refPrefix.size() : nameOrRef;
+
+    GAutoPtr<GError> err;
+    if (!wpa_fi_w1_wpa_supplicant1_interface_call_remove_blob_sync(iface, name, nullptr, &MakeUniquePointerReceiver(err).Get()))
+    {
+        GAutoPtr<char> remoteError(g_dbus_error_get_remote_error(err.get()));
+        if (!(remoteError && strcmp(remoteError.get(), kWpaSupplicantBlobUnknown) == 0))
+        {
+            ChipLogError(DeviceLayer, "wpa_supplicant: failed to remove blob: %s", err ? err->message : "unknown error");
+            return CHIP_ERROR_INTERNAL;
+        }
+        err.reset();
+    }
+    if (!wpa_fi_w1_wpa_supplicant1_interface_call_add_blob_sync(
+            iface, name, g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, data.data(), data.size(), 1), nullptr,
+            &MakeUniquePointerReceiver(err).Get()))
+    {
+        ChipLogError(DeviceLayer, "wpa_supplicant: failed to add blob: %s", err ? err->message : "unknown error");
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
+}
+
+// Note: Static blob names assume we're only supporting a single network configuration.
+static constexpr char kNetworkIdentityBlobRef[]   = "blob://pdc-ni";
+static constexpr char kClientIdentityBlobRef[]    = "blob://pdc-ci";
+static constexpr char kClientIdentityKeyBlobRef[] = "blob://pdc-cik";
+
+CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
+    ByteSpan ssid, ByteSpan networkIdentity, ByteSpan clientIdentity, const Crypto::P256Keypair & clientIdentityKeypair,
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
+{
+    VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // There is another ongoing connect request, reject the new one.
+    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Convert identities and our key pair to DER and add them to wpa_supplicant as blobs
+    {
+        constexpr size_t bufferSize = std::max(kMaxDERCertLength, kP256ECPrivateKeyDERLength);
+        Platform::ScopedMemoryBuffer<uint8_t> buffer;
+        VerifyOrReturnError(buffer.Alloc(bufferSize), CHIP_ERROR_NO_MEMORY);
+
+        MutableByteSpan networkIdentityDER(buffer.Get(), bufferSize);
+        ReturnErrorOnFailure(ConvertChipCertToX509Cert(networkIdentity, networkIdentityDER));
+        ReturnErrorOnFailure(AddOrReplaceBlob(mWpaSupplicant.iface, kNetworkIdentityBlobRef, networkIdentityDER));
+
+        MutableByteSpan clientIdentityDER(buffer.Get(), bufferSize);
+        ReturnErrorOnFailure(ConvertChipCertToX509Cert(clientIdentity, clientIdentityDER));
+        ReturnErrorOnFailure(AddOrReplaceBlob(mWpaSupplicant.iface, kClientIdentityBlobRef, clientIdentityDER));
+
+        Crypto::P256SerializedKeypair serializedKeypair;
+        MutableByteSpan clientIdentityKeypairDER(buffer.Get(), bufferSize);
+        ReturnErrorOnFailure(clientIdentityKeypair.Serialize(serializedKeypair));
+        ReturnErrorOnFailure(ConvertECDSAKeypairRawToDER(serializedKeypair, clientIdentityKeypairDER));
+        ReturnErrorOnFailure(AddOrReplaceBlob(mWpaSupplicant.iface, kClientIdentityKeyBlobRef, clientIdentityKeypairDER));
+    }
+
+    // Build the network configuration
+    GVariantBuilder builder;
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+
+    {
+        char ssidStr[kMaxWiFiSSIDLength + 1] = { 0 };
+        memcpy(ssidStr, ssid.data(), ssid.size());
+        g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssidStr));
+    }
+
+    {
+        CertificateKeyIdStorage keyId;
+        ReturnErrorOnFailure(ExtractIdentifierFromChipNetworkIdentity(networkIdentity, keyId));
+
+        static constexpr char kNAIDomain[] = ".pdc.csa-iot.org";
+        static constexpr auto keyIdHexSize = keyId.size() * 2;
+        char identityStr[1 + keyIdHexSize + sizeof(kNAIDomain)]; // sizeof(kNAIDomain) includes null terminator
+
+        identityStr[0] = '@';
+        ReturnErrorOnFailure(Encoding::BytesToUppercaseHexBuffer(keyId.data(), keyId.size(), &identityStr[1], keyIdHexSize));
+        strcpy(&identityStr[1 + keyIdHexSize], kNAIDomain);
+        g_variant_builder_add(&builder, "{sv}", "identity", g_variant_new_string(identityStr));
+    }
+
+    // The configuration will become simpler once we add explicit Matter support to wpa_supplicant
+    g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-EAP-SHA256"));
+    g_variant_builder_add(&builder, "{sv}", "fallback_key_mgmt", g_variant_new_string("WPA-EAP-SHA256"));
+    g_variant_builder_add(&builder, "{sv}", "pairwise", g_variant_new_string("CCMP"));
+    g_variant_builder_add(&builder, "{sv}", "group", g_variant_new_string("CCMP"));
+    g_variant_builder_add(&builder, "{sv}", "ieee80211w", g_variant_new_int32(2));
+    g_variant_builder_add(&builder, "{sv}", "eap", g_variant_new_string("TLS"));
+    g_variant_builder_add(&builder, "{sv}", "eap_workaround", g_variant_new_int32(0));
+
+    g_variant_builder_add(
+        &builder, "{sv}", "phase1",
+        g_variant_new_string("tls_disable_tlsv1_0=1,tls_disable_tlsv1_1=1,tls_disable_tlsv1_2=1,tls_disable_tlsv1_3=0"));
+    g_variant_builder_add(&builder, "{sv}", "openssl_ciphers", g_variant_new_string("TLS_AES_128_CCM_SHA256"));
+    g_variant_builder_add(&builder, "{sv}", "openssl_ecdh_curves", g_variant_new_string("P-256"));
+
+    g_variant_builder_add(&builder, "{sv}", "ca_cert", g_variant_new_string(kNetworkIdentityBlobRef));
+    g_variant_builder_add(&builder, "{sv}", "client_cert", g_variant_new_string(kClientIdentityBlobRef));
+    g_variant_builder_add(&builder, "{sv}", "private_key", g_variant_new_string(kClientIdentityKeyBlobRef));
+    GVariant * args = g_variant_builder_end(&builder);
+    return _ConnectWiFiNetworkAsync(args, connectCallback);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
