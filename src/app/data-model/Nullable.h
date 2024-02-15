@@ -83,10 +83,13 @@ struct Nullable : protected Optional<T>
     // Set the nullable to the `other` nullable, returning true if something actually changed.
     // This can be used to determine if changes occurred on assignment, so that reporting can be triggered
     // only on actual changes.
-    constexpr bool SetToMatch(const Nullable<T> & other)
+    constexpr bool Update(const Nullable<T> & other)
     {
         bool changed = *this != other;
-        *this        = other;
+        if (changed)
+        {
+            *this = other;
+        }
         return changed;
     }
 

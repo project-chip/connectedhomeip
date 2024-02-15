@@ -173,7 +173,7 @@ void Instance::SendNonConcurrentConnectNetworkResponse()
 
 void Instance::SetLastNetworkingStatusValue(Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue)
 {
-    if (mLastNetworkingStatusValue.SetToMatch(networkingStatusValue))
+    if (mLastNetworkingStatusValue.Update(networkingStatusValue))
     {
         MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
                                                Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
@@ -182,7 +182,7 @@ void Instance::SetLastNetworkingStatusValue(Attributes::LastNetworkingStatus::Ty
 
 void Instance::SetLastConnectErrorValue(Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue)
 {
-    if (mLastConnectErrorValue.SetToMatch(connectErrorValue))
+    if (mLastConnectErrorValue.Update(connectErrorValue))
     {
         MatterReportingAttributeChangeCallback(mEndpointId, Clusters::NetworkCommissioning::Id,
                                                Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId());
@@ -434,7 +434,7 @@ void Instance::OnNetworkingStatusChange(Status aCommissioningError, Optional<Byt
     {
         if (aNetworkId.Value().size() > kMaxNetworkIDLen)
         {
-            ChipLogError(DeviceLayer, "Invalid network ID received when calling OnNetworkingStatusChange");
+            ChipLogError(DeviceLayer, "Overly large network ID received when calling OnNetworkingStatusChange");
         }
         else
         {
@@ -1098,7 +1098,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     }
 
     // If drivers are failing to respond NetworkNotFound on empty results, force it for them.
-    bool resultsMissing = !networks || (networks && (networks->Count() == 0));
+    bool resultsMissing = !networks || (networks->Count() == 0);
     if ((status == Status::kSuccess) && mScanningWasDirected && resultsMissing)
     {
         status = Status::kNetworkNotFound;
@@ -1127,10 +1127,9 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
                                                TLV::TLVType::kTLVType_Array, listContainerType));
 
     // Only encode results on success, to avoid stale contents on partial failure.
-    if (status == Status::kSuccess)
+    if ((status == Status::kSuccess) && (networks != nullptr))
     {
-        for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse;
-             networksEncoded++)
+        while (networks->Next(scanResponse))
         {
             Structs::WiFiInterfaceScanResultStruct::Type result;
             result.security = scanResponse.security;
@@ -1140,6 +1139,12 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
             result.wiFiBand = scanResponse.wiFiBand;
             result.rssi     = scanResponse.rssi;
             SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
+
+            ++networksEncoded;
+            if (networksEncoded >= kMaxNetworksInScanResponse)
+            {
+                break;
+            }
         }
     }
 

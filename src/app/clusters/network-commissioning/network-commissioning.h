@@ -81,7 +81,7 @@ private:
     void SendNonConcurrentConnectNetworkResponse();
 #endif
 
-    EndpointId mEndpointId;
+    EndpointId mEndpointId = kInvalidEndpointId;
     const BitFlags<Feature> mFeatureFlags;
 
     DeviceLayer::NetworkCommissioning::Internal::WirelessDriver * const mpWirelessDriver;
