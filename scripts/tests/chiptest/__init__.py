@@ -209,7 +209,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_GRPKEY_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_LCFG_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_OPCREDS_3_7",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
-        "Test_TC_OPSTATE_2_4",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_SMOKECO_2_2",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_SMOKECO_2_3",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_SMOKECO_2_4",  # darwin-framework-tool does not currently support reading or subscribing to Events
