@@ -443,7 +443,9 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
                 {
                     remoteScopedNode = mExchangeCtx.Get()->GetSessionHandle()->GetPeer();
                 }
-                ChipLogError(DataManagement, "Received Unexpected Response from remote node [%u:" ChipLogFormatX64 "], commandRef=%u", remoteScopedNode.GetFabricIndex(), ChipLogValueX64(remoteScopedNode.GetNodeId()), commandRef.Value());
+                ChipLogError(DataManagement,
+                             "Received Unexpected Response from remote node [%u:" ChipLogFormatX64 "], commandRef=%u",
+                             remoteScopedNode.GetFabricIndex(), ChipLogValueX64(remoteScopedNode.GetNodeId()), commandRef.Value());
             }
             ReturnErrorOnFailure(err);
         }
