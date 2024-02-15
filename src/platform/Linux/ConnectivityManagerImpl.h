@@ -159,16 +159,10 @@ private:
 #endif
 
 public:
-    const char * GetEthernetIfName()
-    {
-        return (mEthIfName[0] == '\0') ? nullptr : mEthIfName;
-    }
+    const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    const char * GetWiFiIfName()
-    {
-        return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName;
-    }
+    const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
 #endif
 
 private:
