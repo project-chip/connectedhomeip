@@ -995,7 +995,7 @@ void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::E
     VerifyOrDieWithMsg(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */) == CHIP_NO_ERROR,
                        DataManagement,
                        "TH Failure: Failed to get the length of InvokeRequests after InvokeRequestMessage validation");
-    
+
     // The command count check (specifically for a count of 2) is tied to IDM_1_3. This may need adjustment for
     // compatibility with future test plans.
     VerifyOrDieWithMsg(commandCount == 2, DataManagement, "DUT failure: We were strictly expecting exactly 2 InvokeRequests");
