@@ -23,7 +23,7 @@
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/AttributeAccessInterface.h> // added in case we ever don't need app/util/attribute-storage.h at some point.
+#include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPEncoding.h>
 
