@@ -27,72 +27,47 @@ using namespace chip::app::Clusters::Messages;
 using Message = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
 
 // Commands
-void MessagesManager::HandlePresentMessagesRequest(const ByteSpan & messageId, const MessagePriorityEnum & priority,
-                                                   const BitMask<MessageControlBitmap> & messageControl,
-                                                   const DataModel::Nullable<uint32_t> & startTime,
-                                                   const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
-                                                   const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
+CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
+    const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
+    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
+    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());
-
-    VerifyOrReturn(messageId.size() == CachedMessage::kMessageIdLength,
-                   ChipLogProgress(Zcl, "HandlePresentMessagesRequest invalid message id length"));
 
     auto cachedMessage = CachedMessage(messageId, priority, messageControl, startTime, duration,
                                        std::string(messageText.data(), messageText.size()));
     if (responses.HasValue())
     {
-        size_t size    = 0;
-        CHIP_ERROR err = responses.Value().ComputeSize(&size);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogProgress(Zcl, "HandlePresentMessagesRequest size check failed"));
-
-        VerifyOrReturn(size <= CachedMessage::kMaxOptionCount,
-                       ChipLogProgress(Zcl, "HandlePresentMessagesRequest too many options"));
-
         auto iter = responses.Value().begin();
         while (iter.Next())
         {
             auto & response = iter.GetValue();
-
-            VerifyOrReturn(response.messageResponseID.HasValue() && response.label.HasValue(),
-                           ChipLogProgress(Zcl, "HandlePresentMessagesRequest missing response id or label"));
-
-            VerifyOrReturn(response.messageResponseID.Value() >= CachedMessageOption::kResponseIdMin,
-                           ChipLogProgress(Zcl, "HandlePresentMessagesRequest responseID value check failed"));
-
-            VerifyOrReturn(response.label.Value().size() <= CachedMessageOption::kLabelMaxLength,
-                           ChipLogProgress(Zcl, "HandlePresentMessagesRequest label length check failed"));
 
             CachedMessageOption option(response.messageResponseID.Value(),
                                        std::string(response.label.Value().data(), response.label.Value().size()));
 
             cachedMessage.AddOption(option);
         }
-        VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR, ChipLogProgress(Zcl, "HandlePresentMessagesRequest TLV parsing error"));
     }
 
     mCachedMessages.push_back(cachedMessage);
 
     // Add your code to present Message
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest complete");
+    return CHIP_NO_ERROR;
 }
 
-void MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
+CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
 {
     auto iter = messageIds.begin();
     while (iter.Next())
     {
         auto & id = iter.GetValue();
 
-        mCachedMessages.remove_if([id](CachedMessage & entry) {
-            if (entry.mMessageId.data_equal(id))
-            {
-                return true;
-            }
-            return false;
-        });
+        mCachedMessages.remove_if([id](CachedMessage & entry) { return entry.mMessageId.data_equal(id); });
         // per spec, the command succeeds even when the message id does not match an existing message
     }
+    return CHIP_NO_ERROR;
 }
 
 // Attributes
@@ -121,7 +96,12 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aE
 // Global Attributes
 uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
 {
-    uint32_t featureMap = 15; // all features enabled by default
+    uint32_t featureMap = static_cast<uint32_t>(chip::app::Clusters::Messages::Feature::kReceivedConfirmation) |
+        static_cast<uint32_t>(chip::app::Clusters::Messages::Feature::kConfirmationResponse) |
+        static_cast<uint32_t>(chip::app::Clusters::Messages::Feature::kConfirmationReply) |
+        static_cast<uint32_t>(chip::app::Clusters::Messages::Feature::kProtectedMessages);
+
+    ChipLogProgress(Zcl, "GetFeatureMap featureMap=%d", featureMap);
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
 }

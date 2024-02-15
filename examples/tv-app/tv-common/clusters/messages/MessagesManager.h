@@ -25,18 +25,16 @@
 
 struct CachedMessageOption
 {
-    constexpr static size_t kResponseIdMin  = 1;
-    constexpr static size_t kLabelMaxLength = 32;
-
     CachedMessageOption(uint32_t id, std::string label) :
         mLabel(label), mOption{ chip::MakeOptional(id), chip::MakeOptional(chip::CharSpan::fromCharString(mLabel.c_str())) }
     {}
 
     CachedMessageOption(const CachedMessageOption & option) :
-        mLabel(option.mLabel),
-        mOption{ option.mOption.messageResponseID, chip::MakeOptional(chip::CharSpan::fromCharString(mLabel.c_str())) } {};
+        mLabel(option.mLabel), mOption{ option.mOption.messageResponseID,
+                                        chip::MakeOptional(chip::CharSpan::fromCharString(mLabel.c_str())) }
+    {}
 
-    CachedMessageOption & operator=(const CachedMessageOption & option) { return *this; };
+    // CachedMessageOption & operator=(const CachedMessageOption & option) { return *this; };
 
     chip::app::Clusters::Messages::MessageResponseOption GetMessageOption() { return mOption; }
 
@@ -49,25 +47,22 @@ protected:
 
 struct CachedMessage
 {
-    constexpr static size_t kMessageIdLength = 16;
-    constexpr static size_t kMaxOptionCount  = 4;
-
     chip::ByteSpan mMessageId;
 
     CachedMessage(const CachedMessage & message) :
         mPriority(message.mPriority), mMessageControl(message.mMessageControl), mStartTime(message.mStartTime),
         mDuration(message.mDuration), mMessageText(message.mMessageText), mOptions(message.mOptions)
     {
-        memcpy(mMessageIdBuffer, message.mMessageIdBuffer, kMessageIdLength);
-        mMessageId = chip::ByteSpan(mMessageIdBuffer, kMessageIdLength);
+        memcpy(mMessageIdBuffer, message.mMessageIdBuffer, sizeof(mMessageIdBuffer));
+        mMessageId = chip::ByteSpan(mMessageIdBuffer);
 
         for (CachedMessageOption & entry : mOptions)
         {
             mResponseOptions.push_back(entry.GetMessageOption());
         }
-    };
+    }
 
-    CachedMessage & operator=(const CachedMessage & message) { return *this; };
+    // CachedMessage & operator=(const CachedMessage & message) { return *this; };
 
     CachedMessage(const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
@@ -76,13 +71,8 @@ struct CachedMessage
         mPriority(priority),
         mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText)
     {
-        if (messageId.size() != kMessageIdLength)
-        {
-            ChipLogProgress(Zcl, "CachedMessage bad message id size, ignoring");
-            return;
-        }
-        memcpy(mMessageIdBuffer, messageId.data(), kMessageIdLength);
-        mMessageId = chip::ByteSpan(mMessageIdBuffer, kMessageIdLength);
+        memcpy(mMessageIdBuffer, messageId.data(), sizeof(mMessageIdBuffer));
+        mMessageId = chip::ByteSpan(mMessageIdBuffer);
     }
 
     void AddOption(CachedMessageOption option)
@@ -107,13 +97,10 @@ struct CachedMessage
                                                                                  chip::MakeOptional(options) };
             return message;
         }
-        else
-        {
-            chip::app::Clusters::Messages::Structs::MessageStruct::Type message{
-                mMessageId, mPriority, mMessageControl, mStartTime, mDuration, chip::CharSpan::fromCharString(mMessageText.c_str())
-            };
-            return message;
-        }
+        chip::app::Clusters::Messages::Structs::MessageStruct::Type message{
+            mMessageId, mPriority, mMessageControl, mStartTime, mDuration, chip::CharSpan::fromCharString(mMessageText.c_str())
+        };
+        return message;
     }
 
     ~CachedMessage() {}
@@ -125,7 +112,7 @@ protected:
     const chip::app::DataModel::Nullable<uint16_t> mDuration;
 
     std::string mMessageText;
-    uint8_t mMessageIdBuffer[kMessageIdLength];
+    uint8_t mMessageIdBuffer[chip::app::Clusters::Messages::kMessageIdLength];
 
     std::vector<chip::app::Clusters::Messages::MessageResponseOption> mResponseOptions;
     std::list<CachedMessageOption> mOptions;
@@ -135,7 +122,7 @@ class MessagesManager : public chip::app::Clusters::Messages::Delegate
 {
 public:
     // Commands
-    void HandlePresentMessagesRequest(
+    CHIP_ERROR HandlePresentMessagesRequest(
         const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
         const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
         const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint16_t> & duration,
@@ -143,7 +130,7 @@ public:
         const chip::Optional<
             chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
             responses) override;
-    void HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
+    CHIP_ERROR HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes
     CHIP_ERROR HandleGetMessages(chip::app::AttributeValueEncoder & aEncoder) override;
