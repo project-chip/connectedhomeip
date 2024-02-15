@@ -267,9 +267,9 @@ class TestSpecParsingSupport(MatterBaseTest):
             [0, 1, 2, 3] + expected_global_attrs), "Unexpected attribute list")
         # Ensure the conformance overrides from the derived cluster are on the attributes
         asserts.assert_equal(str(clusters[0xFFFF].attributes[0].conformance), "M", "Unexpected conformance on attribute 0")
-        asserts.assert_equal(str(clusters[0xFFFF].attributes[1].conformance), "M", "Unexpected conformance on attribute 0")
-        asserts.assert_equal(str(clusters[0xFFFF].attributes[2].conformance), "X", "Unexpected conformance on attribute 1")
-        asserts.assert_equal(str(clusters[0xFFFF].attributes[3].conformance), "X", "Unexpected conformance on attribute 1")
+        asserts.assert_equal(str(clusters[0xFFFF].attributes[1].conformance), "M", "Unexpected conformance on attribute 1")
+        asserts.assert_equal(str(clusters[0xFFFF].attributes[2].conformance), "X", "Unexpected conformance on attribute 2")
+        asserts.assert_equal(str(clusters[0xFFFF].attributes[3].conformance), "X", "Unexpected conformance on attribute 3")
 
         # Ensure both the accepted and generated command overrides work
         asserts.assert_true(set(clusters[0xFFFF].accepted_commands.keys()),
