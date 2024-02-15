@@ -31,7 +31,8 @@ class DoorLockClusterLockOperationErrorEvent(
   val userIndex: UShort?,
   val fabricIndex: UByte?,
   val sourceNode: ULong?,
-  val credentials: Optional<List<matter.controller.cluster.structs.DoorLockClusterCredentialStruct>>?
+  val credentials:
+    Optional<List<matter.controller.cluster.structs.DoorLockClusterCredentialStruct>>?
 ) {
   override fun toString(): String = buildString {
     append("DoorLockClusterLockOperationErrorEvent {\n")
@@ -68,13 +69,13 @@ class DoorLockClusterLockOperationErrorEvent(
       }
       if (credentials != null) {
         if (credentials.isPresent) {
-        val optcredentials = credentials.get()
-        startArray(ContextSpecificTag(TAG_CREDENTIALS))
-      for (item in optcredentials.iterator()) {
-        item.toTlv(AnonymousTag, this)
-      }
-      endArray()
-      }
+          val optcredentials = credentials.get()
+          startArray(ContextSpecificTag(TAG_CREDENTIALS))
+          for (item in optcredentials.iterator()) {
+            item.toTlv(AnonymousTag, this)
+          }
+          endArray()
+        }
       } else {
         putNull(ContextSpecificTag(TAG_CREDENTIALS))
       }
@@ -91,49 +92,68 @@ class DoorLockClusterLockOperationErrorEvent(
     private const val TAG_SOURCE_NODE = 5
     private const val TAG_CREDENTIALS = 6
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DoorLockClusterLockOperationErrorEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterLockOperationErrorEvent {
       tlvReader.enterStructure(tlvTag)
       val lockOperationType = tlvReader.getUByte(ContextSpecificTag(TAG_LOCK_OPERATION_TYPE))
       val operationSource = tlvReader.getUByte(ContextSpecificTag(TAG_OPERATION_SOURCE))
       val operationError = tlvReader.getUByte(ContextSpecificTag(TAG_OPERATION_ERROR))
-      val userIndex = if (!tlvReader.isNull()) {
-        tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_USER_INDEX))
-        null
-      }
-      val fabricIndex = if (!tlvReader.isNull()) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_FABRIC_INDEX))
-        null
-      }
-      val sourceNode = if (!tlvReader.isNull()) {
-        tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE))
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_SOURCE_NODE))
-        null
-      }
-      val credentials = if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREDENTIALS))) {
-        Optional.of(buildList <matter.controller.cluster.structs.DoorLockClusterCredentialStruct> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_CREDENTIALS))
-        while(!tlvReader.isEndOfContainer()) {
-          this.add(matter.controller.cluster.structs.DoorLockClusterCredentialStruct.fromTlv(AnonymousTag, tlvReader))
+      val userIndex =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_USER_INDEX))
+          null
         }
-        tlvReader.exitContainer()
-      })
-      } else {
-        Optional.empty()
-      }
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_CREDENTIALS))
-        null
-      }
-      
+      val fabricIndex =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_FABRIC_INDEX))
+          null
+        }
+      val sourceNode =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_SOURCE_NODE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_SOURCE_NODE))
+          null
+        }
+      val credentials =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREDENTIALS))) {
+            Optional.of(
+              buildList<matter.controller.cluster.structs.DoorLockClusterCredentialStruct> {
+                tlvReader.enterArray(ContextSpecificTag(TAG_CREDENTIALS))
+                while (!tlvReader.isEndOfContainer()) {
+                  this.add(
+                    matter.controller.cluster.structs.DoorLockClusterCredentialStruct.fromTlv(
+                      AnonymousTag,
+                      tlvReader
+                    )
+                  )
+                }
+                tlvReader.exitContainer()
+              }
+            )
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CREDENTIALS))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return DoorLockClusterLockOperationErrorEvent(lockOperationType, operationSource, operationError, userIndex, fabricIndex, sourceNode, credentials)
+      return DoorLockClusterLockOperationErrorEvent(
+        lockOperationType,
+        operationSource,
+        operationError,
+        userIndex,
+        fabricIndex,
+        sourceNode,
+        credentials
+      )
     }
   }
 }

@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class UnitTestingClusterTestListStructOctet (
-    val member1: ULong,
-    val member2: ByteArray) {
-  override fun toString(): String  = buildString {
+class UnitTestingClusterTestListStructOctet(val member1: ULong, val member2: ByteArray) {
+  override fun toString(): String = buildString {
     append("UnitTestingClusterTestListStructOctet {\n")
     append("\tmember1 : $member1\n")
     append("\tmember2 : $member2\n")
@@ -49,11 +43,11 @@ class UnitTestingClusterTestListStructOctet (
     private const val TAG_MEMBER1 = 0
     private const val TAG_MEMBER2 = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : UnitTestingClusterTestListStructOctet {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestListStructOctet {
       tlvReader.enterStructure(tlvTag)
       val member1 = tlvReader.getULong(ContextSpecificTag(TAG_MEMBER1))
       val member2 = tlvReader.getByteArray(ContextSpecificTag(TAG_MEMBER2))
-      
+
       tlvReader.exitContainer()
 
       return UnitTestingClusterTestListStructOctet(member1, member2)

@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -89,35 +88,39 @@ class UnitTestingClusterNestedStructList(
       val a = tlvReader.getUByte(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
       val c = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
-      val d = buildList<UnitTestingClusterSimpleStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_D))
-      while(!tlvReader.isEndOfContainer()) {
-        add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      val e = buildList<UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_E))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      val f = buildList<ByteArray> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_F))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getByteArray(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      val g = buildList<UByte> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_G))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUByte(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val d =
+        buildList<UnitTestingClusterSimpleStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_D))
+          while (!tlvReader.isEndOfContainer()) {
+            add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      val e =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_E))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      val f =
+        buildList<ByteArray> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_F))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getByteArray(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      val g =
+        buildList<UByte> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_G))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUByte(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return UnitTestingClusterNestedStructList(a, b, c, d, e, f, g)

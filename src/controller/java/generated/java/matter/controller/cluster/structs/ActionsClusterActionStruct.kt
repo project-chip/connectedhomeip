@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -72,10 +70,17 @@ class ActionsClusterActionStruct(
       val endpointListID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
       val supportedCommands = tlvReader.getUShort(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
-      
+
       tlvReader.exitContainer()
 
-      return ActionsClusterActionStruct(actionID, name, type, endpointListID, supportedCommands, state)
+      return ActionsClusterActionStruct(
+        actionID,
+        name,
+        type,
+        endpointListID,
+        supportedCommands,
+        state
+      )
     }
   }
 }

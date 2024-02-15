@@ -4456,7 +4456,7 @@ provisional cluster EnergyEvse = 153 {
 }
 
 /** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
-cluster PowerTopology = 156 {
+provisional cluster PowerTopology = 156 {
   revision 1;
 
   bitmap Feature : bitmap32 {

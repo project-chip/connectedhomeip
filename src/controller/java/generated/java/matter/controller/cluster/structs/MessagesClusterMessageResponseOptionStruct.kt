@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -56,17 +55,19 @@ class MessagesClusterMessageResponseOptionStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageResponseOptionStruct {
       tlvReader.enterStructure(tlvTag)
-      val messageResponseID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D)))
-    } else {
-      Optional.empty()
-    }
-      val label = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-    } else {
-      Optional.empty()
-    }
-      
+      val messageResponseID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D)))
+        } else {
+          Optional.empty()
+        }
+      val label =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return MessagesClusterMessageResponseOptionStruct(messageResponseID, label)

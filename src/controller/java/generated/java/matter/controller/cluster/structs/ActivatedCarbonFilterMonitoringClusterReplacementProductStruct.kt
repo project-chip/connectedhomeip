@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -48,14 +46,22 @@ class ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
     private const val TAG_PRODUCT_IDENTIFIER_TYPE = 0
     private const val TAG_PRODUCT_IDENTIFIER_VALUE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ActivatedCarbonFilterMonitoringClusterReplacementProductStruct {
       tlvReader.enterStructure(tlvTag)
-      val productIdentifierType = tlvReader.getUByte(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
-      val productIdentifierValue = tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
-      
+      val productIdentifierType =
+        tlvReader.getUByte(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
+      val productIdentifierValue =
+        tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
+
       tlvReader.exitContainer()
 
-      return ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(productIdentifierType, productIdentifierValue)
+      return ActivatedCarbonFilterMonitoringClusterReplacementProductStruct(
+        productIdentifierType,
+        productIdentifierValue
+      )
     }
   }
 }

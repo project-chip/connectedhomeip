@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -61,20 +60,26 @@ class RvcOperationalStateClusterErrorStateStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterErrorStateStruct {
       tlvReader.enterStructure(tlvTag)
       val errorStateID = tlvReader.getUByte(ContextSpecificTag(TAG_ERROR_STATE_I_D))
-      val errorStateLabel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))
-    } else {
-      Optional.empty()
-    }
-      val errorStateDetails = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_DETAILS))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_DETAILS)))
-    } else {
-      Optional.empty()
-    }
-      
+      val errorStateLabel =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))
+        } else {
+          Optional.empty()
+        }
+      val errorStateDetails =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_DETAILS))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_DETAILS)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return RvcOperationalStateClusterErrorStateStruct(errorStateID, errorStateLabel, errorStateDetails)
+      return RvcOperationalStateClusterErrorStateStruct(
+        errorStateID,
+        errorStateLabel,
+        errorStateDetails
+      )
     }
   }
 }
