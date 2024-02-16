@@ -68,7 +68,7 @@ tests:
 
     - label:
           "Step 3a: Commissioner reads commissioning information, including
-          SupportsConcurrentConnection attribute from General Commissioining
+          SupportsConcurrentConnection attribute from General Commissioning
           Cluster"
       verification: |
           Verify in TH that SupportsConcurrentConnection is false
