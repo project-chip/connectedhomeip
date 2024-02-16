@@ -238,6 +238,7 @@ class DeviceProxyWrapper():
 
 
 DiscoveryFilterType = discovery.FilterType
+DiscoveryType = discovery.DiscoveryType
 
 
 class ChipDeviceControllerBase():
@@ -499,6 +500,15 @@ class ChipDeviceControllerBase():
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
         )
 
+    def EstablishPASESession(self, setUpCode: str, nodeid: int):
+        self.CheckIsActive()
+
+        self.state = DCState.RENDEZVOUS_ONGOING
+        return self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
+                self.devCtrl, setUpCode.encode("utf-8"), nodeid)
+        )
+
     def GetTestCommissionerUsed(self):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissionerUsed()
@@ -593,6 +603,9 @@ class ChipDeviceControllerBase():
                     time.sleep(0.1)
             else:
                 time.sleep(timeoutSecond)
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_StopCommissionableDiscovery(self.devCtrl)).raise_on_error()
 
         return self.GetDiscoveredDevices()
 
@@ -864,6 +877,9 @@ class ChipDeviceControllerBase():
             remoteMaxPathsPerInvoke: Overrides the number of batch commands we think can be sent to remote node.
             suppressTimedRequestMessage: When set to true, we suppress sending Timed Request Message.
             commandRefsOverride: List of commandRefs to use for each command with the same index in `commands`.
+
+        Returns:
+            - TestOnlyBatchCommandResponse
         '''
         self.CheckIsActive()
 
@@ -1473,23 +1489,6 @@ class ChipDeviceControllerBase():
 
         return self._Cluster.ListClusterAttributes()
 
-    def SetLogFilter(self, category):
-        self.CheckIsActive()
-
-        if category < 0 or category > pow(2, 8):
-            raise ValueError("category must be an unsigned 8-bit integer")
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetLogFilter(category)
-        )
-
-    def GetLogFilter(self):
-        self.CheckIsActive()
-
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_GetLogFilter()
-        )
-
     def SetBlockingCB(self, blockingCB):
         self.CheckIsActive()
 
@@ -1567,6 +1566,10 @@ class ChipDeviceControllerBase():
                 c_void_p, c_uint8, c_char_p]
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.restype = PyChipError
 
+            self._dmLib.pychip_DeviceController_StopCommissionableDiscovery.argtypes = [
+                c_void_p]
+            self._dmLib.pychip_DeviceController_StopCommissionableDiscovery.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.argtypes = [
                 c_void_p, c_uint16]
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.restype = PyChipError
@@ -1594,6 +1597,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
                 c_void_p, c_uint32, c_uint16, c_uint64]
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.restype = PyChipError
+            self._dmLib.pychip_DeviceController_EstablishPASESession.argtypes = [
+                c_void_p, c_char_p, c_uint64]
+            self._dmLib.pychip_DeviceController_EstablishPASESession.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
                 c_void_p]
@@ -1614,7 +1620,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_ConnectIP.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_ConnectWithCode.argtypes = [
-                c_void_p, c_char_p, c_uint64, c_bool]
+                c_void_p, c_char_p, c_uint64, c_uint8]
             self._dmLib.pychip_DeviceController_ConnectWithCode.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_UnpairDevice.argtypes = [
@@ -1927,7 +1933,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return PyChipError(CHIP_ERROR_TIMEOUT)
         return self._ChipStack.commissioningEventRes
 
-    def CommissionWithCode(self, setupPayload: str, nodeid: int, networkOnly: bool = False) -> PyChipError:
+    def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> PyChipError:
         ''' Commission with the given nodeid from the setupPayload.
             setupPayload may be a QR or manual code.
         '''
@@ -1943,7 +1949,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
-                self.devCtrl, setupPayload, nodeid, networkOnly)
+                self.devCtrl, setupPayload, nodeid, discoveryType.value)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout

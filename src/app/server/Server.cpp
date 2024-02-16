@@ -339,7 +339,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mICDManager.RegisterObserver(mReportScheduler);
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr);
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
+                     chip::app::InteractionModelEngine::GetInstance());
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -435,6 +436,16 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         }
         break;
     case DeviceEventType::kServerReady:
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
+        // Only Trigger Check-In messages if we are not in the middle of a commissioning.
+        // This check is only necessary for the first commissioiner since the kServerReady event
+        // is triggered once we join the network.
+        // We trigger Check-In messages before resuming subscriptions to avoid doing both.
+        if (!mFailSafeContext.IsFailSafeArmed())
+        {
+            mICDManager.TriggerCheckInMessages();
+        }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         ResumeSubscriptions();
 #endif

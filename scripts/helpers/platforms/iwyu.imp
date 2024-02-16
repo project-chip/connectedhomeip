@@ -32,7 +32,12 @@
     ## lib/*
     { include: [ '"lib/core/CHIPError.h"', private, '<lib/core/CHIPError.h>', public ] },
     { include: [ '"lib/dnssd/ServiceNaming.h"', private, '<lib/dnssd/platform/Dnssd.h>', public ] },
+
+    ## lib/support/logging/*
+    { include: [ '"lib/support/logging/BinaryLogging.h"', private, '<lib/support/logging/CHIPLogging.h>', public ] },
     { include: [ '"lib/support/logging/CHIPLogging.h"', private, '<lib/support/logging/CHIPLogging.h>', public ] },
+    { include: [ '"lib/support/logging/Constants.h"', private, '<lib/support/logging/CHIPLogging.h>', public ] },
+    { include: [ '"lib/support/logging/TextOnlyLogging.h"', private, '<lib/support/logging/CHIPLogging.h>', public ] },
 
     ## platform/*
     { include: [ '"platform/NetworkCommissioning.h"', private, '<platform/NetworkCommissioning.h>', public ] },

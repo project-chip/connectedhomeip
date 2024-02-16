@@ -24,6 +24,36 @@ Usage:
   ./out/debug/chip-tool temperaturemeasurement read measured-value <NODE ID> 1
 ```
 
+## Additional details
+
+This example demonstrates the utilization of the diagnostic logs cluster to send
+diagnostic logs to the client.
+
+In this scenario, the [main/diagnostic_logs](main/diagnostic_logs) directory
+contains three files:
+
+```
+main/diagnostic_logs
+├── crash.log
+├── end_user_support.log
+└── network_diag.log
+```
+
+These files contain dummy data.
+
+#### To test the diagnostic logs cluster
+
+```
+# Commission the app
+chip-tool pairing ble-wifi 1 SSID PASSPHRASE 20202021 3840
+
+# Read end user support logs using response payload protocol
+chip-tool diagnosticlogs retrieve-logs-request 0 0 1 0
+
+# Read network diagnostic using BDX protocol
+chip-tool diagnosticlogs retrieve-logs-request 1 0 1 0 --TransferFileDesignator network-diag.log
+```
+
 ## Optimization
 
 Optimization related to WiFi, BLuetooth, Asserts etc are the part of this

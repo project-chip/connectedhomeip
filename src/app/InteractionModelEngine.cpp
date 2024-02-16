@@ -35,6 +35,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
 
@@ -57,7 +58,7 @@ using Protocols::InteractionModel::Status;
 
 Global<InteractionModelEngine> sInteractionModelEngine;
 
-InteractionModelEngine::InteractionModelEngine() {}
+InteractionModelEngine::InteractionModelEngine() : mReportingEngine(this) {}
 
 InteractionModelEngine * InteractionModelEngine::GetInstance()
 {
@@ -330,7 +331,7 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
-bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subjectID)
+bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subjectID)
 {
     bool isActive = false;
     mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
@@ -365,6 +366,12 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFab
     });
 
     return isActive;
+}
+
+bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID)
+{
+    // TODO(#30281) : Implement persisted sub check and verify how persistent subscriptions affects this at ICDManager::Init
+    return false;
 }
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
@@ -405,6 +412,21 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
         return Status::Busy;
     }
+    CHIP_FAULT_INJECT(
+        FaultInjection::kFault_IMInvoke_SeparateResponses,
+        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
+            apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandler::NlFaultInjectionType::SeparateResponseMessages);
+        return Status::Success;);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponsesInvertResponseOrder,
+                      commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
+                          apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                          CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
+                      return Status::Success;);
+    CHIP_FAULT_INJECT(
+        FaultInjection::kFault_IMInvoke_SkipSecondResponse,
+        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                                                                       CommandHandler::NlFaultInjectionType::SkipSecondResponse);
+        return Status::Success;);
     commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke);
     return Status::Success;
 }
@@ -834,7 +856,7 @@ CHIP_ERROR InteractionModelEngine::OnTimedRequest(Messaging::ExchangeContext * a
                                                   const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                                   Protocols::InteractionModel::Status & aStatus)
 {
-    TimedHandler * handler = mTimedHandlers.CreateObject();
+    TimedHandler * handler = mTimedHandlers.CreateObject(this);
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Timed interaction");

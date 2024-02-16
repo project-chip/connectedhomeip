@@ -39,9 +39,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/SessionParameters.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -93,7 +93,6 @@ void PASESession::Clear()
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
     memset(&mPASEVerifier, 0, sizeof(mPASEVerifier));
-    memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg.ClearValue();
 
     mSpake2p.Clear();
@@ -106,7 +105,6 @@ void PASESession::Clear()
         chip::Platform::MemoryFree(mSalt);
         mSalt = nullptr;
     }
-    mKeLen           = sizeof(mKe);
     mPairingComplete = false;
     PairingSession::Clear();
 }
@@ -251,6 +249,7 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     // If we were waiting for something, mNextExpectedMsg had better have a value.
     ChipLogError(SecureChannel, "PASESession timed out while waiting for a response from the peer. Expected message type was %u",
                  to_underlying(mNextExpectedMsg.Value()));
+    MATTER_TRACE_COUNTER("PASETimeout");
     // Discard the exchange so that Clear() doesn't try closing it.  The
     // exchange will handle that.
     DiscardExchange();
@@ -262,8 +261,15 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
 CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
 {
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
-    return session.InitFromSecret(*mSessionManager->GetSessionKeystore(), ByteSpan(mKe, mKeLen), ByteSpan(),
-                                  CryptoContext::SessionInfoType::kSessionEstablishment, mRole);
+
+    SessionKeystore & keystore = *mSessionManager->GetSessionKeystore();
+    AutoReleaseSymmetricKey<HkdfKeyHandle> hkdfKey(keystore);
+
+    ReturnErrorOnFailure(mSpake2p.GetKeys(keystore, hkdfKey.KeyHandle()));
+    ReturnErrorOnFailure(session.InitFromSecret(keystore, hkdfKey.KeyHandle(), ByteSpan{} /* salt */,
+                                                CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
@@ -572,6 +578,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     size_t verifier_len = kMAX_Hash_Length;
 
     ChipLogDetail(SecureChannel, "Received spake2p msg1");
+    MATTER_TRACE_SCOPE("Pake1", "PASESession");
 
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
@@ -620,6 +627,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     }
 
     ChipLogDetail(SecureChannel, "Sent spake2p msg2");
+    MATTER_TRACE_COUNTER("Pake2");
 
 exit:
 
@@ -670,7 +678,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier, &verifier_len));
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
-    SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
     msg2 = nullptr;
 
     {
@@ -711,6 +718,7 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(SecureChannel, "Received spake2p msg3");
+    MATTER_TRACE_COUNTER("Pake3");
 
     mNextExpectedMsg.ClearValue();
 
@@ -732,7 +740,6 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     VerifyOrExit(peer_verifier_len == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
-    SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
 
     // Send confirmation to peer that we succeeded so they can start using the session.
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
@@ -871,6 +878,7 @@ exit:
         DiscardExchange();
         Clear();
         ChipLogError(SecureChannel, "Failed during PASE session setup: %" CHIP_ERROR_FORMAT, err.Format());
+        MATTER_TRACE_COUNTER("PASEFail");
         // Do this last in case the delegate frees us.
         NotifySessionEstablishmentError(err);
     }

@@ -14,21 +14,33 @@
 
 import("//build_overrides/chip.gni")
 
+config("includes") {
+  include_dirs = [ "${chip_root}/zzz_generated/app-common" ]
+}
+
 static_library("cluster-objects") {
   output_name = "libClusterObjects"
 
   sources = [
-    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums-check.h",
-    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
     "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp",
     "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/app/data-model",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",
   ]
 
-  defines = []
+  public_configs = [ ":includes" ]
+}
+
+source_set("enums") {
+  sources = [
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums-check.h",
+    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
+  ]
+
+  public_configs = [ ":includes" ]
 }

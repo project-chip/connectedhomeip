@@ -634,6 +634,7 @@ GPL
 GPLv
 Gradle
 gradlew
+graphviz
 Groupcast
 GroupId
 GroupKeyManagement

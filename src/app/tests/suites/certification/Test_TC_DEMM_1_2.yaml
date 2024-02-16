@@ -1,0 +1,112 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 241.1.2. [TC-DEMM-1.2] Cluster attributes with DUT as Server
+
+PICS:
+    - DEMM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: TH reads from the DUT the SupportedModes attribute"
+      PICS: DEMM.S.A0000
+      verification: |
+          ./chip-tool deviceenergymanagementmode read supported-modes   1 1
+
+          - Verify that the DUT response contains a list of ModeOptionsStruct entries
+          - Verify that the list has at least 2 and at most 255 entries
+          - Verify that each ModeOptionsStruct entry has a unique Mode field value
+          - Verify that each ModeOptionsStruct entry has a unique Label field value
+          - Verify that each ModeOptionsStruct entry’s ModeTags field has:
+          at least one entry the values of the Value fields that are not larger than 16 bits
+          - for each Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster-derived tag value (No Optimization, Device Optimization, Local Optimization, Grid Optimization) or in the MfgTags (0x8000 to 0xBFFF) range
+          - for at least one Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a derived cluster value (RapidCool, RapidFreeze)
+          - if the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
+          - Verify that at least one ModeOptionsStruct entry includes either the RapidCool semantic tag or the RapidFreeze semantic tag in the SemanticTags field
+          - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
+
+
+          [1705923890.093456][23589:23591] CHIP:DMG: }
+          [1705923890.094137][23589:23591] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_009F Attribute 0x0000_0000 DataVersion: 2217281174
+          [1705923890.094312][23589:23591] CHIP:TOO:   SupportedModes: 5 entries
+          [1705923890.094403][23589:23591] CHIP:TOO:     [1]: {
+          [1705923890.094423][23589:23591] CHIP:TOO:       Label: No energy management (forecast only)
+          [1705923890.094458][23589:23591] CHIP:TOO:       Mode: 0
+          [1705923890.094483][23589:23591] CHIP:TOO:       ModeTags: 1 entries
+          [1705923890.094513][23589:23591] CHIP:TOO:         [1]: {
+          [1705923890.094531][23589:23591] CHIP:TOO:           Value: 16384
+          [1705923890.094542][23589:23591] CHIP:TOO:          }
+          [1705923890.094552][23589:23591] CHIP:TOO:      }
+          [1705923890.094579][23589:23591] CHIP:TOO:     [2]: {
+          [1705923890.094590][23589:23591] CHIP:TOO:       Label: Device optimizes (no local or grid control)
+          [1705923890.094601][23589:23591] CHIP:TOO:       Mode: 1
+          [1705923890.094615][23589:23591] CHIP:TOO:       ModeTags: 1 entries
+          [1705923890.094632][23589:23591] CHIP:TOO:         [1]: {
+          [1705923890.094642][23589:23591] CHIP:TOO:           Value: 16385
+          [1705923890.094653][23589:23591] CHIP:TOO:          }
+          [1705923890.094664][23589:23591] CHIP:TOO:      }
+          [1705923890.094687][23589:23591] CHIP:TOO:     [3]: {
+          [1705923890.094697][23589:23591] CHIP:TOO:       Label: Optimized within building
+          [1705923890.094706][23589:23591] CHIP:TOO:       Mode: 2
+          [1705923890.094722][23589:23591] CHIP:TOO:       ModeTags: 2 entries
+          [1705923890.094738][23589:23591] CHIP:TOO:         [1]: {
+          [1705923890.094748][23589:23591] CHIP:TOO:           Value: 16386
+          [1705923890.094759][23589:23591] CHIP:TOO:          }
+          [1705923890.094773][23589:23591] CHIP:TOO:         [2]: {
+          [1705923890.094784][23589:23591] CHIP:TOO:           Value: 16385
+          [1705923890.094794][23589:23591] CHIP:TOO:          }
+          [1705923890.094804][23589:23591] CHIP:TOO:      }
+          [1705923890.094827][23589:23591] CHIP:TOO:     [4]: {
+          [1705923890.094836][23589:23591] CHIP:TOO:       Label: Optimized for grid
+          [1705923890.094846][23589:23591] CHIP:TOO:       Mode: 3
+          [1705923890.094861][23589:23591] CHIP:TOO:       ModeTags: 2 entries
+          [1705923890.094876][23589:23591] CHIP:TOO:         [1]: {
+          [1705923890.094886][23589:23591] CHIP:TOO:           Value: 16385
+          [1705923890.094893][23589:23591] CHIP:TOO:          }
+          [1705923890.094908][23589:23591] CHIP:TOO:         [2]: {
+          [1705923890.094917][23589:23591] CHIP:TOO:           Value: 16387
+          [1705923890.094927][23589:23591] CHIP:TOO:          }
+          [1705923890.094935][23589:23591] CHIP:TOO:      }
+          [1705923890.094960][23589:23591] CHIP:TOO:     [5]: {
+          [1705923890.094971][23589:23591] CHIP:TOO:       Label: Optimized for grid and building
+          [1705923890.094980][23589:23591] CHIP:TOO:       Mode: 4
+          [1705923890.094998][23589:23591] CHIP:TOO:       ModeTags: 3 entries
+          [1705923890.095013][23589:23591] CHIP:TOO:         [1]: {
+          [1705923890.095022][23589:23591] CHIP:TOO:           Value: 16386
+          [1705923890.095032][23589:23591] CHIP:TOO:          }
+          [1705923890.095047][23589:23591] CHIP:TOO:         [2]: {
+          [1705923890.095057][23589:23591] CHIP:TOO:           Value: 16385
+          [1705923890.095066][23589:23591] CHIP:TOO:          }
+          [1705923890.095080][23589:23591] CHIP:TOO:         [3]: {
+          [1705923890.095090][23589:23591] CHIP:TOO:           Value: 16387
+          [1705923890.095099][23589:23591] CHIP:TOO:          }
+          [1705923890.095109][23589:23591] CHIP:TOO:      }
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the CurrentMode attribute"
+      PICS: DEMM.S.A0001
+      verification: |
+          ./chip-tool deviceenergymanagementmode read current-mode   1 1
+
+          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer value from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+
+          [1705923927.418159][23602:23604] CHIP:DMG: }
+          [1705923927.418327][23602:23604] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_009F Attribute 0x0000_0001 DataVersion: 2217281174
+          [1705923927.418389][23602:23604] CHIP:TOO:   CurrentMode: 0
+      disabled: true

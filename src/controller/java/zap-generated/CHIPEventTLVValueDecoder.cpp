@@ -276,7 +276,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         }
 
                         jclass accessControlTargetStructStructClass_4;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlTargetStruct",
                             accessControlTargetStructStructClass_4);
                         if (err != CHIP_NO_ERROR)
@@ -310,7 +310,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     jnivalue_latestValue_fabricIndex, value_latestValue_fabricIndex);
 
                 jclass accessControlEntryStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlEntryStruct",
                     accessControlEntryStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -345,7 +345,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_fabricIndex);
 
             jclass accessControlEntryChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$AccessControlClusterAccessControlEntryChangedEvent",
                 accessControlEntryChangedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -439,7 +439,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     jnivalue_latestValue_fabricIndex, value_latestValue_fabricIndex);
 
                 jclass accessControlExtensionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlExtensionStruct",
                     accessControlExtensionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -472,7 +472,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_fabricIndex);
 
             jclass accessControlExtensionChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$AccessControlClusterAccessControlExtensionChangedEvent",
                 accessControlExtensionChangedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -539,7 +539,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_newStateClassName.c_str(), value_newStateCtorSignature.c_str(), jnivalue_newState, value_newState);
 
             jclass stateChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ActionsClusterStateChangedEvent", stateChangedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -598,7 +598,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_errorClassName.c_str(), value_errorCtorSignature.c_str(), jnivalue_error, value_error);
 
             jclass actionFailedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ActionsClusterActionFailedEvent", actionFailedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -647,7 +647,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                         jnivalue_softwareVersion, value_softwareVersion);
 
             jclass startUpStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BasicInformationClusterStartUpEvent", startUpStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -676,7 +676,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass shutDownStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BasicInformationClusterShutDownEvent", shutDownStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -712,7 +712,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_fabricIndex);
 
             jclass leaveStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BasicInformationClusterLeaveEvent", leaveStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -749,7 +749,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                            jnivalue_reachableNewValue, value_reachableNewValue);
 
             jclass reachableChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BasicInformationClusterReachableChangedEvent",
                 reachableChangedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -836,7 +836,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass stateTransitionStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$OtaSoftwareUpdateRequestorClusterStateTransitionEvent",
                 stateTransitionStructClass);
             if (err != CHIP_NO_ERROR)
@@ -884,7 +884,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_productIDClassName.c_str(), value_productIDCtorSignature.c_str(), jnivalue_productID, value_productID);
 
             jclass versionAppliedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$OtaSoftwareUpdateRequestorClusterVersionAppliedEvent",
                 versionAppliedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -962,7 +962,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass downloadErrorStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$OtaSoftwareUpdateRequestorClusterDownloadErrorEvent",
                 downloadErrorStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1077,7 +1077,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass wiredFaultChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PowerSourceClusterWiredFaultChangeEvent", wiredFaultChangeStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -1139,7 +1139,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass batFaultChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PowerSourceClusterBatFaultChangeEvent", batFaultChangeStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -1201,7 +1201,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass batChargeFaultChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PowerSourceClusterBatChargeFaultChangeEvent",
                 batChargeFaultChangeStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1305,7 +1305,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass hardwareFaultChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$GeneralDiagnosticsClusterHardwareFaultChangeEvent",
                 hardwareFaultChangeStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1369,7 +1369,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass radioFaultChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$GeneralDiagnosticsClusterRadioFaultChangeEvent",
                 radioFaultChangeStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1432,7 +1432,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass networkFaultChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$GeneralDiagnosticsClusterNetworkFaultChangeEvent",
                 networkFaultChangeStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1471,7 +1471,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_bootReasonClassName.c_str(), value_bootReasonCtorSignature.c_str(), jnivalue_bootReason, value_bootReason);
 
             jclass bootReasonStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$GeneralDiagnosticsClusterBootReasonEvent", bootReasonStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -1547,7 +1547,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass softwareFaultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SoftwareDiagnosticsClusterSoftwareFaultEvent",
                 softwareFaultStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1597,7 +1597,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_connectionStatus, value_connectionStatus);
 
             jclass connectionStatusStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ThreadNetworkDiagnosticsClusterConnectionStatusEvent",
                 connectionStatusStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1660,7 +1660,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass networkFaultChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent",
                 networkFaultChangeStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1710,7 +1710,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_reasonCodeClassName.c_str(), value_reasonCodeCtorSignature.c_str(), jnivalue_reasonCode, value_reasonCode);
 
             jclass disconnectionStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$WiFiNetworkDiagnosticsClusterDisconnectionEvent",
                 disconnectionStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1755,7 +1755,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_statusClassName.c_str(), value_statusCtorSignature.c_str(), jnivalue_status, value_status);
 
             jclass associationFailureStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$WiFiNetworkDiagnosticsClusterAssociationFailureEvent",
                 associationFailureStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1796,7 +1796,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_connectionStatus, value_connectionStatus);
 
             jclass connectionStatusStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$WiFiNetworkDiagnosticsClusterConnectionStatusEvent",
                 connectionStatusStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1846,7 +1846,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass DSTTableEmptyStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterDSTTableEmptyEvent",
                 DSTTableEmptyStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1884,7 +1884,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                            jnivalue_DSTOffsetActive, value_DSTOffsetActive);
 
             jclass DSTStatusStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterDSTStatusEvent", DSTStatusStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -1933,7 +1933,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass timeZoneStatusStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterTimeZoneStatusEvent",
                 timeZoneStatusStructClass);
             if (err != CHIP_NO_ERROR)
@@ -1963,7 +1963,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass timeFailureStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterTimeFailureEvent", timeFailureStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -1992,7 +1992,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass missingTrustedTimeSourceStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterMissingTrustedTimeSourceEvent",
                 missingTrustedTimeSourceStructClass);
             if (err != CHIP_NO_ERROR)
@@ -2041,7 +2041,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                         jnivalue_softwareVersion, value_softwareVersion);
 
             jclass startUpStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterStartUpEvent", startUpStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2070,7 +2070,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass shutDownStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterShutDownEvent",
                 shutDownStructClass);
             if (err != CHIP_NO_ERROR)
@@ -2099,7 +2099,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass leaveStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterLeaveEvent", leaveStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2135,7 +2135,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                            jnivalue_reachableNewValue, value_reachableNewValue);
 
             jclass reachableChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterReachableChangedEvent",
                 reachableChangedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -2185,7 +2185,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_newPosition);
 
             jclass switchLatchedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SwitchClusterSwitchLatchedEvent", switchLatchedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2222,7 +2222,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_newPosition);
 
             jclass initialPressStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SwitchClusterInitialPressEvent", initialPressStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2259,7 +2259,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_newPosition);
 
             jclass longPressStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SwitchClusterLongPressEvent", longPressStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2296,7 +2296,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_previousPosition, value_previousPosition);
 
             jclass shortReleaseStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SwitchClusterShortReleaseEvent", shortReleaseStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2333,7 +2333,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_previousPosition, value_previousPosition);
 
             jclass longReleaseStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SwitchClusterLongReleaseEvent", longReleaseStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2378,7 +2378,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 jnivalue_currentNumberOfPressesCounted, value_currentNumberOfPressesCounted);
 
             jclass multiPressOngoingStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SwitchClusterMultiPressOngoingEvent", multiPressOngoingStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2425,7 +2425,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 jnivalue_totalNumberOfPressesCounted, value_totalNumberOfPressesCounted);
 
             jclass multiPressCompleteStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SwitchClusterMultiPressCompleteEvent", multiPressCompleteStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2553,7 +2553,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_stateValueClassName.c_str(), value_stateValueCtorSignature.c_str(), jnivalue_stateValue, value_stateValue);
 
             jclass stateChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BooleanStateClusterStateChangeEvent", stateChangeStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2647,7 +2647,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass errorStateStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct",
                 errorStateStructStructClass_0);
             if (err != CHIP_NO_ERROR)
@@ -2671,7 +2671,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                value_errorState_errorStateLabel, value_errorState_errorStateDetails);
 
             jclass operationalErrorStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$OvenCavityOperationalStateClusterOperationalErrorEvent",
                 operationalErrorStructClass);
             if (err != CHIP_NO_ERROR)
@@ -2763,7 +2763,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass operationCompletionStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$OvenCavityOperationalStateClusterOperationCompletionEvent",
                 operationCompletionStructClass);
             if (err != CHIP_NO_ERROR)
@@ -2925,7 +2925,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                         value_maskCtorSignature.c_str(), jnivalue_mask, value_mask);
 
             jclass notifyStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$RefrigeratorAlarmClusterNotifyEvent", notifyStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -2994,7 +2994,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_alarmSeverityLevel, value_alarmSeverityLevel);
 
             jclass smokeAlarmStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent", smokeAlarmStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -3031,7 +3031,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_alarmSeverityLevel, value_alarmSeverityLevel);
 
             jclass COAlarmStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent", COAlarmStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -3068,7 +3068,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_alarmSeverityLevel, value_alarmSeverityLevel);
 
             jclass lowBatteryStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent", lowBatteryStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -3097,7 +3097,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass hardwareFaultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterHardwareFaultEvent", hardwareFaultStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -3126,7 +3126,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass endOfServiceStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterEndOfServiceEvent", endOfServiceStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -3155,7 +3155,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass selfTestCompleteStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterSelfTestCompleteEvent",
                 selfTestCompleteStructClass);
             if (err != CHIP_NO_ERROR)
@@ -3185,7 +3185,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass alarmMutedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterAlarmMutedEvent", alarmMutedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -3213,7 +3213,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass muteEndedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterMuteEndedEvent", muteEndedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -3249,7 +3249,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_alarmSeverityLevel, value_alarmSeverityLevel);
 
             jclass interconnectSmokeAlarmStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent",
                 interconnectSmokeAlarmStructClass);
             if (err != CHIP_NO_ERROR)
@@ -3288,7 +3288,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_alarmSeverityLevel, value_alarmSeverityLevel);
 
             jclass interconnectCOAlarmStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent",
                 interconnectCOAlarmStructClass);
             if (err != CHIP_NO_ERROR)
@@ -3318,7 +3318,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass allClearStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterAllClearEvent", allClearStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -3384,7 +3384,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                         value_maskCtorSignature.c_str(), jnivalue_mask, value_mask);
 
             jclass notifyStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DishwasherAlarmClusterNotifyEvent", notifyStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -3480,7 +3480,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass errorStateStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$OperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
@@ -3503,7 +3503,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                value_errorState_errorStateLabel, value_errorState_errorStateDetails);
 
             jclass operationalErrorStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$OperationalStateClusterOperationalErrorEvent",
                 operationalErrorStructClass);
             if (err != CHIP_NO_ERROR)
@@ -3593,7 +3593,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass operationCompletionStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$OperationalStateClusterOperationCompletionEvent",
                 operationCompletionStructClass);
             if (err != CHIP_NO_ERROR)
@@ -3670,7 +3670,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass errorStateStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$RvcOperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
@@ -3693,7 +3693,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                value_errorState_errorStateLabel, value_errorState_errorStateDetails);
 
             jclass operationalErrorStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$RvcOperationalStateClusterOperationalErrorEvent",
                 operationalErrorStructClass);
             if (err != CHIP_NO_ERROR)
@@ -3783,7 +3783,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass operationCompletionStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$RvcOperationalStateClusterOperationCompletionEvent",
                 operationCompletionStructClass);
             if (err != CHIP_NO_ERROR)
@@ -3881,7 +3881,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass alarmsStateChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BooleanStateConfigurationClusterAlarmsStateChangedEvent",
                 alarmsStateChangedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -3922,7 +3922,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_sensorFault);
 
             jclass sensorFaultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BooleanStateConfigurationClusterSensorFaultEvent",
                 sensorFaultStructClass);
             if (err != CHIP_NO_ERROR)
@@ -3986,7 +3986,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass valveStateChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ValveConfigurationAndControlClusterValveStateChangedEvent",
                 valveStateChangedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -4027,7 +4027,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_valveFaultClassName.c_str(), value_valveFaultCtorSignature.c_str(), jnivalue_valveFault, value_valveFault);
 
             jclass valveFaultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ValveConfigurationAndControlClusterValveFaultEvent",
                 valveFaultStructClass);
             if (err != CHIP_NO_ERROR)
@@ -4046,6 +4046,255 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(valveFaultStructClass, valveFaultStructCtor, value_valveFault);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ElectricalPowerMeasurement::Id: {
+        using namespace app::Clusters::ElectricalPowerMeasurement;
+        switch (aPath.mEventId)
+        {
+        case Events::MeasurementPeriodRanges::Id: {
+            Events::MeasurementPeriodRanges::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_ranges;
+            chip::JniReferences::GetInstance().CreateArrayList(value_ranges);
+
+            auto iter_value_ranges_0 = cppValue.ranges.begin();
+            while (iter_value_ranges_0.Next())
+            {
+                auto & entry_0 = iter_value_ranges_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_measurementType;
+                std::string newElement_0_measurementTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_measurementTypeCtorSignature = "(I)V";
+                jint jninewElement_0_measurementType                  = static_cast<jint>(entry_0.measurementType);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_measurementTypeClassName.c_str(), newElement_0_measurementTypeCtorSignature.c_str(),
+                    jninewElement_0_measurementType, newElement_0_measurementType);
+                jobject newElement_0_min;
+                std::string newElement_0_minClassName     = "java/lang/Long";
+                std::string newElement_0_minCtorSignature = "(J)V";
+                jlong jninewElement_0_min                 = static_cast<jlong>(entry_0.min);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_minClassName.c_str(),
+                                                                            newElement_0_minCtorSignature.c_str(),
+                                                                            jninewElement_0_min, newElement_0_min);
+                jobject newElement_0_max;
+                std::string newElement_0_maxClassName     = "java/lang/Long";
+                std::string newElement_0_maxCtorSignature = "(J)V";
+                jlong jninewElement_0_max                 = static_cast<jlong>(entry_0.max);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_maxClassName.c_str(),
+                                                                            newElement_0_maxCtorSignature.c_str(),
+                                                                            jninewElement_0_max, newElement_0_max);
+                jobject newElement_0_startTimestamp;
+                if (!entry_0.startTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_startTimestamp);
+                }
+                else
+                {
+                    jobject newElement_0_startTimestampInsideOptional;
+                    std::string newElement_0_startTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_startTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_startTimestampInsideOptional = static_cast<jlong>(entry_0.startTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_startTimestampInsideOptionalClassName.c_str(),
+                        newElement_0_startTimestampInsideOptionalCtorSignature.c_str(),
+                        jninewElement_0_startTimestampInsideOptional, newElement_0_startTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_startTimestampInsideOptional,
+                                                                      newElement_0_startTimestamp);
+                }
+                jobject newElement_0_endTimestamp;
+                if (!entry_0.endTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_endTimestamp);
+                }
+                else
+                {
+                    jobject newElement_0_endTimestampInsideOptional;
+                    std::string newElement_0_endTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_endTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_endTimestampInsideOptional = static_cast<jlong>(entry_0.endTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_endTimestampInsideOptionalClassName.c_str(),
+                        newElement_0_endTimestampInsideOptionalCtorSignature.c_str(), jninewElement_0_endTimestampInsideOptional,
+                        newElement_0_endTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_endTimestampInsideOptional,
+                                                                      newElement_0_endTimestamp);
+                }
+                jobject newElement_0_minTimestamp;
+                if (!entry_0.minTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_minTimestamp);
+                }
+                else
+                {
+                    jobject newElement_0_minTimestampInsideOptional;
+                    std::string newElement_0_minTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_minTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_minTimestampInsideOptional = static_cast<jlong>(entry_0.minTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_minTimestampInsideOptionalClassName.c_str(),
+                        newElement_0_minTimestampInsideOptionalCtorSignature.c_str(), jninewElement_0_minTimestampInsideOptional,
+                        newElement_0_minTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_minTimestampInsideOptional,
+                                                                      newElement_0_minTimestamp);
+                }
+                jobject newElement_0_maxTimestamp;
+                if (!entry_0.maxTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_maxTimestamp);
+                }
+                else
+                {
+                    jobject newElement_0_maxTimestampInsideOptional;
+                    std::string newElement_0_maxTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_maxTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_maxTimestampInsideOptional = static_cast<jlong>(entry_0.maxTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_maxTimestampInsideOptionalClassName.c_str(),
+                        newElement_0_maxTimestampInsideOptionalCtorSignature.c_str(), jninewElement_0_maxTimestampInsideOptional,
+                        newElement_0_maxTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_maxTimestampInsideOptional,
+                                                                      newElement_0_maxTimestamp);
+                }
+                jobject newElement_0_startSystime;
+                if (!entry_0.startSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_startSystime);
+                }
+                else
+                {
+                    jobject newElement_0_startSystimeInsideOptional;
+                    std::string newElement_0_startSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_startSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_startSystimeInsideOptional = static_cast<jlong>(entry_0.startSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_startSystimeInsideOptionalClassName.c_str(),
+                        newElement_0_startSystimeInsideOptionalCtorSignature.c_str(), jninewElement_0_startSystimeInsideOptional,
+                        newElement_0_startSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_startSystimeInsideOptional,
+                                                                      newElement_0_startSystime);
+                }
+                jobject newElement_0_endSystime;
+                if (!entry_0.endSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_endSystime);
+                }
+                else
+                {
+                    jobject newElement_0_endSystimeInsideOptional;
+                    std::string newElement_0_endSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_endSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_endSystimeInsideOptional                 = static_cast<jlong>(entry_0.endSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_endSystimeInsideOptionalClassName.c_str(),
+                        newElement_0_endSystimeInsideOptionalCtorSignature.c_str(), jninewElement_0_endSystimeInsideOptional,
+                        newElement_0_endSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_endSystimeInsideOptional,
+                                                                      newElement_0_endSystime);
+                }
+                jobject newElement_0_minSystime;
+                if (!entry_0.minSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_minSystime);
+                }
+                else
+                {
+                    jobject newElement_0_minSystimeInsideOptional;
+                    std::string newElement_0_minSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_minSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_minSystimeInsideOptional                 = static_cast<jlong>(entry_0.minSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_minSystimeInsideOptionalClassName.c_str(),
+                        newElement_0_minSystimeInsideOptionalCtorSignature.c_str(), jninewElement_0_minSystimeInsideOptional,
+                        newElement_0_minSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_minSystimeInsideOptional,
+                                                                      newElement_0_minSystime);
+                }
+                jobject newElement_0_maxSystime;
+                if (!entry_0.maxSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_maxSystime);
+                }
+                else
+                {
+                    jobject newElement_0_maxSystimeInsideOptional;
+                    std::string newElement_0_maxSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_0_maxSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_0_maxSystimeInsideOptional                 = static_cast<jlong>(entry_0.maxSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_0_maxSystimeInsideOptionalClassName.c_str(),
+                        newElement_0_maxSystimeInsideOptionalCtorSignature.c_str(), jninewElement_0_maxSystimeInsideOptional,
+                        newElement_0_maxSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_maxSystimeInsideOptional,
+                                                                      newElement_0_maxSystime);
+                }
+
+                jclass measurementRangeStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ElectricalPowerMeasurementClusterMeasurementRangeStruct",
+                    measurementRangeStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ElectricalPowerMeasurementClusterMeasurementRangeStruct");
+                    return nullptr;
+                }
+
+                jmethodID measurementRangeStructStructCtor_1;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, measurementRangeStructStructClass_1, "<init>",
+                    "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                    "Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                    "Optional;)V",
+                    &measurementRangeStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || measurementRangeStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl,
+                                 "Could not find ChipStructs$ElectricalPowerMeasurementClusterMeasurementRangeStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(measurementRangeStructStructClass_1, measurementRangeStructStructCtor_1,
+                                              newElement_0_measurementType, newElement_0_min, newElement_0_max,
+                                              newElement_0_startTimestamp, newElement_0_endTimestamp, newElement_0_minTimestamp,
+                                              newElement_0_maxTimestamp, newElement_0_startSystime, newElement_0_endSystime,
+                                              newElement_0_minSystime, newElement_0_maxSystime);
+                chip::JniReferences::GetInstance().AddToList(value_ranges, newElement_0);
+            }
+
+            jclass measurementPeriodRangesStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent",
+                measurementPeriodRangesStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent");
+                return nullptr;
+            }
+
+            jmethodID measurementPeriodRangesStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, measurementPeriodRangesStructClass, "<init>",
+                                                                "(Ljava/util/ArrayList;)V", &measurementPeriodRangesStructCtor);
+            if (err != CHIP_NO_ERROR || measurementPeriodRangesStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl,
+                    "Could not find ChipEventStructs$ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(measurementPeriodRangesStructClass, measurementPeriodRangesStructCtor, value_ranges);
 
             return value;
         }
@@ -4165,7 +4414,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 }
 
                 jclass energyMeasurementStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
                     energyMeasurementStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -4293,7 +4542,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 }
 
                 jclass energyMeasurementStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
                     energyMeasurementStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -4323,7 +4572,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass cumulativeEnergyMeasuredStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent",
                 cumulativeEnergyMeasuredStructClass);
             if (err != CHIP_NO_ERROR)
@@ -4456,7 +4705,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 }
 
                 jclass energyMeasurementStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
                     energyMeasurementStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -4584,7 +4833,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 }
 
                 jclass energyMeasurementStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
                     energyMeasurementStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -4614,7 +4863,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass periodicEnergyMeasuredStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent",
                 periodicEnergyMeasuredStructClass);
             if (err != CHIP_NO_ERROR)
@@ -4841,7 +5090,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     }
 
                     jclass temperatureControlStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct",
                         temperatureControlStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
@@ -4899,7 +5148,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         value_averageLoadControlInsideOptional_loadAdjustment);
 
                     jclass averageLoadControlStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct",
                         averageLoadControlStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
@@ -4952,7 +5201,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         jnivalue_dutyCycleControlInsideOptional_dutyCycle, value_dutyCycleControlInsideOptional_dutyCycle);
 
                     jclass dutyCycleControlStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct",
                         dutyCycleControlStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
@@ -5006,7 +5255,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         value_powerSavingsControlInsideOptional_powerSavings);
 
                     jclass powerSavingsControlStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct",
                         powerSavingsControlStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
@@ -5062,7 +5311,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         value_heatingSourceControlInsideOptional_heatingSource);
 
                     jclass heatingSourceControlStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct",
                         heatingSourceControlStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
@@ -5093,7 +5342,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass loadControlEventStatusChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent",
                 loadControlEventStatusChangeStructClass);
             if (err != CHIP_NO_ERROR)
@@ -5148,7 +5397,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             value_messageID = value_messageIDByteArray;
 
             jclass messageQueuedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessageQueuedEvent", messageQueuedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5183,7 +5432,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             value_messageID = value_messageIDByteArray;
 
             jclass messagePresentedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessagePresentedEvent", messagePresentedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5277,7 +5526,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass messageCompleteStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessageCompleteEvent", messageCompleteStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5318,7 +5567,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass powerAdjustStartStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DeviceEnergyManagementClusterPowerAdjustStartEvent",
                 powerAdjustStartStructClass);
             if (err != CHIP_NO_ERROR)
@@ -5369,7 +5618,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_energyUseClassName.c_str(), value_energyUseCtorSignature.c_str(), jnivalue_energyUse, value_energyUse);
 
             jclass powerAdjustEndStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DeviceEnergyManagementClusterPowerAdjustEndEvent",
                 powerAdjustEndStructClass);
             if (err != CHIP_NO_ERROR)
@@ -5401,7 +5650,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass pausedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DeviceEnergyManagementClusterPausedEvent", pausedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5436,7 +5685,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_causeClassName.c_str(), value_causeCtorSignature.c_str(), jnivalue_cause, value_cause);
 
             jclass resumedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DeviceEnergyManagementClusterResumedEvent", resumedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5482,7 +5731,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
 
             jclass EVConnectedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEVConnectedEvent", EVConnectedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5560,7 +5809,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass EVNotDetectedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEVNotDetectedEvent", EVNotDetectedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5614,7 +5863,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                         jnivalue_maximumCurrent, value_maximumCurrent);
 
             jclass energyTransferStartedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEnergyTransferStartedEvent",
                 energyTransferStartedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -5675,7 +5924,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                         jnivalue_energyTransferred, value_energyTransferred);
 
             jclass energyTransferStoppedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterEnergyTransferStoppedEvent",
                 energyTransferStoppedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -5744,7 +5993,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 jnivalue_faultStateCurrentState, value_faultStateCurrentState);
 
             jclass faultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterFaultEvent", faultStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5781,7 +6030,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             value_uid = value_uidByteArray;
 
             jclass rfidStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$EnergyEvseClusterRfidEvent", rfidStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5809,6 +6058,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
     }
     case app::Clusters::EnergyPreference::Id: {
         using namespace app::Clusters::EnergyPreference;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::PowerTopology::Id: {
+        using namespace app::Clusters::PowerTopology;
         switch (aPath.mEventId)
         {
         default:
@@ -5856,7 +6115,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_alarmCodeClassName.c_str(), value_alarmCodeCtorSignature.c_str(), jnivalue_alarmCode, value_alarmCode);
 
             jclass doorLockAlarmStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DoorLockClusterDoorLockAlarmEvent", doorLockAlarmStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -5892,7 +6151,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_doorStateClassName.c_str(), value_doorStateCtorSignature.c_str(), jnivalue_doorState, value_doorState);
 
             jclass doorStateChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DoorLockClusterDoorStateChangeEvent", doorStateChangeStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -6017,7 +6276,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                             jninewElement_2_credentialIndex, newElement_2_credentialIndex);
 
                         jclass credentialStructStructClass_3;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DoorLockClusterCredentialStruct",
                             credentialStructStructClass_3);
                         if (err != CHIP_NO_ERROR)
@@ -6045,7 +6304,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass lockOperationStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DoorLockClusterLockOperationEvent", lockOperationStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -6182,7 +6441,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                             jninewElement_2_credentialIndex, newElement_2_credentialIndex);
 
                         jclass credentialStructStructClass_3;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DoorLockClusterCredentialStruct",
                             credentialStructStructClass_3);
                         if (err != CHIP_NO_ERROR)
@@ -6210,7 +6469,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass lockOperationErrorStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DoorLockClusterLockOperationErrorEvent",
                 lockOperationErrorStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6327,7 +6586,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass lockUserChangeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DoorLockClusterLockUserChangeEvent", lockUserChangeStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -6391,7 +6650,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass supplyVoltageLowStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterSupplyVoltageLowEvent",
                 supplyVoltageLowStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6422,7 +6681,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass supplyVoltageHighStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterSupplyVoltageHighEvent",
                 supplyVoltageHighStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6453,7 +6712,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass powerMissingPhaseStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterPowerMissingPhaseEvent",
                 powerMissingPhaseStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6484,7 +6743,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass systemPressureLowStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterSystemPressureLowEvent",
                 systemPressureLowStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6515,7 +6774,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass systemPressureHighStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterSystemPressureHighEvent",
                 systemPressureHighStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6547,7 +6806,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass dryRunningStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterDryRunningEvent",
                 dryRunningStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6576,7 +6835,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass motorTemperatureHighStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterMotorTemperatureHighEvent",
                 motorTemperatureHighStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6608,7 +6867,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass pumpMotorFatalFailureStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent",
                 pumpMotorFatalFailureStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6641,7 +6900,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass electronicTemperatureHighStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterElectronicTemperatureHighEvent",
                 electronicTemperatureHighStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6674,7 +6933,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass pumpBlockedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterPumpBlockedEvent",
                 pumpBlockedStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6704,7 +6963,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass sensorFailureStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterSensorFailureEvent",
                 sensorFailureStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6735,7 +6994,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass electronicNonFatalFailureStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent",
                 electronicNonFatalFailureStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6768,7 +7027,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass electronicFatalFailureStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterElectronicFatalFailureEvent",
                 electronicFatalFailureStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6801,7 +7060,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass generalFaultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterGeneralFaultEvent",
                 generalFaultStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6832,7 +7091,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass leakageStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterLeakageEvent", leakageStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -6860,7 +7119,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass airDetectionStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterAirDetectionEvent",
                 airDetectionStructClass);
             if (err != CHIP_NO_ERROR)
@@ -6891,7 +7150,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass turbineOperationStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$PumpConfigurationAndControlClusterTurbineOperationEvent",
                 turbineOperationStructClass);
             if (err != CHIP_NO_ERROR)
@@ -7180,7 +7439,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
 
                 jclass targetInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$TargetNavigatorClusterTargetInfoStruct", targetInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -7218,7 +7477,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             value_data = value_dataByteArray;
 
             jclass targetUpdatedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$TargetNavigatorClusterTargetUpdatedEvent", targetUpdatedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -7303,7 +7562,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass playbackPositionStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterPlaybackPositionStruct",
                 playbackPositionStructStructClass_0);
             if (err != CHIP_NO_ERROR)
@@ -7373,7 +7632,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                            jnivalue_audioAdvanceUnmuted, value_audioAdvanceUnmuted);
 
             jclass stateChangedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$MediaPlaybackClusterStateChangedEvent", stateChangedStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -7505,7 +7764,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass loggedOutStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$AccountLoginClusterLoggedOutEvent", loggedOutStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -7544,7 +7803,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jclass remainingScreenTimeExpiredStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ContentControlClusterRemainingScreenTimeExpiredEvent",
                 remainingScreenTimeExpiredStructClass);
             if (err != CHIP_NO_ERROR)
@@ -7671,7 +7930,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 value_arg4_hClassName.c_str(), value_arg4_hCtorSignature.c_str(), jnivalue_arg4_h, value_arg4_h);
 
             jclass simpleStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
@@ -7747,7 +8006,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     newElement_0_hClassName.c_str(), newElement_0_hCtorSignature.c_str(), jninewElement_0_h, newElement_0_h);
 
                 jclass simpleStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -7790,7 +8049,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jclass testEventStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$UnitTestingClusterTestEventEvent", testEventStructClass);
             if (err != CHIP_NO_ERROR)
             {
@@ -7831,7 +8090,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_fabricIndex);
 
             jclass testFabricScopedEventStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$UnitTestingClusterTestFabricScopedEventEvent",
                 testFabricScopedEventStructClass);
             if (err != CHIP_NO_ERROR)
@@ -7868,7 +8127,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        jnivalue_arg1, value_arg1);
 
             jclass testDifferentVendorMeiEventStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$UnitTestingClusterTestDifferentVendorMeiEventEvent",
                 testDifferentVendorMeiEventStructClass);
             if (err != CHIP_NO_ERROR)
@@ -7934,7 +8193,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                                        value_fabricIndex);
 
             jclass pingCountEventStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$SampleMeiClusterPingCountEventEvent", pingCountEventStructClass);
             if (err != CHIP_NO_ERROR)
             {

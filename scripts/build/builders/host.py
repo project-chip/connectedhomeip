@@ -228,8 +228,8 @@ class HostApp(Enum):
             yield 'dishwasher-app'
             yield 'dishwasher-app.map'
         elif self == HostApp.MICROWAVE_OVEN:
-            yield 'microwave-oven-app'
-            yield 'microwave-oven-app.map'
+            yield 'chip-microwave-oven-app'
+            yield 'chip-microwave-oven-app.map'
         elif self == HostApp.REFRIGERATOR:
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'
@@ -295,7 +295,7 @@ class HostBuilder(GnBuilder):
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
-                 interactive_mode=True, extra_tests=False, use_platform_mdns=False, enable_rpcs=False,
+                 interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
                  enable_test_event_triggers=None):
@@ -367,6 +367,9 @@ class HostBuilder(GnBuilder):
                 # Fake uses "//build/toolchain/fake:fake_x64_gcc"
                 # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
+
+        if use_nl_fault_injection:
+            self.extra_gn_options.append('chip_with_nlfaultinjection=true')
 
         if minmdns_address_policy:
             if use_platform_mdns:

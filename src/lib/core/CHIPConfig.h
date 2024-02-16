@@ -219,6 +219,19 @@
 #endif // CHIP_CONFIG_SHA256_CONTEXT_ALIGN
 
 /**
+ *  @def CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
+ *
+ *  @brief
+ *    Size of the statically allocated context for the HKDF key handle in CryptoPAL.
+ *
+ *  The default size is selected so that the key handle is able to fit 256-bit raw key
+ *  material along with the size information.
+ */
+#ifndef CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
+#define CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE (32 + 1)
+#endif // CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
+
+/**
  *  @def CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
  *
  *  @brief
@@ -1690,12 +1703,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+ * @def CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
  *
- * @brief Device supports sending multiple batch commands in a single Invoke Request Message.
+ * @brief CommandSender will use built-in support to enable sending batch commands in a single Invoke Request Message.
+ *
+ * **Important:** This feature is code and RAM intensive. Enable only on platforms where these
+ * resources are not constrained.
  */
-#ifndef CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
-#define CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED 0
+#ifndef CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+#define CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS 0
 #endif
 
 /**
@@ -1730,6 +1746,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 #define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 0
 #endif
+
+/**
+ *  @def CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+ *
+ *  @brief
+ *    Maximum number of simultaneously active bdx log transfers.
+ *
+ */
+#ifndef CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+#define CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS 5
+#endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
  * @}

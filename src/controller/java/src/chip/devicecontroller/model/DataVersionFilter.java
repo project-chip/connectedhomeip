@@ -46,6 +46,15 @@ public final class DataVersionFilter {
     return dataVersion;
   }
 
+  // For use in JNI.
+  private long getEndpointId(long wildcardValue) {
+    return endpointId.getId(wildcardValue);
+  }
+
+  private long getClusterId(long wildcardValue) {
+    return clusterId.getId(wildcardValue);
+  }
+
   // check whether the current DataVersionFilter has same path as others.
   @Override
   public boolean equals(Object object) {
