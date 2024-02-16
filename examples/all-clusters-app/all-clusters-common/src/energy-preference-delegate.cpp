@@ -79,7 +79,7 @@ EPrefDelegate::GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aInde
 {
     static EnergyPriorityEnum priorities[] = { EnergyPriorityEnum::kEfficiency, EnergyPriorityEnum::kComfort };
 
-    if (aIndex < (sizeof(priorities) / sizeof(priorities[0])))
+    if (aIndex < ArraySize(priorities))
     {
         priority = priorities[aIndex];
         return CHIP_NO_ERROR;
