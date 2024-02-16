@@ -20,11 +20,13 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRAttributeSpecifiedCheck.h"
+#import "MTRBaseClusters.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCluster.h"
 #import "MTRClusterConstants.h"
 #import "MTRCommandTimedCheck.h"
+#import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
@@ -143,6 +145,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @interface MTRDevice ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
+// protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
+// and protects device calls to setUTCTime and setDSTOffset
+@property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 @property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) MTRWeakReference<id<MTRDeviceDelegate>> * weakDelegate;
 @property (nonatomic) dispatch_queue_t delegateQueue;
@@ -190,6 +195,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @property (nonatomic) BOOL expirationCheckScheduled;
 
+@property (nonatomic) BOOL timeUpdateScheduled;
+
 @property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
 
 @property (nonatomic) NSMutableDictionary * temporaryMetaDataCache;
@@ -224,6 +231,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
+        _timeSyncLock = OS_UNFAIR_LOCK_INIT;
         _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
         _deviceController = controller;
@@ -247,6 +255,226 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     return [controller deviceForNodeID:nodeID];
+}
+
+#pragma mark - Time Synchronization
+
+- (void) _setTimeOnDevice
+{
+    NSDate * now = [NSDate date];
+    // If no date available, error
+    if(!now){
+        MTR_LOG_ERROR("%@ Could not retrieve current date. Unable to setUTCTime on endpoints.", self);
+        return;
+    }
+
+    NSTimeZone* localTimeZone = [NSTimeZone localTimeZone];
+    BOOL setDST = TRUE;
+    if(!localTimeZone){
+        MTR_LOG_ERROR("%@ Could not retrieve local time zone. Unable to setDSTOffset on endpoints.", self);
+        setDST = FALSE;
+    }
+
+    uint64_t matterEpochTimeMicroseconds = 0;
+    uint64_t nextDSTInMatterEpochTimeMicroseconds = 0;
+    if (!DateToMatterEpochMicroseconds(now, matterEpochTimeMicroseconds)){
+        MTR_LOG_ERROR("%@ Could not convert NSDate (%@) to Matter Epoch Time. Unable to setUTCTime on endpoints.", self, now);
+        return;
+    }
+
+    int32_t dstOffset = 0;
+    if(setDST){
+        NSTimeInterval dstOffsetAsInterval = [localTimeZone daylightSavingTimeOffsetForDate:now];
+        dstOffset = int32_t(dstOffsetAsInterval);
+
+        // Calculate time to next DST. This is needed when we set the current DST.
+        NSDate* nextDSTTransitionDate = [localTimeZone nextDaylightSavingTimeTransition];
+        if(!DateToMatterEpochMicroseconds(nextDSTTransitionDate, nextDSTInMatterEpochTimeMicroseconds)){
+            MTR_LOG_ERROR("%@ Could not convert NSDate (%@) to Matter Epoch Time. Unable to setDSTOffset on endpoints.", self, nextDSTTransitionDate);
+            setDST = FALSE;
+        }
+    }
+
+    // Set Time on each Endpoint with a Time Synchronization Cluster Server
+    NSArray<NSNumber*>* endpointsToSync = [self _endpointsWithTimeSyncClusterServer];
+    for(NSNumber* endpoint in endpointsToSync){
+        MTR_LOG_DEBUG("%@ Setting Time on Endpoint %@", self, endpoint);
+        [self _setUTCTime:matterEpochTimeMicroseconds withGranularity:MTRTimeSynchronizationGranularityMicrosecondsGranularity forEndpoint:endpoint];
+        if(setDST){
+            [self _setDSTOffset:dstOffset validStarting:0 validUntil:nextDSTInMatterEpochTimeMicroseconds forEndpoint:endpoint];
+        }
+    }
+}
+
+- (void)_scheduleNextUpdate:(UInt64)nextUpdateInSeconds{
+    MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (nextUpdateInSeconds * NSEC_PER_SEC)), self.queue, ^{
+        MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
+        MTRDevice * strongSelf = weakSelf.strongObject;
+        if(strongSelf){
+            [strongSelf _performScheduledTimeUpdate];
+        } else {
+            MTR_LOG_DEBUG("%@ MTRDevice no longer valid. No Timer Scheduled will be scheduled for a Device Time Update.", self);
+            return;
+        }
+    });
+    self.timeUpdateScheduled = YES;
+    MTR_LOG_DEBUG("%@ Timer Scheduled for next Device Time Update, in %llu seconds", self, nextUpdateInSeconds);
+}
+
+// Time Updates are a day apart (this can be changed in the future)
+#define MTR_DEVICE_TIME_UPDATE_DEFAULT_WAIT_TIME_SEC (24 * 60 * 60)
+// assume lock is held
+- (void)_updateDeviceTimeAndScheduleNextUpdate
+{
+    os_unfair_lock_assert_owner(&self->_timeSyncLock);
+    if(self.timeUpdateScheduled){
+        MTR_LOG_DEBUG("%@ Device Time Update already scheduled", self);
+        return;
+    }
+
+    [self _setTimeOnDevice];
+    [self _scheduleNextUpdate:MTR_DEVICE_TIME_UPDATE_DEFAULT_WAIT_TIME_SEC];
+}
+
+- (void)_performScheduledTimeUpdate
+{
+    os_unfair_lock_lock(&self->_timeSyncLock);
+    // Device needs to still be reachable
+    if(self.state != MTRDeviceStateReachable){
+        MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", self);
+        os_unfair_lock_unlock(&self->_timeSyncLock);
+        return;
+    }
+    // Device must not be invalidated
+    if(!self.timeUpdateScheduled){
+        MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
+        os_unfair_lock_unlock(&self->_timeSyncLock);
+        return;
+    }
+    self.timeUpdateScheduled = NO;
+    [self _updateDeviceTimeAndScheduleNextUpdate];
+    os_unfair_lock_unlock(&self->_timeSyncLock);
+}
+
+- (NSArray<NSNumber *>*) _endpointsWithTimeSyncClusterServer
+{
+     auto partsList = [self readAttributeWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID) params:nil];
+    NSMutableArray<NSNumber *>* endpointsOnDevice = [self arrayOfNumbersFromAttributeValue:partsList];
+    if(!endpointsOnDevice){
+        endpointsOnDevice = [[NSMutableArray<NSNumber*> alloc] init];
+    }
+    // Add Root node!
+    [endpointsOnDevice addObject:@(0)];
+
+    NSMutableArray<NSNumber*>* endpointsWithTimeSyncCluster = [[NSMutableArray<NSNumber*> alloc] init];
+    for(NSNumber * endpoint in endpointsOnDevice){
+        // Get list of server clusters on endpoint
+        auto clusterList =  [self readAttributeWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID) params:nil];
+        NSArray<NSNumber*>* clusterArray = [self arrayOfNumbersFromAttributeValue:clusterList];
+        
+        if(clusterArray && [clusterArray containsObject:@(MTRClusterIDTypeTimeSynchronizationID)]){
+            [endpointsWithTimeSyncCluster addObject:endpoint];
+        }
+    }
+    MTR_LOG_DEBUG("%@ Device has following endpoints with Time Sync Cluster Server: %@", self, endpointsWithTimeSyncCluster);
+    return endpointsWithTimeSyncCluster;
+
+}
+
+- (void) _setUTCTime:(UInt64)matterEpochTime withGranularity:(uint8_t)granularity forEndpoint:(NSNumber*)endpoint
+{
+    MTR_LOG_DEBUG(" %@ _setUTCTime with matterEpochTime: %llu, endpoint %@", self, matterEpochTime, endpoint);
+    MTRTimeSynchronizationClusterSetUTCTimeParams* params =[[MTRTimeSynchronizationClusterSetUTCTimeParams
+                                                             alloc] init];
+    params.utcTime = @(matterEpochTime);
+    params.granularity = @(granularity);
+    auto setUTCTimeResponseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        if(error){
+            MTR_LOG_ERROR("%@ _setUTCTime failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
+        }
+    };
+
+    [self _invokeKnownCommandWithEndpointID:endpoint
+                                         clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
+                                         commandID:@(MTRCommandIDTypeClusterTimeSynchronizationCommandSetUTCTimeID)
+                                    commandPayload:params
+                                    expectedValues:nil
+                             expectedValueInterval:nil
+                                timedInvokeTimeout:nil
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.queue
+                                        completion:setUTCTimeResponseHandler];
+    
+}
+
+- (void) _setDSTOffset:(int32_t)dstOffset validStarting:(uint64_t)validStarting validUntil:(uint64_t)validUntil forEndpoint:(NSNumber*)endpoint
+{
+    MTR_LOG_DEBUG("%@ _setDSTOffset with offset: %d, validStarting: %llu, validUntil: %llu, endpoint %@",
+                 self,
+                 dstOffset, validStarting, validUntil, endpoint);
+    
+    MTRTimeSynchronizationClusterSetDSTOffsetParams* params =[[MTRTimeSynchronizationClusterSetDSTOffsetParams
+                                                             alloc] init];
+    MTRTimeSynchronizationClusterDSTOffsetStruct* dstOffsetStruct = [[MTRTimeSynchronizationClusterDSTOffsetStruct alloc] init];
+    dstOffsetStruct.offset = @(dstOffset);
+    dstOffsetStruct.validStarting = @(validStarting);
+    dstOffsetStruct.validUntil = @(validUntil);
+    params.dstOffset =  @[dstOffsetStruct];
+
+    auto setDSTOffsetResponseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        if(error){
+            MTR_LOG_ERROR("%@ _setDSTOffset failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
+        }
+    };
+
+    [self _invokeKnownCommandWithEndpointID:endpoint
+                                         clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
+                                         commandID:@(MTRCommandIDTypeClusterTimeSynchronizationCommandSetDSTOffsetID)
+                                    commandPayload:params
+                                    expectedValues:nil
+                             expectedValueInterval:nil
+                                timedInvokeTimeout:nil
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.queue
+                                        completion:setDSTOffsetResponseHandler];
+}
+
+- (NSMutableArray<NSNumber*>*) arrayOfNumbersFromAttributeValue:(NSDictionary*)dataDictionary{
+    if (![MTRArrayValueType isEqual:dataDictionary[MTRTypeKey]]) {
+          return nil;
+      }
+
+      id value = dataDictionary[MTRValueKey];
+      if (![value isKindOfClass:NSArray.class]) {
+          return nil;
+      }
+
+      NSArray * valueArray = value;
+    __auto_type outputArray = [NSMutableArray<NSNumber*> arrayWithCapacity:valueArray.count];
+
+      for (id item in valueArray) {
+          if (![item isKindOfClass:NSDictionary.class]) {
+              return nil;
+          }
+
+          NSDictionary * itemDictionary = item;
+          id data = itemDictionary[MTRDataKey];
+          if (![data isKindOfClass:NSDictionary.class]) {
+              return nil;
+          }
+
+          NSDictionary * dataDictionary = data;
+          id dataType = dataDictionary[MTRTypeKey];
+          id dataValue = dataDictionary[MTRValueKey];
+          if (![dataType isKindOfClass:NSString.class] || ![dataValue isKindOfClass:NSNumber.class]) {
+              return nil;
+          }
+          [outputArray addObject:dataValue];
+      }
+    return outputArray;
 }
 
 #pragma mark Subscription and delegate handling
@@ -286,6 +514,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTR_LOG_INFO("%@ invalidate", self);
 
     [_asyncWorkQueue invalidate];
+
+    os_unfair_lock_lock(&self->_timeSyncLock);
+    _timeUpdateScheduled = NO;
+    os_unfair_lock_unlock(&self->_timeSyncLock);
 
     os_unfair_lock_lock(&self->_lock);
 
@@ -370,6 +602,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 }
 
+// First Time Sync happens 2 minutes after reachability (this can be changed in the future)
+#define MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC (60 * 2)
 - (void)_handleSubscriptionEstablished
 {
     os_unfair_lock_lock(&self->_lock);
@@ -380,6 +614,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _changeState:MTRDeviceStateReachable];
 
     os_unfair_lock_unlock(&self->_lock);
+
+    os_unfair_lock_lock(&self->_timeSyncLock);
+
+    if(!self.timeUpdateScheduled){
+        [self _scheduleNextUpdate:MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC];
+    }
+
+    os_unfair_lock_unlock(&self->_timeSyncLock);
 }
 
 - (void)_handleSubscriptionError:(NSError *)error
