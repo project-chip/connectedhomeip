@@ -123,12 +123,12 @@ private:
     BluezGattService1 * mpService = nullptr;
 
     BluezGattCharacteristic1 * mpC1 = nullptr;
-    IOChannel mC1Channel            = { 0 };
+    IOChannel mC1Channel            = {};
     BluezGattCharacteristic1 * mpC2 = nullptr;
-    IOChannel mC2Channel            = { 0 };
+    IOChannel mC2Channel            = {};
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     BluezGattCharacteristic1 * mpC3 = nullptr;
-    IOChannel mC3Channel            = { 0 };
+    IOChannel mC3Channel            = {};
 #endif
 };
 

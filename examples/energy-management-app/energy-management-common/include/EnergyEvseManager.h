@@ -26,8 +26,8 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace EnergyEvse {
 
-using namespace chip::app::Clusters::EnergyEvse;
 class EnergyEvseManager : public Instance
 {
 public:
@@ -46,12 +46,15 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
+    CHIP_ERROR LoadPersistentAttributes();
+
     EnergyEvseDelegate * GetDelegate() { return mDelegate; };
 
 private:
     EnergyEvseDelegate * mDelegate;
 };
 
+} // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip

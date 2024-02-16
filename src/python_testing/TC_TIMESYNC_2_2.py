@@ -29,6 +29,9 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    def pics_TC_TIMESYNC_2_2(self) -> list[str]:
+        return ["TIMESYNC.S"]
+
     @async_test_body
     async def test_TC_TIMESYNC_2_2(self):
 
@@ -43,9 +46,10 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
         self.print_step(2, "Read UTCTime attribute")
         utc_dut_initial = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
         th_utc = utc_time_in_matter_epoch()
+
+        code = 0
         try:
             await self.send_single_cmd(cmd=time_cluster.Commands.SetUTCTime(UTCTime=th_utc, granularity=time_cluster.Enums.GranularityEnum.kMillisecondsGranularity), endpoint=endpoint)
-            code = 0
         except InteractionModelError as e:
             # The python layer discards the cluster specific portion of the status IB, so for now we just expect a generic FAILURE error
             # see #26521

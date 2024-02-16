@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads CurrentHue attribute from DUT"
+    - label: "Step 2: TH reads from the DUT the (0x0000) CurrentHue attribute"
       PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -41,7 +41,9 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Step 3: TH reads CurrentSaturation attribute from DUT"
+    - label:
+          "Step 3: TH reads from the DUT the (0x0001) CurrentSaturation
+          attribute"
       PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -51,7 +53,8 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Step 4: TH reads RemainingTime attribute from DUT"
+    - label:
+          "Step 4: TH reads from the DUT the (0x0002) RemainingTime attribute"
       PICS: CC.S.A0002
       command: "readAttribute"
       attribute: "RemainingTime"
@@ -61,7 +64,7 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "Step 5: TH reads CurrentX attribute from DUT"
+    - label: "Step 5: TH reads from the DUT the (0x0003) CurrentX attribute"
       PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
@@ -71,7 +74,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 6: TH reads CurrentY attribute from DUT"
+    - label: "Step 6: TH reads from the DUT the (0x0004) CurrentY attribute"
       PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
@@ -81,7 +84,9 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 7: TH reads DriftCompensation attribute from DUT"
+    - label:
+          "Step 7: TH reads from the DUT the (0x0005) DriftCompensation
+          attribute"
       PICS: CC.S.A0005
       command: "readAttribute"
       attribute: "DriftCompensation"
@@ -91,7 +96,8 @@ tests:
               minValue: 0
               maxValue: 4
 
-    - label: "Step 8: TH reads CompensationText attribute from DUT"
+    - label:
+          "Step 8: TH reads from the DUT the (0x0006) CompensationText attribute"
       PICS: CC.S.A0006
       command: "readAttribute"
       attribute: "CompensationText"
@@ -100,7 +106,9 @@ tests:
               type: char_string
               maxLength: 254
 
-    - label: "Step 9: TH reads ColorTemperatureMireds attribute from DUT"
+    - label:
+          "Step 9: TH reads from the DUT the (0x0007) ColorTemperatureMireds
+          attribute"
       PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -110,7 +118,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 10: TH reads ColorMode attribute from DUT"
+    - label: "Step 10: TH reads from the DUT the (0x0008) ColorMode attribute"
       PICS: CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
@@ -120,7 +128,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "Step 11: TH reads Options attribute from DUT"
+    - label: "Step 11: TH reads from the DUT the (0x000f) Options attribute"
       PICS: CC.S.A000f
       command: "readAttribute"
       attribute: "Options"
@@ -130,7 +138,9 @@ tests:
               minValue: 0
               maxValue: 4
 
-    - label: "Step 12: TH reads EnhancedCurrentHue attribute from DUT"
+    - label:
+          "Step 12: TH reads from the DUT the (0x4000) EnhancedCurrentHue
+          attribute"
       PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
@@ -140,7 +150,9 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 13: TH reads EnhancedColorMode attribute from DUT"
+    - label:
+          "Step 13: TH reads from the DUT the (0x4001) EnhancedColorMode
+          attribute"
       PICS: CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"
@@ -150,7 +162,8 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "Step 14: TH reads ColorLoopActive attribute from DUT"
+    - label:
+          "Step 14:TH reads from the DUT the (0x4002) ColorLoopActive attribute"
       PICS: CC.S.A4002
       command: "readAttribute"
       attribute: "ColorLoopActive"
@@ -160,7 +173,9 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Step 15: TH reads ColorLoopDirection attribute from DUT"
+    - label:
+          "Step 15: TH reads from the DUT the (0x4003) ColorLoopDirection
+          attribute"
       PICS: CC.S.A4003
       command: "readAttribute"
       attribute: "ColorLoopDirection"
@@ -170,7 +185,8 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Step 16: TH reads ColorLoopTime attribute from DUT"
+    - label:
+          "Step 16: TH reads from the DUT the (0x4004) ColorLoopTime attribute"
       PICS: CC.S.A4004
       command: "readAttribute"
       attribute: "ColorLoopTime"
@@ -180,7 +196,9 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 17: TH reads ColorLoopStartEnhancedHue attribute from DUT"
+    - label:
+          "Step 17: TH reads from the DUT the (0x4005) ColorLoopStartEnhancedHue
+          attribute"
       PICS: CC.S.A4005
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
@@ -190,7 +208,9 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 18: TH reads ColorLoopStoredEnhancedHue attribute from DUT"
+    - label:
+          "Step 18: TH reads from the DUT the (0x4006)
+          ColorLoopStoredEnhancedHue attributeT"
       PICS: CC.S.A4006
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
@@ -208,7 +228,9 @@ tests:
       response:
           saveAs: FeatureMapValue
 
-    - label: "Step 19: TH reads ColorCapabilities attribute from DUT"
+    - label:
+          "Step 19: TH reads from the DUT the (0x400a) ColorCapabilities
+          attribute"
       PICS: CC.S.A400a
       command: "readAttribute"
       attribute: "ColorCapabilities"
@@ -219,7 +241,9 @@ tests:
               minValue: 0
               maxValue: 31
 
-    - label: "Step 20: TH reads ColorTempPhysicalMinMireds attribute from DUT"
+    - label:
+          "Step 20: TH reads from the DUT the (0x400b)
+          ColorTempPhysicalMinMireds attribute"
       PICS: CC.S.A400b
       command: "readAttribute"
       attribute: "ColorTempPhysicalMinMireds"
@@ -229,7 +253,9 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 21: TH reads ColorTempPhysicalMaxMireds attribute from DUT"
+    - label:
+          "Step 21: TH reads from the DUT the (0x400c)
+          ColorTempPhysicalMaxMireds attribute"
       PICS: CC.S.A400c
       command: "readAttribute"
       attribute: "ColorTempPhysicalMaxMireds"
@@ -240,7 +266,8 @@ tests:
               maxValue: 65279
 
     - label:
-          "Step 22: TH reads CoupleColorTempToLevelMinMireds attribute from DUT"
+          "Step 22: TH reads from the DUT the (0x400d)
+          CoupleColorTempToLevelMinMireds attribute"
       PICS: CC.S.A400d
       command: "readAttribute"
       attribute: "CoupleColorTempToLevelMinMireds"
@@ -251,7 +278,8 @@ tests:
               maxValue: 65279
 
     - label:
-          "Step 23: TH reads StartUpColorTemperatureMireds attribute from DUT"
+          "Step 23: TH reads from the DUT the (0x4010)
+          StartUpColorTemperatureMireds attribute"
       PICS: CC.S.A4010
       command: "readAttribute"
       attribute: "StartUpColorTemperatureMireds"
@@ -262,7 +290,9 @@ tests:
               maxValue: 65279
 
     #Defined Primaries Information Attribute Set
-    - label: "Step 24: TH reads NumberOfPrimaries attribute from DUT"
+    - label:
+          "Step 24: TH reads from the DUT the (0x0010) NumberOfPrimaries
+          attribute"
       PICS: CC.S.A0010
       command: "readAttribute"
       attribute: "NumberOfPrimaries"
@@ -671,7 +701,7 @@ tests:
                 value: "y"
 
     #Defined Color Points Settings Attribute Set
-    - label: "Step 43: TH reads WhitePointX attribute from DUT"
+    - label: "Step 43: TH reads from the DUT the (0x0030) WhitePointX attribute"
       PICS: CC.S.A0030
       command: "readAttribute"
       attribute: "WhitePointX"
@@ -681,7 +711,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 44: TH reads WhitePointY attribute from DUT"
+    - label: "Step 44: TH reads from the DUT the (0x0031) WhitePointY attribute"
       PICS: CC.S.A0031
       command: "readAttribute"
       attribute: "WhitePointY"
@@ -691,7 +721,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 45: TH reads ColorPointRX attribute from DUT"
+    - label:
+          "Step 45: TH reads from the DUT the (0x0032) ColorPointRX attribute"
       PICS: CC.S.A0032
       command: "readAttribute"
       attribute: "ColorPointRX"
@@ -701,7 +732,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 46: TH reads ColorPointRY attribute from DUT"
+    - label:
+          "Step 46: TH reads from the DUT the (0x0033) ColorPointRY attribute"
       PICS: CC.S.A0033
       command: "readAttribute"
       attribute: "ColorPointRY"
@@ -711,7 +743,9 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 47: TH reads ColorPointRIntensity attribute from DUT"
+    - label:
+          "Step 47: TH reads from the DUT the (0x0034) ColorPointRIntensity
+          attribute"
       PICS: CC.S.A0034
       command: "readAttribute"
       attribute: "ColorPointRIntensity"
@@ -721,7 +755,8 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Step 48: TH reads ColorPointGX attribute from DUT"
+    - label:
+          "Step 48: TH reads from the DUT the (0x0036) ColorPointGX attribute"
       PICS: CC.S.A0036
       command: "readAttribute"
       attribute: "ColorPointGX"
@@ -731,7 +766,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 49: TH reads ColorPointGY attribute from DUT"
+    - label:
+          "Step 49: TH reads from the DUT the (0x0037) ColorPointGY attribute"
       PICS: CC.S.A0037
       command: "readAttribute"
       attribute: "ColorPointGY"
@@ -741,7 +777,9 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 50: TH reads ColorPointGIntensity attribute from DUT"
+    - label:
+          "Step 50: TH reads from the DUT the (0x0038) ColorPointGIntensity
+          attribute"
       PICS: CC.S.A0038
       command: "readAttribute"
       attribute: "ColorPointGIntensity"
@@ -751,7 +789,8 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Step 51: TH reads ColorPointBX attribute from DUT"
+    - label:
+          "Step 51: TH reads from the DUT the (0x003a) ColorPointBX attribute"
       PICS: CC.S.A003a
       command: "readAttribute"
       attribute: "ColorPointBX"
@@ -761,7 +800,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 52: TH reads ColorPointBY attribute from DUT"
+    - label:
+          "Step 52: TH reads from the DUT the (0x003b) ColorPointBY attribute"
       PICS: CC.S.A003b
       command: "readAttribute"
       attribute: "ColorPointBY"
@@ -771,7 +811,9 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step 53: TH reads ColorPointBIntensity attribute from DUT"
+    - label:
+          "Step 53: TH reads from the DUT the (0x003c) ColorPointBIntensity
+          attribute"
       PICS: CC.S.A003c
       command: "readAttribute"
       attribute: "ColorPointBIntensity"

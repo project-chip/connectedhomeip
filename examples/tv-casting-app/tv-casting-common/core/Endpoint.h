@@ -46,6 +46,7 @@ public:
 };
 
 class CastingPlayer;
+class BaseCluster;
 
 /**
  * @brief An Endpoint on a CastingPlayer e.g. a Speaker or a Matter Content App
@@ -111,6 +112,8 @@ public:
         }
         return serverList;
     }
+
+    void RegisterClusters(std::vector<chip::ClusterId> clusters);
 
     /**
      * @brief Registers a cluster of type T against the passed in clusterId

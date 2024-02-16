@@ -76,7 +76,12 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
             [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                 ChipLogError(AppServer, "ChipDeviceEventHandler::Handle: Connection to CastingPlayer failed");
                 CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-                support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
+                CHIP_ERROR err = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "CastingStore::Delete() failed. Err: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+
                 VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
                 CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
                 CastingPlayer::mTargetCastingPlayer = nullptr;
@@ -151,7 +156,7 @@ void ChipDeviceEventHandler::HandleBindingsChangedViaCluster(const chip::DeviceL
                             " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                             binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                             binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-            if (binding.type == EMBER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
+            if (binding.type == MATTER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
             {
                 ChipLogProgress(AppServer,
                                 "ChipDeviceEventHandler::HandleBindingsChangedViaCluster Matched accessingFabricIndex with "
@@ -185,6 +190,17 @@ void ChipDeviceEventHandler::HandleCommissioningComplete(const chip::DeviceLayer
     targetNodeId         = event->CommissioningComplete.nodeId;
     targetFabricIndex    = event->CommissioningComplete.fabricIndex;
     runPostCommissioning = true;
+}
+
+CHIP_ERROR ChipDeviceEventHandler::SetUdcStatus(bool udcInProgress)
+{
+    if (sUdcInProgress == udcInProgress)
+    {
+        ChipLogError(AppServer, "UDC in progress state is already %d", sUdcInProgress);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    sUdcInProgress = udcInProgress;
+    return CHIP_NO_ERROR;
 }
 
 }; // namespace support

@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: Reads the VendorName attribute"
+    - label: "Step 1: TH reads the VendorName attribute from the DUT"
       PICS: APBSC.S.A0000
       command: "readAttribute"
       attribute: "VendorName"
@@ -40,7 +40,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "Step 2: Reads the VendorID attribute"
+    - label: "Step 2: TH reads the VendorID attribute from the DUT"
       PICS: APBSC.S.A0001
       command: "readAttribute"
       attribute: "VendorID"
@@ -48,7 +48,7 @@ tests:
           constraints:
               type: vendor_id
 
-    - label: "Step 3: Reads the ApplicationName attribute"
+    - label: "Step 3: TH reads the ApplicationName attribute from the DUT"
       PICS: APBSC.S.A0002
       command: "readAttribute"
       attribute: "ApplicationName"
@@ -57,7 +57,7 @@ tests:
               type: long_char_string
               maxLength: 256
 
-    - label: "Step 4: Reads the ProductID attribute"
+    - label: "Step 4: TH reads the ProductID attribute from the DUT"
       PICS: APBSC.S.A0003
       command: "readAttribute"
       attribute: "ProductID"
@@ -67,7 +67,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 5: Reads the Application attribute"
+    - label: "Step 5: TH reads the Application attribute from the DUT"
       PICS: APBSC.S.A0004
       command: "readAttribute"
       attribute: "Application"
@@ -75,7 +75,7 @@ tests:
           constraints:
               type: ApplicationStruct
 
-    - label: "Step 6: Reads the Status attribute"
+    - label: "Step 6: TH reads the Status attribute from the DUT"
       PICS: APBSC.S.A0005
       command: "readAttribute"
       attribute: "Status"
@@ -84,7 +84,7 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "Step 7: Reads the ApplicationVersion attribute"
+    - label: "Step 7: TH reads the ApplicationVersion attribute from the DUT"
       PICS: APBSC.S.A0006
       command: "readAttribute"
       attribute: "ApplicationVersion"
@@ -93,7 +93,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "Step 8: Reads the AllowedVendorList attribute"
+    - label: "Step 8: TH reads the AllowedVendorList attribute from the DUT"
       PICS: APBSC.S.A0007
       command: "readAttribute"
       attribute: "AllowedVendorList"

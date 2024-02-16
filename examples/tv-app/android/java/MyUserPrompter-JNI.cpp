@@ -29,8 +29,8 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for JNIMyUserPrompter"));
 
-    mJNIMyUserPrompterObject = env->NewGlobalRef(provider);
-    VerifyOrReturn(mJNIMyUserPrompterObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef JNIMyUserPrompter"));
+    VerifyOrReturn(mJNIMyUserPrompterObject.Init(provider) == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Failed to init mJNIMyUserPrompterObject"));
 
     jclass JNIMyUserPrompterClass = env->GetObjectClass(provider);
     VerifyOrReturn(JNIMyUserPrompterClass != nullptr, ChipLogError(Zcl, "Failed to get JNIMyUserPrompter Java class"));
@@ -82,15 +82,15 @@ void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint1
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
 
-    VerifyOrExit(mJNIMyUserPrompterObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptForCommissionOKPermissionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         env->ExceptionClear();
-        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptForCommissionOKPermissionMethod, static_cast<jint>(vendorId),
-                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
+        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptForCommissionOKPermissionMethod,
+                            static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in PromptForCommissionOKPermission");
@@ -116,20 +116,21 @@ exit:
  * If user responds with Cancel then implementor calls UserPrompterResolver.OnPinCodeDeclined();
  *
  */
-void JNIMyUserPrompter::PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
+void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                                    uint16_t pairingHint, const char * pairingInstruction)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
 
-    VerifyOrExit(mJNIMyUserPrompterObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptForCommissionPincodeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         env->ExceptionClear();
-        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId),
+        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId),
                             static_cast<jint>(productId), jniCommissioneeName.jniValue());
         if (env->ExceptionCheck())
         {
@@ -148,6 +149,50 @@ exit:
     }
 }
 
+/**
+ *   Called to when CancelCommissioning is received via UDC.
+ * Indicates that commissioner can stop showing the passcode entry or display dialog.
+ * For example, can show text such as "Commissioning cancelled by client" before hiding dialog.
+ */
+void JNIMyUserPrompter::HidePromptsOnCancel(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
+{
+    // TODO
+    ChipLogError(Zcl, "JNIMyUserPrompter::HidePromptsOnCancel Needs Implementation");
+}
+
+/**
+ *   Return true if this UserPrompter displays QR code along with passcode
+ * When PromptWithCommissionerPasscode is called during Commissioner Passcode functionality.
+ */
+bool JNIMyUserPrompter::DisplaysPasscodeAndQRCode()
+{
+    // TODO
+    ChipLogError(Zcl, "JNIMyUserPrompter::DisplaysPasscodeAndQRCode Needs Implementation");
+    return false;
+}
+
+/**
+ *   Called to display the given setup passcode to the user,
+ * for commissioning the given commissioneeName with the given vendorId and productId,
+ * and provide instructions for where to enter it in the commissionee (when pairingHint and pairingInstruction are provided).
+ * For example "Casting Passcode: [passcode]. For more instructions, click here."
+ */
+void JNIMyUserPrompter::PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                                       uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction)
+{
+    // TODO
+    ChipLogError(Zcl, "JNIMyUserPrompter::PromptWithCommissionerPasscode Needs Implementation");
+}
+
+/**
+ *   Called to alert the user that commissioning has begun."
+ */
+void JNIMyUserPrompter::PromptCommissioningStarted(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
+{
+    // TODO
+    ChipLogError(Zcl, "JNIMyUserPrompter::PromptCommissioningStarted Needs Implementation");
+}
+
 /*
  *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
  */
@@ -157,14 +202,14 @@ void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
 
-    VerifyOrExit(mJNIMyUserPrompterObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptCommissioningSucceededMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         env->ExceptionClear();
-        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptCommissioningSucceededMethod, static_cast<jint>(vendorId),
+        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningSucceededMethod, static_cast<jint>(vendorId),
                             static_cast<jint>(productId), jniCommissioneeName.jniValue());
 
         if (env->ExceptionCheck())
@@ -193,7 +238,7 @@ void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName,
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
 
-    VerifyOrExit(mJNIMyUserPrompterObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptCommissioningFailedMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -202,7 +247,7 @@ void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName,
         UtfString jniCommissioneeName(env, stringCommissioneeName.data());
         UtfString jniCommissioneeError(env, stringError.data());
         env->ExceptionClear();
-        env->CallVoidMethod(mJNIMyUserPrompterObject, mPromptCommissioningFailedMethod, jniCommissioneeName.jniValue(),
+        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningFailedMethod, jniCommissioneeName.jniValue(),
                             jniCommissioneeError.jniValue());
 
         if (env->ExceptionCheck())

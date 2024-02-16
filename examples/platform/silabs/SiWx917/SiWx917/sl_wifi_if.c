@@ -41,6 +41,16 @@
 
 #include "ble_config.h"
 
+#if SL_ICD_ENABLED && SIWX_917
+#include "rsi_rom_power_save.h"
+#include "sl_si91x_button_pin_config.h"
+#include "sl_si91x_m4_ps.h"
+
+// TODO: should be removed once we are getting the press interrupt for button 0 with sleep
+#define BUTTON_PRESSED 1
+bool btn0_pressed = false;
+#endif // SL_ICD_ENABLED && SIWX_917
+
 #include "dhcp_client.h"
 #include "sl_wifi.h"
 #include "wfx_host_events.h"
@@ -51,6 +61,11 @@
 #define ADV_PASSIVE_SCAN_DURATION 20
 #define ADV_MULTIPROBE 1
 #define ADV_SCAN_PERIODICITY 10
+
+#ifdef SIWX_917
+#include "sl_si91x_trng.h"
+#define TRNGKEY_SIZE 4
+#endif // SIWX_917
 
 struct wfx_rsi wfx_rsi;
 
@@ -198,6 +213,44 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 }
 
 #if SL_ICD_ENABLED
+
+#if SIWX_917
+/******************************************************************
+ * @fn   sl_wfx_host_si91x_sleep_wakeup()
+ * @brief
+ *       M4 going to sleep
+ *
+ * @param[in] None
+ * @return
+ *        None
+ *********************************************************************/
+void sl_wfx_host_si91x_sleep_wakeup()
+{
+    if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY)
+    {
+        // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
+        if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
+        {
+            sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
+            btn0_pressed = true;
+        }
+        if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
+        {
+#ifdef DISPLAY_ENABLED
+            // if LCD is enabled, power down the lcd before setting the M4 to sleep
+            sl_si91x_hardware_setup();
+#endif
+            btn0_pressed = false;
+            /* Configure RAM Usage and Retention Size */
+            sl_si91x_m4_sleep_wakeup();
+#if SILABS_LOG_ENABLED
+            silabsInitLog();
+#endif
+        }
+    }
+}
+#endif /* SIWX_917 */
+
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -217,14 +270,14 @@ int32_t wfx_rsi_power_save()
         return status;
     }
 
-    sl_wifi_performance_profile_t wifi_profile = { ASSOCIATED_POWER_SAVE };
+    sl_wifi_performance_profile_t wifi_profile = { .profile = ASSOCIATED_POWER_SAVE };
     status                                     = sl_wifi_set_performance_profile(&wifi_profile);
     if (status != RSI_SUCCESS)
     {
         SILABS_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
         return status;
     }
-    SILABS_LOG("Powersave Config Success");
+    wfx_rsi.dev_state |= WFX_RSI_ST_SLEEP_READY;
     return status;
 }
 #endif /* SL_ICD_ENABLED */
@@ -283,7 +336,17 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("wfx_rsi_init failed %x", status);
         return status;
     }
-#endif
+#else // For SoC
+#if SL_ICD_ENABLED
+    uint8_t xtal_enable = 1;
+    status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
+    if (status != SL_STATUS_OK)
+    {
+        SILABS_LOG("Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
+        return status;
+    }
+#endif /* SL_ICD_ENABLED */
+#endif /* SLI_SI91X_MCU_INTERFACE */
 
     sl_wifi_firmware_version_t version = { 0 };
     status                             = sl_wifi_get_firmware_version(&version);
@@ -301,6 +364,25 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("sl_wifi_get_mac_address failed: %x", status);
         return status;
     }
+#ifdef SIWX_917
+    const uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
+
+    // To check the Entropy of TRNG and verify TRNG functioning.
+    status = sl_si91x_trng_entropy();
+    if (status != SL_STATUS_OK)
+    {
+        SILABS_LOG("TRNG Entropy Failed");
+        return status;
+    }
+
+    // Initiate and program the key required for TRNG hardware engine
+    status = sl_si91x_trng_program_key(trngKey, TRNGKEY_SIZE);
+    if (status != SL_STATUS_OK)
+    {
+        SILABS_LOG("TRNG Key Programming Failed");
+        return status;
+    }
+#endif // SIWX_917
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
@@ -499,6 +581,10 @@ static sl_status_t wfx_rsi_do_join(void)
         wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
 
         sl_wifi_set_join_callback(join_callback_handler, NULL);
+
+        // Setting the listen interval to 0 which will set it to DTIM interval
+        sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0 };
+        status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
 
         /* Try to connect Wifi with given Credentials
          * untill there is a success or maximum number of tries allowed

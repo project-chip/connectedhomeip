@@ -195,186 +195,6 @@ class ChipClusters:
             },
         },
     }
-    _SCENES_CLUSTER_INFO = {
-        "clusterName": "Scenes",
-        "clusterId": 0x00000005,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "AddScene",
-                "args": {
-                    "groupID": "int",
-                    "sceneID": "int",
-                    "transitionTime": "int",
-                    "sceneName": "str",
-                    "extensionFieldSets": "ExtensionFieldSet",
-                },
-            },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ViewScene",
-                "args": {
-                    "groupID": "int",
-                    "sceneID": "int",
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "RemoveScene",
-                "args": {
-                    "groupID": "int",
-                    "sceneID": "int",
-                },
-            },
-            0x00000003: {
-                "commandId": 0x00000003,
-                "commandName": "RemoveAllScenes",
-                "args": {
-                    "groupID": "int",
-                },
-            },
-            0x00000004: {
-                "commandId": 0x00000004,
-                "commandName": "StoreScene",
-                "args": {
-                    "groupID": "int",
-                    "sceneID": "int",
-                },
-            },
-            0x00000005: {
-                "commandId": 0x00000005,
-                "commandName": "RecallScene",
-                "args": {
-                    "groupID": "int",
-                    "sceneID": "int",
-                    "transitionTime": "int",
-                },
-            },
-            0x00000006: {
-                "commandId": 0x00000006,
-                "commandName": "GetSceneMembership",
-                "args": {
-                    "groupID": "int",
-                },
-            },
-            0x00000040: {
-                "commandId": 0x00000040,
-                "commandName": "EnhancedAddScene",
-                "args": {
-                    "groupID": "int",
-                    "sceneID": "int",
-                    "transitionTime": "int",
-                    "sceneName": "str",
-                    "extensionFieldSets": "ExtensionFieldSet",
-                },
-            },
-            0x00000041: {
-                "commandId": 0x00000041,
-                "commandName": "EnhancedViewScene",
-                "args": {
-                    "groupID": "int",
-                    "sceneID": "int",
-                },
-            },
-            0x00000042: {
-                "commandId": 0x00000042,
-                "commandName": "CopyScene",
-                "args": {
-                    "mode": "int",
-                    "groupIdentifierFrom": "int",
-                    "sceneIdentifierFrom": "int",
-                    "groupIdentifierTo": "int",
-                    "sceneIdentifierTo": "int",
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "SceneCount",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "CurrentScene",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "CurrentGroup",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "SceneValid",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "NameSupport",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "LastConfiguredBy",
-                "attributeId": 0x00000005,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "SceneTableSize",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
-                "attributeName": "FabricSceneInfo",
-                "attributeId": 0x00000007,
-                "type": "",
-                "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
     _ON_OFF_CLUSTER_INFO = {
         "clusterName": "OnOff",
         "clusterId": 0x00000006,
@@ -2426,6 +2246,15 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "PayloadTestRequest",
+                "args": {
+                    "enableKey": "bytes",
+                    "value": "int",
+                    "count": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4301,6 +4130,12 @@ class ChipClusters:
                 "type": "str",
                 "reportable": True,
             },
+            0x00000008: {
+                "attributeName": "OperatingMode",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5004,13 +4839,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
-            0x00000003: {
-                "attributeName": "OnMode",
-                "attributeId": 0x00000003,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5073,13 +4901,6 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "OnMode",
-                "attributeId": 0x00000003,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -5674,6 +5495,8 @@ class ChipClusters:
                     "cookMode": "int",
                     "cookTime": "int",
                     "powerSetting": "int",
+                    "wattSettingIndex": "int",
+                    "startAfterSetting": "bool",
                 },
             },
             0x00000001: {
@@ -5685,8 +5508,14 @@ class ChipClusters:
             },
         },
         "attributes": {
-            0x00000001: {
+            0x00000000: {
                 "attributeName": "CookTime",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "MaxCookTime",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
@@ -5712,6 +5541,24 @@ class ChipClusters:
             0x00000005: {
                 "attributeName": "PowerStep",
                 "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "SupportedWatts",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "SelectedWattIndex",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "WattRating",
+                "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
             },
@@ -5867,21 +5714,15 @@ class ChipClusters:
                 "args": {
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "Stop",
-                "args": {
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "Start",
-                "args": {
-                },
-            },
             0x00000003: {
                 "commandId": 0x00000003,
                 "commandName": "Resume",
+                "args": {
+                },
+            },
+            0x00000080: {
+                "commandId": 0x00000080,
+                "commandName": "GoHome",
                 "args": {
                 },
             },
@@ -5920,6 +5761,137 @@ class ChipClusters:
             0x00000005: {
                 "attributeName": "OperationalError",
                 "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _SCENES_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "ScenesManagement",
+        "clusterId": 0x00000062,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "AddScene",
+                "args": {
+                    "groupID": "int",
+                    "sceneID": "int",
+                    "transitionTime": "int",
+                    "sceneName": "str",
+                    "extensionFieldSets": "ExtensionFieldSet",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "ViewScene",
+                "args": {
+                    "groupID": "int",
+                    "sceneID": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "RemoveScene",
+                "args": {
+                    "groupID": "int",
+                    "sceneID": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "RemoveAllScenes",
+                "args": {
+                    "groupID": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "StoreScene",
+                "args": {
+                    "groupID": "int",
+                    "sceneID": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "RecallScene",
+                "args": {
+                    "groupID": "int",
+                    "sceneID": "int",
+                    "transitionTime": "int",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "GetSceneMembership",
+                "args": {
+                    "groupID": "int",
+                },
+            },
+            0x00000040: {
+                "commandId": 0x00000040,
+                "commandName": "CopyScene",
+                "args": {
+                    "mode": "int",
+                    "groupIdentifierFrom": "int",
+                    "sceneIdentifierFrom": "int",
+                    "groupIdentifierTo": "int",
+                    "sceneIdentifierTo": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "LastConfiguredBy",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SceneTableSize",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "FabricSceneInfo",
+                "attributeId": 0x00000002,
                 "type": "",
                 "reportable": True,
             },
@@ -6324,6 +6296,170 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000000A: {
+                "attributeName": "LevelStep",
+                "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "ElectricalPowerMeasurement",
+        "clusterId": 0x00000090,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "PowerMode",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "NumberOfMeasurementTypes",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "Accuracy",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "Ranges",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "Voltage",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "ActiveCurrent",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "ReactiveCurrent",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "ApparentCurrent",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "ActivePower",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "ReactivePower",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "ApparentPower",
+                "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "RMSVoltage",
+                "attributeId": 0x0000000B,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000C: {
+                "attributeName": "RMSCurrent",
+                "attributeId": 0x0000000C,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000D: {
+                "attributeName": "RMSPower",
+                "attributeId": 0x0000000D,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000E: {
+                "attributeName": "Frequency",
+                "attributeId": 0x0000000E,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000F: {
+                "attributeName": "HarmonicCurrents",
+                "attributeId": 0x0000000F,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000010: {
+                "attributeName": "HarmonicPhases",
+                "attributeId": 0x00000010,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000011: {
+                "attributeName": "PowerFactor",
+                "attributeId": 0x00000011,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000012: {
+                "attributeName": "NeutralCurrent",
+                "attributeId": 0x00000012,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -6395,6 +6531,12 @@ class ChipClusters:
             0x00000004: {
                 "attributeName": "PeriodicEnergyExported",
                 "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "CumulativeEnergyReset",
+                "attributeId": 0x00000005,
                 "type": "",
                 "reportable": True,
             },
@@ -6565,6 +6707,82 @@ class ChipClusters:
             },
         },
     }
+    _MESSAGES_CLUSTER_INFO = {
+        "clusterName": "Messages",
+        "clusterId": 0x00000097,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "PresentMessagesRequest",
+                "args": {
+                    "messageID": "bytes",
+                    "priority": "int",
+                    "messageControl": "int",
+                    "startTime": "int",
+                    "duration": "int",
+                    "messageText": "str",
+                    "responses": "MessageResponseOptionStruct",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "CancelMessagesRequest",
+                "args": {
+                    "messageIDs": "bytes",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Messages",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "ActiveMessageIDs",
+                "attributeId": 0x00000001,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO = {
         "clusterName": "DeviceEnergyManagement",
         "clusterId": 0x00000098,
@@ -6575,6 +6793,7 @@ class ChipClusters:
                 "args": {
                     "power": "int",
                     "duration": "int",
+                    "cause": "int",
                 },
             },
             0x00000001: {
@@ -6588,6 +6807,7 @@ class ChipClusters:
                 "commandName": "StartTimeAdjustRequest",
                 "args": {
                     "requestedStartTime": "int",
+                    "cause": "int",
                 },
             },
             0x00000003: {
@@ -6595,6 +6815,7 @@ class ChipClusters:
                 "commandName": "PauseRequest",
                 "args": {
                     "duration": "int",
+                    "cause": "int",
                 },
             },
             0x00000004: {
@@ -6609,6 +6830,7 @@ class ChipClusters:
                 "args": {
                     "forecastId": "int",
                     "slotAdjustments": "SlotAdjustmentStruct",
+                    "cause": "int",
                 },
             },
             0x00000006: {
@@ -6616,6 +6838,13 @@ class ChipClusters:
                 "commandName": "RequestConstraintBasedForecast",
                 "args": {
                     "constraints": "ConstraintsStruct",
+                    "cause": "int",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "CancelRequest",
+                "args": {
                 },
             },
         },
@@ -6660,6 +6889,12 @@ class ChipClusters:
                 "attributeName": "Forecast",
                 "attributeId": 0x00000006,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "OptOutState",
+                "attributeId": 0x00000007,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -6737,15 +6972,13 @@ class ChipClusters:
                 "commandId": 0x00000005,
                 "commandName": "SetTargets",
                 "args": {
-                    "dayOfWeekforSequence": "int",
-                    "chargingTargets": "ChargingTargetStruct",
+                    "chargingTargetSchedules": "ChargingTargetScheduleStruct",
                 },
             },
             0x00000006: {
                 "commandId": 0x00000006,
                 "commandName": "GetTargets",
                 "args": {
-                    "daysToReturn": "int",
                 },
             },
             0x00000007: {
@@ -6823,18 +7056,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
                 "writable": True,
-            },
-            0x00000021: {
-                "attributeName": "NumberOfWeeklyTargets",
-                "attributeId": 0x00000021,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000022: {
-                "attributeName": "NumberOfDailyTargets",
-                "attributeId": 0x00000022,
-                "type": "int",
-                "reportable": True,
             },
             0x00000023: {
                 "attributeName": "NextChargeStartTime",
@@ -6981,6 +7202,216 @@ class ChipClusters:
             0x00000004: {
                 "attributeName": "CurrentLowPowerModeSensitivity",
                 "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _POWER_TOPOLOGY_CLUSTER_INFO = {
+        "clusterName": "PowerTopology",
+        "clusterId": 0x0000009C,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "AvailableEndpoints",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "ActiveEndpoints",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _ENERGY_EVSE_MODE_CLUSTER_INFO = {
+        "clusterName": "EnergyEvseMode",
+        "clusterId": 0x0000009D,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO = {
+        "clusterName": "DeviceEnergyManagementMode",
+        "clusterId": 0x0000009F,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ChangeToMode",
+                "args": {
+                    "newMode": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "SupportedModes",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentMode",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "StartUpMode",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "OnMode",
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -7186,6 +7617,22 @@ class ChipClusters:
                 "commandName": "UnboltDoor",
                 "args": {
                     "PINCode": "bytes",
+                },
+            },
+            0x00000028: {
+                "commandId": 0x00000028,
+                "commandName": "SetAliroReaderConfig",
+                "args": {
+                    "signingKey": "bytes",
+                    "verificationKey": "bytes",
+                    "groupIdentifier": "bytes",
+                    "groupResolvingKey": "bytes",
+                },
+            },
+            0x00000029: {
+                "commandId": 0x00000029,
+                "commandName": "ClearAliroReaderConfig",
+                "args": {
                 },
             },
         },
@@ -7423,6 +7870,60 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
                 "writable": True,
+            },
+            0x00000080: {
+                "attributeName": "AliroReaderVerificationKey",
+                "attributeId": 0x00000080,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000081: {
+                "attributeName": "AliroReaderGroupIdentifier",
+                "attributeId": 0x00000081,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000082: {
+                "attributeName": "AliroReaderGroupSubIdentifier",
+                "attributeId": 0x00000082,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000083: {
+                "attributeName": "AliroExpeditedTransactionSupportedProtocolVersions",
+                "attributeId": 0x00000083,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000084: {
+                "attributeName": "AliroGroupResolvingKey",
+                "attributeId": 0x00000084,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000085: {
+                "attributeName": "AliroSupportedBLEUWBProtocolVersions",
+                "attributeId": 0x00000085,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000086: {
+                "attributeName": "AliroBLEAdvertisingVersion",
+                "attributeId": 0x00000086,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000087: {
+                "attributeName": "NumberOfAliroCredentialIssuerKeysSupported",
+                "attributeId": 0x00000087,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000088: {
+                "attributeName": "NumberOfAliroEndpointKeysSupported",
+                "attributeId": 0x00000088,
+                "type": "int",
+                "reportable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -8030,6 +8531,53 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "SetActiveScheduleRequest",
+                "args": {
+                    "scheduleHandle": "bytes",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "SetActivePresetRequest",
+                "args": {
+                    "presetHandle": "bytes",
+                    "delayMinutes": "int",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "StartPresetsSchedulesEditRequest",
+                "args": {
+                    "timeoutSeconds": "int",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "CancelPresetsSchedulesEditRequest",
+                "args": {
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "CommitPresetsSchedulesRequest",
+                "args": {
+                },
+            },
+            0x0000000A: {
+                "commandId": 0x0000000A,
+                "commandName": "CancelSetActivePresetRequest",
+                "args": {
+                },
+            },
+            0x0000000B: {
+                "commandId": 0x0000000B,
+                "commandName": "SetTemperatureSetpointHoldPolicy",
+                "args": {
+                    "temperatureSetpointHoldPolicy": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -8352,6 +8900,92 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
                 "writable": True,
+            },
+            0x00000048: {
+                "attributeName": "PresetTypes",
+                "attributeId": 0x00000048,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000049: {
+                "attributeName": "ScheduleTypes",
+                "attributeId": 0x00000049,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000004A: {
+                "attributeName": "NumberOfPresets",
+                "attributeId": 0x0000004A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000004B: {
+                "attributeName": "NumberOfSchedules",
+                "attributeId": 0x0000004B,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000004C: {
+                "attributeName": "NumberOfScheduleTransitions",
+                "attributeId": 0x0000004C,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000004D: {
+                "attributeName": "NumberOfScheduleTransitionPerDay",
+                "attributeId": 0x0000004D,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000004E: {
+                "attributeName": "ActivePresetHandle",
+                "attributeId": 0x0000004E,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x0000004F: {
+                "attributeName": "ActiveScheduleHandle",
+                "attributeId": 0x0000004F,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000050: {
+                "attributeName": "Presets",
+                "attributeId": 0x00000050,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000051: {
+                "attributeName": "Schedules",
+                "attributeId": 0x00000051,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000052: {
+                "attributeName": "PresetsSchedulesEditable",
+                "attributeId": 0x00000052,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000053: {
+                "attributeName": "TemperatureSetpointHoldPolicy",
+                "attributeId": 0x00000053,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000054: {
+                "attributeName": "SetpointHoldExpiryTimestamp",
+                "attributeId": 0x00000054,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000055: {
+                "attributeName": "QueuedPreset",
+                "attributeId": 0x00000055,
+                "type": "",
+                "reportable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -13126,6 +13760,31 @@ class ChipClusters:
                     "arg1": "int",
                 },
             },
+            0x00000016: {
+                "commandId": 0x00000016,
+                "commandName": "TestBatchHelperRequest",
+                "args": {
+                    "sleepBeforeResponseTimeMs": "int",
+                    "sizeOfResponseBuffer": "int",
+                    "fillCharacter": "int",
+                },
+            },
+            0x00000017: {
+                "commandId": 0x00000017,
+                "commandName": "TestSecondBatchHelperRequest",
+                "args": {
+                    "sleepBeforeResponseTimeMs": "int",
+                    "sizeOfResponseBuffer": "int",
+                    "fillCharacter": "int",
+                },
+            },
+            0xFFF200AA: {
+                "commandId": 0xFFF200AA,
+                "commandName": "TestDifferentVendorMeiRequest",
+                "args": {
+                    "arg1": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -13738,6 +14397,13 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0xFFF24F01: {
+                "attributeName": "MeiInt8u",
+                "attributeId": 0xFFF24F01,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
         },
     }
     _FAULT_INJECTION_CLUSTER_INFO = {
@@ -13873,7 +14539,6 @@ class ChipClusters:
     _CLUSTER_ID_DICT = {
         0x00000003: _IDENTIFY_CLUSTER_INFO,
         0x00000004: _GROUPS_CLUSTER_INFO,
-        0x00000005: _SCENES_CLUSTER_INFO,
         0x00000006: _ON_OFF_CLUSTER_INFO,
         0x00000007: _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         0x00000008: _LEVEL_CONTROL_CLUSTER_INFO,
@@ -13932,15 +14597,21 @@ class ChipClusters:
         0x0000005F: _MICROWAVE_OVEN_CONTROL_CLUSTER_INFO,
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
+        0x00000062: _SCENES_MANAGEMENT_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         0x00000080: _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,
         0x00000081: _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
+        0x00000090: _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,
         0x00000091: _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         0x00000096: _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
+        0x00000097: _MESSAGES_CLUSTER_INFO,
         0x00000098: _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
         0x00000099: _ENERGY_EVSE_CLUSTER_INFO,
         0x0000009B: _ENERGY_PREFERENCE_CLUSTER_INFO,
+        0x0000009C: _POWER_TOPOLOGY_CLUSTER_INFO,
+        0x0000009D: _ENERGY_EVSE_MODE_CLUSTER_INFO,
+        0x0000009F: _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000103: _BARRIER_CONTROL_CLUSTER_INFO,
@@ -13989,7 +14660,6 @@ class ChipClusters:
     _CLUSTER_NAME_DICT = {
         "Identify": _IDENTIFY_CLUSTER_INFO,
         "Groups": _GROUPS_CLUSTER_INFO,
-        "Scenes": _SCENES_CLUSTER_INFO,
         "OnOff": _ON_OFF_CLUSTER_INFO,
         "OnOffSwitchConfiguration": _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         "LevelControl": _LEVEL_CONTROL_CLUSTER_INFO,
@@ -14048,15 +14718,21 @@ class ChipClusters:
         "MicrowaveOvenControl": _MICROWAVE_OVEN_CONTROL_CLUSTER_INFO,
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
         "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
+        "ScenesManagement": _SCENES_MANAGEMENT_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         "BooleanStateConfiguration": _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,
         "ValveConfigurationAndControl": _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
+        "ElectricalPowerMeasurement": _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,
         "ElectricalEnergyMeasurement": _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         "DemandResponseLoadControl": _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
+        "Messages": _MESSAGES_CLUSTER_INFO,
         "DeviceEnergyManagement": _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
         "EnergyEvse": _ENERGY_EVSE_CLUSTER_INFO,
         "EnergyPreference": _ENERGY_PREFERENCE_CLUSTER_INFO,
+        "PowerTopology": _POWER_TOPOLOGY_CLUSTER_INFO,
+        "EnergyEvseMode": _ENERGY_EVSE_MODE_CLUSTER_INFO,
+        "DeviceEnergyManagementMode": _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "BarrierControl": _BARRIER_CONTROL_CLUSTER_INFO,

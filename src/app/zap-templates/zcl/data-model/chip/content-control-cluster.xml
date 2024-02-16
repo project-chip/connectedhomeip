@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain>Media</domain>
     <name>Content Control</name>
     <code>0x050F</code>
@@ -100,9 +100,9 @@ limitations under the License.
     <cluster code="0x050F"/>
     <field name="ScreenTime" mask="0x1"/>
     <field name="PINManagement"  mask="0x2"/>
-    <field name="BlockUnrated" mask="0x3"/>
-    <field name="OnDemandContentRating"  mask="0x4"/>
-    <field name="ScheduledContentRating"  mask="0x5"/>
+    <field name="BlockUnrated" mask="0x4"/>
+    <field name="OnDemandContentRating"  mask="0x8"/>
+    <field name="ScheduledContentRating"  mask="0x10"/>
   </bitmap>
 
 </configurator>

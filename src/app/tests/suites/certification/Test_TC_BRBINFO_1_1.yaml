@@ -34,6 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/30467
     - label: "Step 2: TH reads the ClusterRevision from DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
@@ -207,7 +208,27 @@ tests:
               type: list
               contains: [18]
 
-    - label: "Step 5a: TH reads optional event(StartUp) in EventList"
+    - label:
+          "Step 4p: TH reads optional attribute(ProductAppearance) in
+          AttributeList"
+      PICS: BRBINFO.S.A0014
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label: "Step 5a: TH reads from the DUT the EventList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Step 5b: TH reads optional event(StartUp) in EventList"
       PICS: BRBINFO.S.E00 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -216,7 +237,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 5b: TH reads optional attribute(ShutDown) in EventList"
+    - label: "Step 5c: TH reads optional attribute(ShutDown) in EventList"
       PICS: BRBINFO.S.E01 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -225,7 +246,7 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Step 5c: TH reads optional attribute(Leave) in EventList"
+    - label: "Step 5d TH reads optional attribute(Leave) in EventList"
       PICS: BRBINFO.S.E02 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"

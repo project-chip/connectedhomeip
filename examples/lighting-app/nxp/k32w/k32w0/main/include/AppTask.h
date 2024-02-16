@@ -50,15 +50,6 @@
 class AppTask
 {
 public:
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
-    using FactoryDataProvider = chip::DeviceLayer::CustomFactoryDataProvider;
-#else
-    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProviderImpl;
-#endif
-#endif
-
-public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 

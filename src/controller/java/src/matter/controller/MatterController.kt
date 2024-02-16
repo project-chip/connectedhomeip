@@ -17,6 +17,7 @@
  */
 package matter.controller
 
+import chip.devicecontroller.ICDDeviceInfo
 import java.io.Closeable
 
 /** Controller interface for interacting with a CHIP device. */
@@ -65,7 +66,7 @@ interface MatterController : Closeable, InteractionClient {
     fun onICDRegistrationInfoRequired()
 
     /** Notifies when the registration flow for the ICD completes. */
-    fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long)
+    fun onICDRegistrationComplete(errorCode: Int, icdDeviceInfo: ICDDeviceInfo)
   }
 
   /**

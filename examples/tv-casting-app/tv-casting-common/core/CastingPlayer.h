@@ -121,7 +121,7 @@ public:
      * @param onCompleted for success - called back with CHIP_NO_ERROR and CastingPlayer *.
      * For failure - called back with an error and nullptr.
      * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
-     * required. Defaults to kCommissioningWindowTimeoutSec.
+     * required. Needs to be >= kCommissioningWindowTimeoutSec.
      * @param desiredEndpointFilter (Optional) Attributes (such as VendorId) describing an Endpoint that the client wants to
      * interact with after commissioning. If this value is passed in, the VerifyOrEstablishConnection will force User Directed
      * Commissioning, in case the desired Endpoint is not found in the on device CastingStore.
@@ -129,6 +129,11 @@ public:
     void VerifyOrEstablishConnection(ConnectCallback onCompleted,
                                      unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec,
                                      EndpointFilter desiredEndpointFilter                 = EndpointFilter());
+
+    /**
+     * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
+     */
+    void Disconnect();
 
     /**
      * @brief Find an existing session for this CastingPlayer, or trigger a new session

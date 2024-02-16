@@ -23,7 +23,7 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <crypto/RandUtils.h>
 #include <lib/dnssd/Advertiser_ImplMinimalMdnsAllocator.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
@@ -232,13 +232,9 @@ private:
         {
             auto mrp = optionalMrp.Value();
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-            // An ICD operating as a LIT should not advertise its slow polling interval.
-            // When the ICD doesn't support the LIT feature, it doesn't set nor advertise the GetICDOperatingAsLIT entry.
-            // Therefore when GetICDOperatingAsLIT has no value or a value of 0, we advertise the slow polling interval
-            // otherwise we don't include the SII key in the advertisement.
-            if (!params.GetICDOperatingAsLIT().ValueOr(false))
-#endif
+            // An ICD operating as a LIT shall not advertise its slow polling interval.
+            // Don't include the SII key in the advertisement when operating as so.
+            if (params.GetICDModeToAdvertise() != ICDModeAdvertise::kLIT)
             {
                 if (mrp.mIdleRetransTimeout > kMaxRetryInterval)
                 {
@@ -290,11 +286,11 @@ private:
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.tcpSupportedBuf;
         }
-        if (params.GetICDOperatingAsLIT().HasValue())
+        if (params.GetICDModeToAdvertise() != ICDModeAdvertise::kNone)
         {
             size_t writtenCharactersNumber =
                 static_cast<size_t>(snprintf(storage.operatingICDAsLITBuf, sizeof(storage.operatingICDAsLITBuf), "ICD=%d",
-                                             params.GetICDOperatingAsLIT().Value()));
+                                             (params.GetICDModeToAdvertise() == ICDModeAdvertise::kLIT)));
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.operatingICDAsLITBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.operatingICDAsLITBuf;
@@ -849,6 +845,10 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
     char txtRotatingDeviceId[chip::Dnssd::kKeyRotatingDeviceIdMaxLength + 4];
     char txtPairingHint[chip::Dnssd::kKeyPairingInstructionMaxLength + 4];
     char txtPairingInstr[chip::Dnssd::kKeyPairingInstructionMaxLength + 4];
+
+    // the following sub types only apply to commissioner discovery advertisements
+    char txtCommissionerPasscode[chip::Dnssd::kKeyCommissionerPasscodeMaxLength + 4];
+
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         // a discriminator always exists
@@ -874,6 +874,14 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         {
             snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", params.GetPairingInstruction().Value());
             txtFields[numTxtFields++] = txtPairingInstr;
+        }
+    }
+    else
+    {
+        if (params.GetCommissionerPasscodeSupported().ValueOr(false))
+        {
+            snprintf(txtCommissionerPasscode, sizeof(txtCommissionerPasscode), "CP=%d", static_cast<int>(1));
+            txtFields[numTxtFields++] = txtCommissionerPasscode;
         }
     }
     if (numTxtFields == 0)

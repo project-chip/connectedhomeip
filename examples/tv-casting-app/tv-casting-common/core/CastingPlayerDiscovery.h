@@ -72,8 +72,7 @@ public:
 };
 
 /**
- * @brief CastingPlayerDiscovery represents the discovery of Casting Players.
- * This class is a singleton.
+ * @brief CastingPlayerDiscovery is a singleton utility class for discovering CastingPlayers.
  */
 class CastingPlayerDiscovery
 {

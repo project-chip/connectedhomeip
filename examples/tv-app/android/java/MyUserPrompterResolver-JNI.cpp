@@ -34,7 +34,7 @@ JNI_METHOD(void, OnPinCodeEntered)(JNIEnv *, jobject, jint jPinCode)
     chip::DeviceLayer::StackLock lock;
     uint32_t pinCode = (uint32_t) jPinCode;
     ChipLogProgress(Zcl, "OnPinCodeEntered %d", pinCode);
-    GetCommissionerDiscoveryController()->CommissionWithPincode(pinCode);
+    GetCommissionerDiscoveryController()->CommissionWithPasscode(pinCode);
 #endif
 }
 

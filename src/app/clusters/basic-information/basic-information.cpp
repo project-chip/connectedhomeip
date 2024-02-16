@@ -30,9 +30,11 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <cstddef>
 #include <cstring>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,6 +42,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BasicInformation;
 using namespace chip::app::Clusters::BasicInformation::Attributes;
 using namespace chip::DeviceLayer;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -410,6 +413,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
     void OnStartUp(uint32_t softwareVersion) override
     {
+        MATTER_TRACE_INSTANT("OnStartUp", "BasicInfo");
         // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
         ChipLogDetail(Zcl, "Emitting StartUp event");
 
@@ -429,6 +433,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 
     void OnShutDown() override
     {
+        MATTER_TRACE_INSTANT("OnShutDown", "BasicInfo");
         // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
         ChipLogDetail(Zcl, "Emitting ShutDown event");
 
@@ -460,9 +465,9 @@ namespace Clusters {
 namespace BasicInformation {
 bool IsLocalConfigDisabled()
 {
-    bool disabled        = false;
-    EmberAfStatus status = LocalConfigDisabled::Get(0, &disabled);
-    return status == EMBER_ZCL_STATUS_SUCCESS && disabled;
+    bool disabled = false;
+    Status status = LocalConfigDisabled::Get(0, &disabled);
+    return status == Status::Success && disabled;
 }
 } // namespace BasicInformation
 } // namespace Clusters

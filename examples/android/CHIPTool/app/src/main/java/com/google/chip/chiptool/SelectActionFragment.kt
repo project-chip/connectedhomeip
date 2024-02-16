@@ -74,6 +74,7 @@ class SelectActionFragment : Fragment() {
     binding.unpairDeviceBtn.setOnClickListener { handleUnpairDeviceClicked() }
     binding.groupSettingBtn.setOnClickListener { handleGroupSettingClicked() }
     binding.otaProviderBtn.setOnClickListener { handleOTAProviderClicked() }
+    binding.icdBtn.setOnClickListener { handleICDClicked() }
 
     return binding.root
   }
@@ -171,7 +172,7 @@ class SelectActionFragment : Fragment() {
 
   /** Notifies listener of Scan QR code button click. */
   private fun handleScanQrCodeClicked() {
-    showFragment(BarcodeFragment.newInstance(), false)
+    showFragment(BarcodeFragment.newInstance())
   }
 
   /** Notifies listener of Light On/Off & Level Cluster button click. */
@@ -220,28 +221,32 @@ class SelectActionFragment : Fragment() {
   }
 
   private fun handleOTAProviderClicked() {
-    showFragment(OtaProviderClientFragment.newInstance(), false)
+    showFragment(OtaProviderClientFragment.newInstance())
   }
 
   /** Notifies listener of provision-WiFi-credentials button click. */
   private fun handleProvisionWiFiCredentialsClicked() {
     getCallback()?.SetNetworkType(ProvisionNetworkType.WIFI)
-    showFragment(BarcodeFragment.newInstance(), false)
+    showFragment(BarcodeFragment.newInstance())
   }
 
   /** Notifies listener of provision-Thread-credentials button click. */
   private fun handleProvisionThreadCredentialsClicked() {
     getCallback()?.SetNetworkType(ProvisionNetworkType.THREAD)
-    showFragment(BarcodeFragment.newInstance(), false)
+    showFragment(BarcodeFragment.newInstance())
   }
 
   /** Notifies listener of provision-custom-flow button click. */
   private fun handleProvisionCustomFlowClicked() {
-    showFragment(BarcodeFragment.newInstance(), false)
+    showFragment(BarcodeFragment.newInstance())
   }
 
   private fun handleGroupSettingClicked() {
     showFragment(GroupSettingFragment.newInstance())
+  }
+
+  private fun handleICDClicked() {
+    showFragment(ICDFragment.newInstance())
   }
 
   companion object {

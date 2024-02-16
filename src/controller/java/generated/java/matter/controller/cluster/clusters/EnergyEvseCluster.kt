@@ -46,8 +46,7 @@ import matter.tlv.TlvWriter
 
 class EnergyEvseCluster(private val controller: MatterController, private val endpointId: UShort) {
   class GetTargetsResponse(
-    val dayOfWeekforSequence: UByte,
-    val chargingTargets: List<EnergyEvseClusterChargingTargetStruct>
+    val chargingTargetSchedules: List<EnergyEvseClusterChargingTargetScheduleStruct>
   )
 
   class StateAttribute(val value: UByte?)
@@ -345,8 +344,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
   }
 
   suspend fun setTargets(
-    dayOfWeekforSequence: UByte,
-    chargingTargets: List<EnergyEvseClusterChargingTargetStruct>,
+    chargingTargetSchedules: List<EnergyEvseClusterChargingTargetScheduleStruct>,
     timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 5u
@@ -354,12 +352,9 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_DAY_OF_WEEKFOR_SEQUENCE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_DAY_OF_WEEKFOR_SEQUENCE_REQ), dayOfWeekforSequence)
-
-    val TAG_CHARGING_TARGETS_REQ: Int = 1
-    tlvWriter.startArray(ContextSpecificTag(TAG_CHARGING_TARGETS_REQ))
-    for (item in chargingTargets.iterator()) {
+    val TAG_CHARGING_TARGET_SCHEDULES_REQ: Int = 0
+    tlvWriter.startArray(ContextSpecificTag(TAG_CHARGING_TARGET_SCHEDULES_REQ))
+    for (item in chargingTargetSchedules.iterator()) {
       item.toTlv(AnonymousTag, tlvWriter)
     }
     tlvWriter.endArray()
@@ -376,14 +371,11 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun getTargets(daysToReturn: UByte, timedInvokeTimeout: Duration): GetTargetsResponse {
+  suspend fun getTargets(timedInvokeTimeout: Duration): GetTargetsResponse {
     val commandId: UInt = 6u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_DAYS_TO_RETURN_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_DAYS_TO_RETURN_REQ), daysToReturn)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -398,25 +390,18 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_DAY_OF_WEEKFOR_SEQUENCE: Int = 0
-    var dayOfWeekforSequence_decoded: UByte? = null
-
-    val TAG_CHARGING_TARGETS: Int = 1
-    var chargingTargets_decoded: List<EnergyEvseClusterChargingTargetStruct>? = null
+    val TAG_CHARGING_TARGET_SCHEDULES: Int = 0
+    var chargingTargetSchedules_decoded: List<EnergyEvseClusterChargingTargetScheduleStruct>? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_DAY_OF_WEEKFOR_SEQUENCE)) {
-        dayOfWeekforSequence_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_CHARGING_TARGETS)) {
-        chargingTargets_decoded =
-          buildList<EnergyEvseClusterChargingTargetStruct> {
+      if (tag == ContextSpecificTag(TAG_CHARGING_TARGET_SCHEDULES)) {
+        chargingTargetSchedules_decoded =
+          buildList<EnergyEvseClusterChargingTargetScheduleStruct> {
             tlvReader.enterArray(tag)
             while (!tlvReader.isEndOfContainer()) {
-              add(EnergyEvseClusterChargingTargetStruct.fromTlv(AnonymousTag, tlvReader))
+              add(EnergyEvseClusterChargingTargetScheduleStruct.fromTlv(AnonymousTag, tlvReader))
             }
             tlvReader.exitContainer()
           }
@@ -425,17 +410,13 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       }
     }
 
-    if (dayOfWeekforSequence_decoded == null) {
-      throw IllegalStateException("dayOfWeekforSequence not found in TLV")
-    }
-
-    if (chargingTargets_decoded == null) {
-      throw IllegalStateException("chargingTargets not found in TLV")
+    if (chargingTargetSchedules_decoded == null) {
+      throw IllegalStateException("chargingTargetSchedules not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return GetTargetsResponse(dayOfWeekforSequence_decoded, chargingTargets_decoded)
+    return GetTargetsResponse(chargingTargetSchedules_decoded)
   }
 
   suspend fun clearTargets(timedInvokeTimeout: Duration) {
@@ -1518,192 +1499,6 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UIntSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readNumberOfWeeklyTargetsAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 33u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Numberofweeklytargets attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeNumberOfWeeklyTargetsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 33u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Numberofweeklytargets attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readNumberOfDailyTargetsAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 34u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Numberofdailytargets attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeNumberOfDailyTargetsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 34u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Numberofdailytargets attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }

@@ -161,6 +161,14 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
+    <attribute id="0x000A" name="LevelStep" type="uint8" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <optionalConform>
+        <feature name="LVL"/>
+      </optionalConform>
+      <constraint type="between" from="1" to="50"/>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="Open" response="Y">

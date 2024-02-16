@@ -58,8 +58,6 @@ private:
     }
 
     // Inherited from ExchangeContext
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
-                                 chip::System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**
@@ -73,6 +71,10 @@ private:
     virtual void HandleTransferSessionOutput(TransferSession::OutputEvent & event) = 0;
 
 protected:
+    // Inherited from ExchangeContext
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                 chip::System::PacketBufferHandle && payload) override;
+
     /**
      * The callback for when the poll timer expires. The poll timer regulates how often the TransferSession is polled.
      */
@@ -120,6 +122,9 @@ public:
                                   uint16_t maxBlockSize, System::Clock::Timeout timeout,
                                   System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
 
+    /**
+     * Calls reset on the TransferSession object and stops the poll timer.
+     */
     void ResetTransfer();
 };
 
@@ -145,6 +150,10 @@ public:
     CHIP_ERROR InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
                                 System::Clock::Timeout timeout,
                                 System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+    /**
+     * Calls reset on the TransferSession object and stops the poll timer.
+     */
+    void ResetTransfer();
 };
 
 } // namespace bdx

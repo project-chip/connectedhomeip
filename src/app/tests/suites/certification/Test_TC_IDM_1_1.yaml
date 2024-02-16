@@ -79,15 +79,6 @@ tests:
 
     - label:
           "Step 3: DUT sends the Invoke Request Message to the TH. The Message
-          should contain multiple paths Path = [[ Endpoint = Endpoint1, Cluster
-          = ClusterID, Command = Command1 ], [ Endpoint = Endpoint1, Cluster =
-          ClusterID, Command = Command2 ] ]"
-      verification: |
-          Out of Scope
-      disabled: true
-
-    - label:
-          "Step 4: DUT sends the Invoke Request Message to the TH. The Message
           should contain one valid CommandDataIB, which has the specific
           Endpoint, Specific Cluster and Specific Command. Send 2 more Invoke
           Request Messages to the TH."

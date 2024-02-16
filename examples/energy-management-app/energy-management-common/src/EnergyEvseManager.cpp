@@ -17,14 +17,107 @@
  */
 
 #include <EnergyEvseManager.h>
+#include <app/SafeAttributePersistenceProvider.h>
 
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 
+CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
+{
+
+    SafeAttributePersistenceProvider * aProvider = GetSafeAttributePersistenceProvider();
+    if (aProvider == nullptr)
+    {
+        ChipLogError(AppServer, "GetSafeAttributePersistenceProvider returned NULL");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+    EndpointId aEndpointId = mDelegate->GetEndpointId();
+    CHIP_ERROR err;
+
+    if (aProvider == nullptr)
+    {
+        ChipLogError(AppServer, "GetSafeAttributePersistenceProvider returned NULL");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    // Restore ChargingEnabledUntil value
+    DataModel::Nullable<uint32_t> tempChargingEnabledUntil;
+    err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ChargingEnabledUntil::Id),
+                                     tempChargingEnabledUntil);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "EVSE: successfully loaded ChargingEnabledUntil from NVM");
+        mDelegate->SetChargingEnabledUntil(tempChargingEnabledUntil);
+    }
+    else
+    {
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted ChargingEnabledUntil value");
+    }
+
+    // Restore DischargingEnabledUntil value
+    DataModel::Nullable<uint32_t> tempDischargingEnabledUntil;
+    err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::DischargingEnabledUntil::Id),
+                                     tempDischargingEnabledUntil);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "EVSE: successfully loaded DischargingEnabledUntil from NVM");
+        mDelegate->SetDischargingEnabledUntil(tempDischargingEnabledUntil);
+    }
+    else
+    {
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted DischargingEnabledUntil value");
+    }
+
+    // Restore UserMaximumChargeCurrent value
+    int64_t tempUserMaximumChargeCurrent;
+    err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::UserMaximumChargeCurrent::Id),
+                                     tempUserMaximumChargeCurrent);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "EVSE: successfully loaded UserMaximumChargeCurrent from NVM");
+        mDelegate->SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent);
+    }
+    else
+    {
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted UserMaximumChargeCurrent value");
+    }
+
+    // Restore RandomizationDelayWindow value
+    uint32_t tempRandomizationDelayWindow;
+    err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::RandomizationDelayWindow::Id),
+                                     tempRandomizationDelayWindow);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "EVSE: successfully loaded RandomizationDelayWindow from NVM");
+        mDelegate->SetRandomizationDelayWindow(tempRandomizationDelayWindow);
+    }
+    else
+    {
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted RandomizationDelayWindow value");
+    }
+
+    // Restore ApproximateEVEfficiency value
+    DataModel::Nullable<uint16_t> tempApproxEVEfficiency;
+    err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ApproximateEVEfficiency::Id),
+                                     tempApproxEVEfficiency);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "EVSE: successfully loaded ApproximateEVEfficiency from NVM");
+        mDelegate->SetApproximateEVEfficiency(tempApproxEVEfficiency);
+    }
+    else
+    {
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted ApproximateEVEfficiency value");
+    }
+
+    return CHIP_NO_ERROR; // It is ok to have no value loaded here
+}
+
 CHIP_ERROR EnergyEvseManager::Init()
 {
-    return Instance::Init();
+    ReturnErrorOnFailure(Instance::Init());
+    return LoadPersistentAttributes();
 }
 
 void EnergyEvseManager::Shutdown()

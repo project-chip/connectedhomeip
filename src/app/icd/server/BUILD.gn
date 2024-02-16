@@ -1,0 +1,133 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/app/icd/icd.gni")
+
+# ICD Server sources and configurations
+
+buildconfig_header("icd-server-buildconfig") {
+  header = "ICDServerBuildConfig.h"
+  header_dir = "app/icd/server"
+
+  if (chip_enable_icd_lit) {
+    assert(chip_enable_icd_checkin && chip_enable_icd_user_active_mode_trigger)
+  }
+
+  defines = [
+    "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
+    "CHIP_CONFIG_ENABLE_ICD_LIT=${chip_enable_icd_lit}",
+    "CHIP_CONFIG_ENABLE_ICD_CIP=${chip_enable_icd_checkin}",
+    "CHIP_CONFIG_ENABLE_ICD_UAT=${chip_enable_icd_user_active_mode_trigger}",
+    "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_icd_report_on_active_mode}",
+    "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
+    "ICD_ENFORCE_SIT_SLOW_POLL_LIMIT=${icd_enforce_sit_slow_poll_limit}",
+  ]
+
+  visibility = [ ":icd-server-config" ]
+}
+
+source_set("icd-server-config") {
+  sources = [ "ICDServerConfig.h" ]
+
+  deps = [ ":icd-server-buildconfig" ]
+}
+
+source_set("observer") {
+  sources = [ "ICDStateObserver.h" ]
+}
+
+source_set("notifier") {
+  sources = [
+    "ICDNotifier.cpp",
+    "ICDNotifier.h",
+  ]
+
+  deps = [
+    ":icd-server-config",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+# ICD Manager source-set is broken out of the main source-set to enable unit tests
+# All sources and configurations used by the ICDManager need to go in this source-set
+source_set("manager") {
+  sources = [
+    "ICDManager.cpp",
+    "ICDManager.h",
+  ]
+
+  deps = [ ":icd-server-config" ]
+
+  public_deps = [
+    ":configuration-data",
+    ":notifier",
+    ":observer",
+    "${chip_root}/src/app:subscription-manager",
+    "${chip_root}/src/credentials:credentials",
+    "${chip_root}/src/messaging",
+  ]
+
+  if (chip_enable_icd_checkin) {
+    public_deps += [
+      ":monitoring-table",
+      ":sender",
+    ]
+  }
+}
+
+source_set("sender") {
+  sources = [
+    "ICDCheckInSender.cpp",
+    "ICDCheckInSender.h",
+  ]
+
+  public_deps = [
+    ":configuration-data",
+    ":monitoring-table",
+    ":notifier",
+    "${chip_root}/src/credentials:credentials",
+    "${chip_root}/src/lib/address_resolve:address_resolve",
+    "${chip_root}/src/protocols/secure_channel",
+  ]
+}
+
+# ICDMonitoringTable source-set is broken out of the main source-set to enable unit tests
+# All sources and configurations used by the ICDMonitoringTable need to go in this source-set
+source_set("monitoring-table") {
+  sources = [
+    "ICDMonitoringTable.cpp",
+    "ICDMonitoringTable.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform:platform",
+  ]
+}
+
+source_set("configuration-data") {
+  sources = [
+    "ICDConfigurationData.cpp",
+    "ICDConfigurationData.h",
+  ]
+
+  deps = [
+    ":icd-server-config",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/secure_channel:check-in-counter",
+  ]
+}

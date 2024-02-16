@@ -15,13 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file contains functions for working with CHIP errors.
- */
-
-#include <stddef.h>
+#include <lib/core/CHIPError.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/ErrorStr.h>
@@ -142,6 +136,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_UNINITIALIZED.AsInteger():
         desc = "Uninitialized";
+        break;
+    case CHIP_ERROR_INVALID_IPK.AsInteger():
+        desc = "Invalid IPK";
         break;
     case CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger():
         desc = "Invalid string length";
@@ -316,6 +313,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_FABRIC_EXISTS.AsInteger():
         desc = "Trying to add a NOC for a fabric that already exists";
+        break;
+    case CHIP_ERROR_ENDPOINT_EXISTS.AsInteger():
+        desc = "Trying to add dynamic endpoint that already exists";
         break;
     case CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER.AsInteger():
         desc = "Wrong encryption type error code received from peer";

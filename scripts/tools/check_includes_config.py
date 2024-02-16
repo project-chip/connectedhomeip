@@ -93,7 +93,7 @@ DENY: Set[str] = {
     'vector',
 
     # CHIP headers using STL containers.
-    'lib/support/CHIPListUtils.h',      # uses std::set
+    'app/data-model/ListLargeSystemExtensions.h',      # uses std::set
     'src/platform/DeviceSafeQueue.h',   # uses std::deque
 }
 
@@ -113,7 +113,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/support/IniEscaping.h': {'string'},
 
     # Itself in DENY.
-    'src/lib/support/CHIPListUtils.h': {'set'},
+    'src/app/data-model/ListLargeSystemExtensions.h': {'set'},
     'src/platform/DeviceSafeQueue.h': {'queue'},
 
     # Only uses <chrono> for zero-cost types.
@@ -158,7 +158,10 @@ ALLOW: Dict[str, Set[str]] = {
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
-    'src/tracing/json/json_tracing.h': {'fstream'},
+    'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map'},
+
+    # Not intended for embedded clients
+    'src/app/PendingResponseTrackerImpl.h': {'unordered_set'},
 
     # Not intended for embedded clients
     'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream'},

@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  * MTRCluster
  *    This is the base class for clusters.
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRCluster : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -71,6 +72,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *    If not provided (i.e. nil passed for the CHIPWriteParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWriteParams : NSObject <NSCopying>
 
 /**
@@ -106,6 +108,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *    If not provided (i.e. nil passed for the MTRReadParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRReadParams : NSObject <NSCopying>
 
 /**
@@ -137,6 +140,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
  *    provided (i.e. nil passed for the MTRSubscribeParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRSubscribeParams : MTRReadParams
 
 /**

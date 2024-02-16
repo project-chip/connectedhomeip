@@ -102,7 +102,7 @@ server cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-server cluster Scenes = 5 {
+server cluster MatterScenes = 98 {
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
   }
@@ -117,18 +117,16 @@ server cluster Scenes = 5 {
     int8u attributeValue[] = 1;
   }
 
-  readonly attribute int8u sceneCount = 0;
-  readonly attribute int8u currentScene = 1;
-  readonly attribute group_id currentGroup = 2;
-  readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
+  readonly attribute optional nullable node_id lastConfiguredBy = 0;
+  readonly attribute int16u sceneTableSize = 1;
+  readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
     group_id groupId = 0;
     INT8U sceneId = 1;
-    INT16U transitionTime = 2;
+    INT32U transitionTime = 2;
     CHAR_STRING sceneName = 3;
     ExtensionFieldSet extensionFieldSets[] = 4;
   }
@@ -155,7 +153,7 @@ server cluster Scenes = 5 {
   request struct RecallSceneRequest {
     group_id groupId = 0;
     INT8U sceneId = 1;
-    optional nullable INT16U transitionTime = 2;
+    optional nullable INT32U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
@@ -172,7 +170,7 @@ server cluster Scenes = 5 {
     ENUM8 status = 0;
     group_id groupId = 1;
     INT8U sceneId = 2;
-    optional INT16U transitionTime = 3;
+    optional INT32U transitionTime = 3;
     optional CHAR_STRING sceneName = 4;
     optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
@@ -4221,7 +4219,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 
-  server cluster Scenes {
+  server cluster MatterScenes {
     ram      attribute sceneCount;
     ram      attribute currentScene;
     ram      attribute currentGroup;

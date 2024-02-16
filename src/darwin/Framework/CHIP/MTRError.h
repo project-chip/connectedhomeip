@@ -20,9 +20,9 @@
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
-FOUNDATION_EXPORT NSErrorDomain const MTRErrorDomain;
 
-FOUNDATION_EXPORT NSErrorDomain const MTRInteractionErrorDomain;
+MTR_EXTERN NSErrorDomain const MTRErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSErrorDomain const MTRInteractionErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 /**
  * MTRErrorDomain contains errors caused by data processing the framework
@@ -104,31 +104,33 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
 typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     // These values come from the general status code table in the Matter
     // Interaction Model specification.
-    MTRInteractionErrorCodeFailure                = 0x01,
-    MTRInteractionErrorCodeInvalidSubscription    = 0x7d,
-    MTRInteractionErrorCodeUnsupportedAccess      = 0x7e,
-    MTRInteractionErrorCodeUnsupportedEndpoint    = 0x7f,
-    MTRInteractionErrorCodeInvalidAction          = 0x80,
-    MTRInteractionErrorCodeUnsupportedCommand     = 0x81,
-    MTRInteractionErrorCodeInvalidCommand         = 0x85,
-    MTRInteractionErrorCodeUnsupportedAttribute   = 0x86,
-    MTRInteractionErrorCodeConstraintError        = 0x87,
-    MTRInteractionErrorCodeUnsupportedWrite       = 0x88,
-    MTRInteractionErrorCodeResourceExhausted      = 0x89,
-    MTRInteractionErrorCodeNotFound               = 0x8b,
-    MTRInteractionErrorCodeUnreportableAttribute  = 0x8c,
-    MTRInteractionErrorCodeInvalidDataType        = 0x8d,
-    MTRInteractionErrorCodeUnsupportedRead        = 0x8f,
-    MTRInteractionErrorCodeDataVersionMismatch    = 0x92,
-    MTRInteractionErrorCodeTimeout                = 0x94,
-    MTRInteractionErrorCodeBusy                   = 0x9c,
-    MTRInteractionErrorCodeUnsupportedCluster     = 0xc3,
-    MTRInteractionErrorCodeNoUpstreamSubscription = 0xc5,
-    MTRInteractionErrorCodeNeedsTimedInteraction  = 0xc6,
-    MTRInteractionErrorCodeUnsupportedEvent       = 0xc7,
-    MTRInteractionErrorCodePathsExhausted         = 0xc8,
-    MTRInteractionErrorCodeTimedRequestMismatch   = 0xc9,
-    MTRInteractionErrorCodeFailsafeRequired       = 0xca,
+    MTRInteractionErrorCodeFailure                                   = 0x01,
+    MTRInteractionErrorCodeInvalidSubscription                       = 0x7d,
+    MTRInteractionErrorCodeUnsupportedAccess                         = 0x7e,
+    MTRInteractionErrorCodeUnsupportedEndpoint                       = 0x7f,
+    MTRInteractionErrorCodeInvalidAction                             = 0x80,
+    MTRInteractionErrorCodeUnsupportedCommand                        = 0x81,
+    MTRInteractionErrorCodeInvalidCommand                            = 0x85,
+    MTRInteractionErrorCodeUnsupportedAttribute                      = 0x86,
+    MTRInteractionErrorCodeConstraintError                           = 0x87,
+    MTRInteractionErrorCodeUnsupportedWrite                          = 0x88,
+    MTRInteractionErrorCodeResourceExhausted                         = 0x89,
+    MTRInteractionErrorCodeNotFound                                  = 0x8b,
+    MTRInteractionErrorCodeUnreportableAttribute                     = 0x8c,
+    MTRInteractionErrorCodeInvalidDataType                           = 0x8d,
+    MTRInteractionErrorCodeUnsupportedRead                           = 0x8f,
+    MTRInteractionErrorCodeDataVersionMismatch                       = 0x92,
+    MTRInteractionErrorCodeTimeout                                   = 0x94,
+    MTRInteractionErrorCodeBusy                                      = 0x9c,
+    MTRInteractionErrorCodeUnsupportedCluster                        = 0xc3,
+    MTRInteractionErrorCodeNoUpstreamSubscription                    = 0xc5,
+    MTRInteractionErrorCodeNeedsTimedInteraction                     = 0xc6,
+    MTRInteractionErrorCodeUnsupportedEvent                          = 0xc7,
+    MTRInteractionErrorCodePathsExhausted                            = 0xc8,
+    MTRInteractionErrorCodeTimedRequestMismatch                      = 0xc9,
+    MTRInteractionErrorCodeFailsafeRequired                          = 0xca,
+    MTRInteractionErrorInvalidInState            MTR_NEWLY_AVAILABLE = 0xcb,
+    MTRInteractionErrorNoCommandResponse         MTR_NEWLY_AVAILABLE = 0xcc,
 };
 // clang-format on
 

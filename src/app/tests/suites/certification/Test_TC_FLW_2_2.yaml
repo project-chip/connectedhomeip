@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the mandatory attribute: MeasuredValue"
+    - label: "Step 2: TH reads from the DUT the MeasuredValue attribute."
       PICS: FLW.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -40,7 +42,7 @@ tests:
           constraints:
               type: int16u
               minValue: 0
-              maxValue: 65535
+              maxValue: 65534
 
     - label: "Step 3: Operate on device to change the flow significantly"
       cluster: "LogCommands"
@@ -53,7 +55,9 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 4: Read the mandatory attribute: MeasuredValue"
+    - label:
+          "Step 4: After a few seconds, TH reads from the DUT the MeasuredValue
+          attribute."
       PICS: FLW.S.A0000 && FLW.M.FlowChange
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -61,5 +65,5 @@ tests:
           constraints:
               type: int16u
               minValue: 0
-              maxValue: 65535
+              maxValue: 65534
               notValue: ValueBeforeChange

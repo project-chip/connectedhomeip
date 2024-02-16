@@ -66,6 +66,14 @@ Davis, CA 95616, USA
       <optionalConform>
         <attribute name="Heater"/>
       </optionalConform>
+      <commands>
+        <command id="" name="Pause">
+          <disallowConform/>
+        </command>
+        <command id="" name="Resume">
+          <disallowConform/>
+        </command>
+      </commands>
     </cluster>
     <cluster id="0x0049" name="Oven Mode" side="server">
       <optionalConform>

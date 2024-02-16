@@ -41,6 +41,7 @@
 #if (SIWX_917 | EXP_BOARD)
 #include "sl_board_configuration.h"
 
+#include "sl_rsi_utility.h"
 #include "sl_si91x_host_interface.h"
 
 void gpio_interrupt(uint8_t interrupt_number);

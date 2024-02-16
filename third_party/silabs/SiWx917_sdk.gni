@@ -24,6 +24,14 @@ import("silabs_board.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
+declare_args() {
+  # Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled
+  si91x_alarm_based_wakeup = false
+
+  # Periodic time at which the 917 SoC should wakeup
+  si91x_alarm_periodic_time = 30
+}
+
 # Defines an siwx917 SDK build target.
 #
 # Parameters:
@@ -56,6 +64,10 @@ template("siwx917_sdk") {
 
       # ble component
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+
+      # trng component
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/inc",
 
       # si91x component
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/inc",
@@ -143,12 +155,12 @@ template("siwx917_sdk") {
       "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
-      "CCP_SI917_BRINGUP",
+      "CCP_SI917_BRINGUP=1",
       "SL_COMPONENT_CATALOG_PRESENT",
-      "RS911X_WIFI",
+      "RS911X_WIFI=1",
       "RSI_WLAN_ENABLE",
-      "SLI_SI91X_ENABLE_OS",
-      "SLI_SI91X_MCU_INTERFACE",  #Enable CCP bus Interface
+      "SLI_SI91X_ENABLE_OS=1",
+      "SLI_SI91X_MCU_INTERFACE=1",  #Enable CCP bus Interface
       "RSI_WLAN_API_ENABLE",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
@@ -159,43 +171,46 @@ template("siwx917_sdk") {
       "__HEAP_SIZE=0",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
-      "RSI_ARM_CM4F",
-      "SIWX_917",
-      "CHIP_9117",
+      "SIWX_917=1",
+      "CHIP_9117=1",
       "SLI_SI91X_ENABLE_BLE=1",
       "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
       "TINYCRYPT_PRIMITIVES",
       "OPTIMIZE_TINYCRYPT_ASM",
       "__error_t_defined",
       "RSI_SAMPLE_HAL",
-      "ENABLE_IPMU_APIS",
-      "SLI_SI91X_MCU_MOV_ROM_API_TO_FLASH",
-      "DEBUG_UART",
-      "SLI_SI91X_MCU_ENABLE_FLASH_BASED_EXECUTION",
-      "SL_WIFI_COMPONENT_INCLUDED",
+      "DEBUG_UART=1",
+      "SLI_SI91X_MCU_ENABLE_FLASH_BASED_EXECUTION=1",
+      "SL_WIFI_COMPONENT_INCLUDED=1",
       "SLI_SI917=1",
+      "SI917=1",
       "ROMDRIVER_PRESENT=1",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
-      "SL_PLATFORM_EXAMPLES_ENABLE",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER=1",
-      "FLASH_PAGE_SIZE",
-      "SL_NVM3_PRESENT",
-      "ROM_WIRELESS",
       "BRD4325A",  #TODO: should be removed after SoC macro clean-up
-      "CONNECTIVITY_PLATFORM",
-      "SLI_SI917B0 = 1",
+      "SLI_SI917B0=1",
       "SLI_SI91X_MCU_COMMON_FLASH_MODE=1",
-      "EXECUTION_FROM_RAM",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_VER2=1",
       "SL_BOARD_REV=\"A00\"",
       "SPI_MULTI_SLAVE=1",
       "SYSCALLS_WRITE=1",
-      "SI91X_SYSRTC_COUNT=1",
-      "SSI_ULP_MASTER=1",
-      "SL_MEMLCD_EXTCOMIN_PORT=0",
       "__STATIC_INLINE=static inline",
-      "SL_SI91X_SI917_RAM_MEM_CONFIG=3",
+      "SL_SI91X_SI917_RAM_MEM_CONFIG=2",
       "SL_SI91x_DUAL_INTERRUPTS_ERRATA=1",
+      "EXT_IRQ_COUNT=75",
+      "FLASH_PAGE_SIZE=1",
+      "DEBUG_ENABLE=1",
+      "ENABLE_DEBUG_MODULE=1",
+      "SI91X_SYSRTC_PRESENT=1",
+      "TA_DEEP_SLEEP_COMMON_FLASH=1",
+      "SI917_SOC=1",
+      "SI91X_PLATFORM=1",
+      "SL_NET_COMPONENT_INCLUDED=1",
+      "SRAM_BASE=0x0cUL",
+      "SRAM_SIZE=0x4fc00UL",
+      "SLI_SI91X_MCU_ENABLE_IPMU_APIS=1",
+      "RADIO_CONFIG_DMP_SUPPORT=1",
+      "configUSE_POSIX_ERRNO=1",
     ]
 
     if (chip_build_libshell) {
@@ -250,13 +265,21 @@ template("siwx917_sdk") {
 
     if (chip_enable_icd_server) {
       defines += [
-        "WIFI_DEBUG_ENABLED=1",
         "SL_ICD_ENABLED=1",
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
-        "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
-        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_s}",
+        "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
+        "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
+        "SL_SI91X_MCU_WIRELESS_BASED_WAKEUP=1",
+        "SL_SI91X_MCU_BUTTON_BASED_WAKEUP=1",
       ]
+
+      if (si91x_alarm_based_wakeup) {
+        defines += [
+          "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
+          "ALARM_PERIODIC_TIME=${si91x_alarm_periodic_time}",
+        ]
+      }
     }
 
     if (chip_build_libshell) {  # matter shell
@@ -337,6 +360,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c",
 
       # si91x_basic_buffers component
       "${wifi_sdk_root}/components/board/silabs/src/rsi_board.c",
@@ -472,6 +496,13 @@ template("siwx917_sdk") {
       ]
     }
 
+    if (chip_enable_icd_server) {
+      sources += [
+        "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/src/sl_si91x_m4_ps.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
+      ]
+    }
     public_deps = [
       ":siwx917_mbedtls_config",
       "${segger_rtt_root}:segger_rtt",
@@ -501,6 +532,9 @@ template("siwx917_sdk") {
       ]
     }
 
-    public_configs = [ ":${sdk_target_name}_config" ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      "${examples_plat_dir}:siwx917-common-config",
+    ]
   }
 }

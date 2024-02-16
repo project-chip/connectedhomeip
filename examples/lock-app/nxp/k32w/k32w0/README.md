@@ -173,59 +173,67 @@ will be initiated.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Start building the application either with Secure Element or without, SDK is
-    downloaded with west tool.
-
-    -   without Secure Element
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
-```
-
-In case there are local modification to the already installed git NXP SDK: Use
-the below west `forall` command instead of the west init command to reset the
-west workspace. Warning: all local changes will be lost after running this
-command.
+Activate the Matter environment:
 
 ```bash
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$west forall -c "git reset --hard && git clean -xdf" -a
+user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 ```
 
-Build the application
+To bring the SDK in the environment, the user can:
 
-Prior to building, the user can specify a custom `SDK` path by setting
-`NXP_K32W0_SDK_ROOT`:
+-   download it with west tool, in which case it will be handled automatically
+    by gn:
 
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=$(pwd)/third_party/nxp/k32w0_sdk/repo/core
-```
+    ```bash
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
+    ```
 
-If the environment variable `NXP_K32W0_SDK_ROOT` is not set, it will default to
-the `SDK` found in `third_party/nxp/k32w0_sdk/repo/core`.
+    In case there are local modification to the already installed github NXP
+    SDK, use the below `west forall` command instead of the `west init` command
+    to reset the west workspace. Warning: all local changes will be lost after
+    running this command.
 
-```
+    ```bash
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
+    ```
+
+-   set up a custom path to the SDK, in which case
+    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
+    command:
+
+    ```
+    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
+    ```
+
+Start building the application:
+
+```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/nxp/k32w/k32w0
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ ninja -C out/debug
 ```
 
-    -   with Secure element
-        Exactly the same steps as above but set chip_with_se05x=1 in the gn command.
+To build with Secure Element, follow the same steps as above but set
+`chip_with_se05x=1` in the `gn gen` command.
+
+-   K32W041AM flavor
+
+    Exactly the same steps as above but set argument `build_for_k32w041am=1` in
+    the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
-build argument (chip_with_OM15082) inside the gn build instruction should be set
-to zero. The argument chip_with_OM15082 is set to zero by default.
+build argument (`chip_with_OM15082`) inside the gn build instruction should be
+set to zero. The argument `chip_with_OM15082` is set to zero by default.
 
-In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
+In case that Openthread CLI is needed, `chip_with_ot_cli` build argument must be
 set to 1.
 
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
-running oscillator as a clock source. In this case one must set the use_fro_32k
-argument to 1.
+running oscillator as a clock source. In this case one must set the
+`use_fro_32k` argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 (run automatically) install the recommanded packages (python version > 3, pip3,

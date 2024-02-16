@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 123.1.1. [TC-S-1.1] Global attributes with server as DUT
+name: 123.1.1. [TC-S-1.1] Global attributes with DUT as Server
 
 PICS:
     - S.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Scenes"
+    cluster: "Scenes Management"
     endpoint: 1
 
 tests:
@@ -33,15 +33,16 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read ClusterRevision (global attribute 65533)"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 5
+          value: 1
           constraints:
               type: int16u
 
-    - label: "Step 3a: Read FeatureMap NameSupport bit (global attribute 65532)"
+    - label:
+          "Step 3: TH reads FeatureMap NameSupport bit (global attribute 65532)"
       PICS: (!S.S.F00)
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -50,8 +51,9 @@ tests:
               type: bitmap32
               hasMasksClear: [0x1]
 
-    - label: "Step 3a: Read FeatureMap NameSupport bit (global attribute 65532)"
-      PICS: S.S.F00
+    - label:
+          "Step 3: TH reads FeatureMap NameSupport bit (global attribute 65532)"
+      PICS: (S.S.F00)
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -59,62 +61,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Step 3b: Read FeatureMap Explicit bit (global attribute 65532)"
-      PICS: (!S.S.F01)
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksClear: [0x2]
-
-    - label: "Step 3b: Read FeatureMap Explicit bit (global attribute 65532)"
-      PICS: S.S.F01
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksSet: [0x2]
-
-    - label: "Step 3c: Read FeatureMap TableSize bit (global attribute 65532)"
-      PICS: (!S.S.F02)
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksClear: [0x4]
-
-    - label: "Step 3c: Read FeatureMap TableSize bit (global attribute 65532)"
-      PICS: S.S.F02
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksSet: [0x4]
-
-    - label: "Step 3d: Read FeatureMap FabricScene bit (global attribute 65532)"
-      PICS: (!S.S.F03)
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksClear: [0x8]
-
-    - label: "Step 3d: Read FeatureMap FabricScene bit (global attribute 65532)"
-      PICS: S.S.F03
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksSet: [0x8]
-
     - label:
-          "Step 4: Read Mandatory attributes in AttributeList (global attribute
+          "Step 4a: TH reads AttributeList mandatory attributes(global attribute
           65531)"
       PICS: S.S
       command: "readAttribute"
@@ -122,53 +70,20 @@ tests:
       response:
           constraints:
               type: list
-              contains: [4, 65528, 65529, 65531, 65532, 65533]
+              contains: [1, 2, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4b: Read optional attributes(SceneCount, CurrentScene,
-          CurrentGroup, SceneValid) in AttributeList (global attribute 65531)"
-      PICS: (!S.S.F03)
+          "Step 4b: TH reads the LastConfiguredBy optional attribute from the
+          AttributeList (global attribute 65531)"
+      PICS: S.S.A0000
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3]
+              contains: [0]
 
-    - label:
-          "Step 4c: Read optinnal attribute(LastConfiguredBy) in AttributeList
-          (global attribute 65531)"
-      PICS: S.S.A0005
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [5]
-
-    - label:
-          "Step 4d: Read optionnal attribute(SceneTableSize) in AttributeList
-          (global attribute 65531)"
-      PICS: S.S.F02
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [6]
-
-    - label:
-          "Step 4e: Read optional attribute(FabricSceneInfo) in AttributeList
-          (global attribute 65531)"
-      PICS: S.S.F03
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [7]
-
-    - label: "Step 5: Read EventList (global attribute 65530)"
+    - label: "Step 5: TH reads from the DUT the EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -177,9 +92,7 @@ tests:
               type: list
               contains: []
 
-    - label:
-          "Step 6a: Read Mandatory commands in AcceptedCommandList (global
-          attribute 65529)"
+    - label: "Step 6a: TH reads from the DUT the AcceptedCommandList attribute"
       PICS: S.S
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -189,7 +102,7 @@ tests:
               contains: [0, 1, 2, 3, 4, 5, 6]
 
     - label:
-          "Step 6b: Read optional command(EnhancedAddSceneResponse)
+          "Step 6b: TH reads optional command(CopySceneResponse)
           AcceptedCommandList (global attribute 65529)"
       PICS: S.S.C40.Rsp
       command: "readAttribute"
@@ -199,29 +112,7 @@ tests:
               type: list
               contains: [64]
 
-    - label:
-          "Step 6c: Read optional command(EnhancedViewSceneResponse)
-          AcceptedCommandList (global attribute 65529)"
-      PICS: S.S.C41.Rsp
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [65]
-
-    - label:
-          "Step 6d: Read optional command(CopySceneResponse) AcceptedCommandList
-          (global attribute 65529)"
-      PICS: S.S.C42.Rsp
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [66]
-
-    - label: "Step 7a: Read GeneratedCommandList (global attribute 65528)"
+    - label: "Step 7a: TH reads from the DUT the GeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -230,7 +121,7 @@ tests:
               contains: [0, 1, 2, 3, 4, 6]
 
     - label:
-          "Step 7b: Read optional command(EnhancedAddSceneResponse) in
+          "Step 7b: TH reads Read optional command(CopySceneResponse) in
           GeneratedCommandList (global attribute 65528)"
       PICS: S.S.C40.Rsp
       command: "readAttribute"
@@ -239,25 +130,3 @@ tests:
           constraints:
               type: list
               contains: [64]
-
-    - label:
-          "Step 7c: Read optional command(EnhancedViewSceneResponse) in
-          GeneratedCommandList (global attribute 65528)"
-      PICS: S.S.C41.Rsp
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [65]
-
-    - label:
-          "Step 7d: Read optional command(CopySceneResponse) in
-          GeneratedCommandList (global attribute 65528)"
-      PICS: S.S.C42.Rsp
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [66]

@@ -136,13 +136,13 @@ SceneTableEntry scene14(sceneId11, sceneData14);
 SceneTableEntry scene15(sceneId12, sceneData15);
 
 // Clusters EFS data
-static app::Clusters::Scenes::Structs::ExtensionFieldSet::Type OOextensionFieldSet;
-static app::Clusters::Scenes::Structs::ExtensionFieldSet::Type LCextensionFieldSet;
-static app::Clusters::Scenes::Structs::ExtensionFieldSet::Type CCextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type OOextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type LCextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type CCextensionFieldSet;
 
-static app::Clusters::Scenes::Structs::AttributeValuePair::Type OOPairs[1];
-static app::Clusters::Scenes::Structs::AttributeValuePair::Type LCPairs[2];
-static app::Clusters::Scenes::Structs::AttributeValuePair::Type CCPairs[8];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type OOPairs[1];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type LCPairs[2];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type CCPairs[8];
 
 static uint8_t OO_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
 static uint8_t LC_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
@@ -496,8 +496,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, nullptr != sceneTable);
     VerifyOrReturn(nullptr != sceneTable);
 
-    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type extensionFieldSetOut;
-    app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType extensionFieldSetIn;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldSetOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldSetIn;
 
     TLV::TLVReader reader;
     TLV::TLVWriter writer;
@@ -644,9 +644,9 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     memset(buffer, 0, buff_span.size());
 
     // To test failure on serialize and deserialize when too many pairs are in the field sets
-    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type extensionFieldFailTestOut;
-    app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
-    app::Clusters::Scenes::Structs::AttributeValuePair::Type TooManyPairs[16];
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldFailTestOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
+    app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type TooManyPairs[16];
 
     uint8_t payloadOk = 0;
     for (uint8_t i = 0; i < 16; i++)

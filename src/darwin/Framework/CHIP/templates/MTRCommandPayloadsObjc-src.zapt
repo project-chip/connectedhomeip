@@ -12,7 +12,7 @@
 
 #include <app/data-model/Decode.h>
 #include <lib/core/TLV.h>
-#include <lib/support/CHIPListUtils.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
 #include <lib/support/CodeUtils.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -198,6 +198,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/if}}
 {{/inline}}
 {{#*inline "oldNameImpl"}}
+{{#if (isSupported cluster command=command isForCommandPayload=true)}}
 
 @implementation MTR{{cluster}}Cluster{{command}}Params
 {{#zcl_command_arguments}}
@@ -213,8 +214,9 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic timedInvokeTimeoutMs;
 {{/if}}
 @end
+{{/if}}
 {{/inline}}
-{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
 {{> completeImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                  command=(asUpperCamelCase name preserveAcronyms=true)
                  includeRenamedProperties=false}}

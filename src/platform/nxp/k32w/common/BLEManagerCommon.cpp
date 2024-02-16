@@ -949,7 +949,7 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
     mDeviceConnected = false;
 
     ChipDeviceEvent event;
-    event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
+    event.Type                           = DeviceEventType::kCHIPoBLEConnectionClosed;
     event.CHIPoBLEConnectionError.ConId  = deviceId;
     event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
 
@@ -1174,9 +1174,14 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
 
     if (pConnectionEvent->eventType == gConnEvtConnected_c)
     {
+#if CHIP_DEVICE_K32W1
 #if defined(chip_with_low_power) && (chip_with_low_power == 1)
+        /* Disallow must be called here for K32W1, otherwise an assert will be reached.
+         * Disclaimer: this is a workaround until a better cross platform solution is found. */
         PWR_DisallowDeviceToSleep();
 #endif
+#endif
+
 #if CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ
         ChipLogProgress(DeviceLayer, "BLE K32W: Trying to set the PHY to 2M");
 

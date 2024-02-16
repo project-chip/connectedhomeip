@@ -125,6 +125,11 @@ tests:
           "Step 4: TH sends RemoveNetwork Command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
           set to 1"
+      verification: |
+          Verify that DUT sends NetworkConfigResponse to command with the following fields:
+          NetworkingStatus is success
+
+          NetworkIndex is 'Userwifi_netidx'
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       command: "RemoveNetwork"
       arguments:
@@ -136,6 +141,8 @@ tests:
       response:
           values:
               - name: "NetworkingStatus"
+                value: 0
+              - name: "NetworkIndex"
                 value: 0
 
     - label:
@@ -151,7 +158,7 @@ tests:
                 value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
               - name: "Credentials"
                 value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS
-              - name: "breadcrumb"
+              - name: "Breadcrumb"
                 value: 1
       response:
           values:
@@ -306,6 +313,11 @@ tests:
           "Step 15: TH sends RemoveNetwork Command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
           set to 1"
+      verification: |
+          Verify that DUT sends NetworkConfigResponse to command with the following fields:
+          NetworkingStatus is success
+
+          NetworkIndex is 'Userwifi_netidx'
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       command: "RemoveNetwork"
       arguments:
@@ -317,6 +329,8 @@ tests:
       response:
           values:
               - name: "NetworkingStatus"
+                value: 0
+              - name: "NetworkIndex"
                 value: 0
 
     - label:
@@ -332,7 +346,7 @@ tests:
                 value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
               - name: "Credentials"
                 value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS
-              - name: "breadcrumb"
+              - name: "Breadcrumb"
                 value: 1
       response:
           values:

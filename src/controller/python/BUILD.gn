@@ -70,17 +70,22 @@ shared_library("ChipDeviceCtrl") {
       "OpCredsBinding.cpp",
       "chip/clusters/attribute.cpp",
       "chip/clusters/command.cpp",
+      "chip/commissioning/PlaceholderOperationalCredentialsIssuer.h",
       "chip/credentials/cert.cpp",
+      "chip/credentials/cert.h",
       "chip/crypto/p256keypair.cpp",
+      "chip/crypto/p256keypair.h",
       "chip/discovery/NodeResolution.cpp",
       "chip/interaction_model/Delegate.cpp",
       "chip/interaction_model/Delegate.h",
       "chip/internal/ChipThreadWork.cpp",
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
+      "chip/logging/LoggingFilter.cpp",
       "chip/logging/LoggingRedirect.cpp",
       "chip/native/ChipMainLoopWork.h",
       "chip/native/PyChipError.cpp",
+      "chip/native/PyChipError.h",
       "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
@@ -95,6 +100,7 @@ shared_library("ChipDeviceCtrl") {
   } else {
     sources += [
       "chip/server/Options.cpp",
+      "chip/server/Options.h",
       "chip/server/ServerInit.cpp",
     ]
   }
@@ -130,6 +136,7 @@ shared_library("ChipDeviceCtrl") {
     public_deps += [
       "${chip_root}/src/controller/data_model",
       "${chip_root}/src/credentials:file_attestation_trust_store",
+      "${chip_root}/src/lib/support:testing",
       "${chip_root}/src/tracing/json",
       "${chip_root}/src/tracing/perfetto",
       "${chip_root}/src/tracing/perfetto:file_output",
@@ -269,10 +276,7 @@ chip_python_wheel_action("chip-core") {
       if (chip_controller) {
         sources += [ "chip/ChipDeviceCtrl.py" ]
       } else {
-        sources += [
-          "chip/server/__init__.py",
-          "chip/server/types.py",
-        ]
+        sources += [ "chip/server/__init__.py" ]
       }
     },
     {

@@ -153,6 +153,11 @@ public:
          * issues w.r.t the ReadHandler itself.
          */
         virtual ApplicationCallback * GetAppCallback() = 0;
+
+        /*
+         * Retrieve the InteractionalModelEngine that holds this ReadHandler.
+         */
+        virtual InteractionModelEngine * GetInteractionModelEngine() = 0;
     };
 
     // TODO (#27675) : Merge existing callback and observer into one class and have an observer pool in the Readhandler to notify
@@ -270,7 +275,7 @@ private:
 
     /**
      * Returns SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
-     * For an ICD publisher, this SHALL be set to the idle mode interval.
+     * For an ICD publisher, this SHALL be set to the idle mode duration.
      * Otherwise, this SHALL be set to 60 minutes.
      */
     uint16_t GetPublisherSelectedIntervalLimit();

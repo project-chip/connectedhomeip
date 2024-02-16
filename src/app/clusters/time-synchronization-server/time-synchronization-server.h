@@ -29,7 +29,7 @@
 #include "time-synchronization-delegate.h"
 
 #if TIME_SYNC_ENABLE_TSC_FEATURE
-#include <app/ClusterStateCache.h>
+#include <app/ReadClient.h>
 #endif
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
@@ -68,6 +68,9 @@ enum class TimeSyncEventFlag : uint8_t
     kTimeFailure     = 8,
     kMissingTTSource = 16,
 };
+
+void SetDefaultDelegate(Delegate * delegate);
+Delegate * GetDefaultDelegate();
 
 class TimeSynchronizationServer : public FabricTable::Delegate
 #if TIME_SYNC_ENABLE_TSC_FEATURE

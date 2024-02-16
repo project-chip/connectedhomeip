@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "ICDClientStorage.h"
+#include <app/icd/client/ICDClientStorage.h>
 #include <lib/core/CHIPCore.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -52,6 +52,28 @@ class DefaultICDClientStorage : public ICDClientStorage
 {
 public:
     using ICDClientInfoIterator = CommonIterator<ICDClientInfo>;
+
+    // ICDClientInfoIterator wrapper to release ICDClientInfoIterator when it is out of scope
+    class ICDClientInfoIteratorWrapper
+    {
+    public:
+        ICDClientInfoIteratorWrapper(ICDClientInfoIterator * apICDClientInfoIterator)
+        {
+            mpICDClientInfoIterator = apICDClientInfoIterator;
+        }
+
+        ~ICDClientInfoIteratorWrapper()
+        {
+            if (mpICDClientInfoIterator != nullptr)
+            {
+                mpICDClientInfoIterator->Release();
+                mpICDClientInfoIterator = nullptr;
+            }
+        }
+
+    private:
+        ICDClientInfoIterator * mpICDClientInfoIterator = nullptr;
+    };
 
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS;
 
@@ -95,7 +117,7 @@ public:
      */
     CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex);
 
-    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
+    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, CounterType & counter) override;
 
 protected:
     enum class ClientInfoTag : uint8_t

@@ -29,6 +29,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/LockTracker.h>
+#include <tracing/macros.h>
 
 namespace chip {
 using namespace Credentials;
@@ -279,6 +280,7 @@ CHIP_ERROR FabricTable::ValidateIncomingNOCChain(const ByteSpan & noc, const Byt
                                                  NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                                  Crypto::P256PublicKey & outRootPubkey)
 {
+    MATTER_TRACE_SCOPE("ValidateIncomingNOCChain", "Fabric");
     Credentials::ValidationContext validContext;
 
     // Note that we do NOT set a time in the validation context.  This will
@@ -328,6 +330,7 @@ CHIP_ERROR FabricTable::ValidateIncomingNOCChain(const ByteSpan & noc, const Byt
 
 CHIP_ERROR FabricInfo::SignWithOpKeypair(ByteSpan message, P256ECDSASignature & outSignature) const
 {
+    MATTER_TRACE_SCOPE("SignWithOpKeypair", "Fabric");
     VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
 
     return mOperationalKey->ECDSA_sign_msg(message.data(), message.size(), outSignature);
@@ -335,6 +338,7 @@ CHIP_ERROR FabricInfo::SignWithOpKeypair(ByteSpan message, P256ECDSASignature & 
 
 CHIP_ERROR FabricInfo::FetchRootPubkey(Crypto::P256PublicKey & outPublicKey) const
 {
+    MATTER_TRACE_SCOPE("FetchRootPubKey", "Fabric");
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_KEY_NOT_FOUND);
     outPublicKey = mRootPublicKey;
     return CHIP_NO_ERROR;
@@ -345,6 +349,7 @@ CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, const ByteSpa
                                           FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                           Crypto::P256PublicKey * outRootPublicKey) const
 {
+    MATTER_TRACE_SCOPE("VerifyCredentials", "Fabric");
     assertChipStackLockedByCurrentThread();
     uint8_t rootCertBuf[kMaxCHIPCertLength];
     MutableByteSpan rootCertSpan{ rootCertBuf };
@@ -562,12 +567,14 @@ const FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId co
 
 CHIP_ERROR FabricTable::FetchRootCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
 {
+    MATTER_TRACE_SCOPE("FetchRootCert", "Fabric");
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mOpCertStore->GetCertificate(fabricIndex, CertChainElement::kRcac, outCert);
 }
 
 CHIP_ERROR FabricTable::FetchPendingNonFabricAssociatedRootCert(MutableByteSpan & outCert) const
 {
+    MATTER_TRACE_SCOPE("FetchPendingNonFabricAssociatedRootCert", "Fabric");
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     if (!mStateFlags.Has(StateFlags::kIsTrustedRootPending))
     {
@@ -586,6 +593,7 @@ CHIP_ERROR FabricTable::FetchPendingNonFabricAssociatedRootCert(MutableByteSpan 
 
 CHIP_ERROR FabricTable::FetchICACert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
 {
+    MATTER_TRACE_SCOPE("FetchICACert", "Fabric");
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = mOpCertStore->GetCertificate(fabricIndex, CertChainElement::kIcac, outCert);
@@ -605,12 +613,14 @@ CHIP_ERROR FabricTable::FetchICACert(FabricIndex fabricIndex, MutableByteSpan & 
 
 CHIP_ERROR FabricTable::FetchNOCCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
 {
+    MATTER_TRACE_SCOPE("FetchNOCCert", "Fabric");
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mOpCertStore->GetCertificate(fabricIndex, CertChainElement::kNoc, outCert);
 }
 
 CHIP_ERROR FabricTable::FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256PublicKey & outPublicKey) const
 {
+    MATTER_TRACE_SCOPE("FetchRootPubkey", "Fabric");
     const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
     return fabricInfo->FetchRootPubkey(outPublicKey);
@@ -747,6 +757,7 @@ public:
 
 CHIP_ERROR FabricTable::NotifyFabricUpdated(FabricIndex fabricIndex)
 {
+    MATTER_TRACE_SCOPE("NotifyFabricUpdated", "Fabric");
     FabricTable::Delegate * delegate = mDelegateListRoot;
     while (delegate)
     {
@@ -761,6 +772,8 @@ CHIP_ERROR FabricTable::NotifyFabricUpdated(FabricIndex fabricIndex)
 
 CHIP_ERROR FabricTable::NotifyFabricCommitted(FabricIndex fabricIndex)
 {
+    MATTER_TRACE_SCOPE("NotifyFabricCommitted", "Fabric");
+
     FabricTable::Delegate * delegate = mDelegateListRoot;
     while (delegate)
     {
@@ -919,6 +932,7 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
 
 CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
 {
+    MATTER_TRACE_SCOPE("Delete", "Fabric");
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1608,6 +1622,7 @@ CHIP_ERROR FabricTable::AddNewPendingTrustedRootCert(const ByteSpan & rcac)
 CHIP_ERROR FabricTable::FindExistingFabricByNocChaining(FabricIndex pendingFabricIndex, const ByteSpan & noc,
                                                         FabricIndex & outMatchingFabricIndex) const
 {
+    MATTER_TRACE_SCOPE("FindExistingFabricByNocChaining", "Fabric");
     // Check whether we already have a matching fabric from a cert chain perspective.
     // To do so we have to extract the FabricID from the NOC and the root public key from the RCAC.
     // We assume the RCAC is currently readable from OperationalCertificateStore, whether pending
@@ -1653,6 +1668,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
                                                   Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
                                                   AdvertiseIdentity advertiseIdentity, FabricIndex * outNewFabricIndex)
 {
+    MATTER_TRACE_SCOPE("AddNewPendingFabricCommon", "Fabric");
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(outNewFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
@@ -1724,6 +1740,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
                                                   Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
                                                   AdvertiseIdentity advertiseIdentity)
 {
+    MATTER_TRACE_SCOPE("UpdatePendingFabricCommon", "Fabric");
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2009,6 +2026,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
 
 void FabricTable::RevertPendingFabricData()
 {
+    MATTER_TRACE_SCOPE("RevertPendingFabricData", "Fabric");
     // Will clear pending UpdateNoc/AddNOC
     RevertPendingOpCertsExceptRoot();
 
@@ -2031,6 +2049,7 @@ void FabricTable::RevertPendingFabricData()
 
 void FabricTable::RevertPendingOpCertsExceptRoot()
 {
+    MATTER_TRACE_SCOPE("RevertPendingOpCertsExceptRoot", "Fabric");
     mPendingFabric.Reset();
 
     if (mStateFlags.Has(StateFlags::kIsPendingFabricDataPresent))

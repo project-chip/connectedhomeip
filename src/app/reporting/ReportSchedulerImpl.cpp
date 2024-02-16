@@ -44,7 +44,7 @@ void ReportSchedulerImpl::OnEnterActiveMode()
 {
 #if ICD_REPORT_ON_ENTER_ACTIVE_MODE
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    mNodesPool.ForEachActiveObject([now](ReadHandlerNode * node) {
+    mNodesPool.ForEachActiveObject([this, now](ReadHandlerNode * node) {
         if (now >= node->GetMinTimestamp())
         {
             this->HandlerForceDirtyState(node->GetReadHandler());

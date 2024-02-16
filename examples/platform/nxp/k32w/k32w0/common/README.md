@@ -12,10 +12,11 @@ following interfaces:
 -   DeviceAttestationCredentialsProvider
 -   DeviceInstanceInfoProvider
 
-A user can inherit `FactoryDataProviderImpl` to provide additional functionality
-(such as parsing custom factory data fields) that is customer specific.
+A user can use `FactoryDataProvider::SearchForId` API to extract information
+about custom factory data ids.
 
-What **shall** be done to enable usage of a custom factory provider:
+What **shall** be done to enable usage of a custom factory provider in the
+reference app:
 
 -   Set `use_custom_factory_provider=1`. This option is only available when
     factory data is used (`chip_with_factory_data=1`). An assert will be raised
@@ -33,28 +34,15 @@ What **shall** be done to enable usage of a custom factory provider:
 
       defines = [
         "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
-        "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3"
       ]
     }
     ```
 
-    Note that new flags were introduced:
+Note that new flags were introduced:
 
-    -   `CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER`: select between using
-        `FactoryDataProviderImpl` or `CustomFactoryDataProvider` when
-        registering the provider.
-    -   `CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS`: set the number of
-        custom IDs (which are different than the default IDs). If this macro is
-        not correctly set, compilation should fail.
+-   `CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER`: add custom factory data related
+    code in reference app.
 
--   The default IDs are validated directly in `SearchForId`, but custom IDs
-    should set their maximum lengths through `SetCustomIds` method.
--   `FactoryDataProvider::kNumberOfIds` is computed at compile time and should
-    represent the number of IDs (custom + default). Custom IDs should start from
-    `FactoryDataId::kMaxId`, which is the next valid ID. IDs
-    `[1, FactoryDataId::kMaxId - 1]` are reserved for default factory data IDs.
-
-Please refer to `CustomFactoryDataProvider` for a minimal example of a custom
-factory data provider and note that its implementation is just an example of how
-to integrate a custom provider into the application, while still using the
-default implementation provided by `FactoryDataProviderImpl`.
+Please refer to `CustomFactoryDataProvider` for a minimal example of leveraging
+the standard factory data provider to parse custom factory data information.
+Real applications could use the public API of `FactoryDataProvider` directly.

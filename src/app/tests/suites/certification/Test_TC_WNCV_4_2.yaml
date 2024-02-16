@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-4.2] GoToTiltPercentage Long-Run Verification with
-    server as DUT
+    Window Covering [TC-WNCV-4.2] GoToTiltPercentage command Long-Run
+    Verification [DUT as Server]
 
 PICS:
     - WNCV.S
@@ -77,7 +77,7 @@ tests:
                 value: 3000
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
-    - label: "Step 2b: DUT updates its attributes"
+    - label: "Step 2b: TH waits for 100-1000 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -97,7 +97,7 @@ tests:
 
     ### Step 3x ->  Verify the DUT has reached its 30%
     ### DUT moves toward its 30% position
-    - label: "Step 3a: TH set a timeout of X minutes for failure"
+    - label: "Step 3a: TH waits for PIXIT.WNCV.FULLMOTION on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -106,7 +106,7 @@ tests:
                 value: fullMotionDuration
 
     ### Check for END OF MOVEMENTs
-    - label: "Step 3b: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 3b: TH checks OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a
@@ -146,7 +146,7 @@ tests:
                 value: 6005
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
-    - label: "Step 4b: DUT updates its attributes"
+    - label: "Step 4b: TH waits for 100-1000 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -166,7 +166,7 @@ tests:
 
     ### Step 5x ->  Verify the DUT has reached its 60.2%
     ### DUT moves toward its 60.2% position
-    - label: "Step 5a: TH waits for x seconds movement(s) on the DUT"
+    - label: "Step 5a: TH waits for PIXIT.WNCV.FULLMOTION on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

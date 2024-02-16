@@ -53,6 +53,8 @@ shared_library("jni") {
     "AndroidCurrentFabricRemover.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "AndroidInteractionClient.cpp",
+    "AndroidInteractionClient.h",
     "AndroidOperationalCredentialsIssuer.cpp",
     "AndroidOperationalCredentialsIssuer.h",
     "AttestationTrustStoreBridge.cpp",
@@ -60,11 +62,16 @@ shared_library("jni") {
     "BaseCHIPCluster-JNI.cpp",
     "CHIPAttributeTLVValueDecoder.h",
     "CHIPDeviceController-JNI.cpp",
+    "CHIPEventTLVValueDecoder.h",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
+    "GroupDeviceProxy.h",
+    "MatterCallbacks-JNI.cpp",
+    "MatterController-JNI.cpp",
   ]
 
   deps = [
+    "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/inet",
@@ -368,12 +375,20 @@ kotlin_library("kotlin_matter_controller") {
     "src/matter/controller/CompletionListenerAdapter.kt",
     "src/matter/controller/ControllerParams.kt",
     "src/matter/controller/InteractionClient.kt",
+    "src/matter/controller/InvokeCallback.kt",
+    "src/matter/controller/InvokeCallbackJni.kt",
     "src/matter/controller/MatterController.kt",
     "src/matter/controller/MatterControllerException.kt",
     "src/matter/controller/MatterControllerImpl.kt",
     "src/matter/controller/Messages.kt",
     "src/matter/controller/OperationalKeyConfig.kt",
+    "src/matter/controller/ReportCallback.kt",
+    "src/matter/controller/ReportCallbackJni.kt",
+    "src/matter/controller/ResubscriptionAttemptCallback.kt",
+    "src/matter/controller/SubscriptionEstablishedCallback.kt",
     "src/matter/controller/SubscriptionStates.kt",
+    "src/matter/controller/WriteAttributesCallback.kt",
+    "src/matter/controller/WriteAttributesCallbackJni.kt",
     "src/matter/controller/model/Paths.kt",
     "src/matter/controller/model/States.kt",
   ]
@@ -447,6 +462,8 @@ android_library("java") {
     "src/chip/devicecontroller/DiscoveredDevice.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
+    "src/chip/devicecontroller/ICDClientInfo.java",
+    "src/chip/devicecontroller/ICDDeviceInfo.java",
     "src/chip/devicecontroller/ICDRegistrationInfo.java",
     "src/chip/devicecontroller/InvokeCallback.java",
     "src/chip/devicecontroller/InvokeCallbackJni.java",
@@ -477,6 +494,7 @@ android_library("java") {
     "src/chip/devicecontroller/model/EventState.java",
     "src/chip/devicecontroller/model/InvokeElement.java",
     "src/chip/devicecontroller/model/NodeState.java",
+    "src/chip/devicecontroller/model/Status.java",
   ]
 
   if (matter_enable_tlv_decoder_api) {

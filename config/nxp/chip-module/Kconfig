@@ -1,0 +1,258 @@
+#
+#   Copyright (c) 2024 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+rsource "../../zephyr/Kconfig"
+
+if CHIP
+
+config CHIP_NXP_PLATFORM
+	bool
+	default y
+	help
+	  States that the configuration uses Matter NXP platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for NXP platform related purposes.
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_DEVICE_VENDOR_NAME
+	default "NXP Semiconductors"
+
+config CHIP_APP_LOG_LEVEL
+	int "Logging level in application"
+	default LOG_DEFAULT_LEVEL
+	depends on LOG
+	help
+	  Sets the logging level in the Matter application. Use this configuration
+	  option only within the application. To set the logging level for the
+	  Matter stack, use the MATTER_LOG_LEVEL configuration option.
+
+config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+	bool "Include default device information provider build"
+	default y
+
+config CHIP_DEBUG_SYMBOLS
+	bool "Generate debug symbols"
+	default y
+	help
+	  Enables building the application with debug symbols.
+
+config CHIP_MALLOC_SYS_HEAP
+	default y if !ARCH_POSIX
+
+config CHIP_FACTORY_DATA
+	bool "Factory data provider"
+	help
+	  Enables the default NXP factory data provider implementation that
+	  supports reading the factory data encoded in the KLV format from the
+	  flash memory partition. This option requires a fixed partition named
+	  "factory_partition" declared on the device tree. Factory data partition
+	  can be generated during build process, see CHIP_FACTORY_DATA_BUILD Kconfig.
+
+config CHIP_FACTORY_DATA_CUSTOM_BACKEND
+	bool "Custom factory data provider"
+	depends on !CHIP_FACTORY_DATA
+	help
+	  Enables user's custom factory data provider implementation. This option
+	  cannot be used with the CHIP_FACTORY_DATA, which enables the default NXP
+	  factory data provider implementation.
+
+config CHIP_FACTORY_DATA_BUILD
+	bool "Generate factory data contents"
+	default n
+	imply CHIP_FACTORY_DATA
+	help
+	  Enables generation of the factory data contents during the building. This
+	  option requires a fixed partition named "factory_partition" declared on the
+	  device tree.
+
+config CHIP_FACTORY_DATA_VERSION
+	int
+	default 1
+	help
+	  Provides the version of the generated factory data parameter set. This is
+	  a hidden configuration option that the user cannot change. You can use
+	  this value in the factory data provider implementation to verify that the
+	  factory data saved in the flash memory has the expected version.
+
+config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
+	int "Maximum length of rotating device ID unique ID in bytes"
+	default 16
+	depends on CHIP_FACTORY_DATA
+	help
+	  Maximum acceptable length of rotating device ID unique ID in bytes.
+
+if CHIP_FACTORY_DATA
+
+config CHIP_ENCRYPTED_FACTORY_DATA_AES128_KEY
+	string "AES128 key used to encrypt factory data."
+	default "2B7E151628AED2A6ABF7158809CF4F3C"
+	help
+	  AES128 key used to encrypt factory data.
+
+config CHIP_ENCRYPTED_FACTORY_DATA
+	bool "Encrypt factory data with AES128 ECB."
+	default y
+	help
+	  If enabled, the factory data partition will be encrypted with AES128 ECB.
+
+config CHIP_DEVICE_PRODUCT_URL
+	string "Product URL"
+	help
+	  Provides the URL to the product page. The URL is exposed as an attribute
+	  of the Basic Information cluster.
+
+config CHIP_DEVICE_PRODUCT_LABEL
+	string "Product label"
+	help
+	  Provides the product label. The label is exposed as an attribute
+	  of the Basic Information cluster.
+
+config CHIP_DEVICE_PART_NUMBER
+	string "Part number"
+	help
+	  Provides the part number. The part number is exposed as an attribute
+	  of the Basic Information cluster.
+
+endif
+
+if CHIP_FACTORY_DATA_BUILD
+
+# Factory data definitions
+config CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES
+	bool "Generate onboarding codes during the generation of a factory data set"
+	help
+	  Enables generation of onboarding codes (manual pairing code and QR code)
+	  during the generation of a factory data set. You can provide the
+	  onboarding codes a Matter controller to commission a device to a Matter
+	  network.
+
+# Select source of the certificates
+choice CHIP_FACTORY_DATA_CERT_SOURCE
+	prompt "Attestation certificate file source"
+	default CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+
+	config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+		bool "Use pre-generated development certificates"
+		help
+		  Uses pre-generated certificate files from the
+		  credentials/development/attestation/ directory that match the
+		  configured Product ID. This can be used for development purpose.
+
+	config CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED
+		bool "Auto-generate certificates"
+		help
+		  Generates new certificates instead of using pre-generated ones. The
+		  certificates are generated on every build.
+
+	config CHIP_FACTORY_DATA_CERT_SOURCE_USER
+		bool "Use user-provided certificate files"
+		help
+		  Uses user-provided certificate files. The user needs to specify the
+		  absolute paths to all necessary files.
+
+endchoice
+
+if CHIP_FACTORY_DATA_CERT_SOURCE_USER
+
+config CHIP_FACTORY_DATA_USER_CERTS_CD_CERT
+	string "Path to the CD certificate (DER format)"
+	help
+	  Provides the absolute path to the CD certificate file in the DER format.
+
+config CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT
+	string "Path to the DAC certificate (DER format)"
+	help
+	  Provides the absolute path to the DAC certificate file in the DER format.
+
+config CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY
+	string "Path to the DAC private key (DER format)"
+	help
+	  Provides the absolute path to the DAC keypair file in the DER format. Both
+	  public and private keys must be present (the private key will be extracted
+	  automatically).
+
+config CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT
+	string "Path to the PAI certificate (DER format)"
+	help
+	  Provides the absolute path to the PAI certificate in the DER format.
+endif
+
+# Configs for SPAKE2+ generation
+config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
+	bool "Generate SPAKE2+ verifier"
+	help
+	  Enables the generation of the SPAKE2+ verifier for the configured SPAKE2+
+	  passcode, iteration count and salt.
+
+config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
+	bool "Generate Rotating device ID unique ID"
+	default y
+	help
+	  Enables the generation of a random Rotating device ID unique ID.
+
+endif #CHIP_FACTORY_DATA_BUILD
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_FACTORY_RESET_ERASE_NVS
+	bool
+	default y
+
+endif
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+	bool "Disable some detailed logs to decrease flash usage"
+	help
+	  Disables some log levels for specific Matter log modules that provide
+	  information that is too detailed to be used in most cases. You can find
+	  full configuration enabled by this option in the
+	  platform/nxp/CHIPPlatformConfig.h file.
+
+config CHIP_IPV4
+	bool "IPv4 support for Matter"
+	default n
+	depends on NET_IPV4
+	help
+	  If disabled, it allows to build NXP SDK application
+	  with IPv4 support independently of the Matter stack still
+	  running over IPv6.
+
+config CHIP_OTA_REQUESTOR
+	bool
+	select BOOTLOADER_MCUBOOT
+
+config BOOTLOADER_MCUBOOT
+	bool
+	select IMG_MANAGER
+	select STREAM_FLASH
+	select STREAM_FLASH_ERASE
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+	int "OTA Requestor image buffer size"
+	default 256
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Configures the size of the buffer used by OTA Requestor when downloading
+	  and writing a new firmware image to flash.
+
+config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+	bool "Auto-reboot when firmware update is applied"
+	default y
+	depends on CHIP_OTA_REQUESTOR
+	imply REBOOT
+	help
+	  Reboots the device automatically after downloading a new firmware update
+	  to swap the old and the new firmware images. The reboot happens only when
+	  a user consents to apply the firmware update.

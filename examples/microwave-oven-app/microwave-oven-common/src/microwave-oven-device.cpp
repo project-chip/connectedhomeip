@@ -24,10 +24,9 @@ using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::ModeBase;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 template <typename T>
-using List                 = chip::app::DataModel::List<T>;
-using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
-using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
-using Status               = Protocols::InteractionModel::Status;
+using List              = chip::app::DataModel::List<T>;
+using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
+using Status            = Protocols::InteractionModel::Status;
 
 void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
 {
@@ -35,30 +34,75 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
     mOperationalStateInstance.Init();
     mMicrowaveOvenModeInstance.Init();
     mMicrowaveOvenControlInstance.Init();
+
+    // set default value for attribute SelectedWattIndex and WattRating
+    if (mMicrowaveOvenControlInstance.HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
+    {
+        static_assert(ArraySize(mWattSettingList) > 0, "Watt setting list is empty!");
+        mSelectedWattIndex = ArraySize(mWattSettingList) - 1;
+        mWattRating        = mWattSettingList[mSelectedWattIndex];
+    }
+    else
+    {
+        mWattRating = kExampleWatt5;
+    }
 }
 
 /**
  * MicrowaveOvenControl cluster
  */
 Protocols::InteractionModel::Status
-ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
+ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec, bool startAfterSetting,
+                                                               Optional<uint8_t> powerSettingNum,
+                                                               Optional<uint8_t> wattSettingIndex)
 {
     // placeholder implementation
     Status status;
+    // Update cook mode.
     if ((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(cookMode)) != Status::Success)
     {
         return status;
     }
-    mMicrowaveOvenControlInstance.SetCookTime(cookTime);
-    mMicrowaveOvenControlInstance.SetPowerSetting(powerSetting);
+
+    mMicrowaveOvenControlInstance.SetCookTimeSec(cookTimeSec);
+
+    // If using power as number, check if powerSettingNum has value before setting the power number.
+    // If powerSetting field is missing in the command, the powerSettingNum passed here is handled to the max value
+    // and user can use this value directly.
+    if (powerSettingNum.HasValue())
+    {
+        mPowerSettingNum = powerSettingNum.Value();
+    }
+
+    // If using power in watt, check if wattSettingIndex has value before setting the watt rating and watt list index.
+    // If wattSettinIndex field is missing in the command, the wattSettingIndex passed here is handled to the max value
+    // and user can use this value directly.
+    if (wattSettingIndex.HasValue())
+    {
+        mSelectedWattIndex = wattSettingIndex.Value();
+        mWattRating        = mWattSettingList[mSelectedWattIndex];
+    }
+
+    if (startAfterSetting)
+    {
+        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    }
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleModifyCookTimeCallback(uint32_t finalCookTime)
+Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec)
 {
     // placeholder implementation
-    mMicrowaveOvenControlInstance.SetCookTime(finalCookTime);
+    mMicrowaveOvenControlInstance.SetCookTimeSec(finalCookTimeSec);
     return Status::Success;
+}
+
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting)
+{
+    VerifyOrReturnError(index < ArraySize(mWattSettingList), CHIP_ERROR_NOT_FOUND);
+
+    wattSetting = mWattSettingList[index];
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -66,7 +110,7 @@ Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleModifyCook
  */
 app::DataModel::Nullable<uint32_t> ExampleMicrowaveOvenDevice::GetCountdownTime()
 {
-    return DataModel::MakeNullable(mMicrowaveOvenControlInstance.GetCookTime());
+    return DataModel::MakeNullable(mMicrowaveOvenControlInstance.GetCookTimeSec());
 }
 
 CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index,
@@ -80,15 +124,13 @@ CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index,
-                                                                  OperationalState::GenericOperationalPhase & operationalPhase)
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
-    if (index > mOperationalPhaseList.size() - 1)
+    if (index >= mOperationalPhaseList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalPhase = mOperationalPhaseList[index];
-    return CHIP_NO_ERROR;
+    return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
 void ExampleMicrowaveOvenDevice::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)

@@ -43,10 +43,10 @@ namespace chip {
 #define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
 
 // Descriptor constants
-inline constexpr size_t kVersionStringSize = 64;
-inline constexpr size_t kBuildDateSize     = 64;
+constexpr size_t kVersionStringSize = 64;
+constexpr size_t kBuildDateSize     = 64;
 
-inline constexpr uint16_t requestedOtaMaxBlockSize = 1024;
+constexpr uint16_t requestedOtaMaxBlockSize = 1024;
 
 /**
  * Used alongside RegisterDescriptorCallback to register
@@ -127,6 +127,8 @@ protected:
 #if OTA_ENCRYPTION_ENABLE
     /*ota decryption*/
     uint32_t mIVOffset = 0;
+    /* Expected byte size of the OTAEncryptionKeyLength */
+    static constexpr size_t kOTAEncryptionKeyLength = 16;
 #endif
     uint32_t mLength                             = 0;
     uint32_t mProcessedLength                    = 0;

@@ -63,6 +63,8 @@ public:
     /// Trace a zero-sized event
     virtual void TraceInstant(const char * label, const char * group) {}
 
+    virtual void TraceCounter(const char * label) {}
+    virtual void TraceMetric(const char * label, int32_t value) {}
     virtual void LogMessageSend(MessageSendInfo &) { TraceInstant("MessageSent", "Messaging"); }
     virtual void LogMessageReceived(MessageReceivedInfo &) { TraceInstant("MessageReceived", "Messaging"); }
 

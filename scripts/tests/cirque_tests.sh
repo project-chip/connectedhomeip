@@ -49,6 +49,8 @@ CIRQUE_TESTS=(
     "CommissioningFailureOnReportTest"
     "PythonCommissioningTest"
     "CommissioningWindowTest"
+    "SubscriptionResumptionTest"
+    "SubscriptionResumptionCapacityTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"

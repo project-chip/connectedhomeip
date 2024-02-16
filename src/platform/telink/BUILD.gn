@@ -60,8 +60,6 @@ static_library("telink") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
   deps = [ "${chip_root}/src/platform/logging:headers" ]
 
-  defines = [ "CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>" ]
-
   if (chip_enable_factory_data) {
     sources += [
       "FactoryDataParser.c",
@@ -92,13 +90,6 @@ static_library("telink") {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
-    ]
-  }
-
-  if (chip_enable_bootloader_mcuboot) {
-    sources += [
-      "OTAUtil.cpp",
-      "OTAUtil.h",
     ]
   }
 }

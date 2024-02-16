@@ -30,7 +30,7 @@ jobject createJMatterError(CHIP_ERROR inErr)
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     jclass jMatterErrorClass;
     CHIP_ERROR err =
-        chip::JniReferences::GetInstance().GetClassRef(env, "com/matter/casting/support/MatterError", jMatterErrorClass);
+        chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/matter/casting/support/MatterError", jMatterErrorClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
 
     jmethodID jMatterErrorConstructor = env->GetMethodID(jMatterErrorClass, "<init>", "(JLjava/lang/String;)V");

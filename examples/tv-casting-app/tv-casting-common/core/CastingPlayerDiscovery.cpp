@@ -77,7 +77,7 @@ void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::Discover
 {
     ChipLogProgress(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice() called");
     VerifyOrReturn(mClientDelegate != nullptr,
-                   ChipLogError(NotSpecified, "CastingPlayerDeviceDiscoveryDelegate, mClientDelegate is a nullptr"));
+                   ChipLogError(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice mClientDelegate is a nullptr"));
 
     // convert nodeData to CastingPlayer
     CastingPlayerAttributes attributes;

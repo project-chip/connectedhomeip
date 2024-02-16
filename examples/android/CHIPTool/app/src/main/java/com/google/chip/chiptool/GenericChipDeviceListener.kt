@@ -1,6 +1,7 @@
 package com.google.chip.chiptool
 
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ICDDeviceInfo
 
 open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
   override fun onConnectDeviceComplete() {
@@ -56,7 +57,7 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
-  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
+  override fun onICDRegistrationComplete(errorCode: Int, icdDeviceInfo: ICDDeviceInfo) {
     // No op
   }
 }

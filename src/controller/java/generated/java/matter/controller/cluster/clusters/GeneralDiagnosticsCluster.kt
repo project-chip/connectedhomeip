@@ -48,6 +48,8 @@ class GeneralDiagnosticsCluster(
 ) {
   class TimeSnapshotResponse(val systemTimeMs: ULong, val posixTimeMs: ULong?)
 
+  class PayloadTestResponse(val payload: ByteArray)
+
   class NetworkInterfacesAttribute(val value: List<GeneralDiagnosticsClusterNetworkInterface>)
 
   sealed class NetworkInterfacesAttributeSubscriptionState {
@@ -214,6 +216,61 @@ class GeneralDiagnosticsCluster(
     tlvReader.exitContainer()
 
     return TimeSnapshotResponse(systemTimeMs_decoded, posixTimeMs_decoded)
+  }
+
+  suspend fun payloadTestRequest(
+    enableKey: ByteArray,
+    value: UByte,
+    count: UShort,
+    timedInvokeTimeout: Duration? = null
+  ): PayloadTestResponse {
+    val commandId: UInt = 3u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_ENABLE_KEY_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_ENABLE_KEY_REQ), enableKey)
+
+    val TAG_VALUE_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_VALUE_REQ), value)
+
+    val TAG_COUNT_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_COUNT_REQ), count)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_PAYLOAD: Int = 0
+    var payload_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_PAYLOAD)) {
+        payload_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (payload_decoded == null) {
+      throw IllegalStateException("payload not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return PayloadTestResponse(payload_decoded)
   }
 
   suspend fun readNetworkInterfacesAttribute(): NetworkInterfacesAttribute {

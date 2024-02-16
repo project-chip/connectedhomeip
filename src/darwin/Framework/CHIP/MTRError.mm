@@ -21,8 +21,6 @@
 #import "MTRError_Internal.h"
 
 #import <app/MessageDef/StatusIB.h>
-#import <app/util/af-enums.h>
-#import <app/util/error-mapping.h>
 #import <inet/InetError.h>
 #import <lib/support/TypeTraits.h>
 
@@ -34,7 +32,6 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
-MTR_HIDDEN
 @interface MTRErrorHolder : NSObject
 @property (nonatomic, readonly) CHIP_ERROR error;
 
@@ -48,11 +45,16 @@ MTR_HIDDEN
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
 {
+    return [MTRError errorForCHIPErrorCode:errorCode logContext:nil];
+}
+
++ (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode logContext:(id)contextToLog
+{
     if (errorCode == CHIP_NO_ERROR) {
         return nil;
     }
 
-    ChipLogError(Controller, "Creating NSError from %" CHIP_ERROR_FORMAT, errorCode.Format());
+    ChipLogError(Controller, "Creating NSError from %" CHIP_ERROR_FORMAT " (context: %@)", errorCode.Format(), contextToLog);
 
     if (errorCode.IsIMStatus()) {
         chip::app::StatusIB status(errorCode);

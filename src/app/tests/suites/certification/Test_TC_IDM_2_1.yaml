@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.1. [TC-IDM-2.1] Read Request Action from DUT to TH. [{DUT_Client}]
+name: 3.2.1. [TC-IDM-2.1] Read Request Action from DUT to TH. [DUT as Client]
 
 PICS:
     - MCORE.IDM.C.ReadRequest
@@ -306,7 +306,7 @@ tests:
 
     - label:
           "Step 9: DUT sends the Read Request Message to the TH to read an
-          attribute of data type bool."
+          attribute of data type bool. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bool
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -338,7 +338,7 @@ tests:
 
     - label:
           "Step 10: DUT sends the Read Request Message to the TH to read an
-          attribute of data type string."
+          attribute of data type string. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_String
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -370,7 +370,7 @@ tests:
 
     - label:
           "Step 11: DUT sends the Read Request Message to the TH to read an
-          attribute of data type unsigned integer."
+          attribute of data type unsigned integer. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_UnsignedInteger
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -403,7 +403,7 @@ tests:
 
     - label:
           "Step 12: DUT sends the Read Request Message to the TH to read an
-          attribute of data type signed integer."
+          attribute of data type signed integer. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_SignedInteger
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -435,7 +435,7 @@ tests:
 
     - label:
           "Step 13: DUT sends the Read Request Message to the TH to read an
-          attribute of data type floating point."
+          attribute of data type floating point. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify read an attribute of data type Float
@@ -445,7 +445,7 @@ tests:
 
     - label:
           "Step 14: DUT sends the Read Request Message to the TH to read an
-          attribute of data type Octet String."
+          attribute of data type Octet String. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_OctetString
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -478,7 +478,7 @@ tests:
 
     - label:
           "Step 15: DUT sends the Read Request Message to the TH to read an
-          attribute of data type Struct."
+          attribute of data type Struct. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Struct
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -510,7 +510,7 @@ tests:
 
     - label:
           "Step 16: DUT sends the Read Request Message to the TH to read an
-          attribute of data type List."
+          attribute of data type List. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_List
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -545,7 +545,7 @@ tests:
 
     - label:
           "Step 17: DUT sends the Read Request Message to the TH to read an
-          attribute of data type enum."
+          attribute of data type enum. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Enum
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -577,7 +577,7 @@ tests:
 
     - label:
           "Step 18: DUT sends the Read Request Message to the TH to read an
-          attribute of data type bitmap."
+          attribute of data type bitmap. +"
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bitmap
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)

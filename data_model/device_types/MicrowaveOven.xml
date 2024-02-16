@@ -85,7 +85,7 @@ Davis, CA 95616, USA
         <feature code="" name="Wind">
           <disallowConform/>
         </feature>
-        <feature code="" name="Airflow">
+        <feature code="" name="AirflowDirection">
           <disallowConform/>
         </feature>
       </features>

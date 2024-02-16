@@ -43,6 +43,9 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
             asserts.assert_equal(e.status, error, "Unexpected error returned")
             pass
 
+    def pics_TC_TIMESYNC_2_4(self) -> list[str]:
+        return ["TIMESYNC.S.F00"]
+
     @async_test_body
     async def test_TC_TIMESYNC_2_4(self):
 

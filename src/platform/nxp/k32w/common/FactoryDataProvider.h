@@ -88,17 +88,11 @@ public:
         kPartNumber,
         kProductURL,
         kProductLabel,
+        kProductFinish,
+        kProductPrimaryColor,
         kMaxId
     };
 
-#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
-#if !CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS
-#error "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS must be > 0 if custom provider is enabled."
-#endif
-    static constexpr uint16_t kNumberOfIds = FactoryDataId::kMaxId + CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS;
-#else
-    static constexpr uint16_t kNumberOfIds = FactoryDataId::kMaxId;
-#endif
     static uint32_t kFactoryDataStart;
     static uint32_t kFactoryDataSize;
     static uint32_t kFactoryDataPayloadStart;
@@ -107,11 +101,13 @@ public:
     static constexpr uint32_t kHashLen      = 4;
     static constexpr size_t kHashId         = 0xCE47BA5E;
 
-    FactoryDataProvider();
     virtual ~FactoryDataProvider();
 
     virtual CHIP_ERROR Init()                                                                          = 0;
     virtual CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) = 0;
+    CHIP_ERROR Validate();
+
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
@@ -142,12 +138,10 @@ public:
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override;
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+    CHIP_ERROR GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish) override;
+    CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
 
 protected:
-    CHIP_ERROR Validate();
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
-
-    uint16_t maxLengths[kNumberOfIds];
     Header mHeader;
 };
 

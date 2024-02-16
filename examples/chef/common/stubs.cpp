@@ -3,46 +3,48 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
-#ifdef EMBER_AF_PLUGIN_AIR_QUALITY_SERVER
+#ifdef MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
 #include "chef-air-quality.h"
-#endif // EMBER_AF_PLUGIN_AIR_QUALITY_SERVER
-#if defined(EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
-    defined(EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                    \
-    defined(EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
-    defined(EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
-    defined(EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
-    defined(EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                      \
-    defined(EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                               \
-    defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
-    defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                  \
-    defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+#endif // MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
+#if defined(MATTER_DM_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
+    defined(MATTER_DM_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
+    defined(MATTER_DM_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                 \
+    defined(MATTER_DM_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(MATTER_DM_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                           \
+    defined(MATTER_DM_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                     \
+    defined(MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
+    defined(MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
+    defined(MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                 \
+    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
 #include "chef-concentration-measurement.h"
 #endif
 
 using chip::app::DataModel::Nullable;
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 
-EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength)
+Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                         const EmberAfAttributeMetadata * attributeMetadata,
+                                                                         uint8_t * buffer, uint16_t maxReadLength)
 {
     switch (clusterId)
     {
-#ifdef EMBER_AF_PLUGIN_AIR_QUALITY_SERVER
+#ifdef MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
     case chip::app::Clusters::AirQuality::Id:
         return chefAirQualityReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
-#if defined(EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
-    defined(EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                    \
-    defined(EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
-    defined(EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
-    defined(EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
-    defined(EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                      \
-    defined(EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                               \
-    defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
-    defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                  \
-    defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+#if defined(MATTER_DM_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
+    defined(MATTER_DM_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
+    defined(MATTER_DM_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                 \
+    defined(MATTER_DM_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(MATTER_DM_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                           \
+    defined(MATTER_DM_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                     \
+    defined(MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
+    defined(MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
+    defined(MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                 \
+    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
     case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Id:
     case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Id:
     case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Id:
@@ -58,7 +60,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     default:
         break;
     }
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 /*
@@ -71,25 +73,26 @@ $1 = {defaultValue = {ptrToDefaultValue = 0x0, defaultValue = 0, ptrToMinMaxValu
 48 '0', mask = 16 '\020'} (gdb)
 */
 
-EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                          const EmberAfAttributeMetadata * attributeMetadata,
+                                                                          uint8_t * buffer)
 {
     switch (clusterId)
     {
-#ifdef EMBER_AF_PLUGIN_AIR_QUALITY_SERVER
+#ifdef MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
     case chip::app::Clusters::AirQuality::Id:
         return chefAirQualityWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
-#if defined(EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
-    defined(EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                    \
-    defined(EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
-    defined(EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
-    defined(EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
-    defined(EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                      \
-    defined(EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                               \
-    defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
-    defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                  \
-    defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+#if defined(MATTER_DM_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
+    defined(MATTER_DM_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
+    defined(MATTER_DM_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                 \
+    defined(MATTER_DM_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(MATTER_DM_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                           \
+    defined(MATTER_DM_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                     \
+    defined(MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
+    defined(MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
+    defined(MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                 \
+    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
     case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Id:
     case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Id:
     case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Id:
@@ -105,11 +108,11 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     default:
         break;
     }
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 // Include door lock callbacks only when the server is enabled
-#ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
+#ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #include <app/clusters/door-lock-server/door-lock-server.h>
 
 class LockManager
@@ -338,16 +341,129 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
                                                  credentialType, credentialData);
 }
 
-#endif /* EMBER_AF_PLUGIN_DOOR_LOCK_SERVER */
+#endif /* MATTER_DM_PLUGIN_DOOR_LOCK_SERVER */
 
-#ifdef EMBER_AF_PLUGIN_CHANNEL_SERVER
-#include <chef-channel-manager.h>
+void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}
+
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    ClusterId clusterId     = attributePath.mClusterId;
+    AttributeId attributeId = attributePath.mAttributeId;
+    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
+    {
+        ChipLogProgress(Zcl, "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u", ChipLogValueMEI(attributeId),
+                        type, *value, size);
+    }
+    else if (clusterId == LevelControl::Id)
+    {
+        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
+
+        // WIP Apply attribute change to Light
+    }
+}
+
+/** @brief OnOff Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * TODO Issue #3841
+ * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
+ * attributes to the default value.
+ * The logic here expects something similar to the deprecated Plugins callback
+ * emberAfPluginOnOffClusterServerPostInitCallback.
+ *
+ */
+void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
+
+#ifdef MATTER_DM_PLUGIN_AUDIO_OUTPUT_SERVER
+#include "audio-output/AudioOutputManager.h"
+static AudioOutputManager audioOutputManager;
+
+void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
+    AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
+}
+#endif
+
+#ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
+#include "channel/ChannelManager.h"
+static ChannelManager channelManager;
 
 void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
-    app::Clusters::Channel::SetDefaultDelegate(endpoint,
-                                               static_cast<app::Clusters::Channel::Delegate *>(&(ChefChannelManager::Instance())));
+    ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
+    Channel::SetDefaultDelegate(endpoint, &channelManager);
 }
-#endif // EMBER_AF_PLUGIN_CHANNEL_SERVER
+#endif
 
-void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}
+#ifdef MATTER_DM_PLUGIN_KEYPAD_INPUT_SERVER
+#include "keypad-input/KeypadInputManager.h"
+static KeypadInputManager keypadInputManager;
+
+void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: KeypadInput::SetDefaultDelegate");
+    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
+}
+#endif
+
+#ifdef MATTER_DM_PLUGIN_LOW_POWER_SERVER
+#include "low-power/LowPowerManager.h"
+static LowPowerManager lowPowerManager;
+
+void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
+    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+}
+#endif
+
+#ifdef MATTER_DM_PLUGIN_MEDIA_INPUT_SERVER
+#include "media-input/MediaInputManager.h"
+static MediaInputManager mediaInputManager;
+void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: MediaInput::SetDefaultDelegate");
+    MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
+}
+#endif
+
+#ifdef MATTER_DM_PLUGIN_MEDIA_PLAYBACK_SERVER
+#include "media-playback/MediaPlaybackManager.h"
+static MediaPlaybackManager mediaPlaybackManager;
+
+void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: MediaPlayback::SetDefaultDelegate");
+    MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
+}
+#endif
+
+#ifdef MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER
+#include "target-navigator/TargetNavigatorManager.h"
+static TargetNavigatorManager targetNavigatorManager;
+
+void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
+    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
+}
+#endif
+
+#ifdef MATTER_DM_PLUGIN_WAKE_ON_LAN_SERVER
+#include "wake-on-lan/WakeOnLanManager.h"
+static WakeOnLanManager wakeOnLanManager;
+
+void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: WakeOnLanManager::SetDefaultDelegate");
+    WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
+}
+#endif

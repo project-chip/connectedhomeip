@@ -41,6 +41,7 @@ kotlin_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/discover/DiscoverCommand.kt",
     "java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt",
     "java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.kt",
+    "java/src/com/matter/controller/commands/icd/ICDListCommand.kt",
     "java/src/com/matter/controller/commands/pairing/CloseSessionCommand.kt",
     "java/src/com/matter/controller/commands/pairing/DiscoveryFilterType.kt",
     "java/src/com/matter/controller/commands/pairing/PairAddressPaseCommand.kt",

@@ -35,17 +35,18 @@ tests:
       verification: |
           ./chip-tool dishwashermode read cluster-revision 1 1
 
-          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number (2) on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
+          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 2 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
 
-          [1690365584.246794][27436:27438] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFD DataVersion: 1130015440
-          [1690365584.246860][27436:27438] CHIP:TOO:   ClusterRevision: 2
+          CHIP:DMG : }
+          CHIP:TOO : Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFD DataVersion: 2488070594
+          CHIP:TOO :   ClusterRevision: 2
       disabled: true
 
     - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       verification: |
           ./chip-tool dishwashermode read feature-map 1 1
 
-          On the TH(Chip-tool) Log, Verify featureMap value is 1 If DISHM.S.F00(DEPONOFF) is true, Otherwise 0,  and below is the sample log provided for the raspi platform:
+          On the TH(Chip-tool) Log, Verify featureMap value is 0 and below is the sample log provided for the raspi platform:
 
           [1690365613.351850][27441:27443] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFC DataVersion: 1130015440
           [1690365613.351911][27441:27443] CHIP:TOO:   FeatureMap: 1
@@ -56,32 +57,30 @@ tests:
           ./chip-tool dishwashermode read attribute-list 1 1
 
           Verify the "AttributeList " should include the mandatory attributes (values 0, 1),
-          - Global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528) and
-          - List may include optional attribute(value 0x0002), if DISHM.S.A0002(StartUpMode) supports,
-          - List contains feature dependent attribute (values 0x0003), if DISHM.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+          - Global attributes  (value 65533, 65532, 65531, 65529 and 65528) and
+          - List may include optional attribute(value 0x0002), if DISHM.S.A0002(StartUpMode) supports, on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
-          [1689930814.439457][300741:300743] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFB DataVersion: 2031856391
-          [1689930814.439500][300741:300743] CHIP:TOO:   AttributeList: 10 entries
-          [1689930814.439520][300741:300743] CHIP:TOO:     [1]: 0
-          [1689930814.439538][300741:300743] CHIP:TOO:     [2]: 1
-          [1689930814.439565][300741:300743] CHIP:TOO:     [3]: 2
-          [1689930814.439584][300741:300743] CHIP:TOO:     [4]: 3
-          [1689930814.439599][300741:300743] CHIP:TOO:     [5]: 65528
-          [1689930814.439602][300741:300743] CHIP:TOO:     [6]: 65529
-          [1689930814.439604][300741:300743] CHIP:TOO:     [7]: 65530
-          [1689930814.439616][300741:300743] CHIP:TOO:     [8]: 65531
-          [1689930814.439619][300741:300743] CHIP:TOO:     [9]: 65532
-          [1689930814.439621][300741:300743] CHIP:TOO:     [10]: 65533
+          [1696402605.599359][7921:7923] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFB DataVersion: 712950283
+          [1696402605.599377][7921:7923] CHIP:TOO:   AttributeList: 9 entries
+          [1696402605.599382][7921:7923] CHIP:TOO:     [1]: 0
+          [1696402605.599385][7921:7923] CHIP:TOO:     [2]: 1
+          [1696402605.599388][7921:7923] CHIP:TOO:     [3]: 2
+          [1696402605.599391][7921:7923] CHIP:TOO:     [4]: 3
+          [1696402605.599393][7921:7923] CHIP:TOO:     [5]: 65528
+          [1696402605.599396][7921:7923] CHIP:TOO:     [6]: 65529
+          [1696402605.599399][7921:7923] CHIP:TOO:     [7]: 65531
+          [1696402605.599402][7921:7923] CHIP:TOO:     [8]: 65532
+          [1696402605.599404][7921:7923] CHIP:TOO:     [9]: 65533
       disabled: true
 
     - label: "Step 5: TH reads from the DUT the EventList attribute."
       verification: |
           ./chip-tool dishwashermode read event-list 1 1
 
-          Verify "EventList" contains a list of supported events, for this cluster the list is emty(0 entries) on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+          * Step 5 is currently not supported and SHALL be skipped.
 
-          [1689996691.141081][359868:359870] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFA DataVersion: 1427220838
-          [1689996691.141341][359868:359870] CHIP:TOO:   EventList: 0 entries
+          [1696402636.316151][7926:7928] CHIP:DMG: }
+          [1696402636.316183][7926:7928] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."

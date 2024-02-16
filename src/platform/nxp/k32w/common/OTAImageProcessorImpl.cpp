@@ -148,6 +148,16 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
             mAccumulator.Init(sizeof(OTATlvHeader));
 
             mCurrentProcessor = nullptr;
+
+            // If the block size is 0, it means that the processed data was a multiple of
+            // received BDX block size (e.g. 8 blocks of 1024 bytes were transferred).
+            // After state for selecting next processor is reset, a request for fetching next
+            // data must be sent.
+            if (block.size() == 0)
+            {
+                status = CHIP_NO_ERROR;
+                break;
+            }
         }
         else
         {
@@ -298,7 +308,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (block.empty())
+    if (!IsSpanUsable(block))
     {
         return CHIP_NO_ERROR;
     }
@@ -380,7 +390,11 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     // queued actions, e.g. sending events to a subscription
     SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY),
-        [](chip::System::Layer *, void *) { OtaHookReset(); }, nullptr);
+        [](chip::System::Layer *, void *) {
+            PlatformMgr().HandleServerShuttingDown();
+            OtaHookReset();
+        },
+        nullptr);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()

@@ -50,6 +50,8 @@ chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGr
 // All fabrics share the same ICD client storage.
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
+chip::app::DefaultCheckInDelegate CHIPCommand::sCheckInDelegate;
+chip::app::CheckInHandler CHIPCommand::sCheckInHandler;
 
 namespace {
 
@@ -137,7 +139,19 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
+    auto systemState = chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState();
+    VerifyOrReturnError(nullptr != systemState, CHIP_ERROR_INCORRECT_STATE);
+
+    auto server = systemState->BDXTransferServer();
+    VerifyOrReturnError(nullptr != server, CHIP_ERROR_INCORRECT_STATE);
+
+    server->SetDelegate(&BDXDiagnosticLogsServerDelegate::GetInstance());
+
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
+
+    ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage));
+    ReturnLogErrorOnFailure(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
+                                                 &sICDClientStorage, &sCheckInDelegate));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));

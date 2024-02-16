@@ -17,6 +17,7 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#include "em_rmu.h"
 #include "sl_system_kernel.h"
 
 #ifdef ENABLE_WSTK_LEDS
@@ -68,6 +69,10 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 CHIP_ERROR SilabsPlatform::Init(void)
 {
     sl_system_init();
+
+    mRebootCause = RMU_ResetCauseGet();
+    // Clear register so it does accumualate the causes of each reset
+    RMU_ResetCauseClear();
 
 #if CHIP_ENABLE_OPENTHREAD
     sl_ot_sys_init();
