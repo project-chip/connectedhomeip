@@ -151,10 +151,10 @@ static void InitServer(intptr_t context)
     ApplicationInit();
 
 #if CONFIG_ENABLE_SNTP_TIME_SYNC
-    char ntpServerUrl[]              = "pool.ntp.org";
-    uint16_t mSyncNtpTimeIntervalDay = 1;
-    chip::Esp32TimeSync mEsp32TimeSync(ntpServerUrl, mSyncNtpTimeIntervalDay);
-    mEsp32TimeSync.Init();
+    const char kNtpServerUrl[]             = "pool.ntp.org";
+    const uint16_t kSyncNtpTimeIntervalDay = 1;
+    chip::Esp32TimeSync mEsp32TimeSync;
+    mEsp32TimeSync.Init(kNtpServerUrl, kSyncNtpTimeIntervalDay);
 #endif
 }
 

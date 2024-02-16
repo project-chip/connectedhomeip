@@ -22,25 +22,14 @@
 #include <lib/support/Span.h>
 
 namespace chip {
+
+/**
+ * Class to sync real time on esp32 using ntp server.
+ */
+
 class Esp32TimeSync
 {
 public:
-    Esp32TimeSync(char * aSntpServerName, uint16_t aSyncSntpIntervalDay)
-    {
-        mSntpServerName = new char[strlen(aSntpServerName) + 1];
-        strcpy(mSntpServerName, aSntpServerName);
-        mSyncSntpIntervalDay = aSyncSntpIntervalDay;
-    }
-
-    CHIP_ERROR Init();
-
-private:
-    static CHIP_ERROR GetLocalTimeString(char * buf, size_t buf_len);
-    static bool ValidateTime();
-    static CHIP_ERROR PrintCurrentTime();
-    static void TimeSyncCallback(struct timeval * tv);
-
-    char * mSntpServerName;
-    uint16_t mSyncSntpIntervalDay;
+    void Init(const char * aSntpServerName, uint16_t aSyncSntpIntervalDay);
 };
 } // namespace chip

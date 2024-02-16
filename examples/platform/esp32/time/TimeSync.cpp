@@ -23,9 +23,11 @@
 #define REF_TIME 1546300800 /* 01-Jan-2019 00:00:00 */
 /* Timer interval once every day (24 Hours) */
 #define TIME_PERIOD_SEC 86400000ULL
-namespace chip {
+namespace {
+const uint8_t kMaxNtpServerStringSize = 128;
+char mSntpServerName[kMaxNtpServerStringSize];
 
-CHIP_ERROR Esp32TimeSync::GetLocalTimeString(char * buf, size_t buf_len)
+static CHIP_ERROR GetLocalTimeString(char * buf, size_t buf_len)
 {
     struct tm timeinfo;
     char strftime_buf[64];
@@ -42,47 +44,47 @@ CHIP_ERROR Esp32TimeSync::GetLocalTimeString(char * buf, size_t buf_len)
     return CHIP_NO_ERROR;
 }
 
-bool Esp32TimeSync::ValidateTime()
+static bool ValidateTime()
 {
     time_t now;
     time(&now);
     return (now > REF_TIME);
 }
 
-CHIP_ERROR Esp32TimeSync::PrintCurrentTime()
+static CHIP_ERROR PrintCurrentTime()
 {
     char local_time[64];
-    if (GetLocalTimeString(local_time, sizeof(local_time)) == CHIP_NO_ERROR)
+    ReturnErrorCodeIf(GetLocalTimeString(local_time, sizeof(local_time)) != CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
+    if (!ValidateTime())
     {
-        if (!ValidateTime())
-        {
-            ChipLogProgress(DeviceLayer, "Time not synchronised yet.");
-        }
-        ChipLogProgress(DeviceLayer, "The current time is: %s.", local_time);
-        return CHIP_NO_ERROR;
+        ChipLogProgress(DeviceLayer, "Time not synchronised yet.");
     }
-    return CHIP_ERROR_INTERNAL;
+    ChipLogProgress(DeviceLayer, "The current time is: %s.", local_time);
+    return CHIP_NO_ERROR;
 }
 
-void Esp32TimeSync::TimeSyncCallback(struct timeval * tv)
+static void TimeSyncCallback(struct timeval * tv)
 {
     ChipLogProgress(DeviceLayer, "SNTP Synchronised.");
     PrintCurrentTime();
 }
 
-CHIP_ERROR Esp32TimeSync::Init()
+} // anonymous namespace
+
+namespace chip {
+
+void Esp32TimeSync::Init(const char * aSntpServerName, const uint16_t aSyncSntpIntervalDay)
 {
+    strcpy(mSntpServerName, aSntpServerName);
     if (esp_sntp_enabled())
     {
         ChipLogProgress(DeviceLayer, "SNTP already initialized.");
-        return CHIP_NO_ERROR;
     }
     ChipLogProgress(DeviceLayer, "Initializing SNTP. Using the SNTP server: %s", mSntpServerName);
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
     esp_sntp_setservername(0, mSntpServerName);
-    esp_sntp_set_sync_interval(TIME_PERIOD_SEC * mSyncSntpIntervalDay);
+    esp_sntp_set_sync_interval(TIME_PERIOD_SEC * aSyncSntpIntervalDay);
     esp_sntp_init();
     sntp_set_time_sync_notification_cb(TimeSyncCallback);
-    return CHIP_NO_ERROR;
 }
 } // namespace chip
