@@ -125,6 +125,8 @@ private:
     bool SetSubscribed(bt_conn * conn);
     bool UnsetSubscribed(bt_conn * conn);
     uint32_t GetAdvertisingInterval();
+    CHIP_ERROR RegisterGattService();
+    CHIP_ERROR UnregisterGattService();
 
     static void DriveBLEState(intptr_t arg);
 

@@ -29,8 +29,8 @@ namespace {
 // List of advertising requests ordered by priority
 sys_slist_t sRequests;
 
-bool sIsInitialized;
-uint8_t sBtId;
+bool sIsInitialized = false;
+uint8_t sBtId       = 0;
 
 // Cast an intrusive list node to the containing request object
 const BLEAdvertisingArbiter::Request & ToRequest(const sys_snode_t * node)

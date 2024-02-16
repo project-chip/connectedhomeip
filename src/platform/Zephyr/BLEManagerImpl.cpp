@@ -44,7 +44,9 @@
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
+#ifdef CONFIG_BT_BONDABLE
 #include <zephyr/settings/settings.h>
+#endif // CONFIG_BT_BONDABLE
 
 #include <array>
 
@@ -162,7 +164,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     int err = 0;
-    int id = 0;
+    int id  = 0;
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
@@ -241,7 +243,13 @@ void BLEManagerImpl::DriveBLEState()
         {
             mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
             err = StartAdvertising();
-            SuccessOrExit(err);
+            if (err != CHIP_NO_ERROR)
+            {
+                // Return prematurely but keep the CHIPoBLE service mode enabled to allow advertising retries
+                mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+                ChipLogError(DeviceLayer, "Could not start CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+                return;
+            }
         }
     }
     else
@@ -249,7 +257,12 @@ void BLEManagerImpl::DriveBLEState()
         if (mFlags.Has(Flags::kAdvertising))
         {
             err = StopAdvertising();
-            SuccessOrExit(err);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+                mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+                return;
+            }
         }
 
         // If no connections are active unregister also CHIPoBLE GATT service
@@ -265,13 +278,6 @@ void BLEManagerImpl::DriveBLEState()
                 mFlags.Clear(Flags::kChipoBleGattServiceRegister);
             }
         }
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
 
@@ -338,9 +344,44 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
         else
         {
             ChipLogError(DeviceLayer, "Failed to start CHIPoBLE advertising: %d", rc);
+            BLEManagerImpl().StopAdvertising();
         }
     };
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::RegisterGattService()
+{
+    // Register CHIPoBLE GATT service
+    if (!mFlags.Has(Flags::kChipoBleGattServiceRegister))
+    {
+        int err = bt_gatt_service_register(&sChipoBleService);
+        if (err != 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to register CHIPoBLE GATT service: %d", err);
+        }
+
+        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+        mFlags.Set(Flags::kChipoBleGattServiceRegister);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::UnregisterGattService()
+{
+    // Unregister CHIPoBLE GATT service
+    if (mFlags.Has(Flags::kChipoBleGattServiceRegister))
+    {
+        int err = bt_gatt_service_unregister(&sChipoBleService);
+        if (err != 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to unregister CHIPoBLE GATT service: %d", err);
+        }
+
+        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+        mFlags.Clear(Flags::kChipoBleGattServiceRegister);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -348,19 +389,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
 {
     // Prepare advertising request
     ReturnErrorOnFailure(PrepareAdvertisingRequest());
-
-    // Register dynamically CHIPoBLE GATT service
-    if (!mFlags.Has(Flags::kChipoBleGattServiceRegister))
-    {
-        int err = bt_gatt_service_register(&sChipoBleService);
-
-        if (err != 0)
-            ChipLogError(DeviceLayer, "Failed to register CHIPoBLE GATT service");
-
-        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-
-        mFlags.Set(Flags::kChipoBleGattServiceRegister);
-    }
+    // We need to register GATT service before issuing the advertising to start
+    ReturnErrorOnFailure(RegisterGattService());
 
     // Initialize C3 characteristic data
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -368,7 +398,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
 #endif
 
     // Request advertising
-    ReturnErrorOnFailure(BLEAdvertisingArbiter::InsertRequest(mAdvertisingRequest));
+    CHIP_ERROR err = BLEAdvertisingArbiter::InsertRequest(mAdvertisingRequest);
+    if (CHIP_NO_ERROR != err)
+    {
+        // It makes not sense to keep GATT services registered after the advertising request failed
+        (void) UnregisterGattService();
+        return err;
+    }
 
     // Transition to the Advertising state...
     if (!mFlags.Has(Flags::kAdvertising))
@@ -430,22 +466,23 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising()
         DeviceLayer::SystemLayer().CancelTimer(HandleSlowBLEAdvertisementInterval, this);
         DeviceLayer::SystemLayer().CancelTimer(HandleExtendedBLEAdvertisementInterval, this);
     }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising already stopped");
+    }
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
-    {
-        ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
+    ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
 
-        mFlags.Set(Flags::kAdvertisingEnabled, val);
-        // Ensure that each enabling/disabling of the standard advertising clears
-        // the extended mode flag.
-        mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    }
+    mFlags.Set(Flags::kAdvertisingEnabled, val);
+    // Ensure that each enabling/disabling of the general advertising clears
+    // the extended mode, to make sure we always start fresh in the regular mode
+    mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
@@ -515,7 +552,10 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 
     ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
 
-    mMatterConnNum--;
+    if (mMatterConnNum > 0)
+    {
+        mMatterConnNum--;
+    }
 
     // If indications were enabled for this connection, record that they are now disabled and
     // notify the BLE Layer of a disconnect.
@@ -907,7 +947,11 @@ void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
 
     PlatformMgr().LockChipStack();
 
-    sInstance.mTotalConnNum--;
+    if (sInstance.mTotalConnNum > 0)
+    {
+        sInstance.mTotalConnNum--;
+    }
+
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
 
     VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );

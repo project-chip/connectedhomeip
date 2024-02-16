@@ -66,7 +66,8 @@ struct Request : public sys_snode_t
  *
  * @note This method must be called before trying to insert or cancel any requests.
  *
- * @param btId   Local Bluetooth LE identifier to be used for the advertising parameters.
+ * @param btId   Local Bluetooth LE identifier to be used for the advertising parameters. Currently Bluetooth LE identifier used in
+ * this method will be used for all advertising requests and changing it dynamically is not supported.
  * @return error    If the module is already initialized.
  * @return success  Otherwise.
  */
