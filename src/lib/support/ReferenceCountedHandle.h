@@ -25,30 +25,27 @@ template <typename Target>
 class ReferenceCountedHandle
 {
 public:
-    explicit ReferenceCountedHandle(Target & target) : mTarget(target) { mTarget.Retain(); }
+    explicit ReferenceCountedHandle(Target & target) : mTarget(&target) { mTarget->Retain(); }
+    ~ReferenceCountedHandle() { mTarget->Release(); }
 
-    // Ideally we would suppress this from within Optional.h, where this false positive is coming from. That said suppressing
-    // here is okay since no other cases could create instance of ReferenceCountedHandle without going through explicit
-    // contstructor.
-    //
-    // NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage): Only in a false positive is mTarget uninitialized.
-    ~ReferenceCountedHandle() { mTarget.Release(); }
-
-    ReferenceCountedHandle(const ReferenceCountedHandle & that) : mTarget(that.mTarget) { mTarget.Retain(); }
-
-    ReferenceCountedHandle(ReferenceCountedHandle && that) : mTarget(that.mTarget) { mTarget.Retain(); }
+    ReferenceCountedHandle(const ReferenceCountedHandle & that) : mTarget(that.mTarget) { mTarget->Retain(); }
+    ReferenceCountedHandle(ReferenceCountedHandle && that) : mTarget(std::move(that.mTarget)) {}
 
     ReferenceCountedHandle & operator=(const ReferenceCountedHandle & that) = delete;
-    ReferenceCountedHandle & operator=(ReferenceCountedHandle && that)      = delete;
+    ReferenceCountedHandle & operator=(ReferenceCountedHandle && that)
+    {
+        mTarget = std::move(that.mTarget);
+        return *this;
+    }
 
-    bool operator==(const ReferenceCountedHandle & that) const { return &mTarget == &that.mTarget; }
+    bool operator==(const ReferenceCountedHandle & that) const { return mTarget == that.mTarget; }
     bool operator!=(const ReferenceCountedHandle & that) const { return !(*this == that); }
 
-    Target * operator->() const { return &mTarget; }
-    Target & Get() const { return mTarget; }
+    Target * operator->() const { return mTarget; }
+    Target & Get() const { return *mTarget; }
 
 private:
-    Target & mTarget;
+    Target * mTarget;
 };
 
 } // namespace chip

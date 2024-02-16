@@ -61,14 +61,14 @@ public:
 
     // Converts an Optional of an implicitly convertible type
     template <class U, std::enable_if_t<!std::is_same_v<T, U> && std::is_convertible_v<const U, T>, bool> = true>
-    constexpr Optional(const Optional<U> & other) : mValue(other.mValue)
+    constexpr Optional(const Optional<U> & other) : mValue(other.Value())
     {}
 
     // Converts an Optional of a type that requires explicit conversion
     template <class U,
               std::enable_if_t<!std::is_same_v<T, U> && !std::is_convertible_v<const U, T> && std::is_constructible_v<T, const U &>,
                                bool> = true>
-    constexpr explicit Optional(const Optional<U> & other) : mValue(other.mValue)
+    constexpr explicit Optional(const Optional<U> & other) : mValue(other.Value())
     {}
 
     constexpr Optional(Optional && other) : mValue(std::move(other.mValue)) {}
