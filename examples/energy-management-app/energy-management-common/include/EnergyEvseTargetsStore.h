@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/clusters/energy-evse-server/energy-evse-server.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
@@ -32,32 +33,22 @@ namespace app {
 namespace Clusters {
 namespace EnergyEvse {
 
+class EvseTargetIteratorImpl;
+
 class EvseTargetsDelegate
 {
 
 public:
-    struct EvseChargingTarget
-    {
-        uint16_t targetTimeMinutesPastMidnight;
-        Optional<chip::Percent> targetSoC;
-        Optional<int64_t> addedEnergy;
-    };
-
-    class EvseTargetEntry
-    {
-    public:
-        chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekMap;
-        std::vector<EvseChargingTarget> dailyChargingTargets;
-    };
-
     CHIP_ERROR Init(PersistentStorageDelegate * targetStore);
+    EvseTargetIteratorImpl * GetEvseTargetsIterator() { return mEvseTargetsIterators; };
+    CHIP_ERROR Load(std::vector<EvseTargetEntry> & targetEntryVector, size_t & targetsSize);
+    CHIP_ERROR StoreEntry(const EvseTargetEntry & entry);
+
     CHIP_ERROR IncreaseEntryCount();
     CHIP_ERROR DecreaseEntryCount();
     CHIP_ERROR UpdateEntryCount(bool increase);
     CHIP_ERROR LoadCounter(size_t & count, size_t & targetsSize);
-    CHIP_ERROR Load(std::vector<EvseTargetEntry> & targetEntryVector, size_t & targetsSize);
     CHIP_ERROR SerializeToTlv(TLV::TLVWriter & writer, const std::vector<EvseTargetEntry> & targetEntryVector);
-    CHIP_ERROR StoreEntry(const EvseTargetEntry & entry);
 
     CHIP_ERROR CreateEntry(EvseTargetEntry &);
     CHIP_ERROR DeleteEntry(EvseTargetEntry &);
@@ -81,7 +72,19 @@ public:
      */
     CHIP_ERROR ClearTargets();
 
-    using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
+    static constexpr size_t MaxTargetEntryCounterSize()
+    {
+        // All the fields added together
+        return TLV::EstimateStructOverhead(sizeof(size_t), sizeof(size_t));
+    }
+
+    static constexpr size_t MaxTargetEntrySize()
+    {
+        // All the fields added together
+        return TLV::EstimateStructOverhead(sizeof(chip::BitMask<TargetDayOfWeekBitmap>)) +
+            kEvseTargetsMaxNumberOfDays *
+            TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(Optional<chip::Percent>), sizeof(Optional<int64_t>));
+    }
 
 protected:
     enum class TargetEntryTag : uint8_t
@@ -101,50 +104,34 @@ protected:
         kSize  = 2,
     };
 
-    class EvseTargetIteratorImpl : public EvseTargetIterator
-    {
-    public:
-        EvseTargetIteratorImpl(EvseTargetsDelegate & aDelegate) : mDelegate(aDelegate)
-        {
-            mTargetEntryIndex = 0;
-            mTargetEntryVector.clear();
-        }
-        size_t Count() override;
-        bool Next(EvseTargetEntry & entry) override;
-        void Release() override;
-
-    private:
-        EvseTargetsDelegate & mDelegate;
-        size_t mTargetEntryIndex = 0;
-        std::vector<EvseTargetEntry> mTargetEntryVector;
-    };
-
-    EvseTargetIteratorImpl * GetTargetsIterator();
-
-    static constexpr size_t MaxTargetEntryCounterSize()
-    {
-        // All the fields added together
-        return TLV::EstimateStructOverhead(sizeof(size_t), sizeof(size_t));
-    }
-
-    static constexpr size_t MaxTargetEntrySize()
-    {
-        // All the fields added together
-        return TLV::EstimateStructOverhead(sizeof(chip::BitMask<TargetDayOfWeekBitmap>)) +
-            kMaxTargetsPerDay *
-            TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(Optional<chip::Percent>), sizeof(Optional<int64_t>));
-    }
-
 private:
-    static constexpr uint8_t kMaxNumberOfDays  = 7;
-    static constexpr uint8_t kMaxTargetsPerDay = 10;
-    static constexpr size_t kIteratorsMax      = 1;
+    static constexpr uint8_t kEvseTargetsMaxNumberOfDays  = 7;
+    static constexpr uint8_t kEvseTargetsMaxTargetsPerDay = 10;
 
     // The array itself has a control byte and an end-of-array marker.
     static constexpr size_t kArrayOverHead = 2;
 
-    ObjectPool<EvseTargetIteratorImpl, kIteratorsMax> mEvseTargetsIterators;
+    EvseTargetIteratorImpl * mEvseTargetsIterators;
     PersistentStorageDelegate * mpTargetStore = nullptr;
+};
+
+class EvseTargetIteratorImpl : public CommonIterator<EvseTargetEntry>
+{
+public:
+    EvseTargetIteratorImpl(EvseTargetsDelegate & aDelegate) : mDelegate(aDelegate)
+    {
+        mTargetEntryIndex = 0;
+        mTargetEntryVector.clear();
+    }
+    size_t Count() override;
+    bool Next(EvseTargetEntry & entry) override;
+    void Release() override;
+    CHIP_ERROR Load();
+
+private:
+    EvseTargetsDelegate & mDelegate;
+    size_t mTargetEntryIndex = 0;
+    std::vector<EvseTargetEntry> mTargetEntryVector;
 };
 
 #if 0

@@ -401,17 +401,48 @@ Structs::ChargingTargetScheduleStruct::Type array[3] = {
 
     },
 };
-
-Status EnergyEvseDelegate::GetTargets(Commands::GetTargetsResponse::Type & response)
+CHIP_ERROR EnergyEvseDelegate::PrepareGetTargets(CommonIterator<EvseTargetEntry> & iterator)
 {
-    ChipLogProgress(AppServer, "EnergyEvseDelegate::GetTargets()");
+    CHIP_ERROR err;
 
-    DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
-    chargingTargetSchedules          = array;
-    response.chargingTargetSchedules = chargingTargetSchedules;
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrReturnError(targets != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    return Status::Success;
+    EvseTargetIteratorImpl * tempIterator = targets->GetEvseTargetsIterator();
+    VerifyOrReturnError(tempIterator != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    iterator = *tempIterator; // Assign the value to iterator
+
+    err = tempIterator->Load(); // Load data into the iterator
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
+
+CHIP_ERROR EnergyEvseDelegate::GetTargetsFinished()
+{
+    CHIP_ERROR err;
+
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrReturnError(targets != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    EvseTargetIteratorImpl * tempIterator = targets->GetEvseTargetsIterator();
+    tempIterator->Release();
+
+    return err;
+}
+
+// Status EnergyEvseDelegate::GetTargets(Commands::GetTargetsResponse::Type & response)
+// {
+//     ChipLogProgress(AppServer, "EnergyEvseDelegate::GetTargets()");
+
+//     DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
+//     chargingTargetSchedules          = array;
+//     response.chargingTargetSchedules = chargingTargetSchedules;
+
+//     return Status::Success;
+// }
 
 /**
  * @brief    Called when EVSE cluster receives ClearTargets command

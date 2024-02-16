@@ -30,6 +30,37 @@ using namespace chip::app::Clusters::EnergyEvse;
 
 // using namespace chip::app::Clusters::EnergyEvse::Attributes;
 
+size_t EvseTargetIteratorImpl::Count()
+{
+    return static_cast<size_t>(mTargetEntryVector.size());
+}
+bool EvseTargetIteratorImpl::Next(EvseTargetEntry & entry)
+{
+    if (mTargetEntryIndex < mTargetEntryVector.size())
+    {
+        entry = mTargetEntryVector[mTargetEntryIndex];
+        mTargetEntryIndex++;
+        return true;
+    }
+    return false;
+}
+
+void EvseTargetIteratorImpl::Release()
+{
+    mTargetEntryIndex = 0;
+    mTargetEntryVector.clear();
+
+    return;
+}
+
+CHIP_ERROR EvseTargetIteratorImpl::Load()
+{
+    size_t targetsSize = EvseTargetsDelegate::MaxTargetEntrySize();
+    ReturnErrorOnFailure(mDelegate.Load(mTargetEntryVector, targetsSize));
+
+    return CHIP_NO_ERROR;
+}
+
 #if 0
 
 CHIP_ERROR EvseTargetsStorage::DecodableEntry::Decode(TLV::TLVReader & reader)
@@ -96,71 +127,33 @@ CHIP_ERROR EvseTargetsStorage::EncodableEntry::Stage() const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EvseTargetsStorage::Init(PersistentStorageDelegate & persistentStorage)
-{
-    ChipLogProgress(AppServer, "EvseTargetsStorage: initializing");
-
-    // TODO
-    static const uint16_t kEncodedEntryTotalBytes = 1170;
-
-    CHIP_ERROR err;
-
-    size_t count = 0;
-
-    for (size_t index = 0; /**/; ++index)
-    {
-        uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
-        uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
-        err = persistentStorage.SyncGetKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName(), buffer, size);
-        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-        {
-            break;
-        }
-        SuccessOrExit(err);
-
-        TLV::TLVReader reader;
-        reader.Init(buffer, size);
-        SuccessOrExit(err = reader.Next());
-
-        DecodableEntry decodableEntry;
-        SuccessOrExit(err = decodableEntry.Decode(reader));
-
-        // Entry & entry = decodableEntry.GetEntry();
-
-        // TODO add createentry
-        // SuccessOrExit(err = GetEvseTargets().CreateEntry(entry));
-        count++;
-    }
-    ChipLogProgress(AppServer, "EvseTargetsStorage: %u entries loaded", (unsigned) count);
-    return CHIP_NO_ERROR;
-
-exit:
-    ChipLogError(AppServer, "EvseTargetsStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
-    return err;
-}
-
-
-CHIP_ERROR EvseTargetsStore::LoadTargetsFromStore()
-{
-    // TODO reinstate this one
-    //  uint8_t buf[kEnergyEvseTargetsTLVMaxSize];
-    //  uint16_t size = sizeof(buf);
-
-    // ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName(), buf, size));
-
-    // TLV::ContiguousBufferTLVReader reader;
-    // reader.Init(buf, size);
-
-    // SuccessOrExit(err = reader.Next());
-
-    // DecodableEntry decodableEntry;
-    // SuccessOrExit(err = decodableEntry.Decode(reader));
-
-    // exit:
-
-    return err;
-}
 #endif
+
+// CHIP_ERROR
+// EvseTargetsDelegate::GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules)
+// {
+//     std::vector<EvseTargetEntry> targetEntryVector;
+//     size_t targetEntrySize = MaxTargetEntrySize();
+//     ReturnErrorOnFailure(Load(targetEntryVector, targetEntrySize));
+
+//     uint8_t numberOfEntries = targetEntryVector.size();
+
+//     ChipLogProgress(AppServer, "EVSE %d targets to return", );
+
+//     uint8_t count = 0;
+//     for (auto it = targetEntryVector.begin(); it != targetEntryVector.end(); it++)
+//     {
+//         if (count < kEvseTargetsMaxNumberOfDays)
+//         {
+
+//         }
+//         // TODO work out how we want to overwrite a targetBitmap
+//         // ReturnErrorOnFailure(IncreaseEntryCount());
+//         // targetEntryVector.erase(it);
+//         // break;
+//     }
+// }
+
 /**
  * This function tries to compress a list of entries which has:
  *  dayOfWeek bitmask
@@ -225,14 +218,15 @@ CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetSchedule
     //     {
     //         /* this entry stays - but it has lost some days from the bitmask */
     //         entry.dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(bitmaskB);
-    //         //  updatedList.Put(entry);
+    //         updatedList.Put(entry);
+    //     }
     // }
 
     // /* Append new entry */
     // ChipLogDetail(AppServer, "Adding new entry with bitmask 0x%02x", newEntryBitmask);
     // createdEntry.dayOfWeekForSequence = static_cast<TargetDayOfWeekBitmap>(newEntryBitmask);
     // createdEntry.chargingTargets      = newEntry.chargingTargets;
-    // // updatedList.Put(createdEntry);
+    // updatedList.Put(createdEntry);
 
     // /* delete our original mTargets */
     // mTargets = updatedList; // TODO check this doesn't cause a memory leak?
@@ -495,7 +489,7 @@ CHIP_ERROR EvseTargetsDelegate::StoreEntry(const EvseTargetEntry & entry)
 
 CHIP_ERROR EvseTargetsDelegate::ClearTargets()
 {
-    EvseTargetIteratorImpl * iterator = GetTargetsIterator();
+    EvseTargetIteratorImpl * iterator = GetEvseTargetsIterator();
     EvseTargetEntry entry;
     CHIP_ERROR err;
 
@@ -541,29 +535,4 @@ CHIP_ERROR EvseTargetsDelegate::UpdateEntry(EvseTargetEntry & entry)
 {
 
     return CHIP_NO_ERROR;
-}
-
-EvseTargetsDelegate::EvseTargetIteratorImpl * EvseTargetsDelegate::GetTargetsIterator()
-{
-    return mEvseTargetsIterators.CreateObject(*this);
-}
-
-size_t EvseTargetsDelegate::EvseTargetIteratorImpl::Count()
-{
-    return static_cast<size_t>(mTargetEntryVector.size());
-}
-bool EvseTargetsDelegate::EvseTargetIteratorImpl::Next(EvseTargetEntry & entry)
-{
-    if (mTargetEntryIndex < mTargetEntryVector.size())
-    {
-        entry = mTargetEntryVector[mTargetEntryIndex];
-        mTargetEntryIndex++;
-        return true;
-    }
-    return false;
-}
-
-void EvseTargetsDelegate::EvseTargetIteratorImpl::Release()
-{
-    return mDelegate.mEvseTargetsIterators.ReleaseObject(this);
 }

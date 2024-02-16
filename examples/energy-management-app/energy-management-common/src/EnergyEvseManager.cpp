@@ -122,21 +122,21 @@ CHIP_ERROR EnergyEvseManager::Init()
     // Set up the EnergyEvseTargetsStore and persistent storage delegate
     EnergyEvseDelegate * dg = GetDelegate();
     VerifyOrReturnLogError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
-    EvseTargetsDelegate * targetsStore;
+    EvseTargetsDelegate * targetsStore = nullptr;
     VerifyOrReturnLogError(targetsStore != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    targetsStore->Init(&Server::GetInstance().GetPersistentStorage());
+    ReturnErrorOnFailure(targetsStore->Init(&Server::GetInstance().GetPersistentStorage()));
 
-    EvseTargetsDelegate::EvseTargetEntry entry;
+    EvseTargetEntry entry;
     entry.dayOfWeekMap = BitMask<TargetDayOfWeekBitmap>(0x42);
-    EvseTargetsDelegate::EvseChargingTarget temp;
+    EvseChargingTarget temp;
     temp.targetTimeMinutesPastMidnight = 1439;
-    temp.targetSoC.SetValue(85);
+    // temp.targetSoC.SetValue(85);
     temp.addedEnergy.SetValue(19002);
     entry.dailyChargingTargets.push_back(temp);
     temp.targetTimeMinutesPastMidnight = 1239;
     temp.targetSoC.SetValue(99);
-    temp.addedEnergy.SetValue(3001);
+    temp.addedEnergy.ClearValue();
     entry.dailyChargingTargets.push_back(temp);
 
     targetsStore->StoreEntry(entry);

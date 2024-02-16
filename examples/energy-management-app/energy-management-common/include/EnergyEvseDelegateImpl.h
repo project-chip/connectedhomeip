@@ -147,10 +147,30 @@ public:
     Status SetTargets(
         const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules) override;
 
+    // /**
+    //  * @brief    Called when EVSE cluster receives GetTargets command
+    //  */
+    // Status GetTargets(Commands::GetTargetsResponse::Type & response) override;
+    EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
     /**
-     * @brief    Called when EVSE cluster receives GetTargets command
+     * @brief Delegate should implement a handler to PrepareGetTargets
+     *
+     * This needs to load any stored targets into memory and hold it until the GetTargetsFinished is
+     * called by the cluster server.
+     *
+     * @param  Reference to CommonIterator<EvseTargetEntry> class that implements the ability
+     *         for the cluster server to iterate through the target entries
      */
-    Status GetTargets(Commands::GetTargetsResponse::Type & response) override;
+    CHIP_ERROR PrepareGetTargets(CommonIterator<EvseTargetEntry> & iterator) override;
+
+    /**
+     * @brief Delegate should implement a handler to GetTargetsFinished
+     *
+     * This is used by the cluster server to indicate it has finished preparing
+     * the GetTargetsResponse using the iterator and that the memory in the delegate can
+     * freed
+     */
+    CHIP_ERROR GetTargetsFinished() override;
 
     /**
      * @brief    Called when EVSE cluster receives ClearTargets command
@@ -158,8 +178,6 @@ public:
     Status ClearTargets() override;
 
     /* Helper functions for managing targets*/
-    EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
-
     Status
     ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
 
