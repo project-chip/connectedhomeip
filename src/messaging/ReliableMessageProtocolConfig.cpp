@@ -60,8 +60,8 @@ void ClearLocalMRPConfigOverride()
 
 ReliableMessageProtocolConfig GetDefaultMRPConfig()
 {
-    // Default MRP intervals are defined in spec <2.11.3. Parameters and Constants>
-    static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 300_ms32;
+    // Default MRP intervals are defined in spec <4.12.8. Parameters and Constants>
+    static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 500_ms32;
     static constexpr const System::Clock::Milliseconds32 activeRetransTimeout = 300_ms32;
     static constexpr const System::Clock::Milliseconds16 activeThresholdTime  = 4000_ms16;
     return ReliableMessageProtocolConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);

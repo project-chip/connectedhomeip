@@ -300,6 +300,11 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplication
     return Init(platformDelegate, nullptr, appDelegate, systemLayer);
 }
 
+void BleLayer::IndicateBleClosing()
+{
+    mState = kState_Disconnecting;
+}
+
 void BleLayer::Shutdown()
 {
     mState = kState_NotInitialized;
