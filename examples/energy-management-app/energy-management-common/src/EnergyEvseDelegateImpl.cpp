@@ -1716,7 +1716,7 @@ uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch)
     uint8_t dayOfWeek = static_cast<uint8_t>(local_time.tm_wday);
 
     // Calculate the bitmap value based on the day of the week
-    uint8_t bitmap = 1 << dayOfWeek;
+    uint8_t bitmap = static_cast<uint8_t>(1 << dayOfWeek);
 
     return bitmap;
 }
