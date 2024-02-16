@@ -251,7 +251,7 @@ void ChannelManager::HandleGetProgramGuide(
         {
             continue;
         }
-        if (endTime.ValueOr(0) < program.endTime)
+        if (endTime.ValueOr(std::numeric_limits<uint32_t>::max()) < program.endTime)
         {
             continue;
         }
@@ -315,7 +315,7 @@ bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIde
         std::string nextIdString(program.identifier.data(), program.identifier.size());
         if (nextIdString == idString)
         {
-            program.recordingFlag = MakeOptional<uint32_t>(0);
+            program.recordingFlag = MakeOptional<chip::BitMask<RecordingFlagBitmap>>(0);
         }
     }
     return true;
