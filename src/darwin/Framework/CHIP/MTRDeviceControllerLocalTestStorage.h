@@ -16,6 +16,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
 #import <Matter/Matter.h>
 
 NS_ASSUME_NONNULL_BEGIN
