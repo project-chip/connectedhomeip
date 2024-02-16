@@ -53,6 +53,8 @@ shared_library("jni") {
     "AndroidCurrentFabricRemover.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "AndroidInteractionClient.cpp",
+    "AndroidInteractionClient.h",
     "AndroidOperationalCredentialsIssuer.cpp",
     "AndroidOperationalCredentialsIssuer.h",
     "AttestationTrustStoreBridge.cpp",
@@ -64,6 +66,8 @@ shared_library("jni") {
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
     "GroupDeviceProxy.h",
+    "MatterCallbacks-JNI.cpp",
+    "MatterController-JNI.cpp",
   ]
 
   deps = [
@@ -371,12 +375,20 @@ kotlin_library("kotlin_matter_controller") {
     "src/matter/controller/CompletionListenerAdapter.kt",
     "src/matter/controller/ControllerParams.kt",
     "src/matter/controller/InteractionClient.kt",
+    "src/matter/controller/InvokeCallback.kt",
+    "src/matter/controller/InvokeCallbackJni.kt",
     "src/matter/controller/MatterController.kt",
     "src/matter/controller/MatterControllerException.kt",
     "src/matter/controller/MatterControllerImpl.kt",
     "src/matter/controller/Messages.kt",
     "src/matter/controller/OperationalKeyConfig.kt",
+    "src/matter/controller/ReportCallback.kt",
+    "src/matter/controller/ReportCallbackJni.kt",
+    "src/matter/controller/ResubscriptionAttemptCallback.kt",
+    "src/matter/controller/SubscriptionEstablishedCallback.kt",
     "src/matter/controller/SubscriptionStates.kt",
+    "src/matter/controller/WriteAttributesCallback.kt",
+    "src/matter/controller/WriteAttributesCallbackJni.kt",
     "src/matter/controller/model/Paths.kt",
     "src/matter/controller/model/States.kt",
   ]

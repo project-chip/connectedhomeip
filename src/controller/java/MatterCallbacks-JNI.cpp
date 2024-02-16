@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
-    extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_##CLASS_NAME##_##METHOD_NAME
+    extern "C" JNIEXPORT RETURN JNICALL Java_matter_controller_##CLASS_NAME##_##METHOD_NAME
 
 using namespace chip::Controller;
 
@@ -40,7 +40,7 @@ JNI_METHOD(jlong, ReportCallbackJni, newCallback)
 (JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject resubscriptionAttemptCallbackJava)
 {
     return newReportCallback(env, self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava,
-                             "()Lchip/devicecontroller/model/NodeState;");
+                             "()Lmatter/controller/model/NodeState;");
 }
 
 JNI_METHOD(void, ReportCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)

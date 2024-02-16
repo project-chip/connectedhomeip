@@ -17,6 +17,8 @@
  */
 package chip.devicecontroller;
 
+import chip.devicecontroller.model.ChipAttributePath;
+
 /** JNI wrapper callback class for {@link WriteAttributesCallback}. */
 public final class WriteAttributesCallbackJni {
   private final WriteAttributesCallback wrappedWriteAttributesCallback;
@@ -24,16 +26,33 @@ public final class WriteAttributesCallbackJni {
 
   public WriteAttributesCallbackJni(WriteAttributesCallback wrappedWriteAttributesCallback) {
     this.wrappedWriteAttributesCallback = wrappedWriteAttributesCallback;
-    this.callbackHandle = newCallback(wrappedWriteAttributesCallback);
+    this.callbackHandle = newCallback();
   }
 
   long getCallbackHandle() {
     return callbackHandle;
   }
 
-  private native long newCallback(WriteAttributesCallback wrappedCallback);
+  private native long newCallback();
 
   private native void deleteCallback(long callbackHandle);
+
+  // Called from native code only, which ignores access modifiers.
+  private void onError(
+      boolean isAttributePath, int endpointId, long clusterId, long attributeId, Exception e) {
+    wrappedWriteAttributesCallback.onError(
+        isAttributePath ? ChipAttributePath.newInstance(endpointId, clusterId, attributeId) : null,
+        e);
+  }
+
+  private void onResponse(int endpointId, long clusterId, long attributeId) {
+    wrappedWriteAttributesCallback.onResponse(
+        ChipAttributePath.newInstance(endpointId, clusterId, attributeId));
+  }
+
+  private void onDone() {
+    wrappedWriteAttributesCallback.onDone();
+  }
 
   // TODO(#8578): Replace finalizer with PhantomReference.
   @SuppressWarnings("deprecation")
