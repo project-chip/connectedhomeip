@@ -1976,7 +1976,6 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     MTR_LOG_DEBUG("Causing failure in subscribers on purpose");
     CauseReadClientFailure(self.deviceController, self.nodeID, queue, completion);
 }
-#endif
 
 // The following method is for unit testing purpose only
 + (id)CHIPEncodeAndDecodeNSObject:(id)object
@@ -2018,6 +2017,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     }
     return decodedData.GetDecodedObject();
 }
+#endif
 
 - (void)readEventsWithEndpointID:(NSNumber * _Nullable)endpointID
                        clusterID:(NSNumber * _Nullable)clusterID
