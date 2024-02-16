@@ -34,7 +34,7 @@ namespace chip {
 namespace AppPlatform {
 
 using CommandHandlerInterface    = chip::app::CommandHandlerInterface;
-using Status                     = Protocols::InteractionModel::Status;
+using Status                     = chip::Protocols::InteractionModel::Status;
 using LaunchResponseType         = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
 using PlaybackResponseType       = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
 using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;

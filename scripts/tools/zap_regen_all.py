@@ -368,26 +368,6 @@ def getGlobalTemplatesTargets():
         example_name = example_name[example_name.index('examples/') + 9:]
         example_name = example_name[:example_name.index('/')]
 
-        # Place holder has apps within each build
-        if example_name == "placeholder":
-            example_name = filepath.as_posix()
-            example_name = example_name[example_name.index(
-                'apps/') + len('apps/'):]
-            example_name = example_name[:example_name.index('/')]
-            logging.info("Found example %s (via %s)" %
-                         (example_name, str(filepath)))
-
-            # The name zap-generated is to make includes clear by using
-            # a name like <zap-generated/foo.h>
-            output_dir = os.path.join(
-                'zzz_generated', 'placeholder', example_name, 'zap-generated')
-            template = os.path.join(
-                'examples', 'placeholder', 'linux', 'apps', example_name, 'templates', 'templates.json')
-
-            targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
-            targets.append(ZAPGenerateTarget(ZapInput.FromZap(filepath), output_dir=output_dir, template=template))
-            continue
-
         if example_name == "chef":
             if os.path.join("chef", "devices") not in str(filepath):
                 continue
@@ -400,17 +380,6 @@ def getGlobalTemplatesTargets():
         logging.info("Found example %s (via %s)" %
                      (example_name, str(filepath)))
 
-        generate_subdir = example_name
-
-        # Special casing lighting app because separate folders
-        if example_name == "lighting-app" or example_name == "lock-app":
-            if 'nxp' in str(filepath):
-                generate_subdir = f"{example_name}/nxp"
-
-        # The name zap-generated is to make includes clear by using
-        # a name like <zap-generated/foo.h>
-        output_dir = os.path.join(
-            'zzz_generated', generate_subdir, 'zap-generated')
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
     targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json'),
@@ -450,7 +419,6 @@ def getSpecificTemplatesTargets():
     # Mapping of required template and output directory
     templates = {
         'src/app/common/templates/templates.json': 'zzz_generated/app-common/app-common/zap-generated',
-        'src/app/tests/suites/templates/templates.json': 'zzz_generated/app-common/app-common/zap-generated',
         'examples/chip-tool/templates/templates.json': 'zzz_generated/chip-tool/zap-generated',
         'examples/darwin-framework-tool/templates/templates.json': 'zzz_generated/darwin-framework-tool/zap-generated',
         'src/controller/python/templates/templates.json': None,

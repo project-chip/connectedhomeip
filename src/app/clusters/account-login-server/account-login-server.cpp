@@ -34,6 +34,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>

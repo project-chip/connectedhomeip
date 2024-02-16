@@ -24,6 +24,8 @@
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPEncoding.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 // TODO: figure out a clear path for compile-time codegen
 #include <app/PluginApplicationCallbacks.h>
@@ -33,6 +35,8 @@
 #endif // MATTER_DM_PLUGIN_GROUPS_SERVER
 
 using namespace chip;
+
+using chip::Protocols::InteractionModel::Status;
 
 //------------------------------------------------------------------------------
 // Forward Declarations
@@ -56,8 +60,8 @@ bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
     uint16_t identifyTime;
-    EmberAfStatus status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
-    return (status == EMBER_ZCL_STATUS_SUCCESS && 0 < identifyTime);
+    Status status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
+    return (status == Status::Success && 0 < identifyTime);
 #else
     return false;
 #endif
@@ -104,7 +108,7 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
 // ****************************************
 void emberAfInit()
 {
-    emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
+    emberAfInitializeAttributes(kInvalidEndpointId);
 
     MATTER_PLUGINS_INIT
 
@@ -163,8 +167,10 @@ void MatterDishwasherAlarmPluginServerInitCallback() {}
 void MatterMicrowaveOvenModePluginServerInitCallback() {}
 void MatterDeviceEnergyManagementModePluginServerInitCallback() {}
 void MatterEnergyEvseModePluginServerInitCallback() {}
+void MatterPowerTopologyPluginServerInitCallback() {}
 void MatterElectricalEnergyMeasurementPluginServerInitCallback() {}
 void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
+
 // ****************************************
 // Print out information about each cluster
 // ****************************************
@@ -227,8 +233,7 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
             length = static_cast<decltype(length)>(size);
         }
         memmove(dest + 2, src + 2, length);
-        dest[0] = EMBER_LOW_BYTE(length);
-        dest[1] = EMBER_HIGH_BYTE(length);
+        Encoding::LittleEndian::Put16(dest, length);
     }
 }
 

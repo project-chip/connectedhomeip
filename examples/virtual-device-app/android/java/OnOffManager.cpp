@@ -82,8 +82,9 @@ void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
 
 jboolean OnOffManager::SetOnOff(jint endpoint, bool value)
 {
-    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status status =
+        app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
+    return status == Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)

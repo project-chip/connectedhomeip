@@ -169,9 +169,10 @@ enum PublicEventTypes
 
     /**
      * When supportsConcurrentConnection = False, the ConnectNetwork command cannot start until
-     * the BLE device is closed and the WiFi device has been started.
+     * the BLE device is closed and the Operation Network device (e.g. WiFi) has been started.
      */
     kWiFiDeviceAvailable,
+    kOperationalNetworkStarted,
 
     /**
      * Thread State Change

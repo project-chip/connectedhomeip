@@ -55,7 +55,6 @@ ti/ti_platform_overview
 ## Development Guides
 
 -   [Access Control](./access-control-guide.md)
--   [IP Commissioning](./ip_commissioning.md)
 -   [Matter IDL tooling and validation](./matter_idl_tooling.md)
 
 ## Setup Guides

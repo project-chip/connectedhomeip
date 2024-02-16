@@ -18,64 +18,94 @@
 #include "MessagesManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <vector>
 
 using namespace std;
+using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Messages;
-using Message = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
+using Message               = chip::app::Clusters::Messages::Structs::MessageStruct::Type;
+using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type;
 
 // Commands
-void MessagesManager::HandlePresentMessagesRequest(
-    const chip::ByteSpan & messageId, const MessagePriorityEnum & priority,
-    const chip::BitMask<MessageControlBitmap> & messageControl, const chip::app::DataModel::Nullable<uint32_t> & startTime,
-    const chip::app::DataModel::Nullable<uint16_t> & duration, const chip::CharSpan & messageText,
-    const chip::Optional<chip::app::DataModel::DecodableList<MessageResponseOption>> & responses)
+CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
+    const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
+    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
+    const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
-    Message message{
-        // TODO: Enable id
-        chip::ByteSpan(), priority, messageControl, startTime, duration,
-        // TODO: Enable text
-        chip::CharSpan()
-        // TODO: Convert responses to Optional<chip::app::DataModel::List<const
-        // chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> message.responses = responses;
-    };
+    ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());
 
-    mMessages.push_back(message);
+    auto cachedMessage = CachedMessage(messageId, priority, messageControl, startTime, duration,
+                                       std::string(messageText.data(), messageText.size()));
+    if (responses.HasValue())
+    {
+        auto iter = responses.Value().begin();
+        while (iter.Next())
+        {
+            auto & response = iter.GetValue();
+
+            CachedMessageOption option(response.messageResponseID.Value(),
+                                       std::string(response.label.Value().data(), response.label.Value().size()));
+
+            cachedMessage.AddOption(option);
+        }
+    }
+
+    mCachedMessages.push_back(cachedMessage);
+
     // Add your code to present Message
+    ChipLogProgress(Zcl, "HandlePresentMessagesRequest complete");
+    return CHIP_NO_ERROR;
 }
 
-void MessagesManager::HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds)
+CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
 {
-    // TODO: Cancel Message
+    auto iter = messageIds.begin();
+    while (iter.Next())
+    {
+        auto & id = iter.GetValue();
+
+        mCachedMessages.remove_if([id](CachedMessage & entry) { return entry.MessageIdMatches(id); });
+        // per spec, the command succeeds even when the message id does not match an existing message
+    }
+    return CHIP_NO_ERROR;
 }
 
 // Attributes
-CHIP_ERROR MessagesManager::HandleGetMessages(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (Message & entry : mMessages)
+        for (CachedMessage & entry : mCachedMessages)
         {
-            ReturnErrorOnFailure(encoder.Encode(entry));
+            ReturnErrorOnFailure(encoder.Encode(entry.GetMessage()));
         }
         return CHIP_NO_ERROR;
     });
 }
 
-CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (Message & entry : mMessages)
+        for (CachedMessage & entry : mCachedMessages)
         {
-            ReturnErrorOnFailure(encoder.Encode(entry.messageID));
+            ReturnErrorOnFailure(encoder.Encode(entry.GetMessage().messageID));
         }
         return CHIP_NO_ERROR;
     });
 }
 
 // Global Attributes
-uint32_t MessagesManager::GetFeatureMap(chip::EndpointId endpoint)
+uint32_t MessagesManager::GetFeatureMap(EndpointId endpoint)
 {
-    uint32_t featureMap = 0;
-    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    BitMask<Feature> FeatureMap;
+    FeatureMap.Set(Feature::kReceivedConfirmation);
+    FeatureMap.Set(Feature::kConfirmationResponse);
+    FeatureMap.Set(Feature::kConfirmationReply);
+    FeatureMap.Set(Feature::kProtectedMessages);
+
+    uint32_t featureMap = FeatureMap.Raw();
+    ChipLogProgress(Zcl, "GetFeatureMap featureMap=%d", featureMap);
+    // forcing to all features since this implementation supports all
+    // Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
 }
