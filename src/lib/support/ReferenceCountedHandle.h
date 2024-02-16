@@ -26,10 +26,17 @@ class ReferenceCountedHandle
 {
 public:
     explicit ReferenceCountedHandle(Target & target) : mTarget(&target) { mTarget->Retain(); }
-    ~ReferenceCountedHandle() { mTarget->Release(); }
+    ~ReferenceCountedHandle()
+    {
+        if (mTarget != nullptr)
+        {
+            // release only if target has not been moved out
+            mTarget->Release();
+        }
+    }
 
     ReferenceCountedHandle(const ReferenceCountedHandle & that) : mTarget(that.mTarget) { mTarget->Retain(); }
-    ReferenceCountedHandle(ReferenceCountedHandle && that) : mTarget(std::move(that.mTarget)) {}
+    ReferenceCountedHandle(ReferenceCountedHandle && that) : mTarget(std::move(that.mTarget)) { that.mTarget = nullptr; }
 
     ReferenceCountedHandle & operator=(const ReferenceCountedHandle & that)
     {
@@ -40,7 +47,8 @@ public:
 
     ReferenceCountedHandle & operator=(ReferenceCountedHandle && that)
     {
-        mTarget = std::move(that.mTarget);
+        mTarget      = std::move(that.mTarget);
+        that.mTarget = nullptr;
         return *this;
     }
 

@@ -167,7 +167,7 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
     {
         auto testSrc = MakeNullable<MovableCtorDtorCounter>(400);
         Nullable<MovableCtorDtorCounter> testDst(std::move(testSrc));
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 1);
+        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
         NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 400);
     }
     NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 2);
@@ -179,7 +179,7 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
 
         auto testSrc = MakeNullable<MovableCtorDtorCounter>(401);
         testDst      = std::move(testSrc);
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 4 && CtorDtorCounter::destroyed == 3);
+        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 4 && CtorDtorCounter::destroyed == 2);
         NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 401);
     }
     NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 4 && CtorDtorCounter::destroyed == 4);

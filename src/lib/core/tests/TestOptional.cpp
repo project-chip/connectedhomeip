@@ -168,7 +168,7 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
     {
         auto testSrc = MakeOptional<CountMovable>(400);
         Optional<CountMovable> testDst(std::move(testSrc));
-        NL_TEST_ASSERT(inSuite, Count::created == 2 && Count::destroyed == 1);
+        NL_TEST_ASSERT(inSuite, Count::created == 2 && Count::destroyed == 0);
         NL_TEST_ASSERT(inSuite, testDst.HasValue() && testDst.Value().m == 400);
     }
     NL_TEST_ASSERT(inSuite, Count::created == 2 && Count::destroyed == 2);
@@ -180,7 +180,7 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
 
         auto testSrc = MakeOptional<CountMovable>(401);
         testDst      = std::move(testSrc);
-        NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 3);
+        NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 2);
         NL_TEST_ASSERT(inSuite, testDst.HasValue() && testDst.Value().m == 401);
     }
     NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 4);
