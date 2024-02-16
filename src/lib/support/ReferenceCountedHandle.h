@@ -31,7 +31,8 @@ public:
     ReferenceCountedHandle(const ReferenceCountedHandle & that) : mTarget(that.mTarget) { mTarget->Retain(); }
     ReferenceCountedHandle(ReferenceCountedHandle && that) : mTarget(std::move(that.mTarget)) {}
 
-    ReferenceCountedHandle & operator=(const ReferenceCountedHandle & that) {
+    ReferenceCountedHandle & operator=(const ReferenceCountedHandle & that)
+    {
         mTarget = that.mTarget;
         mTarget->Retain();
         return *this;
