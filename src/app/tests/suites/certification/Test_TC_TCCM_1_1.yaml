@@ -52,7 +52,7 @@ tests:
 
     - label:
           "Step 3: TH reads from the DUT the FeatureMap attribute, bit 0: SHALL
-          be 1 if and only if TCCM.S.F00(DEPONOFF)"
+          be 1 if and only if TCCM.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: TCCM.S.F00
@@ -92,7 +92,7 @@ tests:
 
     - label:
           "Step 4c: TH reads from the DUT the AttributeList attribute. 0x0003
-          SHALL be included if and only if TCCM.S.F00(DEPONOFF)"
+          SHALL be included if and only if TCCM.S.F00"
       PICS: TCCM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"

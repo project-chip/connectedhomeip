@@ -43,7 +43,7 @@ tests:
 
     - label:
           "Step 3:TH reads from the DUT the FeatureMap attribute., bit 0: SHALL
-          be 1 if and only if LWM.S.F00(DEPONOFF)"
+          be 1 if and only if LWM.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: LWM.S.F00
@@ -91,8 +91,7 @@ tests:
               contains: [2]
 
     - label:
-          "Step 4c: TH reads the Feature dependent attribute(DEPONOFF) in
-          AttributeList"
+          "Step 4c: TH reads the Feature dependent attribute in AttributeList"
       PICS: LWM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
