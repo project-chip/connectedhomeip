@@ -433,17 +433,6 @@ CHIP_ERROR EnergyEvseDelegate::GetTargetsFinished()
     return err;
 }
 
-// Status EnergyEvseDelegate::GetTargets(Commands::GetTargetsResponse::Type & response)
-// {
-//     ChipLogProgress(AppServer, "EnergyEvseDelegate::GetTargets()");
-
-//     DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules;
-//     chargingTargetSchedules          = array;
-//     response.chargingTargetSchedules = chargingTargetSchedules;
-
-//     return Status::Success;
-// }
-
 /**
  * @brief    Called when EVSE cluster receives ClearTargets command
  */

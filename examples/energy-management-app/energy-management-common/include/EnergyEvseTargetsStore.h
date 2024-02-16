@@ -39,6 +39,8 @@ class EvseTargetsDelegate
 public:
     using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
 
+    ~EvseTargetsDelegate();
+
     CHIP_ERROR Init(PersistentStorageDelegate * targetStore);
     EvseTargetIteratorImpl * GetEvseTargetsIterator();
     CHIP_ERROR Load(std::vector<EvseTargetEntry> & targetEntryVector, size_t & targetsSize);

@@ -40,6 +40,7 @@ constexpr int64_t kMaximumChargeCurrent         = 80000;
 constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
 constexpr uint8_t kEvseTargetsMaxNumberOfDays   = 7;
 constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
+
 struct EvseChargingTarget
 {
     uint16_t targetTimeMinutesPastMidnight;

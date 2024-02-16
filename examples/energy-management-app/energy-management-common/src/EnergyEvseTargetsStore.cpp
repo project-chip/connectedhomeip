@@ -40,6 +40,13 @@ EvseTargetIteratorImpl * EvseTargetsDelegate::GetEvseTargetsIterator()
     }
     return mEvseTargetsIterator;
 };
+EvseTargetsDelegate::~EvseTargetsDelegate()
+{
+    if (mEvseTargetsIterator)
+    {
+        delete mEvseTargetsIterator;
+    }
+}
 
 size_t EvseTargetIteratorImpl::Count()
 {

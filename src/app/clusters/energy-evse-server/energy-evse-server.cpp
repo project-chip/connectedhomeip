@@ -377,7 +377,7 @@ void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets
 
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
-    EvseTargetIterator * it;
+    EvseTargetIterator * it = nullptr;
 
     EvseTargetEntry chargingTargetScheduleEntry;
     Structs::ChargingTargetScheduleStruct::Type entry;
@@ -401,6 +401,7 @@ void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets
                                                TLV::TLVType::kTLVType_Array, listContainerType));
 
     SuccessOrExit(err = mDelegate.PrepareGetTargets(&it));
+    VerifyOrExit(it != nullptr, err = CHIP_ERROR_UNINITIALIZED);
 
     while (it->Next(chargingTargetScheduleEntry))
     {
@@ -423,17 +424,13 @@ void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets
 
         SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), entry));
     }
-    // if (status == Status::Success)
-    // {
-    //     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    // }
-    // else
-    // {
-    //     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-    // }
+
     SuccessOrExit(err = writer->EndContainer(listContainerType));
     SuccessOrExit(err = commandHandle->FinishCommand());
 exit:
+    // Release iterator and any memory
+    mDelegate.GetTargetsFinished();
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to encode response: %" CHIP_ERROR_FORMAT, err.Format());
