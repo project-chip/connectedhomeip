@@ -250,7 +250,7 @@ tests:
           to 20000 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          scenesmanagement add-scene 0x0001 0x01 20 scene1 [] 1 1
+          ./chip-tool scenesmanagement add-scene 0x0001 0x01 20000 scene1 [] 1 1
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
@@ -412,7 +412,7 @@ tests:
           field sets. If RemainingCapacity is 0, continue to Step 8a."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0001 0x03 20 scene1 [] 1 1
+          ./chip-tool scenesmanagement add-scene 0x0001 0x03 20000 scene1 [] 1 1
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS

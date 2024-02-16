@@ -376,50 +376,39 @@ tests:
           set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
       verification: |
-          ./chip-tool scenesmanagement view-scene GroupId SceneId Node-Id EndpointId
+          ./chip-tool scenesmanagement view-scene 0x0101 0x01 1 1
 
-          Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
+          Verify DUT sends a ViewSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to G1, the SceneID field set to 0x01, the TransitionTime field set to 1000 and a set of extension fields appropriate to AC1 on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
 
-          Verify that the extension fields in the log match the ones expected in the following log:
-          [1705680224.968551][5827:5829] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0001
-          [1705680224.968559][5827:5829] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0001
-          CHIP:TOO:   ViewSceneResponse: {
-          CHIP:TOO:     status: 0
-          CHIP:TOO:     groupID: 1
-          CHIP:TOO:     sceneID: 1
-          CHIP:TOO:     transitionTime: 1000
-          CHIP:TOO:     sceneName:
-          CHIP:TOO:     extensionFieldSets: 3 entries
-          CHIP:TOO:       [1]: {
-          CHIP:TOO:         ClusterID: XX
-          CHIP:TOO:         AttributeValueList: X entries
-          CHIP:TOO:           [1]: {
-          CHIP:TOO:             AttributeID: XX
-          CHIP:TOO:             AttributeValue:XX
-          CHIP:TOO:            }
-          CHIP:TOO:        }
-          CHIP:TOO:       [2]: {
-          CHIP:TOO:         ClusterID: XX
-          CHIP:TOO:         AttributeValueList: X entries
-          CHIP:TOO:           [1]: {
-          CHIP:TOO:             AttributeID: XX
-          CHIP:TOO:             AttributeValue: XX
-          CHIP:TOO:            }
-          CHIP:TOO:        }
-          CHIP:TOO:       [3]: {
-          CHIP:TOO:         ClusterID: XX
-          CHIP:TOO:         AttributeValueList: XX entries
-          CHIP:TOO:           [X]: {
-          CHIP:TOO:             AttributeID: XX
-          CHIP:TOO:             AttributeValue: XX
-          CHIP:TOO:            }
-          ...
-          CHIP:TOO:           [X]: {
-          CHIP:TOO:             AttributeID: XX
-          CHIP:TOO:             AttributeValue: XX
-          CHIP:TOO:            }
-          CHIP:TOO:        }
-          CHIP:TOO:    }
+
+          NOTE: The values below are expected to match the values from the specific AC tested
+
+          [1708071897.294470][7731:7733] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0001
+          [1708071897.294486][7731:7733] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0001
+          [1708071897.294520][7731:7733] CHIP:TOO:   ViewSceneResponse: {
+          [1708071897.294527][7731:7733] CHIP:TOO:     status: 0
+          [1708071897.294530][7731:7733] CHIP:TOO:     groupID: 257
+          [1708071897.294533][7731:7733] CHIP:TOO:     sceneID: 1
+          [1708071897.294536][7731:7733] CHIP:TOO:     transitionTime: 1000
+          [1708071897.294540][7731:7733] CHIP:TOO:     sceneName: scene name
+          [1708071897.294554][7731:7733] CHIP:TOO:     extensionFieldSets: 2 entries
+          [1708071897.294569][7731:7733] CHIP:TOO:       [1]: {
+          [1708071897.294574][7731:7733] CHIP:TOO:         ClusterID: 6
+          [1708071897.294580][7731:7733] CHIP:TOO:         AttributeValueList: 1 entries
+          [1708071897.294589][7731:7733] CHIP:TOO:           [1]: {
+          [1708071897.294593][7731:7733] CHIP:TOO:             AttributeID: 1
+          [1708071897.294596][7731:7733] CHIP:TOO:             AttributeValue: 1
+          [1708071897.294599][7731:7733] CHIP:TOO:            }
+          [1708071897.294603][7731:7733] CHIP:TOO:        }
+          [1708071897.294611][7731:7733] CHIP:TOO:       [2]: {
+          [1708071897.294615][7731:7733] CHIP:TOO:         ClusterID: 8
+          [1708071897.294621][7731:7733] CHIP:TOO:         AttributeValueList: 1 entries
+          [1708071897.294628][7731:7733] CHIP:TOO:           [1]: {
+          [1708071897.294633][7731:7733] CHIP:TOO:             AttributeID: 0
+          [1708071897.294636][7731:7733] CHIP:TOO:             AttributeValue: 100
+          [1708071897.294639][7731:7733] CHIP:TOO:            }
+          [1708071897.294643][7731:7733] CHIP:TOO:        }
+          [1708071897.294647][7731:7733] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
