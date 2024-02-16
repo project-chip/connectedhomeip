@@ -242,8 +242,9 @@ CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetSchedule
 
 CHIP_ERROR EvseTargetsDelegate::Init(PersistentStorageDelegate * targetStore)
 {
+    ChipLogProgress(AppServer, "EVSE: Initializing EvseTargetsDelegate");
     VerifyOrReturnError(targetStore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mpTargetStore == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     mpTargetStore = targetStore;
 
     return CHIP_NO_ERROR;

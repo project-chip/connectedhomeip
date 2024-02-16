@@ -26,15 +26,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <vector>
-// #include <app/util/af.h>
-// #include <app/util/config.h>
-// #include <cstring>
-namespace {
 
-// The array itself has a control byte and an end-of-array marker.
-constexpr size_t kArrayOverHead = 2;
-
-} // namespace
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -147,6 +139,9 @@ private:
     static constexpr uint8_t kMaxNumberOfDays  = 7;
     static constexpr uint8_t kMaxTargetsPerDay = 10;
     static constexpr size_t kIteratorsMax      = 1;
+
+    // The array itself has a control byte and an end-of-array marker.
+    static constexpr size_t kArrayOverHead = 2;
 
     ObjectPool<EvseTargetIteratorImpl, kIteratorsMax> mEvseTargetsIterators;
     PersistentStorageDelegate * mpTargetStore = nullptr;
