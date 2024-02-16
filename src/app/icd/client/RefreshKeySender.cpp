@@ -28,9 +28,9 @@ namespace chip {
 namespace app {
 
 RefreshKeySender::RefreshKeySender(CheckInDelegate * checkInDelegate, const ICDClientInfo & icdClientInfo,
-                                   ICDClientStorage * icdClientStorage, const RefreshKeyBuffer & refreshKeyBuffer) :
-    mICDClientInfo(icdClientInfo),
-    mpICDClientStorage(icdClientStorage), mpCheckInDelegate(checkInDelegate), mOnConnectedCallback(HandleDeviceConnected, this),
+                                   ICDClientStorage * icdClientStorage, InteractionModelEngine *engine, const RefreshKeyBuffer & refreshKeyBuffer) :
+    mpCheckInDelegate(checkInDelegate), mICDClientInfo(icdClientInfo),
+    mpICDClientStorage(icdClientStorage), mpImEngine(engine), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 
 {
@@ -64,9 +64,7 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
         }
 
         mpCheckInDelegate->OnCheckInComplete(mICDClientInfo);
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-        InteractionModelEngine::GetInstance()->OnActiveModeNotification(mICDClientInfo.peer_node);
-#endif
+        mpImEngine->OnActiveModeNotification(mICDClientInfo.peer_node);
         mpCheckInDelegate->OnKeyRefreshDone(this, CHIP_NO_ERROR);
     };
 

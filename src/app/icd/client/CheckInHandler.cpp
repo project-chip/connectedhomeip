@@ -45,7 +45,7 @@ inline constexpr uint32_t kKeyRefreshLimit   = (1U << 31);
 CheckInHandler::CheckInHandler() {}
 
 CHIP_ERROR CheckInHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage,
-                                CheckInDelegate * delegate)
+                                CheckInDelegate * delegate, InteractionModelEngine * engine)
 {
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(clientStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -55,7 +55,7 @@ CHIP_ERROR CheckInHandler::Init(Messaging::ExchangeManager * exchangeManager, IC
     mpExchangeManager  = exchangeManager;
     mpICDClientStorage = clientStorage;
     mpCheckInDelegate  = delegate;
-
+    mpImEngine = engine;
     return mpExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn, this);
 }
 
@@ -128,9 +128,7 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
     else
     {
         mpCheckInDelegate->OnCheckInComplete(clientInfo);
-        #if CHIP_CONFIG_ENABLE_READ_CLIENT
-        InteractionModelEngine::GetInstance()->OnActiveModeNotification(clientInfo.peer_node);
-        #endif
+        mpImEngine->OnActiveModeNotification(clientInfo.peer_node);
     }
 
     return CHIP_NO_ERROR;

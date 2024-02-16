@@ -24,11 +24,12 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage)
+CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage, InteractionModelEngine * engine)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mpStorage = storage;
+    mpImEngine = engine;
     return CHIP_NO_ERROR;
 }
 
@@ -51,7 +52,7 @@ RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
         return nullptr;
     }
 
-    auto refreshKeySender = Platform::New<RefreshKeySender>(this, clientInfo, clientStorage, newKey);
+    auto refreshKeySender = Platform::New<RefreshKeySender>(this, clientInfo, clientStorage, mpImEngine, newKey);
     if (refreshKeySender == nullptr)
     {
         return nullptr;
