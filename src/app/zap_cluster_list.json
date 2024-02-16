@@ -228,7 +228,7 @@
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
-        "POWER_TOPOLOGY_CLUSTER": [],
+        "POWER_TOPOLOGY_CLUSTER": ["power-topology-server"],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": ["operational-credentials-server"],
         "OPERATIONAL_STATE_CLUSTER": ["operational-state-server"],
