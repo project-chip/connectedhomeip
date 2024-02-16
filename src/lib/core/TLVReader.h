@@ -86,6 +86,8 @@ class DLL_EXPORT TLVReader
     friend class TLVUpdater;
 
 public:
+    TLVReader();
+
     /**
      * Initializes a TLVReader object from another TLVReader object.
      *
@@ -943,26 +945,26 @@ public:
      * If an implicitly-encoded tag is encountered while @p ImplicitProfileId is set to
      * kProfileIdNotSpecified, the reader will return a #CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG error.
      */
-    uint32_t ImplicitProfileId = kProfileIdNotSpecified;
+    uint32_t ImplicitProfileId;
 
     /**
      * A pointer field that can be used for application-specific data.
      */
-    void * AppData = nullptr;
+    void * AppData;
 
 protected:
     Tag mElemTag;
-    uint64_t mElemLenOrVal          = 0;
-    TLVBackingStore * mBackingStore = nullptr;
-    const uint8_t * mReadPoint      = nullptr;
-    const uint8_t * mBufEnd         = nullptr;
-    uint32_t mLenRead               = 0;
-    uint32_t mMaxLen                = 0;
-    TLVType mContainerType          = kTLVType_NotSpecified;
-    uint16_t mControlByte           = kTLVControlByte_NotSpecified;
+    uint64_t mElemLenOrVal;
+    TLVBackingStore * mBackingStore;
+    const uint8_t * mReadPoint;
+    const uint8_t * mBufEnd;
+    uint32_t mLenRead;
+    uint32_t mMaxLen;
+    TLVType mContainerType;
+    uint16_t mControlByte;
 
 private:
-    bool mContainerOpen = false;
+    bool mContainerOpen;
 
 protected:
     bool IsContainerOpen() const { return mContainerOpen; }
