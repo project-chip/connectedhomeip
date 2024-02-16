@@ -33,10 +33,26 @@ public:
     bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) override;
     bool HandleSelectOutput(const uint8_t & index) override;
 
+    struct OutputData
+    {
+        uint8_t index;
+        chip::app::Clusters::AudioOutput::OutputTypeEnum outputType;
+        std::string name;
+
+        OutputData(uint8_t i, chip::app::Clusters::AudioOutput::OutputTypeEnum t, const char * n) : index(i), outputType(t), name(n)
+        {}
+        void Rename(const chip::CharSpan & newName) { name.assign(newName.data(), newName.size()); }
+        OutputInfoType GetEncodable() const
+        {
+            OutputInfoType result;
+            result.index      = index;
+            result.outputType = outputType;
+            result.name       = chip::CharSpan::fromCharString(name.c_str());
+            return result;
+        }
+    };
+
 protected:
     uint8_t mCurrentOutput = 1;
-    std::vector<OutputInfoType> mOutputs;
-    // Magic numbers are here on purpose, please allocate memory
-    static constexpr size_t mNameLenMax = 32;
-    char mOutputName[10][mNameLenMax];
+    std::vector<struct OutputData> mOutputs;
 };

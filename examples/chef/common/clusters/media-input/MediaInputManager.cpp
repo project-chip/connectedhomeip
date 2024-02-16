@@ -25,25 +25,25 @@ using namespace chip::app::Clusters::MediaInput;
 
 MediaInputManager::MediaInputManager()
 {
-    mCurrentInput = 1;
+    struct InputData inputData1(1, chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi, "HDMI 1",
+                                "High-Definition Multimedia Interface");
+    mInputs.push_back(inputData1);
+    struct InputData inputData2(2, chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi, "HDMI 2",
+                                "High-Definition Multimedia Interface");
+    mInputs.push_back(inputData2);
+    struct InputData inputData3(3, chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi, "HDMI 3",
+                                "High-Definition Multimedia Interface");
+    mInputs.push_back(inputData3);
 
-    for (int i = 1; i < mTotalInput; ++i)
-    {
-        InputInfoType inputInfo;
-        inputInfo.description = chip::CharSpan::fromCharString("High-Definition Multimedia Interface");
-        inputInfo.name        = chip::CharSpan::fromCharString("HDMI");
-        inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
-        inputInfo.index       = static_cast<uint8_t>(i);
-        mInputs.push_back(inputInfo);
-    }
+    mCurrentInput = 1;
 }
 
 CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (auto const & inputInfo : this->mInputs)
+        for (auto const & inputData : this->mInputs)
         {
-            ReturnErrorOnFailure(encoder.Encode(inputInfo));
+            ReturnErrorOnFailure(encoder.Encode(inputData.GetEncodable()));
         }
         return CHIP_NO_ERROR;
     });
@@ -56,9 +56,9 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
-    for (InputInfoType & input : mInputs)
+    for (auto const & inputData : mInputs)
     {
-        if (input.index == index)
+        if (inputData.index == index)
         {
             mCurrentInput = index;
             return true;
@@ -71,13 +71,11 @@ bool MediaInputManager::HandleSelectInput(const uint8_t index)
 bool MediaInputManager::HandleShowInputStatus()
 {
     ChipLogProgress(Zcl, " MediaInputManager::HandleShowInputStatus()");
-    for (auto const & inputInfo : this->mInputs)
+    for (auto const & inputData : mInputs)
     {
-        string name(inputInfo.name.data(), inputInfo.name.size());
-        string desc(inputInfo.description.data(), inputInfo.description.size());
-        ChipLogProgress(Zcl, " [%d] type=%d selected=%d name=%s desc=%s", inputInfo.index,
-                        static_cast<uint16_t>(inputInfo.inputType), (mCurrentInput == inputInfo.index ? 1 : 0), name.c_str(),
-                        desc.c_str());
+        ChipLogProgress(Zcl, " [%d] type=%d selected=%d name=%s desc=%s", inputData.index,
+                        static_cast<uint16_t>(inputData.inputType), (mCurrentInput == inputData.index ? 1 : 0),
+                        inputData.name.c_str(), inputData.description.c_str());
     }
     return true;
 }
@@ -88,15 +86,13 @@ bool MediaInputManager::HandleHideInputStatus()
     return true;
 }
 
-bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
+bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & newName)
 {
-    for (InputInfoType & input : mInputs)
+    for (auto & inputData : mInputs)
     {
-        if (input.index == index)
+        if (inputData.index == index)
         {
-            const size_t len = std::min(mNameLenMax, name.size());
-            memcpy(mInputName[index], name.data(), len);
-            input.name = mInputName[index];
+            inputData.Rename(newName);
             return true;
         }
     }

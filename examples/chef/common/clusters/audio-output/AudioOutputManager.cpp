@@ -27,17 +27,14 @@ using chip::app::AttributeValueEncoder;
 
 AudioOutputManager::AudioOutputManager()
 {
-    const int totalOutput = 4;
+    struct OutputData outputData1(1, chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi, "HDMI 1");
+    mOutputs.push_back(outputData1);
+    struct OutputData outputData2(2, chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi, "HDMI 2");
+    mOutputs.push_back(outputData2);
+    struct OutputData outputData3(3, chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi, "HDMI 3");
+    mOutputs.push_back(outputData3);
 
-    for (uint8_t i = 1; i < totalOutput; ++i)
-    {
-        OutputInfoType outputInfo;
-        outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
-        // note: safe only because of use of string literal
-        outputInfo.name  = chip::CharSpan::fromCharString("HDMI");
-        outputInfo.index = static_cast<uint8_t>(i);
-        mOutputs.push_back(outputInfo);
-    }
+    mCurrentOutput = 1;
 }
 
 uint8_t AudioOutputManager::HandleGetCurrentOutput()
@@ -48,23 +45,21 @@ uint8_t AudioOutputManager::HandleGetCurrentOutput()
 CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
-        for (auto const & outputInfo : this->mOutputs)
+        for (auto const & outputData : mOutputs)
         {
-            ReturnErrorOnFailure(encoder.Encode(outputInfo));
+            ReturnErrorOnFailure(encoder.Encode(outputData.GetEncodable()));
         }
         return CHIP_NO_ERROR;
     });
 }
 
-bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)
+bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & newName)
 {
-    for (OutputInfoType & output : mOutputs)
+    for (auto & outputData : mOutputs)
     {
-        if (output.index == index)
+        if (outputData.index == index)
         {
-            const size_t len = std::min(mNameLenMax, name.size());
-            memcpy(mOutputName[index], name.data(), len);
-            output.name = mOutputName[index];
+            outputData.Rename(newName);
             return true;
         }
     }
@@ -74,9 +69,9 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
 
 bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
 {
-    for (OutputInfoType & output : mOutputs)
+    for (auto & outputData : mOutputs)
     {
-        if (output.index == index)
+        if (outputData.index == index)
         {
             mCurrentOutput = index;
             return true;

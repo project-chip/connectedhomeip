@@ -36,13 +36,33 @@ public:
     bool HandleHideInputStatus() override;
     bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name) override;
 
+    struct InputData
+    {
+        uint8_t index;
+        chip::app::Clusters::MediaInput::InputTypeEnum inputType;
+        std::string name;
+        std::string description;
+
+        InputData(uint8_t i, chip::app::Clusters::MediaInput::InputTypeEnum t, const char * n, const char * d) :
+            index(i), inputType(t), name(n), description(d)
+        {}
+
+        void Rename(const chip::CharSpan & newName) { name.assign(newName.data(), newName.size()); }
+
+        InputInfoType GetEncodable() const
+        {
+            InputInfoType result;
+            result.index       = index;
+            result.inputType   = inputType;
+            result.name        = chip::CharSpan::fromCharString(name.c_str());
+            result.description = chip::CharSpan::fromCharString(description.c_str());
+            return result;
+        }
+    };
+
 protected:
     uint8_t mCurrentInput;
-    std::vector<InputInfoType> mInputs;
-    // Magic numbers are here on purpose, please allocate memory
-    static constexpr size_t mNameLenMax = 32;
-    char mInputName[10][mNameLenMax];
+    std::vector<InputData> mInputs;
 
 private:
-    static constexpr int mTotalInput = 3;
 };
