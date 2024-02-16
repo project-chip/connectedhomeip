@@ -64,12 +64,12 @@ NSSet<NSNumber *> * CATValuesToSet(const chip::CATValues & values)
 bool DateToMatterEpochSeconds(NSDate * date, uint32_t & matterEpochSeconds)
 {
     uint64_t matterEpochMicroseconds = 0;
-    if(!DateToMatterEpochMicroseconds(date, matterEpochMicroseconds)){
+    if (!DateToMatterEpochMicroseconds(date, matterEpochMicroseconds)) {
         // Could not convert time
         return false;
     }
 
-    uint64_t timeSinceMatterEpoch = matterEpochMicroseconds/chip::kMicrosecondsPerSecond;
+    uint64_t timeSinceMatterEpoch = matterEpochMicroseconds / chip::kMicrosecondsPerSecond;
     if (timeSinceMatterEpoch > UINT32_MAX) {
         // Too far into the future.
         return false;
@@ -81,12 +81,12 @@ bool DateToMatterEpochSeconds(NSDate * date, uint32_t & matterEpochSeconds)
 bool DateToMatterEpochMilliseconds(NSDate * date, uint64_t & matterEpochMilliseconds)
 {
     uint64_t matterEpochMicroseconds = 0;
-    if(!DateToMatterEpochMicroseconds(date, matterEpochMicroseconds)){
+    if (!DateToMatterEpochMicroseconds(date, matterEpochMicroseconds)) {
         // Could not convert time
         return false;
     }
 
-    matterEpochMilliseconds = matterEpochMicroseconds/chip::kMicrosecondsPerMillisecond;
+    matterEpochMilliseconds = matterEpochMicroseconds / chip::kMicrosecondsPerMillisecond;
     return true;
 }
 
