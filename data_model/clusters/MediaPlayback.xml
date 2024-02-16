@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0506" name="Media Playback" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0506" name="Media Playback Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0506" name="Media Playback"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MEDIAPLAYBACK" scope="Endpoint"/>
   <features>
     <feature bit="0" code="AS" name="AdvancedSeek" summary="Advanced media seeking">
@@ -174,50 +179,50 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Play" response="PlaybackResponse">
+    <command id="0x00" name="Play" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x01" name="Pause" response="PlaybackResponse">
+    <command id="0x01" name="Pause" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x02" name="Stop" response="PlaybackResponse">
+    <command id="0x02" name="Stop" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x03" name="StartOver" response="PlaybackResponse">
+    <command id="0x03" name="StartOver" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>
-    <command id="0x04" name="Previous" response="PlaybackResponse">
+    <command id="0x04" name="Previous" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>
-    <command id="0x05" name="Next" response="PlaybackResponse">
+    <command id="0x05" name="Next" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>
-    <command id="0x06" name="Rewind" response="PlaybackResponse">
+    <command id="0x06" name="Rewind" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="VS"/>
       </mandatoryConform>
     </command>
-    <command id="0x07" name="FastForward" response="PlaybackResponse">
+    <command id="0x07" name="FastForward" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="VS"/>
       </mandatoryConform>
     </command>
-    <command id="0x08" name="SkipForward" response="PlaybackResponse">
+    <command id="0x08" name="SkipForward" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
       <field id="0" name="DeltaPositionMilliseconds" type="uint64">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x09" name="SkipBackward" response="PlaybackResponse">
+    <command id="0x09" name="SkipBackward" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
       <field id="0" name="DeltaPositionMilliseconds" type="uint64">
@@ -225,7 +230,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x0A" name="PlaybackResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>
@@ -235,7 +239,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x0B" name="Seek" response="PlaybackResponse">
+    <command id="0x0B" name="Seek" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="AS"/>

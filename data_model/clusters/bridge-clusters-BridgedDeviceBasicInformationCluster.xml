@@ -55,69 +55,102 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:xrefstyle: basic
+:sectnums:
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0505" name="Target Navigator Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Added ProductAppearance attribute"/>
+    <revision revision="3" summary="Added SpecificationVersion attribute"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0505" name="Target Navigator"/>
+    <clusterId id="0x0039" name="Bridged Device Basic Information"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="TGTNAV" scope="Endpoint"/>
-  <dataTypes>
-    <enum name="StatusEnum">
-      <item value="0" name="Success" summary="Command succeeded">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="TargetNotFound" summary="Requested target was not found in the TargetList">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="NotAllowed" summary="Target request is not allowed in current state.">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <struct name="TargetInfoStruct">
-      <field id="0" name="Identifier" type="uint8">
-        <mandatoryConform/>
-        <constraint type="max" value="254"/>
-      </field>
-      <field id="1" name="Name" type="string">
-        <mandatoryConform/>
-      </field>
-    </struct>
-  </dataTypes>
+  <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
   <attributes>
-    <attribute id="0x0000" name="TargetList" type="list">
-      <entry type="TargetInfoStruct"/>
-      <access read="true" readPrivilege="view"/>
+    <attribute id="0x0000" name="DataModelRevision">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0001" name="VendorName">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0002" name="VendorID">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0003" name="ProductName">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0004" name="ProductID">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0005" name="NodeLabel">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0006" name="Location">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0007" name="HardwareVersion">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0008" name="HardwareVersionString">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0009" name="SoftwareVersion">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000A" name="SoftwareVersionString">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000B" name="ManufacturingDate">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000C" name="PartNumber">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000D" name="ProductURL">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000E" name="ProductLabel">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000F" name="SerialNumber">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0010" name="LocalConfigDisabled">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0011" name="Reachable">
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="CurrentTarget" type="uint8" default="0xFF">
-      <access read="true" readPrivilege="view"/>
+    <attribute id="0x0012" name="UniqueID">
       <optionalConform/>
-      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0013" name="CapabilityMinima">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0014" name="ProductAppearance">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0015" name="SpecificationVersion">
+      <disallowConform/>
     </attribute>
   </attributes>
-  <commands>
-    <command id="0x00" name="NavigateTarget" direction="commandToServer" response="NavigateTargetResponse">
-      <access invokePrivilege="operate"/>
+  <events>
+    <event id="0x00" name="StartUp">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x01" name="ShutDown">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x02" name="Leave">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x03" name="ReachableChanged">
+      <access readPrivilege="view"/>
       <mandatoryConform/>
-      <field id="0" name="Target" type="uint8">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Data" type="string" default="MS">
-        <optionalConform/>
-      </field>
-    </command>
-    <command id="0x01" name="NavigateTargetResponse" direction="responseFromServer">
-      <mandatoryConform/>
-      <field id="0" name="Status" type="StatusEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Data" type="string" default="MS">
-        <optionalConform/>
-      </field>
-    </command>
-  </commands>
+    </event>
+  </events>
 </cluster>

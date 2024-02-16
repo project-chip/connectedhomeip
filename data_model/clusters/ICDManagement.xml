@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+// Update Name
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICDManagement" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICD Management Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0046" name="ICDManagement"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="ICDM" scope="Node"/>
   <features>
     <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
@@ -135,7 +140,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="RegisterClient" response="RegisterClientResponse">
+    <command id="0x00" name="RegisterClient" direction="commandToServer" response="RegisterClientResponse">
       <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform>
         <feature name="CIP"/>
@@ -156,7 +161,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="RegisterClientResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
@@ -164,7 +168,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x02" name="UnregisterClient" response="Y">
+    <command id="0x02" name="UnregisterClient" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform>
         <feature name="CIP"/>
@@ -177,7 +181,7 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="16"/>
       </field>
     </command>
-    <command id="0x03" name="StayActiveRequest" response="StayActiveResponse">
+    <command id="0x03" name="StayActiveRequest" direction="commandToServer" response="StayActiveResponse">
       <access invokePrivilege="operate"/>
       <otherwiseConform>
         <mandatoryConform>
@@ -190,7 +194,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="StayActiveResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="LITS"/>

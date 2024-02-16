@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0201" name="Thermostat" revision="6">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0201" name="Thermostat Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; fixed some defaults; CCB 1823, 1480"/>
     <revision revision="2" summary="CCB 1981 2186 2249 2250 2251; NFR Thermostat Setback"/>
@@ -64,6 +64,9 @@ Davis, CA 95616, USA
     <revision revision="5" summary="New data model format and notation, added FeatureMap, collapsed attribute sets, clarified edge cases around limits, default value of xxxSetpointLimit now respects AbsxxxSetpointLimit"/>
     <revision revision="6" summary="Introduced the LTNE feature and adapted text (spec issue #5778)"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0201" name="Thermostat"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="TSTAT" scope="Endpoint"/>
   <features>
     <feature bit="0" code="HEAT" name="Heating" summary="Thermostat is capable of managing a heating device">
@@ -297,7 +300,7 @@ Davis, CA 95616, USA
           <feature name="COOL"/>
         </optionalConform>
       </item>
-      <item value="7" name="Fan">
+      <item value="7" name="FanOnly">
         <optionalConform/>
       </item>
       <item value="8" name="Dry">
@@ -825,7 +828,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="SetpointRaiseLower" response="Y">
+    <command id="0x00" name="SetpointRaiseLower" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Mode" type="SetpointRaiseLowerModeEnum">
@@ -837,7 +840,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x00" name="GetWeeklyScheduleResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
@@ -858,7 +860,7 @@ Davis, CA 95616, USA
         <constraint type="maxCount" value="10"/>
       </field>
     </command>
-    <command id="0x01" name="SetWeeklySchedule" response="Y">
+    <command id="0x01" name="SetWeeklySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="SCH"/>
@@ -881,9 +883,8 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="GetRelayStatusLogResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
-        <attribute name="GetRelayStatusLog"/>
+        <command name="GetRelayStatusLog"/>
       </mandatoryConform>
       <field id="0" name="TimeOfDay" type="uint16">
         <mandatoryConform/>
@@ -909,7 +910,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x02" name="GetWeeklySchedule" response="GetWeeklyScheduleResponse">
+    <command id="0x02" name="GetWeeklySchedule" direction="commandToServer" response="GetWeeklyScheduleResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="SCH"/>
@@ -923,13 +924,13 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x03" name="ClearWeeklySchedule" response="Y">
+    <command id="0x03" name="ClearWeeklySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
     </command>
-    <command id="0x04" name="GetRelayStatusLog" response="GetRelayStatusLogResponse">
+    <command id="0x04" name="GetRelayStatusLog" direction="commandToServer" response="GetRelayStatusLogResponse">
       <access invokePrivilege="operate"/>
       <optionalConform>
         <condition name="Zigbee"/>

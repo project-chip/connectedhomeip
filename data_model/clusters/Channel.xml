@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0504" name="Channel" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0504" name="Channel Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0504" name="Channel"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CHANNEL" scope="Endpoint"/>
   <features>
     <feature bit="0" code="CL" name="ChannelList" summary="Provides list of available channels.">
@@ -142,7 +147,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ChangeChannel" response="ChangeChannelResponse">
+    <command id="0x00" name="ChangeChannel" direction="commandToServer" response="ChangeChannelResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
@@ -155,7 +160,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="ChangeChannelResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
           <feature name="CL"/>
@@ -170,7 +174,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x02" name="ChangeChannelByNumber" response="Y">
+    <command id="0x02" name="ChangeChannelByNumber" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="MajorNumber" type="uint16">
@@ -180,7 +184,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x03" name="SkipChannel" response="Y">
+    <command id="0x03" name="SkipChannel" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Count" type="int16">

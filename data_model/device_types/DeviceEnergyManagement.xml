@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,70 +54,18 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
-
-:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0505" name="Target Navigator Cluster" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050D" name="Device Energy Management" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
+    <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <clusterIds>
-    <clusterId id="0x0505" name="Target Navigator"/>
-  </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="TGTNAV" scope="Endpoint"/>
-  <dataTypes>
-    <enum name="StatusEnum">
-      <item value="0" name="Success" summary="Command succeeded">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="TargetNotFound" summary="Requested target was not found in the TargetList">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="NotAllowed" summary="Target request is not allowed in current state.">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <struct name="TargetInfoStruct">
-      <field id="0" name="Identifier" type="uint8">
-        <mandatoryConform/>
-        <constraint type="max" value="254"/>
-      </field>
-      <field id="1" name="Name" type="string">
-        <mandatoryConform/>
-      </field>
-    </struct>
-  </dataTypes>
-  <attributes>
-    <attribute id="0x0000" name="TargetList" type="list">
-      <entry type="TargetInfoStruct"/>
-      <access read="true" readPrivilege="view"/>
+  <classification class="utility" scope="endpoint"/>
+  <clusters>
+    <cluster id="0x0098" name="Device Energy Management" side="server">
       <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="CurrentTarget" type="uint8" default="0xFF">
-      <access read="true" readPrivilege="view"/>
-      <optionalConform/>
-      <constraint type="desc"/>
-    </attribute>
-  </attributes>
-  <commands>
-    <command id="0x00" name="NavigateTarget" direction="commandToServer" response="NavigateTargetResponse">
-      <access invokePrivilege="operate"/>
+    </cluster>
+    <cluster id="0x009F" name="Device Energy Management Mode" side="server">
       <mandatoryConform/>
-      <field id="0" name="Target" type="uint8">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Data" type="string" default="MS">
-        <optionalConform/>
-      </field>
-    </command>
-    <command id="0x01" name="NavigateTargetResponse" direction="responseFromServer">
-      <mandatoryConform/>
-      <field id="0" name="Status" type="StatusEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Data" type="string" default="MS">
-        <optionalConform/>
-      </field>
-    </command>
-  </commands>
-</cluster>
+    </cluster>
+  </clusters>
+</deviceType>

@@ -55,12 +55,15 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Mode Base" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Mode Base Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial version"/>
     <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status.
 Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId name="Mode Base"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MODB" scope="Endpoint"/>
   <features>
     <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
@@ -122,7 +125,7 @@ Require at least one standard mode tag. Define reserved ranges for base/derived 
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ChangeToMode" response="ChangeToModeResponse">
+    <command id="0x00" name="ChangeToMode" direction="commandToServer" response="ChangeToModeResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="NewMode" type="uint8">
