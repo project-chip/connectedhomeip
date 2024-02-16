@@ -11,129 +11,188 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: "[TC-ICDM-3.4] ICDCounter persistence with DUT as Server"
+name: 217.1.6. [TC-ICDM-3.4] ICDCounter persistence with DUT as Server
 
 PICS:
     - ICDM.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "ICD Management"
     endpoint: 0
 
+    CheckInNodeID1:
+        type: node_id
+        defaultValue: 1
+    MonitorSubID1:
+        type: subject-id
+        defaultValue: 2
+    Key1:
+        type: octstr
+        defaultValue: "hex:1234567890abcdef1234567890abcdef"
+    IdleModedurationValue:
+        type: int16u
+        defaultValue: 5
+
 tests:
-    - label: "Preconditions"
+    - label:
+          "Precondition: Commission DUT to TH (can be skipped if done in a
+          preceding test)"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Precondition: TH reads the RegisteredClients attribute from the DUT"
+      PICS: ICDM.S.A0003
+      command: "readAttribute"
+      attribute: "RegisteredClients"
+      response:
+          saveAs: RegisteredClientsIDs
+          constraints:
+              type: list
+
+    - label:
+          "Precondition: If list of registered clients is not empty, unregister
+          existing client(s)"
       verification: |
-          1.Commission DUT to TH (can be skipped if done in a preceding test).
-          2a. Ensure the TH has administrator privileges for the ICDM cluster.
-          2b. TH reads from the DUT the RegisteredClients attribute.
-          2c. If list of registered clients is not empty, unregister existing client(s)
-          2d. TH reads from the DUT the RegisteredClients attribute. Verify that the DUT response contains empty list of registered clients.
-      disabled: true
+          Please send the 'unregister client' command using the check-in nodeID received from the previous read
+          ./chip-tool icdmanagement unregister-client 112233 1 0
+
+          [1704888949.629057][71657:71659] CHIP:DMG:
+          [1704888949.629066][71657:71659] CHIP:DMG:         InteractionModelRevision = 11
+          [1704888949.629074][71657:71659] CHIP:DMG: },
+          [1704888949.629125][71657:71659] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x0
+          [1704888949.629153][71657:71659] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && ICDM.S.C02.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Precondition: TH reads from the DUT the RegisteredClients attribute.
+          Verify that the DUT response contains empty list of registered
+          clients."
+      PICS: ICDM.S.A0003 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "RegisteredClients"
+      response:
+          value: []
+          constraints:
+              type: list
 
     - label: "Step 1: TH reads from the DUT the IdleModeDuration attribute"
       PICS: ICDM.S.A0000
-      verification: |
-          ./chip-tool icdmanagement read idle-mode-duration 1 0
-
-          On TH(chip-tool), Verify that the DUT response contains IdleModeDuration1
-
-          [1707302050.068494][7883:7885] CHIP:DMG: }
-          [1707302050.068651][7883:7885] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0000 DataVersion: 1394192455
-          [1707302050.068727][7883:7885] CHIP:TOO:   IdleModeDuration: 3600
-          [1707302050.068993][7883:7885] CHIP:EM: <<< [E:17423i S:36331 M:68716366 (Ack:249194918)] (S) Msg TX to 1:0000000000000001 [71CC] [UDP:[fe80::e65f:1ff:fe0f:1a01%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1707302050.069119][7883:7885] CHIP:EM: Flushed pending ack for MessageCounter:249194918 on exchange 17423i
-      disabled: true
+      command: "readAttribute"
+      attribute: "IdleModeDuration"
+      response:
+          saveAs: IdleModeDuration1
+          constraints:
+              type: int32u
+              minValue: 1
+              maxValue: 64800
 
     - label: "Step 2: TH reads from the DUT the ICDCounter attribute."
       PICS: ICDM.S.A0004
-      verification: |
-          ./chip-tool icdmanagement read icdcounter 1 0
-
-          On TH(chip-tool), Verify that the DUT response contains IcdCounter1
-
-          [1707302064.541223][7887:7889] CHIP:DMG: }
-          [1707302064.541383][7887:7889] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0004 DataVersion: 1394192455
-          [1707302064.541450][7887:7889] CHIP:TOO:   ICDCounter: 441744137
-          [1707302064.541712][7887:7889] CHIP:EM: <<< [E:8436i S:19978 M:70974263 (Ack:247918527)] (S) Msg TX to 1:0000000000000001 [71CC] [UDP:[fe80::e65f:1ff:fe0f:1a01%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "readAttribute"
+      attribute: "ICDCounter"
+      response:
+          saveAs: ICDCounter1
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967295
 
     - label:
-          "Step 3a: TH sends RegisterClient command. - CheckInNodeID:
+          "Step 3a & 3b: TH sends RegisterClient command. - CheckInNodeID:
           registering clients node ID (CheckInNodeID1) - MonitoredSubject:
           monitored subject ID (MonitorSubID1) - Key: shared secret between the
-          client and the ICD (Key1)"
-      PICS: ICDM.S.C00.Rsp
-      verification: |
-          ./chip-tool icdmanagement register-client 1 1 1234567890abcdef 1 0
-
-          On TH(chip-tool), Verify DUT responds w/ status SUCCESS(0x00) and the response contains IcdCounter1
-
-          [1707302074.285577][7890:7892] CHIP:DMG: },
-          [1707302074.285711][7890:7892] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0001
-          [1707302074.285819][7890:7892] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Command 0x0000_0001
-          [1707302074.285979][7890:7892] CHIP:TOO:   RegisterClientResponse: {
-          [1707302074.286034][7890:7892] CHIP:TOO:     ICDCounter: 441744137
-          [1707302074.286079][7890:7892] CHIP:TOO:    }
-          [1707302074.286193][7890:7892] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1707302074.286583][7890:7892] CHIP:EM: <<< [E:31586i S:58564 M:28871036 (Ack:219771610)] (S) Msg TX to 1:0000000000000001 [71CC] [UDP:[fe80::e65f:1ff:fe0f:1a01%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
-
-    - label:
-          "Step 3b: Verify DUT responds w/ status SUCCESS(0x00); Verify that the
-          DUT response contains IcdCounter1"
-      PICS: ICDM.S.C01.Tx
-      verification: |
-          ./chip-tool icdmanagement register-client 1 1 1234567890abcdef 1 0
-
-          On TH(chip-tool), Verify DUT responds w/ status SUCCESS(0x00) and the response contains IcdCounter1
-
-          [1707302074.285577][7890:7892] CHIP:DMG: },
-          [1707302074.285711][7890:7892] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0001
-          [1707302074.285819][7890:7892] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Command 0x0000_0001
-          [1707302074.285979][7890:7892] CHIP:TOO:   RegisterClientResponse: {
-          [1707302074.286034][7890:7892] CHIP:TOO:     ICDCounter: 441744137
-          [1707302074.286079][7890:7892] CHIP:TOO:    }
-          [1707302074.286193][7890:7892] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1707302074.286583][7890:7892] CHIP:EM: <<< [E:31586i S:58564 M:28871036 (Ack:219771610)] (S) Msg TX to 1:0000000000000001 [71CC] [UDP:[fe80::e65f:1ff:fe0f:1a01%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+          client and the ICD (Key1). Verify DUT responds w/ status
+          SUCCESS(0x00); Verify that the DUT response contains IcdCounter1"
+      PICS: ICDM.S.C00.Rsp && ICDM.S.C01.Tx
+      command: "RegisterClient"
+      arguments:
+          values:
+              - name: "CheckInNodeID"
+                value: CheckInNodeID1
+              - name: "MonitoredSubject"
+                value: MonitorSubID1
+              - name: "Key"
+                value: Key1
+      response:
+          values:
+              - name: "ICDCounter"
+                value: ICDCounter1
+                constraints:
+                    type: int32u
 
     - label: "Step 4: Wait for 1 or more Idle Mode duration."
-      verification: |
-          Wait for 1 or more Idle Mode duration.
-      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ( IdleModedurationValue * 1000 )
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/31297
     - label: "Step 5: TH reads from the DUT the ICDCounter attribute."
-      PICS: ICDM.S.A0004
       verification: |
           ./chip-tool icdmanagement read icdcounter 1 0
 
-          On TH(chip-tool), Verify that the DUT response contains IcdCounter2 which is greater than IcdCounter1
-
-          [1707302140.686376][7893:7895] CHIP:DMG: }
-          [1707302140.686549][7893:7895] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0004 DataVersion: 1394192455
-          [1707302140.686647][7893:7895] CHIP:TOO:   ICDCounter: 441744138
-          [1707302140.686925][7893:7895] CHIP:EM: <<< [E:18309i S:15070 M:58834445 (Ack:190565833)] (S) Msg TX to 1:0000000000000001 [71CC] [UDP:[fe80::e65f:1ff:fe0f:1a01%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1707302140.687061][7893:7895] CHIP:EM: Flushed pending ack for MessageCounter:190565833 on exchange 18309i
-      disabled: true
+          [1702421000.635860][1431:1433] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0004 DataVersion: 2255930497
+          [1702421000.635970][1431:1433] CHIP:TOO:   ICDCounter: 1706188496
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && ICDM.S.A0004
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 6: Reboot DUT"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      endpoint: 0
+      command: "Reboot"
+
+    - label: "Step Reboot target device(DUT)"
       verification: |
-          Reboot DUT
-      disabled: true
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Step 7: TH reads from the DUT the ICDCounter attribute."
-      PICS: ICDM.S.A0004
-      verification: |
-          ./chip-tool icdmanagement read icdcounter 1 0
-
-          On TH(chip-tool), Verify that the DUT response contains IcdCounter3 which is greater than or equal to IcdCounter2
-
-          [1707302222.125290][7897:7899] CHIP:DMG: }
-          [1707302222.125436][7897:7899] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0004 DataVersion: 3612846356
-          [1707302222.125505][7897:7899] CHIP:TOO:   ICDCounter: 441744236
-          [1707302222.125730][7897:7899] CHIP:EM: <<< [E:24794i S:56835 M:6692486 (Ack:1074051)] (S) Msg TX to 1:0000000000000001 [71CC] [UDP:[fe80::e65f:1ff:fe0f:1a01%eth0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1707302222.125842][7897:7899] CHIP:EM: Flushed pending ack for MessageCounter:1074051 on exchange 24794i
-      disabled: true
+      PICS: ICDM.S.A0004 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "ICDCounter"
+      response:
+          constraints:
+              type: int32u
+              minValue: ICDCounter2
+              maxValue: 4294967295
