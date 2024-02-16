@@ -94,11 +94,7 @@ struct ConcreteReadAttributePath : public ConcreteAttributePath
 
     bool operator!=(const ConcreteReadAttributePath & aOther) const { return !(*this == aOther); }
 
-    bool operator<(const ConcreteReadAttributePath & path) const = delete;
-
-    bool operator==(const ConcreteReadAttributePath & aOther) const = delete;
-    bool operator!=(const ConcreteReadAttributePath & aOther) const = delete;
-    bool operator<(const ConcreteReadAttributePath & aOther) const  = delete;
+    bool operator<(const ConcreteReadAttributePath & aOther) const = delete;
 
     Optional<uint16_t> mListIndex;
 };
@@ -159,7 +155,7 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
 
     bool operator!=(const ConcreteDataAttributePath & aOther) const { return !(*this == aOther); }
 
-    bool operator<(const ConcreteDataAttributePath & path) const = delete;
+    bool operator<(const ConcreteDataAttributePath & aOther) const = delete;
 
     //
     // This index is only valid if `mListOp` is set to a list item operation, i.e
