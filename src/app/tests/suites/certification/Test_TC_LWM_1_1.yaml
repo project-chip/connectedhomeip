@@ -91,10 +91,6 @@ tests:
               type: list
               contains: [2]
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 96f57e6431 (Revert tests)
     #Issue https://github.com/project-chip/connectedhomeip/issues/31551
     - label:
           "Step 4c: TH reads the Feature dependent attribute(DEPONOFF) in
@@ -107,11 +103,6 @@ tests:
               type: list
               contains: [3]
 
-<<<<<<< HEAD
-=======
->>>>>>> 3b0149b454 (Modifed YAML tests:)
-=======
->>>>>>> 96f57e6431 (Revert tests)
     - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
