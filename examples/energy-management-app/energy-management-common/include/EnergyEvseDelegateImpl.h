@@ -147,11 +147,8 @@ public:
     Status SetTargets(
         const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules) override;
 
-    // /**
-    //  * @brief    Called when EVSE cluster receives GetTargets command
-    //  */
-    // Status GetTargets(Commands::GetTargetsResponse::Type & response) override;
     EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
+
     /**
      * @brief Delegate should implement a handler to PrepareGetTargets
      *
