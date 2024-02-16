@@ -401,7 +401,7 @@ Structs::ChargingTargetScheduleStruct::Type array[3] = {
 
     },
 };
-CHIP_ERROR EnergyEvseDelegate::PrepareGetTargets(CommonIterator<EvseTargetEntry> & iterator)
+CHIP_ERROR EnergyEvseDelegate::PrepareGetTargets(EvseTargetIterator ** iterator)
 {
     CHIP_ERROR err;
 
@@ -411,7 +411,7 @@ CHIP_ERROR EnergyEvseDelegate::PrepareGetTargets(CommonIterator<EvseTargetEntry>
     EvseTargetIteratorImpl * tempIterator = targets->GetEvseTargetsIterator();
     VerifyOrReturnError(tempIterator != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    iterator = *tempIterator; // Assign the value to iterator
+    *iterator = tempIterator; // Assign the value to iterator
 
     err = tempIterator->Load(); // Load data into the iterator
     SuccessOrExit(err);

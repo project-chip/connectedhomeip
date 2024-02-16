@@ -158,10 +158,10 @@ public:
      * This needs to load any stored targets into memory and hold it until the GetTargetsFinished is
      * called by the cluster server.
      *
-     * @param  Reference to CommonIterator<EvseTargetEntry> class that implements the ability
+     * @param  Reference to EvseTargetIterator class that implements the ability
      *         for the cluster server to iterate through the target entries
      */
-    CHIP_ERROR PrepareGetTargets(CommonIterator<EvseTargetEntry> & iterator) override;
+    CHIP_ERROR PrepareGetTargets(EvseTargetIterator ** iterator) override;
 
     /**
      * @brief Delegate should implement a handler to GetTargetsFinished

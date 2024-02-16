@@ -381,6 +381,7 @@ void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets
 
     EvseTargetEntry chargingTargetScheduleEntry;
     Structs::ChargingTargetScheduleStruct::Type entry;
+    Structs::ChargingTargetStruct::Type array[kEvseTargetsMaxTargetsPerDay];
 
     if (commandHandle == nullptr)
     {
@@ -389,22 +390,36 @@ void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets
     }
 
     const CommandHandler::InvokeResponseParameters prepareParams(ctx.mRequestPath);
-    SuccessOrExit(commandHandle->PrepareInvokeResponseCommand(
-        ConcreteCommandPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, Commands::GetTargetsResponse::Id),
-        prepareParams));
+    SuccessOrExit(
+        err = commandHandle->PrepareInvokeResponseCommand(
+            ConcreteCommandPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, Commands::GetTargetsResponse::Id),
+            prepareParams));
 
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::GetTargetsResponse::Fields::kChargingTargetSchedules),
                                                TLV::TLVType::kTLVType_Array, listContainerType));
 
-    // Commands::GetTargetsResponse::Type response;
-    SuccessOrExit(err = mDelegate.PrepareGetTargets(*it));
+    SuccessOrExit(err = mDelegate.PrepareGetTargets(&it));
 
     while (it->Next(chargingTargetScheduleEntry))
     {
         entry.dayOfWeekForSequence = chargingTargetScheduleEntry.dayOfWeekMap;
-        // entry.chargingTargets      = chargingTargetScheduleEntry.dailyChargingTargets;
+
+        uint8_t index = 0;
+        // copy from our vector to a local array of structs which we can reduce to the length required
+        // so we can pass it into our Encode engine
+        for (EvseChargingTarget chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
+        {
+            array[index].targetTimeMinutesPastMidnight = chargingTarget.targetTimeMinutesPastMidnight;
+            array[index].targetSoC                     = chargingTarget.targetSoC;
+            array[index].addedEnergy                   = chargingTarget.addedEnergy;
+            index++;
+        }
+
+        DataModel::List<Structs::ChargingTargetStruct::Type> mSpan(array);
+        mSpan.reduce_size(index);
+        entry.chargingTargets = mSpan;
 
         SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), entry));
     }

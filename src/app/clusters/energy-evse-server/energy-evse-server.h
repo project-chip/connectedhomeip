@@ -38,7 +38,8 @@ namespace EnergyEvse {
 constexpr int64_t kMinimumChargeCurrent         = 0;
 constexpr int64_t kMaximumChargeCurrent         = 80000;
 constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
-
+constexpr uint8_t kEvseTargetsMaxNumberOfDays   = 7;
+constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;
 struct EvseChargingTarget
 {
     uint16_t targetTimeMinutesPastMidnight;
@@ -59,6 +60,8 @@ public:
 class Delegate
 {
 public:
+    using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
+
     virtual ~Delegate() = default;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
@@ -109,10 +112,10 @@ public:
      * This needs to load any stored targets into memory and hold it until the GetTargetsFinished is
      * called by the cluster server.
      *
-     * @param  Reference to CommonIterator<EvseTargetEntry> class that implements the ability
+     * @param  Reference to EvseTargetIterator class that implements the ability
      *         for the cluster server to iterate through the target entries
      */
-    virtual CHIP_ERROR PrepareGetTargets(CommonIterator<EvseTargetEntry> & iterator) = 0;
+    virtual CHIP_ERROR PrepareGetTargets(EvseTargetIterator ** iterator) = 0;
 
     /**
      * @brief Delegate should implement a handler to GetTargetsFinished

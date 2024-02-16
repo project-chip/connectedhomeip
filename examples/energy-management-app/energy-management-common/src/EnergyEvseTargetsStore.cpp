@@ -30,6 +30,17 @@ using namespace chip::app::Clusters::EnergyEvse;
 
 // using namespace chip::app::Clusters::EnergyEvse::Attributes;
 
+EvseTargetIteratorImpl * EvseTargetsDelegate::GetEvseTargetsIterator()
+{
+    if (mEvseTargetsIterator == nullptr)
+    {
+        // TODO replace this without using new
+        EvseTargetsDelegate & dg = *this;
+        mEvseTargetsIterator     = new EvseTargetIteratorImpl(dg);
+    }
+    return mEvseTargetsIterator;
+};
+
 size_t EvseTargetIteratorImpl::Count()
 {
     return static_cast<size_t>(mTargetEntryVector.size());
@@ -369,30 +380,27 @@ CHIP_ERROR EvseTargetsDelegate::Load(std::vector<EvseTargetEntry> & targetEntryV
             ReturnErrorOnFailure(reader.Get(evseTarget.targetTimeMinutesPastMidnight));
 
             // targetSoC (Optional)
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TargetEntryTag::kTargetSoC)));
-            if (reader.GetType() == TLV::kTLVType_Null)
-            {
-                evseTarget.targetSoC.ClearValue();
-            }
-            else
+            if (CHIP_NO_ERROR == reader.Next(TLV::ContextTag(TargetEntryTag::kTargetSoC)))
             {
                 chip::Percent tempSoC;
                 ReturnErrorOnFailure(reader.Get(tempSoC));
                 evseTarget.targetSoC.SetValue(tempSoC);
             }
+            else
+            {
+                evseTarget.targetSoC.ClearValue();
+            }
 
             // addedEnergy (Optional)
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TargetEntryTag::kAddedEnergy)));
-            // TODO is this TLVNULL right?
-            if (reader.GetType() == TLV::kTLVType_Null)
-            {
-                evseTarget.addedEnergy.ClearValue();
-            }
-            else
+            if (CHIP_NO_ERROR == reader.Next(TLV::ContextTag(TargetEntryTag::kAddedEnergy)))
             {
                 int64_t tempAddedEnergy;
                 ReturnErrorOnFailure(reader.Get(tempAddedEnergy));
                 evseTarget.addedEnergy.SetValue(tempAddedEnergy);
+            }
+            else
+            {
+                evseTarget.addedEnergy.ClearValue();
             }
 
             targetEntry.dailyChargingTargets.push_back(evseTarget);
@@ -404,15 +412,8 @@ CHIP_ERROR EvseTargetsDelegate::Load(std::vector<EvseTargetEntry> & targetEntryV
         targetEntryVector.push_back(targetEntry);
     }
 
-    if (err != CHIP_END_OF_TLV)
-    {
-        return err;
-    }
-
     ReturnErrorOnFailure(reader.ExitContainer(arrayType));
     return reader.VerifyEndOfContainer();
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EvseTargetsDelegate::SerializeToTlv(TLV::TLVWriter & writer, const std::vector<EvseTargetEntry> & targetEntryVector)

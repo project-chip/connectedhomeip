@@ -34,13 +34,13 @@ namespace Clusters {
 namespace EnergyEvse {
 
 class EvseTargetIteratorImpl;
-
 class EvseTargetsDelegate
 {
-
 public:
+    using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
+
     CHIP_ERROR Init(PersistentStorageDelegate * targetStore);
-    EvseTargetIteratorImpl * GetEvseTargetsIterator() { return mEvseTargetsIterators; };
+    EvseTargetIteratorImpl * GetEvseTargetsIterator();
     CHIP_ERROR Load(std::vector<EvseTargetEntry> & targetEntryVector, size_t & targetsSize);
     CHIP_ERROR StoreEntry(const EvseTargetEntry & entry);
 
@@ -105,17 +105,15 @@ protected:
     };
 
 private:
-    static constexpr uint8_t kEvseTargetsMaxNumberOfDays  = 7;
-    static constexpr uint8_t kEvseTargetsMaxTargetsPerDay = 10;
-
     // The array itself has a control byte and an end-of-array marker.
     static constexpr size_t kArrayOverHead = 2;
 
-    EvseTargetIteratorImpl * mEvseTargetsIterators;
-    PersistentStorageDelegate * mpTargetStore = nullptr;
+    EvseTargetIteratorImpl * mEvseTargetsIterator = nullptr;
+    PersistentStorageDelegate * mpTargetStore     = nullptr;
 };
 
-class EvseTargetIteratorImpl : public CommonIterator<EvseTargetEntry>
+using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
+class EvseTargetIteratorImpl : public EvseTargetIterator
 {
 public:
     EvseTargetIteratorImpl(EvseTargetsDelegate & aDelegate) : mDelegate(aDelegate)
