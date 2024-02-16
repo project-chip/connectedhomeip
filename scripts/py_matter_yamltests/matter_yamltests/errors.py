@@ -232,7 +232,7 @@ class TestStepEnumError(TestStepError):
         - enum_name_or_value (str|int): The name (str) or value (int) of the enumeration in the step.
           If a string is provided, it is considered the name of the enumeration; if an integer is provided, it is considered the value of the enumeration.
         - enum_candidates (dict): A dictionary mapping enumeration names (as strings) to their corresponding values
-          (as integers). This dictionary represents all possible candidates of the enumeration.
+          (as integers). This dictionary represents all known values of the enumeration.
     """
 
     def __init__(self, enum_name_or_value, enum_candidates: dict):
