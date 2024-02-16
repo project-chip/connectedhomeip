@@ -223,13 +223,13 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
     return true;
 }
 
-void ChannelManager::HandleGetProgramGuide(
-    CommandResponseHelper<ProgramGuideResponseType> & helper, const chip::Optional<uint32_t> & startTime,
-    const chip::Optional<uint32_t> & endTime,
-    const chip::Optional<DataModel::DecodableList<ChannelInfoType>> & channelList,
-    const chip::Optional<PageTokenType> & pageToken, const chip::Optional<chip::BitMask<RecordingFlagBitmap>> & recordingFlag,
-    const chip::Optional<DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
-    const chip::Optional<chip::ByteSpan> & data)
+void ChannelManager::HandleGetProgramGuide(CommandResponseHelper<ProgramGuideResponseType> & helper,
+                                           const chip::Optional<uint32_t> & startTime, const chip::Optional<uint32_t> & endTime,
+                                           const chip::Optional<DataModel::DecodableList<ChannelInfoType>> & channelList,
+                                           const chip::Optional<PageTokenType> & pageToken,
+                                           const chip::Optional<chip::BitMask<RecordingFlagBitmap>> & recordingFlag,
+                                           const chip::Optional<DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
+                                           const chip::Optional<chip::ByteSpan> & data)
 {
 
     // 1. Decode received parameters
