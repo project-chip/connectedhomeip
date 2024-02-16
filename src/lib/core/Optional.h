@@ -26,9 +26,11 @@
 #include <new>
 #include <type_traits>
 #include <utility>
+#include <optional>
 
 #include <lib/core/InPlace.h>
 #include <lib/support/CodeUtils.h>
+
 
 namespace chip {
 
@@ -44,172 +46,59 @@ inline constexpr NullOptionalType NullOptional{};
  * is actually valid or not.
  */
 template <class T>
-class Optional
+class Optional : public std::optional<T>
 {
 public:
-    constexpr Optional() : mHasValue(false) {}
-    constexpr Optional(NullOptionalType) : mHasValue(false) {}
+    using std::optional<T>::optional; // bring in all constructors
 
-    ~Optional()
-    {
-        // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Branch): mData is set when mHasValue
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-    }
-
-    explicit Optional(const T & value) : mHasValue(true) { new (&mValue.mData) T(value); }
-
-    template <class... Args>
-    constexpr explicit Optional(InPlaceType, Args &&... args) : mHasValue(true)
-    {
-        new (&mValue.mData) T(std::forward<Args>(args)...);
-    }
-
-    constexpr Optional(const Optional & other) : mHasValue(other.mHasValue)
-    {
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(other.mValue.mData);
-        }
-    }
-
-    // Converts an Optional of an implicitly convertible type
-    template <class U, std::enable_if_t<!std::is_same_v<T, U> && std::is_convertible_v<const U, T>, bool> = true>
-    constexpr Optional(const Optional<U> & other) : mHasValue(other.HasValue())
-    {
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(other.Value());
-        }
-    }
-
-    // Converts an Optional of a type that requires explicit conversion
-    template <class U,
-              std::enable_if_t<!std::is_same_v<T, U> && !std::is_convertible_v<const U, T> && std::is_constructible_v<T, const U &>,
-                               bool> = true>
-    constexpr explicit Optional(const Optional<U> & other) : mHasValue(other.HasValue())
-    {
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(other.Value());
-        }
-    }
-
-    constexpr Optional(Optional && other) : mHasValue(other.mHasValue)
-    {
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(std::move(other.mValue.mData));
-            other.mValue.mData.~T();
-            other.mHasValue = false;
-        }
-    }
-
-    constexpr Optional & operator=(const Optional & other)
-    {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = other.mHasValue;
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(other.mValue.mData);
-        }
-        return *this;
-    }
-
-    constexpr Optional & operator=(Optional && other)
-    {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = other.mHasValue;
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(std::move(other.mValue.mData));
-            other.mValue.mData.~T();
-            other.mHasValue = false;
-        }
-        return *this;
-    }
+    constexpr Optional(NullOptionalType) : std::optional<T>(std::nullopt) {}
 
     /// Constructs the contained value in-place
     template <class... Args>
     constexpr T & Emplace(Args &&... args)
     {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = true;
-        new (&mValue.mData) T(std::forward<Args>(args)...);
-        return mValue.mData;
+        return emplace(std::forward<Args>(args)...);
     }
 
     /** Make the optional contain a specific value */
     constexpr void SetValue(const T & value)
     {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = true;
-        new (&mValue.mData) T(value);
+        *this = value;
     }
 
     /** Make the optional contain a specific value */
     constexpr void SetValue(T && value)
     {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = true;
-        new (&mValue.mData) T(std::move(value));
+        *this = std::move(value);
     }
 
     /** Invalidate the value inside the optional. Optional now has no value */
     constexpr void ClearValue()
     {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = false;
+        *this = std::nullopt;
     }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     T & Value() &
     {
-        VerifyOrDie(HasValue());
-        return mValue.mData;
+        return ((std::optional<T> *)this)->value();
     }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     const T & Value() const &
     {
         VerifyOrDie(HasValue());
-        return mValue.mData;
+        return ((std::optional<T> *)this)->value();
     }
 
     /** Gets the current value of the optional if the optional has a value;
         otherwise returns the provided default value. */
-    const T & ValueOr(const T & defaultValue) const { return HasValue() ? Value() : defaultValue; }
+    const T & ValueOr(const T & defaultValue) const { return value_or(defaultValue); }
 
     /** Checks if the optional contains a value or not */
-    constexpr bool HasValue() const { return mHasValue; }
-
-    bool operator==(const Optional & other) const
-    {
-        return (mHasValue == other.mHasValue) && (!other.mHasValue || (mValue.mData == other.mValue.mData));
+    constexpr bool HasValue() const {
+        return ((std::optional<T> *)this)->has_value();
     }
-    bool operator!=(const Optional & other) const { return !(*this == other); }
-    bool operator==(const T & other) const { return HasValue() && Value() == other; }
-    bool operator!=(const T & other) const { return !(*this == other); }
 
     /** Convenience method to create an optional without a valid value. */
     static Optional<T> Missing() { return Optional<T>(); }
@@ -218,17 +107,8 @@ public:
     template <class... Args>
     static Optional<T> Value(Args &&... args)
     {
-        return Optional(InPlace, std::forward<Args>(args)...);
+        return Optional(std::in_place, std::forward<Args>(args)...);
     }
-
-private:
-    bool mHasValue;
-    union Value
-    {
-        Value() {}
-        ~Value() {}
-        T mData;
-    } mValue;
 };
 
 template <class T>
