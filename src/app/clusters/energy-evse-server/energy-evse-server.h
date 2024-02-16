@@ -39,6 +39,20 @@ constexpr int64_t kMinimumChargeCurrent         = 0;
 constexpr int64_t kMaximumChargeCurrent         = 80000;
 constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
 
+struct EvseChargingTarget
+{
+    uint16_t targetTimeMinutesPastMidnight;
+    Optional<chip::Percent> targetSoC;
+    Optional<int64_t> addedEnergy;
+};
+
+class EvseTargetEntry
+{
+public:
+    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekMap;
+    std::vector<EvseChargingTarget> dailyChargingTargets;
+};
+
 /** @brief
  *    Defines methods for implementing application-specific logic for the EVSE Management Cluster.
  */
@@ -90,11 +104,31 @@ public:
     SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &) = 0;
 
     /**
-     * @brief Delegate should implement a handler to GetTargets command.
-     * It should report Status::Success if successful and may
-     * return other Status codes if it fails
+     * @brief Delegate should implement a handler to PrepareGetTargets
+     *
+     * This needs to load any stored targets into memory and hold it until the GetTargetsFinished is
+     * called by the cluster server.
+     *
+     * @param  Reference to CommonIterator<EvseTargetEntry> class that implements the ability
+     *         for the cluster server to iterate through the target entries
      */
-    virtual Protocols::InteractionModel::Status GetTargets(Commands::GetTargetsResponse::Type &) = 0;
+    virtual CHIP_ERROR PrepareGetTargets(CommonIterator<EvseTargetEntry> & iterator) = 0;
+
+    /**
+     * @brief Delegate should implement a handler to GetTargetsFinished
+     *
+     * This is used by the cluster server to indicate it has finished preparing
+     * the GetTargetsResponse using the iterator and that the memory in the delegate can
+     * freed
+     */
+    virtual CHIP_ERROR GetTargetsFinished() = 0;
+
+    // /**
+    //  * @brief Delegate should implement a handler to GetTargets command.
+    //  * It should report Status::Success if successful and may
+    //  * return other Status codes if it fails
+    //  */
+    // virtual Protocols::InteractionModel::Status GetTargets(Commands::GetTargetsResponse::Type &) = 0;
 
     /**
      * @brief Delegate should implement a handler to ClearTargets command.

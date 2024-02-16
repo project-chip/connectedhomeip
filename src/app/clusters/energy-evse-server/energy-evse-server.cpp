@@ -29,6 +29,8 @@ using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::EnergyEvse::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
+using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -368,16 +370,58 @@ void Instance::HandleSetTargets(HandlerContext & ctx, const Commands::SetTargets
 }
 void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData)
 {
-    // Call the delegate
-    Commands::GetTargetsResponse::Type response;
-    Status status = mDelegate.GetTargets(response);
-    if (status == Status::Success)
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    app::CommandHandler::Handle commandHandleRef = CommandHandler::Handle(&ctx.mCommandHandler);
+    auto commandHandle                           = commandHandleRef.Get();
+
+    TLV::TLVWriter * writer;
+    TLV::TLVType listContainerType;
+    EvseTargetIterator * it;
+
+    EvseTargetEntry chargingTargetScheduleEntry;
+    Structs::ChargingTargetScheduleStruct::Type entry;
+
+    if (commandHandle == nullptr)
     {
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        // When the platform has shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        return;
     }
-    else
+
+    const CommandHandler::InvokeResponseParameters prepareParams(ctx.mRequestPath);
+    SuccessOrExit(commandHandle->PrepareInvokeResponseCommand(
+        ConcreteCommandPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, Commands::GetTargetsResponse::Id),
+        prepareParams));
+
+    VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::GetTargetsResponse::Fields::kChargingTargetSchedules),
+                                               TLV::TLVType::kTLVType_Array, listContainerType));
+
+    // Commands::GetTargetsResponse::Type response;
+    SuccessOrExit(err = mDelegate.PrepareGetTargets(*it));
+
+    while (it->Next(chargingTargetScheduleEntry))
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        entry.dayOfWeekForSequence = chargingTargetScheduleEntry.dayOfWeekMap;
+        // entry.chargingTargets      = chargingTargetScheduleEntry.dailyChargingTargets;
+
+        SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), entry));
+    }
+    // if (status == Status::Success)
+    // {
+    //     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    // }
+    // else
+    // {
+    //     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    // }
+    SuccessOrExit(err = writer->EndContainer(listContainerType));
+    SuccessOrExit(err = commandHandle->FinishCommand());
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData)
