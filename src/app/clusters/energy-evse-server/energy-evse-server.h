@@ -86,21 +86,22 @@ public:
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &) = 0;
+    virtual Protocols::InteractionModel::Status
+    SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &) = 0;
 
     /**
      * @brief Delegate should implement a handler to GetTargets command.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status GetTargets(Commands::GetTargetsResponse::Type &) = 0;
+    virtual Protocols::InteractionModel::Status GetTargets(Commands::GetTargetsResponse::Type &) = 0;
 
     /**
      * @brief Delegate should implement a handler to ClearTargets command.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status ClearTargets() = 0;
+    virtual Protocols::InteractionModel::Status ClearTargets() = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods
@@ -162,8 +163,9 @@ class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
              OptionalCommands aOptionalCmds) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
+        CommandHandlerInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
+        mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
