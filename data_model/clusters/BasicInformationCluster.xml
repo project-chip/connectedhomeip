@@ -59,7 +59,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
-    <revision revision="3" summary="Added SpecificationVersion attribute"/>
+    <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0028" name="Basic Information"/>
@@ -295,6 +295,12 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0016" name="MaxPathsPerInvoke" type="uint16" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="min" value="1"/>
     </attribute>
   </attributes>
   <events>

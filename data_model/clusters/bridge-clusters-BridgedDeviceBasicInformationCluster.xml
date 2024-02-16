@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
-    <revision revision="3" summary="Added SpecificationVersion attribute"/>
+    <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0039" name="Bridged Device Basic Information"/>
@@ -132,6 +132,9 @@ Davis, CA 95616, USA
       <optionalConform/>
     </attribute>
     <attribute id="0x0015" name="SpecificationVersion">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0016" name="MaxPathsPerInvoke">
       <disallowConform/>
     </attribute>
   </attributes>
