@@ -16,21 +16,16 @@
  *    limitations under the License.
  */
 
-#include <esp_err.h>
-#include <esp_log.h>
-
-#if CONFIG_ENABLE_SNTP_TIME_SYNC
+#include "TimeSync.h"
 #include <esp_sntp.h>
-
-static const char * TAG = "ESP_TIME_SYNC";
+#include <lib/support/logging/CHIPLogging.h>
 
 #define REF_TIME 1546300800 /* 01-Jan-2019 00:00:00 */
 /* Timer interval once every day (24 Hours) */
-#define TIME_PERIOD (CONFIG_SNTP_SYNC_INTERVAL_DAY * 86400000ULL)
+#define TIME_PERIOD_SEC 86400000ULL
+namespace chip {
 
-namespace Esp32Time {
-
-esp_err_t GetLocalTimeString(char * buf, size_t buf_len)
+CHIP_ERROR Esp32TimeSync::GetLocalTimeString(char * buf, size_t buf_len)
 {
     struct tm timeinfo;
     char strftime_buf[64];
@@ -41,59 +36,53 @@ esp_err_t GetLocalTimeString(char * buf, size_t buf_len)
     size_t print_size = snprintf(buf, buf_len, "%s, DST: %s", strftime_buf, timeinfo.tm_isdst ? "Yes" : "No");
     if (print_size >= buf_len)
     {
-        ESP_LOGE(TAG, "Buffer size %d insufficient for localtime string. Required size: %d", buf_len, print_size);
-        return ESP_ERR_INVALID_ARG;
+        ChipLogError(DeviceLayer, "Buffer size %d insufficient for localtime string. Required size: %d", buf_len, print_size);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return ESP_OK;
+    return CHIP_NO_ERROR;
 }
 
-bool ValidateTime(void)
+bool Esp32TimeSync::ValidateTime()
 {
     time_t now;
     time(&now);
-    if (now > REF_TIME)
-    {
-        return true;
-    }
-    return false;
-}
-static esp_err_t PrintCurrentTime(void)
-{
-    char local_time[64];
-    if (GetLocalTimeString(local_time, sizeof(local_time)) == ESP_OK)
-    {
-        if (ValidateTime() == false)
-        {
-            ESP_LOGI(TAG, "Time not synchronised yet.");
-        }
-        ESP_LOGI(TAG, "The current time is: %s.", local_time);
-        return ESP_OK;
-    }
-    return ESP_FAIL;
+    return (now > REF_TIME);
 }
 
-static void TimeSyncCallback(struct timeval * tv)
+CHIP_ERROR Esp32TimeSync::PrintCurrentTime()
 {
-    ESP_LOGI(TAG, "SNTP Synchronised.");
+    char local_time[64];
+    if (GetLocalTimeString(local_time, sizeof(local_time)) == CHIP_NO_ERROR)
+    {
+        if (!ValidateTime())
+        {
+            ChipLogProgress(DeviceLayer, "Time not synchronised yet.");
+        }
+        ChipLogProgress(DeviceLayer, "The current time is: %s.", local_time);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INTERNAL;
+}
+
+void Esp32TimeSync::TimeSyncCallback(struct timeval * tv)
+{
+    ChipLogProgress(DeviceLayer, "SNTP Synchronised.");
     PrintCurrentTime();
 }
 
-esp_err_t TimeSycnInit(void)
+CHIP_ERROR Esp32TimeSync::Init()
 {
     if (esp_sntp_enabled())
     {
-        ESP_LOGI(TAG, "SNTP already initialized.");
-        return ESP_OK;
+        ChipLogProgress(DeviceLayer, "SNTP already initialized.");
+        return CHIP_NO_ERROR;
     }
-    char * sntp_server_name = CONFIG_SNTP_SERVER_NAME;
-    ESP_LOGI(TAG, "Initializing SNTP. Using the SNTP server: %s", sntp_server_name);
+    ChipLogProgress(DeviceLayer, "Initializing SNTP. Using the SNTP server: %s", mSntpServerName);
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    esp_sntp_setservername(0, sntp_server_name);
-    esp_sntp_set_sync_interval(TIME_PERIOD);
+    esp_sntp_setservername(0, mSntpServerName);
+    esp_sntp_set_sync_interval(TIME_PERIOD_SEC * mSyncSntpIntervalDay);
     esp_sntp_init();
     sntp_set_time_sync_notification_cb(TimeSyncCallback);
-    return ESP_OK;
+    return CHIP_NO_ERROR;
 }
-
-} // namespace Esp32Time
-#endif
+} // namespace chip

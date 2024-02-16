@@ -23,7 +23,7 @@
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
 #if CONFIG_ENABLE_SNTP_TIME_SYNC
-#include <common/TimeSync.h>
+#include <time/TimeSync.h>
 #endif
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
@@ -151,7 +151,10 @@ static void InitServer(intptr_t context)
     ApplicationInit();
 
 #if CONFIG_ENABLE_SNTP_TIME_SYNC
-    Esp32Time::TimeSycnInit();
+    char ntpServerUrl[]              = "pool.ntp.org";
+    uint16_t mSyncNtpTimeIntervalDay = 1;
+    chip::Esp32TimeSync mEsp32TimeSync(ntpServerUrl, mSyncNtpTimeIntervalDay);
+    mEsp32TimeSync.Init();
 #endif
 }
 

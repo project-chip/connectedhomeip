@@ -17,13 +17,30 @@
  */
 
 #pragma once
-#if CONFIG_ENABLE_SNTP_TIME_SYNC
-#include <esp_err.h>
 #include <esp_sntp.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 
-namespace Esp32Time {
+namespace chip {
+class Esp32TimeSync
+{
+public:
+    Esp32TimeSync(char * aSntpServerName, uint16_t aSyncSntpIntervalDay)
+    {
+        mSntpServerName = new char[strlen(aSntpServerName) + 1];
+        strcpy(mSntpServerName, aSntpServerName);
+        mSyncSntpIntervalDay = aSyncSntpIntervalDay;
+    }
 
-esp_err_t TimeSycnInit(void);
+    CHIP_ERROR Init();
 
-} // namespace Esp32Time
-#endif
+private:
+    static CHIP_ERROR GetLocalTimeString(char * buf, size_t buf_len);
+    static bool ValidateTime();
+    static CHIP_ERROR PrintCurrentTime();
+    static void TimeSyncCallback(struct timeval * tv);
+
+    char * mSntpServerName;
+    uint16_t mSyncSntpIntervalDay;
+};
+} // namespace chip
