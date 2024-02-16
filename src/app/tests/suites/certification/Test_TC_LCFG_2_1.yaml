@@ -48,7 +48,7 @@ tests:
                 value: nodeId
 
     - label: "Step 1a: TH reads SupportedLocales attribute from DUT"
-      PICS: LCFG.S.A0000
+      PICS: LCFG.S.A0001
       command: "readAttribute"
       attribute: "SupportedLocales"
       response:
@@ -81,7 +81,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 3: TH reads SupportedLocales attribute from DUT"
-      PICS: LCFG.S.A0000
+      PICS: LCFG.S.A0001
       command: "readAttribute"
       attribute: "SupportedLocales"
       response:

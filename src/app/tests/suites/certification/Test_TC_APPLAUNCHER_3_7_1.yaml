@@ -36,10 +36,9 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool applicationlauncher launch-app '{"catalogVendorID": 123, "applicationID": "exampleid"}' 1 1
+          ./chip-tool applicationlauncher launch-app  1 1 --Application '{"catalogVendorID": 123, "applicationID": "exampleid"}'
 
-          ./chip-tv-casting-app applicationlauncher launch-app '{"catalogVendorID": 123, "applicationID": "exampleid"}' 1 1
-
+          ./chip-tv-casting-app applicationlauncher launch-app  1 1 --Application '{"catalogVendorID": 123, "applicationID": "exampleid"}'
 
           On TH (tv-app), Verify the launch app command is received successfully.
 
