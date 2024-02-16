@@ -25,8 +25,8 @@
 #include "ti_drivers_config.h"
 
 #include <ti/drivers/AESECB.h>
-#include <ti/drivers/dpl/HwiP.h>
 #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
+#include <ti/drivers/dpl/HwiP.h>
 
 /*
  * number of active contexts, used for power on/off of the crypto core
