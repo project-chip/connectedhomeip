@@ -21,10 +21,9 @@
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
-#include <transport/TracingStructs.h>
-
 #include <matter/tracing/macros_impl.h>
 #include <perfetto.h>
+#include <transport/TracingStructs.h>
 
 namespace chip {
 namespace Tracing {

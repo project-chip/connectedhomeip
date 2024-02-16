@@ -30,34 +30,27 @@
 
 struct WeekDaysScheduleInfo
 {
-    DlScheduleStatus status;
+    DlScheduleStatus status = DlScheduleStatus::kAvailable;
     EmberAfPluginDoorLockWeekDaySchedule schedule;
 };
 
 struct YearDayScheduleInfo
 {
-    DlScheduleStatus status;
+    DlScheduleStatus status = DlScheduleStatus::kAvailable;
     EmberAfPluginDoorLockYearDaySchedule schedule;
 };
 
 struct HolidayScheduleInfo
 {
-    DlScheduleStatus status;
+    DlScheduleStatus status = DlScheduleStatus::kAvailable;
     EmberAfPluginDoorLockHolidaySchedule schedule;
 };
 
 namespace TelinkDoorLock {
 namespace ResourceRanges {
 // Used to size arrays
-static constexpr uint16_t kMaxUsers                  = 10;
-static constexpr uint8_t kMaxCredentialsPerUser      = 10;
-static constexpr uint8_t kMaxWeekdaySchedulesPerUser = 10;
-static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
-static constexpr uint8_t kMaxHolidaySchedules        = 10;
-static constexpr uint8_t kMaxCredentialSize          = 20;
-static constexpr uint8_t kNumCredentialTypes         = 6;
-
-static constexpr uint8_t kMaxCredentials = kMaxUsers * kMaxCredentialsPerUser;
+static constexpr uint8_t kMaxCredentialSize  = 20;
+static constexpr uint8_t kNumCredentialTypes = 6;
 
 } // namespace ResourceRanges
 
@@ -197,10 +190,6 @@ private:
     OperationSource mActuatorOperationSource = OperationSource::kButton;
     k_timer mActuatorTimer                   = {};
 
-#if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
-    bool ReadConfigValues();
-#endif
-
     bool setLockState(chip::EndpointId endpointId, DlLockState lockState, OperationSource source, OperationErrorEnum & err,
                       const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
                       const Optional<chip::ByteSpan> & pin);
@@ -208,15 +197,17 @@ private:
     static void ActuatorTimerEventHandler(k_timer * timer);
     static void ActuatorAppEventHandler(const AppEvent & event);
 
-    EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
-    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentials];
-    WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
-    YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
-    HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
+#if !LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
+    EmberAfPluginDoorLockUserInfo mLockUsers[APP_MAX_USERS];
+    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][APP_MAX_CREDENTIAL];
+    WeekDaysScheduleInfo mWeekdaySchedule[APP_MAX_USERS][APP_MAX_WEEKDAY_SCHEDULE_PER_USER];
+    YearDayScheduleInfo mYeardaySchedule[APP_MAX_USERS][APP_MAX_YEARDAY_SCHEDULE_PER_USER];
+    HolidayScheduleInfo mHolidaySchedule[APP_MAX_HOLYDAY_SCHEDULE_PER_USER];
 
     char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
-    uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentials][kMaxCredentialSize];
-    CredentialStruct mCredentials[kMaxUsers][kMaxCredentials];
+    uint8_t mCredentialData[kNumCredentialTypes][APP_MAX_CREDENTIAL][kMaxCredentialSize];
+    CredentialStruct mCredentials[APP_MAX_USERS][APP_MAX_CREDENTIAL];
+#endif
 
     static LockManager sLock;
     TelinkDoorLock::LockInitParams::LockParam LockParams;

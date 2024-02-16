@@ -44,7 +44,7 @@ void ClearBindingTable(BindingTable & table)
 
 void CreateDefaultFullBindingTable(BindingTable & table)
 {
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
         table.Add(EmberBindingTableEntry::ForNode(i / 10, i % 5, 0, 0, MakeOptional<ClusterId>(i)));
     }
@@ -63,15 +63,15 @@ void TestAddRemove(nlTestSuite * aSuite, void * aContext)
     PendingNotificationMap pendingMap;
     ClearBindingTable(BindingTable::GetInstance());
     CreateDefaultFullBindingTable(BindingTable::GetInstance());
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
         NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(i, nullptr) == CHIP_NO_ERROR);
     }
     // Confirm adding in one more element fails
-    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(EMBER_BINDING_TABLE_SIZE, nullptr) == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(aSuite, pendingMap.AddPendingNotification(MATTER_BINDING_TABLE_SIZE, nullptr) == CHIP_ERROR_NO_MEMORY);
 
     auto iter = pendingMap.begin();
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
         PendingNotificationEntry entry = *iter;
         NL_TEST_ASSERT(aSuite, entry.mBindingEntryId == i);

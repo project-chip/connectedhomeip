@@ -180,6 +180,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-shell-ipv6only-platform-mdns \
     --target linux-x64-chip-cert-ipv6only-platform-mdns \
     --target linux-x64-all-clusters-ipv6only \
+    --target linux-x64-all-clusters-ipv6only-nlfaultinject \
     --target linux-x64-all-clusters-minimal-ipv6only \
     --target linux-x64-bridge-ipv6only \
     --target linux-x64-tv-app-ipv6only \
@@ -198,6 +199,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-x64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
+    && mv out/linux-x64-all-clusters-ipv6only-nlfaultinject/chip-all-clusters-app out/chip-all-clusters-app-nlfaultinject \
     && mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
     && mv out/linux-x64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
     && mv out/linux-x64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
@@ -220,6 +222,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-shell-ipv6only-platform-mdns \
     --target linux-arm64-chip-cert-ipv6only-platform-mdns \
     --target linux-arm64-all-clusters-ipv6only \
+    --target linux-arm64-all-clusters-ipv6only-nlfaultinject \
     --target linux-arm64-all-clusters-minimal-ipv6only \
     --target linux-arm64-bridge-ipv6only \
     --target linux-arm64-tv-app-ipv6only \
@@ -238,6 +241,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-arm64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
+    && mv out/linux-arm64-all-clusters-ipv6only-nlfaultinject/chip-all-clusters-app out/chip-all-clusters-app-nlfaultinject \
     && mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
     && mv out/linux-arm64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
     && mv out/linux-arm64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
@@ -269,6 +273,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tool chip-tool
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-shell chip-shell
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-cert chip-cert
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app chip-all-clusters-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app-nlfaultinject chip-all-clusters-app-nlfaultinject
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-minimal-app chip-all-clusters-minimal-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-app chip-lighting-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tv-casting-app chip-tv-casting-app

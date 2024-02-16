@@ -46,7 +46,6 @@
 #include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
-#include <app/util/error-mapping.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
@@ -476,8 +475,21 @@ public:
                                   }];
 }
 
+static NSDictionary<NSString *, id> * _MakeDataValueDictionary(NSString * type, id _Nullable value, NSNumber * _Nullable dataVersion)
+{
+    if (value && dataVersion) {
+        return @ { MTRTypeKey : type, MTRValueKey : value, MTRDataVersionKey : dataVersion };
+    } else if (value) {
+        return @ { MTRTypeKey : type, MTRValueKey : value };
+    } else if (dataVersion) {
+        return @ { MTRTypeKey : type, MTRDataVersionKey : dataVersion };
+    } else {
+        return @ { MTRTypeKey : type };
+    }
+}
+
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data)
+NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data, NSNumber * dataVersion)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType) {
@@ -488,8 +500,7 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
             MTR_LOG_ERROR("Error(%s): TLV signed integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:MTRSignedIntegerValueType, MTRTypeKey, [NSNumber numberWithLongLong:val],
-                             MTRValueKey, nil];
+        return _MakeDataValueDictionary(MTRSignedIntegerValueType, @(val), dataVersion);
     }
     case chip::TLV::kTLVType_UnsignedInteger: {
         uint64_t val;
@@ -498,8 +509,7 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
             MTR_LOG_ERROR("Error(%s): TLV unsigned integer decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:MTRUnsignedIntegerValueType, MTRTypeKey,
-                             [NSNumber numberWithUnsignedLongLong:val], MTRValueKey, nil];
+        return _MakeDataValueDictionary(MTRUnsignedIntegerValueType, @(val), dataVersion);
     }
     case chip::TLV::kTLVType_Boolean: {
         bool val;
@@ -508,15 +518,14 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
             MTR_LOG_ERROR("Error(%s): TLV boolean decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary
-            dictionaryWithObjectsAndKeys:MTRBooleanValueType, MTRTypeKey, [NSNumber numberWithBool:val], MTRValueKey, nil];
+        return _MakeDataValueDictionary(MTRBooleanValueType, @(val), dataVersion);
     }
     case chip::TLV::kTLVType_FloatingPointNumber: {
         // Try float first
         float floatValue;
         CHIP_ERROR err = data->Get(floatValue);
         if (err == CHIP_NO_ERROR) {
-            return @ { MTRTypeKey : MTRFloatValueType, MTRValueKey : [NSNumber numberWithFloat:floatValue] };
+            return _MakeDataValueDictionary(MTRFloatValueType, @(floatValue), dataVersion);
         }
         double val;
         err = data->Get(val);
@@ -524,8 +533,7 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
             MTR_LOG_ERROR("Error(%s): TLV floating point decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary
-            dictionaryWithObjectsAndKeys:MTRDoubleValueType, MTRTypeKey, [NSNumber numberWithDouble:val], MTRValueKey, nil];
+        return _MakeDataValueDictionary(MTRDoubleValueType, @(val), dataVersion);
     }
     case chip::TLV::kTLVType_UTF8String: {
         CharSpan stringValue;
@@ -539,7 +547,7 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
             MTR_LOG_ERROR("Error(%s): TLV UTF8String value is not actually UTF-8", err.AsString());
             return nil;
         }
-        return @ { MTRTypeKey : MTRUTF8StringValueType, MTRValueKey : stringObj };
+        return _MakeDataValueDictionary(MTRUTF8StringValueType, stringObj, dataVersion);
     }
     case chip::TLV::kTLVType_ByteString: {
         ByteSpan bytesValue;
@@ -548,10 +556,10 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
             MTR_LOG_ERROR("Error(%s): TLV ByteString decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return @ { MTRTypeKey : MTROctetStringValueType, MTRValueKey : AsData(bytesValue) };
+        return _MakeDataValueDictionary(MTROctetStringValueType, AsData(bytesValue), dataVersion);
     }
     case chip::TLV::kTLVType_Null: {
-        return [NSDictionary dictionaryWithObjectsAndKeys:MTRNullValueType, MTRTypeKey, nil];
+        return _MakeDataValueDictionary(MTRNullValueType, nil, dataVersion);
     }
     case chip::TLV::kTLVType_Structure:
     case chip::TLV::kTLVType_Array: {
@@ -607,7 +615,7 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
             MTR_LOG_ERROR("Error(%s): TLV container exiting failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:typeName, MTRTypeKey, array, MTRValueKey, nil];
+        return _MakeDataValueDictionary(typeName, array, dataVersion);
     }
     default:
         MTR_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", (unsigned) data->GetType());
@@ -816,7 +824,7 @@ template <typename DecodableValueType>
 class BufferedReadClientCallback final : public app::ReadClient::Callback {
 public:
     using OnSuccessAttributeCallbackType
-        = std::function<void(const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
+        = std::function<void(const ConcreteDataAttributePath & aPath, const DecodableValueType & aData)>;
     using OnSuccessEventCallbackType = std::function<void(const EventHeader & aEventHeader, const DecodableValueType & aData)>;
     using OnErrorCallbackType = std::function<void(
         const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath, CHIP_ERROR aError)>;
@@ -1029,6 +1037,16 @@ private:
                      queue:(dispatch_queue_t)queue
                 completion:(MTRDeviceResponseHandler)completion
 {
+    [self readAttributePaths:attributePaths eventPaths:eventPaths params:params includeDataVersion:NO queue:queue completion:completion];
+}
+
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+        includeDataVersion:(BOOL)includeDataVersion
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion
+{
     if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
         // No paths, just return an empty array.
         dispatch_async(queue, ^{
@@ -1057,11 +1075,20 @@ private:
 
             auto resultArray = [[NSMutableArray alloc] init];
             auto onAttributeSuccessCb
-                = [resultArray](const ConcreteAttributePath & aAttributePath, const MTRDataValueDictionaryDecodableType & aData) {
-                      [resultArray addObject:@ {
-                          MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:aAttributePath],
-                          MTRDataKey : aData.GetDecodedObject()
-                      }];
+                = [resultArray, includeDataVersion](const ConcreteDataAttributePath & aAttributePath, const MTRDataValueDictionaryDecodableType & aData) {
+                      // TODO: move this logic into MTRDataValueDictionaryDecodableType
+                      if (includeDataVersion && aAttributePath.mDataVersion.HasValue()) {
+                          NSDictionary * dataValue = aData.GetDecodedObject();
+                          [resultArray addObject:@{
+                              MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:aAttributePath],
+                              MTRDataKey : _MakeDataValueDictionary(dataValue[MTRTypeKey], dataValue[MTRValueKey], @(aAttributePath.mDataVersion.Value()))
+                          }];
+                      } else {
+                          [resultArray addObject:@ {
+                              MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:aAttributePath],
+                              MTRDataKey : aData.GetDecodedObject()
+                          }];
+                      }
                   };
 
             auto onEventSuccessCb
@@ -2425,6 +2452,42 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     return [MTRClusterPath clusterPathWithEndpointID:_endpoint clusterID:_cluster];
 }
 
+static NSString * const sEndpointKey = @"endpointKey";
+static NSString * const sClusterKey = @"clusterKey";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super init];
+    if (self == nil) {
+        return nil;
+    }
+
+    _endpoint = [decoder decodeObjectOfClass:[NSNumber class] forKey:sEndpointKey];
+    if (_endpoint && ![_endpoint isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRClusterPath decoded %@ for endpoint, not NSNumber.", _endpoint);
+        return nil;
+    }
+
+    _cluster = [decoder decodeObjectOfClass:[NSNumber class] forKey:sClusterKey];
+    if (_cluster && ![_cluster isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRClusterPath decoded %@ for cluster, not NSNumber.", _cluster);
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeObject:_endpoint forKey:sEndpointKey];
+    [coder encodeObject:_cluster forKey:sClusterKey];
+}
+
 @end
 
 @implementation MTRAttributePath
@@ -2482,6 +2545,35 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     return ConcreteAttributePath([self.endpoint unsignedShortValue], static_cast<ClusterId>([self.cluster unsignedLongValue]),
         static_cast<AttributeId>([self.attribute unsignedLongValue]));
 }
+
+static NSString * const sAttributeKey = @"attributeKey";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super initWithCoder:decoder];
+    if (self == nil) {
+        return nil;
+    }
+
+    _attribute = [decoder decodeObjectOfClass:[NSNumber class] forKey:sAttributeKey];
+    if (_attribute && ![_attribute isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRAttributePath decoded %@ for attribute, not NSNumber.", _attribute);
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeObject:_attribute forKey:sAttributeKey];
+}
+
 @end
 
 @implementation MTRAttributePath (Deprecated)

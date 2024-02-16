@@ -189,3 +189,11 @@ def find_tag_list_problems(roots: list[int], device_types: dict[int, dict[int, s
                                                         missing_feature=missing_feature, duplicates=endpoints)
 
     return tag_problems
+
+
+def flat_list_ok(flat_endpoint_id_to_check: int, endpoints_dict: dict[int, Any]) -> bool:
+    '''Checks if the (flat) PartsList on the supplied endpoint contains all the sub-children of its parts.'''
+    sub_children = set()
+    for child in endpoints_dict[flat_endpoint_id_to_check][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
+        sub_children.update(get_all_children(child, endpoints_dict))
+    return all(item in endpoints_dict[flat_endpoint_id_to_check][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList] for item in sub_children)
