@@ -296,8 +296,8 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
         std::string nextIdString(program.identifier.data(), program.identifier.size());
         if (nextIdString == idString)
         {
-            program.recordingFlag = MakeOptional(
-                chip::BitMask<RecordingFlagBitmap>(shouldRecordSeries ? RecordingFlagBitmap::kRecordSeries : RecordingFlagBitmap::kScheduled));
+            program.recordingFlag = MakeOptional(chip::BitMask<RecordingFlagBitmap>(
+                shouldRecordSeries ? RecordingFlagBitmap::kRecordSeries : RecordingFlagBitmap::kScheduled));
         }
     }
 
@@ -341,7 +341,8 @@ uint16_t ChannelManager::GetClusterRevision(chip::EndpointId endpoint)
     }
 
     uint16_t clusterRevision = 0;
-    bool success             = (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
     if (!success)
     {
         ChipLogError(Zcl, "ChannelManager::GetClusterRevision error reading cluster revision");
