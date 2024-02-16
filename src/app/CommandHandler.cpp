@@ -214,6 +214,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
         SetGroupRequest(true);
     }
 
+    // When updating this code, please remember to make corresponding changes to TestOnlyInvokeCommandRequestWithFaultsInjected.
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
@@ -910,6 +911,135 @@ void CommandHandler::MoveToState(const State aTargetState)
     mState = aTargetState;
     ChipLogDetail(DataManagement, "Command handler moving to [%10.10s]", GetStateStr());
 }
+
+#if CHIP_WITH_NLFAULTINJECTION
+
+namespace {
+
+CHIP_ERROR TestOnlyExtractCommandPathFromNextInvokeRequest(TLV::TLVReader & invokeRequestsReader,
+                                                           ConcreteCommandPath & concretePath)
+{
+    ReturnErrorOnFailure(invokeRequestsReader.Next(TLV::AnonymousTag()));
+    CommandDataIB::Parser commandData;
+    ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
+    CommandPathIB::Parser commandPath;
+    ReturnErrorOnFailure(commandData.GetPath(&commandPath));
+    return commandPath.GetConcreteCommandPath(concretePath);
+}
+
+[[maybe_unused]] const char * GetFaultInjectionTypeStr(CommandHandler::NlFaultInjectionType faultType)
+{
+    switch (faultType)
+    {
+    case CommandHandler::NlFaultInjectionType::SeparateResponseMessages:
+        return "Each response will be sent in a separate InvokeResponseMessage. The order of responses will be the same as the "
+               "original request.";
+    case CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder:
+        return "Each response will be sent in a separate InvokeResponseMessage. The order of responses will be reversed from the "
+               "original request.";
+    case CommandHandler::NlFaultInjectionType::SkipSecondResponse:
+        return "Single InvokeResponseMessages. Dropping response to second request";
+    }
+    VerifyOrDieWithMsg(false, DataManagement, "TH Failure: Unexpected fault type");
+}
+
+} // anonymous namespace
+
+// This method intentionally duplicates code from other sections. While code consolidation
+// is generally preferred, here we prioritize generating a clear crash message to aid in
+// troubleshooting test failures.
+void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
+                                                                    System::PacketBufferHandle && payload, bool isTimedInvoke,
+                                                                    NlFaultInjectionType faultType)
+{
+    VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
+    VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH Failure: state should be Idle, issue with TH");
+
+    ChipLogProgress(DataManagement, "Response to InvokeRequestMessage overridden by fault injection");
+    ChipLogProgress(DataManagement, "   Injecting the following response:%s", GetFaultInjectionTypeStr(faultType));
+
+    mResponseSender.SetExchangeContext(ec);
+    Handle workHandle(this);
+    mResponseSender.WillSendMessage();
+    VerifyOrDieWithMsg(!mResponseSender.IsForGroup(), DataManagement, "DUT Failure: Unexpected Group Command");
+
+    System::PacketBufferTLVReader reader;
+    InvokeRequestMessage::Parser invokeRequestMessage;
+    InvokeRequests::Parser invokeRequests;
+    reader.Init(std::move(payload));
+    VerifyOrDieWithMsg(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, DataManagement,
+                       "TH Failure: Failed 'invokeRequestMessage.Init(reader)'");
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    invokeRequestMessage.PrettyPrint();
+#endif
+
+    VerifyOrDieWithMsg(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, DataManagement,
+                       "DUT Failure: Mandatory SuppressResponse field missing");
+    VerifyOrDieWithMsg(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, DataManagement,
+                       "DUT Failure: Mandatory TimedRequest field missing");
+    VerifyOrDieWithMsg(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, DataManagement,
+                       "DUT Failure: Mandatory InvokeRequests field missing");
+    VerifyOrDieWithMsg(mTimedRequest == isTimedInvoke, DataManagement,
+                       "DUT Failure: TimedRequest value in message mismatches action");
+
+    {
+        InvokeRequestMessage::Parser validationInvokeRequestMessage = invokeRequestMessage;
+        VerifyOrDieWithMsg(ValidateInvokeRequestMessageAndBuildRegistry(validationInvokeRequestMessage) == CHIP_NO_ERROR,
+                           DataManagement, "DUT Failure: InvokeRequestMessage contents were invalid");
+    }
+
+    TLV::TLVReader invokeRequestsReader;
+    invokeRequests.GetReader(&invokeRequestsReader);
+
+    size_t commandCount = 0;
+    VerifyOrDieWithMsg(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */) == CHIP_NO_ERROR,
+                       DataManagement,
+                       "TH Failure: Failed to get the length of InvokeRequests after InvokeRequestMessage validation");
+
+    // The command count check (specifically for a count of 2) is tied to IDM_1_3. This may need adjustment for
+    // compatibility with future test plans.
+    VerifyOrDieWithMsg(commandCount == 2, DataManagement, "DUT failure: We were strictly expecting exactly 2 InvokeRequests");
+    mReserveSpaceForMoreChunkMessages = true;
+
+    {
+        // Response path is the same as request path since we are replying with a failure message.
+        ConcreteCommandPath concreteResponsePath1;
+        ConcreteCommandPath concreteResponsePath2;
+        VerifyOrDieWithMsg(
+            TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath1) == CHIP_NO_ERROR,
+            DataManagement, "DUT Failure: Issues encountered while extracting the ConcreteCommandPath from the first request");
+        VerifyOrDieWithMsg(
+            TestOnlyExtractCommandPathFromNextInvokeRequest(invokeRequestsReader, concreteResponsePath2) == CHIP_NO_ERROR,
+            DataManagement, "DUT Failure: Issues encountered while extracting the ConcreteCommandPath from the second request");
+
+        if (faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
+        {
+            ConcreteCommandPath temp(concreteResponsePath1);
+            concreteResponsePath1 = concreteResponsePath2;
+            concreteResponsePath2 = temp;
+        }
+
+        VerifyOrDieWithMsg(FallibleAddStatus(concreteResponsePath1, Status::Failure) == CHIP_NO_ERROR, DataManagement,
+                           "TH Failure: Error adding the first InvokeResponse");
+        if (faultType == NlFaultInjectionType::SeparateResponseMessages ||
+            faultType == NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder)
+        {
+            VerifyOrDieWithMsg(FinalizeInvokeResponseMessageAndPrepareNext() == CHIP_NO_ERROR, DataManagement,
+                               "TH Failure: Failed to create second InvokeResponseMessage");
+        }
+        if (faultType != NlFaultInjectionType::SkipSecondResponse)
+        {
+            VerifyOrDieWithMsg(FallibleAddStatus(concreteResponsePath2, Status::Failure) == CHIP_NO_ERROR, DataManagement,
+                               "TH Failure: Error adding the second InvokeResponse");
+        }
+    }
+
+    VerifyOrDieWithMsg(invokeRequestsReader.Next() == CHIP_END_OF_TLV, DataManagement,
+                       "DUT Failure: Unexpected TLV ending of InvokeRequests");
+    VerifyOrDieWithMsg(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, DataManagement,
+                       "DUT Failure: InvokeRequestMessage TLV is not properly terminated");
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 } // namespace app
 } // namespace chip

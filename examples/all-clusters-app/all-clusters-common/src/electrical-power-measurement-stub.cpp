@@ -47,5 +47,7 @@ void emberAfElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpo
                 OptionalAttributes::kOptionalAttributeNeutralCurrent));
 
         gEPMInstance->Init();
+
+        gEPMDelegate->SetPowerMode(PowerModeEnum::kAc);
     }
 }

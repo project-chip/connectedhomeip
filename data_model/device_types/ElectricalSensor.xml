@@ -55,38 +55,20 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0051" name="Laundry Mode" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0510" name="Electrical Sensor" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status"/>
+    <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="LWM" scope="Endpoint"/>
-  <dataTypes>
-    <struct name="ModeOptionStruct">
-      <field id="0" name="Label">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Mode">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="ModeTags">
-        <mandatoryConform/>
-        <constraint type="between" from="1" to="8"/>
-      </field>
-    </struct>
-  </dataTypes>
-  <attributes>
-    <attribute id="0x0000" name="SupportedModes">
+  <classification class="utility" scope="endpoint"/>
+  <clusters>
+    <cluster id="0x0090" name="Electrical Power Measurement" side="server">
+      <optionalConform choice="a" more="true"/>
+    </cluster>
+    <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
+      <optionalConform choice="a" more="true"/>
+    </cluster>
+    <cluster id="0x009C" name="Power Topology" side="server">
       <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="CurrentMode">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0002" name="StartUpMode">
-      <provisionalConform/>
-    </attribute>
-    <attribute id="0x0003" name="OnMode">
-      <provisionalConform/>
-    </attribute>
-  </attributes>
-</cluster>
+    </cluster>
+  </clusters>
+</deviceType>

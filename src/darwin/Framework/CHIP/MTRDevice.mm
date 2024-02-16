@@ -46,6 +46,7 @@
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
 NSString * const MTRPreviousDataKey = @"previousData";
+NSString * const MTRDataVersionKey = @"dataVersion";
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
@@ -213,7 +214,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @end
 #endif
 
-@implementation MTRDevice
+@implementation MTRDevice {
+#ifdef DEBUG
+    NSUInteger _unitTestAttributesReportedSinceLastCheck;
+#endif
+}
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
@@ -284,6 +289,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_lock(&self->_lock);
 
+    _state = MTRDeviceStateUnknown;
+
     _weakDelegate = nil;
 
     // Make sure we don't try to resubscribe if we have a pending resubscribe
@@ -343,13 +350,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _state = state;
     if (lastState != state) {
         if (state != MTRDeviceStateReachable) {
-            MTR_LOG_INFO("%@ State change %lu => %lu, set estimated start time to nil", self, static_cast<unsigned long>(lastState),
+            MTR_LOG_INFO("%@ reachability state change %lu => %lu, set estimated start time to nil", self, static_cast<unsigned long>(lastState),
                 static_cast<unsigned long>(state));
             _estimatedStartTime = nil;
             _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
         } else {
             MTR_LOG_INFO(
-                "%@ State change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
+                "%@ reachability state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
         }
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if (delegate) {
@@ -357,6 +364,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 [delegate device:self stateChanged:state];
             });
         }
+    } else {
+        MTR_LOG_INFO(
+            "%@ Not reporting reachability state change, since no change in state %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
     }
 }
 
@@ -592,14 +602,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // If event time is of MTREventTimeTypeSystemUpTime type, then update estimated start time as needed
         NSNumber * eventTimeTypeNumber = eventDict[MTREventTimeTypeKey];
         if (!eventTimeTypeNumber) {
-            MTR_LOG_ERROR("Event %@ missing event time type", eventDict);
+            MTR_LOG_ERROR("%@ Event %@ missing event time type", self, eventDict);
             continue;
         }
         MTREventTimeType eventTimeType = (MTREventTimeType) eventTimeTypeNumber.unsignedIntegerValue;
         if (eventTimeType == MTREventTimeTypeSystemUpTime) {
             NSNumber * eventTimeValueNumber = eventDict[MTREventSystemUpTimeKey];
             if (!eventTimeValueNumber) {
-                MTR_LOG_ERROR("Event %@ missing event time value", eventDict);
+                MTR_LOG_ERROR("%@ Event %@ missing event time value", self, eventDict);
                 continue;
             }
             NSTimeInterval eventTimeValue = eventTimeValueNumber.doubleValue;
@@ -634,6 +644,55 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     os_unfair_lock_unlock(&self->_lock);
+}
+
+- (NSDictionary<MTRClusterPath *, NSNumber *> *)_getCachedDataVersions
+{
+    NSMutableDictionary<MTRClusterPath *, NSNumber *> * dataVersions = [NSMutableDictionary dictionary];
+    os_unfair_lock_lock(&self->_lock);
+    for (MTRAttributePath * path in _readCache) {
+        NSDictionary * dataValue = _readCache[path];
+        NSNumber * dataVersionNumber = dataValue[MTRDataVersionKey];
+        if (dataVersionNumber) {
+            MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:path.endpoint clusterID:path.cluster];
+            NSNumber * currentDataVersion = dataVersions[clusterPath];
+            // Use the highest data version
+            if (currentDataVersion.unsignedLongValue < dataVersionNumber.unsignedLongValue) {
+                dataVersions[clusterPath] = dataVersionNumber;
+            }
+        }
+    }
+    os_unfair_lock_unlock(&self->_lock);
+
+    return dataVersions;
+}
+
+- (void)_createDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions dataVersionFilterList:(DataVersionFilter **)dataVersionFilterList count:(size_t *)count sizeReduction:(size_t)sizeReduction
+{
+    size_t maxDataVersionFilterSize = dataVersions.count;
+
+    // Check if any filter list should be generated
+    if (!dataVersions.count || (maxDataVersionFilterSize <= sizeReduction)) {
+        *count = 0;
+        *dataVersionFilterList = nullptr;
+        return;
+    }
+    maxDataVersionFilterSize -= sizeReduction;
+
+    DataVersionFilter * dataVersionFilterArray = new DataVersionFilter[maxDataVersionFilterSize];
+    size_t i = 0;
+    for (MTRClusterPath * path in dataVersions) {
+        NSNumber * dataVersionNumber = dataVersions[path];
+        if (dataVersionNumber) {
+            dataVersionFilterArray[i++] = DataVersionFilter(static_cast<chip::EndpointId>(path.endpoint.unsignedShortValue), static_cast<chip::ClusterId>(path.cluster.unsignedLongValue), static_cast<chip::DataVersion>(dataVersionNumber.unsignedLongValue));
+        }
+        if (i == maxDataVersionFilterSize) {
+            break;
+        }
+    }
+
+    *dataVersionFilterList = dataVersionFilterArray;
+    *count = maxDataVersionFilterSize;
 }
 
 // assume lock is held
@@ -672,55 +731,21 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                        return;
                    }
 
-                   // Wildcard endpoint, cluster, attribute, event.
-                   auto attributePath = std::make_unique<AttributePathParams>();
-                   auto eventPath = std::make_unique<EventPathParams>();
-                   // We want to get event reports at the minInterval, not the maxInterval.
-                   eventPath->mIsUrgentEvent = true;
-                   ReadPrepareParams readParams(session.Value());
-
-                   readParams.mMinIntervalFloorSeconds = 0;
-                   // Select a max interval based on the device's claimed idle sleep interval.
-                   auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
-                       session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
-
-                   auto maxIntervalCeilingMin = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
-                   if (idleSleepInterval < maxIntervalCeilingMin) {
-                       idleSleepInterval = maxIntervalCeilingMin;
-                   }
-
-                   auto maxIntervalCeilingMax = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
-                   if (idleSleepInterval > maxIntervalCeilingMax) {
-                       idleSleepInterval = maxIntervalCeilingMax;
-                   }
-#ifdef DEBUG
-                   if (maxIntervalOverride.HasValue()) {
-                       idleSleepInterval = maxIntervalOverride.Value();
-                   }
-#endif
-                   readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
-
-                   readParams.mpAttributePathParamsList = attributePath.get();
-                   readParams.mAttributePathParamsListSize = 1;
-                   readParams.mpEventPathParamsList = eventPath.get();
-                   readParams.mEventPathParamsListSize = 1;
-                   readParams.mKeepSubscriptions = true;
-                   readParams.mIsFabricFiltered = false;
-                   attributePath.release();
-                   eventPath.release();
-
                    auto callback = std::make_unique<SubscriptionCallback>(
                        ^(NSArray * value) {
                            MTR_LOG_INFO("%@ got attribute report %@", self, value);
                            dispatch_async(self.queue, ^{
-                               // OnAttributeData (after OnReportEnd)
+                               // OnAttributeData
                                [self _handleAttributeReport:value];
+#ifdef DEBUG
+                               self->_unitTestAttributesReportedSinceLastCheck += value.count;
+#endif
                            });
                        },
                        ^(NSArray * value) {
                            MTR_LOG_INFO("%@ got event report %@", self, value);
                            dispatch_async(self.queue, ^{
-                               // OnEventReport (after OnReportEnd)
+                               // OnEventReport
                                [self _handleEventReport:value];
                            });
                        },
@@ -788,18 +813,87 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                    auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
                        clusterStateCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
-                   // SendAutoResubscribeRequest cleans up the params, even on failure.
-                   CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+                   // Subscribe with data version filter list and retry with smaller list if out of packet space
+                   CHIP_ERROR err;
+                   NSDictionary<MTRClusterPath *, NSNumber *> * dataVersions = [self _getCachedDataVersions];
+                   size_t dataVersionFilterListSizeReduction = 0;
+                   for (;;) {
+                       // Wildcard endpoint, cluster, attribute, event.
+                       auto attributePath = std::make_unique<AttributePathParams>();
+                       auto eventPath = std::make_unique<EventPathParams>();
+                       // We want to get event reports at the minInterval, not the maxInterval.
+                       eventPath->mIsUrgentEvent = true;
+                       ReadPrepareParams readParams(session.Value());
+
+                       readParams.mMinIntervalFloorSeconds = 0;
+                       // Select a max interval based on the device's claimed idle sleep interval.
+                       auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
+                           session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
+
+                       auto maxIntervalCeilingMin = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+                       if (idleSleepInterval < maxIntervalCeilingMin) {
+                           idleSleepInterval = maxIntervalCeilingMin;
+                       }
+
+                       auto maxIntervalCeilingMax = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+                       if (idleSleepInterval > maxIntervalCeilingMax) {
+                           idleSleepInterval = maxIntervalCeilingMax;
+                       }
+#ifdef DEBUG
+                       if (maxIntervalOverride.HasValue()) {
+                           idleSleepInterval = maxIntervalOverride.Value();
+                       }
+#endif
+                       readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
+
+                       readParams.mpAttributePathParamsList = attributePath.get();
+                       readParams.mAttributePathParamsListSize = 1;
+                       readParams.mpEventPathParamsList = eventPath.get();
+                       readParams.mEventPathParamsListSize = 1;
+                       readParams.mKeepSubscriptions = true;
+                       readParams.mIsFabricFiltered = false;
+                       size_t dataVersionFilterListSize = 0;
+                       DataVersionFilter * dataVersionFilterList;
+                       [self _createDataVersionFilterListFromDictionary:dataVersions dataVersionFilterList:&dataVersionFilterList count:&dataVersionFilterListSize sizeReduction:dataVersionFilterListSizeReduction];
+                       readParams.mDataVersionFilterListSize = dataVersionFilterListSize;
+                       readParams.mpDataVersionFilterList = dataVersionFilterList;
+                       attributePath.release();
+                       eventPath.release();
+
+                       // TODO: Change from local filter list generation to rehydrating ClusterStateCache ot take advantage of existing filter list sorting algorithm
+
+                       // SendAutoResubscribeRequest cleans up the params, even on failure.
+                       err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+                       if (err == CHIP_NO_ERROR) {
+                           break;
+                       }
+
+                       // If error is not a "no memory" issue, then break and go through regular resubscribe logic
+                       if (err != CHIP_ERROR_NO_MEMORY) {
+                           break;
+                       }
+
+                       // If "no memory" error is not caused by data version filter list, break as well
+                       if (!dataVersionFilterListSize) {
+                           break;
+                       }
+
+                       // Now "no memory" could mean subscribe request packet space ran out. Reduce size and try again immediately
+                       dataVersionFilterListSizeReduction++;
+                   }
 
                    if (err != CHIP_NO_ERROR) {
-                       NSError * error = [MTRError errorForCHIPErrorCode:err];
+                       NSError * error = [MTRError errorForCHIPErrorCode:err logContext:self];
                        MTR_LOG_ERROR("%@ SendAutoResubscribeRequest error %@", self, error);
                        dispatch_async(self.queue, ^{
                            [self _handleSubscriptionError:error];
+                           [self _handleSubscriptionReset];
                        });
 
                        return;
                    }
+
+                   MTR_LOG_DEFAULT("%@ Subscribe with data version list size %lu, reduced by %lu", self, dataVersions.count, dataVersionFilterListSizeReduction);
 
                    // Callback and ClusterStateCache and ReadClient will be deleted
                    // when OnDone is called.
@@ -812,6 +906,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                    callback.release();
                }];
 }
+
+#ifdef DEBUG
+- (NSUInteger)unitTestAttributesReportedSinceLastCheck
+{
+    NSUInteger attributesReportedSinceLastCheck = _unitTestAttributesReportedSinceLastCheck;
+    _unitTestAttributesReportedSinceLastCheck = 0;
+    return attributesReportedSinceLastCheck;
+}
+#endif
 
 #pragma mark Device Interactions
 
@@ -982,6 +1085,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
+        NSNumber * nodeID = [self nodeID];
+
         [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
             mtr_hide(self); // don't capture self accidentally
             NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
@@ -991,14 +1096,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             while (readRequestsNext.count) {
                 // Can only read up to 9 paths at a time, per spec
                 if (readRequestsCurrent.count >= 9) {
-                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, item is full", workItemID);
+                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, item is full [%@:%@:%@:%@]", workItemID, nodeID, endpointID, clusterID, attributeID);
                     return outcome;
                 }
 
                 // if params don't match then they cannot be merged
                 if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
                         isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
-                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch", workItemID);
+                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch [%@:%@:%@:%@]", workItemID, nodeID, endpointID, clusterID, attributeID);
                     return outcome;
                 }
 
@@ -1006,8 +1111,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 auto readItem = readRequestsNext.firstObject;
                 [readRequestsNext removeObjectAtIndex:0];
                 [readRequestsCurrent addObject:readItem];
-                MTR_LOG_INFO("Batching read attribute work item [%llu]: added %@ (now %tu requests total)",
-                    workItemID, readItem, readRequestsCurrent.count);
+                MTR_LOG_INFO("Batching read attribute work item [%llu]: added %@ (now %tu requests total) [%@:%@:%@:%@]",
+                    workItemID, readItem, readRequestsCurrent.count, nodeID, endpointID, clusterID, attributeID);
                 outcome = MTRBatchedPartially;
             }
             NSCAssert(readRequestsNext.count == 0, @"should have batched everything or returned early");
@@ -1017,7 +1122,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             mtr_hide(self); // don't capture self accidentally
             for (NSArray * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
-                    MTR_LOG_DEFAULT("Read attribute work item [%llu] report duplicate %@", workItemID, readItem);
+                    MTR_LOG_DEFAULT("Read attribute work item [%llu] report duplicate %@ [%@:%@:%@:%@]", workItemID, readItem, nodeID, endpointID, clusterID, attributeID);
                     *isDuplicate = YES;
                     *stop = YES;
                     return;
@@ -1048,28 +1153,29 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 readAttributePaths:attributePaths
                         eventPaths:nil
                             params:readParams
+                includeDataVersion:YES
                              queue:self.queue
                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                             if (values) {
                                 // Since the format is the same data-value dictionary, this looks like an
                                 // attribute report
-                                MTR_LOG_INFO("Read attribute work item [%llu] result: %@", workItemID, values);
+                                MTR_LOG_INFO("Read attribute work item [%llu] result: %@  [%@:%@:%@:%@]", workItemID, values, nodeID, endpointID, clusterID, attributeID);
                                 [self _handleAttributeReport:values];
                             }
 
                             // TODO: better retry logic
                             if (error && (retryCount < 2)) {
-                                MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@", workItemID, error);
+                                MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@   [%@:%@:%@:%@]", workItemID, error, nodeID, endpointID, clusterID, attributeID);
                                 completion(MTRAsyncWorkNeedsRetry);
                             } else {
                                 if (error) {
-                                    MTR_LOG_DEFAULT("Read attribute work item [%llu] failed (giving up): %@", workItemID, error);
+                                    MTR_LOG_DEFAULT("Read attribute work item [%llu] failed (giving up): %@   [%@:%@:%@:%@]", workItemID, error, nodeID, endpointID, clusterID, attributeID);
                                 }
                                 completion(MTRAsyncWorkComplete);
                             }
                         }];
         }];
-        [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ %@ %@", endpointID, clusterID, attributeID];
+        [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ %@ %@ %@", self.nodeID, endpointID, clusterID, attributeID];
     }
 
     return attributeValueToReturn;
@@ -1137,7 +1243,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                   completion(MTRAsyncWorkComplete);
                               }];
     }];
-    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ %@ %@", endpointID, clusterID, attributeID];
+    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ %@ %@ %@", self.nodeID, endpointID, clusterID, attributeID];
 }
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -1739,7 +1845,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     NSDate * expirationTime = [NSDate dateWithTimeIntervalSinceNow:expectedValueInterval.doubleValue / 1000];
 
     MTR_LOG_INFO(
-        "Setting expected values %@ with expiration time %f seconds from now", values, [expirationTime timeIntervalSinceNow]);
+        "%@ Setting expected values %@ with expiration time %f seconds from now", self, values, [expirationTime timeIntervalSinceNow]);
 
     os_unfair_lock_lock(&self->_lock);
 
@@ -1973,7 +2079,8 @@ void SubscriptionCallback::OnAttributeData(
             MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
         }];
     } else {
-        id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
+        NSNumber * dataVersionNumber = aPath.mDataVersion.HasValue() ? @(aPath.mDataVersion.Value()) : nil;
+        NSDictionary * value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData, dataVersionNumber);
         if (value == nil) {
             MTR_LOG_ERROR("Failed to decode attribute data for path %@", attributePath);
             [mAttributeReports addObject:@ {

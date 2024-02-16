@@ -20,6 +20,9 @@ static_library("bdx") {
   sources = [
     "BdxMessages.cpp",
     "BdxMessages.h",
+    "BdxTransferDiagnosticLog.cpp",
+    "BdxTransferDiagnosticLog.h",
+    "BdxTransferDiagnosticLogPool.h",
     "BdxTransferProxy.h",
     "BdxTransferProxyDiagnosticLog.cpp",
     "BdxTransferProxyDiagnosticLog.h",

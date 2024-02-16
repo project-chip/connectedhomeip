@@ -125,6 +125,8 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
     log_cooking_threads = []
 
     app_process = None
+    app_pid = 0
+
     if app:
         if not os.path.exists(app):
             if app is None:
@@ -133,11 +135,12 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
         logging.info(f"Execute: {app_args}")
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
+        app_pid = app_process.pid
         DumpProgramOutputToQueue(
             log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, log_queue)
 
     script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-                      '--log-format', '%(message)s'] + shlex.split(script_args)
+                      '--log-format', '%(message)s', "--app-pid", str(app_pid)] + shlex.split(script_args)
 
     if script_gdb:
         #
