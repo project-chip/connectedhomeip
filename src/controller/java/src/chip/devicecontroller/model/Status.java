@@ -47,11 +47,11 @@ public final class Status {
         clusterStatus.isPresent() ? String.valueOf(clusterStatus.get()) : "None");
   }
 
-  public static Status newInstance(int status, int clusterStatus) {
-    return new Status(status, Optional.of(clusterStatus));
-  }
-
   public static Status newInstance(int status) {
     return new Status(status, Optional.empty());
+  }
+
+  static Status newInstance(int status, Integer clusterStatus) {
+    return new Status(status, Optional.ofNullable(clusterStatus));
   }
 }
