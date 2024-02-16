@@ -16,7 +16,6 @@
 #include "zap-types.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 
 #define DEFAULT_ENUM_RETURN_VALUE 255
 

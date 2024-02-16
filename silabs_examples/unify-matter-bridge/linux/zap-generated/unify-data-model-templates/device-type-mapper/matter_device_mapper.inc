@@ -76,17 +76,6 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace Groups
-        namespace Scenes {
-            namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {
-                    { "SceneCount", SceneCount::Id },
-                    { "CurrentScene", CurrentScene::Id },
-                    { "CurrentGroup", CurrentGroup::Id },
-                    { "SceneValid", SceneValid::Id },
-                    { "NameSupport", NameSupport::Id },
-                };
-            } // namespace Attributes
-        } // namespace Scenes
         namespace OnOff {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {

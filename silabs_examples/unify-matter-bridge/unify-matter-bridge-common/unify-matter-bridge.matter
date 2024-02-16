@@ -1018,11 +1018,14 @@ cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
-server cluster TimeSynchronization = 56 {
+cluster TimeSynchronization = 56 {
+  revision 2;
+
   enum GranularityEnum : enum8 {
     kNoTimeGranularity = 0;
     kMinutesGranularity = 1;
@@ -1111,15 +1114,17 @@ server cluster TimeSynchronization = 56 {
 
   readonly attribute nullable epoch_us UTCTime = 0;
   readonly attribute GranularityEnum granularity = 1;
-  readonly attribute nullable TrustedTimeSourceStruct trustedTimeSource = 3;
-  readonly attribute nullable char_string<128> defaultNTP = 4;
-  readonly attribute TimeZoneStruct timeZone[] = 5;
-  readonly attribute DSTOffsetStruct DSTOffset[] = 6;
-  readonly attribute nullable epoch_us localTime = 7;
-  readonly attribute TimeZoneDatabaseEnum timeZoneDatabase = 8;
-  readonly attribute int8u timeZoneListMaxSize = 10;
-  readonly attribute int8u DSTOffsetListMaxSize = 11;
-  readonly attribute boolean supportsDNSResolve = 12;
+  readonly attribute optional TimeSourceEnum timeSource = 2;
+  readonly attribute optional nullable TrustedTimeSourceStruct trustedTimeSource = 3;
+  readonly attribute optional nullable char_string<128> defaultNTP = 4;
+  readonly attribute optional TimeZoneStruct timeZone[] = 5;
+  readonly attribute optional DSTOffsetStruct DSTOffset[] = 6;
+  readonly attribute optional nullable epoch_us localTime = 7;
+  readonly attribute optional TimeZoneDatabaseEnum timeZoneDatabase = 8;
+  readonly attribute optional boolean NTPServerAvailable = 9;
+  readonly attribute optional int8u timeZoneListMaxSize = 10;
+  readonly attribute optional int8u DSTOffsetListMaxSize = 11;
+  readonly attribute optional boolean supportsDNSResolve = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1141,6 +1146,10 @@ server cluster TimeSynchronization = 56 {
     TimeZoneStruct timeZone[] = 0;
   }
 
+  response struct SetTimeZoneResponse = 3 {
+    boolean DSTOffsetRequired = 0;
+  }
+
   request struct SetDSTOffsetRequest {
     DSTOffsetStruct DSTOffset[] = 0;
   }
@@ -1149,14 +1158,15 @@ server cluster TimeSynchronization = 56 {
     nullable char_string<128> defaultNTP = 0;
   }
 
-  response struct SetTimeZoneResponse = 3 {
-    boolean DSTOffsetRequired = 0;
-  }
-
+  /** This command MAY be issued by Administrator to set the time. */
   command access(invoke: administer) SetUTCTime(SetUTCTimeRequest): DefaultSuccess = 0;
+  /** This command SHALL set TrustedTimeSource. */
   fabric command access(invoke: administer) SetTrustedTimeSource(SetTrustedTimeSourceRequest): DefaultSuccess = 1;
+  /** This command SHALL set TimeZone. */
   command access(invoke: manage) SetTimeZone(SetTimeZoneRequest): SetTimeZoneResponse = 2;
+  /** This command SHALL set DSTOffset. */
   command access(invoke: manage) SetDSTOffset(SetDSTOffsetRequest): DefaultSuccess = 4;
+  /** This command is used to set DefaultNTP. */
   command access(invoke: administer) SetDefaultNTP(SetDefaultNTPRequest): DefaultSuccess = 5;
 }
 
@@ -1544,9 +1554,9 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig default = 0;
-    callback attribute locationCapability default = 0;
-    callback attribute supportsConcurrentConnection default = 1;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
+    callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -1618,14 +1628,14 @@ endpoint 0 {
 
   server cluster EthernetNetworkDiagnostics {
     callback attribute PHYRate;
-    callback attribute fullDuplex default = 0x00;
-    callback attribute packetRxCount default = 0x0000000000000000;
-    callback attribute packetTxCount default = 0x0000000000000000;
-    callback attribute txErrCount default = 0x0000000000000000;
-    callback attribute collisionCount default = 0x0000000000000000;
-    callback attribute overrunCount default = 0x0000000000000000;
-    callback attribute carrierDetect default = 0x00;
-    callback attribute timeSinceReset default = 0x0000000000000000;
+    callback attribute fullDuplex;
+    callback attribute packetRxCount;
+    callback attribute packetTxCount;
+    callback attribute txErrCount;
+    callback attribute collisionCount;
+    callback attribute overrunCount;
+    callback attribute carrierDetect;
+    callback attribute timeSinceReset;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -1643,12 +1653,12 @@ endpoint 0 {
     emits event TimeFailure;
     emits event MissingTrustedTimeSource;
     callback attribute UTCTime;
-    callback attribute granularity default = 0x00;
+    callback attribute granularity;
     callback attribute trustedTimeSource;
     callback attribute defaultNTP;
     callback attribute timeZone;
     callback attribute DSTOffset;
-    callback attribute localTime default = 0xFFFFFFFFFFFFFFFF;
+    callback attribute localTime;
     ram      attribute timeZoneDatabase default = 2;
     callback attribute timeZoneListMaxSize;
     callback attribute DSTOffsetListMaxSize;
@@ -1787,3 +1797,5 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 }
+
+

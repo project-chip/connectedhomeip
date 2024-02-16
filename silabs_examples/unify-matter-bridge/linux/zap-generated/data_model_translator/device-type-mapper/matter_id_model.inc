@@ -182,25 +182,6 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace Groups
-        namespace Scenes {
-            namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "SceneCount", SceneCount::Id },
-                    { "CurrentScene", CurrentScene::Id },
-                    { "CurrentGroup", CurrentGroup::Id },
-                    { "SceneValid", SceneValid::Id },
-                    { "NameSupport", NameSupport::Id },
-                    { "SceneTableSize", SceneTableSize::Id },
-                    { "RemainingCapacity", RemainingCapacity::Id },
-                    { "GeneratedCommandList", GeneratedCommandList::Id },
-                    { "AcceptedCommandList", AcceptedCommandList::Id },
-                    { "EventList", EventList::Id },
-                    { "AttributeList", AttributeList::Id },
-                    { "FeatureMap", FeatureMap::Id },
-                    { "ClusterRevision", ClusterRevision::Id }
-                };
-            } // namespace Attributes
-        } // namespace Scenes
         namespace OnOff {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -359,6 +340,8 @@ namespace app {
                     { "SoftwareVersion", SoftwareVersion::Id },
                     { "SoftwareVersionString", SoftwareVersionString::Id },
                     { "CapabilityMinima", CapabilityMinima::Id },
+                    { "SpecificationVersion", SpecificationVersion::Id },
+                    { "MaxPathsPerInvoke", MaxPathsPerInvoke::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -490,9 +473,6 @@ namespace app {
                     { "LastNetworkingStatus", LastNetworkingStatus::Id },
                     { "LastNetworkID", LastNetworkID::Id },
                     { "LastConnectErrorValue", LastConnectErrorValue::Id },
-                    { "SupportedWiFiBands", SupportedWiFiBands::Id },
-                    { "SupportedThreadFeatures", SupportedThreadFeatures::Id },
-                    { "ThreadVersion", ThreadVersion::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -792,17 +772,6 @@ namespace app {
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
                 };
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "SetTime", SetTime::Id },
-                    { "TimeRemaining", TimeRemaining::Id },
-                    { "TimerState", TimerState::Id },
-                    { "GeneratedCommandList", GeneratedCommandList::Id },
-                    { "AcceptedCommandList", AcceptedCommandList::Id },
-                    { "EventList", EventList::Id },
-                    { "AttributeList", AttributeList::Id },
-                    { "FeatureMap", FeatureMap::Id },
-                    { "ClusterRevision", ClusterRevision::Id }
-                };
             } // namespace Attributes
         } // namespace Timer
         namespace OvenCavityOperationalState {
@@ -810,7 +779,6 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "PhaseList", PhaseList::Id },
                     { "CurrentPhase", CurrentPhase::Id },
-                    { "CountdownTime", CountdownTime::Id },
                     { "OperationalStateList", OperationalStateList::Id },
                     { "OperationalState", OperationalState::Id },
                     { "OperationalError", OperationalError::Id },
@@ -828,8 +796,6 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "SupportedModes", SupportedModes::Id },
                     { "CurrentMode", CurrentMode::Id },
-                    { "StartUpMode", StartUpMode::Id },
-                    { "OnMode", OnMode::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1035,23 +1001,13 @@ namespace app {
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id }
                 };
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "SupportedModes", SupportedModes::Id },
-                    { "CurrentMode", CurrentMode::Id },
-                    { "GeneratedCommandList", GeneratedCommandList::Id },
-                    { "AcceptedCommandList", AcceptedCommandList::Id },
-                    { "EventList", EventList::Id },
-                    { "AttributeList", AttributeList::Id },
-                    { "FeatureMap", FeatureMap::Id },
-                    { "ClusterRevision", ClusterRevision::Id }
-                };
             } // namespace Attributes
         } // namespace MicrowaveOvenMode
         namespace MicrowaveOvenControl {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "CookTime", CookTime::Id },
-                    { "PowerSetting", PowerSetting::Id },
+                    { "MaxCookTime", MaxCookTime::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1098,7 +1054,6 @@ namespace app {
         namespace ScenesManagement {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "LastConfiguredBy", LastConfiguredBy::Id },
                     { "SceneTableSize", SceneTableSize::Id },
                     { "FabricSceneInfo", FabricSceneInfo::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
@@ -1139,14 +1094,6 @@ namespace app {
         namespace BooleanStateConfiguration {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "CurrentSensitivityLevel", CurrentSensitivityLevel::Id },
-                    { "SupportedSensitivityLevels", SupportedSensitivityLevels::Id },
-                    { "DefaultSensitivityLevel", DefaultSensitivityLevel::Id },
-                    { "AlarmsActive", AlarmsActive::Id },
-                    { "AlarmsSuppressed", AlarmsSuppressed::Id },
-                    { "AlarmsEnabled", AlarmsEnabled::Id },
-                    { "AlarmsSupported", AlarmsSupported::Id },
-                    { "SensorFault", SensorFault::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1161,15 +1108,9 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "OpenDuration", OpenDuration::Id },
                     { "DefaultOpenDuration", DefaultOpenDuration::Id },
-                    { "AutoCloseTime", AutoCloseTime::Id },
                     { "RemainingDuration", RemainingDuration::Id },
                     { "CurrentState", CurrentState::Id },
                     { "TargetState", TargetState::Id },
-                    { "CurrentLevel", CurrentLevel::Id },
-                    { "TargetLevel", TargetLevel::Id },
-                    { "DefaultOpenLevel", DefaultOpenLevel::Id },
-                    { "ValveFault", ValveFault::Id },
-                    { "LevelStep", LevelStep::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1188,10 +1129,6 @@ namespace app {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "Accuracy", Accuracy::Id },
-                    { "CumulativeEnergyImported", CumulativeEnergyImported::Id },
-                    { "CumulativeEnergyExported", CumulativeEnergyExported::Id },
-                    { "PeriodicEnergyImported", PeriodicEnergyImported::Id },
-                    { "PeriodicEnergyExported", PeriodicEnergyExported::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1204,13 +1141,12 @@ namespace app {
         namespace DemandResponseLoadControl {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "DeviceClass", DeviceClass::Id },
                     { "LoadControlPrograms", LoadControlPrograms::Id },
                     { "NumberOfLoadControlPrograms", NumberOfLoadControlPrograms::Id },
                     { "Events", Events::Id },
                     { "ActiveEvents", ActiveEvents::Id },
                     { "NumberOfEventsPerProgram", NumberOfEventsPerProgram::Id },
-                    { "NumberOfTransistions", NumberOfTransistions::Id },
+                    { "NumberOfTransitions", NumberOfTransitions::Id },
                     { "DefaultRandomStart", DefaultRandomStart::Id },
                     { "DefaultRandomDuration", DefaultRandomDuration::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
@@ -1235,9 +1171,6 @@ namespace app {
                     { "ESAState", ESAState::Id },
                     { "AbsMinPower", AbsMinPower::Id },
                     { "AbsMaxPower", AbsMaxPower::Id },
-                    { "PowerAdjustmentCapability", PowerAdjustmentCapability::Id },
-                    { "Forecast", Forecast::Id },
-                    { "OptOutState", OptOutState::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1254,25 +1187,12 @@ namespace app {
                     { "SupplyState", SupplyState::Id },
                     { "FaultState", FaultState::Id },
                     { "ChargingEnabledUntil", ChargingEnabledUntil::Id },
-                    { "DischargingEnabledUntil", DischargingEnabledUntil::Id },
                     { "CircuitCapacity", CircuitCapacity::Id },
                     { "MinimumChargeCurrent", MinimumChargeCurrent::Id },
                     { "MaximumChargeCurrent", MaximumChargeCurrent::Id },
-                    { "MaximumDischargeCurrent", MaximumDischargeCurrent::Id },
-                    { "UserMaximumChargeCurrent", UserMaximumChargeCurrent::Id },
-                    { "RandomizationDelayWindow", RandomizationDelayWindow::Id },
-                    { "NextChargeStartTime", NextChargeStartTime::Id },
-                    { "NextChargeTargetTime", NextChargeTargetTime::Id },
-                    { "NextChargeRequiredEnergy", NextChargeRequiredEnergy::Id },
-                    { "NextChargeTargetSoC", NextChargeTargetSoC::Id },
-                    { "ApproximateEVEfficiency", ApproximateEVEfficiency::Id },
-                    { "StateOfCharge", StateOfCharge::Id },
-                    { "BatteryCapacity", BatteryCapacity::Id },
-                    { "VehicleID", VehicleID::Id },
                     { "SessionID", SessionID::Id },
                     { "SessionDuration", SessionDuration::Id },
                     { "SessionEnergyCharged", SessionEnergyCharged::Id },
-                    { "SessionEnergyDischarged", SessionEnergyDischarged::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1285,11 +1205,6 @@ namespace app {
         namespace EnergyPreference {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "EnergyBalances", EnergyBalances::Id },
-                    { "CurrentEnergyBalance", CurrentEnergyBalance::Id },
-                    { "EnergyPriorities", EnergyPriorities::Id },
-                    { "LowPowerModeSensitivities", LowPowerModeSensitivities::Id },
-                    { "CurrentLowPowerModeSensitivity", CurrentLowPowerModeSensitivity::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1309,8 +1224,6 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "SupportedModes", SupportedModes::Id },
                     { "CurrentMode", CurrentMode::Id },
-                    { "StartUpMode", StartUpMode::Id },
-                    { "OnMode", OnMode::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1325,8 +1238,6 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "SupportedModes", SupportedModes::Id },
                     { "CurrentMode", CurrentMode::Id },
-                    { "StartUpMode", StartUpMode::Id },
-                    { "OnMode", OnMode::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1918,12 +1829,6 @@ namespace app {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "Enabled", Enabled::Id },
-                    { "OnDemandRatings", OnDemandRatings::Id },
-                    { "OnDemandRatingThreshold", OnDemandRatingThreshold::Id },
-                    { "ScheduledContentRatings", ScheduledContentRatings::Id },
-                    { "ScheduledContentRatingThreshold", ScheduledContentRatingThreshold::Id },
-                    { "ScreenDailyTime", ScreenDailyTime::Id },
-                    { "RemainingScreenTime", RemainingScreenTime::Id },
                     { "BlockUnrated", BlockUnrated::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
@@ -2065,15 +1970,6 @@ namespace app {
         } // namespace FaultInjection
         namespace SampleMei {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "FlipFlop", FlipFlop::Id },
-                    { "GeneratedCommandList", GeneratedCommandList::Id },
-                    { "AcceptedCommandList", AcceptedCommandList::Id },
-                    { "EventList", EventList::Id },
-                    { "AttributeList", AttributeList::Id },
-                    { "FeatureMap", FeatureMap::Id },
-                    { "ClusterRevision", ClusterRevision::Id }
-                };
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
                     { "FlipFlop", FlipFlop::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
@@ -2373,8 +2269,6 @@ namespace app {
                     { "TestEventTrigger", TestEventTrigger::Id },
                     { "TimeSnapshot", TimeSnapshot::Id },
                     { "TimeSnapshotResponse", TimeSnapshotResponse::Id }
-                    { "TimeSnapshot", TimeSnapshot::Id },
-                    { "TimeSnapshotResponse", TimeSnapshotResponse::Id }
                 };
             } // namespace Commands
         } // namespace GeneralDiagnostics
@@ -2487,9 +2381,7 @@ namespace app {
         } // namespace BooleanState
         namespace IcdManagement {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "RegisterClientResponse", RegisterClientResponse::Id },
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace IcdManagement
         namespace Timer {
@@ -2498,23 +2390,11 @@ namespace app {
                     { "SetTimer", SetTimer::Id },
                     { "AddTime", AddTime::Id },
                 };
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "SetTimer", SetTimer::Id },
-                    { "ResetTimer", ResetTimer::Id },
-                    { "AddTime", AddTime::Id },
-                    { "ReduceTime", ReduceTime::Id }
-                };
             } // namespace Commands
         } // namespace Timer
         namespace OvenCavityOperationalState {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "Pause", Pause::Id },
-                    { "Stop", Stop::Id },
-                    { "Start", Start::Id },
-                    { "Resume", Resume::Id },
-                    { "OperationalCommandResponse", OperationalCommandResponse::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace OvenCavityOperationalState
         namespace OvenMode {
@@ -2619,10 +2499,6 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "SetCookingParameters", SetCookingParameters::Id },
                 };
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "SetCookingParameters", SetCookingParameters::Id },
-                    { "AddMoreTime", AddMoreTime::Id }
-                };
             } // namespace Commands
         } // namespace MicrowaveOvenControl
         namespace OperationalState {
@@ -2651,8 +2527,6 @@ namespace app {
                     { "RecallScene", RecallScene::Id },
                     { "GetSceneMembership", GetSceneMembership::Id },
                     { "GetSceneMembershipResponse", GetSceneMembershipResponse::Id },
-                    { "CopyScene", CopyScene::Id },
-                    { "CopySceneResponse", CopySceneResponse::Id }
                 };
             } // namespace Commands
         } // namespace ScenesManagement
@@ -2666,6 +2540,24 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace ActivatedCarbonFilterMonitoring
+        namespace BooleanStateConfiguration {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace BooleanStateConfiguration
+        namespace ValveConfigurationAndControl {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "Open", Open::Id },
+                    { "Close", Close::Id }
+                };
+            } // namespace Commands
+        } // namespace ValveConfigurationAndControl
+        namespace ElectricalEnergyMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ElectricalEnergyMeasurement
         namespace DemandResponseLoadControl {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -2683,29 +2575,14 @@ namespace app {
         } // namespace Messages
         namespace DeviceEnergyManagement {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "PowerAdjustRequest", PowerAdjustRequest::Id },
-                    { "CancelPowerAdjustRequest", CancelPowerAdjustRequest::Id },
-                    { "StartTimeAdjustRequest", StartTimeAdjustRequest::Id },
-                    { "PauseRequest", PauseRequest::Id },
-                    { "ResumeRequest", ResumeRequest::Id },
-                    { "ModifyForecastRequest", ModifyForecastRequest::Id },
-                    { "RequestConstraintBasedForecast", RequestConstraintBasedForecast::Id },
-                    { "CancelRequest", CancelRequest::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace DeviceEnergyManagement
         namespace EnergyEvse {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "GetTargetsResponse", GetTargetsResponse::Id },
                     { "Disable", Disable::Id },
                     { "EnableCharging", EnableCharging::Id },
-                    { "EnableDischarging", EnableDischarging::Id },
-                    { "StartDiagnostics", StartDiagnostics::Id },
-                    { "SetTargets", SetTargets::Id },
-                    { "GetTargets", GetTargets::Id },
-                    { "ClearTargets", ClearTargets::Id }
                 };
             } // namespace Commands
         } // namespace EnergyEvse
@@ -2903,10 +2780,6 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "ChangeChannelByNumber", ChangeChannelByNumber::Id },
                     { "SkipChannel", SkipChannel::Id },
-                    { "GetProgramGuide", GetProgramGuide::Id },
-                    { "ProgramGuideResponse", ProgramGuideResponse::Id },
-                    { "RecordProgram", RecordProgram::Id },
-                    { "CancelRecordProgram", CancelRecordProgram::Id }
                 };
             } // namespace Commands
         } // namespace Channel
@@ -2991,19 +2864,7 @@ namespace app {
         } // namespace AccountLogin
         namespace ContentControl {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "UpdatePIN", UpdatePIN::Id },
-                    { "ResetPIN", ResetPIN::Id },
-                    { "ResetPINResponse", ResetPINResponse::Id },
-                    { "Enable", Enable::Id },
-                    { "Disable", Disable::Id },
-                    { "AddBonusTime", AddBonusTime::Id },
-                    { "SetScreenDailyTime", SetScreenDailyTime::Id },
-                    { "BlockUnratedContent", BlockUnratedContent::Id },
-                    { "UnblockUnratedContent", UnblockUnratedContent::Id },
-                    { "SetOnDemandRatingThreshold", SetOnDemandRatingThreshold::Id },
-                    { "SetScheduledContentRatingThreshold", SetScheduledContentRatingThreshold::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace ContentControl
         namespace ContentAppObserver {
@@ -3041,11 +2902,6 @@ namespace app {
         } // namespace FaultInjection
         namespace SampleMei {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "Ping", Ping::Id },
-                    { "AddArgumentsResponse", AddArgumentsResponse::Id },
-                    { "AddArguments", AddArguments::Id }
-                };
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "Ping", Ping::Id },
                     { "AddArgumentsResponse", AddArgumentsResponse::Id },

@@ -206,6 +206,7 @@ void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
     }
     ctxt.SetCommandHandled();
 }
+
 // On/Off : 6
 void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {

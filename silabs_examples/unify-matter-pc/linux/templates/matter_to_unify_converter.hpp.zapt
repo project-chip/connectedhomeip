@@ -13,7 +13,6 @@
  ******************************************************************************/
 
 #include "app/data-model/NullObject.h"
-#include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include "zap-types.h"
