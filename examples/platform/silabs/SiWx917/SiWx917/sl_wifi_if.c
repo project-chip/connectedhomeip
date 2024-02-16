@@ -569,7 +569,7 @@ static sl_status_t wfx_rsi_do_join(void)
     }
     else
     {
-        SILABS_LOG("%s: WLAN: connecting to %s==%s, sec=%d", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
+        SILABS_LOG("%s: WLAN: connecting to %s, sec=%d", __func__, &wfx_rsi.sec.ssid[0],
                    wfx_rsi.sec.security);
 
         /*

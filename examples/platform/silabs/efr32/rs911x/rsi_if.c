@@ -466,7 +466,7 @@ static void wfx_rsi_save_ap_info() // translation
         break;
     }
 
-    SILABS_LOG("%s: WLAN: connecting to %s==%s, sec=%d, status=%02x", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
+    SILABS_LOG("%s: WLAN: connecting to %s, sec=%d, status=%02x", __func__, &wfx_rsi.sec.ssid[0],
                wfx_rsi.sec.security, status);
 }
 
@@ -511,7 +511,7 @@ static void wfx_rsi_do_join(void)
             return;
         }
 
-        SILABS_LOG("%s: WLAN: connecting to %s==%s, sec=%d", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
+        SILABS_LOG("%s: WLAN: connecting to %s, sec=%d", __func__, &wfx_rsi.sec.ssid[0],
                    wfx_rsi.sec.security);
 
         /*

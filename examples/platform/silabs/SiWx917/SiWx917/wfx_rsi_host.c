@@ -178,7 +178,7 @@ sl_status_t wfx_connect_to_ap(void)
 {
     if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
     {
-        SILABS_LOG("%s: connecting to access point -> SSID: %s, PSK:%s", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0]);
+        SILABS_LOG("%s: connecting to access point -> SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
         xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
     }
     else
