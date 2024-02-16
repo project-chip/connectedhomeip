@@ -24,13 +24,12 @@
 #pragma once
 
 #include <new>
+#include <optional>
 #include <type_traits>
 #include <utility>
-#include <optional>
 
 #include <lib/core/InPlace.h>
 #include <lib/support/CodeUtils.h>
-
 
 namespace chip {
 
@@ -57,48 +56,34 @@ public:
     template <class... Args>
     constexpr T & Emplace(Args &&... args)
     {
-        return emplace(std::forward<Args>(args)...);
+        return ((std::optional<T> *) this)->emplace(std::forward<Args>(args)...);
     }
 
     /** Make the optional contain a specific value */
-    constexpr void SetValue(const T & value)
-    {
-        *this = value;
-    }
+    constexpr void SetValue(const T & value) { *this = value; }
 
     /** Make the optional contain a specific value */
-    constexpr void SetValue(T && value)
-    {
-        *this = std::move(value);
-    }
+    constexpr void SetValue(T && value) { *this = std::move(value); }
 
     /** Invalidate the value inside the optional. Optional now has no value */
-    constexpr void ClearValue()
-    {
-        *this = std::nullopt;
-    }
+    constexpr void ClearValue() { *this = std::nullopt; }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
-    T & Value() &
-    {
-        return ((std::optional<T> *)this)->value();
-    }
+    T & Value() & { return ((std::optional<T> *) this)->value(); }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     const T & Value() const &
     {
         VerifyOrDie(HasValue());
-        return ((std::optional<T> *)this)->value();
+        return ((std::optional<T> *) this)->value();
     }
 
     /** Gets the current value of the optional if the optional has a value;
         otherwise returns the provided default value. */
-    const T & ValueOr(const T & defaultValue) const { return value_or(defaultValue); }
+    const T & ValueOr(const T & defaultValue) const { return ((std::optional<T> *) this)->value_or(defaultValue); }
 
     /** Checks if the optional contains a value or not */
-    constexpr bool HasValue() const {
-        return ((std::optional<T> *)this)->has_value();
-    }
+    constexpr bool HasValue() const { return ((std::optional<T> *) this)->has_value(); }
 
     /** Convenience method to create an optional without a valid value. */
     static Optional<T> Missing() { return Optional<T>(); }
