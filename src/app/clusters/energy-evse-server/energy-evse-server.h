@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <vector>
 
 namespace chip {
 namespace app {

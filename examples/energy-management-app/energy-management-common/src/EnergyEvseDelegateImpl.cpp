@@ -371,36 +371,9 @@ exit:
 }
 
 /**
- * @brief    Called when EVSE cluster receives GetTargets command
+ * @brief    Called when EVSE cluster receives GetTargets command to load the
+ *           targets into RAM and create an iterator for the cluster server to use
  */
-
-Structs::ChargingTargetStruct::Type dailyTargetArrayDay1[3] = {
-    { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(120), .addedEnergy = MakeOptional(10000) },
-    { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(800), .addedEnergy = MakeOptional(5000) },
-    { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(1200), .addedEnergy = MakeOptional(2000) },
-};
-Structs::ChargingTargetStruct::Type dailyTargetArrayDay2[1] = {
-    { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(800), .addedEnergy = MakeOptional(5000) },
-};
-Structs::ChargingTargetStruct::Type dailyTargetArrayDay3[1] = {
-    { .targetTimeMinutesPastMidnight = static_cast<uint16_t>(1200), .addedEnergy = MakeOptional(2000) },
-};
-
-Structs::ChargingTargetScheduleStruct::Type array[3] = {
-    {
-        .dayOfWeekForSequence = 0x40,
-        .chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(dailyTargetArrayDay1),
-    },
-    {
-        .dayOfWeekForSequence = 0x10,
-        .chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(dailyTargetArrayDay2),
-    },
-    {
-        .dayOfWeekForSequence = 0x01,
-        .chargingTargets      = DataModel::List<const Structs::ChargingTargetStruct::Type>(dailyTargetArrayDay3),
-
-    },
-};
 CHIP_ERROR EnergyEvseDelegate::PrepareGetTargets(EvseTargetIterator ** iterator)
 {
     CHIP_ERROR err;
@@ -420,6 +393,10 @@ exit:
     return err;
 }
 
+/**
+ * @brief    Called when EVSE cluster has finished copying the data into the
+ *           GetTargetsResponse to free up memory
+ */
 CHIP_ERROR EnergyEvseDelegate::GetTargetsFinished()
 {
     CHIP_ERROR err;

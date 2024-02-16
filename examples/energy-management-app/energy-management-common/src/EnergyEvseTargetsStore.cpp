@@ -79,86 +79,6 @@ CHIP_ERROR EvseTargetIteratorImpl::Load()
     return CHIP_NO_ERROR;
 }
 
-/**
- * This function tries to compress a list of entries which has:
- *  dayOfWeek bitmask
- *  chargingTargetsList
- *
- * It takes a new entry and scans the existing list to see if the
- * dayOfWeek bitmask is already included somewhere
- *
- *   compute bitmask values:
- *
- *   bitmaskA: (entry.bitmask & bitmask)
- *      work out which bits in the existing entry are the same (overlapping)
- *
- *   Create and append a new entry for the bits that are the same
- *      newEntry.bitmask = bitmaskA;
- *      newEntry.chargingTargetsList = chargingTargetsList
- *
- *      if entry.bitmask == bitmaskA
- *         this entry is being deleted and can share the newEntry
- *         delete it
- *
- *   bitmaskB = (entry.bitmask & ~bitmask);
- *      work out which bits in the existing entry are different
- *      Remove these bits from the existing entry, (effectively deleting them)
- *          entry.bitmask = bitmaskB;
- *
- *      NOTE: if `all` bits are removed then the existing entry can be deleted,
- *      but that's not possible because we check for a full match first
- *
- * We continue walking our list to see if other entries have overlapping bits
- * If they do, then the newEntry.bitmask |= bitmaskA
- *
- */
-CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetScheduleStruct::DecodableType & newEntry)
-{
-    // Structs::ChargingTargetScheduleStruct::DecodableType createdEntry;
-    // uint8_t newEntryBitmask = 0;
-    // uint8_t bitmaskA;
-    // uint8_t bitmaskB;
-
-    // DataModel::List<Structs::ChargingTargetScheduleStruct::DecodableType> updatedList;
-
-    // uint8_t bitmask = newEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
-    // ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
-
-    // auto iter = mTargets.begin();
-    // while (iter->Next())
-    // {
-    //     auto & entry         = iter->GetValue();
-    //     uint8_t entryBitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
-
-    //     bitmaskA = entryBitmask & bitmask;
-    //     bitmaskB = entryBitmask & ~bitmask;
-    //     newEntryBitmask |= bitmaskA;
-    //     if (entryBitmask == bitmaskA)
-    //     {
-    //         /* This entry has the all the same bits as the newEntry
-    //          * Delete this entry - we don't copy it
-    //          */
-    //     }
-    //     else
-    //     {
-    //         /* this entry stays - but it has lost some days from the bitmask */
-    //         entry.dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(bitmaskB);
-    //         updatedList.Put(entry);
-    //     }
-    // }
-
-    // /* Append new entry */
-    // ChipLogDetail(AppServer, "Adding new entry with bitmask 0x%02x", newEntryBitmask);
-    // createdEntry.dayOfWeekForSequence = static_cast<TargetDayOfWeekBitmap>(newEntryBitmask);
-    // createdEntry.chargingTargets      = newEntry.chargingTargets;
-    // updatedList.Put(createdEntry);
-
-    // /* delete our original mTargets */
-    // mTargets = updatedList; // TODO check this doesn't cause a memory leak?
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR EvseTargetsDelegate::Init(PersistentStorageDelegate * targetStore)
 {
     ChipLogProgress(AppServer, "EVSE: Initializing EvseTargetsDelegate");
@@ -369,6 +289,157 @@ CHIP_ERROR EvseTargetsDelegate::SerializeToTlv(TLV::TLVWriter & writer, const st
     return writer.EndContainer(arrayType);
 }
 
+/**
+ * This function tries to compress a list of entries which has:
+ *  dayOfWeek bitmask
+ *  chargingTargetsList
+ *
+ * It takes a new entry and scans the existing list to see if the
+ * dayOfWeek bitmask is already included somewhere
+ *
+ *   compute bitmask values:
+ *
+ *   bitmaskA: (entry.bitmask & bitmask)
+ *      work out which bits in the existing entry are the same (overlapping)
+ *
+ *   Create and append a new entry for the bits that are the same
+ *      newEntry.bitmask = bitmaskA;
+ *      newEntry.chargingTargetsList = chargingTargetsList
+ *
+ *      if entry.bitmask == bitmaskA
+ *         this entry is being deleted and can share the newEntry
+ *         delete it
+ *
+ *   bitmaskB = (entry.bitmask & ~bitmask);
+ *      work out which bits in the existing entry are different
+ *      Remove these bits from the existing entry, (effectively deleting them)
+ *          entry.bitmask = bitmaskB;
+ *
+ *      NOTE: if `all` bits are removed then the existing entry can be deleted,
+ *      but that's not possible because we check for a full match first
+ *
+ * We continue walking our list to see if other entries have overlapping bits
+ * If they do, then the newEntry.bitmask |= bitmaskA
+ *
+ */
+#if 0
+CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetScheduleStruct::DecodableType & newEntry)
+{
+    Structs::ChargingTargetScheduleStruct::DecodableType createdEntry;
+    uint8_t newEntryBitmask = 0;
+    uint8_t bitmaskA;
+    uint8_t bitmaskB;
+
+    DataModel::List<Structs::ChargingTargetScheduleStruct::DecodableType> updatedList;
+
+    uint8_t bitmask = newEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+    ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
+
+    auto iter = mTargets.begin();
+    while (iter->Next())
+    {
+        auto & entry         = iter->GetValue();
+        uint8_t entryBitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+
+        bitmaskA = entryBitmask & bitmask;
+        bitmaskB = entryBitmask & ~bitmask;
+        newEntryBitmask |= bitmaskA;
+        if (entryBitmask == bitmaskA)
+        {
+            /* This entry has the all the same bits as the newEntry
+             * Delete this entry - we don't copy it
+             */
+        }
+        else
+        {
+            /* this entry stays - but it has lost some days from the bitmask */
+            entry.dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(bitmaskB);
+            updatedList.Put(entry);
+        }
+    }
+
+    /* Append new entry */
+    ChipLogDetail(AppServer, "Adding new entry with bitmask 0x%02x", newEntryBitmask);
+    createdEntry.dayOfWeekForSequence = static_cast<TargetDayOfWeekBitmap>(newEntryBitmask);
+    createdEntry.chargingTargets      = newEntry.chargingTargets;
+    updatedList.Put(createdEntry);
+
+    /* delete our original mTargets */
+    mTargets = updatedList; // TODO check this doesn't cause a memory leak?
+
+    return CHIP_NO_ERROR;
+}
+#endif
+CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetScheduleStruct::DecodableType & newDataModelEntry)
+{
+    uint8_t newEntryBitmask = 0;
+    uint8_t bitmaskA;
+    uint8_t bitmaskB;
+
+    std::vector<EvseTargetEntry> targetEntryVector;
+    size_t targetEntrySize = MaxTargetEntrySize();
+    ReturnErrorOnFailure(Load(targetEntryVector, targetEntrySize));
+
+    uint8_t bitmask = newDataModelEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+    ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
+
+    for (auto entry = targetEntryVector.begin(); entry != targetEntryVector.end(); entry++)
+    {
+        uint8_t entryBitmask = entry->dayOfWeekMap.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+
+        bitmaskA = entryBitmask & bitmask;
+        bitmaskB = entryBitmask & ~bitmask;
+        newEntryBitmask |= bitmaskA;
+        if (entryBitmask == bitmaskA)
+        {
+            /* This entry has the all the same bits as the newEntry
+             * Delete this entry - we don't copy it
+             */
+            targetEntryVector.erase(entry);
+            ReturnErrorOnFailure(DecreaseEntryCount());
+        }
+        else
+        {
+            /* this entry stays - but it has lost some days from the bitmask */
+            entry->dayOfWeekMap = BitMask<TargetDayOfWeekBitmap>(bitmaskB);
+        }
+    }
+
+    // Add the new Entry - we have to convert it from DatatModel format to storage format
+    EvseTargetEntry newStorageEntry;
+    newStorageEntry.dayOfWeekMap = newDataModelEntry.dayOfWeekForSequence;
+
+    auto it = newDataModelEntry.chargingTargets.begin();
+    while (it.Next())
+    {
+        auto & chargingTargetStruct = it.GetValue();
+        EvseChargingTarget temp;
+
+        temp.targetTimeMinutesPastMidnight = chargingTargetStruct.targetTimeMinutesPastMidnight;
+        temp.targetSoC                     = chargingTargetStruct.targetSoC;
+        temp.addedEnergy                   = chargingTargetStruct.addedEnergy;
+        newStorageEntry.dailyChargingTargets.push_back(temp);
+    }
+
+    targetEntryVector.push_back(newStorageEntry);
+
+    size_t total = targetEntrySize * targetEntryVector.size() + kArrayOverHead;
+    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
+    ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
+    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
+
+    ReturnErrorOnFailure(SerializeToTlv(writer, targetEntryVector));
+
+    const auto len = writer.GetLengthWritten();
+    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    writer.Finalize(backingBuffer);
+    ReturnErrorOnFailure(mpTargetStore->SyncSetKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName(), backingBuffer.Get(),
+                                                        static_cast<uint16_t>(len)));
+
+    return IncreaseEntryCount();
+}
+
 CHIP_ERROR EvseTargetsDelegate::StoreEntry(const EvseTargetEntry & entry)
 {
     std::vector<EvseTargetEntry> targetEntryVector;
@@ -404,20 +475,9 @@ CHIP_ERROR EvseTargetsDelegate::StoreEntry(const EvseTargetEntry & entry)
 
 CHIP_ERROR EvseTargetsDelegate::ClearTargets()
 {
-    EvseTargetIteratorImpl * iterator = GetEvseTargetsIterator();
-    EvseTargetEntry entry;
-    CHIP_ERROR err;
-
-    while (iterator->Next(entry))
-    {
-        err = DeleteEntry(entry);
-        if (CHIP_NO_ERROR == err)
-        {
-            iterator->Release();
-            return CHIP_NO_ERROR;
-        }
-    }
-    iterator->Release();
+    /* We simply delete the data from the persistent store */
+    mpTargetStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName());
+    mpTargetStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::EvseTargetEntryCounter().KeyName());
     return CHIP_NO_ERROR;
 }
 
