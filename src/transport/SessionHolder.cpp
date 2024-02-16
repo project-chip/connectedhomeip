@@ -28,13 +28,11 @@ SessionHolder::~SessionHolder()
 
 SessionHolder::SessionHolder(const SessionHolder & that) : IntrusiveListNodeBase()
 {
-    /// TODO: how is this supposed to work since not copy assignment ???
     mSession = that.mSession;
     if (mSession.HasValue())
     {
         mSession.Value()->AddHolder(*this);
     }
-    that.Release();
 }
 
 SessionHolder::SessionHolder(SessionHolder && that) : IntrusiveListNodeBase()

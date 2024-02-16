@@ -33,7 +33,7 @@ public:
 
     ReferenceCountedHandle & operator=(const ReferenceCountedHandle & that) {
         mTarget = that.mTarget;
-        mTarget->Retain;
+        mTarget->Retain();
         return *this;
     }
 
