@@ -1135,7 +1135,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                        return;
                    }
 
-                   MTR_LOG_DEFAULT("%@ Subscribe with data version list size %lu, reduced by %lu", self, dataVersions.count, dataVersionFilterListSizeReduction);
+                   MTR_LOG_DEFAULT("%@ Subscribe with data version list size %lu, reduced by %lu", self, (unsigned long)dataVersions.count, (unsigned long)dataVersionFilterListSizeReduction);
 
                    // Callback and ClusterStateCache and ReadClient will be deleted
                    // when OnDone is called.
