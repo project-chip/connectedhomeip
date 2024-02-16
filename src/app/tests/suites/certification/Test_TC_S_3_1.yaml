@@ -257,6 +257,7 @@ tests:
           [1706722915.344408][5404:5404] CHIP:DMG:
           [1706722915.344422][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
           [1706722915.344436][5404:5404] CHIP:DMG: },
+
       disabled: true
 
     - label: "Step 2: DUT issues a C_VIEW_SCENE command to the Test Harness."
@@ -291,9 +292,6 @@ tests:
           [1706722945.926141][5404:5404] CHIP:DMG:                 },
           [1706722945.926165][5404:5404] CHIP:DMG:
           [1706722945.926176][5404:5404] CHIP:DMG:         ],
-          [1706722945.926197][5404:5404] CHIP:DMG:
-          [1706722945.926208][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
-          [1706722945.926218][5404:5404] CHIP:DMG: },
       disabled: true
 
     - label: "Step 3: DUT issues a C_REMOVE_SCENE command to the Test Harness."
