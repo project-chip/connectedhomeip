@@ -160,6 +160,13 @@ def _GetInDevelopmentTests() -> Set[str]:
     }
 
 
+def _GetChipToolUnsupportedTests() -> Set[str]:
+    """Tests that fail in chip-tool for some reason"""
+    return {
+        "TestDiagnosticLogsDownloadCommand",  # chip-tool does not implement a bdx download command.
+    }
+
+
 def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
     """Tests that fail in darwin-framework-tool for some reason"""
     return {
@@ -202,7 +209,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_GRPKEY_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_LCFG_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_OPCREDS_3_7",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
-        "Test_TC_OPSTATE_2_4",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_SMOKECO_2_2",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_SMOKECO_2_3",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_SMOKECO_2_4",  # darwin-framework-tool does not currently support reading or subscribing to Events
@@ -258,6 +264,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_RVCCLEANM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_BINFO_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "TestDiagnosticLogs.yaml",          # chip-repl does not implement a BDXTransferServerDelegate
+        "TestDiagnosticLogsDownloadCommand.yaml",  # chip-repl does not implement the bdx download command
     }
 
 
@@ -299,6 +306,8 @@ def target_for_name(name: str):
         return TestTarget.BRIDGE
     if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
         return TestTarget.LIT_ICD
+    if name.startswith("Test_TC_MWOCTRL_") or name.startswith("Test_TC_MWOM_"):
+        return TestTarget.MWO
     return TestTarget.ALL_CLUSTERS
 
 
@@ -338,7 +347,7 @@ def tests_with_command(chip_tool: str, is_manual: bool):
         )
 
 
-def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft_unsupported_as_in_development: bool, use_short_run_name: bool):
+def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft_unsupported_as_in_development: bool, treat_chip_tool_unsupported_as_in_development: bool, use_short_run_name: bool):
     """
     use_short_run_name should be true if we want the run_name to be "Test_ABC" instead of "some/path/Test_ABC.yaml"
     """
@@ -348,7 +357,8 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
     extra_slow_tests = _GetExtraSlowTests()
     in_development_tests = _GetInDevelopmentTests()
     chip_repl_unsupported_tests = _GetChipReplUnsupportedTests()
-    treat_dft_unsupported_as_in_development_tests = _GetDarwinFrameworkToolUnsupportedTests()
+    dft_unsupported_as_in_development_tests = _GetDarwinFrameworkToolUnsupportedTests()
+    chip_tool_unsupported_as_in_development_tests = _GetChipToolUnsupportedTests()
     purposeful_failure_tests = _GetPurposefulFailureTests()
 
     for path in _AllYamlTests():
@@ -382,7 +392,10 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         else:
             run_name = str(path)
 
-        if treat_dft_unsupported_as_in_development and run_name in treat_dft_unsupported_as_in_development_tests:
+        if treat_dft_unsupported_as_in_development and run_name in dft_unsupported_as_in_development_tests:
+            tags.add(TestTag.IN_DEVELOPMENT)
+
+        if treat_chip_tool_unsupported_as_in_development and run_name in chip_tool_unsupported_as_in_development_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
         yield TestDefinition(
@@ -394,17 +407,17 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
 
 
 def AllReplYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, treat_dft_unsupported_as_in_development=False, use_short_run_name=False):
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=False):
         yield test
 
 
 def AllChipToolYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, use_short_run_name=True):
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=True):
         yield test
 
 
 def AllDarwinFrameworkToolYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True, use_short_run_name=True):
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=True):
         yield test
 
 

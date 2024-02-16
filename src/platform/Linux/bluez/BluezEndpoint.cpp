@@ -50,6 +50,7 @@
 #include <memory>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <utility>
 
 #include <gio/gio.h>
 #include <gio/gunixfdlist.h>
@@ -694,8 +695,6 @@ void BluezEndpoint::Shutdown()
                 g_object_unref(self->mpObjMgr);
             if (self->mpAdapter != nullptr)
                 g_object_unref(self->mpAdapter);
-            if (self->mpDevice != nullptr)
-                g_object_unref(self->mpDevice);
             if (self->mpRoot != nullptr)
                 g_object_unref(self->mpRoot);
             if (self->mpService != nullptr)
@@ -720,61 +719,42 @@ void BluezEndpoint::Shutdown()
 
 // ConnectDevice callbacks
 
-void BluezEndpoint::ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams)
+CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice)
 {
-    BluezDevice1 * device  = BLUEZ_DEVICE1(aObject);
-    ConnectParams * params = static_cast<ConnectParams *>(apParams);
-    GAutoPtr<GError> error;
-
-    if (!bluez_device1_call_connect_finish(device, aResult, &MakeUniquePointerReceiver(error).Get()))
+    // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
+    // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
+    // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
+    // It's important to make sure that the connection is correctly ceased, by calling `Disconnect()`
+    // D-Bus method, or else `Connect()` returns immediately without any effect.
+    for (uint16_t i = 0; i < kMaxConnectRetries; i++)
     {
-        ChipLogError(DeviceLayer, "FAIL: ConnectDevice : %s (%d)", error->message, error->code);
-
-        // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
-        // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
-        // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
-        // It's important to make sure that the connection is correctly ceased, by calling `Disconnect()`
-        // D-Bus method, or else `Connect()` returns immediately without any effect.
-        if (g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_DBUS_ERROR) && params->mNumRetries++ < kMaxConnectRetries)
+        GAutoPtr<GError> error;
+        if (bluez_device1_call_connect_sync(&aDevice, mConnectCancellable.get(), &MakeUniquePointerReceiver(error).Get()))
         {
-            // Clear the error before usage in subsequent call.
-            g_clear_error(&MakeUniquePointerReceiver(error).Get());
-
-            bluez_device1_call_disconnect_sync(device, nullptr, &MakeUniquePointerReceiver(error).Get());
-            bluez_device1_call_connect(device, params->mEndpoint.mConnectCancellable.get(), ConnectDeviceDone, params);
-            return;
+            ChipLogDetail(DeviceLayer, "ConnectDevice complete");
+            return CHIP_NO_ERROR;
         }
 
-        BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
-    }
-    else
-    {
-        ChipLogDetail(DeviceLayer, "ConnectDevice complete");
+        ChipLogError(DeviceLayer, "FAIL: ConnectDevice: %s (%d)", error->message, error->code);
+        if (!g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_DBUS_ERROR))
+        {
+            break;
+        }
+
+        ChipLogProgress(DeviceLayer, "ConnectDevice retry: %u out of %u", i + 1, kMaxConnectRetries);
+        bluez_device1_call_disconnect_sync(&aDevice, nullptr, nullptr);
     }
 
-    chip::Platform::Delete(params);
-}
-
-CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(ConnectParams * apParams)
-{
-    bluez_device1_call_connect(apParams->mpDevice, apParams->mEndpoint.mConnectCancellable.get(), ConnectDeviceDone, apParams);
-    return CHIP_NO_ERROR;
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
+    return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
 {
-    auto params = chip::Platform::New<ConnectParams>(*this, &aDevice);
-    VerifyOrReturnError(params != nullptr, CHIP_ERROR_NO_MEMORY);
-
+    auto params = std::make_pair(this, &aDevice);
     mConnectCancellable.reset(g_cancellable_new());
-    if (PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectDeviceImpl, params) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "Failed to schedule ConnectDeviceImpl() on CHIPoBluez thread");
-        chip::Platform::Delete(params);
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    return CHIP_NO_ERROR;
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](typeof(params) * aParams) { return aParams->first->ConnectDeviceImpl(*aParams->second); }, &params);
 }
 
 void BluezEndpoint::CancelConnect()

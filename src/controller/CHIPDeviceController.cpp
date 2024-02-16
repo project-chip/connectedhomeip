@@ -42,7 +42,6 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/util/error-mapping.h>
 #include <controller/CurrentFabricRemover.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -1637,27 +1636,6 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
     commissioner->CommissioningStageComplete(error);
 }
 
-static void NonConcurrentTimeout(void * context, CHIP_ERROR error)
-{
-    if (error == CHIP_ERROR_TIMEOUT)
-    {
-        ChipLogProgress(Controller, "Non-concurrent mode: Expected NetworkResponse Timeout, do nothing");
-    }
-    else
-    {
-        ChipLogProgress(Controller, "Non-concurrent mode: Received failure response %" CHIP_ERROR_FORMAT, error.Format());
-    }
-}
-
-static void NonConcurrentNetworkResponse(void * context,
-                                         const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
-{
-    // In Non Concurrent mode the commissioning network should have been shut down and not sent the
-    // ConnectNetworkResponse. In case it does send it this handles the message
-    ChipLogError(Controller, "Non-concurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u",
-                 to_underlying(data.networkingStatus));
-}
-
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
     commissioningCompletionStatus = completionStatus;
@@ -3062,28 +3040,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         request.breadcrumb.Emplace(breadcrumb);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
-        GeneralCommissioning::Attributes::SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
-        supportsConcurrentConnection = params.GetSupportsConcurrentConnection().Value();
         ChipLogProgress(Controller, "SendCommand kWiFiNetworkEnable, supportsConcurrentConnection=%d",
-                        supportsConcurrentConnection);
-        if (supportsConcurrentConnection)
-        {
-            err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
-        }
-        else
-        {
-            // Concurrent Connections not allowed. Send the ConnectNetwork command but do not wait for the
-            // ConnectNetworkResponse on the Commissioning network as it will not be present. Log the expected timeout
-            // and run what would have been in the onConnectNetworkResponse callback.
-            err = SendCommand(proxy, request, NonConcurrentNetworkResponse, NonConcurrentTimeout, endpoint, NullOptional);
-            if (err == CHIP_NO_ERROR)
-            {
-                // As there will be no ConnectNetworkResponse, it is an implicit kSuccess so a default report is fine
-                CommissioningDelegate::CommissioningReport report;
-                CommissioningStageComplete(CHIP_NO_ERROR, report);
-                return;
-            }
-        }
+                        params.GetSupportsConcurrentConnection().Value());
+        err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
 
         if (err != CHIP_NO_ERROR)
         {

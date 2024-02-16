@@ -45,7 +45,7 @@ namespace chip {
  *  timeout when it sends a message to the present node and the present node is
  *  perceived by the peer as active.
  *
- *  This value is announced to the peer using SAI (Sleepy Active Interval) key
+ *  This value is announced to the peer using SAI (Session Active Interval) key
  *  in the advertised DNS Service Discovery TXT records. Additionally, it is
  *  exchanged in the initial phase of the PASE/CASE session establishment.
  *
@@ -84,7 +84,7 @@ namespace chip {
 #if CHIP_ENABLE_OPENTHREAD && !CHIP_DEVICE_LAYER_TARGET_LINUX
 #define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (800_ms32)
 #else
-#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (300_ms32)
+#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (500_ms32)
 #endif
 #endif // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL && !CHIP_DEVICE_LAYER_TARGET_LINUX
 
