@@ -24,8 +24,8 @@
 #pragma once
 
 #include <new>
-#include <type_traits>
 #include <optional>
+#include <type_traits>
 #include <utility>
 
 #include <lib/core/InPlace.h>
@@ -55,30 +55,23 @@ public:
 
     template <class... Args>
     constexpr explicit Optional(InPlaceType, Args &&... args) : mValue(std::in_place, std::forward<Args>(args)...)
-    {
-    }
+    {}
 
-    constexpr Optional(const Optional & other) : mValue(other.mValue)
-    {
-    }
+    constexpr Optional(const Optional & other) : mValue(other.mValue) {}
 
     // Converts an Optional of an implicitly convertible type
     template <class U, std::enable_if_t<!std::is_same_v<T, U> && std::is_convertible_v<const U, T>, bool> = true>
     constexpr Optional(const Optional<U> & other) : mValue(other.mValue)
-    {
-    }
+    {}
 
     // Converts an Optional of a type that requires explicit conversion
     template <class U,
               std::enable_if_t<!std::is_same_v<T, U> && !std::is_convertible_v<const U, T> && std::is_constructible_v<T, const U &>,
                                bool> = true>
     constexpr explicit Optional(const Optional<U> & other) : mValue(other.mValue)
-    {
-    }
+    {}
 
-    constexpr Optional(Optional && other) : mValue(std::move(other.mValue))
-    {
-    }
+    constexpr Optional(Optional && other) : mValue(std::move(other.mValue)) {}
 
     constexpr Optional & operator=(const Optional & other)
     {
@@ -101,22 +94,13 @@ public:
     }
 
     /** Make the optional contain a specific value */
-    constexpr void SetValue(const T & value)
-    {
-        mValue = value;
-    }
+    constexpr void SetValue(const T & value) { mValue = value; }
 
     /** Make the optional contain a specific value */
-    constexpr void SetValue(T && value)
-    {
-        mValue = std::move(value);
-    }
+    constexpr void SetValue(T && value) { mValue = std::move(value); }
 
     /** Invalidate the value inside the optional. Optional now has no value */
-    constexpr void ClearValue()
-    {
-        mValue = std::nullopt;
-    }
+    constexpr void ClearValue() { mValue = std::nullopt; }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     T & Value() &
@@ -139,10 +123,7 @@ public:
     /** Checks if the optional contains a value or not */
     constexpr bool HasValue() const { return mValue.has_value(); }
 
-    bool operator==(const Optional & other) const
-    {
-        return mValue == other.mValue;
-    }
+    bool operator==(const Optional & other) const { return mValue == other.mValue; }
     bool operator!=(const Optional & other) const { return !(*this == other); }
     bool operator==(const T & other) const { return HasValue() && Value() == other; }
     bool operator!=(const T & other) const { return !(*this == other); }
