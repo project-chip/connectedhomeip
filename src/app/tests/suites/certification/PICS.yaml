@@ -9177,6 +9177,9 @@ PICS:
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
 
+    - label: "Can the mode change be manually controlled?"
+      id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
