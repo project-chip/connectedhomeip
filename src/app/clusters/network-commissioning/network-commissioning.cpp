@@ -1204,6 +1204,14 @@ void Instance::OnFailSafeTimerExpired()
 
     // Mark the network list changed since `mpWirelessDriver->RevertConfiguration()` may have updated it.
     ReportNetworksListChanged();
+
+    // If no networks are left, clear-out errors;
+    if (mpBaseDriver && (CountAndRelease(mpBaseDriver->GetNetworks()) == 0))
+    {
+        SetLastNetworkId(ByteSpan{});
+        SetLastConnectErrorValue(NullNullable);
+        SetLastNetworkingStatusValue(NullNullable);
+    }
 }
 
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
