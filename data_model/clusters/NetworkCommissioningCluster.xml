@@ -55,14 +55,6 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-// ----------- START OF TODO ---------------
-// TODO: Add example sequence diagram for basic Wi-Fi network config
-// TODO: Add example sequence diagram for basic Thread network config
-// TODO: Add example sequence diagram for multiple Wi-Fi network config
-// TODO: Add example sequence diagram for multiple Thread network config
-// TODO: Express semantics for why/how multiple network configs would/could be used (https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/4608)
-
-// ----------- END OF TODO ---------------
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0031" name="Network Commissioning Cluster" revision="2">
   <revisionHistory>
