@@ -30,10 +30,10 @@ struct EPrefDelegate : public Delegate
     virtual ~EPrefDelegate();
 
     CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
-                                       chip::MutableCharSpan & aOutLabel) override;
+                                       chip::Optional<chip::MutableCharSpan> & aOutLabel) override;
     CHIP_ERROR GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, EnergyPriorityEnum & priority) override;
     CHIP_ERROR GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
-                                                 chip::MutableCharSpan & aOutLabel) override;
+                                                 chip::Optional<chip::MutableCharSpan> & aOutLabel) override;
 
     size_t GetNumEnergyBalances(chip::EndpointId aEndpoint) override;
     size_t GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint) override;
@@ -63,12 +63,19 @@ size_t EPrefDelegate::GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint
 
 CHIP_ERROR
 EPrefDelegate::GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
-                                       chip::MutableCharSpan & aOutLabel)
+                                       chip::Optional<chip::MutableCharSpan> & aOutLabel)
 {
     if (aIndex < GetNumEnergyBalances(aEndpoint))
     {
         aOutStep = gsEnergyBalances[aIndex].step;
-        chip::CopyCharSpanToMutableCharSpan(gsEnergyBalances[aIndex].label.ValueOr(""_span), aOutLabel);
+        if (gsEnergyBalances[aIndex].HasValue())
+        {
+            chip::CopyCharSpanToMutableCharSpan(gsEnergyBalances[aIndex].label.Value(), aOutLabel.Value());
+        }
+        else
+        {
+            aOutLabel.ClearValue();
+        }
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NOT_FOUND;
@@ -90,12 +97,19 @@ EPrefDelegate::GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aInde
 
 CHIP_ERROR
 EPrefDelegate::GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::Percent & aOutStep,
-                                                 chip::MutableCharSpan & aOutLabel)
+                                                 chip::Optional<chip::MutableCharSpan> & aOutLabel)
 {
     if (aIndex < GetNumLowPowerModeSensitivities(aEndpoint))
     {
         aOutStep = gsPowerBalances[aIndex].step;
-        chip::CopyCharSpanToMutableCharSpan(gsPowerBalances[aIndex].label.ValueOr(""_span), aOutLabel);
+        if (gsPowerBalances[aIndex])
+        {
+            chip::CopyCharSpanToMutableCharSpan(gsPowerBalances[aIndex].label.Value(), aOutLabel.Value());
+        }
+        else
+        {
+            aOutLabel.ClearValue();
+        }
         return CHIP_NO_ERROR;
     }
 
