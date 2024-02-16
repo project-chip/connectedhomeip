@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Demand Response Load Control Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Demand Response Load Control" revision="4">
   <revisionHistory>
     <revision revision="1" summary="mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Updated from SE1.4 version; CCB 1291 1297 1447 1513 1880 2287 2964 2965"/>
