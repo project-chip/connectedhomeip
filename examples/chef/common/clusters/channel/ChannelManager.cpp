@@ -125,7 +125,7 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
     lineup.operatorName   = chip::CharSpan::fromCharString("Comcast");
     lineup.lineupName     = MakeOptional(chip::CharSpan::fromCharString("Comcast King County"));
     lineup.postalCode     = MakeOptional(chip::CharSpan::fromCharString("98052"));
-    lineup.lineupInfoType = chip::app::Clusters::Channel::LineupInfoTypeEnum::kMso;
+    lineup.lineupInfoType = LineupInfoTypeEnum::kMso;
 
     return aEncoder.Encode(lineup);
 }
@@ -160,7 +160,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
             if (iMatchedChannel != -1)
             {
                 // Error: Found multiple matches
-                response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
+                response.status = StatusEnum::kMultipleMatches;
                 helper.Success(response);
                 return;
             }
@@ -171,12 +171,12 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     if (iMatchedChannel == -1)
     {
         // Error: Found no match
-        response.status = chip::app::Clusters::Channel::StatusEnum::kNoMatches;
+        response.status = StatusEnum::kNoMatches;
         helper.Success(response);
     }
     else
     {
-        response.status      = chip::app::Clusters::Channel::StatusEnum::kSuccess;
+        response.status      = StatusEnum::kSuccess;
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
         mCurrentChannel      = mChannels[iMatchedChannel];
         mCurrentChannelIndex = iMatchedChannel;
@@ -226,9 +226,9 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
 void ChannelManager::HandleGetProgramGuide(
     CommandResponseHelper<ProgramGuideResponseType> & helper, const chip::Optional<uint32_t> & startTime,
     const chip::Optional<uint32_t> & endTime,
-    const chip::Optional<chip::app::DataModel::DecodableList<ChannelInfoType>> & channelList,
+    const chip::Optional<DataModel::DecodableList<ChannelInfoType>> & channelList,
     const chip::Optional<PageTokenType> & pageToken, const chip::Optional<chip::BitMask<RecordingFlagBitmap>> & recordingFlag,
-    const chip::Optional<chip::app::DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
+    const chip::Optional<DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
     const chip::Optional<chip::ByteSpan> & data)
 {
 
