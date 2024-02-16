@@ -24,8 +24,8 @@
 #pragma once
 
 #include <new>
-#include <optional>
 #include <type_traits>
+#include <optional>
 #include <utility>
 
 #include <lib/core/InPlace.h>
@@ -45,45 +45,107 @@ inline constexpr NullOptionalType NullOptional{};
  * is actually valid or not.
  */
 template <class T>
-class Optional : public std::optional<T>
+class Optional
 {
 public:
-    using std::optional<T>::optional; // bring in all constructors
+    constexpr Optional() {}
+    constexpr Optional(NullOptionalType) {}
 
-    constexpr Optional(NullOptionalType) : std::optional<T>(std::nullopt) {}
+    explicit Optional(const T & value) : mValue(value) {}
+
+    template <class... Args>
+    constexpr explicit Optional(InPlaceType, Args &&... args) : mValue(std::in_place, std::forward<Args>(args)...)
+    {
+    }
+
+    constexpr Optional(const Optional & other) : mValue(other.mValue)
+    {
+    }
+
+    // Converts an Optional of an implicitly convertible type
+    template <class U, std::enable_if_t<!std::is_same_v<T, U> && std::is_convertible_v<const U, T>, bool> = true>
+    constexpr Optional(const Optional<U> & other) : mValue(other.mValue)
+    {
+    }
+
+    // Converts an Optional of a type that requires explicit conversion
+    template <class U,
+              std::enable_if_t<!std::is_same_v<T, U> && !std::is_convertible_v<const U, T> && std::is_constructible_v<T, const U &>,
+                               bool> = true>
+    constexpr explicit Optional(const Optional<U> & other) : mValue(other.mValue)
+    {
+    }
+
+    constexpr Optional(Optional && other) : mValue(std::move(other.mValue))
+    {
+    }
+
+    constexpr Optional & operator=(const Optional & other)
+    {
+        mValue = other.mValue;
+        return *this;
+    }
+
+    constexpr Optional & operator=(Optional && other)
+    {
+        mValue = std::move(other.mValue);
+        return *this;
+    }
 
     /// Constructs the contained value in-place
     template <class... Args>
     constexpr T & Emplace(Args &&... args)
     {
-        return ((std::optional<T> *) this)->emplace(std::forward<Args>(args)...);
+        mValue.emplace(std::forward<Args>(args)...);
+        return *mValue;
     }
 
     /** Make the optional contain a specific value */
-    constexpr void SetValue(const T & value) { *this = value; }
+    constexpr void SetValue(const T & value)
+    {
+        mValue = value;
+    }
 
     /** Make the optional contain a specific value */
-    constexpr void SetValue(T && value) { *this = std::move(value); }
+    constexpr void SetValue(T && value)
+    {
+        mValue = std::move(value);
+    }
 
     /** Invalidate the value inside the optional. Optional now has no value */
-    constexpr void ClearValue() { *this = std::nullopt; }
+    constexpr void ClearValue()
+    {
+        mValue = std::nullopt;
+    }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
-    T & Value() & { return ((std::optional<T> *) this)->value(); }
+    T & Value() &
+    {
+        VerifyOrDie(HasValue());
+        return *mValue;
+    }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     const T & Value() const &
     {
         VerifyOrDie(HasValue());
-        return ((std::optional<T> *) this)->value();
+        return *mValue;
     }
 
     /** Gets the current value of the optional if the optional has a value;
         otherwise returns the provided default value. */
-    const T & ValueOr(const T & defaultValue) const { return ((std::optional<T> *) this)->value_or(defaultValue); }
+    const T & ValueOr(const T & defaultValue) const { return HasValue() ? Value() : defaultValue; }
 
     /** Checks if the optional contains a value or not */
-    constexpr bool HasValue() const { return ((std::optional<T> *) this)->has_value(); }
+    constexpr bool HasValue() const { return mValue.has_value(); }
+
+    bool operator==(const Optional & other) const
+    {
+        return mValue == other.mValue;
+    }
+    bool operator!=(const Optional & other) const { return !(*this == other); }
+    bool operator==(const T & other) const { return HasValue() && Value() == other; }
+    bool operator!=(const T & other) const { return !(*this == other); }
 
     /** Convenience method to create an optional without a valid value. */
     static Optional<T> Missing() { return Optional<T>(); }
@@ -92,8 +154,11 @@ public:
     template <class... Args>
     static Optional<T> Value(Args &&... args)
     {
-        return Optional(std::in_place, std::forward<Args>(args)...);
+        return Optional(InPlace, std::forward<Args>(args)...);
     }
+
+private:
+    std::optional<T> mValue;
 };
 
 template <class T>
