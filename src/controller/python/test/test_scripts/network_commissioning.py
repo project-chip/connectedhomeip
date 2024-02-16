@@ -140,10 +140,16 @@ class NetworkCommissioningTests:
                 f"LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
 
         # Scan networks
-        logger.info(f"Scan networks")
-        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
-            ssid=b'', breadcrumb=self.with_breadcrumb())
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+        logger.info("Scan networks")
+        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(breadcrumb=self.with_breadcrumb())
+        interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
+        logger.info(f"Request: {req}")
+        res = await self._devCtrl.SendCommand(
+            nodeid=self._nodeid,
+            endpoint=endpointId,
+            payload=req,
+            interactionTimeoutMs=interactionTimeoutMs
+        )
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
@@ -274,10 +280,14 @@ class NetworkCommissioningTests:
                 f"LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
 
         # Scan networks
-        logger.info(f"Scan networks")
-        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
-            ssid=b'', breadcrumb=self.with_breadcrumb())
-        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+        logger.info("Scan networks")
+        req = Clusters.NetworkCommissioning.Commands.ScanNetworks(breadcrumb=self.with_breadcrumb())
+        logger.info(f"Request: {req}")
+        interactionTimeoutMs = self._devCtrl.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=30000)
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid,
+                                              endpoint=endpointId,
+                                              payload=req,
+                                              interactionTimeoutMs=interactionTimeoutMs)
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
