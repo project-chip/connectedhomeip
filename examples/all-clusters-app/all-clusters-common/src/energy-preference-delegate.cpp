@@ -102,7 +102,7 @@ EPrefDelegate::GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, siz
     if (aIndex < GetNumLowPowerModeSensitivities(aEndpoint))
     {
         aOutStep = gsPowerBalances[aIndex].step;
-        if (gsPowerBalances[aIndex])
+        if (gsPowerBalances[aIndex].HasValue())
         {
             chip::CopyCharSpanToMutableCharSpan(gsPowerBalances[aIndex].label.Value(), aOutLabel.Value());
         }
