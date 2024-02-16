@@ -141,6 +141,8 @@ CHIP_ERROR EnergyEvseManager::Init()
 
     targetsStore->StoreEntry(entry);
 
+    targetsStore->StoreEntry(entry);
+
     return LoadPersistentAttributes();
 }
 

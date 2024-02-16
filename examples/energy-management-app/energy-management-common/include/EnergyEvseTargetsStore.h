@@ -59,6 +59,9 @@ public:
     };
 
     CHIP_ERROR Init(PersistentStorageDelegate * targetStore);
+    CHIP_ERROR IncreaseEntryCount();
+    CHIP_ERROR DecreaseEntryCount();
+    CHIP_ERROR UpdateEntryCount(bool increase);
     CHIP_ERROR LoadCounter(size_t & count, size_t & targetsSize);
     CHIP_ERROR Load(std::vector<EvseTargetEntry> & targetEntryVector, size_t & targetsSize);
     CHIP_ERROR SerializeToTlv(TLV::TLVWriter & writer, const std::vector<EvseTargetEntry> & targetEntryVector);
@@ -93,7 +96,7 @@ protected:
     {
         kTargetEntry           = 1,
         kDayOfWeek             = 2,
-        kChargingTargetsArray  = 3,
+        kChargingTargetsList   = 3,
         kChargingTargetsStruct = 4,
         kTargetTime            = 5,
         kTargetSoC             = 6,

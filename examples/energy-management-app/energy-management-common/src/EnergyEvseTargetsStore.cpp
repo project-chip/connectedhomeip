@@ -281,6 +281,47 @@ CHIP_ERROR EvseTargetsDelegate::LoadCounter(size_t & count, size_t & targetsSize
     ReturnErrorOnFailure(reader.ExitContainer(structType));
     return reader.VerifyEndOfContainer();
 }
+CHIP_ERROR EvseTargetsDelegate::IncreaseEntryCount()
+{
+    return UpdateEntryCount(/*increase*/ true);
+}
+
+CHIP_ERROR EvseTargetsDelegate::DecreaseEntryCount()
+{
+    return UpdateEntryCount(/*increase*/ false);
+}
+CHIP_ERROR EvseTargetsDelegate::UpdateEntryCount(bool increase)
+{
+    size_t count       = 0;
+    size_t targetsSize = MaxTargetEntrySize();
+    ReturnErrorOnFailure(LoadCounter(count, targetsSize));
+    if (increase)
+    {
+        count++;
+    }
+    else
+    {
+        count--;
+    }
+
+    size_t total = MaxTargetEntryCounterSize();
+    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
+    ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
+    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
+
+    TLV::TLVType structType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, structType));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(CounterTag::kCount), static_cast<uint32_t>(count)));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(CounterTag::kSize), static_cast<uint32_t>(targetsSize)));
+    ReturnErrorOnFailure(writer.EndContainer(structType));
+
+    const auto len = writer.GetLengthWritten();
+    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
+    writer.Finalize(backingBuffer);
+
+    return mpTargetStore->SyncSetKeyValue(DefaultStorageKeyAllocator::EvseTargetEntryCounter().KeyName(), backingBuffer.Get(),
+                                          static_cast<uint16_t>(len));
+}
 
 CHIP_ERROR EvseTargetsDelegate::Load(std::vector<EvseTargetEntry> & targetEntryVector, size_t & targetsSize)
 {
@@ -316,13 +357,18 @@ CHIP_ERROR EvseTargetsDelegate::Load(std::vector<EvseTargetEntry> & targetEntryV
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TargetEntryTag::kDayOfWeek)));
         ReturnErrorOnFailure(reader.Get(targetEntry.dayOfWeekMap));
 
-        // ChargingTargets array
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
-        TLV::TLVType chargingTargetsArrayType;
-        ReturnErrorOnFailure(reader.EnterContainer(chargingTargetsArrayType));
-        while ((err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag())) == CHIP_NO_ERROR)
+        // ChargingTargets List
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_List, TLV::ContextTag(TargetEntryTag::kChargingTargetsList)));
+        TLV::TLVType chargingTargetsListType;
+        ReturnErrorOnFailure(reader.EnterContainer(chargingTargetsListType));
+
+        while ((err = reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TargetEntryTag::kChargingTargetsStruct))) ==
+               CHIP_NO_ERROR)
         {
             EvseChargingTarget evseTarget;
+            TLV::TLVType chargingTargetsStructType = TLV::kTLVType_Structure;
+            ReturnErrorOnFailure(reader.EnterContainer(chargingTargetsStructType));
+
             // targetTime
             ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TargetEntryTag::kTargetTime)));
             ReturnErrorOnFailure(reader.Get(evseTarget.targetTimeMinutesPastMidnight));
@@ -355,10 +401,9 @@ CHIP_ERROR EvseTargetsDelegate::Load(std::vector<EvseTargetEntry> & targetEntryV
             }
 
             targetEntry.dailyChargingTargets.push_back(evseTarget);
-
-            ReturnErrorOnFailure(reader.ExitContainer(chargingTargetsArrayType));
+            ReturnErrorOnFailure(reader.ExitContainer(chargingTargetsStructType));
         }
-
+        ReturnErrorOnFailure(reader.ExitContainer(chargingTargetsListType));
         ReturnErrorOnFailure(reader.ExitContainer(EvseTargetEntryType));
 
         targetEntryVector.push_back(targetEntry);
@@ -386,7 +431,7 @@ CHIP_ERROR EvseTargetsDelegate::SerializeToTlv(TLV::TLVWriter & writer, const st
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TargetEntryTag::kDayOfWeek), targetEntry.dayOfWeekMap));
 
         TLV::TLVType chargingTargetsListType;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(TargetEntryTag::kChargingTargetsArray), TLV::kTLVType_List,
+        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(TargetEntryTag::kChargingTargetsList), TLV::kTLVType_List,
                                                    chargingTargetsListType));
         for (auto & chargingTarget : targetEntry.dailyChargingTargets)
         {
@@ -423,6 +468,9 @@ CHIP_ERROR EvseTargetsDelegate::StoreEntry(const EvseTargetEntry & entry)
     for (auto it = targetEntryVector.begin(); it != targetEntryVector.end(); it++)
     {
         // TODO work out how we want to overwrite a targetBitmap
+        // ReturnErrorOnFailure(IncreaseEntryCount());
+        // targetEntryVector.erase(it);
+        // break;
     }
 
     targetEntryVector.push_back(entry);
@@ -441,8 +489,7 @@ CHIP_ERROR EvseTargetsDelegate::StoreEntry(const EvseTargetEntry & entry)
     ReturnErrorOnFailure(mpTargetStore->SyncSetKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName(), backingBuffer.Get(),
                                                         static_cast<uint16_t>(len)));
 
-    // TODO update count
-    return CHIP_NO_ERROR; // IncreaseEntryCountForFabric(clientInfo.peer_node.GetFabricIndex());
+    return IncreaseEntryCount();
 }
 
 CHIP_ERROR EvseTargetsDelegate::ClearTargets()
