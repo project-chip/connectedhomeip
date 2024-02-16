@@ -354,6 +354,9 @@ class ClusterParser:
                 return CommandType.GENERATED
             if element.attrib['direction'].lower() == 'commandtoclient':
                 return CommandType.UNKNOWN
+            if element.attrib['direction'].lower() == 'commandtoserver':
+                return CommandType.UNKNOWN
+            raise Exception(f"Unknown direction: {element.attrib['direction']}")
         except KeyError:
             return CommandType.ACCEPTED
 
@@ -481,11 +484,6 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
     action_id = Clusters.Actions.id
     for c in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[action_id]:
-        if c not in clusters[action_id].accepted_commands:
-            # TODO: this happened after the most recent scrape
-            #       unclear why commands are not available anymore...
-            logging.warning("Command %r not part of Actions cluster", c)
-            continue
         clusters[action_id].accepted_commands[c].conformance = optional()
         remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
 
