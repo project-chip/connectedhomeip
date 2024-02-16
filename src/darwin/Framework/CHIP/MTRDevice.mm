@@ -372,7 +372,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // Get list of server clusters on endpoint
         auto clusterList =  [self readAttributeWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID) params:nil];
         NSArray<NSNumber*>* clusterArray = [self arrayOfNumbersFromAttributeValue:clusterList];
-        
+
         if(clusterArray && [clusterArray containsObject:@(MTRClusterIDTypeTimeSynchronizationID)]){
             [endpointsWithTimeSyncCluster addObject:endpoint];
         }
@@ -406,7 +406,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                      responseClass:nil
                                              queue:self.queue
                                         completion:setUTCTimeResponseHandler];
-    
+
 }
 
 - (void) _setDSTOffset:(int32_t)dstOffset validStarting:(uint64_t)validStarting validUntil:(uint64_t)validUntil forEndpoint:(NSNumber*)endpoint
@@ -414,7 +414,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTR_LOG_DEBUG("%@ _setDSTOffset with offset: %d, validStarting: %llu, validUntil: %llu, endpoint %@",
                  self,
                  dstOffset, validStarting, validUntil, endpoint);
-    
+
     MTRTimeSynchronizationClusterSetDSTOffsetParams* params =[[MTRTimeSynchronizationClusterSetDSTOffsetParams
                                                              alloc] init];
     MTRTimeSynchronizationClusterDSTOffsetStruct* dstOffsetStruct = [[MTRTimeSynchronizationClusterDSTOffsetStruct alloc] init];
