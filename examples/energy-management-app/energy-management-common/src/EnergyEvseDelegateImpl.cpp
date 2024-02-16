@@ -1694,6 +1694,55 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
 }
 
 /**
+ * @brief   Helper function to get current timestamp and work out the day of week
+ *
+ * NOTE that the time_t is converted using localtime to provide the timestamp
+ * in local time. If this is not supported on some platforms an alternative
+ * implementation may be required.
+ *
+ * @param   unixEpoch (as time_t)
+ *
+ * @return  bitmap value for day of week
+ * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ */
+uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch)
+{
+    // Define a timezone structure and initialize it to the local timezone
+    // This will capture any daylight saving time changes
+    struct tm local_time;
+    localtime_r(&unixEpoch, &local_time);
+
+    // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    uint8_t dayOfWeek = static_cast<uint8_t>(local_time.tm_wday);
+
+    // Calculate the bitmap value based on the day of the week
+    uint8_t bitmap = 1 << dayOfWeek;
+
+    return bitmap;
+}
+/**
+ * @brief   Helper function to get current timestamp and work out the day of week based on localtime
+ *
+ * @param   reference to hold the day of week as a bitmap
+ *
+ * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ */
+CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap)
+{
+    chip::System::Clock::Milliseconds64 cTMs;
+    CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "EVSE: unable to get current time to check user schedules error=%" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+    time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
+    dayOfWeekMap     = GetDayOfWeekUnixEpoch(unixEpoch);
+
+    return CHIP_NO_ERROR;
+}
+
+/**
  * @brief This function samples the start-time, and energy meter to hold the session info
  *
  * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
