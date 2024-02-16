@@ -236,6 +236,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "TestGroupKeyManagementCluster.yaml",  # chip-repl does not support EqualityCommands (2023-08-04)
         "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in chip-repl
+        "Test_TC_ICDM_3_4.yaml",           # chip-repl does not support ICD registration
         "Test_TC_S_2_2.yaml",              # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
@@ -264,6 +265,10 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_RVCCLEANM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_BINFO_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "TestDiagnosticLogs.yaml",          # chip-repl does not implement a BDXTransferServerDelegate
+        "Test_TC_EEVSEM_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_EEVSEM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_EEVSEM_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_EEVSEM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "TestDiagnosticLogsDownloadCommand.yaml",  # chip-repl does not implement the bdx download command
     }
 
