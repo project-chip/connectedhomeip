@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0098" name="Device Energy Management" revision="3">
   <revisionHistory>
@@ -61,6 +63,9 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
     <revision revision="3" summary="Updates to match cluster spec updates"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0098" name="Device Energy Management"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DEM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PA" name="PowerAdjustment" summary="Allows an EMS to make a temporary power
@@ -469,7 +474,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <commands>
-    <command id="0x00" name="PowerAdjustRequest" response="Y">
+    <command id="0x00" name="PowerAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PA"/>
@@ -487,13 +492,13 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x01" name="CancelPowerAdjustRequest" response="Y">
+    <command id="0x01" name="CancelPowerAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PA"/>
       </mandatoryConform>
     </command>
-    <command id="0x02" name="StartTimeAdjustRequest" response="Y">
+    <command id="0x02" name="StartTimeAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="STA"/>
@@ -507,7 +512,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x03" name="PauseRequest" response="Y">
+    <command id="0x03" name="PauseRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PAU"/>
@@ -521,13 +526,13 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x04" name="ResumeRequest" response="Y">
+    <command id="0x04" name="ResumeRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PAU"/>
       </mandatoryConform>
     </command>
-    <command id="0x05" name="ModifyForecastRequest" response="Y">
+    <command id="0x05" name="ModifyForecastRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="FA"/>
@@ -545,7 +550,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x06" name="RequestConstraintBasedForecast" response="Y">
+    <command id="0x06" name="RequestConstraintBasedForecast" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CON"/>
@@ -560,7 +565,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x07" name="CancelRequest" response="Y">
+    <command id="0x07" name="CancelRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>

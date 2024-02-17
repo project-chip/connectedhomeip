@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: short
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0095" name="Energy Price" revision="4">
   <revisionHistory>
@@ -62,6 +64,9 @@ Davis, CA 95616, USA
     <revision revision="3" summary="CCBs 2043 2706 2810 2912 3566"/>
     <revision revision="4" summary="Initial Matter Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0095" name="Energy Price"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="SEPR" scope="Endpoint"/>
   <features>
     <feature bit="0" code="FORE" name="Forecasting" summary="Forecasts upcoming pricing">
@@ -173,7 +178,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="GetDetailedPriceRequest" response="GetDetailedPriceResponse">
+    <command id="0x00" name="GetDetailedPriceRequest" direction="commandToServer" response="GetDetailedPriceResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
       <field id="0" name="Details" type="PriceDetailBitmap" default="0">
@@ -188,7 +193,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x02" name="GetDetailedForecastRequest" response="GetDetailedForecastResponse">
+    <command id="0x02" name="GetDetailedForecastRequest" direction="commandToServer" response="GetDetailedForecastResponse">
       <access invokePrivilege="operate"/>
       <optionalConform>
         <feature name="FORE"/>

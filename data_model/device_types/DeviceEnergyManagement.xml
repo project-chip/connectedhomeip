@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,97 +55,17 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information" revision="3">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050D" name="Device Energy Management" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Added ProductAppearance attribute"/>
-    <revision revision="3" summary="Added SpecificationVersion attribute"/>
+    <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
-  <attributes>
-    <attribute id="0x0000" name="DataModelRevision">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0001" name="VendorName">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0002" name="VendorID">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0003" name="ProductName">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0004" name="ProductID">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0005" name="NodeLabel">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0006" name="Location">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0007" name="HardwareVersion">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0008" name="HardwareVersionString">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0009" name="SoftwareVersion">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000A" name="SoftwareVersionString">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000B" name="ManufacturingDate">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000C" name="PartNumber">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000D" name="ProductURL">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000E" name="ProductLabel">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000F" name="SerialNumber">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0010" name="LocalConfigDisabled">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0011" name="Reachable">
+  <classification class="utility" scope="endpoint"/>
+  <clusters>
+    <cluster id="0x0098" name="Device Energy Management" side="server">
       <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0012" name="UniqueID">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0013" name="CapabilityMinima">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0014" name="ProductAppearance">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0015" name="SpecificationVersion">
-      <disallowConform/>
-    </attribute>
-  </attributes>
-  <events>
-    <event id="0x00" name="StartUp">
-      <access readPrivilege="view"/>
-      <optionalConform/>
-    </event>
-    <event id="0x01" name="ShutDown">
-      <access readPrivilege="view"/>
-      <optionalConform/>
-    </event>
-    <event id="0x02" name="Leave">
-      <access readPrivilege="view"/>
-      <optionalConform/>
-    </event>
-    <event id="0x03" name="ReachableChanged">
-      <access readPrivilege="view"/>
+    </cluster>
+    <cluster id="0x009F" name="Device Energy Management Mode" side="server">
       <mandatoryConform/>
-    </event>
-  </events>
-</cluster>
+    </cluster>
+  </clusters>
+</deviceType>

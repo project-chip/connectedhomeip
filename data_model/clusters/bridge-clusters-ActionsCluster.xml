@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:sectnums:
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0025" name="Actions" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0025" name="Actions"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="ACT" scope="Node"/>
   <dataTypes>
     <enum name="ActionErrorEnum">
@@ -159,7 +164,7 @@ Davis, CA 95616, USA
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Name" type="ref_DataTypeString">
+      <field id="1" name="Name" type="string">
         <mandatoryConform/>
       </field>
       <field id="2" name="Type" type="ActionTypeEnum">
@@ -181,7 +186,7 @@ Davis, CA 95616, USA
         <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="Name" type="ref_DataTypeString">
+      <field id="1" name="Name" type="string">
         <access read="true"/>
         <mandatoryConform/>
       </field>
@@ -189,32 +194,35 @@ Davis, CA 95616, USA
         <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="3" name="Endpoints" type="ref_DataTypeList[ref_DataTypeEndpointNumber]">
+      <field id="3" name="Endpoints" type="list">
+        <entry type="endpoint-no"/>
         <access read="true"/>
         <mandatoryConform/>
-        <constraint type="max" value="256"/>
+        <constraint type="maxCount" value="256"/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="ActionList" type="ref_DataTypeList[ActionStruct Type]" default="empty">
+    <attribute id="0x0000" name="ActionList" type="list" default="empty">
+      <entry type="ActionStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="max" value="256"/>
+      <constraint type="maxCount" value="256"/>
     </attribute>
-    <attribute id="0x0001" name="EndpointLists" type="ref_DataTypeList[EndpointListStruct Type]" default="empty">
+    <attribute id="0x0001" name="EndpointLists" type="list" default="empty">
+      <entry type="EndpointListStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="max" value="256"/>
+      <constraint type="maxCount" value="256"/>
     </attribute>
-    <attribute id="0x0002" name="SetupURL" type="ref_DataTypeString" default="empty">
+    <attribute id="0x0002" name="SetupURL" type="string" default="empty">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="max" value="512"/>
+      <constraint type="maxLength" value="512"/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="InstantAction" response="Y">
+    <command id="0x00" name="InstantAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -223,7 +231,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x01" name="InstantActionWithTransition" response="Y">
+    <command id="0x01" name="InstantActionWithTransition" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -235,7 +243,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x02" name="StartAction" response="Y">
+    <command id="0x02" name="StartAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -244,37 +252,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x03" name="StartActionWithDuration" response="Y">
-      <access invokePrivilege="operate"/>
-      <field id="0" name="ActionID" type="uint16">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="InvokeID" type="uint32">
-        <optionalConform/>
-      </field>
-      <field id="2" name="Duration" type="uint32" default="MS">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x04" name="StopAction" response="Y">
-      <access invokePrivilege="operate"/>
-      <field id="0" name="ActionID" type="uint16">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="InvokeID" type="uint32">
-        <optionalConform/>
-      </field>
-    </command>
-    <command id="0x05" name="PauseAction" response="Y">
-      <access invokePrivilege="operate"/>
-      <field id="0" name="ActionID" type="uint16">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="InvokeID" type="uint32">
-        <optionalConform/>
-      </field>
-    </command>
-    <command id="0x06" name="PauseActionWithDuration" response="Y">
+    <command id="0x03" name="StartActionWithDuration" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -286,7 +264,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x07" name="ResumeAction" response="Y">
+    <command id="0x04" name="StopAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -295,7 +273,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x08" name="EnableAction" response="Y">
+    <command id="0x05" name="PauseAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -304,7 +282,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x09" name="EnableActionWithDuration" response="Y">
+    <command id="0x06" name="PauseActionWithDuration" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -316,7 +294,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0A" name="DisableAction" response="Y">
+    <command id="0x07" name="ResumeAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -325,7 +303,37 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x0B" name="DisableActionWithDuration" response="Y">
+    <command id="0x08" name="EnableAction" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <field id="0" name="ActionID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="InvokeID" type="uint32">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x09" name="EnableActionWithDuration" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <field id="0" name="ActionID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="InvokeID" type="uint32">
+        <optionalConform/>
+      </field>
+      <field id="2" name="Duration" type="uint32" default="MS">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0A" name="DisableAction" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <field id="0" name="ActionID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="InvokeID" type="uint32">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x0B" name="DisableActionWithDuration" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>

@@ -354,6 +354,9 @@ class ClusterParser:
                 return CommandType.GENERATED
             if element.attrib['direction'].lower() == 'commandtoclient':
                 return CommandType.UNKNOWN
+            if element.attrib['direction'].lower() == 'commandtoserver':
+                return CommandType.ACCEPTED
+            raise Exception(f"Unknown direction: {element.attrib['direction']}")
         except KeyError:
             return CommandType.ACCEPTED
 

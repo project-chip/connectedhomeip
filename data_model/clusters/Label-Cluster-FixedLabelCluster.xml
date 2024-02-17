@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,78 +54,24 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0047" name="Timer" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0040" name="Fixed Label" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial revision"/>
+    <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="TIMER" scope="Endpoint"/>
-  <features>
-    <feature bit="0" code="RESET" name="Reset" summary="Supports the ability to reset timers">
-      <optionalConform/>
-    </feature>
-  </features>
-  <dataTypes>
-    <enum name="TimerStatusEnum">
-      <item value="0" name="Running" summary="The timer is currently in a running state">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Paused" summary="This timer is currently paused">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Expired" summary="This timer has expired">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Ready" summary="This timer is ready to start">
-        <mandatoryConform/>
-      </item>
-    </enum>
-  </dataTypes>
+  <clusterIds>
+    <clusterId id="0x0040" name="Fixed Label"/>
+  </clusterIds>
+  <classification hierarchy="derived" baseCluster="Label" role="utility" picsCode="FLABEL" scope="Endpoint"/>
+  <dataTypes/>
   <attributes>
-    <attribute id="0x0000" name="SetTime" type="elapsed-s">
+    <attribute id="0x0000" name="LabelList" type="list" default="empty">
+      <entry type="LabelStruct"/>
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform/>
-      <constraint type="max" value="259200"/>
-    </attribute>
-    <attribute id="0x0001" name="TimeRemaining" type="elapsed-s">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform/>
-      <constraint type="between" from="0" to="SetTime"/>
-    </attribute>
-    <attribute id="0x0002" name="TimerState" type="TimerStatusEnum">
-      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
   </attributes>
-  <commands>
-    <command id="0x00" name="SetTimer" response="Y">
-      <access invokePrivilege="operate"/>
-      <field id="0" name="NewTime" type="elapsed-s">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-    </command>
-    <command id="0x01" name="ResetTimer" response="Y">
-      <access invokePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="RESET"/>
-      </mandatoryConform>
-    </command>
-    <command id="0x02" name="AddTime" response="Y">
-      <access invokePrivilege="operate"/>
-      <field id="0" name="AdditionalTime" type="elapsed-s">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-    </command>
-    <command id="0x03" name="ReduceTime" response="Y">
-      <access invokePrivilege="operate"/>
-      <optionalConform/>
-      <field id="0" name="TimeReduction" type="elapsed-s">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-    </command>
-  </commands>
 </cluster>

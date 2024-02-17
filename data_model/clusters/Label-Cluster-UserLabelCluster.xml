@@ -54,30 +54,25 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Label" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0041" name="User Label" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="utility" picsCode="LABEL" scope="Endpoint"/>
-  <dataTypes>
-    <struct name="LabelStruct">
-      <field id="0" name="Label" type="string" default="empty">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
-      </field>
-      <field id="1" name="Value" type="string" default="empty">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
-      </field>
-    </struct>
-  </dataTypes>
+  <clusterIds>
+    <clusterId id="0x0041" name="User Label"/>
+  </clusterIds>
+  <classification hierarchy="derived" baseCluster="Label" role="utility" picsCode="ULABEL" scope="Endpoint"/>
+  <dataTypes/>
   <attributes>
     <attribute id="0x0000" name="LabelList" type="list" default="empty">
       <entry type="LabelStruct"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="allowed" value="derived"/>
+      <constraint type="minCount" value="4 per node"/>
     </attribute>
   </attributes>
 </cluster>

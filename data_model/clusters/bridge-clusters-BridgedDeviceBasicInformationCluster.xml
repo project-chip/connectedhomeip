@@ -54,19 +54,106 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:sectnums:
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0040" name="Fixed Label" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Added ProductAppearance attribute"/>
+    <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
   </revisionHistory>
-  <classification hierarchy="derived" baseCluster="Label" role="utility" picsCode="FLABEL" scope="Endpoint"/>
-  <dataTypes/>
+  <clusterIds>
+    <clusterId id="0x0039" name="Bridged Device Basic Information"/>
+  </clusterIds>
+  <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
   <attributes>
-    <attribute id="0x0000" name="LabelList" type="list" default="empty">
-      <entry type="LabelStruct"/>
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+    <attribute id="0x0000" name="DataModelRevision">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0001" name="VendorName">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0002" name="VendorID">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0003" name="ProductName">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0004" name="ProductID">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0005" name="NodeLabel">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0006" name="Location">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0007" name="HardwareVersion">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0008" name="HardwareVersionString">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0009" name="SoftwareVersion">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000A" name="SoftwareVersionString">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000B" name="ManufacturingDate">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000C" name="PartNumber">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000D" name="ProductURL">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000E" name="ProductLabel">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000F" name="SerialNumber">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0010" name="LocalConfigDisabled">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0011" name="Reachable">
       <mandatoryConform/>
     </attribute>
+    <attribute id="0x0012" name="UniqueID">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0013" name="CapabilityMinima">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0014" name="ProductAppearance">
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0015" name="SpecificationVersion">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0016" name="MaxPathsPerInvoke">
+      <disallowConform/>
+    </attribute>
   </attributes>
+  <events>
+    <event id="0x00" name="StartUp">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x01" name="ShutDown">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x02" name="Leave">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x03" name="ReachableChanged">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+    </event>
+  </events>
 </cluster>
