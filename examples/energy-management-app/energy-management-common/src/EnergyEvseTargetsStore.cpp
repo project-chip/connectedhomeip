@@ -389,8 +389,8 @@ CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetSchedule
         uint8_t entryBitmask = entry->dayOfWeekMap.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
         ChipLogProgress(AppServer, " scanning existing entry %d of %ld: bitmap 0x%02x", index, targetEntryVector.size(),
                         entryBitmask);
-        bitmaskA = entryBitmask & bitmask;
-        bitmaskB = entryBitmask & ~bitmask;
+        bitmaskA = static_cast<uint8_t>(entryBitmask & bitmask);
+        bitmaskB = static_cast<uint8_t>(entryBitmask & ~bitmask);
         newEntryBitmask |= bitmaskA;
         if (entryBitmask == bitmaskA)
         {
