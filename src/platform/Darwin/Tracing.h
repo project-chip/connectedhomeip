@@ -20,11 +20,6 @@
 #include <os/signpost.h>
 #include <tracing/backend.h>
 
-#define _MATTER_TRACE_DISABLE(...)                                                                                                 \
-    do                                                                                                                             \
-    {                                                                                                                              \
-    } while (false)
-
 #define MATTER_TRACE_BEGIN(label,group)         os_signpost_interval_begin(_DARWIN_MATTER_SIGNPOST_LOGGER, OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
 #define MATTER_TRACE_END(label,group)           os_signpost_interval_end(_DARWIN_MATTER_SIGNPOST_LOGGER, OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
 #define MATTER_TRACE_INSTANT(label,group)       os_signpost_event_emit(_DARWIN_MATTER_SIGNPOST_LOGGER, OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
@@ -37,6 +32,10 @@
         os_signpost_event_emit(_DARWIN_MATTER_SIGNPOST_LOGGER, OS_SIGNPOST_ID_EXCLUSIVE, label, "%u", ++count##_label);            \
     } while (0)
 
+#define _CONCAT_IMPL(a, b) a##b
+#define _MACRO_CONCAT(a, b) _CONCAT_IMPL(a, b)
+
+#define MATTER_TRACE_SCOPE(label, group) ::chip::Tracing::signposts::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(label, group)
 
 #define MATTER_SDK_SIGNPOST_NAME "com.csa.matter.signpost"
 #define _DARWIN_MATTER_SIGNPOST_LOGGER chip::Tracing::signposts::GetMatterSignpostLogger()
@@ -75,7 +74,3 @@ private:
 } // namespace signposts
 } // namespace Tracing
 } // namespace chip
-#define _CONCAT_IMPL(a, b) a##b
-#define _MACRO_CONCAT(a, b) _CONCAT_IMPL(a, b)
-
-#define MATTER_TRACE_SCOPE(label, group) ::chip::Tracing::signposts::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(label, group)

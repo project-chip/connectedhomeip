@@ -17,6 +17,7 @@
 #pragma once
 
 #include <matter/tracing/build_config.h>
+#include <tracing/metric_macros.h>
 
 #if MATTER_TRACING_ENABLED
 

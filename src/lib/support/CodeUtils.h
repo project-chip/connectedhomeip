@@ -31,6 +31,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/VerificationMacrosNoLogging.h>
 #include <lib/support/logging/TextOnlyLogging.h>
+#include <tracing/metric_macros.h>
 
 /**
  * Base-level abnormal termination.
@@ -422,7 +423,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *                          assertion fails.
  *
  */
-#define VerifyOrExit(aCondition, anAction) nlEXPECT_ACTION(aCondition, exit, anAction)
+#define VerifyOrExit(aCondition, anAction,...) nlEXPECT_ACTION(aCondition, exit, LOG_METRIC_FOR_VERIFY_ACTION(anAction, ##__VA_ARGS__))
 
 /**
  *  @def ExitNow(...)
