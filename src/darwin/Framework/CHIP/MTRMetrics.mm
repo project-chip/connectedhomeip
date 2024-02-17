@@ -15,12 +15,13 @@
  *    limitations under the License.
  */
 #import "MTRLogging_Internal.h"
+#include <MTRMetrics.h>
 #include <Foundation/Foundation.h>
 #import "MTRMetrics_Internal.h"
 #import <Matter/MTRDefines.h>
 
 @implementation MTRMetrics {
-    NSMutableDictionary<NSString *, id> * _metricsData;
+    NSMutableDictionary<NSString *, MTRMetricsData *> * _metricsData;
 }
 
 - (instancetype)init
@@ -31,7 +32,7 @@
     return self;
 }
 
-- (instancetype)initWithDictionary:(NSDictionary *)metricsData
+- (instancetype)initWithDictionary:(NSDictionary<NSString *, MTRMetricsData *> *)metricsData
 {
     if (self = [super init]) {
         _metricsData = [NSMutableDictionary dictionary];
@@ -43,7 +44,7 @@
 }
 
 
-+ (instancetype)metricsFromDictionary:(NSDictionary *)metricsData
++ (instancetype)metricsFromDictionary:(NSDictionary<NSString *, MTRMetricsData *> *)metricsData
 {
     MTRMetrics *metrics = [[MTRMetrics alloc] initWithDictionary:metricsData];
     return metrics;
@@ -54,7 +55,7 @@
     return [_metricsData allKeys];
 }
 
-- (nullable id)valueForKey:(NSString *)key
+- (nullable MTRMetricsData *)valueForKey:(NSString *)key
 {
     if (!key) {
         MTR_LOG_ERROR("Cannot get metrics value for nil key");
@@ -64,7 +65,7 @@
     return _metricsData[key];
 }
 
-- (void)setValue:(id _Nullable)value forKey:(NSString *)key
+- (void)setValue:(MTRMetricsData * _Nullable)value forKey:(NSString *)key
 {
     if (!key) {
         MTR_LOG_ERROR("Cannot set metrics value for nil key");

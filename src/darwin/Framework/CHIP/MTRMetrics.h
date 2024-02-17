@@ -21,14 +21,38 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * A representation of metrics data for an operation.
+ * A representation of a metric data for an operation.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRMetricsData : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+// Value for the metric. This can be null if the metric is just a fire event with no value
+@property (nonatomic, nullable, readonly, copy) NSNumber * value;
+
+// Relative time point at which the metric was emitted. This may be null.
+@property (nonatomic, nullable, readonly, copy) NSNumber * timePointNanoseconds;
+
+// During for the event. This may be null.
+@property (nonatomic, nullable, readonly, copy) NSNumber * durationNanoseconds;
+
+@end
+
+/**
+ * A representation of collection of metrics data for an operation.
  */
 MTR_NEWLY_AVAILABLE
 @interface MTRMetrics : NSObject
 
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
 @property (nonatomic, readonly, copy) NSArray<NSString *> * allKeys;
 
-- (nullable id)valueForKey:(NSString *)key;
+- (nullable MTRMetricsData *)valueForKey:(NSString *)key;
 
 @end
+
 NS_ASSUME_NONNULL_END
