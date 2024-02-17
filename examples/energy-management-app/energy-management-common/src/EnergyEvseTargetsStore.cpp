@@ -207,32 +207,45 @@ CHIP_ERROR EvseTargetsDelegate::Load(std::vector<EvseTargetEntry> & targetEntryV
             TLV::TLVType chargingTargetsStructType = TLV::kTLVType_Structure;
             ReturnErrorOnFailure(reader.EnterContainer(chargingTargetsStructType));
 
-            // targetTime
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TargetEntryTag::kTargetTime)));
-            ReturnErrorOnFailure(reader.Get(evseTarget.targetTimeMinutesPastMidnight));
+            evseTarget.targetSoC.ClearValue();   // Optional: Default these to not being set
+            evseTarget.addedEnergy.ClearValue(); // Optional: Default these to not being set
 
-            // targetSoC (Optional)
-            if (CHIP_NO_ERROR == reader.Next(TLV::ContextTag(TargetEntryTag::kTargetSoC)))
+            while ((err = reader.Next()) == CHIP_NO_ERROR)
             {
-                chip::Percent tempSoC;
-                ReturnErrorOnFailure(reader.Get(tempSoC));
-                evseTarget.targetSoC.SetValue(tempSoC);
-            }
-            else
-            {
-                evseTarget.targetSoC.ClearValue();
-            }
+                auto type = reader.GetType();
+                auto tag  = reader.GetTag();
+                if (type == TLV::kTLVType_NotSpecified)
+                {
+                    // Something wrong - we've lost alignment
+                    return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+                }
+                //         if (type == TLV::kTLVType_List)
+                //         {
+                //             // We've reached the end of the container
+                //             break;
+                //         }
 
-            // addedEnergy (Optional)
-            if (CHIP_NO_ERROR == reader.Next(TLV::ContextTag(TargetEntryTag::kAddedEnergy)))
-            {
-                int64_t tempAddedEnergy;
-                ReturnErrorOnFailure(reader.Get(tempAddedEnergy));
-                evseTarget.addedEnergy.SetValue(tempAddedEnergy);
-            }
-            else
-            {
-                evseTarget.addedEnergy.ClearValue();
+                if (tag == TLV::ContextTag(TargetEntryTag::kTargetTime))
+                {
+                    ReturnErrorOnFailure(reader.Get(evseTarget.targetTimeMinutesPastMidnight));
+                }
+                else if (tag == TLV::ContextTag(TargetEntryTag::kTargetSoC))
+                {
+                    chip::Percent tempSoC;
+                    ReturnErrorOnFailure(reader.Get(tempSoC));
+                    evseTarget.targetSoC.SetValue(tempSoC);
+                }
+                else if (tag == TLV::ContextTag(TargetEntryTag::kAddedEnergy))
+                {
+                    int64_t tempAddedEnergy;
+                    ReturnErrorOnFailure(reader.Get(tempAddedEnergy));
+                    evseTarget.addedEnergy.SetValue(tempAddedEnergy);
+                }
+                else
+                {
+                    // Something else unexpected here
+                    return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+                }
             }
 
             targetEntry.dailyChargingTargets.push_back(evseTarget);
@@ -275,7 +288,6 @@ CHIP_ERROR EvseTargetsDelegate::SerializeToTlv(TLV::TLVWriter & writer, const st
 
             if (chargingTarget.addedEnergy.HasValue())
             {
-                // TODO should we be putting in a NULL instead?
                 ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TargetEntryTag::kAddedEnergy), chargingTarget.addedEnergy.Value()));
             }
 
