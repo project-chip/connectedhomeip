@@ -139,6 +139,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                                                                          addedEnergy=25000000)]
         targets = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
             dayOfWeekForSequence=0x7F, chargingTargets=dailyTargets)]
+        # This should be all days Sun-Sat (0x7F) with an TargetTime 1439 and added Energy 25kWh
         await self.send_set_targets_command(chargingTargetSchedules=targets)
 
         self.step("7a")
@@ -156,19 +157,16 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("8")
         get_targets_response = await self.send_get_targets_command()
         self.log_get_targets_response(get_targets_response)
-        empty_targets_response = Clusters.EnergyEvse.Commands.GetTargetsResponse(chargingTargetSchedules=[])
-        # TODO verify targets needs equivalent logic as DUT to verify
-        # asserts.assert_equal(get_targets_response, empty_targets_response,
-        #                     f"Unexpected 'GetTargets' response value - expected {empty_targets_response}, was {get_targets_response}")
+        asserts.assert_equal(get_targets_response.chargingTargetSchedules, targets,
+                             f"Unexpected 'GetTargets' response value - expected {targets}, was {get_targets_response}")
 
         self.step("9")
-        # The targets is a list of up to 7x ChargingTargetScheduleStruct's (one per day)
-        # each containing a list of up to 10x targets per day
-        dailyTargets = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=1,
-                                                                         targetSoC=100)]
-        targets = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
-            dayOfWeekForSequence=0x7F, chargingTargets=dailyTargets)]
-        await self.send_set_targets_command(chargingTargetSchedules=targets)
+        # This should be all days Sun-Sat (0x7F) with an TargetTime 1439 and SoC of 100%
+        daily_targets_step_9 = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=1,
+                                                                                 targetSoC=100)]
+        targets_step_9 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
+            dayOfWeekForSequence=0x7F, chargingTargets=daily_targets_step_9)]
+        await self.send_set_targets_command(chargingTargetSchedules=targets_step_9)
 
         self.step("9a")
         await self.check_evse_attribute("NextChargeStartTime", NullValue)  # TODO value should be 0-1438
@@ -185,11 +183,13 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("10")
         get_targets_response = await self.send_get_targets_command()
         self.log_get_targets_response(get_targets_response)
+        # This should be the same as targets_step_9
+        asserts.assert_equal(get_targets_response.chargingTargetSchedules, targets_step_9,
+                             f"Unexpected 'GetTargets' response value - expected {targets_step_9}, was {get_targets_response}")
 
         self.step("11")
-        # The targets is a list of up to 7x ChargingTargetScheduleStruct's (one per day)
-        # each containing a list of up to 10x targets per day
-        dailyTargets = [
+        # This should modify Sat (0x40) with 10 targets throughout the day
+        daily_targets_step_11 = [
             Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=60, addedEnergy=25000000),
             Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=180, addedEnergy=25000000),
             Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=300, addedEnergy=25000000),
@@ -201,22 +201,34 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
             Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=1020, addedEnergy=25000000),
             Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=1140, addedEnergy=25000000),
         ]
-        targets = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
-            dayOfWeekForSequence=0x40, chargingTargets=dailyTargets)]
-        await self.send_set_targets_command(chargingTargetSchedules=targets)
+        targets_step_11 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
+            dayOfWeekForSequence=0x40, chargingTargets=daily_targets_step_11)]
+        await self.send_set_targets_command(chargingTargetSchedules=targets_step_11)
 
         self.step("12")
-        # The targets is a list of up to 7x ChargingTargetScheduleStruct's (one per day)
-        # each containing a list of up to 10x targets per day
-        dailyTargets = []
-        targets = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
-            dayOfWeekForSequence=0x01, chargingTargets=dailyTargets)]
-        await self.send_set_targets_command(chargingTargetSchedules=targets)
+        # This should modify Sun (0x01) with NO targets on that day
+        daily_targets_step_12 = []
+        targets_step_12 = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
+            dayOfWeekForSequence=0x01, chargingTargets=daily_targets_step_12)]
+        await self.send_set_targets_command(chargingTargetSchedules=targets_step_12)
 
         self.step("13")
         get_targets_response = await self.send_get_targets_command()
         self.log_get_targets_response(get_targets_response)
-        # TODO verify targets needs equivalent logic as DUT to verify
+        # We should expect that there should be 3 entries:
+        # [0] This should be all days (except Sun & Sat) = 0x3e with an TargetTime 1439 and added Energy 25kWh (from step 9)
+        # [1] This should be (Sat) = 0x40 with 10 TargetTimes and added Energy 25kWh (from step 11)
+        # [2] This should be (Sun) = 0x01 with NO Targets (from step 12)
+        asserts.assert_equal(len(get_targets_response.chargingTargetSchedules), 3,
+                             f"'GetTargets' response should have 3 entries")
+        asserts.assert_equal(get_targets_response.chargingTargetSchedules[0].dayOfWeekForSequence, 0x3e,
+                             f"'GetTargets' response entry 0 should have DayOfWeekForSequence = 0x3e (62)")
+        asserts.assert_equal(get_targets_response.chargingTargetSchedules[0].chargingTargets, daily_targets_step_9,
+                             f"'GetTargets' response entry 0 should have chargingTargets = {daily_targets_step_9})")
+        asserts.assert_equal(get_targets_response.chargingTargetSchedules[1], targets_step_11[0],
+                             f"'GetTargets' response entry 1 should be {targets_step_11})")
+        asserts.assert_equal(get_targets_response.chargingTargetSchedules[2], targets_step_12[0],
+                             f"'GetTargets' response entry 2 should be {targets_step_12})")
 
         self.step("14")
         await self.send_clear_targets_command()
