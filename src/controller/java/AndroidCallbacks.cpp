@@ -281,9 +281,8 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
 
     jobject nodeState = GetNodeStateObj(env, mNodeStateClassSignature, wrapperCallback);
-    if (aStatus.IsFailure())
+
     {
-        ChipLogError(Controller, "Receive bad status %s", ErrorStr(aStatus.ToChipError()));
         // Add Attribute Status to wrapperCallback
         jmethodID addAttributeStatusMethod = nullptr;
         err = JniReferences::GetInstance().FindMethod(env, nodeState, "addAttributeStatus", "(IJJILjava/lang/Integer;)V",
@@ -305,8 +304,10 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
                             static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId),
                             static_cast<jint>(aStatus.mStatus), jClusterState);
         VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-        return;
     }
+
+    VerifyOrReturn(aStatus.IsSuccess(), ChipLogError(Controller, "Receive bad status %s", ErrorStr(aStatus.ToChipError()));
+                   aPath.LogPath());
     VerifyOrReturn(apData != nullptr, ChipLogError(Controller, "Receive empty apData"); aPath.LogPath());
 
     TLV::TLVReader readerForJavaTLV;
@@ -415,9 +416,8 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
                    ChipLogError(Controller, "mReportCallbackRef is not valid in %s", __func__));
     jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
     jobject nodeState       = GetNodeStateObj(env, mNodeStateClassSignature, wrapperCallback);
-    if (apStatus != nullptr && apStatus->IsFailure())
+    if (apStatus != nullptr)
     {
-        ChipLogError(Controller, "Receive bad status %s", ErrorStr(apStatus->ToChipError()));
         // Add Event Status to NodeState
         jmethodID addEventStatusMethod;
         err = JniReferences::GetInstance().FindMethod(env, nodeState, "addEventStatus", "(IJJILjava/lang/Integer;)V",
