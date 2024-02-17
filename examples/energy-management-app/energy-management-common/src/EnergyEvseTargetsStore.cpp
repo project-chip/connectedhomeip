@@ -383,10 +383,12 @@ CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetSchedule
     uint8_t bitmask = newDataModelEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
     ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
 
-    for (auto entry = targetEntryVector.begin(); entry != targetEntryVector.end(); entry++)
+    int8_t index = 0;
+    for (auto entry = targetEntryVector.begin(); entry != targetEntryVector.end(); /* No increment here */)
     {
         uint8_t entryBitmask = entry->dayOfWeekMap.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
-
+        ChipLogProgress(AppServer, " scanning existing entry %d of %ld: bitmap 0x%02x", index, targetEntryVector.size(),
+                        entryBitmask);
         bitmaskA = entryBitmask & bitmask;
         bitmaskB = entryBitmask & ~bitmask;
         newEntryBitmask |= bitmaskA;
@@ -395,13 +397,16 @@ CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetSchedule
             /* This entry has the all the same bits as the newEntry
              * Delete this entry - we don't copy it
              */
-            targetEntryVector.erase(entry);
+            entry->dailyChargingTargets.clear();
+            entry = targetEntryVector.erase(entry);
             ReturnErrorOnFailure(DecreaseEntryCount());
+            ChipLogProgress(AppServer, " ERASED");
         }
         else
         {
             /* this entry stays - but it has lost some days from the bitmask */
             entry->dayOfWeekMap = BitMask<TargetDayOfWeekBitmap>(bitmaskB);
+            ++entry;
         }
     }
 
