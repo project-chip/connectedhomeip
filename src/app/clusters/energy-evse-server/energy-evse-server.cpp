@@ -410,7 +410,7 @@ void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets
         uint8_t index = 0;
         // copy from our vector to a local array of structs which we can reduce to the length required
         // so we can pass it into our Encode engine
-        for (EvseChargingTarget chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
+        for (const EvseChargingTarget & chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
         {
             array[index].targetTimeMinutesPastMidnight = chargingTarget.targetTimeMinutesPastMidnight;
             array[index].targetSoC                     = chargingTarget.targetSoC;

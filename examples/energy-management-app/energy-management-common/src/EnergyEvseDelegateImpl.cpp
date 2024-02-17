@@ -285,10 +285,7 @@ Status EnergyEvseDelegate::ValidateTargets(
             ChipLogError(AppServer, "DayOfWeekForSequence has a bit set which has already been set in another entry.");
             return Status::ConstraintError;
         }
-        else
-        {
-            dayOfWeekBitmap |= bitmask;
-        }
+        dayOfWeekBitmap |= bitmask; // add this day Of week to the previously seen days
 
         auto iterInner   = entry.chargingTargets.begin();
         uint8_t innerIdx = 0;

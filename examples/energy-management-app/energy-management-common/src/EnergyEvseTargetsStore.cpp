@@ -67,8 +67,6 @@ void EvseTargetIteratorImpl::Release()
 {
     mTargetEntryIndex = 0;
     mTargetEntryVector.clear();
-
-    return;
 }
 
 CHIP_ERROR EvseTargetIteratorImpl::Load()
@@ -358,6 +356,7 @@ CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetSchedule
             entry->dayOfWeekMap = BitMask<TargetDayOfWeekBitmap>(bitmaskB);
             ++entry;
         }
+        index++;
     }
 
     // Add the new Entry - we have to convert it from DatatModel format to storage format
