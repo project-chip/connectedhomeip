@@ -44,7 +44,6 @@ public:
     CHIP_ERROR Init(PersistentStorageDelegate * targetStore);
     EvseTargetIteratorImpl * GetEvseTargetsIterator();
     CHIP_ERROR Load(std::vector<EvseTargetEntry> & targetEntryVector, size_t & targetsSize);
-    CHIP_ERROR StoreEntry(const EvseTargetEntry & entry);
 
     CHIP_ERROR IncreaseEntryCount();
     CHIP_ERROR DecreaseEntryCount();
@@ -52,12 +51,8 @@ public:
     CHIP_ERROR LoadCounter(size_t & count, size_t & targetsSize);
     CHIP_ERROR SerializeToTlv(TLV::TLVWriter & writer, const std::vector<EvseTargetEntry> & targetEntryVector);
 
-    CHIP_ERROR CreateEntry(EvseTargetEntry &);
-    CHIP_ERROR DeleteEntry(EvseTargetEntry &);
-    CHIP_ERROR UpdateEntry(EvseTargetEntry &);
-
     /**
-     * @brief   Copies a ChargingTargetSchedule into our mTargets
+     * @brief   Copies a ChargingTargetSchedule into our store
      *
      * @param [in] an entry from the SetTargets list containing:
      *             dayOfWeekForSequence and chargingTargets (list)

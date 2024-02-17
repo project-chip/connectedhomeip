@@ -322,54 +322,6 @@ CHIP_ERROR EvseTargetsDelegate::SerializeToTlv(TLV::TLVWriter & writer, const st
  * If they do, then the newEntry.bitmask |= bitmaskA
  *
  */
-#if 0
-CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetScheduleStruct::DecodableType & newEntry)
-{
-    Structs::ChargingTargetScheduleStruct::DecodableType createdEntry;
-    uint8_t newEntryBitmask = 0;
-    uint8_t bitmaskA;
-    uint8_t bitmaskB;
-
-    DataModel::List<Structs::ChargingTargetScheduleStruct::DecodableType> updatedList;
-
-    uint8_t bitmask = newEntry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
-    ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
-
-    auto iter = mTargets.begin();
-    while (iter->Next())
-    {
-        auto & entry         = iter->GetValue();
-        uint8_t entryBitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
-
-        bitmaskA = entryBitmask & bitmask;
-        bitmaskB = entryBitmask & ~bitmask;
-        newEntryBitmask |= bitmaskA;
-        if (entryBitmask == bitmaskA)
-        {
-            /* This entry has the all the same bits as the newEntry
-             * Delete this entry - we don't copy it
-             */
-        }
-        else
-        {
-            /* this entry stays - but it has lost some days from the bitmask */
-            entry.dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(bitmaskB);
-            updatedList.Put(entry);
-        }
-    }
-
-    /* Append new entry */
-    ChipLogDetail(AppServer, "Adding new entry with bitmask 0x%02x", newEntryBitmask);
-    createdEntry.dayOfWeekForSequence = static_cast<TargetDayOfWeekBitmap>(newEntryBitmask);
-    createdEntry.chargingTargets      = newEntry.chargingTargets;
-    updatedList.Put(createdEntry);
-
-    /* delete our original mTargets */
-    mTargets = updatedList; // TODO check this doesn't cause a memory leak?
-
-    return CHIP_NO_ERROR;
-}
-#endif
 CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetScheduleStruct::DecodableType & newDataModelEntry)
 {
     uint8_t newEntryBitmask = 0;
@@ -445,74 +397,10 @@ CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetSchedule
     return IncreaseEntryCount();
 }
 
-CHIP_ERROR EvseTargetsDelegate::StoreEntry(const EvseTargetEntry & entry)
-{
-    std::vector<EvseTargetEntry> targetEntryVector;
-    size_t targetEntrySize = MaxTargetEntrySize();
-    ReturnErrorOnFailure(Load(targetEntryVector, targetEntrySize));
-
-    for (auto it = targetEntryVector.begin(); it != targetEntryVector.end(); it++)
-    {
-        // TODO work out how we want to overwrite a targetBitmap
-        // ReturnErrorOnFailure(IncreaseEntryCount());
-        // targetEntryVector.erase(it);
-        // break;
-    }
-
-    targetEntryVector.push_back(entry);
-
-    size_t total = targetEntrySize * targetEntryVector.size() + kArrayOverHead;
-    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    ReturnErrorCodeIf(!backingBuffer.Calloc(total), CHIP_ERROR_NO_MEMORY);
-    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), total);
-
-    ReturnErrorOnFailure(SerializeToTlv(writer, targetEntryVector));
-
-    const auto len = writer.GetLengthWritten();
-    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    writer.Finalize(backingBuffer);
-    ReturnErrorOnFailure(mpTargetStore->SyncSetKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName(), backingBuffer.Get(),
-                                                        static_cast<uint16_t>(len)));
-
-    return IncreaseEntryCount();
-}
-
 CHIP_ERROR EvseTargetsDelegate::ClearTargets()
 {
     /* We simply delete the data from the persistent store */
     mpTargetStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::EVSETargets().KeyName());
     mpTargetStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::EvseTargetEntryCounter().KeyName());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR EvseTargetsDelegate::CreateEntry(EvseTargetEntry & entry)
-{
-
-#if 0
-    EvseTargetIteratorImpl * iterator = GetTargetsIterator();
-    CHIP_ERROR err;
-
-    while (iterator->Next(entry))
-    {
-        err = DeleteEntry(entry);
-        if (CHIP_NO_ERROR == err)
-        {
-            iterator->Release();
-            return CHIP_NO_ERROR;
-        }
-    }
-    iterator->Release();
-#endif
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR EvseTargetsDelegate::DeleteEntry(EvseTargetEntry & entry)
-{
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR EvseTargetsDelegate::UpdateEntry(EvseTargetEntry & entry)
-{
-
     return CHIP_NO_ERROR;
 }
