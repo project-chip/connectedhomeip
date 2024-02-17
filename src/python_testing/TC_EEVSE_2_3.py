@@ -78,6 +78,14 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         return steps
 
+    def log_get_targets_response(self, get_targets_response):
+        logger.info(f" Rx'd: {get_targets_response}")
+        for index, entry in enumerate(get_targets_response.chargingTargetSchedules):
+            logger.info(f"   [{index}] DayOfWeekForSequence: {entry.dayOfWeekForSequence:02x}")
+            for sub_index, sub_entry in enumerate(entry.chargingTargets):
+                logger.info(
+                    f"    - [{sub_index}] TargetTime: {sub_entry.targetTimeMinutesPastMidnight} TargetSoC: {sub_entry.targetSoC} AddedEnergy: {sub_entry.addedEnergy}")
+
     @async_test_body
     async def test_TC_EEVSE_2_3(self):
 
@@ -118,6 +126,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("6")
         get_targets_response = await self.send_get_targets_command()
+        self.log_get_targets_response(get_targets_response)
         empty_targets_response = Clusters.EnergyEvse.Commands.GetTargetsResponse(chargingTargetSchedules=[])
         asserts.assert_equal(get_targets_response, empty_targets_response,
                              f"Unexpected 'GetTargets' response value - expected {empty_targets_response}, was {get_targets_response}")
@@ -146,6 +155,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("8")
         get_targets_response = await self.send_get_targets_command()
+        self.log_get_targets_response(get_targets_response)
         empty_targets_response = Clusters.EnergyEvse.Commands.GetTargetsResponse(chargingTargetSchedules=[])
         # TODO verify targets needs equivalent logic as DUT to verify
         # asserts.assert_equal(get_targets_response, empty_targets_response,
@@ -174,7 +184,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("10")
         get_targets_response = await self.send_get_targets_command()
-        # TODO verify targets needs equivalent logic as DUT to verify
+        self.log_get_targets_response(get_targets_response)
 
         self.step("11")
         # The targets is a list of up to 7x ChargingTargetScheduleStruct's (one per day)
@@ -205,6 +215,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("13")
         get_targets_response = await self.send_get_targets_command()
+        self.log_get_targets_response(get_targets_response)
         # TODO verify targets needs equivalent logic as DUT to verify
 
         self.step("14")
@@ -224,6 +235,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("15")
         get_targets_response = await self.send_get_targets_command()
+        self.log_get_targets_response(get_targets_response)
         asserts.assert_equal(get_targets_response, empty_targets_response,
                              f"Unexpected 'GetTargets' response value - expected {empty_targets_response}, was {get_targets_response}")
 
