@@ -70,14 +70,15 @@ CONFIG_ESP32_COREDUMP_DATA_FORMAT_ELF=y
 
 This example's partition table and sdkconfig.default are already modified
 
-- Retrieve the core dump using diagnostic logs cluster
+-   Retrieve the core dump using diagnostic logs cluster
+
     ```
     # Read crash logs over BDX
     chip-tool interactive start
     > diagnosticlogs retrieve-logs-request 1 1 1 0 --TransferFileDesignator crash.bin
     ```
 
-- Decode the crash logs, using espcoredump.py
+-   Decode the crash logs, using espcoredump.py
     ```
     espcoredump.py --chip (CHIP) info_corefile --core /tmp/crash.bin \
                    --core-format elf build/chip-temperature-measurement-app.elf
