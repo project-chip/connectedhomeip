@@ -128,13 +128,6 @@ public:
      */
     virtual CHIP_ERROR GetTargetsFinished() = 0;
 
-    // /**
-    //  * @brief Delegate should implement a handler to GetTargets command.
-    //  * It should report Status::Success if successful and may
-    //  * return other Status codes if it fails
-    //  */
-    // virtual Protocols::InteractionModel::Status GetTargets(Commands::GetTargetsResponse::Type &) = 0;
-
     /**
      * @brief Delegate should implement a handler to ClearTargets command.
      * It should report Status::Success if successful and may
