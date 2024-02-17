@@ -324,7 +324,6 @@ CHIP_ERROR EvseTargetsDelegate::SerializeToTlv(TLV::TLVWriter & writer, const st
  */
 CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetScheduleStruct::DecodableType & newDataModelEntry)
 {
-    uint8_t newEntryBitmask = 0;
     uint8_t bitmaskA;
     uint8_t bitmaskB;
 
@@ -343,7 +342,6 @@ CHIP_ERROR EvseTargetsDelegate::CopyTarget(const Structs::ChargingTargetSchedule
                         static_cast<unsigned int>(targetEntryVector.size()), entryBitmask);
         bitmaskA = static_cast<uint8_t>(entryBitmask & bitmask);
         bitmaskB = static_cast<uint8_t>(entryBitmask & ~bitmask);
-        newEntryBitmask |= bitmaskA;
         if (entryBitmask == bitmaskA)
         {
             /* This entry has the all the same bits as the newEntry
