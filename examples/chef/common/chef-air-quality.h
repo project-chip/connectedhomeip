@@ -23,9 +23,9 @@
 
 #ifdef MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
 chip::Protocols::InteractionModel::Status chefAirQualityWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                const EmberAfAttributeMetadata * attributeMetadata,
-                                                                uint8_t * buffer);
+                                                                      const EmberAfAttributeMetadata * attributeMetadata,
+                                                                      uint8_t * buffer);
 chip::Protocols::InteractionModel::Status chefAirQualityReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                               const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                               uint16_t maxReadLength);
+                                                                     const EmberAfAttributeMetadata * attributeMetadata,
+                                                                     uint8_t * buffer, uint16_t maxReadLength);
 #endif
