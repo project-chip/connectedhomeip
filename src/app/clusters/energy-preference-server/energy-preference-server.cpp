@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 {
     VerifyOrDie(aPath.mClusterId == EnergyPreference::Id);
     EndpointId endpoint = aPath.mEndpointId;
-    uint32_t ourFeatureMap;
+    uint32_t ourFeatureMap = 0;
     const bool featureMapIsGood  = FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == Status::Success;
     const bool balanceSupported  = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
     const bool lowPowerSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0);
