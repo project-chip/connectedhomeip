@@ -270,6 +270,7 @@ CHIP_ERROR ConvertReportTlvToJson(const uint32_t id, TLV::TLVReader & data, std:
 void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                      const app::StatusIB & aStatus)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -362,7 +363,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     env->CallVoidMethod(nodeState, addAttributeMethod, static_cast<jint>(aPath.mEndpointId), static_cast<jlong>(aPath.mClusterId),
                         static_cast<jlong>(aPath.mAttributeId), value, jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-
+    
     UpdateClusterDataVersion();
 }
 
@@ -408,6 +409,7 @@ void ReportCallback::UpdateClusterDataVersion()
 
 void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -642,7 +644,6 @@ void ReportCallback::ReportError(const app::ConcreteAttributePath * attributePat
         eventClusterId  = static_cast<jlong>(eventPath->mClusterId);
         eventId         = static_cast<jlong>(eventPath->mEventId);
     }
-
     env->CallVoidMethod(wrapperCallback, onErrorMethod, isAttributePath, attributeEndpointId, attributeClusterId, attributeId,
                         isEventPath, eventEndpointId, eventClusterId, eventId, exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
