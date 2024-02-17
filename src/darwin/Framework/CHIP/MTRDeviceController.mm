@@ -174,12 +174,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                 return nil;
             }
 
-            id<MTRDeviceControllerStorageDelegate> storageDelegateToUse;
+            id<MTRDeviceControllerStorageDelegate> storageDelegateToUse = storageDelegate;
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
             if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
                 storageDelegateToUse = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:storageDelegate];
-            } else {
-                storageDelegateToUse = storageDelegate;
             }
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
             _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
                                                                             storageDelegate:storageDelegateToUse
                                                                        storageDelegateQueue:storageDelegateQueue];
@@ -187,6 +187,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                 return nil;
             }
         } else {
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
             if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
                 dispatch_queue_t localTestStorageQueue = dispatch_queue_create("org.csa-iot.matter.framework.devicecontroller.localteststorage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
                 MTRDeviceControllerLocalTestStorage * localTestStorage = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:nil];
@@ -197,6 +198,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                     return nil;
                 }
             }
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
         }
 
         // Ensure the otaProviderDelegate, if any, is valid.

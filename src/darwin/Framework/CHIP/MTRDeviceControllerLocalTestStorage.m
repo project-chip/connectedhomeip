@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#if MTRDeviceControllerStorageDelegate
+
 #import "MTRDeviceControllerLocalTestStorage.h"
 
 static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
@@ -91,3 +93,5 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
     }
 }
 @end
+
+#endif // MTRDeviceControllerStorageDelegate
