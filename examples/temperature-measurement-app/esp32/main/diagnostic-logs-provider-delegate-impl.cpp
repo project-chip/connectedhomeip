@@ -150,7 +150,7 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
         VerifyOrReturnError(err == CHIP_NO_ERROR, err, context->Crash.logContext = nullptr);
 
         context->Crash.logContext->readOffset = sizeof(core_dump_header_t);
-        context->Crash.logContext->isMapped = true;
+        context->Crash.logContext->isMapped   = true;
 #else
         return CHIP_ERROR_NOT_FOUND;
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
@@ -274,7 +274,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     // If the session handle rolls over to UINT16_MAX which is invalid, reset to 0.
     VerifyOrDo(mLogSessionHandle != kInvalidLogSessionHandle, mLogSessionHandle = 0);
 
-    outHandle                          = mLogSessionHandle;
+    outHandle                             = mLogSessionHandle;
     mSessionContextMap[mLogSessionHandle] = context;
 
     return CHIP_NO_ERROR;
