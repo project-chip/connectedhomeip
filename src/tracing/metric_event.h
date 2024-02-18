@@ -38,7 +38,8 @@ typedef const char* MetricKey;
 constexpr MetricKey kMetricDiscoveryOverBLE = "disc-over-ble";
 constexpr MetricKey kMetricDiscoveryOnNetwork = "disc-on-nw";
 constexpr MetricKey kMetricPASESession = "pase-session";
-constexpr MetricKey kMetricPASESessionEstState = "pase-conn-est";
+constexpr MetricKey kMetricPASESessionPair = "pase-session-pair";
+constexpr MetricKey kMetricPASESessionBLE = "pase-session-ble";
 constexpr MetricKey kMetricAttestationResult = "attestation-result";
 constexpr MetricKey kMetricAttestationOverridden = "attestation-overridden";
 constexpr MetricKey kMetricCASESession = "case-session";
@@ -49,7 +50,7 @@ constexpr MetricKey kMetricWiFiRSSI = "wifi-rssi";
  * Define a metric that can be logged. A metric consists of a key-value pair. The value is
  * currently limited to simple scalar values. The value is interpreted based on the key type.
  *
- * Additionally a metric is tagged as either an instant type or marked with a begin and end 
+ * Additionally a metric is tagged as either an instant type or marked with a begin and end
  * for the event. When the latter is used, a duration can be associated between the two events.
  */
 struct MetricEvent
@@ -101,6 +102,28 @@ struct MetricEvent
         : tag(tg), key(k), value(err.AsInteger()), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 };
+
+namespace Internal {
+
+void LogEvent(::chip::Tracing::MetricEvent & event);
+
+} // namespace Internal
+  //
+namespace utils {
+
+inline bool logMetricIfError(const ::chip::ChipError& err, MetricKey metricKey)
+{
+    bool success = ::chip::ChipError::IsSuccess(err);
+    if (!success)
+    {
+        using Tag = chip::Tracing::MetricEvent::Tag;
+        ::chip::Tracing::MetricEvent _metric_event(Tag::Instant, metricKey, err);
+        ::chip::Tracing::Internal::LogEvent(_metric_event);
+    }
+    return success;
+}
+
+} // namespace utils
 
 } // namespace Tracing
 } // namespace chip

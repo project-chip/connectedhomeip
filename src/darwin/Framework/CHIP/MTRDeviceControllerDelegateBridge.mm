@@ -130,17 +130,10 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
                     nodeID = @(nodeId);
                 }
 
+                // If the client implements the metrics delegate, prefer that over others
                 if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+                    // Create a snapshot and clear for next operation
                     MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshot:TRUE];
-
-                    /*
-                    if (nsError) {
-                        [metrics setValue:nsError forKey:MTRMetricCommissioningStatusKey];
-                    } else {
-                        auto * error = [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil];
-                        [metrics setValue:error forKey:MTRMetricCommissioningStatusKey];
-                    }
-                    */
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
                 } else {
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];

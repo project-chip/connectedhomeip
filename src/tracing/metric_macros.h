@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <lib/core/CHIPError.h>
 #include <matter/tracing/build_config.h>
 
 #if MATTER_TRACING_ENABLED
@@ -25,12 +26,12 @@
 // Always return the 3rd argument from macro parameters
 #define __GET_3RD_ARGUMENT(_a1,_a2,_a3,...) _a3
 
-// Macro to select the macro with the correct signature based on the invoked macro
+// Macro to select the verify or exit macro with the correct signature based on the invoked macro
 #define __SELECT_MACRO_FOR_VERIFY_ACTION(...) __GET_3RD_ARGUMENT(__VA_ARGS__,                                                  \
         __VERIFY_ACTION_2ARGS,                                                                                                 \
         __VERIFY_ACTION_1ARGS, )
 
-// Wrapper to capture all arguments and invoke the real wrapper
+// Wrapper to capture all arguments and invoke the real wrapper for VerifyOrExit's third argument
 #define __LOG_METRIC_FOR_VERIFY_ACTION(...) __SELECT_MACRO_FOR_VERIFY_ACTION(__VA_ARGS__)(__VA_ARGS__)
 
 // Macro that takes the action wraps it to emit the metric in a Verify macro, when a metric key is specified
@@ -40,7 +41,25 @@
 #define __VERIFY_ACTION_1ARGS(anAction)  anAction
 
 // Macro used by VerifyOrExit macro to handle a third optional metric key and emit an event, if specified
-#define LOG_METRIC_FOR_VERIFY_ACTION(anAction,...) __LOG_METRIC_FOR_VERIFY_ACTION(anAction,##__VA_ARGS__)
+#define LOG_METRIC_FOR_VERIFY_OR_EXIT_ACTION(anAction,...) __LOG_METRIC_FOR_VERIFY_ACTION(anAction,##__VA_ARGS__)
+
+
+// Macro to select the success or exit macro with the correct signature based on the invoked macro
+#define __SELECT_MACRO_FOR_SUCCESS_OR_EXIT(...) __GET_3RD_ARGUMENT(__VA_ARGS__,                                                  \
+        __SUCCESS_OR_EXIT_2ARGS,                                                                                                 \
+        __SUCCESS_OR_EXIT_1ARGS, )
+
+// Wrapper to capture all arguments and invoke the real wrapper for SuccessOrExit's second argument
+#define __LOG_METRIC_FOR_SUCCESS_OR_EXIT(...) __SELECT_MACRO_FOR_SUCCESS_OR_EXIT(__VA_ARGS__)(__VA_ARGS__)
+
+// Macro that takes the status and wraps it to emit the metric in a SuccessOrExit macro, when a metric key is specified
+#define __SUCCESS_OR_EXIT_2ARGS(aStatus, metricKey) chip::Tracing::utils::logMetricIfError(aStatus, chip::Tracing::kMetric##metricKey)
+
+// Macro that just evaluates the status when no metric key is specified
+#define __SUCCESS_OR_EXIT_1ARGS(aStatus)  ::chip::ChipError::IsSuccess((aStatus))
+
+#define LOG_METRIC_FOR_SUCCESS_OR_EXIT(aStatus,...) __LOG_METRIC_FOR_SUCCESS_OR_EXIT(aStatus,##__VA_ARGS__)
+
 
 ////////////////////// Metric LOGGING
 
@@ -153,6 +172,9 @@
 #define MATTER_LOG_METRIC_END(key, ...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
 // Default behavior when tracing is disabled is to just execute the action
-#define LOG_METRIC_FOR_VERIFY_ACTION(anAction,...) anAction
+#define LOG_METRIC_FOR_VERIFY_OR_EXIT_ACTION(anAction,...) anAction
+
+// Default behavior when tracing is disabled is to just evaluate the status
+#define LOG_METRIC_FOR_SUCCESS_OR_EXIT(aStatus,...) ::chip::ChipError::IsSuccess((aStatus))
 
 #endif // MATTER_TRACING_ENABLED

@@ -389,9 +389,12 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @endcode
  *
  *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
+ *  @param[in]  aMetricKey  An optional metric key to be logged if the condition
+ *                          evaluates to false. The value for the metric is
+ *                          result of the expression aStatus.
  *
  */
-#define SuccessOrExit(aStatus) nlEXPECT(::chip::ChipError::IsSuccess((aStatus)), exit)
+#define SuccessOrExit(aStatus,...) nlEXPECT(LOG_METRIC_FOR_SUCCESS_OR_EXIT((aStatus), ##__VA_ARGS__), exit)
 
 /**
  *  @def VerifyOrExit(aCondition, anAction)
@@ -421,9 +424,12 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @param[in]  aCondition  A Boolean expression to be evaluated.
  *  @param[in]  anAction    An expression or block to execute when the
  *                          assertion fails.
+ *  @param[in]  aMetricKey  An optional metric key to be logged if the condition
+ *                          evaluates to false fails. The value for the metric is
+ *                          result of the expression anAction.
  *
  */
-#define VerifyOrExit(aCondition, anAction,...) nlEXPECT_ACTION(aCondition, exit, LOG_METRIC_FOR_VERIFY_ACTION(anAction, ##__VA_ARGS__))
+#define VerifyOrExit(aCondition, anAction,...) nlEXPECT_ACTION(aCondition, exit, LOG_METRIC_FOR_VERIFY_OR_EXIT_ACTION(anAction, ##__VA_ARGS__))
 
 /**
  *  @def ExitNow(...)

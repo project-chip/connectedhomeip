@@ -37,6 +37,15 @@ MTR_NEWLY_AVAILABLE
  */
 + (instancetype)sharedInstance;
 
+/**
+ * @brief This method creates a snapshot of the metrics collected until the current point in time
+ * and returns an object with the stats.
+ *
+ * @param [in] resetCollection Boolean that specifies whether or not to clear the stats collected after
+ *                             creating the snapshot.
+ *
+ * @return MTRMetric object representing the metric data.
+ */
 - (MTRMetrics *)metricSnapshot:(BOOL)resetCollection;
 
 @end

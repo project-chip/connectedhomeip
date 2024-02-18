@@ -29,8 +29,18 @@ MTR_NEWLY_AVAILABLE
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
+/**
+ * @brief Returns the names of all the metrics data collected
+ */
 @property (nonatomic, readonly, copy) NSArray<NSString *> * allKeys;
 
+/**
+ * @brief Returns metric object corresponding to the metric identified by its key
+ *
+ * @param [in] key Name of the metric
+ *
+ * @return An object containing the metric data, nil if key is invalid
+ */
 - (nullable id)valueForKey:(NSString *)key;
 
 @end
