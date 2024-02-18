@@ -18,8 +18,8 @@
 package com.matter.tv.server.tvapp;
 
 public class MessageResponseOption {
-    public long id;
-    public String label;
+    public long id = -1;
+    public String label = "na";
 
     public MessageResponseOption(
         long id,

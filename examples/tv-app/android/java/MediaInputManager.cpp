@@ -51,6 +51,7 @@ void MediaInputManager::NewManager(jint endpoint, jobject manager)
 
 CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -123,6 +124,7 @@ exit:
 
 uint8_t MediaInputManager::HandleGetCurrentInput()
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     jint index     = -1;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -157,6 +159,7 @@ exit:
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -182,6 +185,7 @@ exit:
 
 bool MediaInputManager::HandleShowInputStatus()
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -207,6 +211,7 @@ exit:
 
 bool MediaInputManager::HandleHideInputStatus()
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -232,6 +237,7 @@ exit:
 
 bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
+    DeviceLayer::StackUnlock unlock;
     std::string inputname(name.data(), name.size());
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

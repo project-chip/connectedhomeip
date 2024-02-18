@@ -51,6 +51,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
                                                  const chip::Optional<PlaybackPreferencesType> playbackPreferences,
                                                  bool useCurrentContext)
 {
+    DeviceLayer::StackUnlock unlock;
     Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -107,6 +108,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
                                              const chip::CharSpan & displayString,
                                              const BrandingInformationType & brandingInformation)
 {
+    DeviceLayer::StackUnlock unlock;
     Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -163,6 +165,7 @@ exit:
 
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::list<std::string> acceptedHeadersList;
@@ -208,6 +211,7 @@ exit:
 
 uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err                       = CHIP_NO_ERROR;
     JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
     uint32_t supportedStreamingProtocols = 0;

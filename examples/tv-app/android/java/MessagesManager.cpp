@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,8 +39,6 @@ using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageRes
  * application an opportunity to take care of cluster initialization procedures.
  * It is called exactly once for each endpoint where cluster is present.
  *
- * @param endpoint   Ver.: always
- *
  */
 void emberAfMessagesClusterInitCallback(EndpointId endpoint)
 {
@@ -52,6 +50,7 @@ void MessagesManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "-----TV Android App: Messages::SetDefaultDelegate");
     MessagesManager * mgr = new MessagesManager();
+    VerifyOrReturn(mgr != nullptr, ChipLogError(Zcl, "Failed to create MessagesManager"));
     mgr->InitializeWithObjects(manager);
     chip::app::Clusters::Messages::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
@@ -111,6 +110,7 @@ uint32_t MessagesManager::GetFeatureMap(chip::EndpointId endpoint)
 
 CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -123,7 +123,8 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
     VerifyOrExit(mGetMessagesMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
-        jobjectArray messagesList = (jobjectArray) env->CallObjectMethod(mMessagesManagerObject.ObjectRef(), mGetMessagesMethod);
+        jobjectArray messagesList =
+            static_cast<jobjectArray>(env->CallObjectMethod(mMessagesManagerObject.ObjectRef(), mGetMessagesMethod));
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in MessagesManager::HandleGetMessages");
@@ -191,7 +192,7 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
             jfieldID getResponseOptionsField =
                 env->GetFieldID(messageClass, "responseOptions", "[Lcom/matter/tv/server/tvapp/MessageResponseOption;");
 
-            jobjectArray responsesArray = (jobjectArray) env->GetObjectField(messageObject, getResponseOptionsField);
+            jobjectArray responsesArray = static_cast<jobjectArray>(env->GetObjectField(messageObject, getResponseOptionsField));
             jint size                   = env->GetArrayLength(responsesArray);
             if (size > 0)
             {
@@ -240,6 +241,7 @@ exit:
 
 CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -252,7 +254,8 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aE
     env->ExceptionClear();
 
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
-        jobjectArray messagesList = (jobjectArray) env->CallObjectMethod(mMessagesManagerObject.ObjectRef(), mGetMessagesMethod);
+        jobjectArray messagesList =
+            static_cast<jobjectArray>(env->CallObjectMethod(mMessagesManagerObject.ObjectRef(), mGetMessagesMethod));
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in MessagesManager::HandleGetActiveMessageIds");
@@ -299,6 +302,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
     const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
+    DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
@@ -317,8 +321,18 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
                 chip::Encoding::BytesToUppercaseHexString(messageId.data(), messageId.size(), hex_buf, sizeof(hex_buf)),
             CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "BytesToUppercaseHexString failed"));
 
-        UtfString jIdentifier(env, hex_buf);
-        UtfString jMessageText(env, messageText);
+        jstring jid = env->NewStringUTF(hex_buf);
+        if (jid == nullptr)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        std::string smessageText(messageText.data(), messageText.size());
+        jstring jmessageText = env->NewStringUTF(smessageText.c_str());
+        if (jmessageText == nullptr)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
 
         jint jcontrol  = static_cast<jint>(messageControl.Raw());
         jint jduration = -1;
@@ -359,13 +373,18 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
             {
                 auto & response = iter.GetValue();
 
-                UtfString jlabel(env, response.label.Value());
+                std::string label(response.label.Value().data(), response.label.Value().size());
+                jstring jlabel = env->NewStringUTF(label.c_str());
+                if (jlabel == nullptr)
+                {
+                    return CHIP_ERROR_INTERNAL;
+                }
 
                 jobject jlong = env->NewObject(longClass, longCtor, response.messageResponseID.Value());
                 VerifyOrReturnError(jlong != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not create Long"));
 
                 // add to HashMap
-                env->CallObjectMethod(joptions, hashMapPut, jlong, jlabel.jniValue());
+                env->CallObjectMethod(joptions, hashMapPut, jlong, jlabel);
                 if (env->ExceptionCheck())
                 {
                     ChipLogError(DeviceLayer, "Java exception in MessagesManager::HandlePresentMessagesRequest");
@@ -376,8 +395,8 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
             }
         }
 
-        env->CallBooleanMethod(mMessagesManagerObject.ObjectRef(), mPresentMessagesMethod, jIdentifier.jniValue(), jpriority,
-                               jcontrol, jstartTime, jduration, jMessageText.jniValue(), joptions);
+        env->CallBooleanMethod(mMessagesManagerObject.ObjectRef(), mPresentMessagesMethod, jid, jpriority, jcontrol, jstartTime,
+                               jduration, jmessageText, joptions);
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in MessagesManager::HandlePresentMessagesRequest");
@@ -391,6 +410,7 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
 
 CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::DecodableList<ByteSpan> & messageIds)
 {
+    DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
@@ -413,9 +433,13 @@ CHIP_ERROR MessagesManager::HandleCancelMessagesRequest(const DataModel::Decodab
                                 chip::Encoding::BytesToUppercaseHexString(id.data(), id.size(), hex_buf, sizeof(hex_buf)),
                             CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "BytesToUppercaseHexString failed"));
 
-        UtfString jIdentifier(env, hex_buf);
+        jstring jid = env->NewStringUTF(hex_buf);
+        if (jid == nullptr)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
 
-        env->CallBooleanMethod(mMessagesManagerObject.ObjectRef(), mCancelMessagesMethod, jIdentifier.jniValue());
+        env->CallBooleanMethod(mMessagesManagerObject.ObjectRef(), mCancelMessagesMethod, jid);
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in MessagesManager::HandleCancelMessagesRequest");
