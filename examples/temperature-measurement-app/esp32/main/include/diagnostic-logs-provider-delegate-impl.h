@@ -57,11 +57,11 @@ private:
 
     struct CrashLogContext
     {
-        spi_flash_mmap_handle_t mappedHandle;
-        const void * mappedAddress;
-        uint32_t crashSize;
-        uint32_t readOffset;
-        bool isMapped;
+        spi_flash_mmap_handle_t mappedHandle = 0;
+        const void * mappedAddress           = nullptr;
+        uint32_t crashSize                   = 0;
+        uint32_t readOffset                  = 0;
+        bool isMapped                        = 0;
 
         void Reset()
         {

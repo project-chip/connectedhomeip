@@ -286,10 +286,11 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
     VerifyOrReturnValue(mSessionContextMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
     LogContext * context = mSessionContextMap[sessionHandle];
+    VerifyOrReturnError(context, CHIP_ERROR_INCORRECT_STATE);
 
     CleanupLogContextForIntent(context);
-    mSessionContextMap.erase(sessionHandle);
     Platform::MemoryFree(context);
+    mSessionContextMap.erase(sessionHandle);
 
     return CHIP_NO_ERROR;
 }
@@ -300,7 +301,7 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     VerifyOrReturnValue(mSessionContextMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
     LogContext * context = mSessionContextMap[sessionHandle];
+    VerifyOrReturnError(context, CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR err = GetDataForIntent(context, outBuffer, outIsEndOfLog);
-    return err;
+    return GetDataForIntent(context, outBuffer, outIsEndOfLog);
 }
