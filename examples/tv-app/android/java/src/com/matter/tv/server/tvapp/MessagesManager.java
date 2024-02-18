@@ -30,6 +30,6 @@ public interface MessagesManager {
         int duration,
         String messageText,
         HashMap<Long,String> responseOptions);
-    
+
     boolean cancelMessage(String messageId);
 }

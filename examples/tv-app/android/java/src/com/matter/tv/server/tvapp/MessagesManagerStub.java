@@ -80,7 +80,7 @@ public class MessagesManagerStub implements MessagesManager {
             options));
         return true;
     }
-    
+
   @Override
   public boolean cancelMessage(String messageId)
   {
