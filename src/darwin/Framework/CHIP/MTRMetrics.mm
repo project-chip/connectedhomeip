@@ -21,33 +21,21 @@
 #import <Matter/MTRDefines.h>
 
 @implementation MTRMetrics {
-    NSMutableDictionary<NSString *, MTRMetricsData *> * _metricsData;
+    NSMutableDictionary<NSString *, id> * _metricsData;
 }
 
 - (instancetype)init
 {
-    if (self = [super init]) {
-        _metricsData = [NSMutableDictionary dictionary];
-    }
-    return self;
+    NSAssert(false, @"'init' unavailable, use initWithCapacity: instead");
+    return nil;
 }
 
-- (instancetype)initWithDictionary:(NSDictionary<NSString *, MTRMetricsData *> *)metricsData
+- (instancetype)initWithCapacity:(NSUInteger)numItems
 {
     if (self = [super init]) {
-        _metricsData = [NSMutableDictionary dictionary];
-        if (_metricsData) {
-            [_metricsData addEntriesFromDictionary:metricsData];
-        }
+        _metricsData = [NSMutableDictionary dictionaryWithCapacity:numItems];
     }
     return self;
-}
-
-
-+ (instancetype)metricsFromDictionary:(NSDictionary<NSString *, MTRMetricsData *> *)metricsData
-{
-    MTRMetrics *metrics = [[MTRMetrics alloc] initWithDictionary:metricsData];
-    return metrics;
 }
 
 - (NSArray<NSString *> *)allKeys
@@ -55,7 +43,7 @@
     return [_metricsData allKeys];
 }
 
-- (nullable MTRMetricsData *)valueForKey:(NSString *)key
+- (nullable id)valueForKey:(NSString *)key
 {
     if (!key) {
         MTR_LOG_ERROR("Cannot get metrics value for nil key");
@@ -65,7 +53,7 @@
     return _metricsData[key];
 }
 
-- (void)setValue:(MTRMetricsData * _Nullable)value forKey:(NSString *)key
+- (void)setValue:(id _Nullable)value forKey:(NSString *)key
 {
     if (!key) {
         MTR_LOG_ERROR("Cannot set metrics value for nil key");

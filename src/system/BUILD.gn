@@ -212,6 +212,12 @@ source_set("system_config_header") {
   }
 }
 
+source_set("system_clock") {
+  sources = [
+    "SystemClock.h",
+  ]
+}
+
 static_library("system") {
   output_name = "libSystemLayer"
 
@@ -219,7 +225,6 @@ static_library("system") {
     "PlatformEventSupport.h",
     "SystemAlignSize.h",
     "SystemClock.cpp",
-    "SystemClock.h",
     "SystemError.cpp",
     "SystemError.h",
     "SystemEvent.h",
@@ -259,6 +264,7 @@ static_library("system") {
 
   public_deps = [
     ":system_config_header",
+    ":system_clock",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform:platform_config_header",

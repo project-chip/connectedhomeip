@@ -22,8 +22,7 @@
 #if MATTER_TRACING_ENABLED
 
 #include <lib/core/CHIPError.h>
-#include <stdint.h>
-#include <chrono>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Tracing {
@@ -88,18 +87,18 @@ struct MetricEvent
     Tag tag;
     MetricKey key;
     Value value;
-    std::chrono::steady_clock::time_point timePoint;
+    System::Clock::Microseconds64 timePoint;
 
     MetricEvent(Tag tg, MetricKey k, uint32_t val = 0)
-        : tag(tg), key(k), value(val), timePoint(std::chrono::steady_clock::now())
+        : tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 
     MetricEvent(Tag tg, MetricKey k, int32_t val)
-        : tag(tg), key(k), value(val), timePoint(std::chrono::steady_clock::now())
+        : tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 
     MetricEvent(Tag tg, MetricKey k, const ChipError & err)
-        : tag(tg), key(k), value(err.AsInteger()), timePoint(std::chrono::steady_clock::now())
+        : tag(tg), key(k), value(err.AsInteger()), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 };
 
