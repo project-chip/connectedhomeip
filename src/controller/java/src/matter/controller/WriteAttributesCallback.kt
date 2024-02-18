@@ -18,6 +18,7 @@
 package matter.controller
 
 import matter.controller.model.AttributePath
+import matter.controller.model.Status
 
 /** An interface for receiving write response. */
 interface WriteAttributesCallback {
@@ -38,8 +39,9 @@ interface WriteAttributesCallback {
    * path.
    *
    * @param attributePath The attribute path field in write response.
+   * @param status The attribute status field in write response.
    */
-  fun onResponse(attributePath: AttributePath)
+  fun onResponse(attributePath: AttributePath, status: Status)
 
   fun onDone() {}
 }

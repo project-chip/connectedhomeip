@@ -669,23 +669,27 @@ void WriteAttributesCallback::OnResponse(const app::WriteClient * apWriteClient,
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
-
-    if (aStatus.mStatus != Protocols::InteractionModel::Status::Success)
-    {
-        ReportError(&aPath, aStatus.mStatus);
-        return;
-    }
-
     jmethodID onResponseMethod;
     VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
                    ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s", __func__));
     jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
-    err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "onResponse", "(IJJ)V", &onResponseMethod);
+    err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "onResponse", "(IJJILjava/lang/Integer;)V",
+                                                  &onResponseMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
+
+    jobject jClusterState = nullptr;
+    if (aStatus.mClusterStatus.HasValue())
+    {
+        err = JniReferences::GetInstance().CreateBoxedObject<jint>(
+            "java/lang/Integer", "(I)V", static_cast<jint>(aStatus.mClusterStatus.Value()), jClusterState);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Controller, "Could not CreateBoxedObject with error %" CHIP_ERROR_FORMAT, err.Format()));
+    }
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(wrapperCallback, onResponseMethod, static_cast<jint>(aPath.mEndpointId),
-                        static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId));
+                        static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), aStatus.mStatus,
+                        jClusterState);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
