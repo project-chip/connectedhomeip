@@ -60,6 +60,8 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
     VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetInputListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray inputArray = (jobjectArray) env->CallObjectMethod(mMediaInputManagerObject.ObjectRef(), mGetInputListMethod);
         if (env->ExceptionCheck())
@@ -130,7 +132,8 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleGetCurrentInput");
     VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetCurrentInputMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    env->ExceptionClear();
 
     {
         index = env->CallIntMethod(mMediaInputManagerObject.ObjectRef(), mGetCurrentInputMethod);
@@ -239,9 +242,10 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mMediaInputManagerObject is not valid"));
     VerifyOrExit(mRenameInputMethod != nullptr, ChipLogError(Zcl, "mHideInputStatusMethod null"));
 
+    env->ExceptionClear();
+
     {
         UtfString jniInputname(env, inputname.data());
-        env->ExceptionClear();
         ret = env->CallBooleanMethod(mMediaInputManagerObject.ObjectRef(), mRenameInputMethod, static_cast<jint>(index),
                                      jniInputname.jniValue());
         if (env->ExceptionCheck())

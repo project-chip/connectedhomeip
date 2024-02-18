@@ -61,6 +61,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
     VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mLaunchContentMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
     {
         UtfString jData(env, data);
 
@@ -116,6 +117,8 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
     VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mLaunchUrlMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     {
         UtfString jContentUrl(env, contentUrl);
         UtfString jDisplayString(env, displayString);
@@ -170,6 +173,8 @@ CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncod
     VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAcceptHeaderMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray acceptedHeadersArray =
             (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mGetAcceptHeaderMethod);
@@ -212,6 +217,8 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
     ChipLogProgress(Zcl, "Received ContentLauncherManager::GetSupportedStreamingProtocols");
     VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetSupportedStreamingProtocolsMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     {
         jlong jSupportedStreamingProtocols =

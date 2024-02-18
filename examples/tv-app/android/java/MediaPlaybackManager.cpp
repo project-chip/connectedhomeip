@@ -179,6 +179,8 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTracks(bool audio, AttributeV
     VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAvailableTracksMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     return aEncoder.EncodeList([this, env, audio](const auto & encoder) -> CHIP_ERROR {
         jobjectArray trackList = (jobjectArray) env->CallObjectMethod(mMediaPlaybackManagerObject.ObjectRef(),
                                                                       mGetAvailableTracksMethod, static_cast<jboolean>(audio));
@@ -328,9 +330,11 @@ bool MediaPlaybackManager::HandleActivateTrack(bool audio, const chip::CharSpan 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleActivateAudioTrack");
     VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mActivateTrackMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
+
     {
         UtfString jniid(env, id.c_str());
-        env->ExceptionClear();
         ret = env->CallIntMethod(mMediaPlaybackManagerObject.ObjectRef(), mActivateTrackMethod, static_cast<jboolean>(audio),
                                  jniid.jniValue());
         if (env->ExceptionCheck())
@@ -450,6 +454,8 @@ uint64_t MediaPlaybackManager::HandleMediaRequestGetAttribute(MediaPlaybackReque
     VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     jAttributeValue =
         env->CallLongMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetAttributeMethod, static_cast<jint>(attribute));
     if (env->ExceptionCheck())
@@ -490,6 +496,8 @@ long MediaPlaybackManager::HandleMediaRequestGetLongAttribute(MediaPlaybackReque
     ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetLongAttribute:%d", attribute);
     VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     jAttributeValue =
         env->CallLongMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetAttributeMethod, static_cast<jint>(attribute));

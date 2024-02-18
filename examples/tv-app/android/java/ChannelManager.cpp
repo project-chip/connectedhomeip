@@ -66,6 +66,8 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
     VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetChannelListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray channelInfoList =
             (jobjectArray) env->CallObjectMethod(mChannelManagerObject.ObjectRef(), mGetChannelListMethod);
@@ -144,6 +146,8 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
     VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetLineupMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     {
         jobject channelLineupObject = env->CallObjectMethod(mChannelManagerObject.ObjectRef(), mGetLineupMethod);
         if (channelLineupObject != nullptr)
@@ -206,6 +210,8 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetCurrentChannel");
     VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetCurrentChannelMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     {
         jobject channelInfoObject = env->CallObjectMethod(mChannelManagerObject.ObjectRef(), mGetCurrentChannelMethod);
@@ -282,9 +288,10 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mChangeChannelMethod != nullptr, ChipLogError(Zcl, "mChangeChannelMethod null"));
 
+    env->ExceptionClear();
+
     {
         UtfString jniname(env, name.c_str());
-        env->ExceptionClear();
         jobject channelObject = env->CallObjectMethod(mChannelManagerObject.ObjectRef(), mChangeChannelMethod, jniname.jniValue());
         if (env->ExceptionCheck())
         {
@@ -393,6 +400,8 @@ void ChannelManager::HandleGetProgramGuide(
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetProgramGuide");
     VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetProgramGuideMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     {
         // NOTE: this example app does not pass the Data, PageToken, ChannelsArray or ExternalIdList through to the Java layer

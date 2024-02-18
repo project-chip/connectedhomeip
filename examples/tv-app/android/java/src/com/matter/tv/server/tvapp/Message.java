@@ -21,29 +21,21 @@ import java.util.Vector;
 
 public class Message {
 
-    public class PriorityType {
-        int priority;
-        public PriorityType(int priority)
-        {
-            this.priority = priority;
-        }
-    }
-
     public String messageId;
-    public PriorityType priority;
+    public int priority;
     public int messageControl;
     public long startTime;
     public int duration;
     public String messageText;
-    public Vector<MessageResponseOption> responseOptions;
+    public MessageResponseOption responseOptions[];
 
     public Message(String messageId,
-        PriorityType priority,
+        int priority,
         int messageControl,
         long startTime,
         int duration,
         String messageText,
-        Vector<MessageResponseOption> responseOptions)
+        MessageResponseOption responseOptions[])
     {
         this.messageId = messageId;
         this.priority = priority;

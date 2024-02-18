@@ -74,9 +74,8 @@ void MessagesManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mPresentMessagesMethod = env->GetMethodID(
-        managerClass, "presentMessages",
-        "(Ljava/lang/String;Lcom/matter/tv/server/tvapp/Message$PriorityType;IJILjava/lang/String;Ljava/util/Vector;)Z");
+    mPresentMessagesMethod =
+        env->GetMethodID(managerClass, "presentMessages", "(Ljava/lang/String;IIJILjava/lang/String;Ljava/util/HashMap;)Z");
     if (mPresentMessagesMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MessagesManager 'presentMessages' method");
@@ -117,6 +116,8 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
+    env->ExceptionClear();
+
     ChipLogProgress(Zcl, "Received MessagesManager::HandleGetMessages");
     VerifyOrExit(mMessagesManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetMessagesMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -136,6 +137,7 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
         for (jint i = 0; i < length; i++)
         {
             std::vector<MessageResponseOption> options;
+            std::vector<JniUtfString *> optionLabels;
             uint8_t buf[kMessageIdLength];
 
             chip::app::Clusters::Messages::Structs::MessageStruct::Type message;
@@ -165,8 +167,15 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
             jint jmessageControl         = env->GetIntField(messageObject, messageControlField);
             message.messageControl       = static_cast<chip::BitMask<MessageControlBitmap>>(static_cast<uint8_t>(jmessageControl));
 
+            jfieldID priorityField = env->GetFieldID(messageClass, "priority", "I");
+            jint jpriority         = env->GetIntField(messageObject, priorityField);
+            if (jpriority >= 0)
+            {
+                message.priority = MessagePriorityEnum(static_cast<uint8_t>(jpriority));
+            }
+
             jfieldID startTimeField = env->GetFieldID(messageClass, "startTime", "J");
-            jint jstartTime         = env->GetIntField(messageObject, startTimeField);
+            jlong jstartTime        = env->GetLongField(messageObject, startTimeField);
             if (jstartTime >= 0)
             {
                 message.startTime = DataModel::Nullable<uint32_t>(static_cast<uint32_t>(jstartTime));
@@ -179,34 +188,32 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
                 message.duration = DataModel::Nullable<uint16_t>(static_cast<uint16_t>(jduration));
             }
 
-            jfieldID getResponseOptionsField = env->GetFieldID(messageClass, "responseOptions", "Ljava/lang/Vector;");
+            jfieldID getResponseOptionsField =
+                env->GetFieldID(messageClass, "responseOptions", "[Lcom/matter/tv/server/tvapp/MessageResponseOption;");
 
             jobjectArray responsesArray = (jobjectArray) env->GetObjectField(messageObject, getResponseOptionsField);
             jint size                   = env->GetArrayLength(responsesArray);
             if (size > 0)
             {
-                // MessageResponseOption * optionArray = new MessageResponseOption[static_cast<size_t>(size)];
-                // VerifyOrReturnError(optionArray != nullptr, CHIP_ERROR_NO_MEMORY,
-                //                     ChipLogProgress(Controller, "HandleGetMessages MessageResponseOption alloc failed"));
-                // optionToFree.push_back(optionArray); // TODO
-
                 for (jint j = 0; j < size; j++)
                 {
+                    MessageResponseOption option;
+
                     jobject responseOptionObject = env->GetObjectArrayElement(responsesArray, j);
                     jclass responseOptionClass   = env->GetObjectClass(responseOptionObject);
 
+                    jfieldID idField         = env->GetFieldID(responseOptionClass, "id", "J");
+                    jlong jid                = env->GetLongField(responseOptionObject, idField);
+                    option.messageResponseID = Optional<uint32_t>(static_cast<uint32_t>(jid));
+
                     jfieldID getLabelField = env->GetFieldID(responseOptionClass, "label", "Ljava/lang/String;");
                     jstring jlabelText     = static_cast<jstring>(env->GetObjectField(responseOptionObject, getLabelField));
-                    JniUtfString label(env, jlabelText);
-                    MessageResponseOption option;
-                    if (jlabelText != nullptr)
-                    {
-                        option.label = Optional<CharSpan>(label.charSpan());
-                    }
+                    VerifyOrReturnValue(jlabelText != nullptr, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(Zcl, "jlabelText null"));
+                    JniUtfString * label = new JniUtfString(env, jlabelText);
+                    optionLabels.push_back(label);
 
-                    jfieldID idField         = env->GetFieldID(responseOptionClass, "id", "J");
-                    jint jid                 = env->GetIntField(responseOptionObject, idField);
-                    option.messageResponseID = Optional<uint32_t>(static_cast<uint32_t>(jid));
+                    option.label = Optional<CharSpan>(label->charSpan());
+
                     options.push_back(option);
                 }
 
@@ -214,6 +221,10 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
                     DataModel::List<MessageResponseOption>(options.data(), options.size()));
             }
             ReturnErrorOnFailure(encoder.Encode(message));
+            for (JniUtfString * optionLabel : optionLabels)
+            {
+                delete optionLabel;
+            }
         }
 
         return CHIP_NO_ERROR;
@@ -237,6 +248,8 @@ CHIP_ERROR MessagesManager::HandleGetActiveMessageIds(AttributeValueEncoder & aE
     ChipLogProgress(Zcl, "Received MessagesManager::HandleGetActiveMessageIds");
     VerifyOrExit(mMessagesManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetMessagesMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray messagesList = (jobjectArray) env->CallObjectMethod(mMessagesManagerObject.ObjectRef(), mGetMessagesMethod);
@@ -309,60 +322,50 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
 
         jint jcontrol  = static_cast<jint>(messageControl.Raw());
         jint jduration = -1;
-        if (duration.IsNull())
+        if (!duration.IsNull())
         {
             jduration = static_cast<jint>(duration.Value());
         }
         jlong jstartTime = -1;
-        if (startTime.IsNull())
+        if (!startTime.IsNull())
         {
             jstartTime = static_cast<jlong>(startTime.Value());
         }
 
-        jint jniPriority = static_cast<jint>(priority);
-        jclass priorityTypeClass;
-        VerifyOrReturnError(CHIP_NO_ERROR !=
-                                chip::JniReferences::GetInstance().GetLocalClassRef(
-                                    env, "com/matter/tv/server/tvapp/Message$PriorityType", priorityTypeClass),
-                            CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not find class Message$PriorityType"));
-        jmethodID priorityTypeCtor = env->GetMethodID(priorityTypeClass, "<init>", "(I)V");
-        VerifyOrReturnError(priorityTypeCtor != nullptr, CHIP_ERROR_INCORRECT_STATE,
-                            ChipLogError(Zcl, "Could not find Message$PriorityType constructor"));
-        jobject jpriority = env->NewObject(priorityTypeClass, priorityTypeCtor, jniPriority);
+        jint jpriority = static_cast<jint>(priority);
 
-        jclass vectorClass = env->FindClass("java/util/Vector");
-        VerifyOrReturnError(vectorClass != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not find class Vector"));
-        jmethodID vectorCtor = env->GetMethodID(priorityTypeClass, "<init>", "()V");
-        VerifyOrReturnError(vectorCtor != nullptr, CHIP_ERROR_INCORRECT_STATE,
-                            ChipLogError(Zcl, "Could not find Vector constructor"));
-        jobject joptions = env->NewObject(vectorClass, vectorCtor);
-
-        jmethodID vectorAdd = env->GetMethodID(priorityTypeClass, "add", "(Ljava/lang/Object;)Z");
+        jclass hashMapClass = env->FindClass("java/util/HashMap");
+        VerifyOrReturnError(hashMapClass != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not find class HashMap"));
+        jmethodID hashMapCtor = env->GetMethodID(hashMapClass, "<init>", "()V");
+        VerifyOrReturnError(hashMapCtor != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                            ChipLogError(Zcl, "Could not find HashMap constructor"));
+        jobject joptions = env->NewObject(hashMapClass, hashMapCtor);
+        VerifyOrReturnError(joptions != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not create HashMap"));
 
         if (responses.HasValue())
         {
-            jclass messageResponseOptionClass;
-            VerifyOrReturnError(CHIP_NO_ERROR !=
-                                    chip::JniReferences::GetInstance().GetLocalClassRef(
-                                        env, "com/matter/tv/server/tvapp/MessageResponseOption", messageResponseOptionClass),
-                                CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not find class MessageResponseOption"));
-            jmethodID messageResponseOptionCtor = env->GetMethodID(messageResponseOptionClass, "<init>", "(JLjava/lang/String;)V");
-            VerifyOrReturnError(messageResponseOptionCtor != nullptr, CHIP_ERROR_INCORRECT_STATE,
-                                ChipLogError(Zcl, "Could not find MessageResponseOption constructor"));
+            jmethodID hashMapPut =
+                env->GetMethodID(hashMapClass, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+            VerifyOrReturnError(hashMapPut != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not find HashMap put"));
+
+            jclass longClass = env->FindClass("java/lang/Long");
+            VerifyOrReturnError(longClass != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not find class Long"));
+            jmethodID longCtor = env->GetMethodID(longClass, "<init>", "(J)V");
+            VerifyOrReturnError(longCtor != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                                ChipLogError(Zcl, "Could not find Long constructor"));
 
             auto iter = responses.Value().begin();
             while (iter.Next())
             {
                 auto & response = iter.GetValue();
 
-                jlong jniid = static_cast<jlong>(response.messageResponseID.Value());
                 UtfString jlabel(env, response.label.Value());
 
-                jobject jmessageResponseOption =
-                    env->NewObject(messageResponseOptionClass, messageResponseOptionCtor, jniid, jlabel.jniValue());
+                jobject jlong = env->NewObject(longClass, longCtor, response.messageResponseID.Value());
+                VerifyOrReturnError(jlong != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not create Long"));
 
-                // add to vector
-                env->CallBooleanMethod(joptions, vectorAdd, jmessageResponseOption);
+                // add to HashMap
+                env->CallObjectMethod(joptions, hashMapPut, jlong, jlabel.jniValue());
                 if (env->ExceptionCheck())
                 {
                     ChipLogError(DeviceLayer, "Java exception in MessagesManager::HandlePresentMessagesRequest");

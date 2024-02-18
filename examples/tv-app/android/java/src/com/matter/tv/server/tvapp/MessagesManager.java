@@ -17,20 +17,19 @@
  */
 package com.matter.tv.server.tvapp;
 
-import java.util.Vector;
-import com.matter.tv.server.tvapp.Message.PriorityType;
+import java.util.HashMap;
 
 public interface MessagesManager {
 
     Message[] getMessages();
 
     boolean presentMessages(String messageId,
-        PriorityType priority,
+        int priority,
         int messageControl,
         long startTime,
         int duration,
         String messageText,
-        Vector<MessageResponseOption> responseOptions);
+        HashMap<Long,String> responseOptions);
     
     boolean cancelMessage(String messageId);
 }

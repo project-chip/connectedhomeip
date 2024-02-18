@@ -20,9 +20,8 @@ package com.matter.tv.server.tvapp;
 import android.util.Log;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
-
-import com.matter.tv.server.tvapp.Message.PriorityType;
 
 public class MessagesManagerStub implements MessagesManager {
   private static final String TAG = MessagesManagerStub.class.getSimpleName();
@@ -34,6 +33,18 @@ public class MessagesManagerStub implements MessagesManager {
   public MessagesManagerStub(int endpoint) {
     this.endpoint = endpoint;
     Log.d(TAG, "MessagesManagerStub: at " + this.endpoint);
+
+    HashMap<Long,String> responseOptions = new HashMap<Long,String>();
+    responseOptions.put(new Long(1), "Yes");
+    responseOptions.put(new Long(2), "No");
+    presentMessages("31323334353637383930313233343536",
+        1,
+        1,
+        30,
+        60,
+        "TestMessage",
+        responseOptions);
+    Log.d(TAG, "MessagesManagerStub: added dummy message");
   }
 
   @Override
@@ -44,20 +55,29 @@ public class MessagesManagerStub implements MessagesManager {
 
   @Override
   public boolean presentMessages(String messageId,
-        PriorityType priority,
+        int priority,
         int messageControl,
         long startTime,
         int duration,
         String messageText,
-        Vector<MessageResponseOption> responseOptions) {
+        HashMap<Long,String> responseOptions) {
           Log.d(TAG, "presentMessages: at " + this.endpoint + " id:" + messageId+ " text:"+messageText);
-        messages.put(messageId, new Message(messageId,
+          MessageResponseOption[] options = new MessageResponseOption[responseOptions.size()];
+          int i=0;
+
+          for (Map.Entry<Long,String> set : responseOptions.entrySet()) {
+            Log.d(TAG, "presentMessages option: key:"+set.getKey()+" value:"+set.getValue());
+            options[i] = new MessageResponseOption(set.getKey().longValue(), set.getValue());
+            i++;
+          }
+
+          messages.put(messageId, new Message(messageId,
             priority,
             messageControl,
             startTime,
             duration,
             messageText,
-            responseOptions));
+            options));
         return true;
     }
     
