@@ -18,6 +18,8 @@
 package chip.devicecontroller;
 
 import chip.devicecontroller.model.ChipAttributePath;
+import chip.devicecontroller.model.Status;
+import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link WriteAttributesCallback}. */
 public final class WriteAttributesCallbackJni {
@@ -45,9 +47,15 @@ public final class WriteAttributesCallbackJni {
         e);
   }
 
-  private void onResponse(int endpointId, long clusterId, long attributeId) {
+  private void onResponse(
+      int endpointId,
+      long clusterId,
+      long attributeId,
+      int status,
+      @Nullable Integer clusterStatus) {
     wrappedWriteAttributesCallback.onResponse(
-        ChipAttributePath.newInstance(endpointId, clusterId, attributeId));
+        ChipAttributePath.newInstance(endpointId, clusterId, attributeId),
+        Status.newInstance(status, clusterStatus));
   }
 
   private void onDone() {

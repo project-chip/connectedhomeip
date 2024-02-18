@@ -18,6 +18,7 @@
 package matter.controller
 
 import matter.controller.model.AttributePath
+import matter.controller.model.Status
 
 /** JNI wrapper callback class for [WriteAttributesCallback]. */
 class WriteAttributesCallbackJni(
@@ -53,9 +54,16 @@ class WriteAttributesCallbackJni(
     )
   }
 
-  private fun onResponse(endpointId: Int, clusterId: Long, attributeId: Long) {
+  private fun onResponse(
+    endpointId: Int,
+    clusterId: Long,
+    attributeId: Long,
+    status: Int,
+    clusterStatus: Int?
+  ) {
     wrappedWriteAttributesCallback.onResponse(
-      AttributePath(endpointId.toUShort(), clusterId.toUInt(), attributeId.toUInt())
+      AttributePath(endpointId.toUShort(), clusterId.toUInt(), attributeId.toUInt()),
+      Status(status, clusterStatus)
     )
   }
 
