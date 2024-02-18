@@ -1,4 +1,4 @@
- /*
+/*
  *   Copyright (c) 2024 Project CHIP Authors
  *   All rights reserved.
  *
@@ -21,15 +21,16 @@ import java.util.HashMap;
 
 public interface MessagesManager {
 
-    Message[] getMessages();
+  Message[] getMessages();
 
-    boolean presentMessages(String messageId,
-        int priority,
-        int messageControl,
-        long startTime,
-        int duration,
-        String messageText,
-        HashMap<Long,String> responseOptions);
+  boolean presentMessages(
+      String messageId,
+      int priority,
+      int messageControl,
+      long startTime,
+      int duration,
+      String messageText,
+      HashMap<Long, String> responseOptions);
 
-    boolean cancelMessage(String messageId);
+  boolean cancelMessage(String messageId);
 }

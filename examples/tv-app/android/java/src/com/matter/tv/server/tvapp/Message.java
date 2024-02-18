@@ -17,32 +17,31 @@
  */
 package com.matter.tv.server.tvapp;
 
-import java.util.Vector;
 
 public class Message {
 
-    public String messageId;
-    public int priority;
-    public int messageControl;
-    public long startTime;
-    public int duration;
-    public String messageText;
-    public MessageResponseOption responseOptions[];
+  public String messageId;
+  public int priority;
+  public int messageControl;
+  public long startTime;
+  public int duration;
+  public String messageText;
+  public MessageResponseOption responseOptions[];
 
-    public Message(String messageId,
-        int priority,
-        int messageControl,
-        long startTime,
-        int duration,
-        String messageText,
-        MessageResponseOption responseOptions[])
-    {
-        this.messageId = messageId;
-        this.priority = priority;
-        this.messageControl = messageControl;
-        this.startTime = startTime;
-        this.duration = duration;
-        this.messageText = messageText;
-        this.responseOptions = responseOptions;
-    }
+  public Message(
+      String messageId,
+      int priority,
+      int messageControl,
+      long startTime,
+      int duration,
+      String messageText,
+      MessageResponseOption responseOptions[]) {
+    this.messageId = messageId;
+    this.priority = priority;
+    this.messageControl = messageControl;
+    this.startTime = startTime;
+    this.duration = duration;
+    this.messageText = messageText;
+    this.responseOptions = responseOptions;
+  }
 }
