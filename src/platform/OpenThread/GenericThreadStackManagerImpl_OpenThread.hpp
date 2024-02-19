@@ -1359,6 +1359,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
         break;
     }
 
+    if (ThreadStackMgrImpl().mIsSrpClearAllRequested)
+    {
+        ThreadStackMgrImpl().NotifySrpClearAllComplete();
+        ThreadStackMgrImpl().mIsSrpClearAllRequested = false;
+    }
+
     if (errorStr != nullptr)
     {
         ChipLogError(DeviceLayer, "SRP update error: %s", errorStr);
@@ -1615,6 +1621,31 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
 exit:
     Impl()->UnlockThreadStack();
 
+    return error;
+}
+
+/*
+ * @brief This is a utility function to remove all Thread client srp host and services
+ * established between the device and the srp server (in most cases the OTBR).
+ * The calling task is blocked until OnSrpClientNotification which confims the client received the request.
+ * The blocking mechanism is defined by the platform implementation of `WaitOnSrpClearAllComplete` and `NotifySrpClearAllComplete`
+ *
+ * Note: This function is meant to be used during the factory reset sequence.
+ *
+ */
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ClearAllSrpHostAndServices()
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    if (!mIsSrpClearAllRequested)
+    {
+        Impl()->LockThreadStack();
+        error =
+            MapOpenThreadError(otSrpClientRemoveHostAndServices(mOTInst, true /*aRemoveKeyLease*/, true /*aSendUnregToServer*/));
+        mIsSrpClearAllRequested = true;
+        Impl()->UnlockThreadStack();
+        Impl()->WaitOnSrpClearAllComplete();
+    }
     return error;
 }
 

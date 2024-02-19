@@ -121,6 +121,9 @@ public:
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR InvalidateAllSrpServices(); ///< Mark all SRP services as invalid
     CHIP_ERROR RemoveInvalidSrpServices(); ///< Remove SRP services marked as invalid
+    CHIP_ERROR ClearAllSrpHostAndServices();
+    void WaitOnSrpClearAllComplete();
+    void NotifySrpClearAllComplete();
     CHIP_ERROR SetupSrpHost(const char * aHostName);
     CHIP_ERROR ClearSrpHost(const char * aHostName);
     CHIP_ERROR SetSrpDnsCallbacks(DnsAsyncReturnCallback aInitCallback, DnsAsyncReturnCallback aErrorCallback, void * aContext);
@@ -287,6 +290,21 @@ inline CHIP_ERROR ThreadStackManager::InvalidateAllSrpServices()
 inline CHIP_ERROR ThreadStackManager::RemoveInvalidSrpServices()
 {
     return static_cast<ImplClass *>(this)->_RemoveInvalidSrpServices();
+}
+
+inline CHIP_ERROR ThreadStackManager::ClearAllSrpHostAndServices()
+{
+    return static_cast<ImplClass *>(this)->_ClearAllSrpHostAndServices();
+}
+
+inline void ThreadStackManager::WaitOnSrpClearAllComplete()
+{
+    return static_cast<ImplClass *>(this)->_WaitOnSrpClearAllComplete();
+}
+
+inline void ThreadStackManager::NotifySrpClearAllComplete()
+{
+    return static_cast<ImplClass *>(this)->_NotifySrpClearAllComplete();
 }
 
 inline CHIP_ERROR ThreadStackManager::SetupSrpHost(const char * aHostName)
