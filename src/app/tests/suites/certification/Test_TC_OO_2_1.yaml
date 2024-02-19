@@ -63,6 +63,7 @@ tests:
       command: "writeAttribute"
       attribute: "OnTime"
       arguments:
+       type: int16u
        value: 30
 
     - label: "Step 6: TH reads the OnTime attribute from the DUT"
