@@ -67,7 +67,7 @@ shared_library("jni") {
     "DeviceAttestationDelegateBridge.h",
     "GroupDeviceProxy.h",
     "MatterCallbacks-JNI.cpp",
-    "MatterController-JNI.cpp",
+    "MatterInteractionClient-JNI.cpp",
   ]
 
   deps = [
