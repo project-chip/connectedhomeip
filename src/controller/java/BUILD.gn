@@ -67,7 +67,7 @@ shared_library("jni") {
     "DeviceAttestationDelegateBridge.h",
     "GroupDeviceProxy.h",
     "MatterCallbacks-JNI.cpp",
-    "MatterController-JNI.cpp",
+    "MatterInteractionClient-JNI.cpp",
   ]
 
   deps = [
@@ -391,6 +391,7 @@ kotlin_library("kotlin_matter_controller") {
     "src/matter/controller/WriteAttributesCallbackJni.kt",
     "src/matter/controller/model/Paths.kt",
     "src/matter/controller/model/States.kt",
+    "src/matter/controller/model/Status.kt",
   ]
 
   sources += matter_structs_sources
@@ -477,6 +478,7 @@ android_library("java") {
     "src/chip/devicecontroller/ReportCallback.java",
     "src/chip/devicecontroller/ReportCallbackJni.java",
     "src/chip/devicecontroller/ResubscriptionAttemptCallback.java",
+    "src/chip/devicecontroller/StatusException.java",
     "src/chip/devicecontroller/SubscriptionEstablishedCallback.java",
     "src/chip/devicecontroller/ThreadScanResult.java",
     "src/chip/devicecontroller/UnpairDeviceCallback.java",

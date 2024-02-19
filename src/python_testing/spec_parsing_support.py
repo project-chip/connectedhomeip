@@ -354,6 +354,9 @@ class ClusterParser:
                 return CommandType.GENERATED
             if element.attrib['direction'].lower() == 'commandtoclient':
                 return CommandType.UNKNOWN
+            if element.attrib['direction'].lower() == 'commandtoserver':
+                return CommandType.ACCEPTED
+            raise Exception(f"Unknown direction: {element.attrib['direction']}")
         except KeyError:
             return CommandType.ACCEPTED
 
@@ -496,6 +499,33 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             clusters[id] = new
 
     # TODO: All these fixups should be removed BEFORE SVE if at all possible
+    # Workaround for Color Control cluster - the spec uses a non-standard conformance. Set all to optional now, will need
+    # to implement either arithmetic conformance handling (once spec changes land here) or specific test
+    # https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/7808 for spec changes.
+    # see 3.2.8. Defined Primaries Information Attribute Set, affects Primary<#>X/Y/Intensity attributes.
+    cc_id = Clusters.ColorControl.id
+    cc_attr = Clusters.ColorControl.Attributes
+    affected_attributes = [cc_attr.Primary1X,
+                           cc_attr.Primary1Y,
+                           cc_attr.Primary1Intensity,
+                           cc_attr.Primary2X,
+                           cc_attr.Primary2Y,
+                           cc_attr.Primary2Intensity,
+                           cc_attr.Primary3X,
+                           cc_attr.Primary3Y,
+                           cc_attr.Primary3Intensity,
+                           cc_attr.Primary4X,
+                           cc_attr.Primary4Y,
+                           cc_attr.Primary4Intensity,
+                           cc_attr.Primary5X,
+                           cc_attr.Primary5Y,
+                           cc_attr.Primary5Intensity,
+                           cc_attr.Primary6X,
+                           cc_attr.Primary6Y,
+                           cc_attr.Primary6Intensity,
+                           ]
+    for a in affected_attributes:
+        clusters[cc_id].attributes[a.attribute_id].conformance = optional()
 
     # Workaround for temp control cluster - this is parsed incorrectly in the DM XML and is missing all its attributes
     # Remove this workaround when https://github.com/csa-data-model/projects/issues/330 is fixed
@@ -511,12 +541,6 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             0x04: XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
             0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
         }
-
-    # Workaround for incorrect parsing of access control cluster.
-    # Remove this workaround when https://github.com/csa-data-model/projects/issues/397 is fixed.
-    acl_id = Clusters.AccessControl.id
-    clusters[acl_id].attributes[Clusters.AccessControl.Attributes.Acl.attribute_id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
-    clusters[acl_id].attributes[Clusters.AccessControl.Attributes.Extension.attribute_id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
 
     check_clusters_for_unknown_commands(clusters, problems)
 

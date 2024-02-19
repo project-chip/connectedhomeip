@@ -477,7 +477,7 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
         }
         if (ssid.size() > DeviceLayer::Internal::kMaxWiFiSSIDLength)
         {
-            // This should not happen, it means it's a broken driver.
+            // Clients should never use too large a SSID.
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
             SetLastNetworkingStatusValue(MakeNullable(Status::kUnknownError));
             return;
@@ -491,10 +491,10 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     }
     else if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
-        // Not allowed to populate SSID for Thread.
-        if (!req.ssid.HasValue())
+        // SSID present on Thread violates the `[WI]` conformance.
+        if (req.ssid.HasValue())
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
             return;
         }
 
@@ -559,7 +559,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
             return;
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
         return;
     }
 
@@ -1202,11 +1202,16 @@ void Instance::OnFailSafeTimerExpired()
     mpWirelessDriver->RevertConfiguration();
     mAsyncCommandHandle.Release();
 
-    // Reset state on failsafe expiry.
+    // Mark the network list changed since `mpWirelessDriver->RevertConfiguration()` may have updated it.
     ReportNetworksListChanged();
-    SetLastNetworkId(ByteSpan{});
-    SetLastConnectErrorValue(NullNullable);
-    SetLastNetworkingStatusValue(NullNullable);
+
+    // If no networks are left, clear-out errors;
+    if (mpBaseDriver && (CountAndRelease(mpBaseDriver->GetNetworks()) == 0))
+    {
+        SetLastNetworkId(ByteSpan{});
+        SetLastConnectErrorValue(NullNullable);
+        SetLastNetworkingStatusValue(NullNullable);
+    }
 }
 
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)

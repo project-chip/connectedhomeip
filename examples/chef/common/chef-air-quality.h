@@ -22,10 +22,10 @@
 #include <lib/core/DataModelTypes.h>
 
 #ifdef MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
-Protocols::InteractionModel::Status chefAirQualityWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                const EmberAfAttributeMetadata * attributeMetadata,
-                                                                uint8_t * buffer);
-Protocols::InteractionModel::Status chefAirQualityReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                               const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                               uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status chefAirQualityWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                      const EmberAfAttributeMetadata * attributeMetadata,
+                                                                      uint8_t * buffer);
+chip::Protocols::InteractionModel::Status chefAirQualityReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                     const EmberAfAttributeMetadata * attributeMetadata,
+                                                                     uint8_t * buffer, uint16_t maxReadLength);
 #endif

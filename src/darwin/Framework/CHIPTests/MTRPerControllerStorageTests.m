@@ -22,6 +22,7 @@
 #import "MTRDeviceTestDelegate.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
@@ -32,28 +33,6 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
-
-#ifdef DEBUG
-// MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
-@protocol MTRDeviceControllerDataStoreAttributeStoreMethods
-- (nullable NSArray<NSDictionary *> *)getStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
-- (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)clearAllStoredAttributes;
-@end
-
-// Declare internal methods for testing
-@interface MTRDeviceController (Test)
-+ (void)forceLocalhostAdvertisingOnly;
-- (void)removeDevice:(MTRDevice *)device;
-@property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
-@end
-
-@interface MTRDevice (Test)
-- (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
-- (NSUInteger)unitTestAttributesReportedSinceLastCheck;
-@end
-#endif // DEBUG
 
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
