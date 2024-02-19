@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -74,7 +74,7 @@ public:
      * @param mode The mode for which to search the ModeOptionStruct.
      * @param dataPtr The pointer to receive the ModeOptionStruct, if one is found.
      * @return Status::Success if successfully found the option. Otherwise, returns appropriate status code (found in
-     * <app/util/af-enums.h>)
+     * <protocols/interaction_model/StatusCodeList.h>)
      */
     virtual Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
                                                                     const ModeOptionStructType ** dataPtr) const = 0;

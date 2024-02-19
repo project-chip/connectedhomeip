@@ -34,7 +34,7 @@ namespace chip {
 namespace AppPlatform {
 
 using CommandHandlerInterface    = chip::app::CommandHandlerInterface;
-using Status                     = Protocols::InteractionModel::Status;
+using Status                     = chip::Protocols::InteractionModel::Status;
 using LaunchResponseType         = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
 using PlaybackResponseType       = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
 using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
@@ -64,13 +64,6 @@ public:
         InitializeJNIObjects(manager);
     };
 
-    ~ContentAppCommandDelegate()
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentAppEndpointManager"));
-        env->DeleteGlobalRef(mContentAppEndpointManager);
-    }
-
     void InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext) override;
 
     Status InvokeCommand(EndpointId epId, ClusterId clusterId, CommandId commandId, std::string payload, bool & commandHandled,
@@ -87,9 +80,8 @@ private:
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentAppEndpointManager"));
 
-        mContentAppEndpointManager = env->NewGlobalRef(manager);
-        VerifyOrReturn(mContentAppEndpointManager != nullptr,
-                       ChipLogError(Zcl, "Failed to NewGlobalRef ContentAppEndpointManager"));
+        VerifyOrReturn(mContentAppEndpointManager.Init(manager) == CHIP_NO_ERROR,
+                       ChipLogError(Zcl, "Failed to init mContentAppEndpointManager"));
 
         jclass ContentAppEndpointManagerClass = env->GetObjectClass(manager);
         VerifyOrReturn(ContentAppEndpointManagerClass != nullptr,
@@ -106,8 +98,8 @@ private:
 
     void FormatResponseData(CommandHandlerInterface::HandlerContext & handlerContext, const char * response);
 
-    jobject mContentAppEndpointManager = nullptr;
-    jmethodID mSendCommandMethod       = nullptr;
+    chip::JniGlobalReference mContentAppEndpointManager;
+    jmethodID mSendCommandMethod = nullptr;
 };
 
 } // namespace AppPlatform

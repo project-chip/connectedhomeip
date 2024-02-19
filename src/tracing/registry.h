@@ -76,6 +76,8 @@ namespace Internal {
 void Begin(const char * label, const char * group);
 void End(const char * label, const char * group);
 void Instant(const char * label, const char * group);
+void Counter(const char * label);
+void Metric(const char * label, int32_t value);
 
 void LogMessageSend(::chip::Tracing::MessageSendInfo & info);
 void LogMessageReceived(::chip::Tracing::MessageReceivedInfo & info);

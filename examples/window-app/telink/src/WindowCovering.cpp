@@ -59,8 +59,10 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
-    VerifyOrReturn(Attributes::TargetPositionLiftPercent100ths::Get(Endpoint(), target) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) ==
+                   chip::Protocols::InteractionModel::Status::Success);
+    VerifyOrReturn(Attributes::TargetPositionLiftPercent100ths::Get(Endpoint(), target) ==
+                   chip::Protocols::InteractionModel::Status::Success);
 
     UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
 
@@ -70,7 +72,8 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     // assume single move completed
     Instance().mInLiftMove = false;
 
-    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), current) ==
+                   chip::Protocols::InteractionModel::Status::Success);
 
     if (!TargetCompleted(WindowCoveringType::Lift, current, target))
     {
@@ -86,7 +89,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
 
 chip::Percent100ths WindowCovering::CalculateSingleStep(WindowCoveringType aMoveType)
 {
-    EmberAfStatus status{};
+    chip::Protocols::InteractionModel::Status status{};
     chip::Percent100ths percent100ths{};
     NPercent100ths current{};
     OperationalState opState = OperationalState::Stall;
@@ -102,7 +105,7 @@ chip::Percent100ths WindowCovering::CalculateSingleStep(WindowCoveringType aMove
         opState = OperationalStateGet(Endpoint(), OperationalStatus::kTilt);
     }
 
-    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+    if ((status == chip::Protocols::InteractionModel::Status::Success) && !current.IsNull())
     {
         percent100ths = ComputePercent100thsStep(opState, current.Value(), sPercentDelta);
     }
@@ -152,8 +155,10 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     NPercent100ths target{};
     NPercent100ths positionToSet{};
 
-    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
-    VerifyOrReturn(Attributes::TargetPositionTiltPercent100ths::Get(Endpoint(), target) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) ==
+                   chip::Protocols::InteractionModel::Status::Success);
+    VerifyOrReturn(Attributes::TargetPositionTiltPercent100ths::Get(Endpoint(), target) ==
+                   chip::Protocols::InteractionModel::Status::Success);
 
     UpdateOperationalStatus(WindowCoveringType::Lift, ComputeOperationalState(target, current));
 
@@ -163,7 +168,8 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     // assume single move completed
     Instance().mInTiltMove = false;
 
-    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) == EMBER_ZCL_STATUS_SUCCESS);
+    VerifyOrReturn(Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), current) ==
+                   chip::Protocols::InteractionModel::Status::Success);
 
     if (!TargetCompleted(WindowCoveringType::Tilt, current, target))
     {
@@ -225,7 +231,7 @@ void WindowCovering::UpdateOperationalStatus(WindowCoveringType aMoveType, Opera
 
 void WindowCovering::SetTargetPosition(OperationalState aDirection, chip::Percent100ths aPosition)
 {
-    EmberAfStatus status{};
+    chip::Protocols::InteractionModel::Status status{};
     if (Instance().mCurrentUIMoveType == WindowCoveringType::Lift)
     {
         status = Attributes::TargetPositionLiftPercent100ths::Set(Endpoint(), aPosition);
@@ -235,7 +241,7 @@ void WindowCovering::SetTargetPosition(OperationalState aDirection, chip::Percen
         status = Attributes::TargetPositionTiltPercent100ths::Set(Endpoint(), aPosition);
     }
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != chip::Protocols::InteractionModel::Status::Success)
     {
         LOG_ERR("Cannot set the target position. Error: %d", static_cast<uint8_t>(status));
     }
@@ -243,13 +249,13 @@ void WindowCovering::SetTargetPosition(OperationalState aDirection, chip::Percen
 
 void WindowCovering::PositionLEDUpdate(WindowCoveringType aMoveType)
 {
-    EmberAfStatus status{};
+    chip::Protocols::InteractionModel::Status status{};
     NPercent100ths currentPosition{};
 
     if (aMoveType == WindowCoveringType::Lift)
     {
         status = Attributes::CurrentPositionLiftPercent100ths::Get(Endpoint(), currentPosition);
-        if (EMBER_ZCL_STATUS_SUCCESS == status && !currentPosition.IsNull())
+        if (chip::Protocols::InteractionModel::Status::Success == status && !currentPosition.IsNull())
         {
             Instance().SetBrightness(WindowCoveringType::Lift, currentPosition.Value());
         }
@@ -257,7 +263,7 @@ void WindowCovering::PositionLEDUpdate(WindowCoveringType aMoveType)
     else if (aMoveType == WindowCoveringType::Tilt)
     {
         status = Attributes::CurrentPositionTiltPercent100ths::Get(Endpoint(), currentPosition);
-        if (EMBER_ZCL_STATUS_SUCCESS == status && !currentPosition.IsNull())
+        if (chip::Protocols::InteractionModel::Status::Success == status && !currentPosition.IsNull())
         {
             Instance().SetBrightness(WindowCoveringType::Tilt, currentPosition.Value());
         }

@@ -51,6 +51,11 @@ public class ChipDeviceController {
     return;
   }
 
+  // temp, for kotlin_library
+  public long getDeviceControllerPtr() {
+    return deviceControllerPtr;
+  }
+
   /**
    * Returns a new {@link ChipDeviceController} with the specified parameters. you must set a vendor
    * ID, ControllerParams.newBuilder().setControllerVendorId(0xFFF4).build() 0xFFF4 is a test vendor
@@ -1325,6 +1330,8 @@ public class ChipDeviceController {
   public void shutdownCommissioning() {
     shutdownCommissioning(deviceControllerPtr);
   }
+
+  public static native byte[] validateAndExtractCSR(byte[] csrElements, byte[] csrNonce);
 
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
