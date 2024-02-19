@@ -39,11 +39,11 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
   private final String CHANNEL_ID = "MatterCommissioningPrompter.CHANNEL";
   private final int SUCCESS_ID = 0;
   private final int FAIL_ID = 1;
-  private final VH mHandler;
+  private final MsgHandler mHandler;
   public MatterCommissioningPrompter(Context context) {
     this.context = context;
     this.createNotificationChannel();
-    mHandler = new VH(this);
+    mHandler = new MsgHandler(this);
   }
 
   public void promptForCommissionOkPermission(
@@ -59,10 +59,8 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
                     + commissioneeName);
 
     Message message = Message.obtain();
-    message.arg1 = vendorId;
-    message.arg2 = productId;
     message.obj = commissioneeName;
-    message.what = 101;
+    message.what = MsgHandler.MSG_CommissionOkPermission;
     mHandler.sendMessage(message);
   }
 
@@ -156,10 +154,10 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
     }
   }
 
-  static class VH extends Handler{
-
+  static class MsgHandler extends Handler{
+    private static final int MSG_CommissionOkPermission = 101;
     private final WeakReference<MatterCommissioningPrompter> mPrompterWeakReference;
-    public VH(MatterCommissioningPrompter commissioningPrompter){
+    public MsgHandler(MatterCommissioningPrompter commissioningPrompter){
       super(Looper.getMainLooper());
       mPrompterWeakReference = new WeakReference<>(commissioningPrompter);
     }
