@@ -61,6 +61,8 @@ public:
 
     System::Clock::Milliseconds16 GetActiveModeThreshold() { return mActiveThreshold; }
 
+    System::Clock::Milliseconds32 GetMaxStayActiveDuration() { return kMaxStayActiveDuration; }
+
     Protocols::SecureChannel::CheckInCounter & GetICDCounter() { return mICDCounter; }
 
     uint16_t GetClientsSupportedPerFabric() { return mFabricClientsSupported; }
@@ -123,6 +125,8 @@ private:
 
     static constexpr System::Clock::Seconds32 kMaxIdleModeDuration = System::Clock::Seconds32(18 * kSecondsPerHour);
     static constexpr System::Clock::Seconds32 kMinIdleModeDuration = System::Clock::Seconds32(1);
+    // As defined in the spec, the maximum duration for the StayActiveDuration is 30s (spec 7.5.1)
+    static constexpr System::Clock::Milliseconds32 kMaxStayActiveDuration = System::Clock::Milliseconds32(30000);
 
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= kMaxIdleModeDuration.count(),
                   "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");

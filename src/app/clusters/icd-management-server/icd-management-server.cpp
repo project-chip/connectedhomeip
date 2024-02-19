@@ -364,14 +364,6 @@ void ICDManagementServer::TriggerICDMTableUpdatedEvent()
 
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-Status ICDManagementServer::StayActiveRequest(FabricIndex fabricIndex)
-{
-    // TODO: Implementent stay awake logic for end device
-    // https://github.com/project-chip/connectedhomeip/issues/24259
-    ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kStayActiveRequestReceived);
-    return InteractionModel::Status::UnsupportedCommand;
-}
-
 void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
                                ICDConfigurationData & icdConfigurationData)
 {
@@ -433,10 +425,15 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * comman
 bool emberAfIcdManagementClusterStayActiveRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           const Commands::StayActiveRequest::DecodableType & commandData)
 {
-    ICDManagementServer server;
-    InteractionModel::Status status = server.StayActiveRequest(commandObj->GetAccessingFabricIndex());
-
-    commandObj->AddStatus(commandPath, status);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    IcdManagement::Commands::StayActiveResponse::Type response;
+    response.promisedActiveDuration = Server::GetInstance().GetICDManager().StayActiveRequest(commandData.stayActiveDuration);
+    commandObj->AddResponse(commandPath, response);
+#else
+    // Note: We only keep this line around for platforms examples that enable the ICD management server without building the sample
+    // as an ICD.
+    commandObj->AddStatus(commandPath, InteractionModel::Status::UnsupportedCommand);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     return true;
 }
 

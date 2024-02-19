@@ -65,6 +65,7 @@ public:
     CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) override;
+    Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
@@ -87,18 +88,33 @@ public:
     void EventLoopEnds() override {}
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
-    dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
+    void SetDispatchQueue(dispatch_queue_t dispatchQueue) override
+    {
+        mDispatchQueue = dispatchQueue;
+    };
+    dispatch_queue_t GetDispatchQueue() override
+    {
+        return mDispatchQueue;
+    };
     void HandleTimerComplete(TimerList::Node * timer);
 #elif CHIP_SYSTEM_CONFIG_USE_LIBEV
-    virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) override { mLibEvLoopP = aLibEvLoopP; };
-    virtual struct ev_loop * GetLibEvLoop() override { return mLibEvLoopP; };
+    virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) override
+    {
+        mLibEvLoopP = aLibEvLoopP;
+    };
+    virtual struct ev_loop * GetLibEvLoop() override
+    {
+        return mLibEvLoopP;
+    };
     static void HandleLibEvTimer(EV_P_ struct ev_timer * t, int revents);
     static void HandleLibEvIoWatcher(EV_P_ struct ev_io * i, int revents);
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
     // Expose the result of WaitForEvents() for non-blocking socket implementations.
-    bool IsSelectResultValid() const { return mSelectResult >= 0; }
+    bool IsSelectResultValid() const
+    {
+        return mSelectResult >= 0;
+    }
 
 protected:
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
