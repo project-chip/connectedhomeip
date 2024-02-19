@@ -36,7 +36,7 @@
 #include "em_ldma.h"
 #include "gpiointerrupt.h"
 #include "spidrv.h"
-
+#include "sl_board_control.h"
 #include "sl_device_init_clocks.h"
 #include "sl_device_init_hfxo.h"
 #include "sl_spidrv_instances.h"
@@ -47,9 +47,6 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
-#define DEFAULT_SPI_TRASFER_MODE 0
-// Macro to drive semaphore block minimun timer in milli seconds
-#define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS (50)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif
@@ -62,6 +59,7 @@
 #endif // SL_BTLCTRL_MUX
 #if SL_LCDCTRL_MUX
 #include "sl_memlcd.h"
+#include "sl_memlcd_display.h"
 #endif // SL_LCDCTRL_MUX
 #if SL_MX25CTRL_MUX
 #include "sl_mx25_flash_shutdown_usart_config.h"
@@ -70,21 +68,27 @@
 #if defined(EFR32MG12)
 #include "em_usart.h"
 
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
+#include "sl_spidrv_exp_config.h"
 
 #elif defined(EFR32MG24)
 #include "em_eusart.h"
 #include "sl_spidrv_eusart_exp_config.h"
+#include "spi_multiplex.h"
+#else
+#error "Unknown platform"
+#endif
 
+#if defined(EFR32MG24)
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
 #define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_EUSART_VCOM_BAUDRATE
 #define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
-
-#endif // EFR32MG12 || EFR32MG24
+#endif
 
 #define CONCAT(A, B) (A##B)
 #define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
+// Macro to drive semaphore block minimun timer in milli seconds
+#define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS (50)
 
 #if SL_SPICTRL_MUX
 StaticSemaphore_t spi_sem_peripheral;
@@ -97,15 +101,6 @@ static TaskHandle_t spiInitiatorTaskHandle = NULL;
 
 static uint32_t dummy_buffer; /* Used for DMA - when results don't matter */
 
-#if defined(EFR32MG12)
-#include "sl_spidrv_exp_config.h"
-extern SPIDRV_Handle_t sl_spidrv_exp_handle;
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#elif defined(EFR32MG24)
-#include "spi_multiplex.h"
-#else
-#error "Unknown platform"
-#endif
 
 // variable to identify spi configured for expansion header
 // EUSART configuration available on the SPIDRV
@@ -129,7 +124,7 @@ void sl_wfx_host_gpio_init(void)
 #if defined(EFR32MG24)
     // Set CS pin to high/inactive
     GPIO_PinModeSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN, gpioModePushPull, PINOUT_SET);
-#endif
+#endif // EFR32MG24
 
     GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, PINOUT_SET);
     GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModePushPull, PINOUT_CLEAR);
@@ -171,7 +166,6 @@ void sl_wfx_host_reset_chip(void)
     vTaskDelay(pdMS_TO_TICKS(3));
 }
 
-void gpio_interrupt([[maybe_unused]] uint8_t interrupt_number) {}
 
 /*****************************************************************
  * @fn   void rsi_hal_board_init(void)
@@ -201,26 +195,14 @@ void rsi_hal_board_init(void)
     sl_wfx_host_reset_chip();
 }
 
-void sl_si91x_host_enable_high_speed_bus()
-{
-    // dummy function for wifi-sdk
-}
 
 #if SL_SPICTRL_MUX
-void SPIDRV_SetBaudrate(uint32_t baudrate)
-{
-    if (EUSART_BaudrateGet(MY_USART) == baudrate)
-    {
-        // EUSART synced to baudrate already
-        return;
-    }
-    EUSART_BaudrateSet(MY_USART, 0, baudrate);
-}
 
 sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
+#if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
-
+#endif
     if (!spi_enabled) // Reduce sl_spidrv_init_instances
     {
         sl_spidrv_init_instances();
@@ -320,12 +302,9 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
 #if SL_SPICTRL_MUX
-    if (sl_wfx_host_spi_cs_deassert() != SL_STATUS_OK)
-    {
-        return SL_STATUS_FAIL;
-    }
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
+    sl_board_enable_display();
     // sl_memlcd_refresh takes care of SPIDRV_Init()
     if (SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get()))
     {
@@ -343,6 +322,7 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
     GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+    sl_board_disable_display();
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
