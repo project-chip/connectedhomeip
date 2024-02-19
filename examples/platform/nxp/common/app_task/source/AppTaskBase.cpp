@@ -212,6 +212,13 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
+    // QR code will be used with CHIP Tool
+#if CONFIG_NETWORK_LAYER_BLE
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+#else
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+#endif /* CONFIG_NETWORK_LAYER_BLE */
+
     /* Start a task to run the CHIP Device event loop. */
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
