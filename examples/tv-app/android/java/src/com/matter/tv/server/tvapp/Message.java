@@ -17,7 +17,6 @@
  */
 package com.matter.tv.server.tvapp;
 
-
 public class Message {
 
   public String messageId;
