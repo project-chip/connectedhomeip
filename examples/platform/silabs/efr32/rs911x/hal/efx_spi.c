@@ -35,12 +35,12 @@
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "gpiointerrupt.h"
-#include "spidrv.h"
 #include "sl_board_control.h"
 #include "sl_device_init_clocks.h"
 #include "sl_device_init_hfxo.h"
 #include "sl_spidrv_instances.h"
 #include "sl_status.h"
+#include "spidrv.h"
 
 #include "silabs_utils.h"
 #include "spi_multiplex.h"
@@ -67,9 +67,8 @@
 
 #if defined(EFR32MG12)
 #include "em_usart.h"
-
 #include "sl_spidrv_exp_config.h"
-
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
 #elif defined(EFR32MG24)
 #include "em_eusart.h"
 #include "sl_spidrv_eusart_exp_config.h"
@@ -100,7 +99,6 @@ static SemaphoreHandle_t spiTransferLock;
 static TaskHandle_t spiInitiatorTaskHandle = NULL;
 
 static uint32_t dummy_buffer; /* Used for DMA - when results don't matter */
-
 
 // variable to identify spi configured for expansion header
 // EUSART configuration available on the SPIDRV
@@ -166,7 +164,6 @@ void sl_wfx_host_reset_chip(void)
     vTaskDelay(pdMS_TO_TICKS(3));
 }
 
-
 /*****************************************************************
  * @fn   void rsi_hal_board_init(void)
  * @brief
@@ -194,7 +191,6 @@ void rsi_hal_board_init(void)
     /* Reset of Wifi chip */
     sl_wfx_host_reset_chip();
 }
-
 
 #if SL_SPICTRL_MUX
 
