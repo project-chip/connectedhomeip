@@ -23,28 +23,10 @@
 
 #include <lib/core/CHIPError.h>
 #include <system/SystemClock.h>
+#include <tracing/metric_keys.h>
 
 namespace chip {
 namespace Tracing {
-
-/**
- * Defines the key type use to identity a specific metric
- */
-typedef const char* MetricKey;
-
-/**
- * List of supported metric keys
- */
-constexpr MetricKey kMetricDiscoveryOverBLE = "disc-over-ble";
-constexpr MetricKey kMetricDiscoveryOnNetwork = "disc-on-nw";
-constexpr MetricKey kMetricPASESession = "pase-session";
-constexpr MetricKey kMetricPASESessionPair = "pase-session-pair";
-constexpr MetricKey kMetricPASESessionBLE = "pase-session-ble";
-constexpr MetricKey kMetricAttestationResult = "attestation-result";
-constexpr MetricKey kMetricAttestationOverridden = "attestation-overridden";
-constexpr MetricKey kMetricCASESession = "case-session";
-constexpr MetricKey kMetricCASESessionEstState = "case-conn-est";
-constexpr MetricKey kMetricWiFiRSSI = "wifi-rssi";
 
 /**
  * Define a metric that can be logged. A metric consists of a key-value pair. The value is
@@ -64,25 +46,29 @@ struct MetricEvent
 
     // Value for the metric
     struct Value {
-        enum class ValueType {
-            SignedValue,
-            UnsignedValue,
-            ErrorValue
+        enum class Type : uint8_t {
+            Signed32Type,       // int32_t
+            Unsigned32Type,     // uint32_t
+            ChipErrorType       // chip::ChipError
         };
 
-        union ValueStore {
-            uint32_t uvalue;
-            int32_t svalue;
-            ValueStore(uint32_t v) : uvalue(v) {}
-            ValueStore(int32_t v) : svalue(v) {}
-        } store;
-        ValueType type;
+        union Store {
+            int32_t int32_value;
+            uint32_t uint32_value;
 
-        Value(uint32_t value) : store(value), type(ValueType::UnsignedValue) {}
+            Store(int32_t v) : int32_value(v) {}
 
-        Value(int32_t value) : store(value), type(ValueType::SignedValue) {}
+            Store(uint32_t v) : uint32_value(v) {}
+        };
 
-        Value(const ChipError & err) : store(err.AsInteger()), type(ValueType::ErrorValue) {}
+        Store store;
+        Type type;
+
+        Value(uint32_t value) : store(value), type(Type::Unsigned32Type) {}
+
+        Value(int32_t value) : store(value), type(Type::Signed32Type) {}
+
+        Value(const ChipError & err) : store(err.AsInteger()), type(Type::ChipErrorType) {}
     };
 
     Tag tag;
@@ -90,11 +76,11 @@ struct MetricEvent
     Value value;
     System::Clock::Microseconds64 timePoint;
 
-    MetricEvent(Tag tg, MetricKey k, uint32_t val = 0)
+    MetricEvent(Tag tg, MetricKey k, int32_t val = 0)
         : tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 
-    MetricEvent(Tag tg, MetricKey k, int32_t val)
+    MetricEvent(Tag tg, MetricKey k, uint32_t val)
         : tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 
@@ -108,14 +94,17 @@ namespace Internal {
 void LogEvent(::chip::Tracing::MetricEvent & event);
 
 } // namespace Internal
-  //
+
 namespace utils {
 
+/**
+ * Utility to emit an instant metric if the error is not a success. Used in SuccessOrExit macro
+ * to allow emitting the event before jumping to the exit label.
+ */
 inline bool logMetricIfError(const ::chip::ChipError& err, MetricKey metricKey)
 {
     bool success = ::chip::ChipError::IsSuccess(err);
-    if (!success)
-    {
+    if (!success) {
         using Tag = chip::Tracing::MetricEvent::Tag;
         ::chip::Tracing::MetricEvent _metric_event(Tag::Instant, metricKey, err);
         ::chip::Tracing::Internal::LogEvent(_metric_event);

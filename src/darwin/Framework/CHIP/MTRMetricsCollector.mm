@@ -49,11 +49,11 @@ void InitializeMetricsCollection()
         return nil;
     }
 
-    if (event.value.type == MetricEvent::Value::ValueType::SignedValue) {
-        _value = [NSNumber numberWithInteger:event.value.store.svalue];
+    if (event.value.type == MetricEvent::Value::Type::Signed32Type) {
+        _value = [NSNumber numberWithInteger:event.value.store.int32_value];
     }
     else {
-        _value = [NSNumber numberWithUnsignedInteger:event.value.store.uvalue];
+        _value = [NSNumber numberWithUnsignedInteger:event.value.store.uint32_value];
     }
     _timePoint = event.timePoint;
     _duration = chip::System::Clock::Microseconds64(0);
@@ -132,7 +132,7 @@ void InitializeMetricsCollection()
     return self;
 }
 
-static NSString * suffixNameForMetricTag(MetricEvent::Tag tag)
+static inline NSString * suffixNameForMetricTag(MetricEvent::Tag tag)
 {
     switch (tag) {
         case MetricEvent::Tag::Begin: return @"-begin";
@@ -148,9 +148,14 @@ static inline NSString * suffixNameForMetricTag(const MetricEvent & event)
 
 - (void)handleMetricEvent:(MetricEvent)event
 {
-    MTR_LOG_INFO("Received metric event, type: %s, value: %u", event.key, event.value.store.uvalue);
+    MTR_LOG_INFO("Received metric event, key: %s, type: %hhu value: %d",
+                  event.key,
+                  event.value.type,
+                  (event.value.type == MetricEvent::Value::Type::Signed32Type) ? event.value.store.int32_value : event.value.store.uint32_value);
+
     std::lock_guard lock(_lock);
 
+    // Create the new metric key based event type
     auto metricsKey = [NSString stringWithFormat:@"%s%@", event.key, suffixNameForMetricTag(event)];
     MTRMetricsData *data = [[MTRMetricsData alloc] initWithMetricEvent:event];
 
@@ -162,6 +167,7 @@ static inline NSString * suffixNameForMetricTag(const MetricEvent & event)
             [data setDurationFromMetricData:beginMetric];
         }
         else {
+            // Unbalanced end
             MTR_LOG_ERROR("Unable to find Begin event corresponding to Metric Event: %s", event.key);
         }
     }

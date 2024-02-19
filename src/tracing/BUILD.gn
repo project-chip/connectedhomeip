@@ -51,6 +51,7 @@ source_set("metrics") {
   sources = [
     "metric_event.h",
     "metric_macros.h",
+    "metric_keys.h",
   ]
 
   public_deps = [
