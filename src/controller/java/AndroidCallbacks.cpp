@@ -281,9 +281,8 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
 
     jobject nodeState = GetNodeStateObj(env, mNodeStateClassSignature, wrapperCallback);
-    if (aStatus.IsFailure())
+
     {
-        ChipLogError(Controller, "Receive bad status %s", ErrorStr(aStatus.ToChipError()));
         // Add Attribute Status to wrapperCallback
         jmethodID addAttributeStatusMethod = nullptr;
         err = JniReferences::GetInstance().FindMethod(env, nodeState, "addAttributeStatus", "(IJJILjava/lang/Integer;)V",
@@ -305,8 +304,10 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
                             static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId),
                             static_cast<jint>(aStatus.mStatus), jClusterState);
         VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-        return;
     }
+
+    VerifyOrReturn(aStatus.IsSuccess(), ChipLogError(Controller, "Receive bad status %s", ErrorStr(aStatus.ToChipError()));
+                   aPath.LogPath());
     VerifyOrReturn(apData != nullptr, ChipLogError(Controller, "Receive empty apData"); aPath.LogPath());
 
     TLV::TLVReader readerForJavaTLV;
@@ -415,9 +416,8 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
                    ChipLogError(Controller, "mReportCallbackRef is not valid in %s", __func__));
     jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
     jobject nodeState       = GetNodeStateObj(env, mNodeStateClassSignature, wrapperCallback);
-    if (apStatus != nullptr && apStatus->IsFailure())
+    if (apStatus != nullptr)
     {
-        ChipLogError(Controller, "Receive bad status %s", ErrorStr(apStatus->ToChipError()));
         // Add Event Status to NodeState
         jmethodID addEventStatusMethod;
         err = JniReferences::GetInstance().FindMethod(env, nodeState, "addEventStatus", "(IJJILjava/lang/Integer;)V",
@@ -669,23 +669,27 @@ void WriteAttributesCallback::OnResponse(const app::WriteClient * apWriteClient,
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
-
-    if (aStatus.mStatus != Protocols::InteractionModel::Status::Success)
-    {
-        ReportError(&aPath, aStatus.mStatus);
-        return;
-    }
-
     jmethodID onResponseMethod;
     VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
                    ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s", __func__));
     jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
-    err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "onResponse", "(IJJ)V", &onResponseMethod);
+    err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "onResponse", "(IJJILjava/lang/Integer;)V",
+                                                  &onResponseMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
+
+    jobject jClusterState = nullptr;
+    if (aStatus.mClusterStatus.HasValue())
+    {
+        err = JniReferences::GetInstance().CreateBoxedObject<jint>(
+            "java/lang/Integer", "(I)V", static_cast<jint>(aStatus.mClusterStatus.Value()), jClusterState);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Controller, "Could not CreateBoxedObject with error %" CHIP_ERROR_FORMAT, err.Format()));
+    }
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(wrapperCallback, onResponseMethod, static_cast<jint>(aPath.mEndpointId),
-                        static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId));
+                        static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), aStatus.mStatus,
+                        jClusterState);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 

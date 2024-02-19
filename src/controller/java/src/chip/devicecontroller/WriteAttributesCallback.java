@@ -18,6 +18,7 @@
 package chip.devicecontroller;
 
 import chip.devicecontroller.model.ChipAttributePath;
+import chip.devicecontroller.model.Status;
 import javax.annotation.Nullable;
 
 /** An interface for receiving write response. */
@@ -40,8 +41,9 @@ public interface WriteAttributesCallback {
    * path.
    *
    * @param attributePath The attribute path field in write response.
+   * @param status The status field in write response.
    */
-  void onResponse(ChipAttributePath attributePath);
+  void onResponse(ChipAttributePath attributePath, Status status);
 
   default void onDone() {}
 }

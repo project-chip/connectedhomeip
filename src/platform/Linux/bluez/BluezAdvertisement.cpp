@@ -65,7 +65,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
     // and the flag is necessary to force using LE transport.
     bluez_leadvertisement1_set_discoverable(adv, TRUE);
-    bluez_leadvertisement1_set_discoverable_timeout(adv, 0 /* infinite */);
+    // empty discoverable timeout for infinite discoverability
 
     // empty includes
     bluez_leadvertisement1_set_local_name(adv, mAdvName);
