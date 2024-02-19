@@ -44,72 +44,75 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.IcdManagement.Attributes
-        activeModeDuration = 0
-        activeModeThreshold = 0
-        clientsSupportedPerFabric = 0
         userActiveModeTriggerHintBitmapMatch = False
         uint16Max = 65535
         uint32Max = 4294967295
+        feature_map = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        isCIP = feature_map & Clusters.IcdManagement.Bitmaps.Feature.kCheckInProtocolSupport
+        isUAT = feature_map & Clusters.IcdManagement.Bitmaps.Feature.kUserActiveModeTrigger
+        isLITS = feature_map & Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
+
+        if isLITS:
+            asserts.assert_true(isCIP and self.check_pics("ICDM.S.F00"), "CheckInProtocolSupport is a mandatory feature if LongIdleTimeSupport is set and must be present in the PICS file")
+            asserts.assert_true(isUAT and self.check_pics("ICDM.S.F01"), "UserActiveModeTrigger is a mandatory feature if LongIdleTimeSupport is set and must be present in the PICS file")
+            asserts.assert_true(self.check_pics("ICDM.S.F02"), "LongIdleTimeSupport is a mandatory feature if LongIdleTimeSupport is set and must be present in the PICS file")
 
         # Active Mode Threshold attribute test
-        if self.check_pics("ICDM.S.A0002"):
-            self.print_step(2, "Read ActiveModeThreshold Attribute")
-
-            activeModeThreshold = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.ActiveModeThreshold)
-            asserts.assert_true(0 <= activeModeThreshold <= uint16Max, "ActiveModeThreshold attribute does not fit in a uint16.")
-        else:
-            asserts.assert_true(False, "ActiveModeThreshold is a mandatory attribute and must be present in the PICS file")
+        self.print_step(2, "Read activeModeThreshold Attribute")
+        asserts.assert_true(self.check_pics("ICDM.S.A0002"), "ActiveModeThreshold is a mandatory attribute and must be present in the PICS file")
+        ActiveModeThresholdMin = 5 if isLITS else 0
+        activeModeThreshold = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.ActiveModeThreshold)
+        logger.info(f"ActiveModeThreshold: {activeModeThreshold}")
+        asserts.assert_true(ActiveModeThresholdMin <= activeModeThreshold <= uint16Max, "ActiveModeThreshold attribute does not fit in a uint16.")
 
         # Active Mode Duration attribute test
-        if self.check_pics("ICDM.S.A0001"):
-            self.print_step(3, "Read ActiveModeDuration Attribute")
-
-            activeModeDuration = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.ActiveModeDuration)
-            asserts.assert_true(0 <= activeModeDuration <= uint32Max, "ActiveModeDuration attribute does not fit in a uint32.")
-            asserts.assert_not_equal(activeModeDuration, activeModeThreshold, "ActiveModeDuration includes the ActiveModeThreshold.")
-        else:
-            asserts.assert_true(False, "ActiveModeDuration is a mandatory attribute and must be present in the PICS file")
+        self.print_step(3, "Read ActiveModeDuration Attribute")
+        asserts.assert_true(self.check_pics("ICDM.S.A0001"), "ActiveModeDuration is a mandatory attribute and must be present in the PICS file")
+        activeModeDuration = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.ActiveModeDuration)
+        logger.info(f"ActiveModeDuration: {activeModeDuration}")
+        asserts.assert_true(0 <= activeModeDuration <= uint32Max, "ActiveModeDuration attribute does not fit in a uint32.")
+        asserts.assert_not_equal(activeModeDuration, activeModeThreshold, "ActiveModeDuration includes the ActiveModeThreshold.")
 
         # Idle Mode Duration attribute test
-        if self.check_pics("ICDM.S.A0000"):
-            self.print_step(4, "Read IdleModeDuration Attribute")
+        self.print_step(4, "Read IdleModeDuration Attribute")
+        asserts.assert_true(self.check_pics("ICDM.S.A0000"), "IdleModeDuration is a mandatory attribute and must be present in the PICS file")
+        idleModeDuration = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.IdleModeDuration)
+        logger.info(f"IdleModeDuration: {idleModeDuration}")
+        asserts.assert_true(0 <= activeModeDuration <= uint32Max, "IdleModeDuration attribute does not fit in a uint32.")
+        asserts.assert_greater_equal(idleModeDuration, 1, "IdleModeDuration attribute is smaller than minimum value (1).")
+        asserts.assert_less_equal(idleModeDuration, 64800, "IdleModeDuration attribute is greater than maximum value (64800).")
+        asserts.assert_greater_equal(idleModeDuration, activeModeDuration, "IdleModeDuration attribute is less than ActiveModeDuration.")
 
-            idleModeDuration = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.IdleModeDuration)
-            asserts.assert_true(0 <= activeModeDuration <= uint32Max, "IdleModeDuration attribute does not fit in a uint32.")
-            asserts.assert_greater_equal(idleModeDuration, 1, "IdleModeDuration attribute is smaller than minimum value (1).")
-            asserts.assert_less_equal(idleModeDuration, 64800, "IdleModeDuration attribute is greater than maximum value (64800).")
-            asserts.assert_greater_equal(idleModeDuration, activeModeDuration, "IdleModeDuration attribute is less than ActiveModeDuration.")
-        else:
-            asserts.assert_true(False, "IdleModeDuration is a mandatory attribute and must be present in the PICS file")
-
-        # ClientsSupportedPerFabric attribute test
-        if self.check_pics("ICDM.S.A0005"):
+        if isCIP:
+            # ClientsSupportedPerFabric attribute test
             self.print_step(5, "Read ClientsSupportedPerFabric Attribute")
-
+            asserts.assert_true(self.check_pics("ICDM.S.A0005"), "ClientsSupportedPerFabric is a mandatory attribute if CheckInProtocolSupport feature is set and must be present in the PICS file")
             clientsSupportedPerFabric = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.ClientsSupportedPerFabric)
-            asserts.assert_true(0 <= clientsSupportedPerFabric <= uint16Max, "ActiveModeThreshold ClientsSupportedPerFabric does not fit in a uint16.")
+            logger.info(f"ClientsSupportedPerFabric: {clientsSupportedPerFabric}")
+            asserts.assert_true(0 <= clientsSupportedPerFabric <= uint16Max, "ClientsSupportedPerFabric attribute does not fit in a uint16.")
             asserts.assert_greater_equal(clientsSupportedPerFabric, 1, "ClientsSupportedPerFabric attribute is smaller than minimum value (1).")
 
-        # RegisteredClients attribute test
-        if self.check_pics("ICDM.S.A0003"):
+            # RegisteredClients attribute test
             self.print_step(6, "Read RegisteredClients Attribute")
-
+            asserts.assert_true(self.check_pics("ICDM.S.A0003"), "RegisteredClients is a mandatory attribute if CheckInProtocolSupport feature is set and must be present in the PICS file")
             registeredClients = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.RegisteredClients)
+            logger.info(f"RegisteredClients: {registeredClients}")
             asserts.assert_less_equal(len(registeredClients), clientsSupportedPerFabric, "Number of RegisteredClients is greater than ClientsSupportedPerFabric.")
 
-        # ICDCounter attribute test
-        if self.check_pics("ICDM.S.A0004"):
+            # ICDCounter attribute test
             self.print_step(7, "Read ICDCounter Attribute")
-
+            asserts.assert_true(self.check_pics("ICDM.S.A0004"), "ICDCounter is a mandatory attribute if CheckInProtocolSupport feature is set and must be present in the PICS file")
             ICDCounter = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.ICDCounter)
+            logger.info(f"ICDCounter: {ICDCounter}")
             asserts.assert_true(0 <= ICDCounter <= uint32Max, "ICDCounter attribute does not fit in a uint32.")
 
-        # ICDCounter attribute test
-        if self.check_pics("ICDM.S.A0006"):
+        if isUAT:
+            # UserActiveModeTriggerHint attribute test
             self.print_step(8, "Read UserActiveModeTriggerHint Attribute")
-
+            asserts.assert_true(self.check_pics("ICDM.S.A0006"), "UserActiveModeTriggerHint is a mandatory attribute if UserActiveModeTrigger feature is set and must be present in the PICS file")
             userActiveModeTriggerHint = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserActiveModeTriggerHint)
-            asserts.assert_true(0 <= userActiveModeTriggerHint <= 4294967295, "userActiveModeTriggerHint attribute does not fit in a bitmap32.")
+            logger.info(f"UserActiveModeTriggerHint: {userActiveModeTriggerHint}")
+            asserts.assert_true(0 <= userActiveModeTriggerHint <= uint32Max, "UserActiveModeTriggerHint attribute does not fit in a bitmap32.")
 
             userActiveModeTriggerInstructionList = [
                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kCustomInstruction,
@@ -132,14 +135,13 @@ class TC_ICDM_2_1(MatterBaseTest):
                 else:
                     userActiveModeTriggerHintBitmapMatch = True
 
-        if self.check_pics("ICDM.S.A0009"):
+            # UserActiveModeTriggerInstruction attribute test
             self.print_step(9, "Read UserActiveModeTriggerInstruction Attribute")
+            asserts.assert_true(self.check_pics("ICDM.S.A0009"), "UserActiveModeTriggerHint is a mandatory attribute if UserActiveModeTrigger feature is set and must be present in the PICS file")
             userActiveModeTriggerInstruction = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserActiveModeTriggerInstruction)
-
-            asserts.assert_true(userActiveModeTriggerInstruction != NullValue,
-                                "UserActiveModeTriggerInstruction attribute is a null value.")
-            asserts.assert_less_equal(len(str(userActiveModeTriggerInstruction)), 128,
-                                      "")
+            logger.info(f"UserActiveModeTriggerInstruction: {userActiveModeTriggerInstruction}")
+            asserts.assert_true(userActiveModeTriggerInstruction != NullValue, "UserActiveModeTriggerInstruction attribute is a null value.")
+            asserts.assert_less_equal(len(str(userActiveModeTriggerInstruction)), 128, "UserActiveModeTriggerInstruction attribute is longer than 128 characters.")
             if userActiveModeTriggerHintBitmapMatch:
                 userActiveModeTriggerInstructionTypes = {
                     'digit': [
@@ -169,13 +171,17 @@ class TC_ICDM_2_1(MatterBaseTest):
                     asserts.assert_false(str(userActiveModeTriggerInstruction).isdigit(), "userActiveModeTriggerInstruction attribute is not a text string.")
                 elif userActiveModeTriggerInstruction in userActiveModeTriggerInstructionTypes['color']:
                     asserts.assert_false(str(userActiveModeTriggerInstruction).isdigit(), "userActiveModeTriggerInstruction attribute is not a text string (color of LED).")
+                    # TODO: use semi-manual prompt to verify color of LEDs.
                     # colorList = ['white', 'red', 'green', 'blue', 'orange', 'yellow', 'purple']
                     # asserts.assert_true(userActiveModeTriggerInstruction.lower() in colorList, "userActiveModeTriggerInstruction attribute is not in the range of allowed colors")
 
-        if self.check_pics("ICDM.S.A0008"):
-            self.print_step(9, "Read OperatingMode Attribute")
-            OperatingMode = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.OperatingMode)
-            asserts.assert_true(OperatingMode in [0, 1], "OperatingMode attribute does not fit in an enum of 0 or 1.")
+        if isLITS:
+            # OperatingMode attribute test
+            self.print_step(10, "Read OperatingMode Attribute")
+            asserts.assert_true(self.check_pics("ICDM.S.A0008"), "OperatingMode is a mandatory attribute if LongIdleTimeSupport feature is set and must be present in the PICS file")
+            operatingMode = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.OperatingMode)
+            logger.info(f"OperatingMode: {operatingMode}")
+            asserts.assert_true(operatingMode in [0, 1], "OperatingMode attribute does not fit in an enum of 0 or 1.")
 
 
 if __name__ == "__main__":
