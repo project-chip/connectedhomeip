@@ -108,13 +108,13 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
                             continue;
                         }
 
-                        if (ConnectivityManagerImpl::GetWiFiIfName() == nullptr)
+                        if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
                         {
                             ChipLogDetail(DeviceLayer, "No wifi interface name. Ignoring IP update event.");
                             continue;
                         }
 
-                        if (strcmp(name, ConnectivityManagerImpl::GetWiFiIfName()) != 0)
+                        if (strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) != 0)
                         {
                             continue;
                         }
