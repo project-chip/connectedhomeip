@@ -646,6 +646,12 @@ CHIP_ERROR ThreadStackManagerImpl::_RemoveInvalidSrpServices()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_ClearAllSrpHostAndServices()
+{
+    // TODO : could not find info on Tizen thread apis
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 void ThreadStackManagerImpl::_ThreadIpAddressCb(int index, char * ipAddr, thread_ipaddr_type_e ipAddrType, void * userData)
 {
     VerifyOrReturn(ipAddr != nullptr, ChipLogError(DeviceLayer, "FAIL: Invalid argument: Thread ipAddr not found"));
