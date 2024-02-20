@@ -93,15 +93,13 @@ jobs:
                      --known-failure app/AttributeAccessInterface.h \
                      --known-failure app/AttributeAccessToken.h \
                      --known-failure app/att-storage.h \
-                     --known-failure app/CommandHandler.h \
+                     --known-failure app/Commah.h \
                      --known-failure app/CommandHandlerInterface.h \
                      --known-failure app/CommandSender.h \
                      --known-failure app/CommandSenderLegacyCallback.h \
                      --known-failure app/CompatEnumNames.h \
                      --known-failure app/data-model/ListLargeSystemExtensions.h \
                      --known-failure app/EventHeader.h \
-                     --known-failure app/EventLoggingDelegate.h \
-                     --known-failure app/EventLogging.h \
                      --known-failure app/EventLoggingTypes.h \
                      --known-failure app/InteractionModelHelper.h \
                      --known-failure app/ReadClient.h \

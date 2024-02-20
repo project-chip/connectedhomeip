@@ -235,6 +235,8 @@ static_library("app") {
     "DeferredAttributePersistenceProvider.h",
     "EventManagement.cpp",
     "EventManagement.h",
+    "EventLogging.h",
+    "EventLoggingDelegate.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "OTAUserConsentCommon.h",
