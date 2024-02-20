@@ -134,7 +134,7 @@ void AppTask::UpdateClusterState()
     Protocols::InteractionModel::Status status = Clusters::OnOff::Attributes::OnOff::Set(kOnOffClusterEndpoint, onOffState);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("ERR: Updating On/Off state  %x", status);
+        LOG_ERR("ERR: Updating On/Off state  %x", to_underlying(status));
     }
 
     int16_t maxPressure    = PumpMgr().GetMaxPressure();

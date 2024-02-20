@@ -81,6 +81,7 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/ChipThreadWork.cpp",
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
+      "chip/logging/LoggingFilter.cpp",
       "chip/logging/LoggingRedirect.cpp",
       "chip/native/ChipMainLoopWork.h",
       "chip/native/PyChipError.cpp",

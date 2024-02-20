@@ -464,6 +464,6 @@ void AppTask::UpdateClusterState()
     Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ZCL update failed: %lx", status);
+        ChipLogError(NotSpecified, "ZCL update failed: %lx", to_underlying(status));
     }
 }

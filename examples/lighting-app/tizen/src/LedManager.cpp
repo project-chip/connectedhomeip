@@ -63,7 +63,7 @@ void LedManager::InitOnOff()
     bool isOn   = false;
     auto status = Clusters::OnOff::Attributes::OnOff::Get(mEndpointId, &isOn);
     VerifyOrReturn(status == Protocols::InteractionModel::Status::Success,
-                   ChipLogError(NotSpecified, "Error getting OnOff: 0x%x", status));
+                   ChipLogError(NotSpecified, "Error getting OnOff: 0x%x", to_underlying(status)));
     SetOnOff(isOn);
 }
 

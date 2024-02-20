@@ -31,8 +31,6 @@
 #include <lib/support/SafeInt.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using chip::Protocols::InteractionModel::Status;
-
 /** @name Attribute Storage */
 // @{
 
@@ -98,8 +96,9 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * data type (as Accessors.h/cpp have this correct by default).
  * TODO: this not checking seems off - what if this is run without Accessors.h ?
  */
-Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * dataPtr,
-                             EmberAfAttributeType dataType);
+chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                                chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                                EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.
@@ -110,8 +109,9 @@ Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
  * dataPtr may be NULL, signifying that we don't need the value, just the status
  * (i.e. whether the attribute can be read).
  */
-Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * dataPtr,
-                            uint16_t readLength);
+chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                               chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                               uint16_t readLength);
 
 /**
  * @brief macro that returns size of attribute in bytes.
