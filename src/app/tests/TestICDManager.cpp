@@ -544,8 +544,9 @@ public:
     /* Test that verifies the logic of the ICDManager when it receives a StayActiveRequest*/
     static void TestICDMStayActive(nlTestSuite * aSuite, void * aContext)
     {
-        TestContext * ctx    = static_cast<TestContext *>(aContext);
-        ICDNotifier notifier = ICDNotifier::GetInstance();
+        TestContext * ctx                    = static_cast<TestContext *>(aContext);
+        ICDNotifier notifier                 = ICDNotifier::GetInstance();
+        ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
 
         // Verify That ICDManager starts in Idle
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
@@ -606,8 +607,8 @@ public:
         // confirm the promised time is the same as the requested time
         NL_TEST_ASSERT(aSuite, stayActivePromisedMs == 30000);
 
-        // Advance time by the duration of the stay active request - 10000 ms
-        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(stayActiveRequestedMs) - 10000_ms);
+        // Advance time by the duration of the stay active request - 20000 ms
+        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(stayActiveRequestedMs) - 20000_ms);
         // Confirm ICD manager is in active mode, we should have 20000 seconds left at that point
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
@@ -632,6 +633,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
     NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
     NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
+    NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
     NL_TEST_SENTINEL(),
 };
 

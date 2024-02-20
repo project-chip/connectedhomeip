@@ -18170,14 +18170,18 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void stayActiveRequest(StayActiveResponseCallback callback) {
-      stayActiveRequest(callback, 0);
+    public void stayActiveRequest(StayActiveResponseCallback callback, Long stayActiveDuration) {
+      stayActiveRequest(callback, stayActiveDuration, 0);
     }
 
-    public void stayActiveRequest(StayActiveResponseCallback callback, int timedInvokeTimeoutMs) {
+    public void stayActiveRequest(StayActiveResponseCallback callback, Long stayActiveDuration, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
+      final long stayActiveDurationFieldID = 0L;
+      BaseTLVType stayActiveDurationtlvValue = new UIntType(stayActiveDuration);
+      elements.add(new StructElement(stayActiveDurationFieldID, stayActiveDurationtlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override

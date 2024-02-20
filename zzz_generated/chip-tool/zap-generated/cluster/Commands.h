@@ -4314,6 +4314,7 @@ public:
     IcdManagementStayActiveRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("stay-active-request", credsIssuerConfig)
     {
+        AddArgument("StayActiveDuration", 0, UINT32_MAX, &mRequest.stayActiveDuration);
         ClusterCommand::AddArguments();
     }
 

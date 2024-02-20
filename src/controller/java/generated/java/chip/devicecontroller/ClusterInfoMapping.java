@@ -23352,10 +23352,16 @@ public class ClusterInfoMapping {
     icdManagementClusterInteractionInfoMap.put("unregisterClient", icdManagementunregisterClientInteractionInfo);
 
     Map<String, CommandParameterInfo> icdManagementstayActiveRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo icdManagementstayActiveRequeststayActiveDurationCommandParameterInfo = new CommandParameterInfo("stayActiveDuration", Long.class, Long.class);
+    icdManagementstayActiveRequestCommandParams.put("stayActiveDuration",icdManagementstayActiveRequeststayActiveDurationCommandParameterInfo);
     InteractionInfo icdManagementstayActiveRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.IcdManagementCluster) cluster)
           .stayActiveRequest((ChipClusters.IcdManagementCluster.StayActiveResponseCallback) callback
+           , (Long)
+             commandArguments.get("stayActiveDuration")
+
             );
         },
         () -> new DelegatedIcdManagementClusterStayActiveResponseCallback(),
