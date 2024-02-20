@@ -87,7 +87,11 @@ source_set("revision_info") {
 source_set("paths") {
   sources = [
     "AttributePathParams.h",
+    "CommandPathParams.h",
+    "CommandPathRegistry.h",
+    "ConcreteAttributePath.h",
     "ConcreteClusterPath.h",
+    "ConcreteCommandPath.h",
     "ConcreteEventPath.h",
     "DataVersionFilter.h",
     "EventPathParams.h",
@@ -96,6 +100,7 @@ source_set("paths") {
   # This source sets also depends on basic-types.h that is not in any dependency we can use
   public_deps = [
     ":app_config",
+    "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
   ]
@@ -222,15 +227,20 @@ static_library("app") {
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
+    "CommandResponseSender.h",
     "CommandSender.cpp",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.h",
     "EventManagement.cpp",
+    "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "OTAUserConsentCommon.h",
+    "PendingResponseTracker.h",
+    "PendingResponseTrackerImpl.cpp",
+    "PendingResponseTrackerImpl.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
     "TimedRequest.cpp",
@@ -239,6 +249,21 @@ static_library("app") {
     "TimerDelegates.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
+
+    # TODO: the following items cannot be included due to interaction-model circularity
+    #       (app depending on im and im including these headers):
+    #       Name with _ so that linter does not recognize it
+    # "CommandHandler._h"
+    # "CommandSender._h",
+    # "ReadClient._h",
+    # "ReadHandler._h",
+    # "WriteClient._h",
+    # "WriteHandler._h"
+
+    # TODO: the following items cannot be included due to platform includes not being
+    #       able to depend on src/app
+    #       Name with _ so that linter does not recognize it
+    # "_AttributeAccessInterface._h",
   ]
 
   public_deps = [
@@ -258,9 +283,13 @@ static_library("app") {
   if (chip_enable_read_client) {
     sources += [
       "BufferedReadCallback.cpp",
+      "BufferedReadCallback.h",
       "ClusterStateCache.cpp",
       "ClusterStateCache.h",
       "ReadClient.cpp",
+
+      # TODO: cannot include "ReadClient._h" because interaction-model backreference
+      #       Name with _ so that linter does not recognize it
     ]
   }
 

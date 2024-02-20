@@ -54,14 +54,19 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0508" name="Low Power" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0508" name="Low Power"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="LOWPOWER" scope="Endpoint"/>
   <commands>
-    <command id="0x00" name="Sleep" response="Y">
+    <command id="0x00" name="Sleep" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>

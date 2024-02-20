@@ -4666,6 +4666,21 @@ PICS:
       id: MEDIAPLAYBACK.S.C0b.Rsp
 
     - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActivateAudioTrack command?"
+      id: MEDIAPLAYBACK.S.C0c.Rsp
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActivateTextTrack command?"
+      id: MEDIAPLAYBACK.S.C0d.Rsp
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          DeactivateTextTrack command?"
+      id: MEDIAPLAYBACK.S.C0e.Rsp
+
+    - label:
           "Does the DUT support the Audio Output server cluster, SelectOutput
           command?"
       id: AUDIOOUTPUT.S.C00.Rsp
@@ -9162,6 +9177,9 @@ PICS:
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
 
+    - label: "Can the mode change be manually controlled?"
+      id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
@@ -10064,3 +10082,114 @@ PICS:
       #  Commands generated
     - label: "Does the device implement sending the GetTargetsResponse command?"
       id: EEVSE.S.C00.Tx
+
+    # Energy EVSE Mode Cluster
+    # server / attributes
+    - label: "Does the device implement the Energy EVSE cluster as a server?"
+      id: EEVSEM.S
+
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: EEVSEM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: EEVSEM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: EEVSEM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: EEVSEM.S.A0003
+
+      #  Commands received
+    - label: "Does the device implement sending the ChangeToMode command?"
+      id: EEVSEM.S.C00.Rsp
+
+      #  Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: EEVSEM.S.C01.Tx
+
+      #  Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: EEVSEM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+
+      #Feature
+    - label: "Does the DUT(server) support the Hue/Saturation feature?"
+      id: EEVSEM.S.F00
+
+    #
+    # Device Energy Management Mode Cluster
+    # server / attributes
+
+    - label: "Does the device implement the DEMM cluster as a server?"
+      id: DEMM.S
+
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: DEMM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: DEMM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: DEMM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: DEMM.S.A0003
+
+      #  Commands received
+    - label: "Does the device implement sending the ChangeToMode command?"
+      id: DEMM.S.C00.Rsp
+
+      #  Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: DEMM.S.C01.Tx
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: DEMM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: DEMM.S.M.CAN_MANUALLY_CONTROLLED
+
+      #  Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: EEVSEM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+
+    #
+    # Power Topology Cluster
+    #
+    - label: "Does the device implement the Power Topology Cluster as a server?"
+      id: PWRTL.S
+
+    #  Features
+
+    - label:
+          "Does the associated endpoint provide or consume power for the entire
+          node?"
+      id: PWRTL.S.F00
+
+    - label:
+          "Does the associated endpoint provide or consume power for itself and
+          its child endpoints?"
+      id: PWRTL.S.F01
+
+    - label:
+          "Does the associated endpoint provide or consume power for a provided
+          set of endpoints?"
+      id: PWRTL.S.F02
+
+    - label: "Can the provided set of endpoints change?"
+      id: PWRTL.S.F03
+
+    #Server attributes
+    - label: "Does the device implement the AvailableEndpoints attribute?"
+      id: PWRTL.S.A0000
+
+    - label: "Does the device implement the ActiveEndpoints attribute?"
+      id: PWRTL.S.A0001
