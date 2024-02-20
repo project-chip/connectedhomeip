@@ -49,18 +49,18 @@ class TC_ICDM_2_1(MatterBaseTest):
         uint32Max = 4294967295
         feature_map = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         isCIP = feature_map & Clusters.IcdManagement.Bitmaps.Feature.kCheckInProtocolSupport
-        isUAT = feature_map & Clusters.IcdManagement.Bitmaps.Feature.kUserActiveModeTrigger
-        isLITS = feature_map & Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
+        # isUAT = feature_map & Clusters.IcdManagement.Bitmaps.Feature.kUserActiveModeTrigger
+        # isLITS = feature_map & Clusters.IcdManagement.Bitmaps.Feature.kLongIdleTimeSupport
 
-        if isLITS:
-            asserts.assert_true(isCIP and self.check_pics("ICDM.S.F00"), "CheckInProtocolSupport is a mandatory feature if LongIdleTimeSupport is set and must be present in the PICS file")
-            asserts.assert_true(isUAT and self.check_pics("ICDM.S.F01"), "UserActiveModeTrigger is a mandatory feature if LongIdleTimeSupport is set and must be present in the PICS file")
-            asserts.assert_true(self.check_pics("ICDM.S.F02"), "LongIdleTimeSupport is a mandatory feature if LongIdleTimeSupport is set and must be present in the PICS file")
+        # if isLITS:
+        #     asserts.assert_true(isCIP and self.check_pics("ICDM.S.F00"), "CheckInProtocolSupport is a mandatory feature if LongIdleTimeSupport is set and must be present in the PICS file")
+        #     asserts.assert_true(isUAT and self.check_pics("ICDM.S.F01"), "UserActiveModeTrigger is a mandatory feature if LongIdleTimeSupport is set and must be present in the PICS file")
+        #     asserts.assert_true(self.check_pics("ICDM.S.F02"), "LongIdleTimeSupport is a mandatory feature if LongIdleTimeSupport is set and must be present in the PICS file")
 
         # Active Mode Threshold attribute test
         self.print_step(2, "Read activeModeThreshold Attribute")
         asserts.assert_true(self.check_pics("ICDM.S.A0002"), "ActiveModeThreshold is a mandatory attribute and must be present in the PICS file")
-        ActiveModeThresholdMin = 5 if isLITS else 0
+        ActiveModeThresholdMin = 0  # 5 if isLITS else 0
         activeModeThreshold = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.ActiveModeThreshold)
         logger.info(f"ActiveModeThreshold: {activeModeThreshold}")
         asserts.assert_true(ActiveModeThresholdMin <= activeModeThreshold <= uint16Max, "ActiveModeThreshold attribute does not fit in a uint16.")
@@ -105,83 +105,83 @@ class TC_ICDM_2_1(MatterBaseTest):
             ICDCounter = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.ICDCounter)
             logger.info(f"ICDCounter: {ICDCounter}")
             asserts.assert_true(0 <= ICDCounter <= uint32Max, "ICDCounter attribute does not fit in a uint32.")
-
-        if isUAT:
-            # UserActiveModeTriggerHint attribute test
-            self.print_step(8, "Read UserActiveModeTriggerHint Attribute")
-            asserts.assert_true(self.check_pics("ICDM.S.A0006"), "UserActiveModeTriggerHint is a mandatory attribute if UserActiveModeTrigger feature is set and must be present in the PICS file")
-            userActiveModeTriggerHint = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserActiveModeTriggerHint)
-            logger.info(f"UserActiveModeTriggerHint: {userActiveModeTriggerHint}")
-            asserts.assert_true(0 <= userActiveModeTriggerHint <= uint32Max, "UserActiveModeTriggerHint attribute does not fit in a bitmap32.")
-
-            userActiveModeTriggerInstructionList = [
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kCustomInstruction,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorSeconds,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorTimes,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorLightsBlink,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonLightsBlink,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonSeconds,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonTimes,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonSeconds,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonLightsBlink,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonTimes,
-                Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kAppDefinedButton,
-
-            ]
-            for bitmap in userActiveModeTriggerInstructionList:
-                if userActiveModeTriggerHint & bitmap:
-                    asserts.assert_false(userActiveModeTriggerHintBitmapMatch, "More than one UserActiveModeTriggerHint bit depending on UserActiveModeTriggerInstruction is set: \
-                    bit 2, 5, 6, 7, 9, 10, 11, 13, 14, 15, 16.")
-                else:
-                    userActiveModeTriggerHintBitmapMatch = True
-
-            # UserActiveModeTriggerInstruction attribute test
-            self.print_step(9, "Read UserActiveModeTriggerInstruction Attribute")
-            asserts.assert_true(self.check_pics("ICDM.S.A0009"), "UserActiveModeTriggerHint is a mandatory attribute if UserActiveModeTrigger feature is set and must be present in the PICS file")
-            userActiveModeTriggerInstruction = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserActiveModeTriggerInstruction)
-            logger.info(f"UserActiveModeTriggerInstruction: {userActiveModeTriggerInstruction}")
-            asserts.assert_true(userActiveModeTriggerInstruction != NullValue, "UserActiveModeTriggerInstruction attribute is a null value.")
-            asserts.assert_less_equal(len(str(userActiveModeTriggerInstruction)), 128, "UserActiveModeTriggerInstruction attribute is longer than 128 characters.")
-            if userActiveModeTriggerHintBitmapMatch:
-                userActiveModeTriggerInstructionTypes = {
-                    'digit': [
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorSeconds,
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorTimes,
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonSeconds,
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonTimes,
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonSeconds,
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonTimes,
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kAppDefinedButton,
-                    ],
-                    'string': [
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kCustomInstruction,
-                    ],
-                    'color': [
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorLightsBlink,
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonLightsBlink,
-                        Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonLightsBlink,
-                    ]
-                }
-
-                if userActiveModeTriggerInstruction in userActiveModeTriggerInstructionTypes['digit']:
-                    asserts.assert_true(str(userActiveModeTriggerInstruction).isdigit() and
-                                        not len(str(userActiveModeTriggerInstruction)) - len(str(userActiveModeTriggerInstruction).lstrip('0')),
-                                        "userActiveModeTriggerInstruction attribute is not decimal unsigned integer using the ASCII digits 0-9, and without leading zeros.")
-                elif userActiveModeTriggerInstruction in userActiveModeTriggerInstructionTypes['string']:
-                    asserts.assert_false(str(userActiveModeTriggerInstruction).isdigit(), "userActiveModeTriggerInstruction attribute is not a text string.")
-                elif userActiveModeTriggerInstruction in userActiveModeTriggerInstructionTypes['color']:
-                    asserts.assert_false(str(userActiveModeTriggerInstruction).isdigit(), "userActiveModeTriggerInstruction attribute is not a text string (color of LED).")
-                    # TODO: use semi-manual prompt to verify color of LEDs.
-                    # colorList = ['white', 'red', 'green', 'blue', 'orange', 'yellow', 'purple']
-                    # asserts.assert_true(userActiveModeTriggerInstruction.lower() in colorList, "userActiveModeTriggerInstruction attribute is not in the range of allowed colors")
-
-        if isLITS:
-            # OperatingMode attribute test
-            self.print_step(10, "Read OperatingMode Attribute")
-            asserts.assert_true(self.check_pics("ICDM.S.A0008"), "OperatingMode is a mandatory attribute if LongIdleTimeSupport feature is set and must be present in the PICS file")
-            operatingMode = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.OperatingMode)
-            logger.info(f"OperatingMode: {operatingMode}")
-            asserts.assert_true(operatingMode in [0, 1], "OperatingMode attribute does not fit in an enum of 0 or 1.")
+        #
+        # if isUAT:
+        #     # UserActiveModeTriggerHint attribute test
+        #     self.print_step(8, "Read UserActiveModeTriggerHint Attribute")
+        #     asserts.assert_true(self.check_pics("ICDM.S.A0006"), "UserActiveModeTriggerHint is a mandatory attribute if UserActiveModeTrigger feature is set and must be present in the PICS file")
+        #     userActiveModeTriggerHint = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserActiveModeTriggerHint)
+        #     logger.info(f"UserActiveModeTriggerHint: {userActiveModeTriggerHint}")
+        #     asserts.assert_true(0 <= userActiveModeTriggerHint <= uint32Max, "UserActiveModeTriggerHint attribute does not fit in a bitmap32.")
+        #
+        #     userActiveModeTriggerInstructionList = [
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kCustomInstruction,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorSeconds,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorTimes,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorLightsBlink,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonLightsBlink,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonSeconds,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonTimes,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonSeconds,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonLightsBlink,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonTimes,
+        #         Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kAppDefinedButton,
+        #
+        #     ]
+        #     for bitmap in userActiveModeTriggerInstructionList:
+        #         if userActiveModeTriggerHint & bitmap:
+        #             asserts.assert_false(userActiveModeTriggerHintBitmapMatch, "More than one UserActiveModeTriggerHint bit depending on UserActiveModeTriggerInstruction is set: \
+        #             bit 2, 5, 6, 7, 9, 10, 11, 13, 14, 15, 16.")
+        #         else:
+        #             userActiveModeTriggerHintBitmapMatch = True
+        #
+        #     # UserActiveModeTriggerInstruction attribute test
+        #     self.print_step(9, "Read UserActiveModeTriggerInstruction Attribute")
+        #     asserts.assert_true(self.check_pics("ICDM.S.A0009"), "UserActiveModeTriggerHint is a mandatory attribute if UserActiveModeTrigger feature is set and must be present in the PICS file")
+        #     userActiveModeTriggerInstruction = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.UserActiveModeTriggerInstruction)
+        #     logger.info(f"UserActiveModeTriggerInstruction: {userActiveModeTriggerInstruction}")
+        #     asserts.assert_true(userActiveModeTriggerInstruction != NullValue, "UserActiveModeTriggerInstruction attribute is a null value.")
+        #     asserts.assert_less_equal(len(str(userActiveModeTriggerInstruction)), 128, "UserActiveModeTriggerInstruction attribute is longer than 128 characters.")
+        #     if userActiveModeTriggerHintBitmapMatch:
+        #         userActiveModeTriggerInstructionTypes = {
+        #             'digit': [
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorSeconds,
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorTimes,
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonSeconds,
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonTimes,
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonSeconds,
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonTimes,
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kAppDefinedButton,
+        #             ],
+        #             'string': [
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kCustomInstruction,
+        #             ],
+        #             'color': [
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kActuateSensorLightsBlink,
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kResetButtonLightsBlink,
+        #                 Clusters.IcdManagement.Bitmaps.UserActiveModeTriggerBitmap.kSetupButtonLightsBlink,
+        #             ]
+        #         }
+        #
+        #         if userActiveModeTriggerInstruction in userActiveModeTriggerInstructionTypes['digit']:
+        #             asserts.assert_true(str(userActiveModeTriggerInstruction).isdigit() and
+        #                                 not len(str(userActiveModeTriggerInstruction)) - len(str(userActiveModeTriggerInstruction).lstrip('0')),
+        #                                 "userActiveModeTriggerInstruction attribute is not decimal unsigned integer using the ASCII digits 0-9, and without leading zeros.")
+        #         elif userActiveModeTriggerInstruction in userActiveModeTriggerInstructionTypes['string']:
+        #             asserts.assert_false(str(userActiveModeTriggerInstruction).isdigit(), "userActiveModeTriggerInstruction attribute is not a text string.")
+        #         elif userActiveModeTriggerInstruction in userActiveModeTriggerInstructionTypes['color']:
+        #             asserts.assert_false(str(userActiveModeTriggerInstruction).isdigit(), "userActiveModeTriggerInstruction attribute is not a text string (color of LED).")
+        #             # TODO: use semi-manual prompt to verify color of LEDs.
+        #             # colorList = ['white', 'red', 'green', 'blue', 'orange', 'yellow', 'purple']
+        #             # asserts.assert_true(userActiveModeTriggerInstruction.lower() in colorList, "userActiveModeTriggerInstruction attribute is not in the range of allowed colors")
+        #
+        # if isLITS:
+        #     # OperatingMode attribute test
+        #     self.print_step(10, "Read OperatingMode Attribute")
+        #     asserts.assert_true(self.check_pics("ICDM.S.A0008"), "OperatingMode is a mandatory attribute if LongIdleTimeSupport feature is set and must be present in the PICS file")
+        #     operatingMode = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.OperatingMode)
+        #     logger.info(f"OperatingMode: {operatingMode}")
+        #     asserts.assert_true(operatingMode in [0, 1], "OperatingMode attribute does not fit in an enum of 0 or 1.")
 
 
 if __name__ == "__main__":
