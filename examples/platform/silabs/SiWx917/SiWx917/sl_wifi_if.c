@@ -261,7 +261,7 @@ void sl_wfx_host_si91x_sleep_wakeup()
  * @return
  *        None
  *********************************************************************/
-int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,sl_si91x_performance_profile_t sl_si91x_wifi_state)
+int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
 {
     int32_t status;
 
@@ -278,11 +278,12 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,sl_s
         SILABS_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
         return status;
     }
-    if(sl_si91x_wifi_state == HIGH_PERFORMANCE)
+    if (sl_si91x_wifi_state == HIGH_PERFORMANCE)
     {
         wfx_rsi.dev_state &= ~(WFX_RSI_ST_SLEEP_READY);
     }
-    else{
+    else
+    {
         wfx_rsi.dev_state |= WFX_RSI_ST_SLEEP_READY;
     }
     return status;
@@ -594,7 +595,7 @@ static sl_status_t wfx_rsi_do_join(void)
         sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0 };
         status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
 
-        sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 5};
+        sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 5 };
         sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
 #endif // SL_ICD_ENABLED
         /* Try to connect Wifi with given Credentials

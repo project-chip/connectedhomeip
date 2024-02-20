@@ -26,7 +26,6 @@
 #include "task.h"
 #include "timers.h"
 
-
 typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_body_s
 {
     uint32_t status;

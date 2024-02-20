@@ -20,8 +20,8 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/silabs/OTAImageProcessorImpl.h>
 
-#include <platform/silabs/SilabsConfig.h>
 #include "wfx_host_events.h"
+#include <platform/silabs/SilabsConfig.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -147,11 +147,12 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mHeaderParser.Init();
 
-   //Setting the device is in high performace - no-sleepy mode while OTA tranfer
+    // Setting the device is in high performace - no-sleepy mode while OTA tranfer
 #if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    status = wfx_power_save(RSI_ACTIVE ,HIGH_PERFORMANCE);
-    if (status != SL_STATUS_OK) {
-        ChipLogError(DeviceLayer,"Failed to enable the TA Deep Sleep");
+    status = wfx_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
     }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
@@ -189,7 +190,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     }
     imageProcessor->ReleaseBlock();
 
-    //Setting the device back to power save mode when transfer is completed successfully
+    // Setting the device back to power save mode when transfer is completed successfully
 #if (CHIP_CONFIG_ENABLE_ICD_SERVER)
     sl_status_t err = wfx_power_save(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE);
     if (err != SL_STATUS_OK)
@@ -212,13 +213,14 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully in HandleApply");
 
-    //Setting the device is in high performace - no-sleepy mode before soft reset as soft reset is not happening in sleep mode
+    // Setting the device is in high performace - no-sleepy mode before soft reset as soft reset is not happening in sleep mode
 #if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    status = wfx_power_save(RSI_ACTIVE ,HIGH_PERFORMANCE);
-    if (status != SL_STATUS_OK) {
-        ChipLogError(DeviceLayer,"Failed to enable the TA Deep Sleep");
+    status = wfx_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
+    if (status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
     }
-#endif  /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     if (mReset)
     {
@@ -238,7 +240,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    //Setting the device back to power save mode when transfer is aborted in the middle
+    // Setting the device back to power save mode when transfer is aborted in the middle
 #if (CHIP_CONFIG_ENABLE_ICD_SERVER)
     sl_status_t err = wfx_power_save(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE);
     if (err != SL_STATUS_OK)

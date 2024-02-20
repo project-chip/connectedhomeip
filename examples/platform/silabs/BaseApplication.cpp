@@ -167,8 +167,14 @@ void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_
 #endif // DIC_ENABLE
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
-void BaseApplicationDelegate::OnCommissioningSessionStarted() { isComissioningStarted = true; }
-void BaseApplicationDelegate::OnCommissioningSessionStopped() { isComissioningStarted = false; }
+void BaseApplicationDelegate::OnCommissioningSessionStarted()
+{
+    isComissioningStarted = true;
+}
+void BaseApplicationDelegate::OnCommissioningSessionStopped()
+{
+    isComissioningStarted = false;
+}
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
 {
     ChipLogProgress(DeviceLayer, "OnCommissioningWindowClosed");
@@ -282,7 +288,6 @@ CHIP_ERROR BaseApplication::Init()
     BaseApplication::sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
 #endif
     return err;
-
 }
 
 void BaseApplication::FunctionTimerEventHandler(TimerHandle_t xTimer)

@@ -206,7 +206,7 @@ sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
 {
     return (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) ? SL_STATUS_FAIL : SL_STATUS_OK);
 }
-#else // For RS9116
+#else  // For RS9116
 /*********************************************************************
  * @fn  sl_status_t wfx_power_save()
  * @brief

@@ -21,12 +21,12 @@
 
 #include "AppConfig.h"
 
+#include "BaseApplication.h"
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "silabs_utils.h"
 #include "task.h"
 #include "wfx_host_events.h"
-#include "BaseApplication.h"
 
 #ifdef RS911X_WIFI
 #include "wfx_rsi.h"
@@ -205,7 +205,8 @@ void wfx_ip_changed_notify(int got_ip)
 void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin)
 {
 #if SL_ICD_ENABLED
-    if (m4_alarm_initialization_done == false) {
+    if (m4_alarm_initialization_done == false)
+    {
         initialize_m4_alarm();
     }
 #endif // SL_ICD_ENABLED
@@ -219,12 +220,15 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
             SILABS_LOG("wfx_retry_interval_handler : Next attempt after %d Seconds", CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
 #if SL_ICD_ENABLED
             // TODO: cleanup the retry logic MATTER-1921
-            if(!BaseApplication::sAppDelegate.isComissioningStarted) {
+            if (!BaseApplication::sAppDelegate.isComissioningStarted)
+            {
                 set_alarm_interrupt_timer(WLAN_RETRY_TIMER_MS / 1000);
                 wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
                 // TODO: remove this once TICKLESS_IDLE is applied. MATTER-3134
                 sl_wfx_host_si91x_sleep_wakeup();
-            } else {
+            }
+            else
+            {
                 vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
             }
 #else

@@ -199,7 +199,7 @@ sl_status_t wfx_connect_to_ap(void)
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,sl_si91x_performance_profile_t sl_si91x_wifi_state)
+sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
 {
     if (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) != SL_STATUS_OK)
     {
