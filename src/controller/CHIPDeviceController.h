@@ -84,10 +84,6 @@ using namespace chip::Protocols::UserDirectedCommissioning;
 
 inline constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
 
-// Raw functions for cluster callbacks
-void OnBasicFailure(void * context, CHIP_ERROR err);
-void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &);
-
 struct ControllerInitParams
 {
     DeviceControllerSystemState * systemState                       = nullptr;
@@ -793,6 +789,9 @@ private:
 #endif
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
+
+    static void OnBasicFailure(void * context, CHIP_ERROR err);
+    static void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &);
 
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.

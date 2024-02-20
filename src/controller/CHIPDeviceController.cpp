@@ -1618,13 +1618,13 @@ void DeviceCommissioner::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData 
     mSetUpCodePairer.NotifyCommissionableDeviceDiscovered(nodeData);
 }
 
-void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &)
+void DeviceCommissioner::OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
-void OnBasicFailure(void * context, CHIP_ERROR error)
+void DeviceCommissioner::OnBasicFailure(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "Received failure response %s\n", chip::ErrorStr(error));
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
