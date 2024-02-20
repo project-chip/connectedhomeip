@@ -250,6 +250,7 @@ void * sl_si91x_host_get_buffer_data(sl_wifi_buffer_t * buffer, uint16_t offset,
 
 #if SL_ICD_ENABLED
 sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
+void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 #endif /* SL_ICD_ENABLED */
 
 void wfx_ipv6_notify(int got_ip);
