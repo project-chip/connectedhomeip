@@ -423,8 +423,8 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
 
     if (error == CHIP_ERROR_FORCED_RESET)
     {
-        // Restore dnssd state before restart
-        publisher->mState = State::kUninitialized;
+        // Restore dnssd state before restart, also needs to call ChipDnssdShutdown()
+        publisher->Shutdown();
 
         DeviceLayer::ChipDeviceEvent event;
         event.Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
