@@ -20,15 +20,14 @@
 #include <os/signpost.h>
 #include <tracing/backend.h>
 
-#define MATTER_TRACE_BEGIN(label,group)         os_signpost_interval_begin(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
-#define MATTER_TRACE_END(label,group)           os_signpost_interval_end(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
-#define MATTER_TRACE_INSTANT(label,group)       os_signpost_event_emit(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
+#define MATTER_TRACE_BEGIN(label, group) os_signpost_interval_begin(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
+#define MATTER_TRACE_END(label, group) os_signpost_interval_end(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
+#define MATTER_TRACE_INSTANT(label, group) os_signpost_event_emit(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
 
-#define MATTER_TRACE_COUNTER(label)                                                                                                \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        static unsigned int count##_label = 0;                                                                                     \
-        os_signpost_event_emit(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, label, "%u", ++count##_label);            \
+#define MATTER_TRACE_COUNTER(label)                                                                                        \
+    do {                                                                                                                   \
+        static unsigned int count##_label = 0;                                                                             \
+        os_signpost_event_emit(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, label, "%u", ++count##_label); \
     } while (0)
 
 #define _CONCAT_IMPL(a, b) a##b
@@ -41,35 +40,38 @@
 
 namespace chip {
 namespace Tracing {
-namespace signposts {
+    namespace signposts {
 
-os_log_t GetMatterSignpostLogger();
+        os_log_t GetMatterSignpostLogger();
 
-class Scoped
-{
-public:
-    inline Scoped(const char * label, const char * group) : mLabel(label), mGroup(group) { os_signpost_interval_begin(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, MATTER_SDK_SIGNPOST_NAME, "%s-%s", group, label); }
-    inline ~Scoped() { os_signpost_interval_end(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, MATTER_SDK_SIGNPOST_NAME, "%s-%s", mGroup, mLabel); }
+        class Scoped {
+        public:
+            inline Scoped(const char * label, const char * group)
+                : mLabel(label)
+                , mGroup(group)
+            {
+                os_signpost_interval_begin(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, MATTER_SDK_SIGNPOST_NAME, "%s-%s", group, label);
+            }
+            inline ~Scoped() { os_signpost_interval_end(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, MATTER_SDK_SIGNPOST_NAME, "%s-%s", mGroup, mLabel); }
 
-private:
-    const char * mLabel;
-    const char * mGroup;
-};
+        private:
+            const char * mLabel;
+            const char * mGroup;
+        };
 
-class DarwinTracingBackend : public ::chip::Tracing::Backend
-{
-public:
-    DarwinTracingBackend();
+        class DarwinTracingBackend : public ::chip::Tracing::Backend {
+        public:
+            DarwinTracingBackend();
 
-    typedef void (^LogEventClientCallback)(MetricEvent event);
+            typedef void (^LogEventClientCallback)(MetricEvent event);
 
-    void SetLogEventClientCallback(LogEventClientCallback callback);
-    void LogEvent(MetricEvent & event) override;
+            void SetLogEventClientCallback(LogEventClientCallback callback);
+            void LogEvent(MetricEvent & event) override;
 
-private:
-    LogEventClientCallback mClientCallback;
-};
+        private:
+            LogEventClientCallback mClientCallback;
+        };
 
-} // namespace signposts
+    } // namespace signposts
 } // namespace Tracing
 } // namespace chip

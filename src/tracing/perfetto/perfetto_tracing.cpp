@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <tracing/perfetto/perfetto_tracing.h>
 #include <tracing/metric_event.h>
+#include <tracing/perfetto/perfetto_tracing.h>
 
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/core/ErrorStr.h>

@@ -134,8 +134,8 @@ static_library("Darwin") {
 
 source_set("tracing") {
   sources = [
-    "Tracing.mm",
     "Tracing.h",
+    "Tracing.mm",
   ]
 
   deps = [

@@ -24,8 +24,8 @@
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
 #include <log_json/log_json_build_config.h>
-#include <transport/TracingStructs.h>
 #include <tracing/metric_event.h>
+#include <transport/TracingStructs.h>
 
 #include <json/json.h>
 

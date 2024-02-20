@@ -20,35 +20,35 @@
 
 namespace chip {
 namespace Tracing {
-namespace signposts {
-    os_log_t GetMatterSignpostLogger()
-    {
-        static dispatch_once_t onceToken;
-        static os_log_t logger;
+    namespace signposts {
+        os_log_t GetMatterSignpostLogger()
+        {
+            static dispatch_once_t onceToken;
+            static os_log_t logger;
             dispatch_once(&onceToken, ^{
                 logger = os_log_create("com.csa.matter.signposts", "com.csa.matter.sdk");
             });
             return logger;
-    }
-
-    DarwinTracingBackend::DarwinTracingBackend()
-        : mClientCallback(nullptr)
-    {}
-
-    void DarwinTracingBackend::SetLogEventClientCallback(LogEventClientCallback callback)
-    {
-        mClientCallback = callback;
-    }
-
-    void DarwinTracingBackend::LogEvent(MetricEvent & event)
-    {
-        // Pass along to the client to handle the event
-        if (mClientCallback) {
-            mClientCallback(event);
         }
-    }
 
-} // namespace signposts
+        DarwinTracingBackend::DarwinTracingBackend()
+            : mClientCallback(nullptr)
+        {
+        }
+
+        void DarwinTracingBackend::SetLogEventClientCallback(LogEventClientCallback callback)
+        {
+            mClientCallback = callback;
+        }
+
+        void DarwinTracingBackend::LogEvent(MetricEvent & event)
+        {
+            // Pass along to the client to handle the event
+            if (mClientCallback) {
+                mClientCallback(event);
+            }
+        }
+
+    } // namespace signposts
 } // namespace Tracing
 } // namespace chip
-

@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 #import "MTRLogging_Internal.h"
-#include <MTRMetrics.h>
-#include <Foundation/Foundation.h>
 #import "MTRMetrics_Internal.h"
+#include <Foundation/Foundation.h>
+#include <MTRMetrics.h>
 #import <Matter/MTRDefines.h>
 
 @implementation MTRMetrics {

@@ -69,7 +69,6 @@
         ::chip::Tracing::Internal::LogNodeDiscoveryFailed(_trace_data);                                                            \
     } while (false)
 
-
 #else // MATTER_TRACING_ENABLED
 
 #define _MATTER_TRACE_DISABLE(...)                                                                                                 \

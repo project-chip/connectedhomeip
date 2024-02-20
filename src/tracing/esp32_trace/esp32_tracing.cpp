@@ -22,9 +22,9 @@
 #include <esp_log.h>
 #include <memory>
 #include <tracing/backend.h>
-#include <tracing/metric_event.h>
 #include <tracing/esp32_trace/counter.h>
 #include <tracing/esp32_trace/esp32_tracing.h>
+#include <tracing/metric_event.h>
 
 namespace chip {
 namespace Tracing {
@@ -159,8 +159,9 @@ void ESP32Backend::LogEvent(MetricEvent & event)
 {
     if (!mRegistered)
     {
-        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key /* Unique key 8 */, event.key /* label displayed on dashboard */,
-                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key /* Unique key 8 */,
+                                  event.key /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
+                                  ESP_DIAG_DATA_TYPE_INT /* data_type */);
         mRegistered = true;
     }
     ESP_LOGI("mtr", "The value of %s is %ld ", event.key, event.value.store.int32_value);

@@ -394,7 +394,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *                          result of the expression aStatus.
  *
  */
-#define SuccessOrExit(aStatus,...) nlEXPECT(LOG_METRIC_FOR_SUCCESS_OR_EXIT((aStatus), ##__VA_ARGS__), exit)
+#define SuccessOrExit(aStatus, ...) nlEXPECT(LOG_METRIC_FOR_SUCCESS_OR_EXIT((aStatus), ##__VA_ARGS__), exit)
 
 /**
  *  @def VerifyOrExit(aCondition, anAction)
@@ -429,7 +429,8 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *                          result of the expression anAction.
  *
  */
-#define VerifyOrExit(aCondition, anAction,...) nlEXPECT_ACTION(aCondition, exit, LOG_METRIC_FOR_VERIFY_OR_EXIT_ACTION(anAction, ##__VA_ARGS__))
+#define VerifyOrExit(aCondition, anAction, ...)                                                                                    \
+    nlEXPECT_ACTION(aCondition, exit, LOG_METRIC_FOR_VERIFY_OR_EXIT_ACTION(anAction, ##__VA_ARGS__))
 
 /**
  *  @def ExitNow(...)

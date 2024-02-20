@@ -41,8 +41,8 @@ static_library("tracing") {
   ]
 
   public_deps = [
-    ":tracing_buildconfig",
     ":metrics",
+    ":tracing_buildconfig",
     "${chip_root}/src/lib/support",
   ]
 }
@@ -50,8 +50,8 @@ static_library("tracing") {
 source_set("metrics") {
   sources = [
     "metric_event.h",
-    "metric_macros.h",
     "metric_keys.h",
+    "metric_macros.h",
   ]
 
   public_deps = [

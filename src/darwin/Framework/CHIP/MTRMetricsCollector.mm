@@ -16,12 +16,12 @@
  */
 
 #import "MTRMetricsCollector.h"
-#include <tracing/metric_event.h>
-#include <platform/Darwin/Tracing.h>
-#include <tracing/registry.h>
-#import <MTRUnfairLock.h>
 #import "MTRLogging_Internal.h"
 #include "MTRMetrics_Internal.h"
+#import <MTRUnfairLock.h>
+#include <platform/Darwin/Tracing.h>
+#include <tracing/metric_event.h>
+#include <tracing/registry.h>
 
 using MetricEvent = chip::Tracing::MetricEvent;
 
@@ -31,19 +31,17 @@ static NSString * kMTRMetricDataDurationKey = @"duration_us";
 
 void InitializeMetricsCollection()
 {
-    if ([MTRMetricsCollector sharedInstance])
-    {
+    if ([MTRMetricsCollector sharedInstance]) {
         MTR_LOG_INFO("Initialized metrics collection backend for Darwin");
     }
 }
-
 
 @implementation MTRMetricsData {
     chip::System::Clock::Microseconds64 _timePoint;
     chip::System::Clock::Microseconds64 _duration;
 }
 
-- (instancetype)initWithMetricEvent:(const MetricEvent&) event
+- (instancetype)initWithMetricEvent:(const MetricEvent &)event
 {
     if (!(self = [super init])) {
         return nil;
@@ -51,8 +49,7 @@ void InitializeMetricsCollection()
 
     if (event.value.type == MetricEvent::Value::Type::Signed32Type) {
         _value = [NSNumber numberWithInteger:event.value.store.int32_value];
-    }
-    else {
+    } else {
         _value = [NSNumber numberWithUnsignedInteger:event.value.store.uint32_value];
     }
     _timePoint = event.timePoint;
@@ -113,10 +110,10 @@ void InitializeMetricsCollection()
         if (singleton) {
             chip::Tracing::Register(singleton->_tracingBackend);
             singleton->_tracingBackend.SetLogEventClientCallback(^(MetricEvent event) {
-                    if (singleton) {
-                        [singleton handleMetricEvent:event];
-                    }
-                });
+                if (singleton) {
+                    [singleton handleMetricEvent:event];
+                }
+            });
         }
     });
     return singleton;
@@ -135,9 +132,12 @@ void InitializeMetricsCollection()
 static inline NSString * suffixNameForMetricTag(MetricEvent::Tag tag)
 {
     switch (tag) {
-        case MetricEvent::Tag::Begin: return @"-begin";
-        case MetricEvent::Tag::End: return @"-end";
-        case MetricEvent::Tag::Instant: return @"-instant";
+    case MetricEvent::Tag::Begin:
+        return @"-begin";
+    case MetricEvent::Tag::End:
+        return @"-end";
+    case MetricEvent::Tag::Instant:
+        return @"-instant";
     }
 }
 
@@ -149,15 +149,15 @@ static inline NSString * suffixNameForMetricTag(const MetricEvent & event)
 - (void)handleMetricEvent:(MetricEvent)event
 {
     MTR_LOG_INFO("Received metric event, key: %s, type: %hhu value: %d",
-                  event.key,
-                  event.value.type,
-                  (event.value.type == MetricEvent::Value::Type::Signed32Type) ? event.value.store.int32_value : event.value.store.uint32_value);
+        event.key,
+        event.value.type,
+        (event.value.type == MetricEvent::Value::Type::Signed32Type) ? event.value.store.int32_value : event.value.store.uint32_value);
 
     std::lock_guard lock(_lock);
 
     // Create the new metric key based event type
     auto metricsKey = [NSString stringWithFormat:@"%s%@", event.key, suffixNameForMetricTag(event)];
-    MTRMetricsData *data = [[MTRMetricsData alloc] initWithMetricEvent:event];
+    MTRMetricsData * data = [[MTRMetricsData alloc] initWithMetricEvent:event];
 
     // If End event, compute its duration using the Begin event
     if (event.tag == MetricEvent::Tag::End) {
@@ -165,8 +165,7 @@ static inline NSString * suffixNameForMetricTag(const MetricEvent & event)
         MTRMetricsData * beginMetric = _metricsDataCollection[metricsBeginKey];
         if (beginMetric) {
             [data setDurationFromMetricData:beginMetric];
-        }
-        else {
+        } else {
             // Unbalanced end
             MTR_LOG_ERROR("Unable to find Begin event corresponding to Metric Event: %s", event.key);
         }
@@ -189,14 +188,14 @@ static inline NSString * suffixNameForMetricTag(const MetricEvent & event)
     std::lock_guard lock(_lock);
 
     // Copy the MTRMetrics as NSDictionary
-    MTRMetrics *metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
     for (NSString * key in _metricsDataCollection) {
         [metrics setValue:[_metricsDataCollection[key] toDictionary] forKey:key];
     }
 
     // Clear curent stats, if specified
     if (resetCollection) {
-        [_metricsDataCollection  removeAllObjects];
+        [_metricsDataCollection removeAllObjects];
     }
     return metrics;
 }

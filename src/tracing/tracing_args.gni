@@ -29,7 +29,6 @@ declare_args() {
     matter_enable_tracing_support = true
   }
 
-
   # Defines the trace backend. Current matter tracing splits the logic
   # into two parts:
   #   - data logging, well defined and using type-safe data

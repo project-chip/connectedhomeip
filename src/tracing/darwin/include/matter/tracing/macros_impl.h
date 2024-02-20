@@ -22,6 +22,4 @@
 #error "Tracing macros seem to be double defined"
 #endif
 
-
 #include <platform/Darwin/Tracing.h>
-

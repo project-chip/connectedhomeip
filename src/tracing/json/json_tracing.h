@@ -57,7 +57,7 @@ public:
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
-    void LogEvent(MetricEvent & ) override;
+    void LogEvent(MetricEvent &) override;
     void Close() override { CloseFile(); }
 
 private:

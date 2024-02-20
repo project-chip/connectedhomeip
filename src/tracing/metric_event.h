@@ -38,21 +38,25 @@ namespace Tracing {
 struct MetricEvent
 {
     // Metric tag type
-    enum class Tag {
-        Begin,    // Implies tracking a duration
-        End,      // Implies tracking a duration
-        Instant   // No duration
+    enum class Tag
+    {
+        Begin,  // Implies tracking a duration
+        End,    // Implies tracking a duration
+        Instant // No duration
     };
 
     // Value for the metric
-    struct Value {
-        enum class Type : uint8_t {
-            Signed32Type,       // int32_t
-            Unsigned32Type,     // uint32_t
-            ChipErrorType       // chip::ChipError
+    struct Value
+    {
+        enum class Type : uint8_t
+        {
+            Signed32Type,   // int32_t
+            Unsigned32Type, // uint32_t
+            ChipErrorType   // chip::ChipError
         };
 
-        union Store {
+        union Store
+        {
             int32_t int32_value;
             uint32_t uint32_value;
 
@@ -76,32 +80,24 @@ struct MetricEvent
     Value value;
     System::Clock::Microseconds64 timePoint;
 
-    MetricEvent(Tag tg, MetricKey k, int32_t val = 0)
-        : tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
+    MetricEvent(Tag tg, MetricKey k, int32_t val = 0) :
+        tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 
-    MetricEvent(Tag tg, MetricKey k, uint32_t val)
-        : tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
+    MetricEvent(Tag tg, MetricKey k, uint32_t val) :
+        tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 
-    MetricEvent(Tag tg, MetricKey k, int8_t val)
-        : MetricEvent(tg, k, int32_t(val))
-    {}
+    MetricEvent(Tag tg, MetricKey k, int8_t val) : MetricEvent(tg, k, int32_t(val)) {}
 
-    MetricEvent(Tag tg, MetricKey k, uint8_t val)
-        : MetricEvent(tg, k, uint32_t(val))
-    {}
+    MetricEvent(Tag tg, MetricKey k, uint8_t val) : MetricEvent(tg, k, uint32_t(val)) {}
 
-    MetricEvent(Tag tg, MetricKey k, int16_t val)
-        : MetricEvent(tg, k, int32_t(val))
-    {}
+    MetricEvent(Tag tg, MetricKey k, int16_t val) : MetricEvent(tg, k, int32_t(val)) {}
 
-    MetricEvent(Tag tg, MetricKey k, uint16_t val)
-        : MetricEvent(tg, k, uint32_t(val))
-    {}
+    MetricEvent(Tag tg, MetricKey k, uint16_t val) : MetricEvent(tg, k, uint32_t(val)) {}
 
-    MetricEvent(Tag tg, MetricKey k, const ChipError & err)
-        : tag(tg), key(k), value(err.AsInteger()), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
+    MetricEvent(Tag tg, MetricKey k, const ChipError & err) :
+        tag(tg), key(k), value(err.AsInteger()), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 };
 
@@ -117,10 +113,11 @@ namespace utils {
  * Utility to emit an instant metric if the error is not a success. Used in SuccessOrExit macro
  * to allow emitting the event before jumping to the exit label.
  */
-inline bool logMetricIfError(const ::chip::ChipError& err, MetricKey metricKey)
+inline bool logMetricIfError(const ::chip::ChipError & err, MetricKey metricKey)
 {
     bool success = ::chip::ChipError::IsSuccess(err);
-    if (!success) {
+    if (!success)
+    {
         using Tag = chip::Tracing::MetricEvent::Tag;
         ::chip::Tracing::MetricEvent _metric_event(Tag::Instant, metricKey, err);
         ::chip::Tracing::Internal::LogEvent(_metric_event);

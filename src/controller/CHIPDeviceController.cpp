@@ -716,9 +716,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetDiscoveredObject(), this,
-                                                                                   OnDiscoveredDeviceOverBleSuccess,
-                                                                                   OnDiscoveredDeviceOverBleError), PASESessionBLE);
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(
+                              params.GetDiscoveredObject(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError),
+                          PASESessionBLE);
             ExitNow(CHIP_NO_ERROR);
         }
         else if (params.HasDiscriminator())
@@ -730,7 +730,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             SetupDiscriminator discriminator;
             discriminator.SetLongValue(params.GetDiscriminator());
             SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
-                              discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError), PASESessionBLE);
+                              discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError),
+                          PASESessionBLE);
             ExitNow(CHIP_NO_ERROR);
         }
         else
