@@ -18,8 +18,8 @@
 
 #include "CommandSender.h"
 #include "StatusResponse.h"
-#include <app/TimedRequest.h>
 #include <app/InteractionModelTimeout.h>
+#include <app/TimedRequest.h>
 #include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
