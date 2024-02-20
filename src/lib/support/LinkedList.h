@@ -22,13 +22,13 @@
 #include <stddef.h>
 
 namespace chip {
-namespace app {
 
+/// A very basic single-linked list
 template <typename T>
-struct ObjectList
+struct SingleLinkedListNode
 {
     T mValue;
-    ObjectList * mpNext = nullptr;
+    SingleLinkedListNode * mpNext = nullptr;
 
     size_t Count() const
     {
@@ -41,5 +41,4 @@ struct ObjectList
     }
 };
 
-} // namespace app
 } // namespace chip
