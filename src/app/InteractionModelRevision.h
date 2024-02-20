@@ -30,8 +30,8 @@ namespace chip {
  * See section 8.1.1. "Revision History" in the "Interaction Model
  * Specification" chapter of the core Matter specification.
  */
-inline constexpr InteractionModelRevision kInteractionModelRevision    = 11;
-inline constexpr uint8_t kInteractionModelRevisionTag = 0xFF;
+inline constexpr InteractionModelRevision kInteractionModelRevision = 11;
+inline constexpr uint8_t kInteractionModelRevisionTag               = 0xFF;
 
 /**
  * A monotonic number identifying the revision number of the Data Model against
