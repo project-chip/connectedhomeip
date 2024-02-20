@@ -71,9 +71,6 @@ Davis, CA 95616, USA
         <feature code="" name="OFFONLY">
           <mandatoryConform/>
         </feature>
-        <feature code="" name="DF">
-          <mandatoryConform/>
-        </feature>
       </features>
     </cluster>
   </clusters>

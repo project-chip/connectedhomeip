@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Resource Monitoring Clusters" revision="1">
   <revisionHistory>
@@ -116,12 +118,10 @@ Davis, CA 95616, USA
     </enum>
     <struct name="ReplacementProductStruct">
       <field id="0" name="ProductIdentifierType" type="ProductIdentifierTypeEnum">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="ProductIdentifierValue" type="string">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="20"/>
       </field>
@@ -166,7 +166,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ResetCondition" response="Y">
+    <command id="0x00" name="ResetCondition" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>

@@ -32,7 +32,7 @@ declare_args() {
   sl_wfx_config_scan = true
 
   # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_transition = false
+  rs91x_wpa3_transition = true
 
   #default WiFi SSID
   chip_default_wifi_ssid = ""

@@ -44,6 +44,7 @@ void KeypadInputManager::NewManager(jint endpoint, jobject manager)
 
 void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CECKeyCodeEnum & keyCode)
 {
+    DeviceLayer::StackUnlock unlock;
     Commands::SendKeyResponse::Type response;
 
     jint ret       = -1;

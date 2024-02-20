@@ -480,11 +480,12 @@ void AppTask::UpdateCluster(intptr_t context)
 
     OperationSourceEnum source = OperationSourceEnum::kUnspecified;
     // write the new lock value
-    EmberAfStatus status =
-        DoorLockServer::Instance().SetLockState(1, newState, source) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = DoorLockServer::Instance().SetLockState(1, newState, source)
+        ? Protocols::InteractionModel::Status::Success
+        : Protocols::InteractionModel::Status::Failure;
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ASR_LOG("ERR: updating lock state %x", status);
+        ASR_LOG("ERR: updating lock state %x", to_underlying(status));
     }
 }
 

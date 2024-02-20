@@ -31,7 +31,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
-#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -82,11 +81,11 @@ LaundryWasherControlsServer & LaundryWasherControlsServer::Instance()
     return sInstance;
 }
 
-EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
+Status LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> spinSpeedCurrent)
 {
     DataModel::Nullable<uint8_t> spinSpeedCurrentNow;
-    EmberAfStatus res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrentNow);
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (spinSpeedCurrentNow != spinSpeedCurrent))
+    Status res = SpinSpeedCurrent::Get(endpointId, spinSpeedCurrentNow);
+    if ((res == Status::Success) && (spinSpeedCurrentNow != spinSpeedCurrent))
     {
         res = SpinSpeedCurrent::Set(endpointId, spinSpeedCurrent);
     }
@@ -94,18 +93,17 @@ EmberAfStatus LaundryWasherControlsServer::SetSpinSpeedCurrent(EndpointId endpoi
     return res;
 }
 
-EmberAfStatus LaundryWasherControlsServer::GetSpinSpeedCurrent(EndpointId endpointId,
-                                                               DataModel::Nullable<uint8_t> & spinSpeedCurrent)
+Status LaundryWasherControlsServer::GetSpinSpeedCurrent(EndpointId endpointId, DataModel::Nullable<uint8_t> & spinSpeedCurrent)
 {
     return SpinSpeedCurrent::Get(endpointId, spinSpeedCurrent);
 }
 
-EmberAfStatus LaundryWasherControlsServer::SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
+Status LaundryWasherControlsServer::SetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum newNumberOfRinses)
 {
     NumberOfRinsesEnum numberOfRinses;
-    EmberAfStatus res = NumberOfRinses::Get(endpointId, &numberOfRinses);
+    Status res = NumberOfRinses::Get(endpointId, &numberOfRinses);
 
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (numberOfRinses != newNumberOfRinses))
+    if ((res == Status::Success) && (numberOfRinses != newNumberOfRinses))
     {
         res = NumberOfRinses::Set(endpointId, newNumberOfRinses);
     }
@@ -113,7 +111,7 @@ EmberAfStatus LaundryWasherControlsServer::SetNumberOfRinses(EndpointId endpoint
     return res;
 }
 
-EmberAfStatus LaundryWasherControlsServer::GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
+Status LaundryWasherControlsServer::GetNumberOfRinses(EndpointId endpointId, NumberOfRinsesEnum & numberOfRinses)
 {
     return NumberOfRinses::Get(endpointId, &numberOfRinses);
 }

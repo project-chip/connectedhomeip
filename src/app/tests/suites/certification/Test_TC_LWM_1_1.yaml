@@ -41,9 +41,10 @@ tests:
           constraints:
               type: int16u
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/31551
     - label:
           "Step 3:TH reads from the DUT the FeatureMap attribute., bit 0: SHALL
-          be 1 if and only if LWM.S.F00(DEPONOFF)"
+          be 1 if and only if LWM.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: LWM.S.F00
@@ -90,9 +91,9 @@ tests:
               type: list
               contains: [2]
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/31551
     - label:
-          "Step 4c: TH reads the Feature dependent attribute(DEPONOFF) in
-          AttributeList"
+          "Step 4c: TH reads the Feature dependent attribute in AttributeList"
       PICS: LWM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"

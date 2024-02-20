@@ -43,6 +43,10 @@
 
 #include "bluez/BluezEndpoint.h"
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#include <platform/DeviceControlServer.h>
+#endif
+
 using namespace ::nl;
 using namespace ::chip::Ble;
 
@@ -650,8 +654,23 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(Ble, "Got notification regarding chip connection closure");
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
-    DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
+    if (mState == kState_NotInitialized)
+    {
+        // Close BLE GATT connections to disconnect BlueZ
+        CloseConnection(conId);
+        // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
+        DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
+    }
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+}
+
+void BLEManagerImpl::CheckNonConcurrentBleClosing()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (mState == kState_Disconnecting)
+    {
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+    }
 #endif
 }
 
@@ -790,22 +809,25 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * 
 
 void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
 {
-    ChipLogProgress(Ble, "New device scanned: %s", bluez_device1_get_address(&device));
+    const char * address = bluez_device1_get_address(&device);
+    ChipLogProgress(Ble, "New device scanned: %s", address);
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
-        if (!mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator()))
-        {
-            return;
-        }
+        auto isMatch = mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator());
+        VerifyOrReturn(
+            isMatch,
+            ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", info.GetDeviceDiscriminator(),
+                         mBLEScanConfig.mDiscriminator.IsShortDiscriminator() ? mBLEScanConfig.mDiscriminator.GetShortValue()
+                                                                              : mBLEScanConfig.mDiscriminator.GetLongValue()));
         ChipLogProgress(Ble, "Device discriminator match. Attempting to connect.");
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
     {
-        if (strcmp(bluez_device1_get_address(&device), mBLEScanConfig.mAddress.c_str()) != 0)
-        {
-            return;
-        }
+        auto isMatch = strcmp(address, mBLEScanConfig.mAddress.c_str()) == 0;
+        VerifyOrReturn(isMatch,
+                       ChipLogError(Ble, "Skip connection: Device address does not match: %s != %s", address,
+                                    mBLEScanConfig.mAddress.c_str()));
         ChipLogProgress(Ble, "Device address match. Attempting to connect.");
     }
     else
@@ -826,7 +848,10 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, &mEndpoint);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    mEndpoint.ConnectDevice(device);
+    CHIP_ERROR err = mEndpoint.ConnectDevice(device);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Ble, "Device connection failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    ChipLogProgress(Ble, "New device connected: %s", address);
 }
 
 void BLEManagerImpl::OnScanComplete()

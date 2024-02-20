@@ -10726,38 +10726,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 namespace PowerTopology {
 namespace Attributes {
 
-namespace FeatureMap {
-
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::PowerTopology::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerTopology::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
-}
-
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value)

@@ -235,7 +235,7 @@
 
     if (!validPayload) {
         if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT logContext:onboardingPayload];
         }
         return nil;
     }
@@ -336,7 +336,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     if (self.commissioningFlow == MTRCommissioningFlowInvalid) {
         // No idea how to map this to the standard codes.
         if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE logContext:@"invalid flow"];
         }
         return nil;
     }
@@ -344,7 +344,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     if (self.hasShortDiscriminator) {
         // Can't create a QR code with a short discriminator.
         if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE logContext:@"cannot create a QR code with a short descrimintor"];
         }
         return nil;
     }
@@ -352,7 +352,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     if (self.discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
         // Can't create a QR code if we don't know the discovery capabilities.
         if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE logContext:@"cannot create a QR code with unknown discovery capabilities"];
         }
         return nil;
     }

@@ -1703,12 +1703,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+ * @def CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
  *
- * @brief Device supports sending multiple batch commands in a single Invoke Request Message.
+ * @brief CommandSender will use built-in support to enable sending batch commands in a single Invoke Request Message.
+ *
+ * **Important:** This feature is code and RAM intensive. Enable only on platforms where these
+ * resources are not constrained.
  */
-#ifndef CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
-#define CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED 0
+#ifndef CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+#define CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS 0
 #endif
 
 /**
@@ -1743,6 +1746,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 #define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 0
 #endif
+
+/**
+ *  @def CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+ *
+ *  @brief
+ *    Maximum number of simultaneously active bdx log transfers.
+ *
+ */
+#ifndef CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+#define CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS 5
+#endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 
 /**
  * @}

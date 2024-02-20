@@ -84,8 +84,9 @@ void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
 jboolean OnOffManager::SetOnOff(jint endpoint, bool value)
 {
     chip::DeviceLayer::StackLock stack;
-    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    chip::Protocols::InteractionModel::Status status =
+        app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
+    return status == chip::Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
@@ -112,6 +113,7 @@ CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
 
 void OnOffManager::HandleOnOffChanged(bool value)
 {
+    DeviceLayer::StackUnlock unlock;
     ChipLogProgress(Zcl, "OnOffManager::HandleOnOffChanged");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

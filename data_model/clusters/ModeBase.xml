@@ -61,6 +61,9 @@ Davis, CA 95616, USA
     <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status.
 Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId name="Mode Base"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MODB" scope="Endpoint"/>
   <features>
     <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
@@ -70,29 +73,24 @@ Require at least one standard mode tag. Define reserved ranges for base/derived 
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label" type="string" default="MS">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="64"/>
       </field>
       <field id="1" name="Mode" type="uint8" default="MS">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="ModeTags" type="list" default="MS">
         <entry type="ModeTagStruct"/>
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="8"/>
       </field>
     </struct>
     <struct name="ModeTagStruct">
       <field id="0" name="MfgCode" type="vendor-id">
-        <access read="true"/>
         <optionalConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="Value" type="enum16">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
     </struct>
@@ -127,7 +125,7 @@ Require at least one standard mode tag. Define reserved ranges for base/derived 
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ChangeToMode" response="ChangeToModeResponse">
+    <command id="0x00" name="ChangeToMode" direction="commandToServer" response="ChangeToModeResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="NewMode" type="uint8">

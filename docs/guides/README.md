@@ -34,7 +34,6 @@
 ## Development Guides
 
 -   [Access Control](./access-control-guide.md)
--   [IP Commissioning](./ip_commissioning.md)
 
 ## Setup Guides
 

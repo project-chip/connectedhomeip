@@ -83,8 +83,8 @@ class App:
     def waitForAnyAdvertisement(self):
         self.__waitFor("mDNS service published:", self.process, self.outpipe)
 
-    def waitForMessage(self, message):
-        self.__waitFor(message, self.process, self.outpipe)
+    def waitForMessage(self, message, timeoutInSeconds=10):
+        self.__waitFor(message, self.process, self.outpipe, timeoutInSeconds)
         return True
 
     def kill(self):
@@ -124,7 +124,7 @@ class App:
                     self.kvsPathSet.add(value)
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
-    def __waitFor(self, waitForString, server_process, outpipe):
+    def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
         logging.debug('Waiting for %s' % waitForString)
 
         start_time = time.monotonic()
@@ -139,7 +139,7 @@ class App:
                             (waitForString, server_process.returncode))
                 logging.error(died_str)
                 raise Exception(died_str)
-            if time.monotonic() - start_time > 10:
+            if time.monotonic() - start_time > timeoutInSeconds:
                 raise Exception('Timeout while waiting for %s' % waitForString)
             time.sleep(0.1)
             ready, self.lastLogIndex = outpipe.CapturedLogContains(
@@ -176,6 +176,7 @@ class TestTarget(Enum):
     BRIDGE = auto()
     LIT_ICD = auto()
     MWO = auto()
+    RVC = auto()
 
 
 @dataclass
@@ -191,10 +192,11 @@ class ApplicationPaths:
     microwave_oven_app: typing.List[str]
     chip_repl_yaml_tester_cmd: typing.List[str]
     chip_tool_with_python_cmd: typing.List[str]
+    rvc_app: typing.List[str]
 
     def items(self):
         return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app,
-                self.tv_app, self.bridge_app, self.lit_icd_app, self.microwave_oven_app, self.chip_repl_yaml_tester_cmd, self.chip_tool_with_python_cmd]
+                self.tv_app, self.bridge_app, self.lit_icd_app, self.microwave_oven_app, self.chip_repl_yaml_tester_cmd, self.chip_tool_with_python_cmd, self.rvc_app]
 
 
 @dataclass
@@ -305,6 +307,8 @@ class TestDefinition:
                 target_app = paths.lit_icd_app
             elif self.target == TestTarget.MWO:
                 target_app = paths.microwave_oven_app
+            elif self.target == TestTarget.RVC:
+                target_app = paths.rvc_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
@@ -334,6 +338,13 @@ class TestDefinition:
                     apps_register.add(key, app)
                     # Remove server application storage (factory reset),
                     # so it will be commissionable again.
+                    app.factoryReset()
+
+                    # It may sometimes be useful to run the same app multiple times depending
+                    # on the implementation. So this code creates a duplicate entry but with a different
+                    # key.
+                    app = App(runner, path)
+                    apps_register.add(f'{key}#2', app)
                     app.factoryReset()
 
             if dry_run:

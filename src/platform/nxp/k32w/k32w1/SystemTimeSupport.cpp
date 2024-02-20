@@ -25,7 +25,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-extern "C" uint32_t otPlatAlarmMicroGetNow(void);
+#include <openthread/platform/time.h>
 
 namespace chip {
 namespace System {
@@ -43,7 +43,7 @@ uint64_t sBootTimeUS = 0;
 
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return Clock::Microseconds64(otPlatAlarmMicroGetNow());
+    return Clock::Microseconds64(otPlatTimeGet());
 }
 
 Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
@@ -53,12 +53,12 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 
 uint64_t GetClock_Monotonic(void)
 {
-    return otPlatAlarmMicroGetNow();
+    return otPlatTimeGet();
 }
 
 uint64_t GetClock_MonotonicMS(void)
 {
-    return (otPlatAlarmMicroGetNow() / 1000);
+    return (otPlatTimeGet() / 1000);
 }
 
 uint64_t GetClock_MonotonicHiRes(void)

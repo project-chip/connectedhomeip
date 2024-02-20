@@ -58,7 +58,7 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
-bool Engine::IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
+bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
                                        const ConcreteReadAttributePath & aPath)
 {
     bool existPathMatch       = false;

@@ -86,6 +86,7 @@ class Status(enum.IntEnum):
     FailsafeRequired = 0xca
     InvalidInState = 0xcb
     NoCommandResponse = 0xcc
+    WriteIgnored = 0xf0
 
 
 class InteractionModelError(ChipStackException):

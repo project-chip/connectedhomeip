@@ -60,6 +60,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial version"/>
     <revision revision="2" summary="The MfgCode field was marked non-nullable. Updated the related text. Reorder sections."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0050" name="Mode Select"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MOD" scope="Endpoint"/>
   <features>
     <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
@@ -69,29 +72,24 @@ Davis, CA 95616, USA
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label" type="string" default="MS">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="64"/>
       </field>
       <field id="1" name="Mode" type="uint8" default="MS">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="SemanticTags" type="list" default="MS">
         <entry type="SemanticTagStruct"/>
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="64"/>
       </field>
     </struct>
     <struct name="SemanticTagStruct">
       <field id="0" name="MfgCode" type="vendor-id">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="Value" type="enum16">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
     </struct>
@@ -138,7 +136,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ChangeToMode" response="Y">
+    <command id="0x00" name="ChangeToMode" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="NewMode" type="uint8">

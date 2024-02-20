@@ -60,6 +60,7 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.tracing import TracingContext
+from global_attribute_ids import GlobalAttributeIds
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
@@ -412,6 +413,9 @@ class ClusterMapper:
             return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
 
     def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
+        global_attrs = [item.value for item in GlobalAttributeIds]
+        if attribute_id in global_attrs:
+            return f"Attribute {GlobalAttributeIds(attribute_id).to_name()} {attribute_id}, 0x{attribute_id:04X}"
         mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
         if not mapping:
             return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
@@ -976,8 +980,21 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.runner_hook.test_stop(exception=None, duration=test_duration)
 
     def pics_guard(self, pics_condition: bool):
+        """Checks a condition and if False marks the test step as skipped and
+           returns False, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("4")
+              if self.pics_guard(condition_needs_to_be_true_to_execute):
+                  # do the test for step 4
+
+              self.step("5")
+              if self.pics_guard(condition2_needs_to_be_true_to_execute):
+                  # do the test for step 5
+           """
         if not pics_condition:
             self.mark_current_step_skipped()
+        return pics_condition
 
     def mark_current_step_skipped(self):
         try:
@@ -1001,16 +1018,24 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step(step)
         self.mark_current_step_skipped()
 
-    def skip_all_remaining_steps(self, starting_step):
+    def skip_all_remaining_steps(self, starting_step_number):
         ''' Skips all remaining test steps starting with provided starting step
 
-            starting_step must be provided, and is not derived intentionally. By providing argument
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally. By providing argument
                 test is more deliberately identifying where test skips are starting from, making
                 it easier to validate against the test plan for correctness.
         '''
-        last_step = len(self.get_test_steps(self.current_test_info.name)) + 1
-        for index in range(starting_step, last_step):
-            self.skip_step(index)
+        steps = self.get_test_steps(self.current_test_info.name)
+        for idx, step in enumerate(steps):
+            if step.test_plan_number == starting_step_number:
+                starting_step_idx = idx
+                break
+        else:
+            asserts.fail("skip_all_remaining_steps was provided with invalid starting_step_num")
+        remaining = steps[starting_step_idx:]
+        for step in remaining:
+            self.skip_step(step.test_plan_number)
 
     def step(self, step: typing.Union[int, str]):
         test_name = self.current_test_info.name
