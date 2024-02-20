@@ -112,6 +112,10 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
                                          "are listed under the NSBonjourServices key in Info.plist",
             nil);
         break;
+    case CHIP_ERROR_CANCELLED.AsInteger():
+        code = MTRErrorCodeCancelled;
+        description = NSLocalizedString(@"The operation was cancelled.", nil);
+        break;
     default:
         code = MTRErrorCodeGeneralError;
         description = [NSString stringWithFormat:NSLocalizedString(@"General error: %u", nil), errorCode.AsInteger()];
@@ -298,6 +302,9 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         break;
     case MTRErrorCodeDNSSDUnauthorized:
         code = CHIP_ERROR_DNS_SD_UNAUTHORIZED.AsInteger();
+        break;
+    case MTRErrorCodeCancelled:
+        code = CHIP_ERROR_CANCELLED.AsInteger();
         break;
     case MTRErrorCodeGeneralError: {
         id userInfoErrorCode = error.userInfo[@"errorCode"];

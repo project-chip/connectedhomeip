@@ -91,6 +91,11 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * application's Info.plist.
      */
     MTRErrorCodeDNSSDUnauthorized MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 15,
+
+    /**
+     * The operation was cancelled.
+     */
+    MTRErrorCodeCancelled MTR_NEWLY_AVAILABLE = 16,
 };
 // clang-format on
 
