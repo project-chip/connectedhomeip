@@ -44,8 +44,8 @@
 #if SL_ICD_ENABLED && SIWX_917
 #include "rsi_rom_power_save.h"
 #include "sl_si91x_button_pin_config.h"
-#include "sl_si91x_m4_ps.h"
 #include "sl_si91x_driver.h"
+#include "sl_si91x_m4_ps.h"
 
 // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
 #define BUTTON_PRESSED 1
@@ -385,7 +385,7 @@ static sl_status_t wfx_rsi_init(void)
     }
 
     // Initiate and program the key required for TRNG hardware engine
-    status = sl_si91x_trng_program_key((uint32_t *)trngKey, TRNGKEY_SIZE);
+    status = sl_si91x_trng_program_key((uint32_t *) trngKey, TRNGKEY_SIZE);
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("TRNG Key Programming Failed");
