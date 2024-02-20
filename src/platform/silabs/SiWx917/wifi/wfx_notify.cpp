@@ -222,9 +222,8 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
             if(!BaseApplication::sAppDelegate.isComissioningStarted) {
                 set_alarm_interrupt_timer(WLAN_RETRY_TIMER_MS / 1000);
                 wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
-                // Adding a small delay, to trigger the idle task and letting the device go to sleep
-                // TODO: Change this to a callback/event handler
-                vTaskDelay(pdMS_TO_TICKS(5));
+                // TODO: remove this once TICKLESS_IDLE is applied. MATTER-3134
+                sl_wfx_host_si91x_sleep_wakeup();
             } else {
                 vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
             }
@@ -252,9 +251,8 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
 #if SL_ICD_ENABLED
         set_alarm_interrupt_timer(retryInterval / 1000);
         wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
-        // Adding a small delay, to trigger the idle task and letting the device go to sleep
-        // TODO: Change this to a callback/event handler
-        vTaskDelay(pdMS_TO_TICKS(5));
+        // TODO: remove this once TICKLESS_IDLE is applied. MATTER-3134
+        sl_wfx_host_si91x_sleep_wakeup();
 #else
         vTaskDelay(pdMS_TO_TICKS(retryInterval));
 #endif // SL_ICD_ENABLED

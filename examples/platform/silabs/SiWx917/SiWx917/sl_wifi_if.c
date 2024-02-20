@@ -589,10 +589,14 @@ static sl_status_t wfx_rsi_do_join(void)
 
         sl_wifi_set_join_callback(join_callback_handler, NULL);
 
+#if SL_ICD_ENABLED
         // Setting the listen interval to 0 which will set it to DTIM interval
         sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0 };
         status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
 
+        sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 5};
+        sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
+#endif // SL_ICD_ENABLED
         /* Try to connect Wifi with given Credentials
          * untill there is a success or maximum number of tries allowed
          */
