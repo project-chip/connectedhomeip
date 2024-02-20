@@ -20,6 +20,7 @@
 
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 #include <map>
+#include <spi_flash_mmap.h>
 
 namespace chip {
 namespace app {
@@ -54,12 +55,59 @@ private:
     LogProvider(const LogProvider &)             = delete;
     LogProvider & operator=(const LogProvider &) = delete;
 
-    // This tracks the ByteSpan for each session
-    std::map<LogSessionHandle, ByteSpan *> mSessionSpanMap;
+    struct CrashLogContext
+    {
+        spi_flash_mmap_handle_t mappedHandle = 0;
+        const void * mappedAddress           = nullptr;
+        uint32_t crashSize                   = 0;
+        uint32_t readOffset                  = 0;
+        bool isMapped                        = 0;
+
+        void Reset()
+        {
+            this->mappedHandle  = 0;
+            this->mappedAddress = nullptr;
+            this->crashSize     = 0;
+            this->readOffset    = 0;
+            this->isMapped      = 0;
+        }
+    };
+
+    static CrashLogContext sCrashLogContext;
+
+    struct LogContext
+    {
+        IntentEnum intent;
+        union
+        {
+            struct
+            {
+                ByteSpan span;
+            } EndUserSupport;
+            struct
+            {
+                ByteSpan span;
+            } NetworkDiag;
+            struct
+            {
+                // TODO: This be a ref counted, so that we can serve parallel queries for crash logs
+                CrashLogContext * logContext;
+            } Crash;
+        };
+    };
+
+    // This tracks the ByteSpan for each session, need to change this to void *
+    std::map<LogSessionHandle, LogContext *> mSessionContextMap;
 
     LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
 
-    const uint8_t * GetDataStartForIntent(IntentEnum intent);
+    // Helpers for Retrieving Core Dump from flash
+    size_t GetCrashSize();
+    CHIP_ERROR MapCrashPartition(CrashLogContext * crashLogContext);
+
+    CHIP_ERROR PrepareLogContextForIntent(LogContext * context, IntentEnum intent);
+    void CleanupLogContextForIntent(LogContext * contex);
+    CHIP_ERROR GetDataForIntent(LogContext * context, MutableByteSpan & outBuffer, bool & outIsEndOfLog);
 };
 
 } // namespace DiagnosticLogs

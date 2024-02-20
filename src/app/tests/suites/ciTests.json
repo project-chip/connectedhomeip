@@ -50,12 +50,21 @@
         "Test_TC_CNET_1_3"
     ],
     "Descriptor": ["Test_TC_DESC_1_1"],
+    "DeviceEnergyManagementMode": ["Test_TC_DEMM_1_1", "Test_TC_DEMM_2_1"],
     "EthernetNetworkDiagnostics": [
         "Test_TC_DGETH_1_1",
         "Test_TC_DGETH_2_1",
         "Test_TC_DGETH_2_2"
     ],
     "DiagnosticsLogs": ["Test_TC_DLOG_1_1"],
+    "EnergyEVSE": ["Test_TC_EEVSE_1_1", "Test_TC_EEVSE_2_1"],
+    "EnergyEVSEMode": [
+        "Test_TC_EEVSEM_1_1",
+        "Test_TC_EEVSEM_2_1",
+        "Test_TC_EEVSEM_3_1",
+        "Test_TC_EEVSEM_3_2",
+        "Test_TC_EEVSEM_3_3"
+    ],
     "FlowMeasurement": ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"],
     "FixedLabel": ["Test_TC_FLABEL_1_1", "Test_TC_FLABEL_2_1"],
     "FanControl": [
@@ -69,7 +78,11 @@
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1"],
     "GroupKeyManagement": ["Test_TC_GRPKEY_1_1", "Test_TC_GRPKEY_2_2"],
-    "IcdManagement": ["TestIcdManagementCluster", "Test_TC_ICDM_1_1"],
+    "IcdManagement": [
+        "TestIcdManagementCluster",
+        "Test_TC_ICDM_1_1",
+        "Test_TC_ICDM_3_4"
+    ],
     "Identify": [
         "Test_TC_I_1_1",
         "Test_TC_I_2_1",
@@ -177,8 +190,8 @@
         "Test_TC_OO_2_2",
         "Test_TC_OO_2_4"
     ],
-    "OperationalState": ["Test_TC_OPSTATE_1_1", "Test_TC_OPSTATE_2_4"],
     "PowerSource": ["Test_TC_PS_1_1", "Test_TC_PS_2_1"],
+    "PowerTopology": ["Test_TC_PWRTL_1_1"],
     "PressureMeasurement": [
         "Test_TC_PRS_1_1",
         "Test_TC_PRS_2_1",
@@ -340,6 +353,7 @@
         "TestScenesFabricRemoval",
         "TestScenesFabricSceneInfo",
         "TestScenesMultiFabric",
+        "TestScenesMaxCapacity",
         "Test_TC_S_1_1",
         "Test_TC_S_2_1",
         "Test_TC_S_2_2",
@@ -389,9 +403,12 @@
         "ConcentrationMeasurement",
         "ContentAppObserver",
         "DeviceManagement",
+        "DeviceEnergyManagementMode",
         "Descriptor",
         "DiagnosticsLogs",
         "EthernetNetworkDiagnostics",
+        "EnergyEVSE",
+        "EnergyEVSEMode",
         "FlowMeasurement",
         "FixedLabel",
         "FanControl",

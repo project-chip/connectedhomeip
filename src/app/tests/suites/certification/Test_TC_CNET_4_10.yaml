@@ -125,6 +125,11 @@ tests:
           "Step 4: TH sends RemoveNetwork Command to the DUT with NetworkID
           field set to PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb
           field set to 1"
+      verification: |
+          Verify that DUT sends NetworkConfigResponse to command with the following fields:
+          NetworkingStatus is success
+
+          NetworkIndex is 'Userwifi_netidx'
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       command: "RemoveNetwork"
       arguments:
@@ -136,6 +141,8 @@ tests:
       response:
           values:
               - name: "NetworkingStatus"
+                value: 0
+              - name: "NetworkIndex"
                 value: 0
 
     - label: "Step 5: TH reads Networks attribute from the DUT"
@@ -264,6 +271,11 @@ tests:
           "Step 14: TH sends RemoveNetwork Command to the DUT with NetworkID
           field set to extended PAN ID of
           PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb field set to 1"
+      verification: |
+          Verify that DUT sends NetworkConfigResponse to command with the following fields:
+          NetworkingStatus is success
+
+          NetworkIndex is 'Userwifi_netidx'
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       command: "RemoveNetwork"
       arguments:
@@ -275,6 +287,8 @@ tests:
       response:
           values:
               - name: "NetworkingStatus"
+                value: 0
+              - name: "NetworkIndex"
                 value: 0
 
     - label: "Step 15: TH sends the CommissioningComplete command to the DUT"

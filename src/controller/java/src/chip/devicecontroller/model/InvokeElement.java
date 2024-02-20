@@ -77,6 +77,19 @@ public final class InvokeElement {
     return commandId;
   }
 
+  // For use in JNI.
+  private long getEndpointId(long wildcardValue) {
+    return endpointId.getId(wildcardValue);
+  }
+
+  private long getClusterId(long wildcardValue) {
+    return clusterId.getId(wildcardValue);
+  }
+
+  private long getCommandId(long wildcardValue) {
+    return commandId.getId(wildcardValue);
+  }
+
   public Optional<Integer> getGroupId() {
     return groupId;
   }

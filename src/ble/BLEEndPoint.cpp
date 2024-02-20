@@ -1040,6 +1040,7 @@ CHIP_ERROR BLEEndPoint::DriveSending()
         else
         {
             // Nothing to send!
+            mBle->mApplicationDelegate->CheckNonConcurrentBleClosing();
         }
     }
 
