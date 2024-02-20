@@ -188,8 +188,8 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
         SILABS_LOG("F: Join Event received with %u bytes payload\n", result_length);
         callback_status = *(sl_status_t *) result;
         wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTED);
-        wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
         is_wifi_disconnection_event = true;
+        wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
         if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
         {
             xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
@@ -256,28 +256,35 @@ void sl_wfx_host_si91x_sleep_wakeup()
  * @brief
  *       Setting the RS911x in DTIM sleep based mode
  *
- * @param[in] None
+ * @param[in] sl_si91x_ble_state : State to set for the BLE
+              sl_si91x_wifi_state : State to set for the WiFi
  * @return
  *        None
  *********************************************************************/
-int32_t wfx_rsi_power_save()
+int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,sl_si91x_performance_profile_t sl_si91x_wifi_state)
 {
     int32_t status;
-    status = rsi_bt_power_save_profile(2, 0);
+
+    status = rsi_bt_power_save_profile(sl_si91x_ble_state, 0);
     if (status != RSI_SUCCESS)
     {
         SILABS_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
         return status;
     }
-
-    sl_wifi_performance_profile_t wifi_profile = { .profile = ASSOCIATED_POWER_SAVE };
+    sl_wifi_performance_profile_t wifi_profile = { .profile = sl_si91x_wifi_state };
     status                                     = sl_wifi_set_performance_profile(&wifi_profile);
     if (status != RSI_SUCCESS)
     {
         SILABS_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
         return status;
     }
-    wfx_rsi.dev_state |= WFX_RSI_ST_SLEEP_READY;
+    if(sl_si91x_wifi_state == HIGH_PERFORMANCE)
+    {
+        wfx_rsi.dev_state &= ~(WFX_RSI_ST_SLEEP_READY);
+    }
+    else{
+        wfx_rsi.dev_state |= WFX_RSI_ST_SLEEP_READY;
+    }
     return status;
 }
 #endif /* SL_ICD_ENABLED */
@@ -630,11 +637,11 @@ static sl_status_t wfx_rsi_do_join(void)
                            wfx_rsi.join_retries);
                 wfx_rsi.join_retries += 1;
                 wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
+                wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
                 if (is_wifi_disconnection_event || wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT)
                 {
                     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
                 }
-                wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
             }
         }
     }

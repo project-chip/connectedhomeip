@@ -32,6 +32,9 @@
 
 #include "sl_status.h"
 
+#include "rsi_common_apis.h"
+#include "sl_wifi_device.h"
+
 #define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS 1000
 /* Wi-Fi events*/
 #define SL_WFX_STARTUP_IND_ID (1)
@@ -246,7 +249,7 @@ sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_w
 void * sl_si91x_host_get_buffer_data(sl_wifi_buffer_t * buffer, uint16_t offset, uint16_t * data_length);
 
 #if SL_ICD_ENABLED
-sl_status_t wfx_power_save();
+sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state,sl_si91x_performance_profile_t sl_si91x_wifi_state);
 #endif /* SL_ICD_ENABLED */
 
 void wfx_ipv6_notify(int got_ip);

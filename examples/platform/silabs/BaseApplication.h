@@ -30,6 +30,7 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/server/AppDelegate.h>
 #include <app/util/config.h>
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
@@ -62,10 +63,20 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+class BaseApplicationDelegate : public AppDelegate
+{
+public:
+    bool isComissioningStarted;
+    void OnCommissioningSessionStarted() override;
+    void OnCommissioningSessionStopped() override;
+    void OnCommissioningWindowClosed() override;
+};
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+
 /**********************************************************
  * BaseApplication Declaration
  *********************************************************/
-
 class BaseApplication
 {
 
@@ -75,6 +86,9 @@ public:
     static bool sIsProvisioned;
     static bool sIsFactoryResetTriggered;
     static LEDWidget * sAppActionLed;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+    static BaseApplicationDelegate sAppDelegate;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 
     /**
      * @brief Create AppTask task and Event Queue
