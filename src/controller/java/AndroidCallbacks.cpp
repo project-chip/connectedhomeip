@@ -138,7 +138,6 @@ jobject GetNodeStateObj(JNIEnv * env, const char * nodeStateClassSignature, jobj
         JniReferences::GetInstance().FindMethod(env, wrapperCallback, "getNodeState", nodeStateClassSignature, &getNodeStateMethod);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Could not find getNodeState method"));
 
-    DeviceLayer::StackUnlock unlock;
     jobject ret = env->CallObjectMethod(wrapperCallback, getNodeStateMethod);
     VerifyOrReturnValue(!env->ExceptionCheck(), nullptr, env->ExceptionDescribe());
 
@@ -270,6 +269,7 @@ CHIP_ERROR ConvertReportTlvToJson(const uint32_t id, TLV::TLVReader & data, std:
 void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                      const app::StatusIB & aStatus)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -408,6 +408,7 @@ void ReportCallback::UpdateClusterDataVersion()
 
 void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -642,7 +643,6 @@ void ReportCallback::ReportError(const app::ConcreteAttributePath * attributePat
         eventClusterId  = static_cast<jlong>(eventPath->mClusterId);
         eventId         = static_cast<jlong>(eventPath->mEventId);
     }
-
     env->CallVoidMethod(wrapperCallback, onErrorMethod, isAttributePath, attributeEndpointId, attributeClusterId, attributeId,
                         isEventPath, eventEndpointId, eventClusterId, eventId, exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
