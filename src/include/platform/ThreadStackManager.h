@@ -125,7 +125,7 @@ public:
     /*
      * @brief Utility function to clear all thread SRP host and services established between the SRP server and client.
      * It is expected that a transaction is done between the SRP server and client so the clear request is applied on both ends
-     * 
+     *
      * A generic implementation is provided in `GenericThreadStackManagerImpl_OpenThread` with the SoC OT stack
      */
     CHIP_ERROR ClearAllSrpHostAndServices();
