@@ -137,7 +137,7 @@ CHIP_ERROR BridgedDeviceBasicInfoAttributeAccess::Read(const ConcreteReadAttribu
         }
         case ClusterRevision::Id: {
             // Update version if bridged-device-basic.xml version is changed
-            uint16_t revision = 1;
+            uint16_t revision = 3;
             return aEncoder.Encode(revision);
         }
         }
