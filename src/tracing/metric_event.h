@@ -18,9 +18,6 @@
 
 #include <matter/tracing/build_config.h>
 #include <tracing/metric_macros.h>
-
-#if MATTER_TRACING_ENABLED
-
 #include <lib/core/CHIPError.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_keys.h>
@@ -129,5 +126,3 @@ inline bool logMetricIfError(const ::chip::ChipError & err, MetricKey metricKey)
 
 } // namespace Tracing
 } // namespace chip
-
-#endif // MATTER_TRACING_ENABLED
