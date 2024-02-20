@@ -33,7 +33,10 @@ config("nxp_platform_config") {
       ".",
       "../../common/factory_data",
     ]
-    defines += [ "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1" ]
+    defines += [
+      "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1",
+      "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA=1"
+    ]
 
     if(chip_enable_secure_dac_private_key_storage == 1){
       defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
