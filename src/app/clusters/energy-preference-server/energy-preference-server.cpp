@@ -69,18 +69,22 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         if (gsDelegate != nullptr)
         {
             return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-                chip::Percent step;
-                char buffer[64];
-                chip::Optional<chip::MutableCharSpan> label{ chip::MutableCharSpan(buffer) };
                 size_t index   = 0;
                 CHIP_ERROR err = CHIP_NO_ERROR;
-                while ((err = gsDelegate->GetEnergyBalanceAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
+                do
                 {
-                    BalanceStruct::Type balance = { step,
-                                                    label.HasValue() ? Optional<CharSpan>(label.Value()) : Optional<CharSpan>() };
-                    ReturnErrorOnFailure(encoder.Encode(balance));
-                    index++;
-                }
+                    Percent step;
+                    char buffer[64];
+                    Optional<MutableCharSpan> label{ MutableCharSpan(buffer) };
+                    if ((err = gsDelegate->GetEnergyBalanceAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
+                        {
+                            BalanceStruct::Type balance = { step,
+                                                            label.HasValue() ? Optional<CharSpan>(label.Value()) : Optional<CharSpan>() };
+                            ReturnErrorOnFailure(encoder.Encode(balance));
+                            index++;
+                        }
+                } while (err == CHIP_NO_ERROR);
+
                 if (err == CHIP_ERROR_NOT_FOUND)
                 {
                     return CHIP_NO_ERROR;
@@ -123,21 +127,24 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         if (gsDelegate != nullptr)
         {
             return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-                chip::Percent step;
-                char buffer[64];
-                chip::Optional<chip::MutableCharSpan> label{ chip::MutableCharSpan(buffer) };
                 size_t index   = 0;
                 CHIP_ERROR err = CHIP_NO_ERROR;
-                while ((err = gsDelegate->GetLowPowerModeSensitivityAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
+                do
                 {
-                    BalanceStruct::Type balance = { step,
-                                                    label.HasValue() ? Optional<CharSpan>(label.Value()) : Optional<CharSpan>() };
-                    ReturnErrorOnFailure(encoder.Encode(balance));
-                    index++;
-                }
+                    Percent step;
+                    char buffer[64];
+                    Optional<MutableCharSpan> label{ MutableCharSpan(buffer) };
+                    if ((err = gsDelegate->GetLowPowerModeSensitivityAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
+                        {
+                            BalanceStruct::Type balance = { step,
+                                                            label.HasValue() ? Optional<CharSpan>(label.Value()) : Optional<CharSpan>() };
+                            ReturnErrorOnFailure(encoder.Encode(balance));
+                            index++;
+                        }
+                } while err == CHIP_NO_ERROR);
                 if (err == CHIP_ERROR_NOT_FOUND)
                 {
-                    return CHIP_NO_ERROR;
+                        return CHIP_NO_ERROR;
                 }
                 return err;
             });
