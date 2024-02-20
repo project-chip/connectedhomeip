@@ -141,7 +141,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
                             ReturnErrorOnFailure(encoder.Encode(balance));
                             index++;
                         }
-                } while err == CHIP_NO_ERROR);
+                } while (err == CHIP_NO_ERROR);
                 if (err == CHIP_ERROR_NOT_FOUND)
                 {
                         return CHIP_NO_ERROR;
