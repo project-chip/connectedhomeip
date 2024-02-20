@@ -648,8 +648,12 @@ CHIP_ERROR ThreadStackManagerImpl::_RemoveInvalidSrpServices()
 
 CHIP_ERROR ThreadStackManagerImpl::_ClearAllSrpHostAndServices()
 {
-    // TODO : could not find info on Tizen thread apis
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    for (auto it = mSrpClientServices.begin(); it != mSrpClientServices.end();)
+    {
+        ReturnErrorOnFailure(_RemoveSrpService(it->mInstanceName, it->mName));
+        it = mSrpClientServices.erase(it);
+    }
+    return CHIP_NO_ERROR;
 }
 
 void ThreadStackManagerImpl::_ThreadIpAddressCb(int index, char * ipAddr, thread_ipaddr_type_e ipAddrType, void * userData)
