@@ -211,6 +211,8 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
                     jstring jlabelText     = static_cast<jstring>(env->GetObjectField(responseOptionObject, getLabelField));
                     VerifyOrReturnValue(jlabelText != nullptr, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(Zcl, "jlabelText null"));
                     JniUtfString * label = new JniUtfString(env, jlabelText);
+                    VerifyOrReturnValue(label != nullptr, CHIP_ERROR_NO_MEMORY, ChipLogError(Zcl, "label null"));
+
                     optionLabels.push_back(label);
 
                     option.label = Optional<CharSpan>(label->charSpan());

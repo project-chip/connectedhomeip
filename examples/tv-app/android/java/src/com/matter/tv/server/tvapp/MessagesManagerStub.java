@@ -26,7 +26,7 @@ import java.util.Vector;
 public class MessagesManagerStub implements MessagesManager {
   private static final String TAG = MessagesManagerStub.class.getSimpleName();
 
-  private int endpoint;
+  private int endpoint = -1;
 
   private Map<String,Message> messages = new HashMap<String,Message>();
 
