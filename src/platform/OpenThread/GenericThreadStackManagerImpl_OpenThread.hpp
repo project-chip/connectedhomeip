@@ -1307,6 +1307,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
                 ThreadStackMgrImpl().mSrpClient.mIsInitialized = true;
                 ThreadStackMgrImpl().mSrpClient.mInitializedCallback(ThreadStackMgrImpl().mSrpClient.mCallbackContext,
                                                                      CHIP_NO_ERROR);
+
+                if (ThreadStackMgrImpl().mIsSrpClearAllRequested)
+                {
+                    ThreadStackMgrImpl().NotifySrpClearAllComplete();
+                    ThreadStackMgrImpl().mIsSrpClearAllRequested = false;
+                }
             }
         }
 
@@ -1357,12 +1363,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
     default:
         errorStr = "unknown error";
         break;
-    }
-
-    if (ThreadStackMgrImpl().mIsSrpClearAllRequested)
-    {
-        ThreadStackMgrImpl().NotifySrpClearAllComplete();
-        ThreadStackMgrImpl().mIsSrpClearAllRequested = false;
     }
 
     if (errorStr != nullptr)
@@ -1637,14 +1637,18 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ClearAllSrpHostAndServices()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
+    Impl()->LockThreadStack();
     if (!mIsSrpClearAllRequested)
     {
-        Impl()->LockThreadStack();
         error =
             MapOpenThreadError(otSrpClientRemoveHostAndServices(mOTInst, true /*aRemoveKeyLease*/, true /*aSendUnregToServer*/));
         mIsSrpClearAllRequested = true;
         Impl()->UnlockThreadStack();
         Impl()->WaitOnSrpClearAllComplete();
+    }
+    else
+    {
+        Impl()->UnlockThreadStack();
     }
     return error;
 }

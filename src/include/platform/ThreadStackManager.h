@@ -121,8 +121,25 @@ public:
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR InvalidateAllSrpServices(); ///< Mark all SRP services as invalid
     CHIP_ERROR RemoveInvalidSrpServices(); ///< Remove SRP services marked as invalid
+
+    /*
+     * @brief Utility function to clear all thread SRP host and services established between the SRP server and client.
+     * It is expected that a transaction is done between the SRP server and client so the clear request is applied on both ends
+     * 
+     * A generic implementation is provided in `GenericThreadStackManagerImpl_OpenThread` with the SoC OT stack
+     */
     CHIP_ERROR ClearAllSrpHostAndServices();
+
+    /*
+     * @brief Used to synchronize on the SRP server response confirming the clearing of the host and service entries
+     * Should be called in ClearAllSrpHostAndServices once the request is sent.
+     */
     void WaitOnSrpClearAllComplete();
+
+    /*
+     * @brief Notify that the SRP server confirmed the clearing of the host and service entries
+     * Should be called in the SRP Client set callback in the removal confirmation.
+     */
     void NotifySrpClearAllComplete();
     CHIP_ERROR SetupSrpHost(const char * aHostName);
     CHIP_ERROR ClearSrpHost(const char * aHostName);
