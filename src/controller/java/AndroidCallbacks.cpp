@@ -138,7 +138,6 @@ jobject GetNodeStateObj(JNIEnv * env, const char * nodeStateClassSignature, jobj
         JniReferences::GetInstance().FindMethod(env, wrapperCallback, "getNodeState", nodeStateClassSignature, &getNodeStateMethod);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Could not find getNodeState method"));
 
-    DeviceLayer::StackUnlock unlock;
     jobject ret = env->CallObjectMethod(wrapperCallback, getNodeStateMethod);
     VerifyOrReturnValue(!env->ExceptionCheck(), nullptr, env->ExceptionDescribe());
 
@@ -363,7 +362,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     env->CallVoidMethod(nodeState, addAttributeMethod, static_cast<jint>(aPath.mEndpointId), static_cast<jlong>(aPath.mClusterId),
                         static_cast<jlong>(aPath.mAttributeId), value, jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-    
+
     UpdateClusterDataVersion();
 }
 
