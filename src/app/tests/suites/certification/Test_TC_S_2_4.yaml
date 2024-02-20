@@ -296,7 +296,7 @@ tests:
     - label:
           "Step 6a: TH configures AC2 on DUT for all implemented application
           clusters supporting scenes."
-      PICS: PICS_SDK_CI_ONLY
+      PICS: S.S.C05.Rsp && PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
       arguments:
@@ -317,7 +317,7 @@ tests:
           Is DUT configured with AC2?
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: S.S.C05.Rsp && PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"

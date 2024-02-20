@@ -4455,6 +4455,27 @@ provisional cluster EnergyEvse = 153 {
   timed command ClearTargets(): DefaultSuccess = 7;
 }
 
+/** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
+provisional cluster PowerTopology = 156 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kNodeTopology = 0x1;
+    kTreeTopology = 0x2;
+    kSetTopology = 0x4;
+    kDynamicPowerFlow = 0x8;
+  }
+
+  readonly attribute optional endpoint_no availableEndpoints[] = 0;
+  readonly attribute optional endpoint_no activeEndpoints[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes and commands for selecting a mode from a list of supported options. */
 provisional cluster EnergyEvseMode = 157 {
   revision 1;
@@ -5247,7 +5268,7 @@ cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-provisional cluster FanControl = 514 {
+cluster FanControl = 514 {
   revision 4;
 
   enum AirflowDirectionEnum : enum8 {
@@ -8338,6 +8359,17 @@ endpoint 1 {
     handle command SetTargets;
     handle command GetTargets;
     handle command ClearTargets;
+  }
+
+  server cluster PowerTopology {
+    callback attribute availableEndpoints;
+    callback attribute activeEndpoints;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster EnergyEvseMode {

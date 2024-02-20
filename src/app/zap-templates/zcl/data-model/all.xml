@@ -72,6 +72,7 @@
    <xi:include href="chip/pressure-measurement-cluster.xml" />
    <xi:include href="chip/power-source-cluster.xml" />
    <xi:include href="chip/power-source-configuration-cluster.xml" />
+   <xi:include href="chip/power-topology-cluster.xml" />
    <xi:include href="chip/proxy-configuration-cluster.xml" />
    <xi:include href="chip/proxy-discovery-cluster.xml" />
    <xi:include href="chip/proxy-valid-cluster.xml" />

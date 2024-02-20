@@ -28,6 +28,7 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <platform/PlatformManager.h>
 #include <zap-generated/endpoint_config.h>
 
 namespace chip {
@@ -43,6 +44,7 @@ std::string ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttri
         return "";
     }
 
+    DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read being called for endpoint %d cluster %d attribute %d",
                     aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);

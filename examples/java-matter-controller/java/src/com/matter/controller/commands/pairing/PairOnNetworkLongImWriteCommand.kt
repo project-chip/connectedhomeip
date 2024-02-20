@@ -22,6 +22,7 @@ import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCal
 import chip.devicecontroller.WriteAttributesCallback
 import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
+import chip.devicecontroller.model.Status
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -51,11 +52,8 @@ class PairOnNetworkLongImWriteCommand(
       setFailure("write failure")
     }
 
-    override fun onResponse(attributePath: ChipAttributePath?) {
-      logger.log(Level.INFO, "Write receive OnResponse on ")
-      if (attributePath != null) {
-        logger.log(Level.INFO, attributePath.toString())
-      }
+    override fun onResponse(attributePath: ChipAttributePath, status: Status) {
+      logger.log(Level.INFO, "$attributePath : Write response: $status")
       setSuccess()
     }
   }

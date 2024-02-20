@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 19.8.7. [TC-MEDIAPLAYBACK-6.8] Text Track Verification
 
@@ -20,77 +19,53 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Media Playback"
+    endpoint: 3
+
+    ID_Value:
+        type: CHAR_STRING
+        defaultValue: activeTextTrackId_0
 
 tests:
-    - label: "Preconditions"
-      verification: |
-          1.DUT is powered on and not in a low power state
-          2.DUT has media playing with no corresponding text appearing on screen (text tracks are disabled)
-      disabled: true
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Step 1: TH reads the ActiveTextTrack attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0009
-      verification: |
-          ./chip-tool mediaplayback read active-text-track 1 3
-
-          [1705510042.296465][16330:16332] CHIP:DMG:         InteractionModelRevision = 11
-          [1705510042.296473][16330:16332] CHIP:DMG: }
-          [1705510042.296562][16330:16332] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0009 DataVersion: 900375739
-          [1705510042.296659][16330:16332] CHIP:TOO:   ActiveTextTrack: {
-          [1705510042.296668][16330:16332] CHIP:TOO:     Id: activeTextTrackId_0
-          [1705510042.296701][16330:16332] CHIP:TOO:     TrackAttributes: {
-          [1705510042.296710][16330:16332] CHIP:TOO:       LanguageCode: languageCode1
-          [1705510042.296722][16330:16332] CHIP:TOO:       DisplayName: displayName1
-          [1705510042.296731][16330:16332] CHIP:TOO:      }
-          [1705510042.296741][16330:16332] CHIP:TOO:    }
-          [1705510042.296826][16330:16332] CHIP:EM: <<< [E:46686i S:46889 M:218476891 (Ack:232741748)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1705510042.296863][16330:16332] CHIP:EM: Flushed pending ack for MessageCounter:232741748 on exchange 46686i
-      disabled: true
+      command: "readAttribute"
+      attribute: "ActiveTextTrack"
+      response:
+          value: { ID: "", TrackAttributes: null }
 
     - label: "Step 2: TH reads the AvailableTextTracks attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A000a
-      verification: |
-          ./chip-tool mediaplayback  read available-text-tracks 1 3
-
-          [1705510341.175871][16392:16394] CHIP:DMG:         InteractionModelRevision = 11
-          [1705510341.175877][16392:16394] CHIP:DMG: }
-          [1705510341.176016][16392:16394] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_000A DataVersion: 900375739
-          [1705510341.176056][16392:16394] CHIP:TOO:   AvailableTextTracks: 2 entries
-          [1705510341.176114][16392:16394] CHIP:TOO:     [1]: {
-          [1705510341.176121][16392:16394] CHIP:TOO:       Id: activeTextTrackId_0
-          [1705510341.176142][16392:16394] CHIP:TOO:       TrackAttributes: {
-          [1705510341.176148][16392:16394] CHIP:TOO:         LanguageCode: languageCode1
-          [1705510341.176156][16392:16394] CHIP:TOO:         DisplayName: displayName1
-          [1705510341.176163][16392:16394] CHIP:TOO:        }
-          [1705510341.176169][16392:16394] CHIP:TOO:      }
-          [1705510341.176184][16392:16394] CHIP:TOO:     [2]: {
-          [1705510341.176189][16392:16394] CHIP:TOO:       Id: activeTextTrackId_1
-          [1705510341.176195][16392:16394] CHIP:TOO:       TrackAttributes: {
-          [1705510341.176200][16392:16394] CHIP:TOO:         LanguageCode: languageCode2
-          [1705510341.176206][16392:16394] CHIP:TOO:         DisplayName: displayName2
-          [1705510341.176212][16392:16394] CHIP:TOO:        }
-          [1705510341.176218][16392:16394] CHIP:TOO:      }
-          [1705510341.176307][16392:16394] CHIP:EM: <<< [E:6048i S:22581 M:56736636 (Ack:198505019)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1705510341.176351][16392:16394] CHIP:EM: Flushed pending ack for MessageCounter:198505019 o
-      disabled: true
+      command: "readAttribute"
+      attribute: "AvailableTextTracks"
+      response:
+          constraints:
+              type: list
+              minLength: 1
 
     - label:
           "Step 3: TH sends a ActivateTextTrack command to DUT specifying the ID
           value from step 2"
       PICS: MEDIAPLAYBACK.S.C0d.Rsp
       verification: |
-          ./chip-tool mediaplayback activate-text-track activeAudioTrackId_0 1 3
+          ./chip-tool mediaplayback activate-text-track activeTextTrackId_1 1 3
 
-          [1705510090.516480][16340:16342] CHIP:DMG:         ],
-          [1705510090.516490][16340:16342] CHIP:DMG:
-          [1705510090.516496][16340:16342] CHIP:DMG:         InteractionModelRevision = 11
-          [1705510090.516502][16340:16342] CHIP:DMG: },
-          [1705510090.516532][16340:16342] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000D Status=0x0
-          [1705510090.516551][16340:16342] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1705510090.516603][16340:16342] CHIP:EM: <<< [E:38439i S:17770 M:29388041 (Ack:36384138)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1705510090.516635][16340:16342] CHIP:EM: Flushed pending ack for MessageCounter:36384138 on exchange 38439i
+          On TH(chip-tool), Verify response is a successful (value 0) status response
+
+          [1705920343.780331][14340:14342] CHIP:DMG:         InteractionModelRevision = 11
+          [1705920343.780356][14340:14342] CHIP:DMG: },
+          [1705920343.780439][14340:14342] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000D Status=0x0
+          [1705920343.780508][14340:14342] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1705920343.780756][14340:14342] CHIP:EM: <<< [E:28106i S:13054 M:170208295 (Ack:222967153)] (S) Msg TX to 1:0000000000000001 [D27C] [UDP:[fe80::e65f:1ff:fe0f:19ff%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
     - label: "Step 4: TH reads the ActiveTextTrack attribute from the DUT"
@@ -98,22 +73,19 @@ tests:
       verification: |
           ./chip-tool mediaplayback read active-text-track 1 3
 
-          [1705510111.140989][16347:16349] CHIP:DMG:         SuppressResponse = true,
-          [1705510111.140995][16347:16349] CHIP:DMG:         InteractionModelRevision = 11
-          [1705510111.141001][16347:16349] CHIP:DMG: }
-          [1705510111.141083][16347:16349] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0009 DataVersion: 900375739
-          [1705510111.141165][16347:16349] CHIP:TOO:   ActiveTextTrack: {
-          [1705510111.141173][16347:16349] CHIP:TOO:     Id: activeTextTrackId_0
-          [1705510111.141193][16347:16349] CHIP:TOO:     TrackAttributes: {
-          [1705510111.141200][16347:16349] CHIP:TOO:       LanguageCode: languageCode1
-          [1705510111.141207][16347:16349] CHIP:TOO:       DisplayName: displayName1
-          [1705510111.141214][16347:16349] CHIP:TOO:      }
-          [1705510111.141220][16347:16349] CHIP:TOO:    }
-          [1705510111.141301][16347:16349] CHIP:EM: <<< [E:17921i S:33385 M:33192485 (Ack:130923512)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1705510111.141335][16347:16349] CHIP:EM: Flushed pending ack for MessageCounter:130923512 on exchange 17921i
-          [1705510111.141507][16347:16347] CHIP:CTL: Shutting down the commissioner
-          [1705510111.141549][16347:16347] CHIP:CTL: Shutting down the controller
-          [1705510111.141558][16347:16347] CHIP:IN: Expiring all sessions for fabric 0x1!!
+          On TH(chip-tool), Verify that the attribute returned has a value equal to the ID value from step 2.
+
+          [1705920389.490076][14344:14346] CHIP:DMG:         InteractionModelRevision = 11
+          [1705920389.490106][14344:14346] CHIP:DMG: }
+          [1705920389.490347][14344:14346] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0009 DataVersion: 402582000
+          [1705920389.490552][14344:14346] CHIP:TOO:   ActiveTextTrack: {
+          [1705920389.490588][14344:14346] CHIP:TOO:     Id: activeTextTrackId_1
+          [1705920389.490634][14344:14346] CHIP:TOO:     TrackAttributes: {
+          [1705920389.490697][14344:14346] CHIP:TOO:       LanguageCode: languageCode2
+          [1705920389.490731][14344:14346] CHIP:TOO:       DisplayName: displayName2
+          [1705920389.490761][14344:14346] CHIP:TOO:      }
+          [1705920389.490790][14344:14346] CHIP:TOO:    }
+          [1705920389.491114][14344:14346] CHIP:EM: <<< [E:21221i S:59617 M:230711552 (Ack:159745975)] (S) Msg TX to 1:0000000000000001 [D27C] [UDP:[fe80::e65f:1ff:fe0f:19ff%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
       disabled: true
 
     - label: "Step 5: TH sends a DeactivateTextTrack command to DUT"
@@ -121,14 +93,12 @@ tests:
       verification: |
           ./chip-tool mediaplayback  deactivate-text-track 1 3
 
-          [1705510243.371080][16362:16364] CHIP:DMG:         InteractionModelRevision = 11
-          [1705510243.371088][16362:16364] CHIP:DMG: },
-          [1705510243.371125][16362:16364] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000E Status=0x0
-          [1705510243.371148][16362:16364] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1705510243.371203][16362:16364] CHIP:EM: <<< [E:35676i S:44821 M:224478765 (Ack:259090512)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1705510243.371238][16362:16364] CHIP:EM: Flushed pending ack for MessageCounter:259090512 on exchange 35676i
-          [1705510243.371429][16362:16362] CHIP:CTL: Shutting down the commissioner
-          [1705510243.371483][16362:16362] CHIP:CTL: Shutting down the controller
+          On TH(chip-tool), Verify response is a successful (value 0) status response
+          [1705920432.359994][14349:14351] CHIP:DMG: },
+          [1705920432.360088][14349:14351] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000E Status=0x0
+          [1705920432.360161][14349:14351] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1705920432.360460][14349:14351] CHIP:EM: <<< [E:34606i S:60686 M:245440743 (Ack:79584870)] (S) Msg TX to 1:0000000000000001 [D27C] [UDP:[fe80::e65f:1ff:fe0f:19ff%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1705920432.360651][14349:14351] CHIP:EM: Flushed pending ack for MessageCounter:79584870 on exchange 34606i
       disabled: true
 
     - label: "Step 6: TH reads the ActiveTextTrack attribute from the DUT"
@@ -136,14 +106,36 @@ tests:
       verification: |
           ./chip-tool mediaplayback read active-text-track 1 3
 
-
-          [1705510269.182464][16374:16376] CHIP:DMG:         InteractionModelRevision = 11
-          [1705510269.182472][16374:16376] CHIP:DMG: }
-          [1705510269.182556][16374:16376] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0009 DataVersion: 900375739
-          [1705510269.182642][16374:16376] CHIP:TOO:   ActiveTextTrack: {
-          [1705510269.182651][16374:16376] CHIP:TOO:     Id:
-          [1705510269.182670][16374:16376] CHIP:TOO:     TrackAttributes: null
-          [1705510269.182679][16374:16376] CHIP:TOO:    }
-          [1705510269.182763][16374:16376] CHIP:EM: <<< [E:17583i S:2252 M:176774078 (Ack:187039870)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1705510269.182802][16374:16376] CHIP:EM: Flushed pending ack for MessageCounter:187039870 on exchange 17583i
+          On TH(chip-tool), Verify that the attribute returned has a null value.
+          [1705920471.994181][14352:14354] CHIP:DMG: }
+          [1705920471.994472][14352:14354] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0009 DataVersion: 402582000
+          [1705920471.994741][14352:14354] CHIP:TOO:   ActiveTextTrack: {
+          [1705920471.994789][14352:14354] CHIP:TOO:     Id:
+          [1705920471.994845][14352:14354] CHIP:TOO:     TrackAttributes: null
+          [1705920471.994886][14352:14354] CHIP:TOO:    }
+          [1705920471.995254][14352:14354] CHIP:EM: <<< [E:930i S:17726 M:66812520 (Ack:87654763)] (S) Msg TX to 1:0000000000000001 [D27C] [UDP:[fe80::e65f:1ff:fe0f:19ff%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1705920471.995502][14352:14354] CHIP:EM: Flushed pending ack for MessageCounter:87654763 on exchange 930i
       disabled: true
+      command: "ActivateTextTrack"
+      arguments:
+          values:
+              - name: "TrackID"
+                value: ID_Value
+
+    - label: "Step 4: TH reads the ActiveTextTrack attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0009
+      command: "readAttribute"
+      attribute: "ActiveTextTrack"
+      response:
+          value: { ID: ID_Value }
+
+    - label: "Step 5: TH sends a DeactivateTextTrack command to DUT"
+      PICS: MEDIAPLAYBACK.S.C0e.Rsp
+      command: "DeactivateTextTrack"
+
+    - label: "Step 6: TH reads the ActiveTextTrack attribute from the DUT"
+      PICS: MEDIAPLAYBACK.S.A0009
+      command: "readAttribute"
+      attribute: "ActiveTextTrack"
+      response:
+          value: { ID: "", TrackAttributes: null }

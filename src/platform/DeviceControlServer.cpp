@@ -87,5 +87,12 @@ CHIP_ERROR DeviceControlServer::PostWiFiDeviceAvailableNetworkEvent()
     return PlatformMgr().PostEvent(&event);
 }
 
+CHIP_ERROR DeviceControlServer::PostOperationalNetworkStartedEvent()
+{
+    ChipDeviceEvent event;
+    event.Type = DeviceEventType::kOperationalNetworkStarted;
+    return PlatformMgr().PostEvent(&event);
+}
+
 } // namespace DeviceLayer
 } // namespace chip
