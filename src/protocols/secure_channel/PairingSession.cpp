@@ -110,13 +110,13 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionActiveThreshold),
                                        mrpLocalConfig.mActiveThresholdTime.count()));
 
-    uint16_t dataModel = kDataModelRevision;
+    uint16_t dataModel = Revision::kDataModelRevision;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kDataModelRevision), dataModel));
 
-    uint16_t interactionModel = kInteractionModelRevision;
+    uint16_t interactionModel = Revision::kInteractionModelRevision;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kInteractionModelRevision), interactionModel));
 
-    uint32_t specVersion = kSpecificationVersion;
+    uint32_t specVersion = Revision::kSpecificationVersion;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSpecificationVersion), specVersion));
 
     uint16_t maxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;

@@ -52,7 +52,7 @@ CHIP_ERROR MessageParser::CheckInteractionModelRevision(TLV::TLVReader & aReader
 
 CHIP_ERROR MessageParser::GetInteractionModelRevision(InteractionModelRevision * const apInteractionModelRevision) const
 {
-    return GetUnsignedInteger(kInteractionModelRevisionTag, apInteractionModelRevision);
+    return GetUnsignedInteger(Revision::kInteractionModelRevisionTag, apInteractionModelRevision);
 }
 
 } // namespace app

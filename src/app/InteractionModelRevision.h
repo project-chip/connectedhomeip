@@ -23,6 +23,7 @@
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
+namespace Revision {
 
 /**
  * A monothonic number identifying the interaction model revision.
@@ -51,4 +52,5 @@ inline constexpr uint16_t kDataModelRevision = 17;
  */
 inline constexpr uint32_t kSpecificationVersion = 0x01030000;
 
+} // namespace Revision
 } // namespace chip

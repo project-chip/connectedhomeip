@@ -313,7 +313,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
 CHIP_ERROR BasicAttrAccess::ReadDataModelRevision(AttributeValueEncoder & aEncoder)
 {
-    uint16_t revision = kDataModelRevision;
+    uint16_t revision = Revision::kDataModelRevision;
     return aEncoder.Encode(revision);
 }
 
@@ -398,7 +398,7 @@ CHIP_ERROR BasicAttrAccess::ReadProductAppearance(AttributeValueEncoder & aEncod
 
 CHIP_ERROR BasicAttrAccess::ReadSpecificationVersion(AttributeValueEncoder & aEncoder)
 {
-    uint32_t specification_version = kSpecificationVersion;
+    uint32_t specification_version = Revision::kSpecificationVersion;
     return aEncoder.Encode(specification_version);
 }
 
