@@ -38,10 +38,9 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 
-#include <app/server/Dnssd.h>
-
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
+#include <app/server/Dnssd.h>
 #include <controller/CurrentFabricRemover.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -400,11 +399,7 @@ DeviceCommissioner::DeviceCommissioner() :
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
-{
-    mPairingDelegate           = nullptr;
-    mDeviceBeingCommissioned   = nullptr;
-    mDeviceInPASEEstablishment = nullptr;
-}
+{}
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
@@ -1638,7 +1633,7 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
 
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
-    commissioningCompletionStatus = completionStatus;
+    mCommissioningCompletionStatus = completionStatus;
 
     if (completionStatus.err == CHIP_NO_ERROR)
     {
@@ -1650,7 +1645,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         }
         // Send the callbacks, we're done.
         CommissioningStageComplete(CHIP_NO_ERROR);
-        SendCommissioningCompleteCallbacks(nodeId, commissioningCompletionStatus);
+        SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
     }
     else if (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup)
     {
@@ -1658,7 +1653,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         // We do not need to reset the failsafe here because we want to keep everything on the device up to this point, so just
         // send the completion callbacks.
         CommissioningStageComplete(CHIP_NO_ERROR);
-        SendCommissioningCompleteCallbacks(nodeId, commissioningCompletionStatus);
+        SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
     }
     else
     {
@@ -1711,7 +1706,7 @@ void DeviceCommissioner::DisarmDone()
 
     // Signal completion - this will reset mDeviceBeingCommissioned.
     CommissioningStageComplete(CHIP_NO_ERROR);
-    SendCommissioningCompleteCallbacks(nodeId, commissioningCompletionStatus);
+    SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
 
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)

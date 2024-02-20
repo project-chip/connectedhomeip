@@ -769,7 +769,7 @@ public:
                            OnExtendFailsafeFailure onFailure);
 
 private:
-    DevicePairingDelegate * mPairingDelegate;
+    DevicePairingDelegate * mPairingDelegate = nullptr;
 
     DeviceProxy * mDeviceBeingCommissioned               = nullptr;
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
@@ -1024,7 +1024,7 @@ private:
         nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
-    CompletionStatus commissioningCompletionStatus;
+    CompletionStatus mCommissioningCompletionStatus;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
