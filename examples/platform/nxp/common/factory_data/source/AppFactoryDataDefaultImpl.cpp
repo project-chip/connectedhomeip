@@ -25,14 +25,16 @@
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 #include "FactoryDataProvider.h"
+#if CONFIG_CHIP_ENCRYPTED_FACTORY_DATA
 /*
  * Test key used to encrypt factory data before storing it to the flash.
  */
 static const uint8_t aes128TestKey[]
     __attribute__((aligned)) = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
+#endif /* CONFIG_CHIP_ENCRYPTED_FACTORY_DATA */
 #else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#endif
+#endif /* CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA */
 
 using namespace chip;
 using namespace ::chip::Credentials;
@@ -56,21 +58,20 @@ CHIP_ERROR chip::NXP::App::AppFactoryData_PreMatterStackInit(void)
  */
 CHIP_ERROR chip::NXP::App::AppFactoryData_PostMatterStackInit(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
+#if CONFIG_CHIP_ENCRYPTED_FACTORY_DATA
     FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
     FactoryDataPrvdImpl().SetAes128Key(&aes128TestKey[0]);
+#endif /* CONFIG_CHIP_ENCRYPTED_FACTORY_DATA */
 
-    err = FactoryDataPrvdImpl().Init();
-    if (err == CHIP_NO_ERROR)
-    {
-        SetDeviceInstanceInfoProvider(&FactoryDataPrvd());
-        SetDeviceAttestationCredentialsProvider(&FactoryDataPrvd());
-        SetCommissionableDataProvider(&FactoryDataPrvd());
-    }
+    ReturnErrorOnFailure(FactoryDataPrvdImpl().Init());
+
+    SetDeviceInstanceInfoProvider(&FactoryDataPrvd());
+    SetDeviceAttestationCredentialsProvider(&FactoryDataPrvd());
+    SetCommissionableDataProvider(&FactoryDataPrvd());
 #else
     // Initialize device attestation with example one (only for debug purpose)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif
-    return err;
+#endif /* CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA */
+    return CHIP_NO_ERROR;
 }
