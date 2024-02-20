@@ -20,30 +20,23 @@ package com.matter.tv.server.tvapp;
 import android.util.Log;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Vector;
 
 public class MessagesManagerStub implements MessagesManager {
   private static final String TAG = MessagesManagerStub.class.getSimpleName();
 
   private int endpoint = -1;
 
-  private Map<String,Message> messages = new HashMap<String,Message>();
+  private Map<String, Message> messages = new HashMap<String, Message>();
 
   public MessagesManagerStub(int endpoint) {
     this.endpoint = endpoint;
     Log.d(TAG, "MessagesManagerStub: at " + this.endpoint);
 
-    HashMap<Long,String> responseOptions = new HashMap<Long,String>();
+    HashMap<Long, String> responseOptions = new HashMap<Long, String>();
     responseOptions.put(new Long(1), "Yes");
     responseOptions.put(new Long(2), "No");
-    presentMessages("31323334353637383930313233343536",
-        1,
-        1,
-        30,
-        60,
-        "TestMessage",
-        responseOptions);
+    presentMessages(
+        "31323334353637383930313233343536", 1, 1, 30, 60, "TestMessage", responseOptions);
     Log.d(TAG, "MessagesManagerStub: added dummy message");
   }
 
@@ -54,39 +47,36 @@ public class MessagesManagerStub implements MessagesManager {
   }
 
   @Override
-  public boolean presentMessages(String messageId,
-        int priority,
-        int messageControl,
-        long startTime,
-        int duration,
-        String messageText,
-        HashMap<Long,String> responseOptions) {
-          Log.d(TAG, "presentMessages: at " + this.endpoint + " id:" + messageId+ " text:"+messageText);
-          MessageResponseOption[] options = new MessageResponseOption[responseOptions.size()];
-          int i=0;
+  public boolean presentMessages(
+      String messageId,
+      int priority,
+      int messageControl,
+      long startTime,
+      int duration,
+      String messageText,
+      HashMap<Long, String> responseOptions) {
+    Log.d(
+        TAG, "presentMessages: at " + this.endpoint + " id:" + messageId + " text:" + messageText);
+    MessageResponseOption[] options = new MessageResponseOption[responseOptions.size()];
+    int i = 0;
 
-          for (Map.Entry<Long,String> set : responseOptions.entrySet()) {
-            Log.d(TAG, "presentMessages option: key:"+set.getKey()+" value:"+set.getValue());
-            options[i] = new MessageResponseOption(set.getKey().longValue(), set.getValue());
-            i++;
-          }
-
-          messages.put(messageId, new Message(messageId,
-            priority,
-            messageControl,
-            startTime,
-            duration,
-            messageText,
-            options));
-        return true;
+    for (Map.Entry<Long, String> set : responseOptions.entrySet()) {
+      Log.d(TAG, "presentMessages option: key:" + set.getKey() + " value:" + set.getValue());
+      options[i] = new MessageResponseOption(set.getKey().longValue(), set.getValue());
+      i++;
     }
-    
+
+    messages.put(
+        messageId,
+        new Message(
+            messageId, priority, messageControl, startTime, duration, messageText, options));
+    return true;
+  }
+
   @Override
-  public boolean cancelMessage(String messageId)
-  {
-    Log.d(TAG, "cancelMessage: at " + this.endpoint + " messageId:"+messageId);
+  public boolean cancelMessage(String messageId) {
+    Log.d(TAG, "cancelMessage: at " + this.endpoint + " messageId:" + messageId);
     messages.remove(messageId);
     return true; // per spec, succeed unless error
   }
-
 }
