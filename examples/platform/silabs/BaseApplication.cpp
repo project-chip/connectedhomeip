@@ -43,7 +43,6 @@
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <provision/ProvisionManager.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -283,6 +282,7 @@ CHIP_ERROR BaseApplication::Init()
     BaseApplication::sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
 #endif
     return err;
+
 }
 
 void BaseApplication::FunctionTimerEventHandler(TimerHandle_t xTimer)

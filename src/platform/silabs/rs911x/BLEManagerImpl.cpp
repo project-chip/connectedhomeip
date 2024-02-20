@@ -755,7 +755,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         {
             ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
         }
-
     }
     return err;
 }
