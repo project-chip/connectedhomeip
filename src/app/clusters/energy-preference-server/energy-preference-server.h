@@ -48,7 +48,7 @@ struct Delegate
      * @param aOutLabel The Label value from BalanceStruct. Storage is
      * provided by the caller, and is large enough to accomodate the
      * longest label (64 chars), on successful return the size of the span must be
-     * adjusted to reflect the length of the value.
+     * adjusted to reflect the length of the value, or ClearValue() called on the Optional to indicate there is no label.
      *
      * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
      */
@@ -79,7 +79,7 @@ struct Delegate
      * @param aOutLabel The Label value from BalanceStruct. Storage is
      * provided by the caller, and is large enough to accomodate the
      * longest label (64 chars), on successful return the size of the span must be
-     * adjusted to reflect the length of the value.
+     * adjusted to reflect the length of the value, or ClearValue() called on the Optional to indicate there is no label.
      *
      * @return CHIP_ERROR_NOT_FOUND if the index is out of range.
      */
