@@ -23,7 +23,6 @@
 #define MATTER_TRACE_BEGIN(label,group)         os_signpost_interval_begin(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
 #define MATTER_TRACE_END(label,group)           os_signpost_interval_end(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
 #define MATTER_TRACE_INSTANT(label,group)       os_signpost_event_emit(__DARWIN_MATTER_SIGNPOST_LOGGER(), OS_SIGNPOST_ID_EXCLUSIVE, group "-" label)
-#define MATTER_TRACE_METRIC(label, value)       ::chip::Tracing::Internal::Metric(label, value)
 
 #define MATTER_TRACE_COUNTER(label)                                                                                                \
     do                                                                                                                             \

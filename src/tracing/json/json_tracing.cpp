@@ -25,6 +25,7 @@
 #include <lib/support/StringSplitter.h>
 #include <log_json/log_json_build_config.h>
 #include <transport/TracingStructs.h>
+#include <tracing/metric_event.h>
 
 #include <json/json.h>
 
@@ -295,11 +296,11 @@ void JsonBackend::TraceCounter(const char * label)
     OutputValue(value);
 }
 
-void JsonBackend::TraceMetric(const char * label, int32_t val)
+void JsonBackend::LogEvent(MetricEvent & event)
 {
     ::Json::Value value;
-    value["label"] = label;
-    value["value"] = val;
+    value["label"] = event.key;
+    value["value"] = event.value.store.int32_value;
 
     OutputValue(value);
 }

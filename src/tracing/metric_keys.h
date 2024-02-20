@@ -40,6 +40,7 @@ constexpr MetricKey kMetricAttestationResult = "attestation-result";
 constexpr MetricKey kMetricAttestationOverridden = "attestation-overridden";
 constexpr MetricKey kMetricCASESession = "case-session";
 constexpr MetricKey kMetricCASESessionEstState = "case-conn-est";
+constexpr MetricKey kMetricWiFiRSSI = "wifi_rssi";
 
 } // namespace Tracing
 } // namespace chip

@@ -17,6 +17,7 @@
  */
 
 #include <tracing/perfetto/perfetto_tracing.h>
+#include <tracing/metric_event.h>
 
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/core/ErrorStr.h>
@@ -124,6 +125,11 @@ void PerfettoBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
         "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
         "error", chip::ErrorStr(info.error)                           //
     );
+}
+
+void PerfettoBackend::LogEvent(MetricEvent & event)
+{
+    TRACE_COUNTER("Matter", event.key, event.value.store.int32_value);
 }
 
 } // namespace Perfetto

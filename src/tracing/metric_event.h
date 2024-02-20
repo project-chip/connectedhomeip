@@ -84,6 +84,22 @@ struct MetricEvent
         : tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}
 
+    MetricEvent(Tag tg, MetricKey k, int8_t val)
+        : MetricEvent(tg, k, int32_t(val))
+    {}
+
+    MetricEvent(Tag tg, MetricKey k, uint8_t val)
+        : MetricEvent(tg, k, uint32_t(val))
+    {}
+
+    MetricEvent(Tag tg, MetricKey k, int16_t val)
+        : MetricEvent(tg, k, int32_t(val))
+    {}
+
+    MetricEvent(Tag tg, MetricKey k, uint16_t val)
+        : MetricEvent(tg, k, uint32_t(val))
+    {}
+
     MetricEvent(Tag tg, MetricKey k, const ChipError & err)
         : tag(tg), key(k), value(err.AsInteger()), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
     {}

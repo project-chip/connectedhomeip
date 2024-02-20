@@ -22,6 +22,7 @@
 #include <esp_log.h>
 #include <memory>
 #include <tracing/backend.h>
+#include <tracing/metric_event.h>
 #include <tracing/esp32_trace/counter.h>
 #include <tracing/esp32_trace/esp32_tracing.h>
 
@@ -154,16 +155,16 @@ void ESP32Backend::TraceCounter(const char * label)
     ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
 }
 
-void ESP32Backend::TraceMetric(const char * label, int32_t value)
+void ESP32Backend::LogEvent(MetricEvent & event)
 {
     if (!mRegistered)
     {
-        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, label /* Unique key 8 */, label /* label displayed on dashboard */,
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key /* Unique key 8 */, event.key /* label displayed on dashboard */,
                                   "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
         mRegistered = true;
     }
-    ESP_LOGI("mtr", "The value of %s is %ld ", label, value);
-    esp_diag_metrics_add_int(label, value);
+    ESP_LOGI("mtr", "The value of %s is %ld ", event.key, event.value.store.int32_value);
+    esp_diag_metrics_add_int(event.key, event.value.store.int32_value);
 }
 
 void ESP32Backend::TraceBegin(const char * label, const char * group)
