@@ -22,7 +22,7 @@
 #include "AppFactoryData.h"
 #include "CHIPDeviceManager.h"
 #include "CommonDeviceCallbacks.h"
-#include "binding-handler.h"
+
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
 
@@ -36,6 +36,10 @@
 #include "lib/core/ErrorStr.h"
 
 #include <platform/DeviceInstanceInfoProvider.h>
+
+#ifdef EMBER_AF_PLUGIN_BINDING
+#include "binding-handler.h"
+#endif
 
 #if CONFIG_NET_L2_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -186,6 +190,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
      */
     PlatformMgr().ScheduleWork(InitServer, 0);
 
+#ifdef EMBER_AF_PLUGIN_BINDING
     /* Init binding handlers */
     err = InitBindingHandlers();
     if (err != CHIP_NO_ERROR)
@@ -193,6 +198,8 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "InitBindingHandlers failed: %s", ErrorStr(err));
         goto exit;
     }
+#endif
+
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     sNetworkCommissioningInstance.Init();
 #endif
