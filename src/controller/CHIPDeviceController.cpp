@@ -811,6 +811,13 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 {
     MATTER_TRACE_SCOPE("Commission", "DeviceCommissioner");
+
+    if (mDefaultCommissioner == nullptr)
+    {
+        ChipLogError(Controller, "No default commissioner is specified");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     CommissioneeDeviceProxy * device = FindCommissioneeDevice(remoteDeviceId);
     if (device == nullptr || (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
     {
@@ -827,12 +834,6 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
     if (mCommissioningStage != CommissioningStage::kSecurePairing)
     {
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    if (mDefaultCommissioner == nullptr)
-    {
-        ChipLogError(Controller, "No default commissioner is specified");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -855,6 +856,13 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
                                                                 Credentials::AttestationVerificationResult attestationResult)
 {
     MATTER_TRACE_SCOPE("continueCommissioningDevice", "DeviceCommissioner");
+
+    if (mDefaultCommissioner == nullptr)
+    {
+        ChipLogError(Controller, "No default commissioner is specified");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     if (device == nullptr || device != mDeviceBeingCommissioned)
     {
         ChipLogError(Controller, "Invalid device for commissioning %p", device);
@@ -876,12 +884,6 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
     if (mCommissioningStage != CommissioningStage::kAttestationVerification)
     {
         ChipLogError(Controller, "Commissioning is not attestation verification phase");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    if (mDefaultCommissioner == nullptr)
-    {
-        ChipLogError(Controller, "No default commissioner is specified");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
