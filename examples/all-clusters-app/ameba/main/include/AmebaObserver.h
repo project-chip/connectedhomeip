@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/server/Server.h>
 #include <app/server/AppDelegate.h>
+#include <app/server/Server.h>
 #include <credentials/FabricTable.h>
 
 namespace chip {
