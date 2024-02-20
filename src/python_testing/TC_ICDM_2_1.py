@@ -17,7 +17,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
+# from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -44,7 +44,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.IcdManagement.Attributes
-        userActiveModeTriggerHintBitmapMatch = False
+        # userActiveModeTriggerHintBitmapMatch = False
         uint16Max = 65535
         uint32Max = 4294967295
         feature_map = await self.read_icdm_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
