@@ -23,11 +23,17 @@
 #include "app/clusters/ota-requestor/DefaultOTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
+
+#ifdef CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER
+#include CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER
+#else
 #ifdef CONFIG_CHIP
 #include <platform/nxp/zephyr/ota/OTAImageProcessorImpl.h>
 #else
 #include "platform/nxp/common/OTAImageProcessorImpl.h"
 #endif /* CONFIG_CHIP */
+#endif /* CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER */
+
 #include <stdint.h>
 
 using namespace chip;
