@@ -241,6 +241,10 @@ source_set("siwx917-common") {
     public_deps += [ "${chip_root}/examples/common/QRCode" ]
   }
 
+  if (sl_uart_log_output) {
+    sources += [ "${silabs_common_plat_dir}/SiWx917/uart.cpp" ]
+  }
+
   if (enable_heap_monitoring) {
     sources += [ "${silabs_common_plat_dir}/MemMonitoring.cpp" ]
   }

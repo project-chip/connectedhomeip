@@ -55,6 +55,7 @@
 #endif
 
 #if SILABS_LOG_OUT_UART
+#include "rsi_debug.h"
 #include "uart.h"
 #endif
 
@@ -135,12 +136,18 @@ static void PrintLog(const char * msg)
         sz = strlen(msg);
 
 #if SILABS_LOG_OUT_UART
-        uartLogWrite(msg, sz);
+        for (/* Empty */; sz != 0; --sz)
+        {
+            Board_UARTPutChar(*msg++);
+        }
+        // To print next log in new line with proper formatting
+        Board_UARTPutChar('\r');
+        Board_UARTPutChar('\n');
 #elif PW_RPC_ENABLED
         PigweedLogger::putString(msg, sz);
 #else
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
-#endif
+#endif // SILABS_LOG_OUT_UART
 
 #if SILABS_LOG_OUT_RTT || PW_RPC_ENABLED
         const char * newline = "\r\n";
