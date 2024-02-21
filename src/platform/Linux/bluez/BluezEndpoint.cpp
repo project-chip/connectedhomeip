@@ -277,17 +277,17 @@ void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult 
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 {
-    GDBusObject * adapter;
+    GDBusObject * adapterObject;
     BluezGattManager1 * gattMgr;
     GVariantBuilder optionsBuilder;
     GVariant * options;
 
-    VerifyOrExit(mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mpAdapter in %s", __func__));
+    VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
-    adapter = g_dbus_interface_get_object(G_DBUS_INTERFACE(mpAdapter));
-    VerifyOrExit(adapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapter in %s", __func__));
+    adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
+    VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    gattMgr = bluez_object_get_gatt_manager1(BLUEZ_OBJECT(adapter));
+    gattMgr = bluez_object_get_gatt_manager1(BLUEZ_OBJECT(adapterObject));
     VerifyOrExit(gattMgr != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL gattMgr in %s", __func__));
 
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
@@ -344,11 +344,11 @@ void BluezEndpoint::BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClie
                                                           GDBusProxy * aInterface, GVariant * aChangedProperties,
                                                           const char * const * aInvalidatedProps)
 {
-    VerifyOrReturn(mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mpAdapter in %s", __func__));
+    VerifyOrReturn(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
     VerifyOrReturn(strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0, );
 
     BluezDevice1 * device = BLUEZ_DEVICE1(aInterface);
-    VerifyOrReturn(BluezIsDeviceOnAdapter(device, mpAdapter));
+    VerifyOrReturn(BluezIsDeviceOnAdapter(device, mAdapter.get()));
 
     UpdateConnectionTable(device);
 }
@@ -386,7 +386,7 @@ void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBu
     GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(aObject)));
     VerifyOrReturn(device.get() != nullptr);
 
-    if (BluezIsDeviceOnAdapter(device.get(), mpAdapter) == TRUE)
+    if (BluezIsDeviceOnAdapter(device.get(), mAdapter.get()) == TRUE)
     {
         HandleNewDevice(device.get());
     }
@@ -395,7 +395,7 @@ void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBu
 void BluezEndpoint::BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject)
 {
     // TODO: for Device1, lookup connection, and call otPlatTobleHandleDisconnected
-    // for Adapter1: unclear, crash if this pertains to our adapter? at least null out the self->mpAdapter.
+    // for Adapter1: unclear, crash if this pertains to our adapter? at least null out the self->mAdapter.
     // for Characteristic1, or GattService -- handle here via calling otPlatTobleHandleDisconnected, or ignore.
 }
 
@@ -427,28 +427,28 @@ void BluezEndpoint::SetupAdapter()
     snprintf(expectedPath, sizeof(expectedPath), BLUEZ_PATH "/hci%u", mAdapterId);
 
     GList * objects = g_dbus_object_manager_get_objects(mpObjMgr);
-    for (auto l = objects; l != nullptr && mpAdapter == nullptr; l = l->next)
+    for (auto l = objects; l != nullptr && mAdapter.get() == nullptr; l = l->next)
     {
         BluezObject * object = BLUEZ_OBJECT(l->data);
 
         GList * interfaces = g_dbus_object_get_interfaces(G_DBUS_OBJECT(object));
         for (auto ll = interfaces; ll != nullptr; ll = ll->next)
         {
-            if (BLUEZ_IS_ADAPTER1(ll->data))
-            { // we found the adapter
-                BluezAdapter1 * adapter = BLUEZ_ADAPTER1(ll->data);
+            BluezAdapter1 * adapter = BLUEZ_ADAPTER1(ll->data);
+            if (adapter != nullptr)
+            {
                 if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
                 {
                     if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter)), expectedPath) == 0)
                     {
-                        mpAdapter = static_cast<BluezAdapter1 *>(g_object_ref(adapter));
+                        mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
                     }
                 }
                 else
                 {
                     if (strcmp(bluez_adapter1_get_address(adapter), mpAdapterAddr) == 0)
                     {
-                        mpAdapter = static_cast<BluezAdapter1 *>(g_object_ref(adapter));
+                        mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
                     }
                 }
             }
@@ -456,14 +456,14 @@ void BluezEndpoint::SetupAdapter()
         g_list_free_full(interfaces, g_object_unref);
     }
 
-    VerifyOrExit(mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mpAdapter in %s", __func__));
+    VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
-    bluez_adapter1_set_powered(mpAdapter, TRUE);
+    bluez_adapter1_set_powered(mAdapter.get(), TRUE);
 
     // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
     // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
     // and the flag is necessary to force using LE transport.
-    bluez_adapter1_set_discoverable(mpAdapter, FALSE);
+    bluez_adapter1_set_discoverable(mAdapter.get(), FALSE);
 
 exit:
     g_list_free_full(objects, g_object_unref);
@@ -692,8 +692,7 @@ void BluezEndpoint::Shutdown()
         +[](BluezEndpoint * self) {
             if (self->mpObjMgr != nullptr)
                 g_object_unref(self->mpObjMgr);
-            if (self->mpAdapter != nullptr)
-                g_object_unref(self->mpAdapter);
+            self->mAdapter.reset();
             if (self->mpRoot != nullptr)
                 g_object_unref(self->mpRoot);
             if (self->mpService != nullptr)
