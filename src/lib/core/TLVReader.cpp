@@ -110,13 +110,46 @@ void TLVReader::Init(const TLVReader & aReader)
 TLVType TLVReader::GetType() const
 {
     TLVElementType elemType = ElementType();
-    if (elemType == TLVElementType::EndOfContainer)
-        return kTLVType_NotSpecified;
-    if (elemType == TLVElementType::FloatingPointNumber32 || elemType == TLVElementType::FloatingPointNumber64)
+    switch (ElementType())
+    {
+    case TLVElementType::FloatingPointNumber32:
+    case TLVElementType::FloatingPointNumber64:
         return kTLVType_FloatingPointNumber;
-    if (elemType == TLVElementType::NotSpecified || elemType >= TLVElementType::Null)
+    case TLVElementType::BooleanFalse:
+    case TLVElementType::BooleanTrue:
+        return kTLVType_Boolean;
+    case TLVElementType::NotSpecified:
+    case TLVElementType::Null:
+    case TLVElementType::Structure:
+    case TLVElementType::Array:
+    case TLVElementType::List:
+        // these match exactly:
         return static_cast<TLVType>(elemType);
-    return static_cast<TLVType>(static_cast<uint8_t>(elemType) & ~kTLVTypeSizeMask);
+    case TLVElementType::Int8:
+    case TLVElementType::Int16:
+    case TLVElementType::Int32:
+    case TLVElementType::Int64:
+        return kTLVType_SignedInteger;
+    case TLVElementType::UInt8:
+    case TLVElementType::UInt16:
+    case TLVElementType::UInt32:
+    case TLVElementType::UInt64:
+        return kTLVType_UnsignedInteger;
+    case TLVElementType::UTF8String_1ByteLength:
+    case TLVElementType::UTF8String_2ByteLength:
+    case TLVElementType::UTF8String_4ByteLength:
+    case TLVElementType::UTF8String_8ByteLength:
+        return kTLVType_UTF8String;
+    case TLVElementType::ByteString_1ByteLength:
+    case TLVElementType::ByteString_2ByteLength:
+    case TLVElementType::ByteString_4ByteLength:
+    case TLVElementType::ByteString_8ByteLength:
+        return kTLVType_ByteString;
+    case TLVElementType::EndOfContainer:
+    case TLVElementType::kInvalidType:
+    default:
+        return kTLVType_NotSpecified;
+    }
 }
 
 uint32_t TLVReader::GetLength() const

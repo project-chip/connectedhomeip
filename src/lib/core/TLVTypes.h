@@ -48,7 +48,10 @@ enum TLVType
     kTLVType_Null      = 0x14,
     kTLVType_Structure = 0x15,
     kTLVType_Array     = 0x16,
-    kTLVType_List      = 0x17
+    kTLVType_List      = 0x17,
+
+    // EndOfContainer is handled separately during conversion
+    kInvalidType = 0x19,
 };
 
 // TODO: Move to private namespace
