@@ -18,8 +18,6 @@
 
 #include <matter/tracing/build_config.h>
 
-#if MATTER_TRACING_ENABLED
-
 namespace chip {
 namespace Tracing {
 
@@ -44,5 +42,3 @@ constexpr MetricKey kMetricWiFiRSSI              = "wifi_rssi";
 
 } // namespace Tracing
 } // namespace chip
-
-#endif // MATTER_TRACING_ENABLED
