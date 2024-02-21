@@ -111,7 +111,7 @@ static void efx32_spi_init(void)
     // Enable USART interface pins
     GPIO->USARTROUTE[SPI_USART_ROUTE_INDEX].ROUTEEN = GPIO_USART_ROUTEEN_RXPEN | // MISO
         GPIO_USART_ROUTEEN_TXPEN |                                               // MOSI
-        GPIO_USART_ROUTEEN_CLKPEN;                                               //| GPIO_USART_ROUTEEN_CSPEN;
+        GPIO_USART_ROUTEEN_CLKPEN;
 
     // Set slew rate for alternate usage pins
     GPIO_SlewrateSet(SPI_CLOCK_PIN.port, 7, 7);
@@ -148,7 +148,10 @@ uint32_t sl_si91x_host_get_wake_indicator(void)
 sl_status_t sl_si91x_host_init(sl_si91x_host_init_configuration * config)
 {
 #if SL_SPICTRL_MUX
-    sl_board_disable_display();
+    if (SL_STATUS_OK != sl_board_disable_display())
+    {
+        return SL_STATUS_FAIL;
+    }
 #endif
     init_config.rx_irq  = config->rx_irq;
     init_config.rx_done = config->rx_done;

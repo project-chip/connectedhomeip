@@ -84,7 +84,10 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
-    sl_board_enable_display();
+    if (SL_STATUS_OK != sl_board_enable_display())
+    {
+        return SL_STATUS_FAIL;
+    }
     SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
 
     return SL_STATUS_OK;
@@ -102,7 +105,10 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
-    sl_board_disable_display();
+    if (SL_STATUS_OK != sl_board_disable_display())
+    {
+       return SL_STATUS_FAIL;
+    }
     return SL_STATUS_OK;
 }
 #endif // SL_LCDCTRL_MUX
