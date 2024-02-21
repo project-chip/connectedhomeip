@@ -164,7 +164,7 @@ bool TizenThreadDriver::ThreadNetworkIterator::Next(Network & item)
     return false;
 }
 
-ThreadCapabilities TizenThreadDriver::GetSupportedThreadFeatures()
+BitMask<ThreadCapabilities> TizenThreadDriver::GetSupportedThreadFeatures()
 {
     BitMask<ThreadCapabilities> capabilites = 0;
     capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable,

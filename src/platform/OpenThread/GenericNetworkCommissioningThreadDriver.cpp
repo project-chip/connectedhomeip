@@ -256,7 +256,7 @@ bool GenericThreadDriver::ThreadNetworkIterator::Next(Network & item)
     return true;
 }
 
-ThreadCapabilities GenericThreadDriver::GetSupportedThreadFeatures()
+BitMask<ThreadCapabilities> GenericThreadDriver::GetSupportedThreadFeatures()
 {
     BitMask<ThreadCapabilities> capabilites = 0;
     capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable,

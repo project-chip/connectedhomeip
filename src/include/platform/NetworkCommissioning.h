@@ -423,7 +423,7 @@ public:
     /**
      * @brief Provide all of the Thread features supported by the Thread interface
      */
-    virtual ThreadCapabilities GetSupportedThreadFeatures() = 0;
+    virtual BitMask<ThreadCapabilities> GetSupportedThreadFeatures() = 0;
 
     /**
      * @brief Return the Thread version supported by the Thread interface

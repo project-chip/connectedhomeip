@@ -197,15 +197,17 @@ bool LinuxThreadDriver::ThreadNetworkIterator::Next(Network & item)
     return true;
 }
 
-ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
+BitMask<ThreadCapabilities> LinuxThreadDriver::GetSupportedThreadFeatures()
 {
-    BitMask<ThreadCapabilities> capabilites = 0;
+    BitMask<ThreadCapabilities> capabilites;
+
     capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable, CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER);
     capabilites.SetField(ThreadCapabilities::kIsRouterCapable, CHIP_DEVICE_CONFIG_THREAD_FTD);
     capabilites.SetField(ThreadCapabilities::kIsSleepyEndDeviceCapable, !CHIP_DEVICE_CONFIG_THREAD_FTD);
     capabilites.SetField(ThreadCapabilities::kIsFullThreadDevice, CHIP_DEVICE_CONFIG_THREAD_FTD);
     capabilites.SetField(ThreadCapabilities::kIsSynchronizedSleepyEndDeviceCapable,
                          (!CHIP_DEVICE_CONFIG_THREAD_FTD && CHIP_DEVICE_CONFIG_THREAD_SSED));
+
     return capabilites;
 }
 

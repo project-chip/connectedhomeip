@@ -197,7 +197,7 @@ bool LinuxThreadDriver::ThreadNetworkIterator::Next(Network & item)
     return true;
 }
 
-ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
+BitMask<ThreadCapabilities> LinuxThreadDriver::GetSupportedThreadFeatures()
 {
     BitMask<ThreadCapabilities> capabilites = 0;
     capabilites.SetField(ThreadCapabilities::kIsBorderRouterCapable, CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER);

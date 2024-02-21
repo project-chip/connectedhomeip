@@ -286,11 +286,15 @@ void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & newMode)
         newMode.Clear(Mode::kCalibrationMode);
     }
 
-    if (oldMode != newMode)
+    if (oldMode.Raw() != newMode.Raw())
+    {
         Attributes::Mode::Set(endpoint, newMode);
+    }
 
-    if (oldStatus != newStatus)
+    if (oldStatus.Raw() != newStatus.Raw())
+    {
         ConfigStatusSet(endpoint, newStatus);
+    }
 }
 
 chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)

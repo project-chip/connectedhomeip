@@ -96,7 +96,7 @@ public:
     uint8_t GetMaxNetworks() override { return 1; }
     uint8_t GetScanNetworkTimeoutSeconds() override { return scanNetworkTimeoutSeconds; }
     uint8_t GetConnectNetworkTimeoutSeconds() override { return connectNetworkTimeout; }
-    ThreadCapabilities GetSupportedThreadFeatures() override;
+    BitMask<ThreadCapabilities> GetSupportedThreadFeatures() override;
     uint16_t GetThreadVersion() override;
 
     void SetScanNetworkTimeoutSeconds(uint8_t scanTimeoutSec) { scanNetworkTimeoutSeconds = scanTimeoutSec; }
