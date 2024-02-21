@@ -49,6 +49,12 @@ using namespace chip::Encoding;
 
 static const uint8_t sTagSizes[] = { 0, 1, 2, 4, 2, 4, 6, 8 };
 
+TLVReader::TLVReader() :
+    ImplicitProfileId(kProfileIdNotSpecified), AppData(nullptr), mElemLenOrVal(0), mBackingStore(nullptr), mReadPoint(nullptr),
+    mBufEnd(nullptr), mLenRead(0), mMaxLen(0), mContainerType(kTLVType_NotSpecified), mControlByte(kTLVControlByte_NotSpecified),
+    mContainerOpen(false)
+{}
+
 void TLVReader::Init(const uint8_t * data, size_t dataLen)
 {
     // TODO: Maybe we can just make mMaxLen and mLenRead size_t instead?
