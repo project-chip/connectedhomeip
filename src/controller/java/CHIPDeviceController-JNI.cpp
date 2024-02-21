@@ -176,10 +176,10 @@ JNI_METHOD(jint, onNOCChainGeneration)
     jmethodID getIpk;
     jmethodID getAdminSubject;
 
-    jbyteArray rootCertificate = nullptr;
+    jbyteArray rootCertificate         = nullptr;
     jbyteArray intermediateCertificate = nullptr;
-    jbyteArray operationalCertificate = nullptr;
-    jbyteArray ipk = nullptr;
+    jbyteArray operationalCertificate  = nullptr;
+    jbyteArray ipk                     = nullptr;
 
     Optional<NodeId> adminSubjectOptional;
     uint64_t adminSubject;
@@ -205,7 +205,6 @@ JNI_METHOD(jint, onNOCChainGeneration)
 
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Find getIpk method fail!"));
-
 
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Find getAdminSubject method fail!"));
@@ -259,9 +258,9 @@ JNI_METHOD(jint, onNOCChainGeneration)
         JniByteArray jByteArrayNoc(env, operationalCertificate);
 
 #ifndef JAVA_MATTER_CONTROLLER_TEST
-        err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(CHIP_NO_ERROR, jByteArrayNoc.byteSpan(),
-                                                                                jByteArrayIcac.byteSpan(), jByteArrayRcac.byteSpan(),
-                                                                                ipkOptional, adminSubjectOptional);
+        err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(
+            CHIP_NO_ERROR, jByteArrayNoc.byteSpan(), jByteArrayIcac.byteSpan(), jByteArrayRcac.byteSpan(), ipkOptional,
+            adminSubjectOptional);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -272,7 +271,8 @@ JNI_METHOD(jint, onNOCChainGeneration)
     }
 exit:
 #ifndef JAVA_MATTER_CONTROLLER_TEST
-    err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(err, ByteSpan(), ByteSpan(), ByteSpan(), ipkOptional, adminSubjectOptional);
+    err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(err, ByteSpan(), ByteSpan(), ByteSpan(), ipkOptional,
+                                                                               adminSubjectOptional);
 #endif // JAVA_MATTER_CONTROLLER_TEST
     return static_cast<jint>(err.AsInteger());
 }
