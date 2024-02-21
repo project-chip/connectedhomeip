@@ -88,14 +88,14 @@ public:
      *
      *  Three conditions that can prevent the ReadHandler from being reportable:
      *  1: The ReadHandler is not in the CanStartReporting state:
-     *      This condition can be removed by setting the CanStartReporting flag on the ReadHandler
+     *      This condition can be resolved by setting the CanStartReporting flag on the ReadHandler
      *
      *  2: The minimal interval since the last report has not elapsed
-     *      This condition can be removed after enough time has passed since the last report or by setting the EngineRunScheduled
+     *      This condition can be resolved after enough time has passed since the last report or by setting the EngineRunScheduled
      *      flag
      *
      *  3: The maximal interval since the last report has not elapsed and the ReadHandler is not dirty:
-     *      This condition can be removed after enough time has passed since the last report to reach the max interval, by the
+     *      This condition can be resolved after enough time has passed since the last report to reach the max interval, by the
      *      ReadHandler becoming dirty or by setting the CanBeSynced flag and having another ReadHandler needing to report.
      *
      *  Once the 3 conditions are met, the ReadHandler is considered reportable.
