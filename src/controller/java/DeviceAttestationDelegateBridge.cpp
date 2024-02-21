@@ -56,7 +56,8 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, const chip::Credentials::DeviceAtte
                                                          static_cast<jsize>(certificationDeclarationSpan.Value().size()), javaCD);
         SuccessOrExit(err);
     }
-    outAttestationInfo = (jobject) env->NewObject(infoClass, constructor, javaDAC, javaPAI, javaCD, static_cast<jint>(vendorId), static_cast<jint>(productId));
+    outAttestationInfo = (jobject) env->NewObject(infoClass, constructor, javaDAC, javaPAI, javaCD, static_cast<jint>(vendorId),
+                                                  static_cast<jint>(productId));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 exit:
     return err;

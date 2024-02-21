@@ -47,7 +47,8 @@ static CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray element
 
 static CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray nonce, jbyteArray elements,
                                       jbyteArray elementsSignature, jbyteArray dac, jbyteArray pai, jbyteArray cd,
-                                      jbyteArray firmwareInfo, chip::VendorId vendorId, uint16_t productId, jobject & outAttestationInfo);
+                                      jbyteArray firmwareInfo, chip::VendorId vendorId, uint16_t productId,
+                                      jobject & outAttestationInfo);
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage, AutoCommissioner * autoCommissioner,
                                                            jobject javaObjectRef)
@@ -271,12 +272,15 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     JniReferences::GetInstance().N2J_ByteArray(env, firmwareInfoSpan.data(), static_cast<jint>(firmwareInfoSpan.size()),
                                                javaFirmwareInfo);
 
-    chip::VendorId vendorId = mAutoCommissioner->GetCommissioningParameters().GetRemoteVendorId().ValueOr(chip::VendorId::Unspecified);
-    uint16_t productId = mAutoCommissioner->GetCommissioningParameters().GetRemoteProductId().ValueOr(0x0000); // 0x0000 is invalid product ID value.
+    chip::VendorId vendorId =
+        mAutoCommissioner->GetCommissioningParameters().GetRemoteVendorId().ValueOr(chip::VendorId::Unspecified);
+    uint16_t productId =
+        mAutoCommissioner->GetCommissioningParameters().GetRemoteProductId().ValueOr(0x0000); // 0x0000 is invalid product ID value.
 
     jobject attestationInfo;
     err = N2J_AttestationInfo(env, javaAttestationChallenge, javaAttestationNonce, javaAttestationElements,
-                              javaAttestationElementsSignature, javaDAC, javaPAI, javaCD, javaFirmwareInfo, vendorId, productId, attestationInfo);
+                              javaAttestationElementsSignature, javaDAC, javaPAI, javaCD, javaFirmwareInfo, vendorId, productId,
+                              attestationInfo);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to create AttestationInfo");
@@ -498,8 +502,8 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray no
     constructor = env->GetMethodID(infoClass, "<init>", "([B[B[B[B[B[B[B[BII)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outAttestationInfo =
-        (jobject) env->NewObject(infoClass, constructor, challenge, nonce, elements, elementsSignature, dac, pai, cd, firmwareInfo, static_cast<jint>(vendorId), static_cast<jint>(productId));
+    outAttestationInfo = (jobject) env->NewObject(infoClass, constructor, challenge, nonce, elements, elementsSignature, dac, pai,
+                                                  cd, firmwareInfo, static_cast<jint>(vendorId), static_cast<jint>(productId));
 
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 exit:
