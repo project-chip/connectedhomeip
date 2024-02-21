@@ -1270,6 +1270,144 @@ exit:
     return outJbytes;
 }
 
+JNI_METHOD(jbyteArray, extractAkidFromPaiCert)
+(JNIEnv * env, jclass clazz, jbyteArray paiCert)
+{
+    uint32_t allocatedCertLength = chip::Credentials::kMaxCHIPCertLength;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> outBuf;
+    jbyteArray outJbytes = nullptr;
+    JniByteArray paiCertBytes(env, paiCert);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
+    {
+        MutableByteSpan outBytes(outBuf.Get(), allocatedCertLength);
+
+        err = chip::Crypto::ExtractAKIDFromX509Cert(paiCertBytes.byteSpan(), outBytes);
+        SuccessOrExit(err);
+
+        VerifyOrExit(chip::CanCastTo<uint32_t>(outBytes.size()), err = CHIP_ERROR_INTERNAL);
+
+        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<jsize>(outBytes.size()), outJbytes);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to extract akid frome X509 cert. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    return outJbytes;
+}
+
+JNI_METHOD(void, validateAttestationInfo)
+(JNIEnv * env, jclass clazz, jint vendorId, jint productId, jbyteArray paaCert, jbyteArray paiCert, jbyteArray dacCert, jbyteArray attestationElementsBuffer)
+{
+    AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    DeviceInfoForAttestation deviceInfo{
+        .vendorId  = static_cast<uint16_t>(vendorId),
+        .productId = static_cast<uint16_t>(productId),
+    };
+
+    VerifyOrExit(paaCert != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(paiCert != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(dacCert != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    {
+        JniByteArray paaCertBytes(env, paaCert);
+        JniByteArray paiCertBytes(env, paiCert);
+        JniByteArray dacCertBytes(env, dacCert);
+
+        AttestationCertVidPid paaVidPid;
+        AttestationCertVidPid paiVidPid;
+        AttestationCertVidPid dacVidPid;
+
+        uint8_t skidBuf[chip::Crypto::kAuthorityKeyIdentifierLength];
+        MutableByteSpan paaSKID(skidBuf);
+
+        CertificateChainValidationResult chainValidationResult;
+
+        err = chip::Crypto::VerifyAttestationCertificateFormat(paiCertBytes.byteSpan(), AttestationCertType::kPAI);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Verify PAI Attestation Cert format Error! : %" CHIP_ERROR_FORMAT, err.Format()));
+
+        err = chip::Crypto::VerifyAttestationCertificateFormat(dacCertBytes.byteSpan(), AttestationCertType::kDAC);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Verify DAC Attestation Cert format Error! : %" CHIP_ERROR_FORMAT, err.Format()));
+
+        err = chip::Crypto::ExtractVIDPIDFromX509Cert(paaCertBytes.byteSpan(), paaVidPid);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Extract VID, PID from PAA Error! : %" CHIP_ERROR_FORMAT, err.Format()));
+
+        err = chip::Crypto::ExtractVIDPIDFromX509Cert(paiCertBytes.byteSpan(), paiVidPid);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Extract VID, PID from PAI Error! : %" CHIP_ERROR_FORMAT, err.Format()));
+
+        err = chip::Crypto::ExtractVIDPIDFromX509Cert(dacCertBytes.byteSpan(), dacVidPid);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Extract VID, PID from DAC Error! : %" CHIP_ERROR_FORMAT, err.Format()));
+
+        if (paaVidPid.mVendorId.HasValue())
+        {
+            VerifyOrExit(paaVidPid.mVendorId == paiVidPid.mVendorId,
+                            attestationError = AttestationVerificationResult::kPaiVendorIdMismatch);
+        }
+
+        VerifyOrExit(!paaVidPid.mProductId.HasValue(), attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+
+        err = chip::Crypto::ValidateCertificateChain(paaCertBytes.byteSpan().data(), paaCertBytes.byteSpan().size(), paiCertBytes.byteSpan().data(),
+                                            paiCertBytes.byteSpan().size(), dacCertBytes.byteSpan().data(), dacCertBytes.byteSpan().size(),
+                                            chainValidationResult);
+        VerifyOrExit(err == CHIP_NO_ERROR, attestationError = static_cast<AttestationVerificationResult>(chainValidationResult));
+
+        err = ExtractSKIDFromX509Cert(paaCertBytes.byteSpan(), paaSKID);
+        VerifyOrExit(err == CHIP_NO_ERROR, attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+        VerifyOrExit(paaSKID.size() == chip::Crypto::kAuthorityKeyIdentifierLength, attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+
+        deviceInfo.dacVendorId  = dacVidPid.mVendorId.Value();
+        deviceInfo.dacProductId = dacVidPid.mProductId.Value();
+        deviceInfo.paiVendorId  = paiVidPid.mVendorId.Value();
+        deviceInfo.paiProductId = paiVidPid.mProductId.ValueOr(0);
+        deviceInfo.paaVendorId  = paaVidPid.mVendorId.ValueOr(VendorId::NotSpecified);
+    }
+
+    {
+        VerifyOrExit(attestationElementsBuffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        JniByteArray attestationElementsBytes(env, attestationElementsBuffer);
+
+        ByteSpan certificationDeclarationSpan;
+        ByteSpan attestationNonceSpan;
+        uint32_t timestampDeconstructed;
+        ByteSpan firmwareInfoSpan;
+        DeviceAttestationVendorReservedDeconstructor vendorReserved;
+        ByteSpan certificationDeclarationPayload;
+
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        chip::Credentials::DeviceAttestationVerifier * dacVertifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+
+        err = chip::Credentials::DeconstructAttestationElements(attestationElementsBytes.byteSpan(), certificationDeclarationSpan,
+                                                        attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan,
+                                                        vendorReserved);
+
+        VerifyOrExit(err == CHIP_NO_ERROR, attestationError = AttestationVerificationResult::kAttestationElementsMalformed);
+
+        attestationError = dacVertifier->ValidateCertificationDeclarationSignature(certificationDeclarationSpan, certificationDeclarationPayload);
+        VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, err = CHIP_ERROR_INTERNAL);
+    }
+
+exit:
+    if (err == CHIP_NO_ERROR && attestationError != AttestationVerificationResult::kSuccess)
+    {
+        err = CHIP_ERROR_INTERNAL;
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to validate Attestation Info. Err = %u, %" CHIP_ERROR_FORMAT , static_cast<uint16_t>(attestationError), err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
