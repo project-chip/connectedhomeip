@@ -136,23 +136,22 @@ For platforms defined in [`scripts/setup/zap.json`](/scripts/setup/zap.json),
 up in `$PATH`.
 
 ZAP releases are copied to CIPD by an automated bot. You can check if a release
-was copied by looking at tags created at
-[here](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/zap) in
-various platforms.
+was copied by looking at tags created for
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/zap)
+in various platforms.
 
 ### Custom ZAP
 
 If you want to install or use a different version of the tool, you may download
-one from the ZAP project's
-[Releases](https://github.com/project-chip/zap/releases) page or build it from
-source.
+one from the [ZAP releases](https://github.com/project-chip/zap/releases) or
+build it from source.
 
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
 so you can refer to it to find a compatible version. The version is also
 maintained at [`scripts/setup/zap.version`](/scripts/setup/zap.version).
 
-To checkout as source code, the corresponding tag should exist in the zap
-[repository tags](https://github.com/project-chip/zap/tags) list.
+To check out as source code, the corresponding tag should exist in the
+[ZAP repository tags](https://github.com/project-chip/zap/tags) list.
 
 Example commands:
 
@@ -167,7 +166,7 @@ RUN set -x \
 ENV ZAP_DEVELOPMENT_PATH=/opt/zap-${ZAP_VERSION}
 ```
 
-### ZAP environment variables
+### Which ZAP to use
 
 The ZAP tool scripting uses the following detection, in order of importance:
 
