@@ -65,10 +65,10 @@ The chip-ota-provider-app binary for a Raspberry Pi is a part of the Artifacts p
 - To Build OTA-Provider app for Linux Platform, run below command in the matter repository.
 
 ```shell
-    scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
+scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
 ```
 
-## Matter OTA Images
+## Matter OTA Application Images
 - To create and Build matter OTA from matter code, need two different applications to build mentioned below:
   - OTA A
   - OTA B
@@ -76,24 +76,27 @@ The chip-ota-provider-app binary for a Raspberry Pi is a part of the Artifacts p
 ### Build OTA A Application
  - Matter OTA-A Application will be used to flash on the matter device.
  - In matter cloned directory run below commands to build an OTA A application.
-```
-For RS9116: 
 
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting_A BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116
+    For RS9116:
+    ``` 
+    ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting_A BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116
+    ``` 
 
-For WF200
+    For WF200:
+    ``` 
+    ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/wf200_lighting_A BRD41xxx chip_build_libshell=false --wifi wf200
+    ``` 
 
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/wf200_lighting_A BRD41xxx chip_build_libshell=false --wifi wf200
+    For SiWx917 NCP:
+    ``` 
+    ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/siwx917_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi SiWx917
+    ``` 
 
-For SiWx917 NCP
+    For SiWx917 SOC:
+    ``` 
+    ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/SiWx917_lighting BRD4388A
+    ```
 
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/siwx917_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi SiWx917
-
-For SiWx917 SOC
-
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/SiWx917_lighting BRD4388A
-
-```
 **Note:** Matter OTA-A application will be having software version as 1 by default in **third_party/silabs/BUILD.gn** file.
 
 ### Build OTA B Application
@@ -101,7 +104,7 @@ For SiWx917 SOC
 - Open the file **third_party/silabs/BUILD.gn** from matter code cloned directory and modify **sl_matter_version = 1** to any number.
 
 **Note:** Make sure always **sl_matter_version** should be greater than **sl_hardware_version**
-- After Modifying software version build OTA B application using below commands for EFR boards
+- After Modifying software version build OTA B application using below commands:
 
 ```
 For RS9116: 
@@ -124,10 +127,20 @@ For SiWx917 SOC
 
 ## Running the OTA Download Scenario
 
+- Image will be created and uploaded onto Raspberry Pi which provides the firmware image chunk by chunk to the device.
+- Host will initiate the OTA download and provider app will start the OTA image transfer.
+- Host will receive combined image and host will transfer the firmware image on to the flash backup location chunk by chunk.
+- Once image is downloaded, the device will reboot into the downloaded image.
+
+### Creation of GBL and OTA Images
+
+#### For EFR NCP Devices
+
 - Create a bootable image file (using the Lighting application image as an
     example):
 
-    ```shell
+
+   ```shell
     commander gbl create chip-efr32-lighting-example.gbl --compress lzma --app chip-efr32-lighting-example.s37
     ```
 **Note**:- Using LZMA compression when building the .gbl file ( passing `--compress lzma` parameter to the `commander gbl create` command) further reduces the downloaded image size.
@@ -136,6 +149,71 @@ For SiWx917 SOC
 
     ```shell
     $ commander ota create --type matter --input chip-efr32-lighting-example.gbl --vendorid 0xFFF1 --productid 0x8005 --swstring "2.0" --swversion 2 --digest sha256 -o chip-efr32-lighting-example.ota
+    ```
+#### For SiWx917 SoC Devices
+
+Storing a single Matter combined upgrade image(TA+M4) and transfer the image to the co-processor and rewrite the 917 firmware as well as M4 firmware Image then boot loading with the upgraded TA processor image and the M4 processor image.
+
+Host will initiate OTA download to receive combined image (TA+M4) and store M4 and TA image on flash backup location.
+
+##### Use Cases
+
+- Combined image where TA and M4 images to be upgraded. M4 image also has the **sl_matter_version** modified with the latest version.
+- Only M4 image to be upgraded. M4 image also has the **sl_matter_version** modified with the latest version.
+- Only TA image to be upgraded. In this case, We need to have a M4 image with just **sl_matter_version** modified with the latest version. This would be similar to Combined image upgrade.
+
+##### Creation of OTA Images
+
+- The first step is to create a combined image that contains both the firmwares (TA & M4).
+- This image is created by combining the binary images of both firmwares.
+- For the Matter OTA file, create a bootable image file with the .rps format (using the Lighting application image as an example) and then create the Matter OTA file from the bootable image file using commands provided below.
+- Once the .ota file is created, it will be uploaded onto the Raspberry Pi where the OTA provider application is running.
+
+###### Generating The Combined OTA image
+
+- Create TA  image (.rps) with combined image flag set by using command.
+
+    ```shell
+    commander rps convert <ta_image_combined.rps> --taapp <ta_image.rps> --combinedimage
+    ```
+
+- Create M4 .rps file from .s37 using below command.
+
+    ```shell
+    commander rps create <m4_image.rps> --app <m4_image.s37>
+    ```
+
+- Create M4 (.rps) with combined image flag set by using command.
+
+    ```shell
+    commander rps convert <m4_image_combined.rps> --app <m4_image.rps> --combinedimage
+    ```
+
+- Create combined image from the above created TA and M4 images.
+
+    ```shell
+    commander rps convert "combined_image.rps" --app "m4_image_combined.rps" --taapp "ta_image_combined.rps" 
+    ```
+
+- Create the Matter OTA file from the bootable image file.
+
+    ```shell
+    ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 combined_image.rps combined_image.ota
+    ```
+**Note:** For TA(alone) OTA firmware upgrade, follow the same steps as above.
+
+###### Generating The M4 OTA image
+
+- Create M4 (.s37) image to  (.rps) image using below command.
+
+    ```shell
+    commander rps create <m4_image.rps> --app <m4_image.s37>
+    ```
+
+- Create the Matter OTA file from the bootable image file
+
+    ```shell
+    ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 m4_image.rps m4_image.ota
     ```
 
 ### Running OTA Provider

@@ -71,6 +71,8 @@ Here is an example to build the lock-app as an ICD for the SiWx917 SoC
 ./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/SiWx917_lock_sleep BRD4338A chip_enable_icd_server=true 
 ```
 
+**Note**: By Default, ICD functionality is enabled for Lock Application.
+
 ### Minimal Power Consumption
 
 Simply enabling Sleepy functionalities does not give the application the best power consumption.

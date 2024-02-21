@@ -77,10 +77,16 @@ If the firmware update fails, try the following:
 
 1. SiWx917 SoC device support is available in the latest Simplicity Commander(version 1v15p3). To flash the TA Firmware/Matter application on SiWx917 SoC,
     - Convert the .s37 file into .rps file using the below command,
+         
+      ```shell
+      commander rps create <output file with .rps extension> --app <input file with .s37 extension>
+      ```
 
     - Flash to the device using,          
     
-          commander rps load <file-name>.rps 
+      ```shell
+      commander rps load <file-name>.rps
+      ```
 
 2. Official support for SiWx917 SoC for Common Flash Board is not yet available in the Ozone Debugger, but can be configured - [Ozone Environment Setup for SiWx917 SoC](SiWx917_Enablement_For_Ozone.md).
 

@@ -24,7 +24,16 @@ application images. Users may need to run the various commands as the root user 
     # Create a directory where binaries will be updated/compiled called `out`
     $ mkdir out
     ```
-
+3. Troubleshooting the errors:
+   
+   1. For resolving [Git Submodule Error](./images/git_submodule_error.png), run below command:
+      ```shell
+      $ git submodule update --init --checkout
+      ```
+   2. For resolving [Bootstrapping Error](./images/Boostrapping_Error.png), run below command:
+      ```shell
+      $ pip install --upgrade prompt-toolkit
+      ```
 ## Compiling the chip-tool
 
 In order to control the Wi-Fi Matter Accessory Device you will have to compile
@@ -63,88 +72,94 @@ continue with this documentation.
 
 ## Building the Matter Application
 
-The following commands are for building the Matter application. Depending on which device
-you are using, select the appropriate command to build.
-
->    **Note:**
->    1. The build commands given below are for the following applications: `lighting-app`, `lock-app`, `light-switch-app`, `window-app`
->    2. In order to build applications other than those mentioned in # 1, (such as `thermostat-app`), substitute the appropriate application name after the application name.
->    3. Additional examples (such as `onoff-plug-app`) are provided in the [/examples](https://github.com/SiliconLabs/matter/blob/latest/examples/) or [/silabs_examples](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/) directory.
->    4. In order to build applications from [/silabs_examples](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/) (such as `onoff-plug-app`), substitute `examples` with `silabs_examples`.
->    5. To build for EFR32MG24 host processors, substitute `BRD41xxx` in the build command with the appropriate MG24 board number
-from the [Hardware Requirements Page](../general/HARDWARE_REQUIREMENTS.md).
-
-Run the following:
+Depending on the host processdor used and the application required, select the appropriate build command :
 
 ```shell
 $ cd matter
 $ <run_appropriate_build_command_from_below>
 ```
+Syntax for the build command:
+```shell
+$ ./scripts/examples/gn_silabs_example.sh <path to the application code> <out folder for the generated binary> <Device/HW for which the binary is built> <build parameters if required>
+```
 
-> **Note:** The image size currently exceeds the available flash with CHIP logging enabled.
+>    **Note:**
+>    1. Build commands should not be executed under root user.
+>    2. The build commands given below are for the `lighting-app` application.
+>    3. In order to build applications other than the `lighting-app`, (such as `thermostat-app`, `lock-app`, `light-switch-app`, `window-app`, `onoff-plug-app`), substitute the appropriate application path in the build command.
+>    4. Path to the sample application examples are provided in the [/examples](https://github.com/SiliconLabs/matter/blob/latest/examples/) or [/silabs_examples](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/) directory.
+>    5. To build for EFR32MG24 / 917 SoC host processors, substitute `BRD41xxx` in the build command with the appropriate board number from the [Hardware Requirements Page](../general/HARDWARE_REQUIREMENTS.md).
 
 Build command for EFR32MG24 + RS9116:
 
 ```shell
-$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116 |& tee out/rs911x_lighting.log
+$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx --wifi rs9116
 ```
 
 Build command for EFR32MG24 + SiWx917:
 
 ```shell
-$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/siwx917_lighting BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi SiWx917 |& tee out/siwx917_lighting.log
+$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/siwx917_lighting BRD41xxx disable_lcd=true use_external_flash=false --wifi SiWx917
 ```
 
 Build command for EFR32MG24 + WF200:
 
 ```shell
-$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/wf200_lighting BRD41xxx chip_build_libshell=false --wifi wf200 |& tee out/wf200_lighting.log
+$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/wf200_lighting BRD41xxx chip_build_libshell=false --wifi wf200
 ```
 
 Build command for SiWx917 SoC processor(common flash):
 
 ```shell
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/SiWx917_lighting BRD4338A |& tee out/soc_lighting.out
+$ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/SiWx917_lighting BRD4338A
 ```
 
 >    **Note:**
->    1. LED and button features are enabled for SiWx917 SoC.
->    2. Before building for SiWx917 SoC, you must first obtain the WiseMCU Combo SDK package and install it. See the [Software Requirements page](../general/SOFTWARE_REQUIREMENTS.md).
+>    1. If the build fails during the creation of the .rps file in WSL, then sym link commander with the proper path to the executable using below command and rebuild the application.
+>    ```shell
+>    cd .local/bin
+>    ln -s <commander_path>/commander.exe commander
+>    ```
 
-A complete list of hardware supported is included on the [Hardware Requirements page](../general/HARDWARE_REQUIREMENTS.md).
-
-Enable or disable the lighting application's features using the following flags.
+Enable or disable the application's features using the following build parameters.
 
 1.  `segger_rtt_buffer_size_up` : Flag to get the complete logs without truncation.
 
     ```shell
-    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx segger_rtt_buffer_size_up=2068 --wifi rs9116 |& tee out/rs911x_lighting.log
+    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx segger_rtt_buffer_size_up=2068 --wifi rs9116
     ```
-2.  `show_qr_code=false` : Use this flag while building to disable QR code.
+    
+2.  `disable_lcd=true` : Use this flag while building to disable the LCD.
+    
+     ```shell
+    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx disable_lcd=true --wifi rs9116
+    ```
+    
+3.  `show_qr_code=false` : Use this flag while building to disable the QR code.
 
     ```shell
-    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx show_qr_code=false --wifi rs9116 |& tee out/rs911x_lighting.log
+    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx show_qr_code=false --wifi rs9116
     ```
 >    **Note:**
 >    1. QR code is enabled by default for all except MG24
 >    2. QR code is disabled for MG24 because of lcd disable. It cannot be enabled using the flag.
 
-3. `chip_enable_wifi_ipv4` : Use this flag while building to enable IPV4 (disabled by default).
+4. `chip_enable_wifi_ipv4` : Use this flag while building to enable IPV4 (disabled by default).
 
     ```shell
-    ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx chip_enable_wifi_ipv4=true --wifi rs9116 |& tee out/rs911x_lighting.log
+    ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx chip_enable_wifi_ipv4=true --wifi rs9116 
     ```
 
-The generated software can be found in
-`out/rs911x_xxx/BRD41xxx/*.out` for the RS9116, in `out/siwx917_xxx/BRD41xxx/*.out`  for the
-SiWx917 and in `out/wf200_xxx/BRD41xxx/*.out` for the WF200.
+The generated software binaries can be found in the `out/` folder created during the build.
+Once you have downloaded the binaries for your device, you can follow the instructions for running the demo.
 
-This is what you will flash onto the EFR32 device or SiWx917 SoC device. For more information on flashing:
+  - **For EFR32MG24 host processors**
 
-- Flashing the EFR32
-  - [Flashing a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
-- Flashing the SiWx917
-  - [Flashing the SiWX917 SoC Device](../general/FLASH_SILABS_SiWx917_SOC_DEVICE.md)
+    - [Running the Matter Demo for EFR32 device over Wi-Fi page](./RUN_DEMO.md)
+
+  - **For SiWx917 SoC processor**
+
+    - [Running the Matter Demo for SiWx917 SoC device over Wi-Fi page](./RUN_DEMO_SiWx917_SoC.md)
 
 **[Optional:** Increasing stack size **]** 
 
@@ -153,10 +168,3 @@ Navigate to
 `examples/platform/silabs/efr32/FreeRTOSConfig.h`. Find the macro:
 \``configMINIMAL_STACK_SIZE`\`, and change the macro value from `140` to
  **`320`**.
-
- ### Troubleshooting
-
-If having issues building the above examples, users may need to run the following commands:
-
-    git submodule update --init --checkout
-    pip install --upgrade prompt-toolkit

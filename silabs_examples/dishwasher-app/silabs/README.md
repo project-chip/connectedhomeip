@@ -235,15 +235,17 @@ combination with JLinkRTTClient as follows:
 
     **Push Button 1** Cycle the dishwasher operational states Running/Paused/Stopped
 
-*   You can provision and control the Chip device using the python controller,
-    Chip tool standalone, Android or iOS app
+### Commissioning
 
-*   You can provision and control the Chip device using the python controller,
-    Chip tool standalone, Android or iOS app
+  You can provision and control the Matter device using the python controller,
+  `mattertool` standalone, Android, or iOS app.
 
-    [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
+  Silabs provides `mattertool` as a wrapper function and more user-friendly method of using 
+  [chip-tool](../../../../examples/chip-tool/README.md) within the pre-built Raspberry Pi image. For more info on using `mattertool`, see 
+  [Mattertool](../../../docs/silabs/thread/CHIP_TOOL.md).
 
-    Here is an example with the chip-tool:
+  Here is an example using `mattertool`:
 
-          $ chip-tool pairing ble-thread <nodeid> hex:<operationalDataset> 20202021 3840
-          $ chip-tool operationalstate start <nodeid> 1
+    $ mattertool startThread
+    $ mattertool bleThread
+    $ mattertool operationalstate start 1 1

@@ -31,10 +31,10 @@ $ mattertool levelcontrol read current-level 106 1
     -   ubuntu (you are here)
         -   connectedhomeip (git repo:
             https://github.com/project-chip/connectedhomeip.git)
-            -   .
+            
         -   ot-br-posix (git repo:
             https://github.com/openthread/ot-br-posix.git)
-            -   .
+
         -   scripts (in-house scripts)
             -   configurations.sh
             -   matterTool.sh

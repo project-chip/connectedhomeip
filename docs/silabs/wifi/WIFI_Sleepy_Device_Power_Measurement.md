@@ -11,7 +11,7 @@ pin 7 and 9 to UULP_2 and UULP_0 respectively.
 
 ## Using Simplicity Studio Energy Profiler for Current Measurement
 
-After flashing the Matter application to the module, Energy profiler or a power meter can be used for power measurements.
+After flashing the Matter application to the device (EFR32 or SiWx917 SoC), Energy profiler or a power meter can be used for power measurements.
 
 ![Power measurement connection overview](./images/WiFi_PowerSave_Overview.png)
 
@@ -24,6 +24,7 @@ From the Quick Access or Profiler menu, select 'Start Energy Capture'.
 ![Power measurement using PowerProfiler](./images/WiFi_PowerProfiler_start.png)
 
 > **Note**: A quick-start guide on the Energy Profiler user interface is in the Simplicity Studio User's Guide's [Energy Profiler User Interface section](https://docs.silabs.com/simplicity-studio-5-users-guide/latest/ss-5-users-guide-tools-energy-profiler/energy-profiler-user-interface).
+
 
 ## Power Consumption Measurment (EFR) Using Energy Profiler
 

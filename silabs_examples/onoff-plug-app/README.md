@@ -242,19 +242,20 @@ combination with JLinkRTTClient as follows:
 
     **Push Button 1** Toggles the plug state On/Off
 
-*   You can provision and control the Matter device using the python controller,
-    Matter tool standalone, Android or iOS app
+### Commissioning
 
-*   You can provision and control the Matter device using the python controller,
-    Matter tool standalone, Android or iOS app
+  You can provision and control the Matter device using the python controller,
+  `mattertool` standalone, Android, or iOS app.
 
-    [MATTERTool](https://github.com/project-matter/connectedhomeip/blob/master/examples/matter-tool/README.md)
+  Silabs provides `mattertool` as a wrapper function and more user-friendly method of using 
+  [chip-tool](../../examples/chip-tool/README.md) within the pre-built Raspberry Pi image. For more info on using `mattertool`, see 
+  [Mattertool](../../docs/silabs/thread/CHIP_TOOL.md).
 
-    Here is an example with the MATTERTool:
+  Here is an example using `mattertool`:
 
-    matter-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
-
-    matter-tool onoff on 1 1
+    $ mattertool startThread
+    $ mattertool bleThread
+    $ mattertool occupancysensing read occupancy 1 1
 
 ### Notes
 
@@ -306,7 +307,7 @@ tracking code inside the `trackAlloc` and `trackFree` function
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../docs/guides/silabs_efr32_software_update.md)
 
 ## Group Communication (Multicast)
 
