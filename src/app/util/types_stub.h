@@ -167,12 +167,6 @@ typedef struct
 } EmberEventControl;
 
 /**
- * @description Useful macro for avoiding compiler warnings related to unused
- * function arguments or unused variables.
- */
-#define UNUSED_VAR(x) (void) (x)
-
-/**
  * @brief Returns the value of the bitmask \c bits within
  * the register or byte \c reg.
  */
