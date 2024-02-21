@@ -127,10 +127,7 @@ public:
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 #ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    void SetTestFeatureMapValue(uint32_t featureMap)
-    {
-        mFeatureMap = featureMap;
-    };
+    void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
 #endif
 
     // Implementation of ICDListener functions.

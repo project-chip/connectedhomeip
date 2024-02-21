@@ -2892,12 +2892,6 @@ endpoint 0 {
     callback attribute activeModeThreshold;
     ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 2;
-
-    handle command RegisterClient;
-    handle command RegisterClientResponse;
-    handle command UnregisterClient;
-    handle command StayActiveRequest;
-    handle command StayActiveResponse;
   }
 }
 endpoint 1 {
