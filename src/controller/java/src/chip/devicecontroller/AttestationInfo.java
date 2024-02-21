@@ -20,7 +20,8 @@ public final class AttestationInfo {
     this.certificationDeclaration = certificationDeclaration;
   }
 
-  public AttestationInfo(byte[] dac, byte[] pai, byte[] certificationDeclaration, int vendorId, int productId) {
+  public AttestationInfo(
+      byte[] dac, byte[] pai, byte[] certificationDeclaration, int vendorId, int productId) {
     this.dac = dac;
     this.pai = pai;
     this.certificationDeclaration = certificationDeclaration;

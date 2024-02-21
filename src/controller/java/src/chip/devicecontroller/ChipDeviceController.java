@@ -1316,7 +1316,13 @@ public class ChipDeviceController {
 
   public static native byte[] extractAkidFromPaiCert(byte[] paiCert);
 
-  public static native void validateAttestationInfo(int vendorId, int productId, byte[] paaCert, byte[] paiCert, byte[] dacCert, byte[] attestationElementsBuffer);
+  public static native void validateAttestationInfo(
+      int vendorId,
+      int productId,
+      byte[] paaCert,
+      byte[] paiCert,
+      byte[] dacCert,
+      byte[] attestationElementsBuffer);
 
   /**
    * Generates a new PASE verifier for the given setup PIN code.
