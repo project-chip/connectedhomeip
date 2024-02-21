@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include <controller/CommandSenderAllocator.h>
 #include <controller/TypedCommandCallback.h>
 #include <lib/core/Optional.h>
+
+#include <functional>
 
 namespace chip {
 namespace Controller {
@@ -49,7 +50,8 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
                      const Optional<uint16_t> & timedInvokeTimeoutMs,
-                     const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
+                     const Optional<System::Clock::Timeout> & responseTimeout = NullOptional,
+                     std::function<void()> * outCancelFn                      = nullptr)
 {
     // InvokeCommandRequest expects responses, so cannot happen over a group session.
     VerifyOrReturnError(!sessionHandle->IsGroupSession(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -80,6 +82,15 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
 
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData, timedInvokeTimeoutMs));
     ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle, responseTimeout));
+
+    // If requested by the caller, provide a way to cancel the invoke interaction.
+    if (outCancelFn != nullptr)
+    {
+        *outCancelFn = [rawDecoderPtr = decoder.get(), rawCommandSender = commandSender.get()]() {
+            chip::Platform::Delete(rawCommandSender);
+            chip::Platform::Delete(rawDecoderPtr);
+        };
+    }
 
     //
     // We've effectively transferred ownership of the above allocated objects to CommandSender, and we need to wait for it to call
