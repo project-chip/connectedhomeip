@@ -89,12 +89,10 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
 
 gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation)
 {
-    ChipLogDetail(DeviceLayer, "Release BLE adv object in %s", __func__);
-    g_dbus_object_manager_server_unexport(mRoot.get(), mAdvPath);
-    mAdv.reset();
+    // This method is called when the advertisement is stopped (released) by BlueZ.
+    // We can use it to update the state of the advertisement in the CHIP layer.
+    ChipLogDetail(DeviceLayer, "BLE advertisement stopped by BlueZ");
     mIsAdvertising = false;
-    // Advertisement object needs to be re-created before it can be used again.
-    mIsInitialized = false;
     return TRUE;
 }
 
@@ -209,6 +207,10 @@ void BluezAdvertisement::Shutdown()
     // attached to the advertising object that may run on the glib thread.
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezAdvertisement * self) {
+            // The object manager server (mRoot) might not be released right away (it may be held
+            // by other BLE layer objects). We need to unexport the advertisement object in the
+            // explicit way to make sure that we can export it again in the Init() method.
+            g_dbus_object_manager_server_unexport(self->mRoot.get(), self->mAdvPath);
             self->mRoot.reset();
             self->mAdapter.reset();
             self->mAdv.reset();
@@ -226,10 +228,6 @@ void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
     gboolean success = FALSE;
 
     success = bluez_leadvertising_manager1_call_register_advertisement_finish(advMgr, aResult, &error.GetReceiver());
-    if (success == FALSE)
-    {
-        g_dbus_object_manager_server_unexport(mRoot.get(), mAdvPath);
-    }
     VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: RegisterAdvertisement : %s", error->message));
 
     mIsAdvertising = true;
@@ -288,17 +286,9 @@ void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
     gboolean success = FALSE;
 
     success = bluez_leadvertising_manager1_call_unregister_advertisement_finish(advMgr, aResult, &error.GetReceiver());
+    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: UnregisterAdvertisement: %s", error->message));
 
-    if (success == FALSE)
-    {
-        g_dbus_object_manager_server_unexport(mRoot.get(), mAdvPath);
-    }
-    else
-    {
-        mIsAdvertising = false;
-    }
-
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: UnregisterAdvertisement : %s", error->message));
+    mIsAdvertising = false;
 
     ChipLogDetail(DeviceLayer, "UnregisterAdvertisement complete");
 
