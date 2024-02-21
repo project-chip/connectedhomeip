@@ -271,11 +271,16 @@ class GroupSettingFragment : Fragment() {
   private suspend fun sendKeySetWrite(
     groupKeySetStruct: GroupKeyManagementClusterGroupKeySetStruct
   ) {
-    val cluster =
-      ChipClusters.GroupKeyManagementCluster(
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-        0
-      )
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
+    val cluster = ChipClusters.GroupKeyManagementCluster(devicePtr, 0)
+
     cluster.keySetWrite(
       object : ChipClusters.DefaultClusterCallback {
         override fun onError(e: Exception?) {
@@ -311,11 +316,15 @@ class GroupSettingFragment : Fragment() {
   }
 
   private suspend fun writeGroupKeyMap(groupId: UInt, groupKeySetId: UInt) {
-    val cluster =
-      ChipClusters.GroupKeyManagementCluster(
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-        0
-      )
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
+    val cluster = ChipClusters.GroupKeyManagementCluster(devicePtr, 0)
     cluster.writeGroupKeyMapAttribute(
       object : ChipClusters.DefaultClusterCallback {
         override fun onError(e: Exception?) {
@@ -356,11 +365,16 @@ class GroupSettingFragment : Fragment() {
   }
 
   private suspend fun sendAddGroup(groupId: UInt, groupName: String) {
-    val cluster =
-      ChipClusters.GroupsCluster(
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-        0
-      )
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
+    val cluster = ChipClusters.GroupsCluster(devicePtr, 0)
+
     cluster.addGroup(
       object : ChipClusters.GroupsCluster.AddGroupResponseCallback {
         override fun onError(e: Exception?) {
@@ -379,11 +393,15 @@ class GroupSettingFragment : Fragment() {
   }
 
   private suspend fun readAccessControl() {
-    val cluster =
-      ChipClusters.AccessControlCluster(
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-        0
-      )
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
+    val cluster = ChipClusters.AccessControlCluster(devicePtr, 0)
     cluster.readAclAttribute(
       object : ChipClusters.AccessControlCluster.AclAttributeCallback {
         override fun onError(e: Exception?) {
@@ -437,12 +455,16 @@ class GroupSettingFragment : Fragment() {
     groupId: UInt,
     privilege: UInt
   ) {
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
     // If GroupID is already added to AccessControl, do not add it.
-    val cluster =
-      ChipClusters.AccessControlCluster(
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-        0
-      )
+    val cluster = ChipClusters.AccessControlCluster(devicePtr, 0)
     val sendEntry = ArrayList<AccessControlClusterAccessControlEntryStruct>()
     for (entry in value) {
       if (
