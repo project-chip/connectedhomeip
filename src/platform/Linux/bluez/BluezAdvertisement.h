@@ -86,8 +86,8 @@ private:
     bool mIsInitialized = false;
     bool mIsAdvertising = false;
 
-    char * mpAdvPath  = nullptr;
-    char * mpAdvUUID  = nullptr;
+    char mAdvPath[64] = ""; // D-Bus path of the advertisement object
+    char mAdvUUID[64] = ""; // UUID of the service to be advertised
     char mAdvName[32] = "";
 };
 

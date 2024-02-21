@@ -45,13 +45,13 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     GVariant * serviceUUID;
     GVariantBuilder serviceUUIDsBuilder;
 
-    ChipLogDetail(DeviceLayer, "Create BLE adv object at %s", mpAdvPath);
-    object = bluez_object_skeleton_new(mpAdvPath);
+    ChipLogDetail(DeviceLayer, "Create BLE adv object at %s", mAdvPath);
+    object = bluez_object_skeleton_new(mAdvPath);
 
     adv = bluez_leadvertisement1_skeleton_new();
 
     g_variant_builder_init(&serviceUUIDsBuilder, G_VARIANT_TYPE("as"));
-    g_variant_builder_add(&serviceUUIDsBuilder, "s", mpAdvUUID);
+    g_variant_builder_add(&serviceUUIDsBuilder, "s", mAdvUUID);
 
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
 
@@ -90,10 +90,12 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
 gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation)
 {
     ChipLogDetail(DeviceLayer, "Release BLE adv object in %s", __func__);
-    g_dbus_object_manager_server_unexport(mpRoot, mpAdvPath);
+    g_dbus_object_manager_server_unexport(mpRoot, mAdvPath);
     g_object_unref(mpAdv);
     mpAdv          = nullptr;
     mIsAdvertising = false;
+    // Advertisement object needs to be re-created before it can be used again.
+    mIsInitialized = false;
     return TRUE;
 }
 
@@ -119,12 +121,12 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char 
     mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter())));
 
     g_object_get(G_OBJECT(mpRoot), "object-path", &rootPath.GetReceiver(), nullptr);
-    mpAdvPath = g_strdup_printf("%s/advertising", rootPath.get());
-    mpAdvUUID = g_strdup(aAdvUUID);
+    g_snprintf(mAdvPath, sizeof(mAdvPath), "%s/advertising", rootPath.get());
+    g_strlcpy(mAdvUUID, aAdvUUID, sizeof(mAdvUUID));
 
     if (aAdvName != nullptr)
     {
-        g_snprintf(mAdvName, sizeof(mAdvName), "%s", aAdvName);
+        g_strlcpy(mAdvName, aAdvName, sizeof(mAdvName));
     }
     else
     {
@@ -177,7 +179,7 @@ CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
 
     GVariantBuilder serviceDataBuilder;
     g_variant_builder_init(&serviceDataBuilder, G_VARIANT_TYPE("a{sv}"));
-    g_variant_builder_add(&serviceDataBuilder, "{sv}", mpAdvUUID,
+    g_variant_builder_add(&serviceDataBuilder, "{sv}", mAdvUUID,
                           g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &deviceInfo, sizeof(deviceInfo), sizeof(uint8_t)));
 
     GVariant * serviceData = g_variant_builder_end(&serviceDataBuilder);
@@ -223,11 +225,6 @@ void BluezAdvertisement::Shutdown()
         },
         this);
 
-    g_free(mpAdvPath);
-    mpAdvPath = nullptr;
-    g_free(mpAdvUUID);
-    mpAdvUUID = nullptr;
-
     mIsInitialized = false;
 }
 
@@ -240,7 +237,7 @@ void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
     success = bluez_leadvertising_manager1_call_register_advertisement_finish(advMgr, aResult, &error.GetReceiver());
     if (success == FALSE)
     {
-        g_dbus_object_manager_server_unexport(mpRoot, mpAdvPath);
+        g_dbus_object_manager_server_unexport(mpRoot, mAdvPath);
     }
     VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: RegisterAdvertisement : %s", error->message));
 
@@ -272,7 +269,7 @@ CHIP_ERROR BluezAdvertisement::StartImpl()
     options = g_variant_builder_end(&optionsBuilder);
 
     bluez_leadvertising_manager1_call_register_advertisement(
-        advMgr.get(), mpAdvPath, options, nullptr,
+        advMgr.get(), mAdvPath, options, nullptr,
         [](GObject * aObject, GAsyncResult * aResult, void * aData) {
             reinterpret_cast<BluezAdvertisement *>(aData)->StartDone(aObject, aResult);
         },
@@ -303,7 +300,7 @@ void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
 
     if (success == FALSE)
     {
-        g_dbus_object_manager_server_unexport(mpRoot, mpAdvPath);
+        g_dbus_object_manager_server_unexport(mpRoot, mAdvPath);
     }
     else
     {
@@ -333,7 +330,7 @@ CHIP_ERROR BluezAdvertisement::StopImpl()
     VerifyOrExit(advMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
     bluez_leadvertising_manager1_call_unregister_advertisement(
-        advMgr.get(), mpAdvPath, nullptr,
+        advMgr.get(), mAdvPath, nullptr,
         [](GObject * aObject, GAsyncResult * aResult, void * aData) {
             reinterpret_cast<BluezAdvertisement *>(aData)->StopDone(aObject, aResult);
         },
