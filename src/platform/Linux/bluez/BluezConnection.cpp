@@ -60,7 +60,7 @@ gboolean BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService
 } // namespace
 
 BluezConnection::BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice) :
-    mpDevice(BLUEZ_DEVICE1(g_object_ref(apDevice)))
+    mpDevice(reinterpret_cast<BluezDevice1 *>(g_object_ref(apDevice)))
 {
     Init(aEndpoint);
 }
@@ -101,9 +101,9 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
     if (!aEndpoint.mIsCentral)
     {
-        mpService = BLUEZ_GATT_SERVICE1(g_object_ref(aEndpoint.mpService));
-        mpC1      = BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC1));
-        mpC2      = BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC2));
+        mpService = reinterpret_cast<BluezGattService1 *>(g_object_ref(aEndpoint.mpService));
+        mpC1      = reinterpret_cast<BluezGattCharacteristic1 *>(g_object_ref(aEndpoint.mpC1));
+        mpC2      = reinterpret_cast<BluezGattCharacteristic1 *>(g_object_ref(aEndpoint.mpC2));
     }
     else
     {

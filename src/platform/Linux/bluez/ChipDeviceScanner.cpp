@@ -58,7 +58,7 @@ CHIP_ERROR ChipDeviceScanner::Init(BluezAdapter1 * adapter, ChipDeviceScannerDel
     // Make this function idempotent by shutting down previously initialized state if any.
     Shutdown();
 
-    mAdapter.reset(BLUEZ_ADAPTER1(g_object_ref(adapter)));
+    mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(adapter)));
     mDelegate = delegate;
 
     // Create the D-Bus object manager client object on the glib thread, so that all D-Bus signals
