@@ -162,7 +162,7 @@ private:
     bool CheckInMessagesWouldBeSent();
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-    KeepActiveFlags mKeepActiveFlags;
+    KeepActiveFlags mKeepActiveFlags{};
 
     // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.
     OperationalState mOperationalState = OperationalState::ActiveMode;
