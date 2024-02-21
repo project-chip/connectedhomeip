@@ -385,9 +385,12 @@ void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
 {
     assertChipStackLockedByCurrentThread();
 
-    if (state) {
+    if (state)
+    {
         mKeepActiveFlags.Set(flag);
-    } else {
+    }
+    else
+    {
         mKeepActiveFlags.Clear(flag);
     }
     if (mOperationalState == OperationalState::IdleMode && mKeepActiveFlags.HasAny())
