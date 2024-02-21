@@ -278,7 +278,7 @@ void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult 
 CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 {
     GDBusObject * adapterObject;
-    BluezGattManager1 * gattMgr;
+    GAutoPtr<BluezGattManager1> gattMgr;
     GVariantBuilder optionsBuilder;
     GVariant * options;
 
@@ -287,14 +287,14 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    gattMgr = bluez_object_get_gatt_manager1(BLUEZ_OBJECT(adapterObject));
-    VerifyOrExit(gattMgr != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL gattMgr in %s", __func__));
+    gattMgr.reset(bluez_object_get_gatt_manager1(BLUEZ_OBJECT(adapterObject)));
+    VerifyOrExit(gattMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL gattMgr in %s", __func__));
 
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
     options = g_variant_builder_end(&optionsBuilder);
 
     bluez_gatt_manager1_call_register_application(
-        gattMgr, mpRootPath, options, nullptr,
+        gattMgr.get(), mpRootPath, options, nullptr,
         +[](GObject * aObj, GAsyncResult * aResult, void * self) {
             reinterpret_cast<BluezEndpoint *>(self)->RegisterGattApplicationDone(aObj, aResult);
         },
@@ -429,21 +429,23 @@ void BluezEndpoint::SetupAdapter()
     GList * objects = g_dbus_object_manager_get_objects(mpObjMgr);
     for (auto l = objects; l != nullptr && mAdapter.get() == nullptr; l = l->next)
     {
-        BluezAdapter1 * adapter = bluez_object_get_adapter1(BLUEZ_OBJECT(l->data));
-        if (adapter != nullptr)
+        GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(BLUEZ_OBJECT(l->data)));
+        if (adapter.get() != nullptr)
         {
             if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
             {
-                if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter)), expectedPath) == 0)
+                if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter.get())), expectedPath) == 0)
                 {
-                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
+                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter.get())));
+                    break;
                 }
             }
             else
             {
-                if (strcmp(bluez_adapter1_get_address(adapter), mpAdapterAddr) == 0)
+                if (strcmp(bluez_adapter1_get_address(adapter.get()), mpAdapterAddr) == 0)
                 {
-                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
+                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter.get())));
+                    break;
                 }
             }
         }

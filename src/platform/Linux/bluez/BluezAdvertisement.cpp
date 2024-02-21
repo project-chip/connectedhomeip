@@ -255,7 +255,7 @@ exit:
 CHIP_ERROR BluezAdvertisement::StartImpl()
 {
     GDBusObject * adapterObject;
-    BluezLEAdvertisingManager1 * advMgr = nullptr;
+    GAutoPtr<BluezLEAdvertisingManager1> advMgr;
     GVariantBuilder optionsBuilder;
     GVariant * options;
 
@@ -265,14 +265,14 @@ CHIP_ERROR BluezAdvertisement::StartImpl()
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    advMgr = bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapterObject));
-    VerifyOrExit(advMgr != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
+    advMgr.reset(bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapterObject)));
+    VerifyOrExit(advMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
     options = g_variant_builder_end(&optionsBuilder);
 
     bluez_leadvertising_manager1_call_register_advertisement(
-        advMgr, mpAdvPath, options, nullptr,
+        advMgr.get(), mpAdvPath, options, nullptr,
         [](GObject * aObject, GAsyncResult * aResult, void * aData) {
             reinterpret_cast<BluezAdvertisement *>(aData)->StartDone(aObject, aResult);
         },
@@ -321,7 +321,7 @@ exit:
 CHIP_ERROR BluezAdvertisement::StopImpl()
 {
     GDBusObject * adapterObject;
-    BluezLEAdvertisingManager1 * advMgr = nullptr;
+    GAutoPtr<BluezLEAdvertisingManager1> advMgr;
 
     VerifyOrExit(mIsAdvertising, ChipLogError(DeviceLayer, "FAIL: Advertising has already been disabled in %s", __func__));
     VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
@@ -329,11 +329,11 @@ CHIP_ERROR BluezAdvertisement::StopImpl()
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    advMgr = bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapterObject));
-    VerifyOrExit(advMgr != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
+    advMgr.reset(bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapterObject)));
+    VerifyOrExit(advMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
     bluez_leadvertising_manager1_call_unregister_advertisement(
-        advMgr, mpAdvPath, nullptr,
+        advMgr.get(), mpAdvPath, nullptr,
         [](GObject * aObject, GAsyncResult * aResult, void * aData) {
             reinterpret_cast<BluezAdvertisement *>(aData)->StopDone(aObject, aResult);
         },

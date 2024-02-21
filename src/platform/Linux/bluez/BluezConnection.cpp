@@ -111,9 +111,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         for (l = objects; l != nullptr; l = l->next)
         {
-            BluezObject * object        = BLUEZ_OBJECT(l->data);
-            BluezGattService1 * service = bluez_object_get_gatt_service1(object);
-
+            BluezGattService1 * service = bluez_object_get_gatt_service1(BLUEZ_OBJECT(l->data));
             if (service != nullptr)
             {
                 if ((BluezIsServiceOnDevice(service, mpDevice)) == TRUE &&
@@ -130,9 +128,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         for (l = objects; l != nullptr; l = l->next)
         {
-            BluezObject * object             = BLUEZ_OBJECT(l->data);
-            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(object);
-
+            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(BLUEZ_OBJECT(l->data));
             if (char1 != nullptr)
             {
                 if ((BluezIsCharOnService(char1, mpService) == TRUE) &&

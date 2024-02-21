@@ -66,6 +66,18 @@ struct GAutoPtrDeleter<BluezDevice1>
     using deleter = GObjectDeleter;
 };
 
+template <>
+struct GAutoPtrDeleter<BluezGattManager1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezLEAdvertisingManager1>
+{
+    using deleter = GObjectDeleter;
+};
+
 namespace DeviceLayer {
 namespace Internal {
 
