@@ -1031,13 +1031,11 @@ TLVElementType TLVReader::ElementType() const
     // Range check
     if (elementType > static_cast<int8_t>(TLVElementType::EndOfContainer))
     {
-        // this is not a valid TLV ...
-        return TLVElementType::NotSpecified;
+        return TLVElementType::kInvalidType;
     }
     if (elementType < static_cast<int8_t>(TLVElementType::Int8))
     {
-        // this is not a valid TLV ...
-        return TLVElementType::NotSpecified;
+        return TLVElementType::kInvalidType;
     }
 
     // Range checks were done above

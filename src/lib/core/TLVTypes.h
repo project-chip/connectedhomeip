@@ -84,6 +84,9 @@ enum class TLVElementType : int8_t
     Array          = 0x16,
     List           = 0x17,
     EndOfContainer = 0x18
+
+    // Must be a value outside of the range (so that IsValidTLVType returns false)
+    kInvalidType = 0x19,
 };
 
 template <typename T>
@@ -122,7 +125,10 @@ enum
  */
 inline bool IsValidTLVType(TLVElementType type)
 {
-    return type <= TLVElementType::EndOfContainer;
+    return (type == TLVElementType::NotSpecified) ||
+        (
+         (type >= TLVElementType::Int8) &&
+         (type <= TLVElementType::EndOfContainer);
 }
 
 /**
