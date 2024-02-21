@@ -1023,8 +1023,26 @@ CHIP_ERROR TLVReader::GetElementHeadLength(uint8_t & elemHeadBytes) const
 TLVElementType TLVReader::ElementType() const
 {
     if (mControlByte == static_cast<uint16_t>(kTLVControlByte_NotSpecified))
+    {
         return TLVElementType::NotSpecified;
-    return static_cast<TLVElementType>(mControlByte & kTLVTypeMask);
+    }
+    int8_t elementType = mControlByte & kTLVTypeMask;
+
+    // Range check
+    if (elementType > static_cast<int8_t>(TLVElementType::EndOfContainer))
+    {
+        // this is not a valid TLV ...
+        return TLVElementType::NotSpecified;
+    }
+    if (elementType < static_cast<int8_t>(TLVElementType::Int8))
+    {
+        // this is not a valid TLV ...
+        return TLVElementType::NotSpecified;
+    }
+
+    // Range checks were done above
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
+    return static_cast<TLVElementType>(elementType);
 }
 
 CHIP_ERROR TLVReader::FindElementWithTag(Tag tag, TLVReader & destReader) const

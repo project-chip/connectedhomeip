@@ -231,6 +231,8 @@ void BluezConnection::SetupWriteHandler(int aSocketFd)
     g_io_channel_set_close_on_unref(channel, TRUE);
     g_io_channel_set_buffered(channel, FALSE);
 
+    // CIOCondition are flags not an actual enum
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL));
     g_source_set_callback(watchSource, G_SOURCE_FUNC(WriteHandlerCallback), this, nullptr);
 
@@ -252,6 +254,8 @@ void BluezConnection::SetupNotifyHandler(int aSocketFd, bool aAdditionalAdvertis
     g_io_channel_set_close_on_unref(channel, TRUE);
     g_io_channel_set_buffered(channel, FALSE);
 
+    // CIOCondition are flags not an actual enum
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL));
     g_source_set_callback(watchSource, G_SOURCE_FUNC(NotifyHandlerCallback), this, nullptr);
 

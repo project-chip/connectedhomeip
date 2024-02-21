@@ -52,7 +52,7 @@ public:
         kStayActiveRequestReceived = 0x02,
     };
 
-    using KeepActiveFlags = BitFlags<KeepActiveFlagsValues>;
+    using KeepActiveFlags = BitMask<KeepActiveFlagsValues>;
     using KeepActiveFlag  = KeepActiveFlagsValues;
 
     virtual ~ICDListener() {}
