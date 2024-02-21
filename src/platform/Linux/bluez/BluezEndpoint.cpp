@@ -429,31 +429,24 @@ void BluezEndpoint::SetupAdapter()
     GList * objects = g_dbus_object_manager_get_objects(mpObjMgr);
     for (auto l = objects; l != nullptr && mAdapter.get() == nullptr; l = l->next)
     {
-        BluezObject * object = BLUEZ_OBJECT(l->data);
-
-        GList * interfaces = g_dbus_object_get_interfaces(G_DBUS_OBJECT(object));
-        for (auto ll = interfaces; ll != nullptr; ll = ll->next)
+        BluezAdapter1 * adapter = bluez_object_get_adapter1(BLUEZ_OBJECT(l->data));
+        if (adapter != nullptr)
         {
-            BluezAdapter1 * adapter = BLUEZ_ADAPTER1(ll->data);
-            if (adapter != nullptr)
+            if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
             {
-                if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
+                if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter)), expectedPath) == 0)
                 {
-                    if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter)), expectedPath) == 0)
-                    {
-                        mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
-                    }
+                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
                 }
-                else
+            }
+            else
+            {
+                if (strcmp(bluez_adapter1_get_address(adapter), mpAdapterAddr) == 0)
                 {
-                    if (strcmp(bluez_adapter1_get_address(adapter), mpAdapterAddr) == 0)
-                    {
-                        mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
-                    }
+                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
                 }
             }
         }
-        g_list_free_full(interfaces, g_object_unref);
     }
 
     VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
