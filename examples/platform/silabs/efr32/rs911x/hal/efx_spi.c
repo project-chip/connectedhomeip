@@ -297,12 +297,16 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 #if SL_LCDCTRL_MUX
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
+    uint32_t status = SL_STATUS_OK;
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
-    if (SL_STATUS_OK != sl_board_enable_display())
+    status = sl_board_enable_display();
+    if (SL_STATUS_OK != status)
     {
-       return SL_STATUS_FAIL;
+        SILABS_LOG("sl_board_enable_display failed with error: %x", status);
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return status;
     }
     // sl_memlcd_refresh takes care of SPIDRV_Init()
     if (SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get()))
@@ -318,12 +322,16 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 {
+    uint32_t status = SL_STATUS_OK;
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
     GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
-    if (SL_STATUS_OK != sl_board_disable_display())
+    status = sl_board_disable_display();
+    if (SL_STATUS_OK != status)
     {
-       return SL_STATUS_FAIL;
+        SILABS_LOG("sl_board_disable_display failed with error: %x", status);
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return status;
     }
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);

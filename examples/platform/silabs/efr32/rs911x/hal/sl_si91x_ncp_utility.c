@@ -67,7 +67,6 @@ sl_status_t sl_wfx_host_spiflash_cs_deassert(void);
 #if SL_SPICTRL_MUX
 StaticSemaphore_t spi_sem_peripheral;
 SemaphoreHandle_t spi_sem_sync_hdl;
-
 #endif // SL_SPICTRL_MUX
 
 #if SL_LCDCTRL_MUX
@@ -81,12 +80,16 @@ SemaphoreHandle_t spi_sem_sync_hdl;
  **********************************************************/
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
+    uint32_t status = SL_STATUS_OK;
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
-    if (SL_STATUS_OK != sl_board_enable_display())
+    status = sl_board_enable_display();
+    if (SL_STATUS_OK != status)
     {
-        return SL_STATUS_FAIL;
+        SILABS_LOG("sl_board_enable_display failed with error: %x", status);
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return status;
     }
     SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
 
@@ -102,12 +105,16 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
  **********************************************************/
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 {
+    uint32_t status = SL_STATUS_OK;
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
-    if (SL_STATUS_OK != sl_board_disable_display())
+    status = sl_board_disable_display();
+    if (SL_STATUS_OK != status)
     {
-       return SL_STATUS_FAIL;
+        SILABS_LOG("sl_board_disable_display failed with error: %x", status);
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return status;
     }
     return SL_STATUS_OK;
 }
