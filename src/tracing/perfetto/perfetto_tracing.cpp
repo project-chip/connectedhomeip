@@ -127,7 +127,7 @@ void PerfettoBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
     );
 }
 
-void PerfettoBackend::LogEvent(MetricEvent & event)
+void PerfettoBackend::LogMetricEvent(MetricEvent & event)
 {
     TRACE_COUNTER("Matter", event.key, event.value.store.int32_value);
 }

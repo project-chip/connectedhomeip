@@ -25,7 +25,6 @@ void InitializeMetricsCollection();
 /**
  * A representation of metrics data for an operation.
  */
-MTR_NEWLY_AVAILABLE
 @interface MTRMetricsCollector : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;

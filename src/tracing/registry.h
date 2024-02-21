@@ -83,7 +83,7 @@ void LogMessageReceived(::chip::Tracing::MessageReceivedInfo & info);
 void LogNodeLookup(::chip::Tracing::NodeLookupInfo & info);
 void LogNodeDiscovered(::chip::Tracing::NodeDiscoveredInfo & info);
 void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo & info);
-void LogEvent(::chip::Tracing::MetricEvent & event);
+void LogMetricEvent(::chip::Tracing::MetricEvent & event);
 
 } // namespace Internal
 

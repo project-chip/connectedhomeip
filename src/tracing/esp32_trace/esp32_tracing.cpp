@@ -155,7 +155,7 @@ void ESP32Backend::TraceCounter(const char * label)
     ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
 }
 
-void ESP32Backend::LogEvent(MetricEvent & event)
+void ESP32Backend::LogMetricEvent(MetricEvent & event)
 {
     if (!mRegistered)
     {

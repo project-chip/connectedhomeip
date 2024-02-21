@@ -74,7 +74,7 @@
     {                                                                                                                              \
         using Tag = chip::Tracing::MetricEvent::Tag;                                                                               \
         ::chip::Tracing::MetricEvent _metric_event(Tag::Instant, chip::Tracing::kMetric##key);                                     \
-        ::chip::Tracing::Internal::LogEvent(_metric_event);                                                                        \
+        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                        \
     } while (false)
 
 // Wrapper macro that accepts metric tag and key and logs an event corresponding to the tag
@@ -83,7 +83,7 @@
     {                                                                                                                              \
         using Tag = chip::Tracing::MetricEvent::Tag;                                                                               \
         ::chip::Tracing::MetricEvent _metric_event(tag, chip::Tracing::kMetric##key);                                              \
-        ::chip::Tracing::Internal::LogEvent(_metric_event);                                                                        \
+        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                        \
     } while (false)
 
 // Wrapper macro that accepts metric tag, key and value and logs the corresponding event
@@ -92,7 +92,7 @@
     {                                                                                                                              \
         using Tag = chip::Tracing::MetricEvent::Tag;                                                                               \
         ::chip::Tracing::MetricEvent _metric_event(tag, chip::Tracing::kMetric##key, value);                                       \
-        ::chip::Tracing::Internal::LogEvent(_metric_event);                                                                        \
+        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                        \
     } while (false)
 
 /**

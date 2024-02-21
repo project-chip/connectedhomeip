@@ -63,13 +63,13 @@ namespace Tracing {
         public:
             DarwinTracingBackend();
 
-            typedef void (^LogEventClientCallback)(MetricEvent event);
+            typedef void (^MetricEventHandler)(MetricEvent event);
 
-            void SetLogEventClientCallback(LogEventClientCallback callback);
-            void LogEvent(MetricEvent & event) override;
+            void SetMetricEventHandler(MetricEventHandler callback);
+            void LogMetricEvent(MetricEvent & event) override;
 
         private:
-            LogEventClientCallback mClientCallback;
+            MetricEventHandler mClientCallback;
         };
 
     } // namespace signposts

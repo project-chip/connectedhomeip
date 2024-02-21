@@ -109,7 +109,7 @@ void InitializeMetricsCollection()
         singleton = [[MTRMetricsCollector alloc] init];
         if (singleton) {
             chip::Tracing::Register(singleton->_tracingBackend);
-            singleton->_tracingBackend.SetLogEventClientCallback(^(MetricEvent event) {
+            singleton->_tracingBackend.SetMetricEventHandler(^(MetricEvent event) {
                 if (singleton) {
                     [singleton handleMetricEvent:event];
                 }

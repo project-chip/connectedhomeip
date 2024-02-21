@@ -296,7 +296,7 @@ void JsonBackend::TraceCounter(const char * label)
     OutputValue(value);
 }
 
-void JsonBackend::LogEvent(MetricEvent & event)
+void JsonBackend::LogMetricEvent(MetricEvent & event)
 {
     ::Json::Value value;
     value["label"] = event.key;

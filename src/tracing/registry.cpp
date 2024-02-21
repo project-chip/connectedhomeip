@@ -124,11 +124,11 @@ void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo & info)
     }
 }
 
-void LogEvent(::chip::Tracing::MetricEvent & event)
+void LogMetricEvent(::chip::Tracing::MetricEvent & event)
 {
     for (auto & backend : gTracingBackends)
     {
-        backend.LogEvent(event);
+        backend.LogMetricEvent(event);
     }
 }
 

@@ -34,15 +34,17 @@ namespace Tracing {
  */
 struct MetricEvent
 {
-    // Metric tag type
+    // This specifies the different categories of metric events that can created. In addition to
+    // emitting an event, events paired with a Begin and End are used to track duration for the
+    // event. An instant event just represents a one shot event.
     enum class Tag
     {
-        Begin,  // Implies tracking a duration
-        End,    // Implies tracking a duration
+        Begin,  // Marks the begin of an event. This is typically tied with an End event.
+        End,    // Marks the end of an event. This is typically preceeded with a Begin event.
         Instant // No duration
     };
 
-    // Value for the metric
+    // This defines the different types of values that can stored when a metric is emitted
     struct Value
     {
         enum class Type : uint8_t
@@ -100,7 +102,7 @@ struct MetricEvent
 
 namespace Internal {
 
-void LogEvent(::chip::Tracing::MetricEvent & event);
+void LogMetricEvent(::chip::Tracing::MetricEvent & event);
 
 } // namespace Internal
 
@@ -117,7 +119,7 @@ inline bool logMetricIfError(const ::chip::ChipError & err, MetricKey metricKey)
     {
         using Tag = chip::Tracing::MetricEvent::Tag;
         ::chip::Tracing::MetricEvent _metric_event(Tag::Instant, metricKey, err);
-        ::chip::Tracing::Internal::LogEvent(_metric_event);
+        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);
     }
     return success;
 }
