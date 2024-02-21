@@ -21,7 +21,6 @@
 
 #include "AppConfig.h"
 
-#include "BaseApplication.h"
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "silabs_utils.h"
@@ -220,7 +219,7 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
             SILABS_LOG("wfx_retry_interval_handler : Next attempt after %d Seconds", CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
 #if SL_ICD_ENABLED
             // TODO: cleanup the retry logic MATTER-1921
-            if (!BaseApplication::sAppDelegate.isComissioningStarted)
+            if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
             {
                 set_alarm_interrupt_timer(WLAN_RETRY_TIMER_MS / 1000);
                 wfx_rsi_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);

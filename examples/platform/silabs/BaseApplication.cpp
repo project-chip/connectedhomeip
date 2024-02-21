@@ -177,7 +177,6 @@ void BaseApplicationDelegate::OnCommissioningSessionStopped()
 }
 void BaseApplicationDelegate::OnCommissioningWindowClosed()
 {
-    ChipLogProgress(DeviceLayer, "OnCommissioningWindowClosed");
     if (!BaseApplication::GetProvisionStatus() && !isComissioningStarted)
     {
         int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);

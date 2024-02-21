@@ -66,7 +66,7 @@
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 class BaseApplicationDelegate : public AppDelegate
 {
-public:
+private:
     bool isComissioningStarted;
     void OnCommissioningSessionStarted() override;
     void OnCommissioningSessionStopped() override;

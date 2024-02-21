@@ -123,7 +123,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    int32_t status        = 0;
+    int32_t status        = SL_STATUS_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     if (imageProcessor == nullptr)
@@ -161,7 +161,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
-    int32_t status        = 0;
+    int32_t status        = SL_STATUS_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -204,7 +204,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
-    int32_t status = 0;
+    int32_t status = SL_STATUS_OK;
 
     ChipLogProgress(SoftwareUpdate, "OTAImageProcessorImpl::HandleApply()");
 
@@ -255,7 +255,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
-    int32_t status        = 0;
+    int32_t status        = SL_STATUS_OK;
     int32_t content_block = 0;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
