@@ -179,26 +179,29 @@ bool CompareByTag(const ElementContext & a, const ElementContext & b)
     return IsContextTag(a.tag);
 }
 
-CHIP_ERROR InternalConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag, const uint32_t profileId = kTemporaryImplicitProfileId)
+CHIP_ERROR InternalConvertTlvTag(const uint32_t tagNumber, TLV::Tag & tag, const uint32_t profileId = kTemporaryImplicitProfileId)
 {
-    if (tagNumber <= UINT8_MAX)
+    uint16_t vendor_id = static_cast<uint16_t>(tagNumber >> 16);
+    uint16_t tag_id    = static_cast<uint16_t>(tagNumber & 0xFFFF);
+
+    if (vendor_id != 0)
+    {
+        tag = TLV::ProfileTag(vendor_id, /*profileNum=*/0, tag_id);
+    }
+    else if (tag_id <= UINT8_MAX)
     {
         tag = TLV::ContextTag(static_cast<uint8_t>(tagNumber));
     }
-    else if (tagNumber <= UINT32_MAX)
-    {
-        tag = TLV::ProfileTag(profileId, static_cast<uint32_t>(tagNumber));
-    }
     else
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        tag = TLV::ProfileTag(profileId, static_cast<uint32_t>(tagNumber));
     }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, uint32_t implicitProfileId)
 {
-    uint64_t tagNumber                  = 0;
+    uint32_t tagNumber                  = 0;
     const char * elementType            = nullptr;
     std::vector<std::string> nameFields = SplitIntoFieldsBySeparator(name, ':');
     TLV::Tag tag                        = TLV::AnonymousTag();
@@ -208,13 +211,13 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, ui
     if (nameFields.size() == 2)
     {
         VerifyOrReturnError(IsUnsignedInteger(nameFields[0]), CHIP_ERROR_INVALID_ARGUMENT);
-        tagNumber   = std::strtoull(nameFields[0].c_str(), nullptr, 10);
+        tagNumber   = static_cast<uint32_t>(std::strtoul(nameFields[0].c_str(), nullptr, 10));
         elementType = nameFields[1].c_str();
     }
     else if (nameFields.size() == 3)
     {
         VerifyOrReturnError(IsUnsignedInteger(nameFields[1]), CHIP_ERROR_INVALID_ARGUMENT);
-        tagNumber   = std::strtoull(nameFields[1].c_str(), nullptr, 10);
+        tagNumber   = static_cast<uint32_t>(std::strtoul(nameFields[1].c_str(), nullptr, 10));
         elementType = nameFields[2].c_str();
     }
     else
@@ -459,10 +462,16 @@ CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer)
 
     ElementContext elementCtx;
     elementCtx.type = { TLV::kTLVType_Structure, false };
+
+    if (writer.ImplicitProfileId == TLV::kProfileIdNotSpecified)
+    {
+        writer.ImplicitProfileId = kTemporaryImplicitProfileId;
+    }
+
     return EncodeTlvElement(json, writer, elementCtx);
 }
 
-CHIP_ERROR ConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag)
+CHIP_ERROR ConvertTlvTag(const uint32_t tagNumber, TLV::Tag & tag)
 {
     return InternalConvertTlvTag(tagNumber, tag);
 }

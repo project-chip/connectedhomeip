@@ -300,7 +300,7 @@ void Test32BitConvert(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
         NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(kImplicitProfileId, 0xFEDCBA98u)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(0xFEDCu, 0, 0xBA98u)) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
         NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, value == 321);
