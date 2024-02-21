@@ -30,29 +30,30 @@ data secure by applying hardware write protection.
 
 <hr>
 
--   [Configuring factory data for the nRF Connect examples](#configuring-factory-data-for-the-nrf-connect-examples)
-    -   [Overview](#overview)
-        -   [Factory data component table](#factory-data-component-table)
-        -   [Factory data format](#factory-data-format)
-            -   [Appearance field description](#appearance-field-description)
-    -   [Enabling factory data support](#enabling-factory-data-support)
-    -   [Generating factory data](#generating-factory-data)
-        -   [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
-        -   [How to set user data](#how-to-set-user-data)
-            -   [How to handle user data](#how-to-handle-user-data)
-        -   [Verifying using the JSON Schema tool](#verifying-using-the-json-schema-tool)
-            -   [Option 1: Using the php-json-schema tool](#option-1-using-the-php-json-schema-tool)
-            -   [Option 2: Using a website validator](#option-2-using-a-website-validator)
-            -   [Option 3: Using the nRF Connect Python script](#option-3-using-the-nrf-connect-python-script)
-        -   [Generating onboarding codes](#generating-onboarding-codes)
-            -   [Enabling onboarding codes generation within the build system](#enabling-onboarding-codes-generation-within-the-build-system)
-        -   [Preparing factory data partition on a device](#preparing-factory-data-partition-on-a-device)
-        -   [Creating a factory data partition with the second script](#creating-a-factory-data-partition-with-the-second-script)
-    -   [Building an example with factory data](#building-an-example-with-factory-data)
-        -   [Providing factory data parameters as a build argument list](#providing-factory-data-parameters-as-a-build-argument-list)
-        -   [Setting factory data parameters using interactive Kconfig interfaces](#setting-factory-data-parameters-using-interactive-kconfig-interfaces)
-    -   [Programming factory data](#programming-factory-data)
-    -   [Using own factory data implementation](#using-own-factory-data-implementation)
+- [Configuring factory data for the nRF Connect examples](#configuring-factory-data-for-the-nrf-connect-examples)
+  - [Overview](#overview)
+    - [Factory data component table](#factory-data-component-table)
+    - [Factory data format](#factory-data-format)
+      - [Appearance field description](#appearance-field-description)
+  - [Enabling factory data support](#enabling-factory-data-support)
+  - [Generating factory data](#generating-factory-data)
+    - [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
+    - [How to set user data](#how-to-set-user-data)
+      - [How to handle user data](#how-to-handle-user-data)
+    - [Verifying using the JSON Schema tool](#verifying-using-the-json-schema-tool)
+      - [Option 1: Using the php-json-schema tool](#option-1-using-the-php-json-schema-tool)
+      - [Option 2: Using a website validator](#option-2-using-a-website-validator)
+      - [Option 3: Using the nRF Connect Python script](#option-3-using-the-nrf-connect-python-script)
+    - [Generating onboarding codes](#generating-onboarding-codes)
+      - [Enabling onboarding codes generation within the build system](#enabling-onboarding-codes-generation-within-the-build-system)
+    - [Preparing factory data partition on a device](#preparing-factory-data-partition-on-a-device)
+    - [Creating a factory data partition with the second script](#creating-a-factory-data-partition-with-the-second-script)
+  - [Building an example with factory data](#building-an-example-with-factory-data)
+    - [Providing factory data parameters as a build argument list](#providing-factory-data-parameters-as-a-build-argument-list)
+    - [Setting factory data parameters using interactive Kconfig interfaces](#setting-factory-data-parameters-using-interactive-kconfig-interfaces)
+    - [Default Kconfig values and developing aspects](#default-kconfig-values-and-developing-aspects)
+  - [Programming factory data](#programming-factory-data)
+  - [Using own factory data implementation](#using-own-factory-data-implementation)
 
 <hr>
 
@@ -272,6 +273,7 @@ To use this script, complete the following steps:
 
         ```
         --chip_cert_path <path to chip-cert executable>
+        --gen_certs
         ```
 
     > **Note:** To generate new certificates, you need the `chip-cert`
@@ -293,7 +295,7 @@ To use this script, complete the following steps:
         --rd_uid <rotating device ID unique ID>
         ```
 
-    - Generate a new ID and provide it ():
+    - (optional) Generate a new ID and provide it:
 
         ```
         --generate_rd_uid
@@ -327,6 +329,17 @@ To use this script, complete the following steps:
     --product_finish <finish>
     --product_color <color>
     ```
+
+    j. (optional) Generate Certification Declaration for testing purposes
+
+    ```
+    --chip_cert_path <path to chip-cert executable>
+    --gen_cd
+    ```
+
+    > **Note:** To generate new Certification Declaration, you need the `chip-cert`
+    > executable. See the note at the end of this section to learn how to get
+    > it.
 
 4. Run the script using the prepared list of arguments:
 
@@ -793,6 +806,38 @@ snippet:
 > **Note:** To get more information about how to use the interactive Kconfig
 > interfaces, read the
 > [Kconfig documentation](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/build/kconfig/menuconfig.html).
+
+### Default Kconfig values and developing aspects
+
+Each factory data parameter has its default value reflected in the Kconfig.
+The list below shows some Kconfig settings that are configured in the nRF Connect build system and have an impact on the application. 
+You can modify them to achieve the desired behavior of your application.
+
+* The device uses the test certificates located in the `credentials/development/attestation/` directory, which are generated using all default values. 
+  If you want to change the default `vendor_id`, `product_id`, `vendor_name`, or `device_name` and generate new test certificates, add the `CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED=y` Kconfig option.
+  Remember to build the `chip-cert` application and add it to the system PATH.
+
+  For developing a production-ready product, you need to write the certificates obtained during the certification process.
+  To do this, add the `CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_USER=y` Kconfig option and set the appropriate paths for the following Kconfig options:
+
+    * `CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT`
+    * `CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY`
+    * `CONFIG_CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT`
+
+* By default, the SPAKE2+ verifier is generated during each example's build. This means that this value will change automatically if you change any of the following parameters:
+
+    * `CONFIG_CHIP_DEVICE_SPAKE2_PASSCODE`
+    * `CONFIG_CHIP_DEVICE_SPAKE2_SALT`
+    * `CONFIG_CHIP_DEVICE_SPAKE2_IT`
+
+  You can disable the generation of the SPAKE2+ verifier by setting the `CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER=n` Kconfig option. 
+  Then, you will need to provide the externally-generated SPAKE2+ verifier using the `CONFIG_CHIP_DEVICE_SPAKE2_TEST_VERIFIER` Kconfig value.
+
+* Generating the rotating device ID unique ID is disabled by default, but you can enable it by setting the `CONFIG_CHIP_ROTATING_DEVICE_ID=y` and `CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID=y` Kconfig values. 
+  Moreover, if you set the `CONFIG_CHIP_ROTATING_DEVICE_ID` Kconfig option to `y` and disable the `CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID` Kconfig option, you will need to provide it manually using the `CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID` Kconfig value.
+
+* You can generate the test Certification Declaration by using the `CONFIG_CHIP_FACTORY_DATA_GENERATE_CD=y` Kconfig option. 
+  Remember to build the `chip-cert` application and add it to the system PATH.
 
 <hr>
 
