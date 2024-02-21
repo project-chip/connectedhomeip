@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/util/af-enums.h>
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -33,11 +33,15 @@ namespace OperationalState {
 class GenericOperationalStateDelegateImpl : public Delegate
 {
 public:
+    uint32_t mRunningTime = 0;
+    uint32_t mPausedTime  = 0;
+    app::DataModel::Nullable<uint32_t> mCountDownTime;
+
     /**
      * Get the countdown time. This attribute is not used in this application.
      * @return The current countdown time.
      */
-    app::DataModel::Nullable<uint32_t> GetCountdownTime() override { return {}; };
+    app::DataModel::Nullable<uint32_t> GetCountdownTime() override;
 
     /**
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
@@ -104,10 +108,32 @@ private:
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
     };
 
+    const uint32_t kExampleCountDown = 30;
+
 public:
     OperationalStateDelegate()
     {
         GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const GenericOperationalState>(opStateList);
+    }
+
+    /**
+     * Handle Command Callback in application: Start
+     * @param[out] get operational error after callback.
+     */
+    void HandleStartStateCallback(GenericOperationalError & err) override
+    {
+        mCountDownTime.SetNonNull(static_cast<uint32_t>(kExampleCountDown));
+        GenericOperationalStateDelegateImpl::HandleStartStateCallback(err);
+    }
+
+    /**
+     * Handle Command Callback in application: Stop
+     * @param[out] get operational error after callback.
+     */
+    void HandleStopStateCallback(GenericOperationalError & err) override
+    {
+        GenericOperationalStateDelegateImpl::HandleStopStateCallback(err);
+        mCountDownTime.SetNull();
     }
 };
 

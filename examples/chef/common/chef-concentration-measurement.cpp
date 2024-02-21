@@ -27,16 +27,16 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 
-#if defined(EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
-    defined(EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                    \
-    defined(EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
-    defined(EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
-    defined(EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
-    defined(EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                      \
-    defined(EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                               \
-    defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
-    defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                  \
-    defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+#if defined(MATTER_DM_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
+    defined(MATTER_DM_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
+    defined(MATTER_DM_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                 \
+    defined(MATTER_DM_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(MATTER_DM_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                           \
+    defined(MATTER_DM_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                     \
+    defined(MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
+    defined(MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
+    defined(MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                 \
+    defined(MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
 #include <app/clusters/concentration-measurement-server/concentration-measurement-server.h>
 using namespace chip::app::Clusters::ConcentrationMeasurement;
 
@@ -55,19 +55,19 @@ static std::map<int, Instance<true, true, true, true, true, true> *>
 
 template <bool NumericMeasurementEnabled, bool LevelIndicationEnabled, bool MediumLevelEnabled, bool CriticalLevelEnabled,
           bool PeakMeasurementEnabled, bool AverageMeasurementEnabled>
-EmberAfStatus chefConcentrationMeasurementWriteCallback(
+Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(
     std::map<int,
              Instance<NumericMeasurementEnabled, LevelIndicationEnabled, MediumLevelEnabled, CriticalLevelEnabled,
                       PeakMeasurementEnabled, LevelIndicationEnabled> *> & map,
     AttributeId measuredValueId, chip::EndpointId endpoint, chip::ClusterId clusterId,
     const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
-    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
     if (map.find(endpoint) == map.end())
     {
         ChipLogError(DeviceLayer, "Invalid Endpoind ID: %d", endpoint);
-        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+        return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
 
     Instance<NumericMeasurementEnabled, LevelIndicationEnabled, MediumLevelEnabled, CriticalLevelEnabled, PeakMeasurementEnabled,
@@ -95,23 +95,24 @@ EmberAfStatus chefConcentrationMeasurementWriteCallback(
         }
         else
         {
-            ret = EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+            ret = Protocols::InteractionModel::Status::UnsupportedWrite;
             ChipLogError(DeviceLayer, "Invalid Attribute Update status: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
     else
     {
-        ret = EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        ret = Protocols::InteractionModel::Status::UnsupportedAttribute;
         ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
     }
 
     return ret;
 }
 
-EmberAfStatus chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Protocols::InteractionModel::Status chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                              const EmberAfAttributeMetadata * attributeMetadata,
+                                                                              uint8_t * buffer)
 {
-    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
     switch (clusterId)
     {
@@ -174,17 +175,17 @@ EmberAfStatus chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoin
     return ret;
 }
 
-EmberAfStatus chefConcentrationMeasurementReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                       const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                       uint16_t maxReadLength)
+Protocols::InteractionModel::Status chefConcentrationMeasurementReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                             const EmberAfAttributeMetadata * attributeMetadata,
+                                                                             uint8_t * buffer, uint16_t maxReadLength)
 {
-    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+    Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
     return ret;
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gCarbonMonoxideConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
@@ -202,7 +203,7 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(EndpointId
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gCarbonDioxideConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
@@ -220,7 +221,7 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId 
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gNitrogenDioxideConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
@@ -238,7 +239,7 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(EndpointI
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfOzoneConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gOzoneConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
@@ -256,7 +257,7 @@ void emberAfOzoneConcentrationMeasurementClusterInitCallback(EndpointId endpoint
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfPm25ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gPm25ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
@@ -274,7 +275,7 @@ void emberAfPm25ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gFormaldehydeConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
@@ -292,7 +293,7 @@ void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId e
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gPm1ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
@@ -310,7 +311,7 @@ void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gPm10ConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
@@ -328,7 +329,7 @@ void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfRadonConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gRadonConcentrationMeasurementInstance[EndpointId(endpoint)] = new Instance<true, true, true, true, true, true>(
@@ -346,7 +347,7 @@ void emberAfRadonConcentrationMeasurementClusterInitCallback(EndpointId endpoint
 }
 #endif
 
-#ifdef EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER
+#ifdef MATTER_DM_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER
 void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance[EndpointId(endpoint)] =

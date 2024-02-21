@@ -158,7 +158,7 @@ choice B9X_BLE_CTRL_MAC_TYPE
 endchoice
 
 # Board retention config
-if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
+if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION 
 config BOARD_TLSR9X_NON_RETENTION_RAM_CODE
     default y if PM
 
@@ -170,7 +170,7 @@ config PWM
 endif
 
 # Board non-retention config
-if BOARD_TLSR9528A || BOARD_TLSR9518ADK80D
+if BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
 config PWM
     default y
 endif
@@ -211,7 +211,7 @@ config SETTINGS_NVS_SECTOR_SIZE_MULT
 
 # Set sector counter of NVS
 config SETTINGS_NVS_SECTOR_COUNT
-    default 10
+    default 12
 
 # Enable OpenThread
 
@@ -328,5 +328,8 @@ config PWM_SHELL
 
 config OPENTHREAD_SHELL
     default n
+
+config CHIP_TASK_STACK_SIZE
+	default 4864 if PM
 
 endif

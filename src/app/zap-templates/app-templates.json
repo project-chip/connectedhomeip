@@ -36,11 +36,6 @@
             "output": "IMClusterCommandHandler.cpp"
         },
         {
-            "path": "templates/app/CHIPClusters.zapt",
-            "name": "C++ ZCL API Header",
-            "output": "CHIPClusters.h"
-        },
-        {
             "path": "templates/app/access.zapt",
             "name": "Matter access definitions",
             "output": "access.h"

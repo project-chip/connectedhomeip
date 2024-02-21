@@ -672,7 +672,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     else
     {
-        ChipLogDetail(DeviceLayer, "Start BLE advertissement");
+        ChipLogDetail(DeviceLayer, "Start BLE advertisement");
     }
 
     if (!(mFlags.Has(Flags::kAdvertising)))
@@ -1072,7 +1072,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     }
 }

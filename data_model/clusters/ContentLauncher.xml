@@ -54,17 +54,32 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050A" name="Content Launcher" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050A" name="Content Launcher" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Add Seasons, Episode, Any and CurrentContext to search, Added Text/Audio tracks support with PlaybackPreferences field"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x050A" name="Content Launcher"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONTENTLAUNCHER" scope="Endpoint"/>
   <features>
     <feature bit="0" code="CS" name="ContentSearch" summary="Device supports content search (non-app specific)">
       <optionalConform/>
     </feature>
     <feature bit="1" code="UP" name="URLPlayback" summary="Device supports basic URL-based file playback">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="AS" name="AdvancedSeek" summary="Enables clients to implement more advanced media seeking behavior in their user interface, such as for example a &quot;seek bar&quot;.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="TT" name="TextTracks" summary="Device or app supports Text Tracks.">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="AT" name="AudioTracks" summary="Device or app supports Audio Tracks.">
       <optionalConform/>
     </feature>
   </features>
@@ -119,11 +134,20 @@ Davis, CA 95616, USA
       <item value="11" name="SportsTeam" summary="SportsTeam represents the categorical information of a professional sports team; for example, &quot;University of Washington Huskies&quot;">
         <mandatoryConform/>
       </item>
-      <item value="12" name="Type" summary="The type of content requested. Supported types are &quot;Movie&quot;, &quot;MovieSeries&quot;, &quot;TVSeries&quot;, &quot;TVSeason&quot;, &quot;TVEpisode&quot;, &quot;SportsEvent&quot;, and &quot;Video&quot;">
+      <item value="12" name="Type" summary="The type of content requested. Supported types are &quot;Movie&quot;, &quot;MovieSeries&quot;, &quot;TVSeries&quot;, &quot;TVSeason&quot;, &quot;TVEpisode&quot;, &quot;Trailer&quot;, &quot;SportsEvent&quot;, &quot;LiveEvent&quot;, and &quot;Video&quot;">
         <mandatoryConform/>
       </item>
       <item value="13" name="Video" summary="Video represents the identifying data for a specific piece of video content; for example, &quot;Manchester by the Sea&quot;.">
         <mandatoryConform/>
+      </item>
+      <item value="14" name="Season" summary="Season represents the specific season number within a TV series.">
+        <optionalConform/>
+      </item>
+      <item value="15" name="Episode" summary="Episode represents a specific episode number within a Season in a TV series.">
+        <optionalConform/>
+      </item>
+      <item value="16" name="Any" summary="Represents a search text input across many parameter types or even outside of the defined param types.">
+        <optionalConform/>
       </item>
     </enum>
     <enum name="StatusEnum">
@@ -135,6 +159,16 @@ Davis, CA 95616, USA
       </item>
       <item value="2" name="AuthFailed" summary="Requested URL returned 401 error code.">
         <mandatoryConform/>
+      </item>
+      <item value="3" name="TextTrackNotAvailable" summary="Requested Text Track (in PlaybackPreferences) not available">
+        <mandatoryConform>
+          <feature name="TT"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="AudioTrackNotAvailable" summary="Requested Audio Track (in PlaybackPreferences) not available">
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
       </item>
     </enum>
     <bitmap name="SupportedProtocolsBitmap">
@@ -206,6 +240,27 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </struct>
+    <struct name="PlaybackPreferencesStruct">
+      <field id="0" name="PlaybackPosition" type="uint64">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+      </field>
+      <field id="1" name="TextTrack" type="TrackPreferenceStruct">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="TT"/>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="AudioTracks" type="list">
+        <entry type="TrackPreferenceStruct"/>
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
+      </field>
+    </struct>
     <struct name="StyleInformationStruct">
       <field id="0" name="ImageURL" type="string" default="MS">
         <optionalConform/>
@@ -218,6 +273,23 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="Size" type="DimensionStruct" default="MS">
         <optionalConform/>
+      </field>
+    </struct>
+    <struct name="TrackPreferenceStruct">
+      <field id="0" name="LanguageCode" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="32"/>
+      </field>
+      <field id="1" name="Characteristics" type="list" default="null">
+        <entry type="ref_CharacteristicEnum"/>
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="2" name="AudioOutputIndex" type="uint8">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
       </field>
     </struct>
   </dataTypes>
@@ -242,7 +314,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="LaunchContent" response="LauncherResponse">
+    <command id="0x00" name="LaunchContent" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CS"/>
@@ -258,8 +330,15 @@ Davis, CA 95616, USA
       <field id="2" name="Data" type="string" default="MS">
         <optionalConform/>
       </field>
+      <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
+        <optionalConform/>
+      </field>
+      <field id="4" name="UseCurrentContext" type="bool" default="TRUE">
+        <optionalConform/>
+        <constraint type="desc"/>
+      </field>
     </command>
-    <command id="0x01" name="LaunchURL" response="LauncherResponse">
+    <command id="0x01" name="LaunchURL" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="UP"/>
@@ -273,9 +352,11 @@ Davis, CA 95616, USA
       <field id="2" name="BrandingInformation" type="BrandingInformationStruct" default="MS">
         <optionalConform/>
       </field>
+      <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
+        <optionalConform/>
+      </field>
     </command>
     <command id="0x02" name="LauncherResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
           <feature name="CS"/>

@@ -2153,14 +2153,6 @@
               "isEnabled": 1
             },
             {
-              "name": "OpenBasicCommissioningWindow",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
               "name": "RevokeCommissioning",
               "code": 2,
               "mfgCode": null,

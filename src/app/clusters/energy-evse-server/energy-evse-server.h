@@ -27,6 +27,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -38,7 +39,6 @@ constexpr int64_t kMinimumChargeCurrent         = 0;
 constexpr int64_t kMaximumChargeCurrent         = 80000;
 constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
 
-using chip::Protocols::InteractionModel::Status;
 /** @brief
  *    Defines methods for implementing application-specific logic for the EVSE Management Cluster.
  */
@@ -55,30 +55,31 @@ public:
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status Disable() = 0;
+    virtual Protocols::InteractionModel::Status Disable() = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Charging.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status EnableCharging(const DataModel::Nullable<uint32_t> & enableChargeTime, const int64_t & minimumChargeCurrent,
-                                  const int64_t & maximumChargeCurrent) = 0;
+    virtual Protocols::InteractionModel::Status EnableCharging(const DataModel::Nullable<uint32_t> & enableChargeTime,
+                                                               const int64_t & minimumChargeCurrent,
+                                                               const int64_t & maximumChargeCurrent) = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Discharging.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
-                                     const int64_t & maximumDischargeCurrent) = 0;
+    virtual Protocols::InteractionModel::Status EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
+                                                                  const int64_t & maximumDischargeCurrent) = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Diagnostics.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status StartDiagnostics() = 0;
+    virtual Protocols::InteractionModel::Status StartDiagnostics() = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods

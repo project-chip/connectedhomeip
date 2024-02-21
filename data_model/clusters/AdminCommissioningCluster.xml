@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!--
-link:../matter-defines.adoc[]
-
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
@@ -61,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x003C" name="Administrator Commissioning"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="CADMIN" scope="Node"/>
   <features>
     <feature bit="0" code="BC" name="Basic" summary="Node supports Basic Commissioning Method.">
@@ -93,21 +94,21 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="AdminVendorId" type="ref_DataTypeVendorId">
+    <attribute id="0x0002" name="AdminVendorId" type="vendor-id">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="OpenCommissioningWindow" response="Y">
+    <command id="0x00" name="OpenCommissioningWindow" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="CommissioningTimeout" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="PAKEPasscodeVerifier" type="ref_DataTypeOctstr">
+      <field id="1" name="PAKEPasscodeVerifier" type="octstr">
         <mandatoryConform/>
       </field>
       <field id="2" name="Discriminator" type="uint16">
@@ -118,12 +119,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="between" from="1000" to="100000"/>
       </field>
-      <field id="4" name="Salt" type="ref_DataTypeOctstr">
+      <field id="4" name="Salt" type="octstr">
         <mandatoryConform/>
-        <constraint type="between" from="16" to="32"/>
+        <constraint type="lengthBetween" from="16" to="32"/>
       </field>
     </command>
-    <command id="0x01" name="OpenBasicCommissioningWindow" response="Y">
+    <command id="0x01" name="OpenBasicCommissioningWindow" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="BC"/>
@@ -133,7 +134,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x02" name="RevokeCommissioning" response="Y">
+    <command id="0x02" name="RevokeCommissioning" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform/>
     </command>
