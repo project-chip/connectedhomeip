@@ -26,6 +26,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
 #include "Types.h"
@@ -79,7 +80,7 @@ private:
     CHIP_ERROR StopImpl();
 
     // Objects (interfaces) used by LE advertisement
-    GDBusObjectManagerServer * mpRoot = nullptr;
+    GAutoPtr<GDBusObjectManagerServer> mRoot;
     GAutoPtr<BluezAdapter1> mAdapter;
     GAutoPtr<BluezLEAdvertisement1> mAdv;
 
