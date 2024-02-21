@@ -181,13 +181,13 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
     chip::GAutoPtr<char> ifaceName;
     uint32_t interfaceId = 0;
 
-    ret = dnssd_service_get_type(service, &MakeUniquePointerReceiver(type).Get());
+    ret = dnssd_service_get_type(service, &type.GetReceiver());
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_type() failed: %s", get_error_message(ret)));
 
-    ret = dnssd_service_get_name(service, &MakeUniquePointerReceiver(name).Get());
+    ret = dnssd_service_get_name(service, &name.GetReceiver());
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_name() failed: %s", get_error_message(ret)));
 
-    ret = dnssd_service_get_interface(service, &MakeUniquePointerReceiver(ifaceName).Get());
+    ret = dnssd_service_get_interface(service, &ifaceName.GetReceiver());
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  ChipLogError(DeviceLayer, "dnssd_service_get_interface() failed: %s", get_error_message(ret)));
 
@@ -305,12 +305,12 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
     chip::Inet::IPAddress ipAddr;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    int ret = dnssd_service_get_name(service, &MakeUniquePointerReceiver(name).Get());
+    int ret = dnssd_service_get_name(service, &name.GetReceiver());
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_name() failed: %s", get_error_message(ret)));
 
     chip::Platform::CopyString(rCtx->mResult.mName, name.get());
 
-    ret = dnssd_service_get_ip(service, &MakeUniquePointerReceiver(ipv4).Get(), &MakeUniquePointerReceiver(ipv6).Get());
+    ret = dnssd_service_get_ip(service, &ipv4.GetReceiver(), &ipv6.GetReceiver());
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_ip() failed: %s", get_error_message(ret)));
 
     // If both IPv4 and IPv6 are set, IPv6 address has higher priority.

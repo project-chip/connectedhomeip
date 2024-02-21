@@ -57,7 +57,7 @@ CHIP_ERROR AdapterIterator::Initialize(AdapterIterator * self)
     self->mManager = g_dbus_object_manager_client_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
         bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-        nullptr /*destroy notify */, nullptr /* cancellable */, &MakeUniquePointerReceiver(error).Get());
+        nullptr /* destroy notify */, nullptr /* cancellable */, &error.GetReceiver());
 
     VerifyOrExit(self->mManager != nullptr, ChipLogError(DeviceLayer, "Failed to get DBUS object manager for listing adapters.");
                  err = CHIP_ERROR_INTERNAL);
