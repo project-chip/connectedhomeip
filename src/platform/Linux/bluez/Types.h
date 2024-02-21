@@ -73,6 +73,12 @@ struct GAutoPtrDeleter<BluezGattManager1>
 };
 
 template <>
+struct GAutoPtrDeleter<BluezLEAdvertisement1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<BluezLEAdvertisingManager1>
 {
     using deleter = GObjectDeleter;

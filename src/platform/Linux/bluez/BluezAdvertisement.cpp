@@ -91,8 +91,7 @@ gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 
 {
     ChipLogDetail(DeviceLayer, "Release BLE adv object in %s", __func__);
     g_dbus_object_manager_server_unexport(mpRoot, mAdvPath);
-    g_object_unref(mpAdv);
-    mpAdv          = nullptr;
+    mAdv.reset();
     mIsAdvertising = false;
     // Advertisement object needs to be re-created before it can be used again.
     mIsInitialized = false;
@@ -105,7 +104,7 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
     // all D-Bus signals will be delivered to the GLib global default main context.
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    mpAdv = CreateLEAdvertisement();
+    mAdv.reset(CreateLEAdvertisement());
     return CHIP_NO_ERROR;
 }
 
@@ -114,7 +113,7 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char 
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
 
-    VerifyOrExit(mpAdv == nullptr, err = CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrExit(!mAdv, err = CHIP_ERROR_INCORRECT_STATE;
                  ChipLogError(DeviceLayer, "FAIL: BLE advertisement already initialized in %s", __func__));
 
     mpRoot = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.GetGattApplicationObjectManager()));
@@ -147,17 +146,17 @@ exit:
 
 CHIP_ERROR BluezAdvertisement::SetIntervals(AdvertisingIntervals aAdvIntervals)
 {
-    VerifyOrReturnError(mpAdv != nullptr, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(mAdv, CHIP_ERROR_UNINITIALIZED);
     // If the advertisement is already running, BlueZ will update the intervals
     // automatically. There is no need to stop and restart the advertisement.
-    bluez_leadvertisement1_set_min_interval(mpAdv, aAdvIntervals.first * 0.625);
-    bluez_leadvertisement1_set_max_interval(mpAdv, aAdvIntervals.second * 0.625);
+    bluez_leadvertisement1_set_min_interval(mAdv.get(), aAdvIntervals.first * 0.625);
+    bluez_leadvertisement1_set_max_interval(mAdv.get(), aAdvIntervals.second * 0.625);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
 {
-    VerifyOrReturnError(mpAdv != nullptr, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(mAdv, CHIP_ERROR_UNINITIALIZED);
 
     Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
     ReturnErrorOnFailure(ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceInfo));
@@ -187,7 +186,7 @@ CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
     GAutoPtr<char> debugStr(g_variant_print(serviceData, TRUE));
     ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
 
-    bluez_leadvertisement1_set_service_data(mpAdv, serviceData);
+    bluez_leadvertisement1_set_service_data(mAdv.get(), serviceData);
 
     return CHIP_NO_ERROR;
 }
@@ -216,11 +215,7 @@ void BluezAdvertisement::Shutdown()
                 self->mpRoot = nullptr;
             }
             self->mAdapter.reset();
-            if (self->mpAdv != nullptr)
-            {
-                g_object_unref(self->mpAdv);
-                self->mpAdv = nullptr;
-            }
+            self->mAdv.reset();
             return CHIP_NO_ERROR;
         },
         this);

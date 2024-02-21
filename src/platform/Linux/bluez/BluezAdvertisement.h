@@ -81,7 +81,7 @@ private:
     // Objects (interfaces) used by LE advertisement
     GDBusObjectManagerServer * mpRoot = nullptr;
     GAutoPtr<BluezAdapter1> mAdapter;
-    BluezLEAdvertisement1 * mpAdv = nullptr;
+    GAutoPtr<BluezLEAdvertisement1> mAdv;
 
     bool mIsInitialized = false;
     bool mIsAdvertising = false;
