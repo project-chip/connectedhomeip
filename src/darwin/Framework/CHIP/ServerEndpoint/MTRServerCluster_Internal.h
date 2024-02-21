@@ -57,15 +57,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)invalidate;
 
 /**
- * The access grants the Matter stack can observe.  Only modified while in
- * Initializing state or on the Matter queue.
+ * Add the cluster to an endpoint with the given endpoint ID.  Will return NO
+ * if the cluster is already added to an endpoint.
  */
-@property (nonatomic, strong, readonly) NSSet<MTRAccessGrant *> * matterAccessGrants;
+- (BOOL)addToEndpoint:(chip::EndpointId)endpoint;
+
+/**
+ * The access grants the Matter stack can observe.  Only modified while
+ * associating with a controller or on the Matter queue.
+ */
+@property (nonatomic, copy, readonly) NSArray<MTRAccessGrant *> * matterAccessGrants;
 
 /**
  * parentEndpoint will be kInvalidEndpointId until the cluster is added to an endpoint.
  */
-@property (nonatomic, assign) chip::EndpointId parentEndpoint;
+@property (nonatomic, assign, readonly) chip::EndpointId parentEndpoint;
 
 /**
  * The attribute metadata for the cluster.  Only valid after associateWithController: has succeeded.
