@@ -186,7 +186,7 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
             jint jduration         = env->GetIntField(messageObject, durationField);
             if (jduration >= 0)
             {
-                message.duration = DataModel::Nullable<uint16_t>(static_cast<uint16_t>(jduration));
+                message.duration = DataModel::Nullable<uint16_t>(static_cast<uint64_t>(jduration));
             }
 
             jfieldID getResponseOptionsField =
@@ -301,7 +301,7 @@ exit:
 
 CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
-    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
+    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
     const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     DeviceLayer::StackUnlock unlock;
