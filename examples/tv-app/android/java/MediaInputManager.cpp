@@ -51,6 +51,7 @@ void MediaInputManager::NewManager(jint endpoint, jobject manager)
 
 CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -59,6 +60,8 @@ CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncode
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleGetInputList");
     VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetInputListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray inputArray = (jobjectArray) env->CallObjectMethod(mMediaInputManagerObject.ObjectRef(), mGetInputListMethod);
@@ -121,6 +124,7 @@ exit:
 
 uint8_t MediaInputManager::HandleGetCurrentInput()
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     jint index     = -1;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -130,7 +134,8 @@ uint8_t MediaInputManager::HandleGetCurrentInput()
     ChipLogProgress(Zcl, "Received MediaInputManager::HandleGetCurrentInput");
     VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetCurrentInputMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    env->ExceptionClear();
 
     {
         index = env->CallIntMethod(mMediaInputManagerObject.ObjectRef(), mGetCurrentInputMethod);
@@ -154,6 +159,7 @@ exit:
 
 bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -179,6 +185,7 @@ exit:
 
 bool MediaInputManager::HandleShowInputStatus()
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -204,6 +211,7 @@ exit:
 
 bool MediaInputManager::HandleHideInputStatus()
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -229,6 +237,7 @@ exit:
 
 bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
+    DeviceLayer::StackUnlock unlock;
     std::string inputname(name.data(), name.size());
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -239,9 +248,10 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     VerifyOrExit(mMediaInputManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mMediaInputManagerObject is not valid"));
     VerifyOrExit(mRenameInputMethod != nullptr, ChipLogError(Zcl, "mHideInputStatusMethod null"));
 
+    env->ExceptionClear();
+
     {
         UtfString jniInputname(env, inputname.data());
-        env->ExceptionClear();
         ret = env->CallBooleanMethod(mMediaInputManagerObject.ObjectRef(), mRenameInputMethod, static_cast<jint>(index),
                                      jniInputname.jniValue());
         if (env->ExceptionCheck())
