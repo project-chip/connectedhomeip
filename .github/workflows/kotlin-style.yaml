@@ -1,0 +1,64 @@
+name: Kotlin
+
+on:
+  pull_request:
+    paths:
+      - "**/*.kt"
+      - ".github/workflows/kotlin-style.yaml"
+      - "kotlin-detect-config.yaml"
+
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
+
+jobs:
+  detekt:
+    name: Static code analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v4
+
+      - name: "detekt"
+        uses: natiginfo/action-detekt-all@1.23.5
+        # Detekt seems not to like circular symlinks, so we set up
+        # explicit paths below
+        with:
+          args: --parallel --build-upon-default-config --config kotlin-detect-config.yaml --input examples/android/CHIPTest,examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java
+
+  ktlint:
+    name: "Format check"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Download ktfmt
+        run: |
+          cd /tmp
+          wget "https://repo1.maven.org/maven2/com/facebook/ktfmt/0.44/ktfmt-0.44-jar-with-dependencies.jar" 
+
+      - name: Format kotlin files
+        run: |
+          find src examples -name '*.kt' \
+            | xargs java -jar /tmp/ktfmt-0.44-jar-with-dependencies.jar --google-style
+
+      - name: Ensure git works in current working directory
+        run: git config --global --add safe.directory `pwd`
+
+      - name: Check for uncommited changes
+        run: |
+            git add .
+            # Show the full diff
+            git diff-index -p HEAD --
+            # Also show just the files that are different, to make it easy
+            # to tell at a glance what might be going on.  And throw in
+            # --exit-code to make this job fail if there is a difference.
+            git diff-index --exit-code HEAD --

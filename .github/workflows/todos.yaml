@@ -1,0 +1,38 @@
+name: Create issues from To-Dos
+
+on:
+    workflow_dispatch:
+        inputs:
+            importAll:
+                default: "false"
+                required: false
+                type: boolean
+                description: Enable, if you want to import all TODOs. Runs on checked out branch! Only use if you're sure what you are doing.
+#   push: Will move this to a cadence
+#     branches:
+#       - master
+
+permissions:
+    issues: write
+    repository-projects: read
+    contents: read
+
+jobs:
+    todos:
+        name: Scan for To-Dos
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Run Issue Bot
+              uses: derjuulsn/todo-issue@main
+              with:
+                  #           autoAssign: false
+                  reopenClosed: false
+                  #           label: "todo"
+                  # disabled until this works: https://github.com/DerJuulsn/todo-issue/issues/9
+                  keywords: "todo,fixme,bug,TODO,FIXME,BUG"
+                  excludePattern: "^(node_modules/|third_party/|zzz_generated/|docs/|.vscode/)"
+              env:
+                  GITHUB_TOKEN: ${{ secrets.MATTER_PAT }}
