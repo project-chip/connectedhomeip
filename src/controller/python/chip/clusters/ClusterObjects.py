@@ -301,7 +301,7 @@ class ClusterAttributeDescriptor:
         """Register a subclass."""
         super().__init_subclass__(*args, **kwargs)
         try:
-            if cls.cluster_id not in ALL_ATTRIBUTES:
+            if cls.standard_attribute and cls.cluster_id not in ALL_ATTRIBUTES:
                 ALL_ATTRIBUTES[cls.cluster_id] = {}
             # register this clusterattribute in the ALL_ATTRIBUTES dict for quick lookups
             ALL_ATTRIBUTES[cls.cluster_id][cls.attribute_id] = cls
@@ -344,6 +344,10 @@ class ClusterAttributeDescriptor:
     @ChipUtility.classproperty
     def must_use_timed_write(cls) -> bool:
         return False
+
+    @ChipUtility.classproperty
+    def standard_attribute(cls) -> bool:
+        return True
 
     @ChipUtility.classproperty
     def _cluster_object(cls) -> ClusterObject:

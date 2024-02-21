@@ -47,6 +47,18 @@ inline NSDate * MatterEpochSecondsAsDate(uint32_t matterEpochSeconds)
 bool DateToMatterEpochSeconds(NSDate * date, uint32_t & epoch);
 
 /**
+ * Returns whether the conversion could be performed.  Will return false if the
+ * passed-in date is our of the range representable as a Matter epoch-s value.
+ */
+bool DateToMatterEpochMilliseconds(NSDate * date, uint64_t & matterEpochMilliseconds);
+
+/**
+ * Returns whether the conversion could be performed.  Will return false if the
+ * passed-in date is our of the range representable as a Matter epoch-s value.
+ */
+bool DateToMatterEpochMicroseconds(NSDate * date, uint64_t & matterEpochMicroseconds);
+
+/**
  * Utilities for converting between NSSet<NSNumber *> and chip::CATValues.
  */
 CHIP_ERROR SetToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values);

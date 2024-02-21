@@ -59,18 +59,25 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x002B" name="Localization Configuration"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="LCFG" scope="Node"/>
   <attributes>
-    <attribute id="0x0000" name="ActiveLocale" type="ref_DataTypeString" default="MS">
+    <attribute id="0x0000" name="ActiveLocale" type="string" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="max" value="35"/>
+      <constraint type="maxLength" value="35"/>
     </attribute>
-    <attribute id="0x0001" name="SupportedLocales" type="ref_DataTypeList[ref_DataTypeString]" default="MS">
+    <attribute id="0x0001" name="SupportedLocales" type="list" default="MS">
+      <entry type="string">
+        <constraint type="maxLength" value="35"/>
+      </entry>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
+      <constraint type="maxCount" value="32"/>
     </attribute>
   </attributes>
 </cluster>

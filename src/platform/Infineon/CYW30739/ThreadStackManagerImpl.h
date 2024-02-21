@@ -58,6 +58,11 @@ protected:
     bool _TryLockThreadStack();
     void _UnlockThreadStack();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    void _WaitOnSrpClearAllComplete();
+    void _NotifySrpClearAllComplete();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    // ===== Methods that override the GenericThreadStackMa
 private:
     // ===== Members for internal use by the following friends.
 
@@ -67,6 +72,9 @@ private:
     wiced_thread_t * mThread;
     EventFlags mEventFlags;
     wiced_mutex_t * mMutex;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    wiced_mutex_t * mSrpClearAllSemaphore;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     static ThreadStackManagerImpl sInstance;
 
     // ===== Private members for use by this class only.

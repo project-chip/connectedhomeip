@@ -117,6 +117,7 @@ limitations under the License.
         <scope>Node</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Power Topology" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Electrical Energy Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
             <include cluster="Electrical Power Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
         </clusters>

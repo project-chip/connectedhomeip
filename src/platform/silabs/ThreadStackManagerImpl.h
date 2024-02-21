@@ -72,19 +72,11 @@ public:
 
     using ThreadStackManager::InitThreadStack;
     CHIP_ERROR InitThreadStack(otInstance * otInst);
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    void RemoveAllSrpServices();
-#endif
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
     CHIP_ERROR _InitThreadStack(void);
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    static void OnSrpClientRemoveCallback(otError aError, const otSrpClientHostInfo * aHostInfo,
-                                          const otSrpClientService * aServices, const otSrpClientService * aRemovedServices,
-                                          void * aContext);
-#endif
     // ===== Members for internal use by the following friends.
 
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
@@ -94,9 +86,6 @@ private:
     static ThreadStackManagerImpl sInstance;
 
     static bool IsInitialized();
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    TaskHandle_t srpRemoveRequester = nullptr;
-#endif
 
     // ===== Private members for use by this class only.
 

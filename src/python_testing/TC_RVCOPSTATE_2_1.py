@@ -16,6 +16,7 @@
 #
 
 import logging
+from time import sleep
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -63,6 +64,9 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
+        # Allow some time for the command to take effect.
+        # This removes the test flakyness which is very annoying for everyone in CI.
+        sleep(0.001)
 
     def TC_RVCOPSTATE_2_1(self) -> list[str]:
         return ["RVCOPSTATE.S"]

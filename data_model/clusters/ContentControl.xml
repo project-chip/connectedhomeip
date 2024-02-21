@@ -59,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x050F" name="Content Control"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONCON" scope="Endpoint"/>
   <features>
     <feature bit="0" code="ST" name="ScreenTime" summary="Supports managing screen time limits.">
@@ -255,7 +258,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="UpdatePIN" response="Y">
+    <command id="0x00" name="UpdatePIN" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform>
         <feature name="PM"/>
@@ -269,14 +272,13 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="6"/>
       </field>
     </command>
-    <command id="0x01" name="ResetPIN" response="ResetPINResponse">
+    <command id="0x01" name="ResetPIN" direction="commandToServer" response="ResetPINResponse">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="PM"/>
       </mandatoryConform>
     </command>
     <command id="0x02" name="ResetPINResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PM"/>
       </mandatoryConform>
@@ -285,15 +287,15 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="6"/>
       </field>
     </command>
-    <command id="0x03" name="Enable" response="Y">
+    <command id="0x03" name="Enable" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform/>
     </command>
-    <command id="0x04" name="Disable" response="Y">
+    <command id="0x04" name="Disable" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform/>
     </command>
-    <command id="0x05" name="AddBonusTime" response="Y">
+    <command id="0x05" name="AddBonusTime" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="ST"/>
@@ -307,7 +309,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x06" name="SetScreenDailyTime" response="Y">
+    <command id="0x06" name="SetScreenDailyTime" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="ST"/>
@@ -317,19 +319,19 @@ Davis, CA 95616, USA
         <constraint type="max" value="86400"/>
       </field>
     </command>
-    <command id="0x07" name="BlockUnratedContent" response="Y">
+    <command id="0x07" name="BlockUnratedContent" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>
     </command>
-    <command id="0x08" name="UnblockUnratedContent" response="Y">
+    <command id="0x08" name="UnblockUnratedContent" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>
     </command>
-    <command id="0x09" name="SetOnDemandRatingThreshold" response="Y">
+    <command id="0x09" name="SetOnDemandRatingThreshold" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="OCR"/>
@@ -339,7 +341,7 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="8"/>
       </field>
     </command>
-    <command id="0x0A" name="SetScheduledContentRatingThreshold" response="Y">
+    <command id="0x0A" name="SetScheduledContentRatingThreshold" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="SCR"/>
@@ -349,7 +351,7 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="8"/>
       </field>
     </command>
-    <command id="0x0B" name="AddBlockChannels" response="Y">
+    <command id="0x0B" name="AddBlockChannels" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BC"/>
@@ -359,7 +361,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0C" name="RemoveBlockChannels" response="Y">
+    <command id="0x0C" name="RemoveBlockChannels" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BC"/>
@@ -369,7 +371,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0D" name="AddBlockApplications" response="Y">
+    <command id="0x0D" name="AddBlockApplications" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BA"/>
@@ -379,7 +381,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0E" name="RemoveBlockApplications" response="Y">
+    <command id="0x0E" name="RemoveBlockApplications" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BA"/>
@@ -389,7 +391,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0F" name="SetBlockContentTimeWindow" response="Y">
+    <command id="0x0F" name="SetBlockContentTimeWindow" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BTW"/>
@@ -398,7 +400,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x10" name="RemoveBlockContentTimeWindow" response="Y">
+    <command id="0x10" name="RemoveBlockContentTimeWindow" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BTW"/>

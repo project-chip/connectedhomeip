@@ -222,3 +222,45 @@ class TestStepSaveAsNameError(TestStepError):
         self.tag_key_with_error(content, 'attribute')
         response = content.get('response')
         self.tag_key_with_error(response, 'saveAs')
+
+
+class TestStepEnumError(TestStepError):
+    """
+    Raise when an enum value or an enum name is not found in the definitions.
+
+    Parameters:
+        - enum_name_or_value (str|int): The name (str) or value (int) of the enumeration in the step.
+          If a string is provided, it is considered the name of the enumeration; if an integer is provided, it is considered the value of the enumeration.
+        - enum_candidates (dict): A dictionary mapping enumeration names (as strings) to their corresponding values
+          (as integers). This dictionary represents all known values of the enumeration.
+    """
+
+    def __init__(self, enum_name_or_value, enum_candidates: dict):
+        if type(enum_name_or_value) is str:
+            message = f'Unknown enum name: "{enum_name_or_value}". The possible values are: "{enum_candidates}"'
+
+            for enum_name in enum_candidates:
+                if enum_name.lower() == enum_name_or_value.lower():
+                    message = f'Unknown enum name: "{enum_name_or_value}". Did you mean "{enum_name}" ?'
+                    break
+
+        else:
+            message = f'Unknown enum value: "{enum_name_or_value}". The possible values are: "{enum_candidates}"'
+
+        super().__init__(message)
+
+
+class TestStepEnumSpecifierNotUnknownError(TestStepError):
+    """Raise when an enum value declared as unknown is in fact a known enum value from the definitions."""
+
+    def __init__(self, specified_value, enum_name):
+        message = f'The value "{specified_value}" is not unknown. It is the value of "{enum_name}"'
+        super().__init__(message)
+
+
+class TestStepEnumSpecifierWrongError(TestStepError):
+    """Raise when an enum value is specified for a given enum name but it does not match the enum value from the definitions."""
+
+    def __init__(self, specified_value, enum_name, enum_value):
+        message = f'The value "{specified_value}" is not the value of "{enum_name}({enum_value})"'
+        super().__init__(message)

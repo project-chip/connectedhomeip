@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,73 +22,73 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "ContentAppObserver"
+    endpoint: 1
 
 tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "Step 1: TH reads the ClusterRevision attribute from the DUT"
-      verification: |
-          ./chip-tool contentappobserver read cluster-revision 1 1
-           Verify " ClusterRevision " value is of unit16 and reflects the highest revision number on the TH(Chip-tool) Log, in RPI the value of  ClusterRevision is 1
-          [1702624923.223245][5892:5894] CHIP:DMG:         InteractionModelRevision = 11
-          [1702624923.223299][5892:5894] CHIP:DMG: }
-          [1702624923.223652][5892:5894] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0510 Attribute 0x0000_FFFD DataVersion: 2272699478
-          [1702624923.223820][5892:5894] CHIP:TOO:   ClusterRevision: 1
-          [1702624923.224324][5892:5894] CHIP:EM: <<< [E:5445i S:15084 M:255037238 (Ack:113660697)] (S) Msg TX to 1:0000000000000001 [EDAD] [UDP:[fe80::e65f:1ff:fe49:ae1a%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1702624923.224578][5892:5894] CHIP:EM: Flushed pending ack for MessageCounter:113660697 on exchange 5445i
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
     - label: "Step 2: TH reads the FeatureMap attribute from the DUT"
-      verification: |
-          ./chip-tool contentappobserver read feature-map 1 1
-          On TH, verify that DUT sends the FeatureMap attribute has the value 0 or returns a general error that the attribute is not supported
-          [1702624956.728609][5896:5898] CHIP:DMG:         SuppressResponse = true,
-          [1702624956.728667][5896:5898] CHIP:DMG:         InteractionModelRevision = 11
-          [1702624956.728720][5896:5898] CHIP:DMG: }
-          [1702624956.729021][5896:5898] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0510 Attribute 0x0000_FFFC DataVersion: 2272699478
-          [1702624956.729138][5896:5898] CHIP:TOO:   FeatureMap: 0
-          [1702624956.729564][5896:5898] CHIP:EM: <<< [E:26717i S:26806 M:11352307 (Ack:31492418)] (S) Msg TX to 1:0000000000000001 [EDAD] [UDP:[fe80::e65f:1ff:fe49:ae1a%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
     - label: "Step 3: TH reads the AttributeList attribute from the DUT"
-      verification: |
-          ./chip-tool contentappobserver read  attribute-list 1 1
-          Verify " AttributeList " value consists the list of mandatory attributes (65533, 65532, 65531, 65529, 65528) on the TH(Chip-tool) Log:
-          [1702624983.367693][5900:5902] CHIP:DMG: }
-          [1702624983.368044][5900:5902] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0510 Attribute 0x0000_FFFB DataVersion: 2272699478
-          [1702624983.368485][5900:5902] CHIP:TOO:   AttributeList: 5 entries
-          [1702624983.368564][5900:5902] CHIP:TOO:     [1]: 65528
-          [1702624983.368624][5900:5902] CHIP:TOO:     [2]: 65529
-          [1702624983.368683][5900:5902] CHIP:TOO:     [3]: 65531
-          [1702624983.368741][5900:5902] CHIP:TOO:     [4]: 65532
-          [1702624983.368798][5900:5902] CHIP:TOO:     [5]: 65533
-          [1702624983.369236][5900:5902] CHIP:EM: <<< [E:55491i S:35892 M:103959395 (Ack:145764997)] (S) Msg TX to 1:0000000000000001 [EDAD] [UDP:[fe80::e65f:1ff:fe49:ae1a%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 3: TH reads the AttributeList attribute from the DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
 
     - label: "Step 4: TH reads the AcceptedCommandList attribute from the DUT"
-      verification: |
-          ./chip-tool contentappobserver read accepted-command-list 1 1
-          Verify " AcceptedCommandList " consists the list of mandatory commands(0)on the TH(Chip-tool) Log:
-          [1702625012.494394][5905:5907] CHIP:DMG: }
-          [1702625012.494619][5905:5907] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0510 Attribute 0x0000_FFF9 DataVersion: 2272699478
-          [1702625012.494697][5905:5907] CHIP:TOO:   AcceptedCommandList: 1 entries
-          [1702625012.494725][5905:5907] CHIP:TOO:     [1]: 0
-          [1702625012.494981][5905:5907] CHIP:EM: <<< [E:43961i S:9805 M:165451447 (Ack:180558712)] (S) Msg TX to 1:0000000000000001 [EDAD] [UDP:[fe80::e65f:1ff:fe49:ae1a%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
     - label: "Step 5: TH reads the GeneratedCommandList attribute from the DUT"
-      verification: |
-          ./chip-tool contentappobserver read generated-command-list 1 1
-          Verify " GeneratedCommandList " consists the list of mandatory commands(1) on the TH(Chip-tool) Log:
-          [1702625044.200661][5910:5912] CHIP:DMG: }
-          [1702625044.201052][5910:5912] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0510 Attribute 0x0000_FFF8 DataVersion: 2272699478
-          [1702625044.201230][5910:5912] CHIP:TOO:   GeneratedCommandList: 1 entries
-          [1702625044.201298][5910:5912] CHIP:TOO:     [1]: 1
-          [1702625044.201724][5910:5912] CHIP:EM: <<< [E:33891i S:27945 M:56965554 (Ack:52573112)] (S) Msg TX to 1:0000000000000001 [EDAD] [UDP:[fe80::e65f:1ff:fe49:ae1a%wlan0]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1702625044.201956][5910:5912] CHIP:EM: Flushed pending ack for MessageCounter:52573112 on exchange 33891i
-      disabled: true
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
     - label: "Step 6: TH reads the EventList attribute from the DUT"
-      verification: |
-          ./chip-tool contentappobserver read event-list 1 1
-      disabled: true
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list

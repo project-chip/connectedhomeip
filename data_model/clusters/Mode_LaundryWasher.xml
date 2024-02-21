@@ -54,12 +54,17 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0051" name="Laundry Washer Mode" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0051" name="Laundry Washer Mode"/>
+  </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="LWM" scope="Endpoint"/>
   <dataTypes>
     <struct name="ModeOptionStruct">

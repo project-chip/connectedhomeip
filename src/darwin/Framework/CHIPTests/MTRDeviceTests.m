@@ -25,8 +25,10 @@
 #import <Matter/Matter.h>
 
 #import "MTRCommandPayloadExtensions_Internal.h"
+#import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
@@ -74,19 +76,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
     return mConnectedDevice;
 }
 
-#ifdef DEBUG
-@interface MTRBaseDevice (Test)
-- (void)failSubscribers:(dispatch_queue_t)queue completion:(void (^)(void))completion;
-
-// Test function for whitebox testing
-+ (id)CHIPEncodeAndDecodeNSObject:(id)object;
-@end
-
-@interface MTRDevice (Test)
-- (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
-@end
-#endif
-
 @interface MTRDeviceTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @end
@@ -129,9 +118,18 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 @implementation MTRDeviceTests
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+static BOOL slocalTestStorageEnabledBeforeUnitTest;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
 + (void)setUp
 {
     XCTestExpectation * pairingExpectation = [[XCTestExpectation alloc] initWithDescription:@"Pairing Complete"];
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+    slocalTestStorageEnabledBeforeUnitTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = YES;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -181,6 +179,14 @@ static MTRBaseDevice * GetConnectedDevice(void)
 + (void)tearDown
 {
     ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), nil, kTimeoutInSeconds);
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+    // Restore testing setting to previous state, and remove all persisted attributes
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = slocalTestStorageEnabledBeforeUnitTest;
+    [sController.controllerDataStore clearAllStoredAttributes];
+    NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedAttributesAfterClear.count, 0);
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
@@ -1236,7 +1242,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * params = [[MTRSubscribeParams alloc] init];
     params.resubscribeAutomatically = NO;
     params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not
-                                              // affect this subscription erroring out correctly.
+    // affect this subscription erroring out correctly.
     [device subscribeWithQueue:queue
         minInterval:1
         maxInterval:2
@@ -1344,6 +1350,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test017_TestMTRDeviceBasics
 {
+    // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
+    [sController.controllerDataStore clearAllStoredAttributes];
+    NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedAttributesAfterClear.count, 0);
+
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1526,6 +1537,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Resubscription test setup
     XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
+
     delegate.onNotReachable = ^() {
         [subscriptionDroppedExpectation fulfill];
     };
@@ -1600,7 +1612,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
     params.resubscribeAutomatically = NO;
     params.replaceExistingSubscriptions = NO; // Not strictly needed, but checking that doing this does not
-                                              // affect this subscription erroring out correctly.
+    // affect this subscription erroring out correctly.
     __block BOOL subscriptionEstablished = NO;
     [device subscribeToAttributesWithEndpointID:@1
         clusterID:@6
@@ -2825,6 +2837,65 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqual(cluster.device, device);
     XCTAssertEqualObjects(cluster.endpointID, @(0));
 }
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+- (void)test031_MTRDeviceAttributeCacheLocalTestStorage
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // First start with clean slate and
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    [sController removeDevice:device];
+    [sController.controllerDataStore clearAllStoredAttributes];
+    NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedAttributesAfterClear.count, 0);
+
+    // Now recreate device and get subscription primed
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportEnd = ^{
+        [gotReportsExpectation fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ gotReportsExpectation ] timeout:60];
+
+    NSUInteger attributesReportedWithFirstSubscription = [device unitTestAttributesReportedSinceLastCheck];
+
+    NSArray * dataStoreValuesAfterFirstSubscription = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
+    XCTAssertTrue(dataStoreValuesAfterFirstSubscription.count > 0);
+
+    // Now remove device, resubscribe, and see that it succeeds
+    [sController removeDevice:device];
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+
+    XCTestExpectation * resubGotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received for resubscription"];
+    delegate.onReportEnd = ^{
+        [resubGotReportsExpectation fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ resubGotReportsExpectation ] timeout:60];
+
+    NSUInteger attributesReportedWithSecondSubscription = [device unitTestAttributesReportedSinceLastCheck];
+
+    XCTAssertTrue(attributesReportedWithSecondSubscription < attributesReportedWithFirstSubscription);
+
+    // 1) MTRDevice actually gets some attributes reported more than once
+    // 2) Some attributes do change on resubscribe
+    //   * With all-clusts-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
+    // And so conservatively, assert that data version filters save at least 300 entries.
+    NSArray * dataStoreValuesAfterSecondSubscription = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
+    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesAfterSecondSubscription.count - attributesReportedWithSecondSubscription;
+    XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
+}
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 @end
 

@@ -46,7 +46,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode read feature-map 1 1
 
-          On the TH(Chip-tool) Log, Verify featureMap value is 1 If DISHM.S.F00(DEPONOFF) is true, Otherwise 0,  and below is the sample log provided for the raspi platform:
+          On the TH(Chip-tool) Log, Verify featureMap value is 0 and below is the sample log provided for the raspi platform:
 
           [1690365613.351850][27441:27443] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFC DataVersion: 1130015440
           [1690365613.351911][27441:27443] CHIP:TOO:   FeatureMap: 1
@@ -58,8 +58,7 @@ tests:
 
           Verify the "AttributeList " should include the mandatory attributes (values 0, 1),
           - Global attributes  (value 65533, 65532, 65531, 65529 and 65528) and
-          - List may include optional attribute(value 0x0002), if DISHM.S.A0002(StartUpMode) supports,
-          - List contains feature dependent attribute (values 0x0003), if DISHM.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+          - List may include optional attribute(value 0x0002), if DISHM.S.A0002(StartUpMode) supports, on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1696402605.599359][7921:7923] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFB DataVersion: 712950283
           [1696402605.599377][7921:7923] CHIP:TOO:   AttributeList: 9 entries

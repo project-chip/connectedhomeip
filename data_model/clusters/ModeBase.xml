@@ -61,6 +61,9 @@ Davis, CA 95616, USA
     <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status.
 Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId name="Mode Base"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MODB" scope="Endpoint"/>
   <features>
     <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
@@ -122,7 +125,7 @@ Require at least one standard mode tag. Define reserved ranges for base/derived 
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ChangeToMode" response="ChangeToModeResponse">
+    <command id="0x00" name="ChangeToMode" direction="commandToServer" response="ChangeToModeResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="NewMode" type="uint8">

@@ -52,7 +52,7 @@ extern bool emberAfEndpointIndexIsEnabled(uint16_t index);
 namespace chip {
 namespace app {
 
-AttributePathExpandIterator::AttributePathExpandIterator(ObjectList<AttributePathParams> * aAttributePath)
+AttributePathExpandIterator::AttributePathExpandIterator(SingleLinkedListNode<AttributePathParams> * aAttributePath)
 {
     mpAttributePath = aAttributePath;
 

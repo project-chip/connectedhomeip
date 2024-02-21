@@ -59,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0053" name="Laundry Washer Controls"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WASHERCTRL" scope="Endpoint"/>
   <features>
     <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">

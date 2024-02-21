@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,129 +11,291 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 272.1.1. [TC-EEVSE-1.1] Global Attributes with DUT as Server
+name: 265.1.1. [TC-EEVSE-1.1] Global Attributes with DUT as Server
 
 PICS:
     - EEVSE.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Energy EVSE"
+    endpoint: 1
 
 tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2
+          constraints:
+              type: int16u
+
+    - label: "Step 3a: TH reads from the DUT the FeatureMap attribute"
+      PICS:
+          "!EEVSE.S.F00 && !EEVSE.S.F01 && !EEVSE.S.F02 && !EEVSE.S.F03 &&
+          !EEVSE.S.F04"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
     - label:
-          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
-          test)."
-      verification: |
+          "Step 3b: Given EEVSE.S.F00(ChargingPreferences) ensure featuremap has
+          the correct bit set"
+      PICS: EEVSE.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
-      disabled: true
+    - label:
+          "Step 3b: Given EEVSE.S.F01(SoCReporting) ensure featuremap has the
+          correct bit set"
+      PICS: EEVSE.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
 
-    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
-      verification: |
-          ./chip-tool energyevse read cluster-revision 1 1
+    - label:
+          "Step 3b: Given EEVSE.S.F02(PlugAndCharge) ensure featuremap has the
+          correct bit set"
+      PICS: EEVSE.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
 
-          On TH(chip-tool), Verify the ClusterRevision attribute value as 2:
-          Below mentioned log is based on the RPI implementation, Value may vary on real DUT
+    - label:
+          "Step 3b: Given EEVSE.S.F03(RFID) ensure featuremap has the correct
+          bit set"
+      PICS: EEVSE.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
 
-          [1703744384.239486][1259:1261] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_FFFD DataVersion: 1471857723
-          [1703744384.239529][1259:1261] CHIP:TOO:   ClusterRevision: 2
-      disabled: true
+    - label:
+          "Step 3b: Given EEVSE.S.F04(V2X) ensure featuremap has the correct bit
+          set"
+      PICS: EEVSE.S.F04
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x10]
 
-    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
-      verification: |
-          ./chip-tool energyevse read feature-map 1 1
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      2,
+                      3,
+                      5,
+                      6,
+                      7,
+                      64,
+                      65,
+                      66,
+                      65528,
+                      65529,
+                      65530,
+                      65531,
+                      65532,
+                      65533,
+                  ]
 
-          Via the TH (chip-tool), verify that theFeatureMap attribute contains the value. Below mentioned log is based on the RPI implementation, Value may vary on real DUT
+    - label: "Step 4a: TH reads AttributeList from DUT"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0,
+                      1,
+                      2,
+                      3,
+                      5,
+                      6,
+                      7,
+                      64,
+                      65,
+                      66,
+                      65528,
+                      65529,
+                      65531,
+                      65532,
+                      65533,
+                  ]
 
+    - label:
+          "Step 4b: TH reads optional attribute (UserMaximumChargeCurrent) in
+          AttributeList from DUT"
+      PICS: EEVSE.S.A0009
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
 
-          [1703744496.721907][1265:1267] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_FFFC DataVersion: 1471857723
-          [1703744496.721955][1265:1267] CHIP:TOO:   FeatureMap: 31
-      disabled: true
+    - label:
+          "Step 4c: TH reads optional attribute (RandomizationDelayWindow) in
+          AttributeList from DUT"
+      PICS: EEVSE.S.A000A
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [10]
 
-    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
-      verification: |
-          ./chip-tool energyevse read attribute-list 1 1
+    - label:
+          "Step 4d: TH reads optional attribute (V2X) in AttributeList from DUT"
+      PICS: EEVSE.S.F04
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4, 8, 67]
 
-          Via the TH (chip-tool), verify that  theAttributeListattribute contains
-          - Mandatory entries:0x0000, 0x0001, 0x0002, 0x0003, 0x0005, 0x0006, 0x0007, 0x0040, 0x0041, 0x0042 0xfff8, 0xfff9, 0xfffb, 0xfffc and 0xfffd
-          - Optional entries: 0x0009, 0x000A
-          - Based on feature support:- 0x0004, 0x0008, 0x0043, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0030, 0x0031, 0x0032
-          Below mentioned log is based on the RPI implementation, Value may vary on real DUT
+    - label:
+          "Step 4e: TH reads optional attribute (ChargingPreferences) in
+          AttributeList from DUT"
+      PICS: EEVSE.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [35, 36, 37, 38, 39]
 
-          [1705654173.130338][6375:6377] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_FFFB DataVersion: 1462274739
-          [1705654173.130427][6375:6377] CHIP:TOO:   AttributeList: 28 entries
-          [1705654173.130469][6375:6377] CHIP:TOO:     [1]: 0
-          [1705654173.130506][6375:6377] CHIP:TOO:     [2]: 1
-          [1705654173.130529][6375:6377] CHIP:TOO:     [3]: 2
-          [1705654173.130551][6375:6377] CHIP:TOO:     [4]: 3
-          [1705654173.130574][6375:6377] CHIP:TOO:     [5]: 4
-          [1705654173.130608][6375:6377] CHIP:TOO:     [6]: 5
-          [1705654173.130631][6375:6377] CHIP:TOO:     [7]: 6
-          [1705654173.130664][6375:6377] CHIP:TOO:     [8]: 7
-          [1705654173.130687][6375:6377] CHIP:TOO:     [9]: 8
-          [1705654173.130710][6375:6377] CHIP:TOO:     [10]: 9
-          [1705654173.130744][6375:6377] CHIP:TOO:     [11]: 10
-          [1705654173.130769][6375:6377] CHIP:TOO:     [12]: 35
-          [1705654173.130801][6375:6377] CHIP:TOO:     [13]: 36
-          [1705654173.130826][6375:6377] CHIP:TOO:     [14]: 37
-          [1705654173.130849][6375:6377] CHIP:TOO:     [15]: 38
-          [1705654173.130883][6375:6377] CHIP:TOO:     [16]: 39
-          [1705654173.130907][6375:6377] CHIP:TOO:     [17]: 48
-          [1705654173.130930][6375:6377] CHIP:TOO:     [18]: 49
-          [1705654173.130964][6375:6377] CHIP:TOO:     [19]: 50
-          [1705654173.130988][6375:6377] CHIP:TOO:     [20]: 64
-          [1705654173.131021][6375:6377] CHIP:TOO:     [21]: 65
-          [1705654173.131045][6375:6377] CHIP:TOO:     [22]: 66
-          [1705654173.131068][6375:6377] CHIP:TOO:     [23]: 67
-          [1705654173.131101][6375:6377] CHIP:TOO:     [24]: 65528
-          [1705654173.131126][6375:6377] CHIP:TOO:     [25]: 65529
-          [1705654173.131149][6375:6377] CHIP:TOO:     [26]: 65531
-          [1705654173.131182][6375:6377] CHIP:TOO:     [27]: 65532
-          [1705654173.131205][6375:6377] CHIP:TOO:     [28]: 65533
-      disabled: true
+    - label:
+          "Step 4e: TH reads optional attribute (SoCReporting) in AttributeList
+          from DUT"
+      PICS: EEVSE.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [48, 49]
 
-    - label: "Step 5*: TH reads from the DUT the EventList attribute."
-      verification: |
-          EventList is currently not supported and SHALL be skipped.
+    - label:
+          "Step 4f: TH reads optional attribute (PlugAndCharge) in AttributeList
+          from DUT"
+      PICS: EEVSE.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [50]
 
-          ./chip-tool energyevse read event-list 1 1
+    - label: "Step 5a: TH reads EventList from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 4]
 
-           Via the TH (chip-tool), verify that the EventList attribute. Below mentioned log is based on the RPI implementation, Value may vary on real DUT
+    - label: "Step 5b: TH reads optional attribute (RFID) in EventList from DUT"
+      PICS: EEVSE.S.F03 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
 
-          [1703745599.166331][1300:1302] CHIP:DMG:                                 StatusIB =
-          [1703745599.166364][1300:1302] CHIP:DMG:                                 {
-          [1703745599.166419][1300:1302] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1703745599.166450][1300:1302] CHIP:DMG:                                 },
-      disabled: true
+    - label: "Step 6a: TH reads AcceptedCommandList from DUT"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [1, 2]
 
-    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
-      verification: |
-          ./chip-tool energyevse read accepted-command-list 1 1
+    - label:
+          "Step 6b: TH reads the optional (StartDiagnostics) command in
+          AcceptedCommandList"
+      PICS: EEVSE.S.C04.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
 
-          On TH(chip-tool), Verify the  AcceptedCommandList attribute that contains 7 entries:
-          Below mentioned log is based on the RPI implementation, Value may vary on real DUT
+    - label:
+          "Step 6c: TH reads Feature dependent commands(EEVSE.S.F04) in
+          AcceptedCommandList"
+      PICS: EEVSE.S.F04
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
 
-          [1703745620.007744][1304:1306] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_FFF9 DataVersion: 1471857723
-          [1703745620.007809][1304:1306] CHIP:TOO:   AcceptedCommandList: 7 entries
-          [1703745620.007838][1304:1306] CHIP:TOO:     [1]: 1
-          [1703745620.007862][1304:1306] CHIP:TOO:     [2]: 2
-          [1703745620.007886][1304:1306] CHIP:TOO:     [3]: 3
-          [1703745620.007909][1304:1306] CHIP:TOO:     [4]: 5
-          [1703745620.007931][1304:1306] CHIP:TOO:     [5]: 6
-          [1703745620.007954][1304:1306] CHIP:TOO:     [6]: 7
-          [1703745620.007977][1304:1306] CHIP:TOO:     [7]: 4
-      disabled: true
+    - label:
+          "Step 6d: TH reads Feature dependent commands(ChargingPreferences) in
+          AcceptedCommandList"
+      PICS: EEVSE.S.F00
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [5, 6, 7]
 
-    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
-      verification: |
-          ./chip-tool energyevse read generated-command-list 1 1
+    - label: "Step 7a: TH reads GeneratedCommandList from DUT"
+      PICS: " !EEVSE.S.F00 "
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
 
-          On TH(chip-tool), Verify the  GeneratedCommandList attribute that contains  1 entries:
-
-          [1703745647.799108][1307:1309] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_FFF8 DataVersion: 1471857723
-          [1703745647.799167][1307:1309] CHIP:TOO:   GeneratedCommandList: 1 entries
-          [1703745647.799197][1307:1309] CHIP:TOO:     [1]: 0
-      disabled: true
+    - label: "Step 7b: TH reads GeneratedCommandList from DUT"
+      PICS: EEVSE.S.F00
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]

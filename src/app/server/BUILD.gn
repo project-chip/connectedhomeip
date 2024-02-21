@@ -30,6 +30,7 @@ static_library("server") {
   sources = [
     "AclStorage.cpp",
     "AclStorage.h",
+    "AppDelegate.h",
     "CommissioningModeProvider.h",
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",

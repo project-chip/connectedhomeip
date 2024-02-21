@@ -79,7 +79,7 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run):
 
     def scrape_cluster(filename: str) -> None:
         xml_path = get_xml_path(filename, clusters_output_dir)
-        cmd = [scraper, 'cluster', '-i', filename, '-o', xml_path, '-nd']
+        cmd = [scraper, 'cluster', '-i', filename, '-o', xml_path, '-nd', '--define', 'in-progress']
         if dry_run:
             print(cmd)
         else:

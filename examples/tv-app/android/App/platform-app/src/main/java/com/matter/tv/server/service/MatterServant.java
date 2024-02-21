@@ -41,6 +41,7 @@ import com.matter.tv.server.tvapp.LevelManagerStub;
 import com.matter.tv.server.tvapp.LowPowerManagerStub;
 import com.matter.tv.server.tvapp.MediaInputManagerStub;
 import com.matter.tv.server.tvapp.MediaPlaybackManagerStub;
+import com.matter.tv.server.tvapp.MessagesManagerStub;
 import com.matter.tv.server.tvapp.OnOffManagerStub;
 import com.matter.tv.server.tvapp.TvApp;
 import com.matter.tv.server.tvapp.WakeOnLanManagerStub;
@@ -96,6 +97,8 @@ public class MatterServant {
                 app.setMediaPlaybackManager(endpoint, new MediaPlaybackManagerStub(endpoint));
               } else if (clusterId == Clusters.ClusterId_Channel) {
                 app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_Messaging) {
+                app.setMessagesManager(endpoint, new MessagesManagerStub(endpoint));
               } else if (clusterId == Clusters.ClusterId_OnOff) {
                 mOnOffEndpoint = endpoint;
                 app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));

@@ -523,6 +523,7 @@ epochStartTime
 eq
 errorValue
 esd
+espcoredump
 ESPPORT
 Espressif
 esptool

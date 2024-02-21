@@ -94,6 +94,6 @@ tests:
       arguments:
           # Per spec, if [TEMP] feature is enabled, then this attribute can be
           # one of 0 (Farenheit), 1 (Celsius) or 2 (Kelvin)
-          value: 5 # INVALID
+          value: TempUnitEnum.UnknownEnumValue(5)
       response:
           error: CONSTRAINT_ERROR

@@ -26,6 +26,7 @@
 
 #include <ti/drivers/AESECB.h>
 #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
+#include <ti/drivers/dpl/HwiP.h>
 
 /*
  * number of active contexts, used for power on/off of the crypto core
@@ -111,7 +112,10 @@ int mbedtls_aes_setkey_dec(mbedtls_aes_context * ctx, const unsigned char * key,
 int mbedtls_aes_crypt_ecb(mbedtls_aes_context * ctx, int mode, const unsigned char input[16], unsigned char output[16])
 {
     int statusCrypto;
+    uint32_t key;
     AESECB_Operation operationOneStepEncrypt;
+
+    key = HwiP_disable();
 
     /* run it through the authentication + encryption, pass the ccmLVal = 2 */
     AESECB_Operation_init(&operationOneStepEncrypt);
@@ -125,9 +129,10 @@ int mbedtls_aes_crypt_ecb(mbedtls_aes_context * ctx, int mode, const unsigned ch
 
     if (CryptoKey_STATUS_SUCCESS != statusCrypto)
     {
+        HwiP_restore(key);
         return MBEDTLS_ERR_AES_HW_ACCEL_FAILED;
     }
-
+    HwiP_restore(key);
     return 0;
 }
 #endif

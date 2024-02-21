@@ -22,6 +22,7 @@
 #import "MTRDeviceTestDelegate.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
@@ -32,27 +33,6 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
-
-#ifdef DEBUG
-// MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
-@protocol MTRDeviceControllerDataStoreAttributeStoreMethods
-- (nullable NSArray<NSDictionary *> *)getStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
-- (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)clearAllStoredAttributes;
-@end
-
-// Declare internal methods for testing
-@interface MTRDeviceController (Test)
-+ (void)forceLocalhostAdvertisingOnly;
-- (void)removeDevice:(MTRDevice *)device;
-@property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
-@end
-
-@interface MTRDevice (Test)
-- (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
-@end
-#endif // DEBUG
 
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -1235,20 +1215,45 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [controller removeDevice:device];
 
     // Verify the new device is initialized with the same values
-    __auto_type * deviceNew = [MTRDevice deviceWithNodeID:deviceID controller:controller];
-    BOOL storedAttributeDifferFromMTRDevice = NO;
+    __auto_type * newDevice = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    NSUInteger storedAttributeDifferFromMTRDeviceCount = 0;
     for (NSDictionary * responseValue in dataStoreValues) {
         MTRAttributePath * path = responseValue[MTRAttributePathKey];
         XCTAssertNotNil(path);
         NSDictionary * dataValue = responseValue[MTRDataKey];
         XCTAssertNotNil(dataValue);
 
-        NSDictionary * dataValueFromMTRDevice = [deviceNew readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute params:nil];
-        if (![deviceNew _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]) {
-            storedAttributeDifferFromMTRDevice = YES;
+        NSDictionary * dataValueFromMTRDevice = [newDevice readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute params:nil];
+        if (![newDevice _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]) {
+            storedAttributeDifferFromMTRDeviceCount++;
         }
     }
-    XCTAssertTrue(storedAttributeDifferFromMTRDevice);
+
+    // Only test that 90% of attributes are the same because there are some changing attributes each time (UTC time, for example)
+    //   * With all-clusters-app as of 2024-02-10, about 1.476% of attributes change.
+    double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValues.count;
+    XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
+
+    // Now
+    __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * newDeviceSubscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up for new device"];
+
+    newDelegate.onReportEnd = ^{
+        [newDeviceSubscriptionExpectation fulfill];
+    };
+
+    [newDevice setDelegate:newDelegate queue:queue];
+
+    [self waitForExpectations:@[ newDeviceSubscriptionExpectation ] timeout:60];
+    newDelegate.onReportEnd = nil;
+
+    // 1) MTRDevice actually gets some attributes reported more than once
+    // 2) Some attributes do change on resubscribe
+    //   * With all-clusts-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
+    // And so conservatively, assert that data version filters save at least 300 entries.
+    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValues.count - [device unitTestAttributesReportedSinceLastCheck];
+    XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];

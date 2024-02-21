@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!--
-link:../matter-defines.adoc[]
-
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
@@ -61,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x002A" name="OTA Software Update Requestor"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="OTAR" scope="Node"/>
   <dataTypes>
     <enum name="AnnouncementReasonEnum">
@@ -122,17 +123,18 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="ProviderLocation">
-      <field id="1" name="ProviderNodeID" type="ref_DataTypeNodeId">
+      <field id="1" name="ProviderNodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Endpoint" type="ref_DataTypeEndpointNumber">
+      <field id="2" name="Endpoint" type="endpoint-no">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="DefaultOTAProviders" type="ref_DataTypeList[ProviderLocation Type]" default="[]">
+    <attribute id="0x0000" name="DefaultOTAProviders" type="list" default="[]">
+      <entry type="ProviderLocation"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <constraint type="desc"/>
@@ -153,23 +155,23 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="AnnounceOTAProvider" response="Y">
+    <command id="0x00" name="AnnounceOTAProvider" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <optionalConform/>
-      <field id="0" name="ProviderNodeID" type="ref_DataTypeNodeId">
+      <field id="0" name="ProviderNodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="VendorID" type="ref_DataTypeVendorId">
+      <field id="1" name="VendorID" type="vendor-id">
         <mandatoryConform/>
       </field>
       <field id="2" name="AnnouncementReason" type="AnnouncementReasonEnum">
         <mandatoryConform/>
       </field>
-      <field id="3" name="MetadataForNode" type="ref_DataTypeOctstr">
+      <field id="3" name="MetadataForNode" type="octstr">
         <optionalConform/>
-        <constraint type="max" value="512"/>
+        <constraint type="maxLength" value="512"/>
       </field>
-      <field id="4" name="Endpoint" type="ref_DataTypeEndpointNumber">
+      <field id="4" name="Endpoint" type="endpoint-no">
         <mandatoryConform/>
       </field>
     </command>

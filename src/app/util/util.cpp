@@ -167,8 +167,10 @@ void MatterDishwasherAlarmPluginServerInitCallback() {}
 void MatterMicrowaveOvenModePluginServerInitCallback() {}
 void MatterDeviceEnergyManagementModePluginServerInitCallback() {}
 void MatterEnergyEvseModePluginServerInitCallback() {}
+void MatterPowerTopologyPluginServerInitCallback() {}
 void MatterElectricalEnergyMeasurementPluginServerInitCallback() {}
 void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
+
 // ****************************************
 // Print out information about each cluster
 // ****************************************

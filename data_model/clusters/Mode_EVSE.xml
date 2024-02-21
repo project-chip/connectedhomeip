@@ -54,10 +54,15 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009D" name="Energy EVSE Mode" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x009D" name="Energy EVSE Mode"/>
+  </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="EEVSEM" scope="Endpoint"/>
 </cluster>

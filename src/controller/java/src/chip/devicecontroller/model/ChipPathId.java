@@ -43,6 +43,11 @@ public class ChipPathId {
     return type;
   }
 
+  // For use in JNI.
+  long getId(long wildCardValue) {
+    return type == IdType.WILDCARD ? wildCardValue : id;
+  }
+
   @Override
   public boolean equals(Object object) {
     if (object instanceof ChipPathId) {

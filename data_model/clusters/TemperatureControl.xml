@@ -59,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0056" name="Temperature Control"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="TCTL" scope="Endpoint"/>
   <features>
     <feature bit="0" code="TN" name="TemperatureNumber" summary="Use actual temperature numbers">
@@ -73,9 +76,58 @@ Davis, CA 95616, USA
       </optionalConform>
     </feature>
   </features>
-  <attributes/>
+  <attributes>
+    <attribute id="0x0000" name="TemperatureSetpoint" type="temperature">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="TN"/>
+      </mandatoryConform>
+      <constraint type="between" from="MinTemperature" to="MaxTemperature"/>
+    </attribute>
+    <attribute id="0x0001" name="MinTemperature" type="temperature">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="TN"/>
+      </mandatoryConform>
+      <constraint type="max" value="MaxTemperature - 1"/>
+    </attribute>
+    <attribute id="0x0002" name="MaxTemperature" type="temperature">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="TN"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0003" name="Step" type="temperature">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="STEP"/>
+      </mandatoryConform>
+      <constraint type="max" value="MaxTemperature - MinTemperature"/>
+    </attribute>
+    <attribute id="0x0004" name="SelectedTemperatureLevel" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="TL"/>
+      </mandatoryConform>
+      <constraint type="between" from="0" to="31"/>
+    </attribute>
+    <attribute id="0x0005" name="SupportedTemperatureLevels" type="list">
+      <entry type="string">
+        <constraint type="maxLength" value="16"/>
+      </entry>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="TL"/>
+      </mandatoryConform>
+      <constraint type="maxCount" value="32"/>
+    </attribute>
+  </attributes>
   <commands>
-    <command id="0x00" name="SetTemperature" response="Y">
+    <command id="0x00" name="SetTemperature" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="TargetTemperature" type="temperature">

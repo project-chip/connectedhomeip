@@ -55,10 +55,13 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001F" name="AccessControl" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001F" name="Access Control" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x001F" name="AccessControl"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="ACL" scope="Node"/>
   <dataTypes>
     <enum name="AccessControlEntryAuthModeEnum">
@@ -112,25 +115,27 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="3" name="Subjects" type="ref_DataTypeList[SubjectID]">
+      <field id="3" name="Subjects" type="list">
+        <entry type="SubjectID"/>
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="max" value="SubjectsPerAccessControlEntry"/>
+        <constraint type="maxCount" value="SubjectsPerAccessControlEntry"/>
       </field>
-      <field id="4" name="Targets" type="ref_DataTypeList[AccessControlTargetStruct Type]">
+      <field id="4" name="Targets" type="list">
+        <entry type="AccessControlTargetStruct"/>
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="max" value="TargetsPerAccessControlEntry"/>
+        <constraint type="maxCount" value="TargetsPerAccessControlEntry"/>
       </field>
       <access fabricScoped="true"/>
     </struct>
     <struct name="AccessControlExtensionStruct">
-      <field id="1" name="Data" type="ref_DataTypeOctstr">
+      <field id="1" name="Data" type="octstr">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="max" value="128"/>
+        <constraint type="maxLength" value="128"/>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -150,12 +155,14 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="ACL" type="ref_DataTypeList[AccessControlEntryStruct Type]" default="desc">
+    <attribute id="0x0000" name="ACL" type="list" default="desc">
+      <entry type="AccessControlEntryStruct"/>
       <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0001" name="Extension" type="ref_DataTypeList[AccessControlExtensionStruct Type]" default="desc">
+    <attribute id="0x0001" name="Extension" type="list" default="desc">
+      <entry type="AccessControlExtensionStruct"/>
       <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
       <optionalConform/>
       <constraint type="desc"/>

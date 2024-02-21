@@ -17,6 +17,7 @@ import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.NodeState
+import chip.devicecontroller.model.Status
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -191,8 +192,8 @@ class BasicClientFragment : Fragment() {
             Log.e(TAG, "Write ${attribute.name} failure", ex)
           }
 
-          override fun onResponse(attributePath: ChipAttributePath?) {
-            showMessage("Write ${attribute.name} success")
+          override fun onResponse(attributePath: ChipAttributePath, status: Status) {
+            showMessage("Write ${attribute.name} response: $status")
           }
         },
         devicePtr,

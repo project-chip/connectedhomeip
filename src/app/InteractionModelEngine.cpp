@@ -35,6 +35,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
 
@@ -411,6 +412,21 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
         return Status::Busy;
     }
+    CHIP_FAULT_INJECT(
+        FaultInjection::kFault_IMInvoke_SeparateResponses,
+        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
+            apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandler::NlFaultInjectionType::SeparateResponseMessages);
+        return Status::Success;);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponsesInvertResponseOrder,
+                      commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
+                          apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                          CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
+                      return Status::Success;);
+    CHIP_FAULT_INJECT(
+        FaultInjection::kFault_IMInvoke_SkipSecondResponse,
+        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+                                                                       CommandHandler::NlFaultInjectionType::SkipSecondResponse);
+        return Status::Success;);
     commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke);
     return Status::Success;
 }
@@ -434,7 +450,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         // This avoids the 'parse all paths' approach that is employed in ReadHandler since we want to
         // avoid allocating out of the path store during this minimal initial processing stage.
         //
-        ObjectList<AttributePathParams> paramsList;
+        SingleLinkedListNode<AttributePathParams> paramsList;
 
         ReturnErrorOnFailure(path.Init(pathReader));
         ReturnErrorOnFailure(path.ParsePath(paramsList.mValue));
@@ -840,7 +856,7 @@ CHIP_ERROR InteractionModelEngine::OnTimedRequest(Messaging::ExchangeContext * a
                                                   const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                                   Protocols::InteractionModel::Status & aStatus)
 {
-    TimedHandler * handler = mTimedHandlers.CreateObject();
+    TimedHandler * handler = mTimedHandlers.CreateObject(this);
     if (handler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Timed interaction");
@@ -1497,12 +1513,12 @@ bool InteractionModelEngine::HasConflictWriteRequests(const WriteHandler * apWri
     return false;
 }
 
-void InteractionModelEngine::ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList)
+void InteractionModelEngine::ReleaseAttributePathList(SingleLinkedListNode<AttributePathParams> *& aAttributePathList)
 {
     ReleasePool(aAttributePathList, mAttributePathPool);
 }
 
-CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList,
+CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNode<AttributePathParams> *& aAttributePathList,
                                                               AttributePathParams & aAttributePath)
 {
     CHIP_ERROR err = PushFront(aAttributePathList, aAttributePath, mAttributePathPool);
@@ -1514,10 +1530,10 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(ObjectList<Attribu
     return err;
 }
 
-void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<AttributePathParams> *& aAttributePaths)
+void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)
 {
-    ObjectList<AttributePathParams> * prev = nullptr;
-    auto * path1                           = aAttributePaths;
+    SingleLinkedListNode<AttributePathParams> * prev = nullptr;
+    auto * path1                                     = aAttributePaths;
 
     while (path1 != nullptr)
     {
@@ -1569,12 +1585,12 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<Att
     }
 }
 
-void InteractionModelEngine::ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList)
+void InteractionModelEngine::ReleaseEventPathList(SingleLinkedListNode<EventPathParams> *& aEventPathList)
 {
     ReleasePool(aEventPathList, mEventPathPool);
 }
 
-CHIP_ERROR InteractionModelEngine::PushFrontEventPathParamsList(ObjectList<EventPathParams> *& aEventPathList,
+CHIP_ERROR InteractionModelEngine::PushFrontEventPathParamsList(SingleLinkedListNode<EventPathParams> *& aEventPathList,
                                                                 EventPathParams & aEventPath)
 {
     CHIP_ERROR err = PushFront(aEventPathList, aEventPath, mEventPathPool);
@@ -1586,12 +1602,12 @@ CHIP_ERROR InteractionModelEngine::PushFrontEventPathParamsList(ObjectList<Event
     return err;
 }
 
-void InteractionModelEngine::ReleaseDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList)
+void InteractionModelEngine::ReleaseDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList)
 {
     ReleasePool(aDataVersionFilterList, mDataVersionFilterPool);
 }
 
-CHIP_ERROR InteractionModelEngine::PushFrontDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList,
+CHIP_ERROR InteractionModelEngine::PushFrontDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList,
                                                                   DataVersionFilter & aDataVersionFilter)
 {
     CHIP_ERROR err = PushFront(aDataVersionFilterList, aDataVersionFilter, mDataVersionFilterPool);
@@ -1604,12 +1620,13 @@ CHIP_ERROR InteractionModelEngine::PushFrontDataVersionFilterList(ObjectList<Dat
 }
 
 template <typename T, size_t N>
-void InteractionModelEngine::ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool)
+void InteractionModelEngine::ReleasePool(SingleLinkedListNode<T> *& aObjectList,
+                                         ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool)
 {
-    ObjectList<T> * current = aObjectList;
+    SingleLinkedListNode<T> * current = aObjectList;
     while (current != nullptr)
     {
-        ObjectList<T> * nextObject = current->mpNext;
+        SingleLinkedListNode<T> * nextObject = current->mpNext;
         aObjectPool.ReleaseObject(current);
         current = nextObject;
     }
@@ -1618,9 +1635,10 @@ void InteractionModelEngine::ReleasePool(ObjectList<T> *& aObjectList, ObjectPoo
 }
 
 template <typename T, size_t N>
-CHIP_ERROR InteractionModelEngine::PushFront(ObjectList<T> *& aObjectList, T & aData, ObjectPool<ObjectList<T>, N> & aObjectPool)
+CHIP_ERROR InteractionModelEngine::PushFront(SingleLinkedListNode<T> *& aObjectList, T & aData,
+                                             ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool)
 {
-    ObjectList<T> * object = aObjectPool.CreateObject();
+    SingleLinkedListNode<T> * object = aObjectPool.CreateObject();
     if (object == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;

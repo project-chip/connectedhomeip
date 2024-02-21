@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: short
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009A" name="Energy Calendar" revision="3">
   <revisionHistory>
@@ -61,6 +63,9 @@ Davis, CA 95616, USA
     <revision revision="2" summary="CCB 3042"/>
     <revision revision="3" summary="Initial Matter Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x009A" name="Energy Calendar"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="SECA" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PTIER" name="PricingTier" summary="Supports information about pricing tiers">

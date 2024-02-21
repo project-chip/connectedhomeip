@@ -32,6 +32,7 @@
 #import "MTRConversion.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
+#import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDevice_Internal.h"
@@ -173,12 +174,31 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                 return nil;
             }
 
+            id<MTRDeviceControllerStorageDelegate> storageDelegateToUse = storageDelegate;
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+            if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
+                storageDelegateToUse = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:storageDelegate];
+            }
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
             _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
-                                                                            storageDelegate:storageDelegate
+                                                                            storageDelegate:storageDelegateToUse
                                                                        storageDelegateQueue:storageDelegateQueue];
             if (_controllerDataStore == nil) {
                 return nil;
             }
+        } else {
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+            if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
+                dispatch_queue_t localTestStorageQueue = dispatch_queue_create("org.csa-iot.matter.framework.devicecontroller.localteststorage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+                MTRDeviceControllerLocalTestStorage * localTestStorage = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:nil];
+                _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
+                                                                                storageDelegate:localTestStorage
+                                                                           storageDelegateQueue:localTestStorageQueue];
+                if (_controllerDataStore == nil) {
+                    return nil;
+                }
+            }
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
         }
 
         // Ensure the otaProviderDelegate, if any, is valid.

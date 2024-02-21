@@ -60,6 +60,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
     <revision revision="2" summary="New data model format and notation, added &quot;Conversion of Temperature Values for Display&quot; section"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0204" name="Thermostat User Interface Configuration"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="TSUIC" scope="Endpoint"/>
   <dataTypes>
     <enum name="KeypadLockoutEnum">

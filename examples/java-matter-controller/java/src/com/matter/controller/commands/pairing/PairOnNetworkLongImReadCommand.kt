@@ -67,13 +67,12 @@ class PairOnNetworkLongImReadCommand(
     }
 
     fun checkUnitTestClusterGeneralStatus(status: Status): Boolean =
-      (status.getStatus() == CLUSTER_ID_TEST_GENERAL_ERROR_STATUS) &&
-        !status.getClusterStatus().isPresent()
+      (status.getStatus() == Status.Code.InvalidDataType) && !status.getClusterStatus().isPresent()
 
     fun checkUnitTestClusterClusterStatus(status: Status): Boolean =
-      (status.getStatus() == CLUSTER_ID_TEST_CLUSTER_ERROR_STATUS) &&
+      (status.getStatus() == Status.Code.Failure) &&
         status.getClusterStatus().isPresent() &&
-        status.getClusterStatus().get() == CLUSTER_ID_TEST_CLUSTER_ERROR_CLUSTER_STATUS
+        (status.getClusterStatus().get() == CLUSTER_ID_TEST_CLUSTER_ERROR_CLUSTER_STATUS)
 
     private fun validateResponse(nodeState: NodeState) {
       val endpointZero =
@@ -243,8 +242,6 @@ class PairOnNetworkLongImReadCommand(
     private const val CLUSTER_ID_BASIC_VERSION = 0L
     private const val CLUSTER_ID_TEST_GENERAL_ERROR_BOOLEAN = 0x0031L
     private const val CLUSTER_ID_TEST_CLUSTER_ERROR_BOOLEAN = 0x0032L
-    private const val CLUSTER_ID_TEST_GENERAL_ERROR_STATUS = 0x8d
-    private const val CLUSTER_ID_TEST_CLUSTER_ERROR_STATUS = 1
     private const val CLUSTER_ID_TEST_CLUSTER_ERROR_CLUSTER_STATUS = 17
   }
 }

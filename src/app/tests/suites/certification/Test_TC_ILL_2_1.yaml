@@ -86,4 +86,4 @@ tests:
           constraints:
               type: enum8
               minValue: 0
-              maxValue: 254
+              maxValue: LightSensorTypeEnum.UnknownEnumValue(254)

@@ -32,6 +32,7 @@ import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.NodeState
+import chip.devicecontroller.model.Status
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -223,9 +224,9 @@ class OtaProviderClientFragment : Fragment() {
           showMessage("Error : ${e.toString()}")
         }
 
-        override fun onResponse(attributePath: ChipAttributePath?) {
+        override fun onResponse(attributePath: ChipAttributePath, status: Status) {
           Log.d(TAG, "onResponse")
-          showMessage("write Success")
+          showMessage("$attributePath : Write response: $status")
         }
       },
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
@@ -350,9 +351,9 @@ class OtaProviderClientFragment : Fragment() {
           showMessage("error : ${e.toString()}")
         }
 
-        override fun onResponse(attributePath: ChipAttributePath?) {
+        override fun onResponse(attributePath: ChipAttributePath, status: Status) {
           Log.d(TAG, "onResponse")
-          showMessage("write success")
+          showMessage("$attributePath : Write response: $status")
         }
       },
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),

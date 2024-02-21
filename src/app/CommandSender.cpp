@@ -75,6 +75,9 @@ CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messagin
     mTimedRequest(aIsTimedRequest), mUseExtendableCallback(true)
 {
     assertChipStackLockedByCurrentThread();
+#if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+    mpPendingResponseTracker = &mNonTestPendingResponseTracker;
+#endif // CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
 }
 
 CommandSender::~CommandSender()
@@ -222,9 +225,9 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 
     if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandResponse))
     {
+        mInvokeResponseMessageCount++;
         err = ProcessInvokeResponse(std::move(aPayload), moreChunkedMessages);
         SuccessOrExit(err);
-        mInvokeResponseMessageCount++;
         if (moreChunkedMessages)
         {
             StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);
@@ -258,6 +261,10 @@ exit:
 
     if (mState != State::AwaitingResponse)
     {
+        if (err == CHIP_NO_ERROR)
+        {
+            FlushNoCommandResponse();
+        }
         Close();
     }
     // Else we got a response to a Timed Request and just sent the invoke.
@@ -331,12 +338,25 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
     Close();
 }
 
+void CommandSender::FlushNoCommandResponse()
+{
+    if (mpPendingResponseTracker && mUseExtendableCallback && mCallbackHandle.extendableCallback)
+    {
+        Optional<uint16_t> commandRef = mpPendingResponseTracker->PopPendingResponse();
+        while (commandRef.HasValue())
+        {
+            NoResponseData noResponseData = { commandRef.Value() };
+            mCallbackHandle.extendableCallback->OnNoResponse(this, noResponseData);
+            commandRef = mpPendingResponseTracker->PopPendingResponse();
+        }
+    }
+}
+
 void CommandSender::Close()
 {
     mSuppressResponse = false;
     mTimedRequest     = false;
     MoveToState(State::AwaitingDestruction);
-
     OnDoneCallback();
 }
 
@@ -350,10 +370,10 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
     StatusIB statusIB;
 
     {
-        bool commandRefExpected = (mFinishedCommandCount > 1);
-        bool hasDataResponse    = false;
+        bool hasDataResponse = false;
         TLV::TLVReader commandDataReader;
         Optional<uint16_t> commandRef;
+        bool commandRefExpected = mpPendingResponseTracker && (mpPendingResponseTracker->Count() > 1);
 
         CommandStatusIB::Parser commandStatus;
         err = aInvokeResponse.GetStatus(&commandStatus);
@@ -409,6 +429,27 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         }
         ReturnErrorOnFailure(err);
 
+        if (commandRef.HasValue() && mpPendingResponseTracker != nullptr)
+        {
+            err = mpPendingResponseTracker->Remove(commandRef.Value());
+            if (err != CHIP_NO_ERROR)
+            {
+                // This can happen for two reasons:
+                // 1. The current InvokeResponse is a duplicate (based on its commandRef).
+                // 2. The current InvokeResponse is for a request we never sent (based on its commandRef).
+                // Used when logging errors related to server violating spec.
+                [[maybe_unused]] ScopedNodeId remoteScopedNode;
+                if (mExchangeCtx.Get()->HasSessionHandle())
+                {
+                    remoteScopedNode = mExchangeCtx.Get()->GetSessionHandle()->GetPeer();
+                }
+                ChipLogError(DataManagement,
+                             "Received Unexpected Response from remote node " ChipLogFormatScopedNodeId ", commandRef=%u",
+                             ChipLogValueScopedNodeId(remoteScopedNode), commandRef.Value());
+                return err;
+            }
+        }
+
         // When using ExtendableCallbacks, we are adhering to a different API contract where path
         // specific errors are sent to the OnResponse callback. For more information on the history
         // of this issue please see https://github.com/project-chip/connectedhomeip/issues/30991
@@ -430,17 +471,19 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
 CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters & aConfigParams)
 {
-#if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mpPendingResponseTracker != nullptr)
+    {
 
-    mRemoteMaxPathsPerInvoke = aConfigParams.remoteMaxPathsPerInvoke;
-    mBatchCommandsEnabled    = (aConfigParams.remoteMaxPathsPerInvoke > 1);
+        mRemoteMaxPathsPerInvoke = aConfigParams.remoteMaxPathsPerInvoke;
+        mBatchCommandsEnabled    = (aConfigParams.remoteMaxPathsPerInvoke > 1);
+    }
+    else
+    {
+        VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    }
     return CHIP_NO_ERROR;
-#else
-    VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    return CHIP_NO_ERROR;
-#endif
 }
 
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams,
@@ -453,12 +496,19 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     //
     bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled && mUseExtendableCallback);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
+
+    if (mpPendingResponseTracker != nullptr)
+    {
+        size_t pendingCount = mpPendingResponseTracker->Count();
+        VerifyOrReturnError(pendingCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
+    }
 
     if (mBatchCommandsEnabled)
     {
+        VerifyOrReturnError(mpPendingResponseTracker != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(aPrepareCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(aPrepareCommandParams.commandRef.Value() == mFinishedCommandCount, CHIP_ERROR_INVALID_ARGUMENT);
+        uint16_t commandRef = aPrepareCommandParams.commandRef.Value();
+        VerifyOrReturnError(!mpPendingResponseTracker->IsTracked(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
@@ -482,8 +532,10 @@ CHIP_ERROR CommandSender::FinishCommand(FinishCommandParameters & aFinishCommand
 {
     if (mBatchCommandsEnabled)
     {
+        VerifyOrReturnError(mpPendingResponseTracker != nullptr, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(aFinishCommandParams.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(aFinishCommandParams.commandRef.Value() == mFinishedCommandCount, CHIP_ERROR_INVALID_ARGUMENT);
+        uint16_t commandRef = aFinishCommandParams.commandRef.Value();
+        VerifyOrReturnError(!mpPendingResponseTracker->IsTracked(commandRef), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     return FinishCommandInternal(aFinishCommandParams);
@@ -511,7 +563,10 @@ CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinis
 
     MoveToState(State::AddedCommand);
 
-    mFinishedCommandCount++;
+    if (mpPendingResponseTracker && aFinishCommandParams.commandRef.HasValue())
+    {
+        mpPendingResponseTracker->Add(aFinishCommandParams.commandRef.Value());
+    }
 
     if (aFinishCommandParams.timedInvokeTimeoutMs.HasValue())
     {

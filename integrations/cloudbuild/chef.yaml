@@ -18,7 +18,7 @@ steps:
       args:
           - >-
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
-              ./examples/chef/chef.py --build_all --build_exclude noip\|basicvideo\|roboticvacuumcleaner
+              ./examples/chef/chef.py --build_all --build_exclude noip\|roboticvacuumcleaner
       id: CompileAll
       waitFor:
           - Bootstrap

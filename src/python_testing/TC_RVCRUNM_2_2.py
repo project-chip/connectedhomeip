@@ -15,6 +15,8 @@
 #    limitations under the License.
 #
 
+from time import sleep
+
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -91,6 +93,9 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
+        # Delay for pipe command to be processed (otherwise tests are flaky)
+        # TODO(#31239): centralize pipe write logic and remove the need of sleep
+        sleep(0.001)
 
     def pics_TC_RVCRUNM_2_2(self) -> list[str]:
         return ["RVCRUNM.S"]

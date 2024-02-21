@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Wi" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Wi-Fi Network Management" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId name="Wi"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="TODO" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0001" name="SSID" type="octstr" default="null">
@@ -69,12 +74,11 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="NetworkPassphraseRequest" response="NetworkPassphraseResponse">
+    <command id="0x00" name="NetworkPassphraseRequest" direction="commandToServer" response="NetworkPassphraseResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
     </command>
     <command id="0x01" name="NetworkPassphraseResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field name="Passphrase" type="octstr">
         <mandatoryConform/>

@@ -182,9 +182,58 @@ bool emberAfMessagesClusterPresentMessagesRequestCallback(
     auto & responses      = commandData.responses;
 
     Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, status = Status::NotFound);
 
-    delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses);
+    VerifyOrExit(messageId.size() == kMessageIdLength,
+                 ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback invalid message id length");
+                 status = Status::ConstraintError);
+
+    VerifyOrExit(messageText.size() <= kMessageTextLengthMax,
+                 ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback invalid message text length");
+                 status = Status::ConstraintError);
+
+    if (responses.HasValue())
+    {
+        size_t size = 0;
+        err         = responses.Value().ComputeSize(&size);
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback size check failed");
+                     status = Status::ConstraintError);
+
+        VerifyOrExit(
+            delegate->HasFeature(endpoint, Feature::kConfirmationResponse),
+            ChipLogProgress(
+                Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback responses sent but response feature not supported");
+            status = Status::InvalidCommand);
+
+        VerifyOrExit(size <= kMessageMaxOptionCount,
+                     ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback too many options");
+                     status = Status::ConstraintError);
+
+        auto iter = responses.Value().begin();
+        while (iter.Next())
+        {
+            auto & response = iter.GetValue();
+
+            // response feature is checked above
+            VerifyOrExit(response.messageResponseID.HasValue() && response.label.HasValue(),
+                         ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback missing response id or label");
+                         status = Status::InvalidCommand);
+
+            VerifyOrExit(response.messageResponseID.Value() >= kMessageResponseIdMin,
+                         ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback responseID value check failed");
+                         status = Status::ConstraintError);
+
+            VerifyOrExit(response.label.Value().size() <= kMessageResponseLabelMaxLength,
+                         ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback label length check failed");
+                         status = Status::ConstraintError);
+        }
+        VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR,
+                     ChipLogProgress(Zcl, "emberAfMessagesClusterPresentMessagesRequestCallback TLV parsing error");
+                     status = Status::InvalidAction);
+    }
+
+    err = delegate->HandlePresentMessagesRequest(messageId, priority, messageControl, startTime, duration, messageText, responses);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -214,7 +263,21 @@ bool emberAfMessagesClusterCancelMessagesRequestCallback(
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
-    delegate->HandleCancelMessagesRequest(messageIds);
+    {
+        auto iter = messageIds.begin();
+        while (iter.Next())
+        {
+            auto & id = iter.GetValue();
+            VerifyOrExit(id.size() >= kMessageIdLength,
+                         ChipLogProgress(Zcl, "emberAfMessagesClusterCancelMessagesRequestCallback message id size check failed");
+                         status = Status::ConstraintError);
+        }
+        VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR,
+                     ChipLogProgress(Zcl, "emberAfMessagesClusterCancelMessagesRequestCallback TLV parsing error");
+                     status = Status::InvalidAction);
+    }
+
+    err = delegate->HandleCancelMessagesRequest(messageIds);
 
 exit:
     if (err != CHIP_NO_ERROR)

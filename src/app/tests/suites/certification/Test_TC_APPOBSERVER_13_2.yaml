@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     19.15.2. [TC-APPOBSERVER-13.2] Content App Message Verification (DUT as
@@ -22,27 +21,41 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Content App Observer"
+    endpoint: 1
+
+    DataValue:
+        type: char_string
+        defaultValue: "exampleData"
+    EncodingHintValue:
+        type: char_string
+        defaultValue: "Zoo"
 
 tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label:
-          "Step 1: TH sends a ContentAppMessage command to the DUT with dummy
+          "Step 2: TH sends a ContentAppMessage command to the DUT with dummy
           data and encodingHint strings"
       PICS: APPOBSERVER.S.C00.Rsp
-      verification: |
-          ./chip-tool contentappobserver content-app-message foo 1234 1 --Data bar
-          On TH(chip-tool), The DUT should respond with a ContentAppMessageResponse response with status 0 (success) and optional data and encodingHint strings.
-          [1705666572.972558][4778:4780] CHIP:DMG:         InteractionModelRevision = 11
-          [1705666572.972584][4778:4780] CHIP:DMG: },
-          [1705666572.972667][4778:4780] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0510 Command=0x0000_0001
-          [1705666572.972720][4778:4780] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0510 Command 0x0000_0001
-          [1705666572.972820][4778:4780] CHIP:TOO:   ContentAppMessageResponse: {
-          [1705666572.972862][4778:4780] CHIP:TOO:     status: 0
-          [1705666572.972888][4778:4780] CHIP:TOO:     data: exampleData
-          [1705666572.972912][4778:4780] CHIP:TOO:     encodingHint: foo
-          [1705666572.972936][4778:4780] CHIP:TOO:    }
-          [1705666572.972989][4778:4780] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1705666572.973210][4778:4780] CHIP:EM: <<< [E:743i S:54358 M:87646250 (Ack:136640189)] (S) Msg TX to 1:0000000000000001 [A5ED] [UDP:[fe80::e65f:1ff:fe0f:1a01%wlan0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1705666572.973340][4778:4780] CHIP:EM: Flushed pending ack for MessageCounter:136640189 on exchange 743i
-      disabled: true
+      command: "ContentAppMessage"
+      arguments:
+          values:
+              - name: "Data"
+                value: DataValue
+              - name: "EncodingHint"
+                value: EncodingHintValue
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "Data"
+                value: DataValue
+              - name: "EncodingHint"
+                value: EncodingHintValue

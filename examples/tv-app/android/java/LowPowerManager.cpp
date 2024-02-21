@@ -64,6 +64,7 @@ void LowPowerManager::InitializeWithObjects(jobject managerObject)
 
 bool LowPowerManager::HandleSleep()
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniLocalReferenceScope scope(env);

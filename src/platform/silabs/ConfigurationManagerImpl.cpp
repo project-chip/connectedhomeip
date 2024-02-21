@@ -272,7 +272,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgrImpl().RemoveAllSrpServices();
+    ThreadStackMgr().ClearAllSrpHostAndServices();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ChipLogProgress(DeviceLayer, "Clearing Thread provision");
     ThreadStackMgr().ErasePersistentInfo();

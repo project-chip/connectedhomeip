@@ -443,7 +443,7 @@ tests:
       arguments:
           values:
               - name: "Intent"
-                value: 128 # undefined value
+                value: IntentEnum.UnknownEnumValue(128)
               - name: "RequestedProtocol"
                 value: 0 # ResponsePayload
       response:
@@ -456,7 +456,7 @@ tests:
               - name: "Intent"
                 value: 0 # EndUserSupport
               - name: "RequestedProtocol"
-                value: 128 # undefined value
+                value: TransferProtocolEnum.UnknownEnumValue(128)
       response:
           error: "INVALID_COMMAND"
 

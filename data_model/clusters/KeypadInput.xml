@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0509" name="Keypad Input" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0509" name="Keypad Input"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="KEYPADINPUT" scope="Endpoint"/>
   <features>
     <feature bit="0" code="NV" name="NavigationKeyCodes" summary="Supports UP, DOWN, LEFT, RIGHT, SELECT, BACK, EXIT, MENU">
@@ -345,7 +350,7 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <commands>
-    <command id="0x00" name="SendKey" response="SendKeyResponse">
+    <command id="0x00" name="SendKey" direction="commandToServer" response="SendKeyResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="KeyCode" type="CecKeyCodeEnum">
@@ -353,7 +358,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="SendKeyResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>

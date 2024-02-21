@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!--
-link:../matter-defines.adoc[]
-
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
@@ -61,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0029" name="OTA Software Update Provider"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="OTAP" scope="Node"/>
   <dataTypes>
     <enum name="ApplyUpdateActionEnum">
@@ -104,10 +105,10 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <commands>
-    <command id="0x00" name="QueryImage" response="QueryImageResponse">
+    <command id="0x00" name="QueryImage" direction="commandToServer" response="QueryImageResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="VendorID" type="ref_DataTypeVendorId">
+      <field id="0" name="VendorID" type="vendor-id">
         <mandatoryConform/>
       </field>
       <field id="1" name="ProductID" type="uint16">
@@ -116,27 +117,27 @@ Davis, CA 95616, USA
       <field id="2" name="SoftwareVersion" type="uint32">
         <mandatoryConform/>
       </field>
-      <field id="3" name="ProtocolsSupported" type="ref_DataTypeList[DownloadProtocolEnum Type]">
+      <field id="3" name="ProtocolsSupported" type="list">
+        <entry type="DownloadProtocolEnum"/>
         <mandatoryConform/>
-        <constraint type="max" value="8"/>
+        <constraint type="maxCount" value="8"/>
       </field>
       <field id="4" name="HardwareVersion" type="uint16">
         <optionalConform/>
       </field>
-      <field id="5" name="Location" type="ref_DataTypeString">
+      <field id="5" name="Location" type="string">
         <optionalConform/>
-        <constraint type="allowed" value="2"/>
+        <constraint type="maxLength" value="2"/>
       </field>
       <field id="6" name="RequestorCanConsent" type="bool" default="False">
         <optionalConform/>
       </field>
-      <field id="7" name="MetadataForProvider" type="ref_DataTypeOctstr">
+      <field id="7" name="MetadataForProvider" type="octstr">
         <optionalConform/>
-        <constraint type="max" value="512"/>
+        <constraint type="maxLength" value="512"/>
       </field>
     </command>
     <command id="0x01" name="QueryImageResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>
@@ -144,42 +145,41 @@ Davis, CA 95616, USA
       <field id="1" name="DelayedActionTime" type="uint32">
         <optionalConform/>
       </field>
-      <field id="2" name="ImageURI" type="ref_DataTypeString">
+      <field id="2" name="ImageURI" type="string">
         <optionalConform/>
-        <constraint type="max" value="256"/>
+        <constraint type="maxLength" value="256"/>
       </field>
       <field id="3" name="SoftwareVersion" type="uint32">
         <optionalConform/>
       </field>
-      <field id="4" name="SoftwareVersionString" type="ref_DataTypeString">
+      <field id="4" name="SoftwareVersionString" type="string">
         <optionalConform/>
-        <constraint type="between" from="1" to="64"/>
+        <constraint type="lengthBetween" from="1" to="64"/>
       </field>
-      <field id="5" name="UpdateToken" type="ref_DataTypeOctstr">
+      <field id="5" name="UpdateToken" type="octstr">
         <optionalConform/>
-        <constraint type="between" from="8" to="32"/>
+        <constraint type="lengthBetween" from="8" to="32"/>
       </field>
       <field id="6" name="UserConsentNeeded" type="bool" default="False">
         <optionalConform/>
       </field>
-      <field id="7" name="MetadataForRequestor" type="ref_DataTypeOctstr">
+      <field id="7" name="MetadataForRequestor" type="octstr">
         <optionalConform/>
-        <constraint type="max" value="512"/>
+        <constraint type="maxLength" value="512"/>
       </field>
     </command>
-    <command id="0x02" name="ApplyUpdateRequest" response="ApplyUpdateResponse">
+    <command id="0x02" name="ApplyUpdateRequest" direction="commandToServer" response="ApplyUpdateResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="UpdateToken" type="ref_DataTypeOctstr">
+      <field id="0" name="UpdateToken" type="octstr">
         <mandatoryConform/>
-        <constraint type="between" from="8" to="32"/>
+        <constraint type="lengthBetween" from="8" to="32"/>
       </field>
       <field id="1" name="NewVersion" type="uint32">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x03" name="ApplyUpdateResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Action" type="ApplyUpdateActionEnum">
         <mandatoryConform/>
@@ -188,12 +188,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x04" name="NotifyUpdateApplied" response="Y">
+    <command id="0x04" name="NotifyUpdateApplied" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="UpdateToken" type="ref_DataTypeOctstr">
+      <field id="0" name="UpdateToken" type="octstr">
         <mandatoryConform/>
-        <constraint type="between" from="8" to="32"/>
+        <constraint type="lengthBetween" from="8" to="32"/>
       </field>
       <field id="1" name="SoftwareVersion" type="uint32">
         <mandatoryConform/>

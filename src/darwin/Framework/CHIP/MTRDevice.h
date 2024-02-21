@@ -350,6 +350,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_EXTERN NSString * const MTRPreviousDataKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
 
 @protocol MTRDeviceDelegate <NSObject>
 @required
@@ -366,6 +367,10 @@ MTR_EXTERN NSString * const MTRPreviousDataKey MTR_NEWLY_AVAILABLE;
  *                In addition to MTRDataKey, each response-value dictionary in the array may also have this key:
  *
  *                MTRPreviousDataKey : Same data-value dictionary format as the object for MTRDataKey. This is included when the previous value is known for an attribute.
+ *
+ *                The data-value dictionary also contains this key:
+ *
+ *                MTRDataVersionKey : NSNumber-wrapped uin32_t. Monotonically increaseing data version for the cluster.
  */
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 

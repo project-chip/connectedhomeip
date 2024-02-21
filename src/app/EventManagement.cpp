@@ -639,7 +639,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
     return err;
 }
 
-CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
+CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const SingleLinkedListNode<EventPathParams> * apEventPathList,
                                              EventNumber & aEventMin, size_t & aEventCount,
                                              const Access::SubjectDescriptor & aSubjectDescriptor)
 {

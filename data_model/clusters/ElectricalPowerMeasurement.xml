@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0090" name="Electrical Power Measurement" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0090" name="Electrical Power Measurement"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="EPM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="DIRC" name="DirectCurrent" summary="Supports measurement of direct current">
@@ -95,6 +100,68 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <struct name="HarmonicMeasurementStruct">
+      <field id="0" name="Order" type="uint8" default="1">
+        <mandatoryConform/>
+        <constraint type="min" value="1"/>
+      </field>
+      <field id="1" name="Measurement" type="int64" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="between" from="-2" to="2"/>
+      </field>
+    </struct>
+    <struct name="MeasurementRangeStruct">
+      <field id="0" name="MeasurementType" type="ref_MeasurementTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Min" type="int64">
+        <mandatoryConform/>
+        <constraint type="between" from="-2" to="2"/>
+      </field>
+      <field id="2" name="Max" type="int64">
+        <mandatoryConform/>
+        <constraint type="between" from="-2" to="2"/>
+      </field>
+      <field id="3" name="StartTimestamp" type="epoch-s">
+        <mandatoryConform>
+          <attribute name="EndTimestamp"/>
+        </mandatoryConform>
+      </field>
+      <field id="4" name="EndTimestamp" type="epoch-s">
+        <constraint type="min" value="StartTimestamp+1"/>
+      </field>
+      <field id="5" name="MinTimestamp" type="epoch-s">
+        <mandatoryConform>
+          <attribute name="EndTimestamp"/>
+        </mandatoryConform>
+      </field>
+      <field id="6" name="MaxTimestamp" type="epoch-s">
+        <mandatoryConform>
+          <attribute name="EndTimestamp"/>
+        </mandatoryConform>
+        <constraint type="min" value="MinTimestamp+1"/>
+      </field>
+      <field id="7" name="StartSystime" type="systime-ms">
+        <mandatoryConform>
+          <attribute name="EndSystime"/>
+        </mandatoryConform>
+      </field>
+      <field id="8" name="EndSystime" type="systime-ms">
+        <constraint type="min" value="StartSystime+1"/>
+      </field>
+      <field id="9" name="MinSystime" type="systime-ms">
+        <mandatoryConform>
+          <attribute name="EndSystime"/>
+        </mandatoryConform>
+      </field>
+      <field id="10" name="MaxSystime" type="systime-ms">
+        <mandatoryConform>
+          <attribute name="EndSystime"/>
+        </mandatoryConform>
+        <constraint type="min" value="MinSystime+1"/>
+      </field>
+    </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="PowerMode" type="PowerModeEnum">

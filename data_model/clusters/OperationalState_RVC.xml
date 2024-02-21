@@ -54,32 +54,29 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
     <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Deprecate the Start and Stop commands. Add the GoHome command."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0061" name="RVC Operational State"/>
+  </clusterIds>
   <classification hierarchy="derived" baseCluster="Operational State" role="application" picsCode="RVCOPSTATE" scope="Endpoint"/>
   <commands>
-    <command id="0x00" name="Pause" direction="commandToClient">
-      <access invokePrivilege="operate"/>
-    </command>
-    <command id="0x01" name="Stop" direction="commandToClient">
-      <access invokePrivilege="operate"/>
+    <command id="0x00" name="Pause"/>
+    <command id="0x01" name="Stop">
       <deprecateConform/>
     </command>
-    <command id="0x02" name="Start" direction="commandToClient">
-      <access invokePrivilege="operate"/>
+    <command id="0x02" name="Start">
       <deprecateConform/>
     </command>
-    <command id="0x03" name="Resume" direction="commandToClient">
-      <access invokePrivilege="operate"/>
-    </command>
-    <command id="0x04" name="OperationalCommandResponse" direction="commandToClient">
-      <access invokePrivilege="operate"/>
-    </command>
-    <command id="0x80" name="GoHome" response="OperationalCommandResponse">
+    <command id="0x03" name="Resume"/>
+    <command id="0x04" name="OperationalCommandResponse"/>
+    <command id="0x80" name="GoHome" direction="commandToServer" response="OperationalCommandResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>

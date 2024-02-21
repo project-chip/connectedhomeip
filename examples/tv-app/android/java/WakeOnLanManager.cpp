@@ -51,6 +51,7 @@ void WakeOnLanManager::NewManager(jint endpoint, jobject manager)
 
 CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     jobject javaMac;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();

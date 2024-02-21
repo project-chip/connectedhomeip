@@ -43,12 +43,19 @@ chip_data_model("chef-data-model") {
 executable("${sample_name}") {
   sources = [
     "${project_dir}/common/chef-air-quality.cpp",
-    "${project_dir}/common/chef-channel-manager.cpp",
     "${project_dir}/common/chef-concentration-measurement.cpp",
     "${project_dir}/common/chef-fan-control-manager.cpp",
     "${project_dir}/common/chef-resource-monitoring-delegates.cpp",
     "${project_dir}/common/chef-rvc-mode-delegate.cpp",
     "${project_dir}/common/chef-rvc-operational-state-delegate.cpp",
+    "${project_dir}/common/clusters/audio-output/AudioOutputManager.cpp",
+    "${project_dir}/common/clusters/channel/ChannelManager.cpp",
+    "${project_dir}/common/clusters/keypad-input/KeypadInputManager.cpp",
+    "${project_dir}/common/clusters/low-power/LowPowerManager.cpp",
+    "${project_dir}/common/clusters/media-input/MediaInputManager.cpp",
+    "${project_dir}/common/clusters/media-playback/MediaPlaybackManager.cpp",
+    "${project_dir}/common/clusters/target-navigator/TargetNavigatorManager.cpp",
+    "${project_dir}/common/clusters/wake-on-lan/WakeOnLanManager.cpp",
     "${project_dir}/common/stubs.cpp",
     "${project_dir}/linux/main.cpp",
   ]
@@ -63,6 +70,7 @@ executable("${sample_name}") {
   include_dirs = [
     "include",
     "${project_dir}/common",
+    "${project_dir}/common/clusters",
   ]
 
   if (chip_enable_pw_rpc) {

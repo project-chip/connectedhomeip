@@ -27,6 +27,7 @@ import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.ChipPathId
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
+import chip.devicecontroller.model.Status
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.WildcardFragmentBinding
@@ -92,8 +93,8 @@ class WildcardFragment : Fragment() {
         Log.e(TAG, "Report error for $attributePath: $ex")
       }
 
-      override fun onResponse(attributePath: ChipAttributePath?) {
-        val text = "$attributePath : Write Success"
+      override fun onResponse(attributePath: ChipAttributePath, status: Status) {
+        val text = "$attributePath : Write response: $status"
         requireActivity().runOnUiThread { binding.outputTv.text = text }
       }
 

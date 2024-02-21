@@ -130,7 +130,7 @@ tests:
                   {
                       FabricIndex: 0,
                       Privilege: 3,
-                      AuthMode: 4, # INVALID
+                      AuthMode: AccessControlEntryAuthModeEnum.UnknownEnumValue,
                       Subjects: [],
                       Targets: null,
                   },
@@ -231,7 +231,7 @@ tests:
                   },
                   {
                       FabricIndex: 0,
-                      Privilege: 6, # INVALID
+                      Privilege: AccessControlEntryPrivilegeEnum.UnknownEnumValue,
                       AuthMode: 2, # CASE
                       Subjects: null,
                       Targets: null,

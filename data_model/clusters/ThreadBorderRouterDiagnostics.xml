@@ -54,19 +54,23 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Thread Border Router Diagnostics" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId name="Thread Border Router Diagnostics"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="TODO" scope="Endpoint"/>
   <commands>
-    <command id="0x00" name="OpDatasetRequest" response="OpDatasetResponse">
+    <command id="0x00" name="OpDatasetRequest" direction="commandToServer" response="OpDatasetResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
     </command>
     <command id="0x01" name="OpDatasetResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="OperationalDataset" type="octstr">
         <mandatoryConform>
@@ -75,12 +79,11 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="254"/>
       </field>
     </command>
-    <command id="0x02" name="TopologyRequest" response="TopologyResponse">
+    <command id="0x02" name="TopologyRequest" direction="commandToServer" response="TopologyResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
     </command>
     <command id="0x03" name="TopologyResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="ThreadTopology" type="TODO">
         <mandatoryConform>

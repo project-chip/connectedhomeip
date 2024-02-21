@@ -20,7 +20,10 @@ config("mock_include") {
 
 source_set("mock_ember") {
   sources = [
+    "Constants.h",
+    "Functions.h",
     "MockNodeConfig.cpp",
+    "MockNodeConfig.h",
     "attribute-storage.cpp",
   ]
 

@@ -429,6 +429,35 @@ public:
         return mResponseSender.GetSubjectDescriptor();
     }
 
+#if CHIP_WITH_NLFAULTINJECTION
+
+    enum class NlFaultInjectionType : uint8_t
+    {
+        SeparateResponseMessages,
+        SeparateResponseMessagesAndInvertedResponseOrder,
+        SkipSecondResponse
+    };
+
+    /**
+     * @brief Sends InvokeResponseMessages with injected faults for certification testing.
+     *
+     * The Test Harness (TH) uses this to simulate various server response behaviors,
+     * ensuring the Device Under Test (DUT) handles responses per specification.
+     *
+     * This function strictly validates the DUT's InvokeRequestMessage against the test plan.
+     * If deviations occur, the TH terminates with a detailed error message.
+     *
+     * @param ec Exchange context for sending InvokeResponseMessages to the client.
+     * @param payload Payload of the incoming InvokeRequestMessage from the client.
+     * @param isTimedInvoke Indicates whether the interaction is timed.
+     * @param faultType The specific type of fault to inject into the response.
+     */
+    // TODO(#30453): After refactoring CommandHandler for better unit testability, create a
+    // unit test specifically for the fault injection behavior.
+    void TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
+                                                        bool isTimedInvoke, NlFaultInjectionType faultType);
+#endif // CHIP_WITH_NLFAULTINJECTION
+
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;

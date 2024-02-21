@@ -32,6 +32,7 @@
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/PendingResponseTrackerImpl.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Optional.h>
@@ -73,6 +74,16 @@ public:
         // Reference for the command. This should be associated with the reference value sent out in the initial
         // invoke request.
         Optional<uint16_t> commandRef;
+    };
+
+    // CommandSender::ExtendableCallback::OnNoResponse is public SDK API, so we cannot break
+    // source compatibility for it. To allow for additional values to be added at a future
+    // time without constantly changing the function's declaration parameter list, we are
+    // defining the struct NoResponseData and adding that to the parameter list to allow for
+    // future extendability.
+    struct NoResponseData
+    {
+        uint16_t commandRef;
     };
 
     // CommandSender::ExtendableCallback::OnError is public SDK API, so we cannot break source
@@ -127,8 +138,20 @@ public:
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aResponseData   Information pertaining to the response.
          */
-        ;
         virtual void OnResponse(CommandSender * commandSender, const ResponseData & aResponseData) {}
+
+        /**
+         * Called for each request that failed to receive a response after the server indicates completion of all requests.
+         *
+         * This callback may be omitted if clients have alternative ways to track non-responses.
+         *
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param apCommandSender The CommandSender object that initiated the transaction.
+         * @param aNoResponseData Details about the request without a response.
+         */
+        virtual void OnNoResponse(CommandSender * commandSender, const NoResponseData & aNoResponseData) {}
 
         /**
          * OnError will be called when a non-path-specific error occurs *after* a successful call to SendCommandRequest().
@@ -229,12 +252,6 @@ public:
         // early in PrepareCommand, even though it's not used until FinishCommand. This proactive
         // validation helps prevent unnecessary writing an InvokeRequest into the packet that later
         // needs to be undone.
-        //
-        // Currently, provided commandRefs for the first request must start at 0 and increment by one
-        // for each subsequent request. This requirement can be relaxed in the future if a compelling
-        // need arises.
-        // TODO(#30453): After introducing Request/Response tracking, remove statement above about
-        // this currently enforced requirement on commandRefs.
         Optional<uint16_t> commandRef;
         // If the InvokeRequest needs to be in a state with a started data TLV struct container
         bool startDataStruct = false;
@@ -278,6 +295,10 @@ public:
         bool endDataStruct = false;
     };
 
+    class TestOnlyMarker
+    {
+    };
+
     /*
      * Constructor.
      *
@@ -287,12 +308,20 @@ public:
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
-    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
     CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false) :
         CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
     {}
+    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
+                  bool aSuppressResponse = false);
+    // TODO(#32138): After there is a macro that is always defined for all unit tests, the constructor with
+    // TestOnlyMarker should only be compiled if that macro is defined.
+    CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
+                  PendingResponseTracker * apPendingResponseTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
+        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+    {
+        mpPendingResponseTracker = apPendingResponseTracker;
+    }
     ~CommandSender();
 
     /**
@@ -307,11 +336,14 @@ public:
      *                      based on how many paths the remote peer claims to support.
      *
      * @return CHIP_ERROR_INCORRECT_STATE
-     *                      If device has previously called `PrepareCommand`.
+     *             If device has previously called `PrepareCommand`.
      * @return CHIP_ERROR_INVALID_ARGUMENT
-     *                      Invalid argument value.
+     *             Invalid argument value.
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
-     *                      Device has not enabled CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED.
+     *             Device has not enabled batch command support. To enable:
+     *               1. Enable the CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+     *                  configuration option.
+     *               2. Ensure you provide ExtendableCallback.
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
@@ -497,6 +529,7 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
+    void FlushNoCommandResponse();
     //
     // Called internally to signal the completion of all work on this object, gracefully close the
     // exchange (by calling into the base class) and finally, signal to the application that it's
@@ -580,8 +613,12 @@ private:
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 
+#if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+    PendingResponseTrackerImpl mNonTestPendingResponseTracker;
+#endif // CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+    PendingResponseTracker * mpPendingResponseTracker = nullptr;
+
     uint16_t mInvokeResponseMessageCount = 0;
-    uint16_t mFinishedCommandCount       = 0;
     uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
     State mState                = State::Idle;
