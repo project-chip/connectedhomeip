@@ -4360,6 +4360,10 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
         0x35, // Structure with context tag
         0x36, // Array with context tag
         0x18, // End of container
+
+        // invalid data:
+        0x19, // out of range - end of container
+        0xFE, // out of range
     };
     // clang-format on
 
