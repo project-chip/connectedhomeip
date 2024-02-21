@@ -100,7 +100,13 @@ class OpCredClientFragment : Fragment() {
     val attributeId = attribute.id
 
     val devicePtr =
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
 
     ChipClient.getDeviceController(requireContext())
       .readPath(
@@ -137,7 +143,13 @@ class OpCredClientFragment : Fragment() {
 
   private suspend fun sendRemoveFabricsBtnClick(fabricIndex: UInt) {
     val devicePtr =
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
     // TODO : Need to be implement poj-to-tlv
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
