@@ -55,8 +55,10 @@ CHIP_ERROR SilabsPlatform::Init(void)
     // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
     NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
 
+#if !CHIP_CONFIG_ENABLE_ICD_SERVER
     // Configuration the clock rate
     soc_pll_config();
+#endif
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();

@@ -257,7 +257,7 @@ void CastingPlayer::LogDetail() const
     {
         for (unsigned j = 0; j < mAttributes.numIPs; j++)
         {
-            char * ipAddressOut = mAttributes.ipAddresses[j].ToString(buf);
+            [[maybe_unused]] char * ipAddressOut = mAttributes.ipAddresses[j].ToString(buf);
             ChipLogDetail(AppServer, "\tIP Address #%d: %s", j + 1, ipAddressOut);
         }
     }

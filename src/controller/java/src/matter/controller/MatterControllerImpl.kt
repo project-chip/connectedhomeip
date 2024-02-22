@@ -36,6 +36,7 @@ import matter.controller.model.AttributePath
 import matter.controller.model.EventPath
 import matter.controller.model.EventState
 import matter.controller.model.NodeState
+import matter.controller.model.Status
 
 /** Controller to interact with the CHIP device. */
 class MatterControllerImpl(params: ControllerParams) : MatterController {
@@ -340,8 +341,11 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
     return suspendCancellableCoroutine { continuation ->
       val writeCallback =
         object : WriteAttributesCallback {
-          override fun onResponse(attributePath: AttributePath) {
-            logger.log(Level.INFO, "write success for attributePath:%s", attributePath.toString())
+          override fun onResponse(attributePath: AttributePath, status: Status) {
+            logger.log(
+              Level.INFO,
+              "Receive write response for attributePath: ${attributePath} and status ${status}"
+            )
           }
 
           override fun onError(attributePath: AttributePath?, ex: Exception) {
