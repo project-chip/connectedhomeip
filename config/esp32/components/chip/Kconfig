@@ -167,6 +167,13 @@ menu "CHIP Core"
 
                 A value of 0 disables automatic closing of idle connections.
 
+        config ENABLE_ENDPOINT_QUEUE_FILTER
+            bool "Enable UDP Endpoint queue filter for mDNS Broadcast packets"
+            depends on USE_MINIMAL_MDNS
+            default y
+            help
+                Enable this option to start a UDP Endpoint queue filter for mDNS Broadcast packets
+
     endmenu # "Networking Options"
 
     menu "System Options"

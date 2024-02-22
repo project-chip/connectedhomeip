@@ -130,6 +130,9 @@ static_library("ESP32") {
         "DnssdImpl.h",
       ]
     }
+    if (chip_mdns == "minimal") {
+      sources += [ "ESP32EndpointQueueFilter.h" ]
+    }
   }
 
   if (chip_enable_ethernet) {
