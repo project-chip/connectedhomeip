@@ -155,17 +155,34 @@ void ESP32Backend::TraceCounter(const char * label)
     ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
 }
 
-void ESP32Backend::LogMetricEvent(MetricEvent & event)
+void ESP32Backend::LogMetricEvent(const MetricEvent & event)
 {
     if (!mRegistered)
     {
-        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key /* Unique key 8 */,
-                                  event.key /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key() /* Unique key 8 */,
+                                  event.key() /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
                                   ESP_DIAG_DATA_TYPE_INT /* data_type */);
         mRegistered = true;
     }
-    ESP_LOGI("mtr", "The value of %s is %ld ", event.key, event.value.store.int32_value);
-    esp_diag_metrics_add_int(event.key, event.value.store.int32_value);
+
+    using ValueType = MetricEvent::Value::Type;
+    switch (event.value().type) {
+    case ValueType::kInt32:
+        ESP_LOGI("mtr", "The value of %s is %ld ", event.key(), event.ValueInt32());
+        esp_diag_metrics_add_int(event.key(), event.ValueInt32());
+        break;
+    case ValueType::kUInt32:
+        ESP_LOGI("mtr", "The value of %s is %lu ", event.key(), event.ValueUInt32());
+        esp_diag_metrics_add_uint(event.key(), event.ValueUInt32());
+        break;
+    case ValueType::kChipErrorCode:
+        ESP_LOGI("mtr", "The value of %s is error with code %lu ", event.key(), event.ValueUInt32());
+        esp_diag_metrics_add_uint(event.key(), event.ValueUInt32());
+        break;
+    default:
+        ESP_LOGI("mtr", "The value of %s is of an UNKNOWN TYPE", event.key());
+        break;
+    }
 }
 
 void ESP32Backend::TraceBegin(const char * label, const char * group)

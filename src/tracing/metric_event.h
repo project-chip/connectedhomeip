@@ -16,10 +16,8 @@
  */
 #pragma once
 
-#include <matter/tracing/build_config.h>
-#include <tracing/metric_macros.h>
 #include <lib/core/CHIPError.h>
-#include <system/SystemClock.h>
+#include <tracing/metric_macros.h>
 #include <tracing/metric_keys.h>
 
 namespace chip {
@@ -27,31 +25,43 @@ namespace Tracing {
 
 /**
  * Define a metric that can be logged. A metric consists of a key-value pair. The value is
- * currently limited to simple scalar values. The value is interpreted based on the key type.
+ * currently limited to simple scalar values.
  *
- * Additionally a metric is tagged as either an instant type or marked with a begin and end
+ * Additionally a metric is tagged as either an instant event or marked with a begin and end
  * for the event. When the latter is used, a duration can be associated between the two events.
  */
-struct MetricEvent
+class MetricEvent
 {
+public:
+    MetricEvent(const MetricEvent&) = default;
+    MetricEvent(MetricEvent &&) = default;
+    MetricEvent &operator=(const MetricEvent&) = default;
+    MetricEvent &operator=(MetricEvent &&) = default;
+
+public:
     // This specifies the different categories of metric events that can created. In addition to
-    // emitting an event, events paired with a Begin and End are used to track duration for the
-    // event. An instant event just represents a one shot event.
-    enum class Tag
+    // emitting an event, events paired with a kBeginEvent and kEndEvent can be used to track
+    // duration for the event. A kInstantEvent represents a one shot event.
+    enum class Type
     {
-        Begin,  // Marks the begin of an event. This is typically tied with an End event.
-        End,    // Marks the end of an event. This is typically preceeded with a Begin event.
-        Instant // No duration
+        kBeginEvent,  // Marks the begin of an event. This must be tied with an End event.
+        kEndEvent,    // Marks the end of an event. This is typically preceeded with a Begin event.
+        kInstantEvent // No duration
     };
 
     // This defines the different types of values that can stored when a metric is emitted
     struct Value
     {
+        Value(const Value&) = default;
+        Value(Value &&) = default;
+        Value &operator=(const Value&) = default;
+        Value &operator=(Value &&) = default;
+
         enum class Type : uint8_t
         {
-            Signed32Type,   // int32_t
-            Unsigned32Type, // uint32_t
-            ChipErrorType   // chip::ChipError
+            kInt32,          // int32_t
+            kUInt32,         // uint32_t
+            kChipErrorCode   // chip::ChipError
         };
 
         union Store
@@ -67,58 +77,91 @@ struct MetricEvent
         Store store;
         Type type;
 
-        Value(uint32_t value) : store(value), type(Type::Unsigned32Type) {}
+        Value(uint32_t value) : store(value), type(Type::kUInt32) {}
 
-        Value(int32_t value) : store(value), type(Type::Signed32Type) {}
+        Value(int32_t value) : store(value), type(Type::kInt32) {}
 
-        Value(const ChipError & err) : store(err.AsInteger()), type(Type::ChipErrorType) {}
+        Value(const ChipError & err) : store(err.AsInteger()), type(Type::kChipErrorCode) {}
     };
 
-    Tag tag;
-    MetricKey key;
-    Value value;
-    System::Clock::Microseconds64 timePoint;
-
-    MetricEvent(Tag tg, MetricKey k, int32_t val = 0) :
-        tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
+    MetricEvent(Type type, MetricKey key, int32_t value = 0) :
+        mType(type), mKey(key), mValue(value)
     {}
 
-    MetricEvent(Tag tg, MetricKey k, uint32_t val) :
-        tag(tg), key(k), value(val), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
+    MetricEvent(Type type, MetricKey key, uint32_t value) :
+        mType(type), mKey(key), mValue(value)
     {}
 
-    MetricEvent(Tag tg, MetricKey k, int8_t val) : MetricEvent(tg, k, int32_t(val)) {}
-
-    MetricEvent(Tag tg, MetricKey k, uint8_t val) : MetricEvent(tg, k, uint32_t(val)) {}
-
-    MetricEvent(Tag tg, MetricKey k, int16_t val) : MetricEvent(tg, k, int32_t(val)) {}
-
-    MetricEvent(Tag tg, MetricKey k, uint16_t val) : MetricEvent(tg, k, uint32_t(val)) {}
-
-    MetricEvent(Tag tg, MetricKey k, const ChipError & err) :
-        tag(tg), key(k), value(err.AsInteger()), timePoint(System::SystemClock().GetMonotonicMicroseconds64())
+    MetricEvent(Type type, MetricKey key, const ChipError & error) :
+        mType(type), mKey(key), mValue(error)
     {}
+
+    MetricEvent(Type type, MetricKey key, Value value) :
+        mType(type), mKey(key), mValue(value)
+    {}
+
+    MetricEvent(Type type, MetricKey key, int8_t value) : MetricEvent(type, key, int32_t(value)) {}
+
+    MetricEvent(Type type, MetricKey key, uint8_t value) : MetricEvent(type, key, uint32_t(value)) {}
+
+    MetricEvent(Type type, MetricKey key, int16_t value) : MetricEvent(type, key, int32_t(value)) {}
+
+    MetricEvent(Type type, MetricKey key, uint16_t value) : MetricEvent(type, key, uint32_t(value)) {}
+
+    Type type() const 
+    { 
+        return mType;
+    }
+
+    MetricKey key() const 
+    { 
+        return mKey;
+    }
+
+    Value value() const
+    {
+        return mValue;
+    }
+
+    uint32_t ValueUInt32() const
+    {
+        return mValue.store.uint32_value;
+    }
+
+    int32_t ValueInt32() const
+    {
+        return mValue.store.int32_value;
+    }
+
+    uint32_t ValueErrorCode() const
+    {
+        return mValue.store.uint32_value;
+    }
+
+private:
+    Type mType;
+    MetricKey mKey;
+    Value mValue;
 };
 
 namespace Internal {
 
-void LogMetricEvent(::chip::Tracing::MetricEvent & event);
+void LogMetricEvent(const ::chip::Tracing::MetricEvent & event);
 
 } // namespace Internal
 
 namespace utils {
 
 /**
- * Utility to emit an instant metric if the error is not a success. Used in SuccessOrExit macro
- * to allow emitting the event before jumping to the exit label.
+ * Utility to emit an instant metric if the error is not a success.
  */
-inline bool logMetricIfError(const ::chip::ChipError & err, MetricKey metricKey)
+inline bool LogMetricIfError(const ::chip::ChipError & err, MetricKey metricKey)
 {
     bool success = ::chip::ChipError::IsSuccess(err);
     if (!success)
     {
-        using Tag = chip::Tracing::MetricEvent::Tag;
-        ::chip::Tracing::MetricEvent _metric_event(Tag::Instant, metricKey, err);
+        using Type = chip::Tracing::MetricEvent::Type;
+        ::chip::Tracing::MetricEvent _metric_event(Type::kInstantEvent, metricKey, err);
         ::chip::Tracing::Internal::LogMetricEvent(_metric_event);
     }
     return success;

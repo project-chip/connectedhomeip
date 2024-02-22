@@ -27,7 +27,7 @@ struct MessageReceivedInfo;
 struct NodeLookupInfo;
 struct NodeDiscoveredInfo;
 struct NodeDiscoveryFailedInfo;
-struct MetricEvent;
+class MetricEvent;
 
 } // namespace Tracing
 } // namespace chip

@@ -22,6 +22,7 @@
 #include <platform/Darwin/Tracing.h>
 #include <tracing/metric_event.h>
 #include <tracing/registry.h>
+#include <system/SystemClock.h>
 
 using MetricEvent = chip::Tracing::MetricEvent;
 
@@ -47,12 +48,20 @@ void InitializeMetricsCollection()
         return nil;
     }
 
-    if (event.value.type == MetricEvent::Value::Type::Signed32Type) {
-        _value = [NSNumber numberWithInteger:event.value.store.int32_value];
-    } else {
-        _value = [NSNumber numberWithUnsignedInteger:event.value.store.uint32_value];
+    using ValueType = MetricEvent::Value::Type;
+    switch (event.value().type) {
+    case ValueType::kInt32:
+        _value = [NSNumber numberWithInteger:event.ValueInt32()];
+        break;
+    case ValueType::kUInt32:
+        _value = [NSNumber numberWithInteger:event.ValueUInt32()];
+        break;
+    case ValueType::kChipErrorCode:
+        _value = [NSNumber numberWithInteger:event.ValueUInt32()];
+        break;
     }
-    _timePoint = event.timePoint;
+
+    _timePoint = chip::System::SystemClock().GetMonotonicMicroseconds64();
     _duration = chip::System::Clock::Microseconds64(0);
     return self;
 }
@@ -129,56 +138,66 @@ void InitializeMetricsCollection()
     return self;
 }
 
-static inline NSString * suffixNameForMetricTag(MetricEvent::Tag tag)
+static inline NSString * suffixNameForMetricType(MetricEvent::Type type)
 {
-    switch (tag) {
-    case MetricEvent::Tag::Begin:
+    switch (type) {
+    case MetricEvent::Type::kBeginEvent:
         return @"-begin";
-    case MetricEvent::Tag::End:
+    case MetricEvent::Type::kEndEvent:
         return @"-end";
-    case MetricEvent::Tag::Instant:
+    case MetricEvent::Type::kInstantEvent:
         return @"-instant";
     }
 }
 
-static inline NSString * suffixNameForMetricTag(const MetricEvent & event)
+static inline NSString * suffixNameForMetric(const MetricEvent & event)
 {
-    return suffixNameForMetricTag(event.tag);
+    return suffixNameForMetricType(event.type());
 }
 
 - (void)handleMetricEvent:(MetricEvent)event
 {
-    MTR_LOG_INFO("Received metric event, key: %s, type: %hhu value: %d",
-        event.key,
-        event.value.type,
-        (event.value.type == MetricEvent::Value::Type::Signed32Type) ? event.value.store.int32_value : event.value.store.uint32_value);
-
     std::lock_guard lock(_lock);
 
+    using ValueType = MetricEvent::Value::Type;
+    switch (event.value().type) {
+    case ValueType::kInt32:
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %d", event.key(), event.type(), event.ValueInt32());
+        break;
+    case ValueType::kUInt32:
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %u", event.key(), event.type(), event.ValueUInt32());
+        break;
+    case ValueType::kChipErrorCode:
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, error value: %u", event.key(), event.type(), event.ValueUInt32());
+        break;
+    default:
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, unknown value", event.key(), event.type());
+        return;
+    }
+
     // Create the new metric key based event type
-    auto metricsKey = [NSString stringWithFormat:@"%s%@", event.key, suffixNameForMetricTag(event)];
+    auto metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(event)];
     MTRMetricsData * data = [[MTRMetricsData alloc] initWithMetricEvent:event];
 
     // If End event, compute its duration using the Begin event
-    if (event.tag == MetricEvent::Tag::End) {
-        auto metricsBeginKey = [NSString stringWithFormat:@"%s%@", event.key, suffixNameForMetricTag(MetricEvent::Tag::Begin)];
+    if (event.type() == MetricEvent::Type::kEndEvent) {
+        auto metricsBeginKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetricType(MetricEvent::Type::kBeginEvent)];
         MTRMetricsData * beginMetric = _metricsDataCollection[metricsBeginKey];
         if (beginMetric) {
             [data setDurationFromMetricData:beginMetric];
         } else {
             // Unbalanced end
-            MTR_LOG_ERROR("Unable to find Begin event corresponding to Metric Event: %s", event.key);
+            MTR_LOG_ERROR("Unable to find Begin event corresponding to Metric Event: %s", event.key());
         }
     }
 
     [_metricsDataCollection setValue:data forKey:metricsKey];
 
     // If the event is a being or end event, implicitly emit a corresponding instant event
-    if (event.tag == MetricEvent::Tag::Begin || event.tag == MetricEvent::Tag::End) {
-        MetricEvent instantEvent(event);
-        instantEvent.tag = MetricEvent::Tag::Instant;
-        data = [[MTRMetricsData alloc] initWithMetricEvent:event];
-        metricsKey = [NSString stringWithFormat:@"%s%@", event.key, suffixNameForMetricTag(MetricEvent::Tag::Instant)];
+    if (event.type() == MetricEvent::Type::kBeginEvent || event.type() == MetricEvent::Type::kEndEvent) {
+        MetricEvent instantEvent(MetricEvent::Type::kInstantEvent, event.key(), event.value());
+        data = [[MTRMetricsData alloc] initWithMetricEvent:instantEvent];
+        metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(instantEvent)];
         [_metricsDataCollection setValue:data forKey:metricsKey];
     }
 }

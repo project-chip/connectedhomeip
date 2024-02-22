@@ -27,6 +27,7 @@
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
+#include <tracing/metric_keys.h>
 #endif
 #ifndef __STDC_FORMAT_MACROS
 #define __STDC_FORMAT_MACROS
@@ -630,7 +631,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, co
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
-    MATTER_LOG_METRIC_BEGIN(PASESession);
+    MATTER_LOG_METRIC_BEGIN(chip::Tracing::kMetricPASESession);
 
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     CommissioneeDeviceProxy * device   = nullptr;
@@ -709,7 +710,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     {
         if (params.HasConnectionObject())
         {
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()), PASESessionBLE);
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()), chip::Tracing::kMetricPASESessionBLE);
         }
         else if (params.HasDiscoveredObject())
         {
@@ -718,7 +719,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
             SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(
                               params.GetDiscoveredObject(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError),
-                          PASESessionBLE);
+                          chip::Tracing::kMetricPASESessionBLE);
             ExitNow(CHIP_NO_ERROR);
         }
         else if (params.HasDiscriminator())
@@ -731,7 +732,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             discriminator.SetLongValue(params.GetDiscriminator());
             SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
                               discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError),
-                          PASESessionBLE);
+                          chip::Tracing::kMetricPASESessionBLE);
             ExitNow(CHIP_NO_ERROR);
         }
         else
@@ -741,7 +742,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     }
 #endif
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), params.GetMRPConfig());
-    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY, PASESessionPair);
+    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY, chip::Tracing::kMetricPASESessionPair);
 
     // Allocate the exchange immediately before calling PASESession::Pair.
     //
@@ -750,10 +751,10 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     // exchange context right before calling Pair ensures that if allocation
     // succeeds, PASESession has taken ownership.
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
-    VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL, PASESessionPair);
+    VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL, chip::Tracing::kMetricPASESessionPair);
 
     err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetSetupPINCode(), GetLocalMRPConfig(), exchangeCtxt, this);
-    SuccessOrExit(err, PASESessionPair);
+    SuccessOrExit(err, chip::Tracing::kMetricPASESessionPair);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -764,7 +765,7 @@ exit:
         }
     }
 
-    MATTER_LOG_METRIC_END(PASESession, err);
+    MATTER_LOG_METRIC_END(chip::Tracing::kMetricPASESession);
     return err;
 }
 

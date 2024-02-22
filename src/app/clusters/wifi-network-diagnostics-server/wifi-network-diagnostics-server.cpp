@@ -29,6 +29,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
 #include <tracing/metric_event.h>
+#include <tracing/metric_keys.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -164,7 +165,7 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiRssi(AttributeValueEncoder & aEncod
     {
         rssi.SetNonNull(value);
         ChipLogProgress(Zcl, "The current RSSI of the Node’s Wi-Fi radio in dB: %d", value);
-        MATTER_LOG_METRIC(WiFiRSSI, value);
+        MATTER_LOG_METRIC(chip::Tracing::kMetricWiFiRSSI, value);
     }
     else
     {

@@ -127,9 +127,23 @@ void PerfettoBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
     );
 }
 
-void PerfettoBackend::LogMetricEvent(MetricEvent & event)
+void PerfettoBackend::LogMetricEvent(const MetricEvent & event)
 {
-    TRACE_COUNTER("Matter", event.key, event.value.store.int32_value);
+    using ValueType = MetricEvent::Value::Type;
+    switch (event.value().type) {
+    case ValueType::kInt32:
+        TRACE_EVENT_INSTANT("Matter", event.key(), "value", event.ValueInt32());
+        break;
+    case ValueType::kUInt32:
+        TRACE_EVENT_INSTANT("Matter", event.key(), "value", event.ValueUInt32());
+        break;
+    case ValueType::kChipErrorCode:
+        TRACE_EVENT_INSTANT("Matter", event.key(), "error", event.ValueErrorCode());
+        break;
+    default:
+        TRACE_EVENT_INSTANT("Matter", event.key(), "type", "UNKNOWN");
+        break;
+    }
 }
 
 } // namespace Perfetto

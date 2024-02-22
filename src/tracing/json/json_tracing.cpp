@@ -296,11 +296,27 @@ void JsonBackend::TraceCounter(const char * label)
     OutputValue(value);
 }
 
-void JsonBackend::LogMetricEvent(MetricEvent & event)
+void JsonBackend::LogMetricEvent(const MetricEvent & event)
 {
     ::Json::Value value;
-    value["label"] = event.key;
-    value["value"] = event.value.store.int32_value;
+
+    value["label"] = event.key();
+
+    using ValueType = MetricEvent::Value::Type;
+    switch (event.value().type) {
+    case ValueType::kInt32:
+        value["value"] = event.ValueInt32();
+        break;
+    case ValueType::kUInt32:
+        value["value"] = event.ValueUInt32();
+        break;
+    case ValueType::kChipErrorCode:
+        value["value"] = event.ValueErrorCode();
+        break;
+    default:
+        value["value"] = "UNKNOWN";
+        break;
+    }
 
     OutputValue(value);
 }

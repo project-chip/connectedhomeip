@@ -66,7 +66,7 @@ namespace Tracing {
             typedef void (^MetricEventHandler)(MetricEvent event);
 
             void SetMetricEventHandler(MetricEventHandler callback);
-            void LogMetricEvent(MetricEvent & event) override;
+            void LogMetricEvent(const MetricEvent & event) override;
 
         private:
             MetricEventHandler mClientCallback;

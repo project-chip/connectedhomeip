@@ -48,7 +48,7 @@
 
 // Utility macro that takes the status and wraps it to emit the metric in a SuccessOrExit macro, when a metric key is specified
 #define __SUCCESS_OR_EXIT_2ARGS(aStatus, metricKey)                                                                                \
-    chip::Tracing::utils::logMetricIfError(aStatus, chip::Tracing::kMetric##metricKey)
+    chip::Tracing::utils::LogMetricIfError(aStatus, metricKey)
 
 // Utility macro that just evaluates the status when no metric key is specified
 #define __SUCCESS_OR_EXIT_1ARGS(aStatus) ::chip::ChipError::IsSuccess((aStatus))
@@ -72,26 +72,24 @@
 #define __MATTER_LOG_METRIC_1ARGS(key)                                                                                             \
     do                                                                                                                             \
     {                                                                                                                              \
-        using Tag = chip::Tracing::MetricEvent::Tag;                                                                               \
-        ::chip::Tracing::MetricEvent _metric_event(Tag::Instant, chip::Tracing::kMetric##key);                                     \
+        using Type = chip::Tracing::MetricEvent::Type;                                                                              \
+        ::chip::Tracing::MetricEvent _metric_event(Type::kInstantEvent, key);                              \
+        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                  \
+    } while (false)
+
+// Wrapper macro that accepts metric type and key and logs an event corresponding to the type
+#define __MATTER_LOG_METRIC_2ARGS(type, key)                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        ::chip::Tracing::MetricEvent _metric_event(type, key);                                              \
         ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                        \
     } while (false)
 
-// Wrapper macro that accepts metric tag and key and logs an event corresponding to the tag
-#define __MATTER_LOG_METRIC_2ARGS(tag, key)                                                                                        \
+// Wrapper macro that accepts metric type, key and value and logs the corresponding event
+#define __MATTER_LOG_METRIC_3ARGS(type, key, value)                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
-        using Tag = chip::Tracing::MetricEvent::Tag;                                                                               \
-        ::chip::Tracing::MetricEvent _metric_event(tag, chip::Tracing::kMetric##key);                                              \
-        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                        \
-    } while (false)
-
-// Wrapper macro that accepts metric tag, key and value and logs the corresponding event
-#define __MATTER_LOG_METRIC_3ARGS(tag, key, value)                                                                                 \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        using Tag = chip::Tracing::MetricEvent::Tag;                                                                               \
-        ::chip::Tracing::MetricEvent _metric_event(tag, chip::Tracing::kMetric##key, value);                                       \
+        ::chip::Tracing::MetricEvent _metric_event(type, key, value);                                       \
         ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                        \
     } while (false)
 
@@ -103,7 +101,7 @@
  *
  *  Example usage:
  *  @code
- *      MATTER_LOG_METRIC(PASESession, err);
+ *      MATTER_LOG_METRIC(chip::Tracing::kMetricPASESession, err);
  *  @endcode
  *      The above example generates an instant metric event with key kMetricPASESession.
  *      The metric also holds the 32 bit value corresponding to the ChipError object 'err'.
@@ -114,17 +112,17 @@
  *  @param[in]  value An optional value for the metric. This value corresponds to one of the values supported
  *                    in MetricEvent::Value
  */
-#define MATTER_LOG_METRIC(key, ...) __MATTER_LOG_METRIC(Tag::Instant, key, ##__VA_ARGS__)
+#define MATTER_LOG_METRIC(key, ...) __MATTER_LOG_METRIC(chip::Tracing::MetricEvent::Type::kInstantEvent, key, ##__VA_ARGS__)
 
 /**
  * @def MATTER_TRACE_BEGIN
  *
  * @brief
- * Generate a metric with the Begin tag
+ * Generate a metric with the Begin Type
  *
  *  Example usage:
  *  @code
- *      MATTER_LOG_METRIC_BEGIN(PASESession);
+ *      MATTER_LOG_METRIC_BEGIN(chip::Tracing::kMetricPASESession);
  *  @endcode
  *      The above example generates a Begin metric event with key kMetricPASESession.
  *
@@ -134,17 +132,17 @@
  *  @param[in]  value An optional value for the metric. This value corresponds to one of the values supported
  *                    in MetricEvent::Value
  */
-#define MATTER_LOG_METRIC_BEGIN(key, ...) __MATTER_LOG_METRIC(Tag::Begin, key, ##__VA_ARGS__)
+#define MATTER_LOG_METRIC_BEGIN(key, ...) __MATTER_LOG_METRIC(chip::Tracing::MetricEvent::Type::kBeginEvent, key, ##__VA_ARGS__)
 
 /**
  * @def MATTER_TRACE_END
  *
  * @brief
- * Generate a metric with the Eng tag
+ * Generate a metric with the End Type
  *
  *  Example usage:
  *  @code
- *      MATTER_LOG_METRIC_END(PASESession);
+ *      MATTER_LOG_METRIC_END(chip::Tracing::kMetricPASESession);
  *  @endcode
  *      The above example generates an End metric event with key kMetricPASESession.
  *
@@ -154,7 +152,7 @@
  *  @param[in]  value An optional value for the metric. This value corresponds to one of the values supported
  *                    in MetricEvent::Value
  */
-#define MATTER_LOG_METRIC_END(key, ...) __MATTER_LOG_METRIC(Tag::End, key, ##__VA_ARGS__)
+#define MATTER_LOG_METRIC_END(key, ...) __MATTER_LOG_METRIC(chip::Tracing::MetricEvent::Type::kEndEvent, key, ##__VA_ARGS__)
 
 #else // Tracing is disabled
 

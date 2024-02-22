@@ -42,7 +42,7 @@ namespace Tracing {
             mClientCallback = callback;
         }
 
-        void DarwinTracingBackend::LogMetricEvent(MetricEvent & event)
+        void DarwinTracingBackend::LogMetricEvent(const MetricEvent & event)
         {
             // Pass along to the client to handle the event
             if (mClientCallback) {
