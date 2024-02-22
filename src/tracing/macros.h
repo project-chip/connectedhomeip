@@ -18,7 +18,6 @@
 #pragma once
 
 #include <matter/tracing/build_config.h>
-#include <tracing/metric_macros.h>
 
 #if MATTER_TRACING_ENABLED
 
@@ -27,6 +26,9 @@
 //    MATTER_TRACE_END(label, group)
 //    MATTER_TRACE_INSTANT(label, group)
 //    MATTER_TRACE_SCOPE(label, group)
+
+// Tracing macro to trace monotonically increasing counter values.
+//  MATTER_TRACE_COUNTER(label)
 
 #include <matter/tracing/macros_impl.h>
 #include <tracing/log_declares.h>
