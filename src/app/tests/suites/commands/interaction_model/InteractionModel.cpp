@@ -186,16 +186,15 @@ void InteractionModel::OnDone(WriteClient * client)
     ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
-/////////// CommandSender Callback Interface /////////
-void InteractionModel::OnResponse(CommandSender * client, const ConcreteCommandPath & path, const StatusIB & status,
-                                  TLV::TLVReader * data)
+/////////// CommandSender ExtendableCallback Interface /////////
+void InteractionModel::OnResponse(CommandSender * client, const CommandSender::ResponseData & responseData)
 {
-    OnResponse(status, data);
+    OnResponse(responseData.statusIB, responseData.data);
 }
 
-void InteractionModel::OnError(const CommandSender * client, CHIP_ERROR error)
+void InteractionModel::OnError(const CommandSender * client, const CommandSender::ErrorData & errorData)
 {
-    StatusIB status(error);
+    StatusIB status(errorData.error);
     OnResponse(status, nullptr);
 }
 
