@@ -136,8 +136,8 @@ $ echo '{"Name":"TemperatureMeasurement","NewValue":1800}' > /tmp/chip_air_quali
 
 ### Trigger Humidity change event
 
-Generate event `RelativeHumidityMeasurement`, to change the temperate value 
-(6000 for 60,0 %).
+Generate event `RelativeHumidityMeasurement`, to change the temperate value
+ (6000 for 60,0 %).
 
 ```
 $ echo '{"Name":"RelativeHumidityMeasurement","NewValue":6000}' > /tmp/chip_air_quality_fifo_<PID>
