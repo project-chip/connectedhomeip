@@ -40,7 +40,6 @@
 #define USART_INITSYNC_BAUDRATE 12500000
 
 #if SL_SPICTRL_MUX
-extern SemaphoreHandle_t spi_sem_sync_hdl;
 sl_status_t spi_board_init(void);
 #endif // SL_SPICTRL_MUX
 
