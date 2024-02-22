@@ -20,9 +20,9 @@
 #include "MTRMetrics_Internal.h"
 #import <MTRUnfairLock.h>
 #include <platform/Darwin/Tracing.h>
+#include <system/SystemClock.h>
 #include <tracing/metric_event.h>
 #include <tracing/registry.h>
-#include <system/SystemClock.h>
 
 using MetricEvent = chip::Tracing::MetricEvent;
 

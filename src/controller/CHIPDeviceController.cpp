@@ -710,15 +710,18 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
         if (params.HasConnectionObject())
         {
-            SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE, err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()));
+            SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE,
+                                    err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()));
         }
         else if (params.HasDiscoveredObject())
         {
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-            SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE, err = mSystemState->BleLayer()->NewBleConnectionByObject(
-                              params.GetDiscoveredObject(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
+            SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE,
+                                    err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetDiscoveredObject(), this,
+                                                                                             OnDiscoveredDeviceOverBleSuccess,
+                                                                                             OnDiscoveredDeviceOverBleError));
             ExitNow(CHIP_NO_ERROR);
         }
         else if (params.HasDiscriminator())
@@ -729,8 +732,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
             SetupDiscriminator discriminator;
             discriminator.SetLongValue(params.GetDiscriminator());
-            SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE, err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
-                              discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
+            SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE,
+                                    err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
+                                        discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
             ExitNow(CHIP_NO_ERROR);
         }
         else

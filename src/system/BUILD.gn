@@ -218,8 +218,8 @@ static_library("system") {
   sources = [
     "PlatformEventSupport.h",
     "SystemAlignSize.h",
-    "SystemClock.h",
     "SystemClock.cpp",
+    "SystemClock.h",
     "SystemError.cpp",
     "SystemError.h",
     "SystemEvent.h",

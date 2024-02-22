@@ -17,15 +17,14 @@
  */
 #pragma once
 
-#include <matter/tracing/build_config.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <matter/tracing/build_config.h>
 
 #define __LOG_METRIC_CONCAT_IMPL(a, b) a##b
 #define __LOG_METRIC_MACRO_CONCAT(a, b) __LOG_METRIC_CONCAT_IMPL(a, b)
 
 #if MATTER_TRACING_ENABLED
-
 
 /**
  *  @def SuccessOrExitWithMetric(kMetriKey, aStatus)
@@ -97,7 +96,8 @@
  *  @param[in]  anAction    An expression or block to execute when the
  *                          assertion fails.
  */
-#define VerifyOrExitWithMetric(kMetricKey, aCondition, anAction) nlEXPECT_ACTION(aCondition, exit, MATTER_LOG_METRIC(kMetricKey, anAction))
+#define VerifyOrExitWithMetric(kMetricKey, aCondition, anAction)                                                                   \
+    nlEXPECT_ACTION(aCondition, exit, MATTER_LOG_METRIC(kMetricKey, anAction))
 
 /*
  * Utility Macros to support optional arguments for MATTER_LOG_METRIC_XYZ macros
@@ -117,27 +117,26 @@
 #define __MATTER_LOG_METRIC_1ARGS(key)                                                                                             \
     do                                                                                                                             \
     {                                                                                                                              \
-        using Type = chip::Tracing::MetricEvent::Type;                                                                              \
-        ::chip::Tracing::MetricEvent _metric_event(Type::kInstantEvent, key);                              \
+        using Type = chip::Tracing::MetricEvent::Type;                                                                             \
+        ::chip::Tracing::MetricEvent _metric_event(Type::kInstantEvent, key);                                                      \
         ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                  \
     } while (false)
 
 // Wrapper macro that accepts metric type and key and logs an event corresponding to the type
-#define __MATTER_LOG_METRIC_2ARGS(type, key)                                                                                        \
+#define __MATTER_LOG_METRIC_2ARGS(type, key)                                                                                       \
     do                                                                                                                             \
     {                                                                                                                              \
-        ::chip::Tracing::MetricEvent _metric_event(type, key);                                              \
-        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                        \
+        ::chip::Tracing::MetricEvent _metric_event(type, key);                                                                     \
+        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                  \
     } while (false)
 
 // Wrapper macro that accepts metric type, key and value and logs the corresponding event
-#define __MATTER_LOG_METRIC_3ARGS(type, key, value)                                                                                 \
+#define __MATTER_LOG_METRIC_3ARGS(type, key, value)                                                                                \
     do                                                                                                                             \
     {                                                                                                                              \
-        ::chip::Tracing::MetricEvent _metric_event(type, key, value);                                       \
-        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                        \
+        ::chip::Tracing::MetricEvent _metric_event(type, key, value);                                                              \
+        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                  \
     } while (false)
-
 
 ////////////////////////
 // Metric logging macros
@@ -201,7 +200,6 @@
  */
 #define MATTER_LOG_METRIC_END(key, ...) __MATTER_LOG_METRIC(chip::Tracing::MetricEvent::Type::kEndEvent, key, ##__VA_ARGS__)
 
-
 /**
  * @def MATTER_LOG_METRIC_SCOPE
  *
@@ -216,7 +214,8 @@
  *
  *  @param[in]  key The key representing the metric name/event.
  */
-#define MATTER_LOG_METRIC_SCOPE(key) ::chip::Tracing::utils::ScopedMetricEvent __LOG_METRIC_MACRO_CONCAT(_metric_scope, __COUNTER__)(key)
+#define MATTER_LOG_METRIC_SCOPE(key)                                                                                               \
+    ::chip::Tracing::utils::ScopedMetricEvent __LOG_METRIC_MACRO_CONCAT(_metric_scope, __COUNTER__)(key)
 
 /**
  * @def MATTER_LOG_METRIC_SCOPE_WITH_ERROR
@@ -236,7 +235,8 @@
  *  @param[in]  errorObj The name of the object for the ScopedMetricEvent.
  *  @param[in]  errorValue The initial error code value.
  */
-#define MATTER_LOG_METRIC_SCOPE_WITH_ERROR(key, errorObj, errorValue) chip::Tracing::utils::ScopedMetricEvent errorObj(key, errorValue)
+#define MATTER_LOG_METRIC_SCOPE_WITH_ERROR(key, errorObj, errorValue)                                                              \
+    chip::Tracing::utils::ScopedMetricEvent errorObj(key, errorValue)
 
 #else // Tracing is disabled
 
@@ -247,7 +247,6 @@
 #define SuccessOrExitWithMetric(kMetricKey, aStatus) SuccessOrExit(aStatus)
 
 #define VerifyOrExitWithMetric(kMetricKey, aCondition, anAction) VerifyOrExit(aCondition, anAction)
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Map all MATTER_LOG_METRIC_XYZ macros to noops

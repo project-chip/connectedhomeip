@@ -17,8 +17,8 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <tracing/metric_macros.h>
 #include <tracing/metric_keys.h>
+#include <tracing/metric_macros.h>
 #include <tracing/registry.h>
 
 namespace chip {
@@ -34,10 +34,10 @@ namespace Tracing {
 class MetricEvent
 {
 public:
-    MetricEvent(const MetricEvent&) = default;
-    MetricEvent(MetricEvent &&) = default;
-    MetricEvent &operator=(const MetricEvent&) = default;
-    MetricEvent &operator=(MetricEvent &&) = default;
+    MetricEvent(const MetricEvent &)             = default;
+    MetricEvent(MetricEvent &&)                  = default;
+    MetricEvent & operator=(const MetricEvent &) = default;
+    MetricEvent & operator=(MetricEvent &&)      = default;
 
 public:
     // This specifies the different categories of metric events that can created. In addition to
@@ -53,16 +53,16 @@ public:
     // This defines the different types of values that can stored when a metric is emitted
     struct Value
     {
-        Value(const Value&) = default;
-        Value(Value &&) = default;
-        Value &operator=(const Value&) = default;
-        Value &operator=(Value &&) = default;
+        Value(const Value &)             = default;
+        Value(Value &&)                  = default;
+        Value & operator=(const Value &) = default;
+        Value & operator=(Value &&)      = default;
 
         enum class Type : uint8_t
         {
-            kInt32,          // int32_t
-            kUInt32,         // uint32_t
-            kChipErrorCode   // chip::ChipError
+            kInt32,        // int32_t
+            kUInt32,       // uint32_t
+            kChipErrorCode // chip::ChipError
         };
 
         union Store
@@ -85,21 +85,13 @@ public:
         Value(const ChipError & err) : store(err.AsInteger()), type(Type::kChipErrorCode) {}
     };
 
-    MetricEvent(Type type, MetricKey key, int32_t value = 0) :
-        mType(type), mKey(key), mValue(value)
-    {}
+    MetricEvent(Type type, MetricKey key, int32_t value = 0) : mType(type), mKey(key), mValue(value) {}
 
-    MetricEvent(Type type, MetricKey key, uint32_t value) :
-        mType(type), mKey(key), mValue(value)
-    {}
+    MetricEvent(Type type, MetricKey key, uint32_t value) : mType(type), mKey(key), mValue(value) {}
 
-    MetricEvent(Type type, MetricKey key, const ChipError & error) :
-        mType(type), mKey(key), mValue(error)
-    {}
+    MetricEvent(Type type, MetricKey key, const ChipError & error) : mType(type), mKey(key), mValue(error) {}
 
-    MetricEvent(Type type, MetricKey key, Value value) :
-        mType(type), mKey(key), mValue(value)
-    {}
+    MetricEvent(Type type, MetricKey key, Value value) : mType(type), mKey(key), mValue(value) {}
 
     MetricEvent(Type type, MetricKey key, int8_t value) : MetricEvent(type, key, int32_t(value)) {}
 
@@ -109,35 +101,17 @@ public:
 
     MetricEvent(Type type, MetricKey key, uint16_t value) : MetricEvent(type, key, uint32_t(value)) {}
 
-    Type type() const
-    {
-        return mType;
-    }
+    Type type() const { return mType; }
 
-    MetricKey key() const
-    {
-        return mKey;
-    }
+    MetricKey key() const { return mKey; }
 
-    Value value() const
-    {
-        return mValue;
-    }
+    Value value() const { return mValue; }
 
-    uint32_t ValueUInt32() const
-    {
-        return mValue.store.uint32_value;
-    }
+    uint32_t ValueUInt32() const { return mValue.store.uint32_value; }
 
-    int32_t ValueInt32() const
-    {
-        return mValue.store.int32_value;
-    }
+    int32_t ValueInt32() const { return mValue.store.int32_value; }
 
-    uint32_t ValueErrorCode() const
-    {
-        return mValue.store.uint32_value;
-    }
+    uint32_t ValueErrorCode() const { return mValue.store.uint32_value; }
 
 private:
     Type mType;
@@ -164,63 +138,44 @@ inline bool LogMetricIfError(MetricKey metricKey, const ::chip::ChipError & err)
 
 /**
  * This utility class helps generate a Begin and End metric event within the scope of a block using RAII.
- * This class is also meant to be used in expressions where ChipError object are typically used to capture 
+ * This class is also meant to be used in expressions where ChipError object are typically used to capture
  * error values.
  */
 class ScopedMetricEvent
 {
 public:
-    ScopedMetricEvent(const ScopedMetricEvent&) = default;
-    ScopedMetricEvent(ScopedMetricEvent &&) = default;
-    ScopedMetricEvent &operator=(const ScopedMetricEvent&) = default;
-    ScopedMetricEvent &operator=(ScopedMetricEvent &&) = default;
+    ScopedMetricEvent(const ScopedMetricEvent &)             = default;
+    ScopedMetricEvent(ScopedMetricEvent &&)                  = default;
+    ScopedMetricEvent & operator=(const ScopedMetricEvent &) = default;
+    ScopedMetricEvent & operator=(ScopedMetricEvent &&)      = default;
 
-    ScopedMetricEvent(MetricKey key, const ChipError & error = CHIP_NO_ERROR) : mKey(key), mError(error) 
+    ScopedMetricEvent(MetricKey key, const ChipError & error = CHIP_NO_ERROR) : mKey(key), mError(error)
     {
         MATTER_LOG_METRIC_BEGIN(mKey);
     }
 
-    ~ScopedMetricEvent()
-    {
-        MATTER_LOG_METRIC_END(mKey, mError);
-    }
+    ~ScopedMetricEvent() { MATTER_LOG_METRIC_END(mKey, mError); }
 
-    operator ChipError() const
-    {
-        return mError;
-    }
+    operator ChipError() const { return mError; }
 
-    ScopedMetricEvent& operator = (const ChipError & err)
+    ScopedMetricEvent & operator=(const ChipError & err)
     {
         mError = err;
         return *this;
     }
 
-    friend bool operator == (const ScopedMetricEvent & event, const ChipError & err)
-    {
-        return event.mError == err;
-    }
+    friend bool operator==(const ScopedMetricEvent & event, const ChipError & err) { return event.mError == err; }
 
-    friend bool operator != (const ScopedMetricEvent & event, const ChipError & err)
-    {
-        return event.mError != err;
-    }
+    friend bool operator!=(const ScopedMetricEvent & event, const ChipError & err) { return event.mError != err; }
 
-    friend bool operator == (const ChipError & err, const ScopedMetricEvent & event)
-    {
-        return event.mError == err;
-    }
+    friend bool operator==(const ChipError & err, const ScopedMetricEvent & event) { return event.mError == err; }
 
-    friend bool operator != (const ChipError & err, const ScopedMetricEvent & event)
-    {
-        return event.mError != err;
-    }
+    friend bool operator!=(const ChipError & err, const ScopedMetricEvent & event) { return event.mError != err; }
 
 private:
     MetricKey mKey;
     ChipError mError;
 };
-
 
 } // namespace utils
 

@@ -303,7 +303,8 @@ void JsonBackend::LogMetricEvent(const MetricEvent & event)
     value["label"] = event.key();
 
     using ValueType = MetricEvent::Value::Type;
-    switch (event.value().type) {
+    switch (event.value().type)
+    {
     case ValueType::kInt32:
         value["value"] = event.ValueInt32();
         break;
