@@ -17,8 +17,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("zap") {
   zap_file = "switch.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/light-switch-app/qpg/zap-generated"
   is_server = true
 }
