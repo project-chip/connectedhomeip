@@ -88,10 +88,8 @@ MTR_DIRECT_MEMBERS
     NSArray<NSNumber *> * _generatedCommands;
 
     /**
-     * _lock always protects access to: _accessGrants, _attributes,
-     * _deviceController, _attributeAccessInterface, _matterAttributeMetadata,
-     * _matterAccessGrants, _parentEndpoint, _acceptedCommands,
-     * _generatedCommands, _matterAcceptedCommandList, _matterGeneratedCommandList.
+     * _lock always protects access to all our mutable ivars (the ones that are
+     * modified after init).
      */
     os_unfair_lock _lock;
 }
