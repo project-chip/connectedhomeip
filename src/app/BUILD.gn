@@ -52,7 +52,6 @@ declare_args() {
   #       if the cluster build targets are decoupled as stand-alone units.
   time_sync_enable_tsc_feature = 1
 
-
   # Systems that can spare a bit of RAM for InteractionModelEngine/delegate
   # pointers should do so (allows InteractionModelEngine decoupling and less usage
   # of global pointers)
