@@ -23,6 +23,7 @@
 #pragma once
 
 #include <platform/PlatformManager.h>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 #include <queue>
 
@@ -32,7 +33,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the PlatformManager singleton object for Linux platforms.
  */
-class PlatformManagerImpl final : public PlatformManager
+class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
 {
     // Allow the PlatformManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -52,7 +53,7 @@ private:
     void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
     void _HandleServerStarted() {}
     void _HandleServerShuttingDown() {}
-    void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) {}
+    CHIP_ERROR _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     void _RunEventLoop()
     {

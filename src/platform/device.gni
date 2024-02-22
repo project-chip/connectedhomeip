@@ -243,6 +243,5 @@ assert(
         chip_device_platform == "mw320" || chip_device_platform == "zephyr" ||
         chip_device_platform == "beken" || chip_device_platform == "bl702" ||
         chip_device_platform == "mt793x" || chip_device_platform == "SiWx917" ||
-        chip_device_platform == "openiotsdk" || chip_device_platform == "asr" ||
-	chip_device_platform == "renesas",
+        chip_device_platform == "openiotsdk" || chip_device_platform == "asr" || chip_device_platform == "renesas",
     "Please select a valid value for chip_device_platform")
