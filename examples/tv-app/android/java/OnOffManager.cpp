@@ -113,6 +113,7 @@ CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
 
 void OnOffManager::HandleOnOffChanged(bool value)
 {
+    DeviceLayer::StackUnlock unlock;
     ChipLogProgress(Zcl, "OnOffManager::HandleOnOffChanged");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

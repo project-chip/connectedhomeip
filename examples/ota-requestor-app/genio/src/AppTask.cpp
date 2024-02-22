@@ -53,8 +53,6 @@
 #error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
 #endif
 
-#define UNUSED_PARAMETER(a) (a = a)
-
 namespace {
 
 TaskHandle_t sAppTaskHandle;

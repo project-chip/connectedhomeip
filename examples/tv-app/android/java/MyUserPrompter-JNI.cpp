@@ -78,6 +78,7 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
  */
 void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
@@ -119,6 +120,7 @@ exit:
 void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
                                                     uint16_t pairingHint, const char * pairingInstruction)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
@@ -198,6 +200,7 @@ void JNIMyUserPrompter::PromptCommissioningStarted(uint16_t vendorId, uint16_t p
  */
 void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);
@@ -234,6 +237,7 @@ exit:
  */
 void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName, CHIP_ERROR error)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::string stringCommissioneeName(commissioneeName);

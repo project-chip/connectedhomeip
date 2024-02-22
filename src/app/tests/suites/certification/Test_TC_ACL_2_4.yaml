@@ -1164,7 +1164,7 @@ tests:
                       FabricIndex: CurrentFabricIndexValue,
                   },
                   {
-                      Privilege: 6,
+                      Privilege: AccessControlEntryPrivilegeEnum.UnknownEnumValue,
                       AuthMode: 2,
                       Subjects: null,
                       Targets: null,
@@ -1192,7 +1192,7 @@ tests:
                   },
                   {
                       Privilege: 3,
-                      AuthMode: 4,
+                      AuthMode: AccessControlEntryAuthModeEnum.UnknownEnumValue,
                       Subjects: null,
                       Targets: null,
                       FabricIndex: CurrentFabricIndexValue,

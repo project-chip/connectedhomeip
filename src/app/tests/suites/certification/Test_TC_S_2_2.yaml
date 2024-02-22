@@ -643,48 +643,18 @@ tests:
           to 60 000 000 (60 000s) and a set of extension fields appropriate to
           AC1."
       verification: |
-          ./chip-tool scenes add-scene 0x0001 1 60000000 "Test Name" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": value}]}' nodeId endpointId
+          ./chip-tool scenesmanagement add-scene 0x0001 0x01 60000000 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4001", "attributeValue": "0x01"}]}]' 1 1
 
-          Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
+          Verify DUT sends a AddSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to G1 and the SceneID field set to 0x01 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
-          Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-          [1670970505.887060][5742:5744] CHIP:DMG: InvokeResponseMessage =
-          [1670970505.887118][5742:5744] CHIP:DMG: {
-          [1670970505.887172][5742:5744] CHIP:DMG: 	suppressResponse = false,
-          [1670970505.887231][5742:5744] CHIP:DMG: 	InvokeResponseIBs =
-          [1670970505.887307][5742:5744] CHIP:DMG: 	[
-          [1670970505.887366][5742:5744] CHIP:DMG: 		InvokeResponseIB =
-          [1670970505.887444][5742:5744] CHIP:DMG: 		{
-          [1670970505.887507][5742:5744] CHIP:DMG: 			CommandDataIB =
-          [1670970505.887576][5742:5744] CHIP:DMG: 			{
-          [1670970505.887713][5742:5744] CHIP:DMG: 				CommandPathIB =
-          [1670970505.887804][5742:5744] CHIP:DMG: 				{
-          [1670970505.887940][5742:5744] CHIP:DMG: 					EndpointId = 0x1,
-          [1670970505.888093][5742:5744] CHIP:DMG: 					ClusterId = 0x5,
-          [1670970505.888242][5742:5744] CHIP:DMG: 					CommandId = 0x0,
-          [1670970505.888385][5742:5744] CHIP:DMG: 				},
-          [1670970505.888692][5742:5744] CHIP:DMG:
-          [1670970505.888769][5742:5744] CHIP:DMG: 				CommandFields =
-          [1670970505.888852][5742:5744] CHIP:DMG: 				{
-          [1670970505.889030][5742:5744] CHIP:DMG: 					0x0 = 0,
-          [1670970505.889183][5742:5744] CHIP:DMG: 					0x1 = 1,
-          [1670970505.889406][5742:5744] CHIP:DMG: 					0x2 = 1,
-          [1670970505.889515][5742:5744] CHIP:DMG: 				},
-          [1670970505.889603][5742:5744] CHIP:DMG: 			},
-          [1670970505.889684][5742:5744] CHIP:DMG:
-          [1670970505.889745][5742:5744] CHIP:DMG: 		},
-          [1670970505.889821][5742:5744] CHIP:DMG:
-          [1670970505.889878][5742:5744] CHIP:DMG: 	],
-          [1670970505.889953][5742:5744] CHIP:DMG:
-          [1670970505.890009][5742:5744] CHIP:DMG: 	InteractionModelRevision = 1
-          [1670970505.890066][5742:5744] CHIP:DMG: },
-          [1670970505.890212][5742:5744] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0005 Command=0x0000_0000
-          [1670970505.890328][5742:5744] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
-          [1670970505.890458][5742:5744] CHIP:TOO:   AddSceneResponse: {
-          [1670970505.890551][5742:5744] CHIP:TOO:     status: 0
-          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 1
-          [1670970505.890717][5742:5744] CHIP:TOO:     sceneId: 1
-          [1670970505.890774][5742:5744] CHIP:TOO:    }
+          [1706763610.675038][4232:4234] CHIP:DMG: },
+          [1706763610.675108][4232:4234] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
+          [1706763610.675134][4232:4234] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
+          [1706763610.675187][4232:4234] CHIP:TOO:   AddSceneResponse: {
+          [1706763610.675215][4232:4234] CHIP:TOO:     status: 0
+          [1706763610.675229][4232:4234] CHIP:TOO:     groupID: 1
+          [1706763610.675244][4232:4234] CHIP:TOO:     sceneID: 1
+          [1706763610.675258][4232:4234] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP

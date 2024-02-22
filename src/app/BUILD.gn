@@ -87,7 +87,11 @@ source_set("revision_info") {
 source_set("paths") {
   sources = [
     "AttributePathParams.h",
+    "CommandPathParams.h",
+    "CommandPathRegistry.h",
+    "ConcreteAttributePath.h",
     "ConcreteClusterPath.h",
+    "ConcreteCommandPath.h",
     "ConcreteEventPath.h",
     "DataVersionFilter.h",
     "EventPathParams.h",
@@ -96,6 +100,7 @@ source_set("paths") {
   # This source sets also depends on basic-types.h that is not in any dependency we can use
   public_deps = [
     ":app_config",
+    "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
   ]
@@ -135,16 +140,24 @@ static_library("interaction-model") {
     "CASEClientPool.h",
     "CASESessionManager.cpp",
     "CASESessionManager.h",
+    "CommandSender.cpp",
+    "CommandSender.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "InteractionModelDelegatePointers.cpp",
     "InteractionModelDelegatePointers.h",
     "InteractionModelEngine.cpp",
     "InteractionModelEngine.h",
+    "InteractionModelHelper.h",
     "InteractionModelTimeout.h",
     "OperationalSessionSetup.cpp",
     "OperationalSessionSetup.h",
     "OperationalSessionSetupPool.h",
+    "PendingResponseTracker.h",
+    "PendingResponseTrackerImpl.cpp",
+    "PendingResponseTrackerImpl.h",
+    "ReadClient.h",  # TODO: cpp is only included conditionally. Needs logic
+                     # fixing
     "RequiredPrivilege.cpp",
     "RequiredPrivilege.h",
     "StatusResponse.cpp",
@@ -152,6 +165,10 @@ static_library("interaction-model") {
     "SubscriptionResumptionStorage.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
+    "TimedRequest.cpp",
+    "TimedRequest.h",
+    "WriteClient.cpp",
+    "WriteClient.h",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
     "reporting/ReportScheduler.h",
@@ -178,6 +195,10 @@ static_library("interaction-model") {
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
+
+  if (chip_enable_read_client) {
+    sources += [ "ReadClient.cpp" ]
+  }
 
   if (chip_persist_subscriptions) {
     sources += [
@@ -222,26 +243,35 @@ static_library("app") {
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
-    "CommandSender.cpp",
+    "CommandResponseSender.h",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.h",
+    "EventLogging.h",
+    "EventLoggingDelegate.h",
     "EventManagement.cpp",
+    "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "OTAUserConsentCommon.h",
-    "PendingResponseTracker.h",
-    "PendingResponseTrackerImpl.cpp",
-    "PendingResponseTrackerImpl.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
-    "TimedRequest.cpp",
-    "TimedRequest.h",
     "TimerDelegates.cpp",
     "TimerDelegates.h",
-    "WriteClient.cpp",
     "WriteHandler.cpp",
+
+    # TODO: the following items cannot be included due to interaction-model circularity
+    #       (app depending on im and im including these headers):
+    #       Name with _ so that linter does not recognize it
+    # "CommandHandler._h"
+    # "ReadHandler._h",
+    # "WriteHandler._h"
+
+    # TODO: the following items cannot be included due to platform includes not being
+    #       able to depend on src/app
+    #       Name with _ so that linter does not recognize it
+    # "_AttributeAccessInterface._h",
   ]
 
   public_deps = [
@@ -261,9 +291,9 @@ static_library("app") {
   if (chip_enable_read_client) {
     sources += [
       "BufferedReadCallback.cpp",
+      "BufferedReadCallback.h",
       "ClusterStateCache.cpp",
       "ClusterStateCache.h",
-      "ReadClient.cpp",
     ]
   }
 

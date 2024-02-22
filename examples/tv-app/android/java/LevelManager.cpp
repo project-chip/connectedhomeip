@@ -112,6 +112,7 @@ CHIP_ERROR LevelManager::InitializeWithObjects(jobject managerObject)
 
 void LevelManager::HandleLevelChanged(uint8_t value)
 {
+    DeviceLayer::StackUnlock unlock;
     ChipLogProgress(Zcl, "LevelManager::HandleLevelChanged");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

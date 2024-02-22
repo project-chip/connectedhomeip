@@ -240,6 +240,8 @@
 		5ACDDD7D27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5ACDDD7C27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm */; };
 		5ACDDD7E27CD3F3A00EFD68A /* MTRClusterStateCacheContainer_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5ACDDD7B27CD14AF00EFD68A /* MTRClusterStateCacheContainer_Internal.h */; };
 		5AE6D4E427A99041001F2493 /* MTRDeviceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6D4E327A99041001F2493 /* MTRDeviceTests.m */; };
+		75139A6F2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 75139A6E2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.m */; };
+		75139A702B7FE68C00E3A919 /* MTRDeviceControllerLocalTestStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 75139A6D2B7FE5D600E3A919 /* MTRDeviceControllerLocalTestStorage.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		7534F12828BFF20300390851 /* MTRDeviceAttestationDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7534F12628BFF20300390851 /* MTRDeviceAttestationDelegate.mm */; };
 		7534F12928BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7534F12728BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h */; };
 		754F3DF427FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 754F3DF327FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h */; };
@@ -633,6 +635,9 @@
 		5ACDDD7B27CD14AF00EFD68A /* MTRClusterStateCacheContainer_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRClusterStateCacheContainer_Internal.h; sourceTree = "<group>"; };
 		5ACDDD7C27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRClusterStateCacheContainer.mm; sourceTree = "<group>"; };
 		5AE6D4E327A99041001F2493 /* MTRDeviceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceTests.m; sourceTree = "<group>"; };
+		75139A6C2B7FE19100E3A919 /* MTRTestDeclarations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRTestDeclarations.h; sourceTree = "<group>"; };
+		75139A6D2B7FE5D600E3A919 /* MTRDeviceControllerLocalTestStorage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerLocalTestStorage.h; sourceTree = "<group>"; };
+		75139A6E2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceControllerLocalTestStorage.m; sourceTree = "<group>"; };
 		7534F12628BFF20300390851 /* MTRDeviceAttestationDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceAttestationDelegate.mm; sourceTree = "<group>"; };
 		7534F12728BFF20300390851 /* MTRDeviceAttestationDelegate_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceAttestationDelegate_Internal.h; sourceTree = "<group>"; };
 		754F3DF327FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTREventTLVValueDecoder_Internal.h; sourceTree = "<group>"; };
@@ -792,9 +797,6 @@
 				039145E02993102B00257B3E /* main.mm */,
 				03F430A52994100000166449 /* controller */,
 				039547092992DB02006D42A8 /* editline */,
-				039546AD2991E193006D42A8 /* log */,
-				039546B12991E194006D42A8 /* system */,
-				039546A72991E185006D42A8 /* delay */,
 				039546A22991E132006D42A8 /* interaction_model */,
 				039546972991DFC4006D42A8 /* lib_json */,
 				039546872991C400006D42A8 /* chip-tool */,
@@ -815,7 +817,6 @@
 				03FB93DA2A46200A0048CB35 /* discover */,
 				037C3D7C2991BD4F00B7EEE2 /* pairing */,
 				037C3D852991BD4F00B7EEE2 /* clusters */,
-				037C3D8B2991BD4F00B7EEE2 /* tests */,
 				037C3D8D2991BD4F00B7EEE2 /* provider */,
 				037C3D932991BD4F00B7EEE2 /* payload */,
 				037C3D972991BD4F00B7EEE2 /* storage */,
@@ -1105,6 +1106,7 @@
 				51C984602A61CE2A00B0AD9A /* MTRFabricInfoChecker.m */,
 				75B0D01C2B71B46F002074DD /* MTRDeviceTestDelegate.h */,
 				75B0D01D2B71B47F002074DD /* MTRDeviceTestDelegate.m */,
+				75139A6C2B7FE19100E3A919 /* MTRTestDeclarations.h */,
 			);
 			path = TestHelpers;
 			sourceTree = "<group>";
@@ -1238,6 +1240,8 @@
 				5136661228067D550025EDAE /* MTRDeviceControllerFactory.h */,
 				5136661128067D540025EDAE /* MTRDeviceControllerFactory_Internal.h */,
 				5136661028067D540025EDAE /* MTRDeviceControllerFactory.mm */,
+				75139A6D2B7FE5D600E3A919 /* MTRDeviceControllerLocalTestStorage.h */,
+				75139A6E2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.m */,
 				5A6FEC8D27B5624E00F25F42 /* MTRDeviceControllerOverXPC.h */,
 				5A830D6B27CFCF590053B85D /* MTRDeviceControllerOverXPC_Internal.h */,
 				5A6FEC8F27B563D900F25F42 /* MTRDeviceControllerOverXPC.mm */,
@@ -1555,6 +1559,7 @@
 				1EC4CE6425CC276600D7304F /* MTRBaseClusters.h in Headers */,
 				3D843712294977000070D20A /* MTRCallbackBridgeBase.h in Headers */,
 				3DECCB742934C21B00585AEC /* MTRDefines.h in Headers */,
+				75139A702B7FE68C00E3A919 /* MTRDeviceControllerLocalTestStorage.h in Headers */,
 				2C5EEEF6268A85C400CAE3D3 /* MTRDeviceConnectionBridge.h in Headers */,
 				2C8C8FC0253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.h in Headers */,
 				51FE72352ACDB40000437032 /* MTRCommandPayloads_Internal.h in Headers */,
@@ -1753,7 +1758,6 @@
 				B45373EF2A9FEBFE00807602 /* ops-raw-skt.c in Sources */,
 				516411332B6BF77700E67C05 /* MTRServerAccessControl.mm in Sources */,
 				037C3DD52991C2E200B7EEE2 /* CHIPCommandBridge.mm in Sources */,
-				039546BC2991E1CB006D42A8 /* LogCommands.cpp in Sources */,
 				516411312B6BF70300E67C05 /* DataModelHandler.cpp in Sources */,
 				B45373E12A9FEB7F00807602 /* ops-h1.c in Sources */,
 				B45373EB2A9FEBDB00807602 /* ops-listen.c in Sources */,
@@ -1766,13 +1770,11 @@
 				B45373E62A9FEBA400807602 /* header.c in Sources */,
 				B45374002A9FEC4F00807602 /* unix-init.c in Sources */,
 				B45373DF2A9FEB6F00807602 /* system.c in Sources */,
-				039546BD2991E1CB006D42A8 /* SystemCommands.cpp in Sources */,
 				B45373FC2A9FEC4F00807602 /* unix-caps.c in Sources */,
 				B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */,
 				B45373ED2A9FEBEC00807602 /* ops-pipe.c in Sources */,
 				B45373C02A9FEA9100807602 /* output.c in Sources */,
 				0395470F2992DB37006D42A8 /* complete.c in Sources */,
-				039546BE2991E1CB006D42A8 /* DelayCommands.cpp in Sources */,
 				B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */,
 				B45373FF2A9FEC4F00807602 /* unix-misc.c in Sources */,
 				B45373D92A9FEB3800807602 /* poll.c in Sources */,
@@ -1840,6 +1842,7 @@
 				75B765C32A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm in Sources */,
 				AF5F90FF2878D351005503FA /* MTROTAProviderDelegateBridge.mm in Sources */,
 				516415FF2B6B132200D5CE11 /* DataModelHandler.cpp in Sources */,
+				75139A6F2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.m in Sources */,
 				51E95DFC2A78443C00A434F0 /* MTRSessionResumptionStorageBridge.mm in Sources */,
 				514C79ED2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp in Sources */,
 				7534F12828BFF20300390851 /* MTRDeviceAttestationDelegate.mm in Sources */,

@@ -171,10 +171,7 @@ void sl_wfx_host_reset_chip(void)
     vTaskDelay(pdMS_TO_TICKS(3));
 }
 
-void gpio_interrupt(uint8_t interrupt_number)
-{
-    UNUSED_PARAMETER(interrupt_number);
-}
+void gpio_interrupt([[maybe_unused]] uint8_t interrupt_number) {}
 
 /*****************************************************************
  * @fn   void rsi_hal_board_init(void)

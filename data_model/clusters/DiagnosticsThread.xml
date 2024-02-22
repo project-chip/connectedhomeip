@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!--
-link:../matter-defines.adoc[]
-
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
@@ -62,6 +60,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Remove optionality from FrameErrorRate and MessageErrorRate"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0035" name="Thread Network Diagnostics"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DGTHREAD" scope="Node"/>
   <features>
     <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Server supports the counts for the number of received and transmitted packets on the Thread interface.">
@@ -292,11 +293,13 @@ Davis, CA 95616, USA
         <feature name="ERRCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0007" name="NeighborTable" type="ref_DataTypeList[NeighborTableStruct Type]" default="[]">
+    <attribute id="0x0007" name="NeighborTable" type="list" default="[]">
+      <entry type="NeighborTableStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0008" name="RouteTable" type="ref_DataTypeList[RouteTableStruct Type]" default="[]">
+    <attribute id="0x0008" name="RouteTable" type="list" default="[]">
+      <entry type="RouteTableStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
@@ -654,14 +657,15 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x003E" name="ActiveNetworkFaultsList" type="ref_DataTypeList[NetworkFaultEnum Type]">
+    <attribute id="0x003E" name="ActiveNetworkFaultsList" type="list">
+      <entry type="NetworkFaultEnum"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="max" value="4"/>
+      <constraint type="maxCount" value="4"/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ResetCounts" response="Y">
+    <command id="0x00" name="ResetCounts" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="ERRCNT"/>
@@ -679,13 +683,15 @@ Davis, CA 95616, USA
     <event id="0x01" name="NetworkFaultChange" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="Current" type="ref_DataTypeList[NetworkFaultEnum Type]">
+      <field id="0" name="Current" type="list">
+        <entry type="NetworkFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="max" value="4"/>
+        <constraint type="maxCount" value="4"/>
       </field>
-      <field id="1" name="Previous" type="ref_DataTypeList[NetworkFaultEnum Type]">
+      <field id="1" name="Previous" type="list">
+        <entry type="NetworkFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="max" value="4"/>
+        <constraint type="maxCount" value="4"/>
       </field>
     </event>
   </events>

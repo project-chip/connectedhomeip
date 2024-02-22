@@ -237,7 +237,7 @@ tests:
               - name: "EffectIdentifier"
                 value: 0
               - name: "EffectVariant"
-                value: 66
+                value: EffectVariantEnum.UnknownEnumValue(66)
 
     - label: "Check DUT executes a blink effect."
       cluster: "LogCommands"

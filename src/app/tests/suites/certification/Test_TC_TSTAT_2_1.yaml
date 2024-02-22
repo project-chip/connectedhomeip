@@ -468,8 +468,12 @@ tests:
       response:
           constraints:
               type: enum8
-              minValue: 0
-              maxValue: 9
+              anyOf:
+                  [
+                      ThermostatRunningModeEnum.Off(0),
+                      ThermostatRunningModeEnum.Cool(3),
+                      ThermostatRunningModeEnum.Heat(4),
+                  ]
 
     - label: "Step 27: TH reads the StartOfWeek attribute from the DUT"
       PICS: TSTAT.S.F03

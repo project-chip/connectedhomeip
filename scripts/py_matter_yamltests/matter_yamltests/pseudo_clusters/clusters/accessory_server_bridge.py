@@ -77,6 +77,9 @@ def _get_start_options(request):
             elif name == 'crashLogPath':
                 options.append('--crash_log')
                 options.append(str(value))
+            elif name == 'traceDecode':
+                options.append('--trace_decode')
+                options.append(str(value))
             elif name == 'registerKey':
                 pass
             else:

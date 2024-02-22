@@ -26,7 +26,6 @@
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <app/ObjectList.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
@@ -36,6 +35,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/EnforceFormat.h>
+#include <lib/support/LinkedList.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/Constants.h>
@@ -177,7 +177,7 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::EventNumber startingEventNumber,
-                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo)
+                            size_t expectedNumEvents, chip::SingleLinkedListNode<chip::app::EventPathParams> * clusterInfo)
 {
     CHIP_ERROR err;
     chip::TLV::TLVReader reader;
@@ -279,7 +279,7 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     NL_TEST_ASSERT(apSuite, (eid4 + 1) == eid5);
     NL_TEST_ASSERT(apSuite, (eid5 + 1) == eid6);
 
-    chip::app::ObjectList<chip::app::EventPathParams> paths[2];
+    chip::SingleLinkedListNode<chip::app::EventPathParams> paths[2];
 
     paths[0].mValue.mEndpointId = kTestEndpointId1;
     paths[0].mValue.mClusterId  = kLivenessClusterId;
@@ -300,7 +300,7 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     // interested paths are path list, expect to retrieve all events for those interested paths
     CheckLogReadOut(apSuite, logMgmt, 0, 6, paths);
 
-    chip::app::ObjectList<chip::app::EventPathParams> pathsWithWildcard[2];
+    chip::SingleLinkedListNode<chip::app::EventPathParams> pathsWithWildcard[2];
     paths[0].mValue.mEndpointId = kTestEndpointId1;
     paths[0].mValue.mClusterId  = kLivenessClusterId;
 

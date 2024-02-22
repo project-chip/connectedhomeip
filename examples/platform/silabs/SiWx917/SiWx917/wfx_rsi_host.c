@@ -178,7 +178,7 @@ sl_status_t wfx_connect_to_ap(void)
 {
     if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
     {
-        SILABS_LOG("%s: connecting to access point -> SSID: %s, PSK:%s", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0]);
+        SILABS_LOG("%s: connecting to access point -> SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
         xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
     }
     else
@@ -194,13 +194,14 @@ sl_status_t wfx_connect_to_ap(void)
  * @fn  sl_status_t wfx_power_save()
  * @brief
  *      Implements the power save in sleepy application
- * @param[in]  None
+ * @param[in]  sl_si91x_ble_state : State to set for the BLE
+               sl_si91x_wifi_state : State to set for the WiFi
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_power_save()
+sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state)
 {
-    if (wfx_rsi_power_save() != SL_STATUS_OK)
+    if (wfx_rsi_power_save(sl_si91x_ble_state, sl_si91x_wifi_state) != SL_STATUS_OK)
     {
         return SL_STATUS_FAIL;
     }

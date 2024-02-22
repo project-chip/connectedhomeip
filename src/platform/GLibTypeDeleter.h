@@ -29,10 +29,10 @@ class UniquePointerReceiver
 {
 public:
     UniquePointerReceiver(std::unique_ptr<T, Deleter> & target) : mTarget(target) {}
-
     ~UniquePointerReceiver() { mTarget.reset(mValue); }
 
     T *& Get() { return mValue; }
+    T ** operator&() { return &mValue; }
 
 private:
     std::unique_ptr<T, Deleter> & mTarget;
@@ -151,6 +151,14 @@ struct GAutoPtrDeleter<GVariantIter>
 };
 
 template <typename T>
-using GAutoPtr = std::unique_ptr<T, typename GAutoPtrDeleter<T>::deleter>;
+class GAutoPtr : public std::unique_ptr<T, typename GAutoPtrDeleter<T>::deleter>
+{
+public:
+    using deleter = typename GAutoPtrDeleter<T>::deleter;
+    using std::unique_ptr<T, deleter>::unique_ptr;
+
+    // Convenience method to get a UniquePointerReceiver for this object.
+    UniquePointerReceiver<T, deleter> GetReceiver() { return MakeUniquePointerReceiver(*this); }
+};
 
 } // namespace chip

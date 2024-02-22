@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0081" name="Valve Configuration and Control" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0081" name="Valve Configuration and Control"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="VALCC" scope="Endpoint"/>
   <features>
     <feature bit="0" code="TS" name="TimeSync" summary="UTC time is used for time indications"/>
@@ -171,7 +176,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Open" response="Y">
+    <command id="0x00" name="Open" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="OpenDuration" type="elapsed-s">
@@ -186,7 +191,7 @@ Davis, CA 95616, USA
         <constraint type="min" value="1"/>
       </field>
     </command>
-    <command id="0x01" name="Close" response="Y">
+    <command id="0x01" name="Close" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
