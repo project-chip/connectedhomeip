@@ -23,10 +23,22 @@
 // #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 // #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 
+using chip::Protocols::InteractionModel::Status;
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
+
+static DataModel::Nullable<Structs::ForecastStruct::Type> sForecast;
+
+struct DeviceEnergyManagementTestEventSaveData
+{
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecast;
+};
+
+static DeviceEnergyManagementTestEventSaveData    sDeviceEnergyManagementTestEventSaveData;
+
 
 CHIP_ERROR DeviceEnergyManagementManufacturer::Init()
 {
@@ -44,102 +56,49 @@ CHIP_ERROR DeviceEnergyManagementManufacturer::Init()
 
     /*
      * This is an example implementation for manufacturers to consider
-     *
-     * For Manufacturer to specify the hardware capability in mA:
-     *  dg->HwSetMaxHardwareCurrentLimit(32000);    // 32A
-     *
-     * For Manufacturer to specify the CircuitCapacity in mA (e.g. from DIP switches)
-     *  dg->HwSetCircuitCapacity(20000);            // 20A
-     *
      */
 
     /* Once the system is initialised then check to see if the state was restored
      * (e.g. after a power outage), and if the Enable timer check needs to be started
      */
-//    dg->ScheduleCheckOnEnabledTimeout();
 
     return CHIP_NO_ERROR;
 }
 
 /*
- * When the EV is plugged in, and asking for demand change the state
- * and set the CableAssembly current limit
- *
- *   EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
- *   if (dg == nullptr)
- *   {
- *       ChipLogError(AppServer, "Delegate is not initialized");
- *       return CHIP_ERROR_UNINITIALIZED;
- *   }
- *
- *   dg->HwSetState(StateEnum::kPluggedInDemand);
- *   dg->HwSetCableAssemblyLimit(63000);    // 63A = 63000mA
- *
- *
- * If the vehicle ID can be retrieved (e.g. over Powerline)
- *   dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_123456789"));
- *
- *
- * If the EVSE has an RFID sensor, the RFID value read can cause an event to be sent
- * (e.g. can be used to indicate if a user as tried to activate the charging)
- *
- *   uint8_t uid[10] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
- *   dg->HwSetRFID(ByteSpan(uid));
  */
-
 CHIP_ERROR DeviceEnergyManagementManufacturer::Shutdown()
 {
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief   Allows a client application to send in power readings into the system
- *
- * @param[in]  aEndpointId     - Endpoint to send to EPM Cluster
- */
-// CHIP_ERROR DeviceEnergyManagementManufacturer::SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV,
-//                                               int64_t aCurrent_mA)
-// {
-//     // TODO add Power Readings when EPM cluster is merged
+DeviceEnergyManagementDelegate * GetDeviceEnergyManagementDelegate()
+{
+    DeviceEnergyManagementManufacturer * mn = GetDeviceEnergyManagementManufacturer();
+    VerifyOrDieWithMsg(mn != nullptr, AppServer, "DeviceEnergyManagementManufacturer is null");
 
-//     return CHIP_NO_ERROR;
-// }
+    DeviceEnergyManagementDelegate * dg = mn->GetDelegate();
+    VerifyOrDieWithMsg(dg != nullptr, AppServer, "DeviceEnergyManagement Delegate is null");
 
-
-// struct EVSETestEventSaveData
-// {
-//     int64_t mOldMaxHardwareCurrentLimit;
-//     int64_t mOldCircuitCapacity;
-//     int64_t mOldUserMaximumChargeCurrent;
-//     int64_t mOldCableAssemblyLimit;
-//     StateEnum mOldHwStateBasic;           /* For storing hwState before Basic Func event */
-//     StateEnum mOldHwStatePluggedIn;       /* For storing hwState before PluggedIn event */
-//     StateEnum mOldHwStatePluggedInDemand; /* For storing hwState before PluggedInDemand event */
-// };
-
-// static EVSETestEventSaveData sEVSETestEventSaveData;
-
-// EnergyEvseDelegate * GetEvseDelegate()
-// {
-//     DeviceEnergyManagementManufacturer * mn = GetDeviceEnergyManagementManufacturer();
-//     VerifyOrDieWithMsg(mn != nullptr, AppServer, "DeviceEnergyManagementManufacturer is null");
-//     DeviceEnergyManagementDelegate * dg = mn->GetDelegate();
-//     VerifyOrDieWithMsg(dg != nullptr, AppServer, "DeviceEnergyManagement Delegate is null");
-
-//     return dg;
-// }
+    return dg;
+}
 
 void SetTestEventTrigger_zzzzzzzzzz()
 {
-//     EnergyEvseDelegate * dg = GetEvseDelegate();
-//     sEVSETestEventSaveData.mOldMaxHardwareCurrentLimit  = dg->HwGetMaxHardwareCurrentLimit();
-//     sEVSETestEventSaveData.mOldCircuitCapacity          = dg->GetCircuitCapacity();
-//     sEVSETestEventSaveData.mOldUserMaximumChargeCurrent = dg->GetUserMaximumChargeCurrent();
-//     sEVSETestEventSaveData.mOldHwStateBasic             = dg->HwGetState();
-//     dg->HwSetMaxHardwareCurrentLimit(32000);
-//     dg->HwSetCircuitCapacity(32000);
-//     dg->SetUserMaximumChargeCurrent(32000);
-//     dg->HwSetState(StateEnum::kNotPluggedIn);
+    ChipLogProgress(Support, "[zzzzzzzzzz-handle] L-%d", __LINE__ );
+}
+
+void SetTestEventTrigger_StartTimeAdjustment()
+{
+    DeviceEnergyManagementDelegate * dg = GetDeviceEnergyManagementDelegate();
+    ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d", __LINE__ );
+
+    sDeviceEnergyManagementTestEventSaveData.forecast = dg->GetForecast();
+    //     virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast() override;
+    sForecast = dg->GetForecast();
+
+    //  Status  StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) override;
+    Status s = dg->StartTimeAdjustRequest(1, AdjustmentCauseEnum::kLocalOptimization);
 }
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
@@ -147,6 +106,7 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
     DeviceEnergyManagementTrigger trigger = static_cast<DeviceEnergyManagementTrigger>(eventTrigger);
 
  ChipLogProgress(Support, "[PowerAdjustment-Test-Event] => zzzzzzzzz-%d", __LINE__);
+ ChipLogProgress(Support, "[PowerAdjustment-Test-Event] => zzzzzzzzz-%d - trigger=0x%lux", __LINE__, (uint64_t)trigger);
  
     switch (trigger)
     {
@@ -172,7 +132,7 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         break;
     case DeviceEnergyManagementTrigger::kStartTimeAdjustment:
         ChipLogProgress(Support, "[StartTimeAdjustment-Test-Event] => Create simulated forecast to allow StartTimeAdjustment");
-        // TODO call implementation
+        SetTestEventTrigger_StartTimeAdjustment();
         break;
     case DeviceEnergyManagementTrigger::kStartTimeAdjustmentClear:
         ChipLogProgress(Support, "[StartTimeAdjustmentClear-Test-Event] => Clear StartTimeAdjustment forecast");

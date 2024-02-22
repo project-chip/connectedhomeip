@@ -36,6 +36,7 @@ namespace DeviceEnergyManagement {
 class DeviceEnergyManagementDelegate : public DeviceEnergyManagement::Delegate
 {
 public:
+    DeviceEnergyManagementDelegate();
     virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause) override;
     virtual Status CancelPowerAdjustRequest() override;
     virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) override;

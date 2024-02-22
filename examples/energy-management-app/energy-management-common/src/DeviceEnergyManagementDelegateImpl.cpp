@@ -30,6 +30,12 @@ using chip::Optional;
 using namespace chip::app;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
+#if 1
+#include "DeviceEnergyManagementDelegateImpl_TestData.cpp"
+#else
+DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() {}
+#endif
+
 /**
  * @brief Delegate handler for PowerAdjustRequest
  *
