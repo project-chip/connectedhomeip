@@ -126,7 +126,7 @@ uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
     VerifyOrReturnValue(mOperationalState == OperationalState::ActiveMode, 0);
 
     uint32_t promisedActiveDuration =
-        std::min(static_cast<uint32_t>(ICDConfigurationData::GetInstance().GetMaxStayActiveDuration().count()), stayActiveDuration);
+        std::min(ICDConfigurationData::GetInstance().GetGuaranteedStayActiveDuration().count(), stayActiveDuration);
 
     // If the device is already in ActiveMode, we need to extend the active mode duration
     // for whichever is smallest between 30000 milliseconds and stayActiveDuration, taking in account the remaining active time.

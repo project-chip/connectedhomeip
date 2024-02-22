@@ -556,7 +556,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance time by the ActiveModeDuration - 1
-        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms);
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms32);
         // Confirm ICD manager is in active mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
@@ -567,12 +567,12 @@ public:
         NL_TEST_ASSERT(aSuite, stayActivePromisedMs == stayActiveRequestedMs);
 
         // Advance time by the duration of the stay stayActiveRequestedMs - 1 ms
-        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(stayActiveRequestedMs) - 1_ms);
+        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(stayActiveRequestedMs) - 1_ms32);
         // Confirm ICD manager is in active mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance time by 1ms and Confirm ICD manager is in idle mode
-        AdvanceClockAndRunEventLoop(ctx, 1_ms);
+        AdvanceClockAndRunEventLoop(ctx, 1_ms32);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Trigger a subscription report Put the ICD manager into active mode
@@ -580,7 +580,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance time by the duration of the stay active request - 1 ms
-        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms);
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms32);
         stayActiveRequestedMs = 35000;
         // Send a stay active request for 35 seconds, which is higher than the maximum stay active duration (30 seconds)
         stayActivePromisedMs = ctx->mICDManager.StayActiveRequest(stayActiveRequestedMs);
@@ -588,11 +588,11 @@ public:
         NL_TEST_ASSERT(aSuite, stayActivePromisedMs == 30000);
 
         // Advance time by the duration of the max stay active duration - 1 ms
-        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(30000) - 1_ms);
+        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(30000) - 1_ms32);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance time by 1ms and Confirm ICD manager is in idle mode
-        AdvanceClockAndRunEventLoop(ctx, 1_ms);
+        AdvanceClockAndRunEventLoop(ctx, 1_ms32);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Trigger a subscription report Put the ICD manager into active mode
@@ -600,7 +600,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance time by the duration of the stay active request - 1 ms
-        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms);
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms32);
         stayActiveRequestedMs = 30000;
         // Send a stay active request for 30 seconds
         stayActivePromisedMs = ctx->mICDManager.StayActiveRequest(stayActiveRequestedMs);
@@ -608,7 +608,7 @@ public:
         NL_TEST_ASSERT(aSuite, stayActivePromisedMs == 30000);
 
         // Advance time by the duration of the stay active request - 20000 ms
-        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(stayActiveRequestedMs) - 20000_ms);
+        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(stayActiveRequestedMs) - 20000_ms32);
         // Confirm ICD manager is in active mode, we should have 20000 seconds left at that point
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 

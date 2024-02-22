@@ -140,8 +140,8 @@ public:
 
 protected:
     /**
-     * @brief Hepler function that extends the Active Mode duration by the extendDuration parameter
-     *        as well as the Active Mode Jitter timer for the transition to iddle mode.
+     * @brief Hepler function that extends the Active Mode duration as well as the Active Mode Jitter timer for the transition to
+     * iddle mode.
      */
     void ExtendActiveMode(System::Clock::Milliseconds16 extendDuration);
 
