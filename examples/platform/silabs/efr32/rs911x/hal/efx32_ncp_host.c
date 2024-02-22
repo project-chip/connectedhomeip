@@ -147,9 +147,8 @@ uint32_t sl_si91x_host_get_wake_indicator(void)
 
 sl_status_t sl_si91x_host_init(sl_si91x_host_init_configuration * config)
 {
-    sl_status_t status = SL_STATUS_OK;
 #if SL_SPICTRL_MUX
-    status = sl_board_disable_display();
+    sl_status_t status = sl_board_disable_display();
     if (SL_STATUS_OK != status)
     {
         SILABS_LOG("sl_board_disable_display failed with error: %x", status);

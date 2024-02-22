@@ -110,20 +110,17 @@ sl_status_t updateDisplay(void)
 #if SL_LCDCTRL_MUX
     status = sl_wfx_host_pre_lcd_spi_transfer();
     if(status != SL_STATUS_OK)
-    {
         return status;
-    }
 #endif // SL_LCDCTRL_MUX
     status = DMD_updateDisplay();
+    if (status != DMD_OK)
+        return SL_STATUS_FAIL;
 #if SL_LCDCTRL_MUX
     status =     sl_wfx_host_post_lcd_spi_transfer();
     if(status != SL_STATUS_OK)
-    {
         return status;
-    }
 #endif // SL_LCDCTRL_MUX
-    if (status != DMD_OK)
-        return SL_STATUS_FAIL;
+
     return SL_STATUS_OK;
 }
 
