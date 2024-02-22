@@ -327,10 +327,11 @@ template("siwx917_sdk") {
         # WISECONNECT 3 SDK
         "SLI_AEAD_DEVICE_SI91X=1",
         "SLI_CIPHER_DEVICE_SI91X=1",
+        "SLI_ECDH_DEVICE_SI91X=1",
         "SLI_MAC_DEVICE_SI91X=1",
         "SLI_SHA_DEVICE_SI91X=1",
-        "SLI_SECURE_KEY_STORAGE_DEVICE_SI91X=1",
         "SLI_TRNG_DEVICE_SI91X=1",
+        "SLI_SECURE_KEY_STORAGE_DEVICE_SI91X=1",
       ]
 
       include_dirs = [
