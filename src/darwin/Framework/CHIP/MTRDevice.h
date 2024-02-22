@@ -403,6 +403,11 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
  */
 - (void)deviceBecameActive:(MTRDevice *)device MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * Notifies delegate when the device attribute cache has been primed with initial configuration data of the device
+ */
+- (void)deviceCachePrimed:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
+
 @end
 
 @interface MTRDevice (Deprecated)

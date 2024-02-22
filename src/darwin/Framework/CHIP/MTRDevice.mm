@@ -225,6 +225,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #ifdef DEBUG
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
 #endif
+    BOOL _delegateDeviceCachePrimedCalled;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -506,6 +507,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _setupSubscription];
     }
 
+    // Check if cache is already primed from storage
+    [self _checkIfCacheIsPrimed];
+
     os_unfair_lock_unlock(&self->_lock);
 }
 
@@ -572,6 +576,29 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     auto state = _state;
     os_unfair_lock_unlock(&self->_lock);
     return (delegate != nil) && (state == MTRDeviceStateReachable);
+}
+
+- (BOOL)_callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+    if (delegate) {
+        dispatch_async(_delegateQueue, ^{
+            block(delegate);
+        });
+        return YES;
+    }
+    return NO;
+}
+
+- (void)_callDelegateDeviceCachePrimed
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    _delegateDeviceCachePrimedCalled = [self _callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(deviceCachePrimed:)]) {
+            [delegate deviceCachePrimed:self];
+        }
+    }];
 }
 
 // assume lock is held
@@ -741,6 +768,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _receivingReport = NO;
     _receivingPrimingReport = NO;
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
+
+    // First subscription report is priming report
+    if (!_delegateDeviceCachePrimedCalled) {
+        [self _callDelegateDeviceCachePrimed];
+    }
+
 // For unit testing only
 #ifdef DEBUG
     id delegate = _weakDelegate.strongObject;
@@ -2145,6 +2178,48 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
         [self _reportAttributes:@[ attribute ]];
     }
+}
+
+// This method checks if there is a need to inform delegate that the attribute cache has been "primed"
+//   - The delegate callback is only called once
+- (void)_checkIfCacheIsPrimed
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // Only send the callback once per lifetime of MTRDevice
+    if (_delegateDeviceCachePrimedCalled) {
+        return;
+    }
+
+    // Check if root node descriptor exists
+    NSDictionary * rootDescriptorPartsListDataValue = _readCache[[MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)]];
+    if (!rootDescriptorPartsListDataValue || ![MTRArrayValueType isEqualToString:rootDescriptorPartsListDataValue[MTRTypeKey]]) {
+        return;
+    }
+    NSArray * partsList = rootDescriptorPartsListDataValue[MTRValueKey];
+    if (![partsList isKindOfClass:[NSArray class]] || !partsList.count) {
+        MTR_LOG_ERROR("%@ unexpected type %@ for parts list %@", self, [partsList class], partsList);
+        return;
+    }
+
+    // Check if we have cached descriptor clusters for each listed endpoint
+    for (NSDictionary * endpointDataValue in partsList) {
+        if (![MTRUnsignedIntegerValueType isEqual:endpointDataValue[MTRTypeKey]]) {
+            MTR_LOG_ERROR("%@ unexpected type for parts list item %@", self, endpointDataValue);
+            continue;
+        }
+        NSNumber * endpoint = endpointDataValue[MTRValueKey];
+        if (![endpoint isKindOfClass:[NSNumber class]]) {
+            MTR_LOG_ERROR("%@ unexpected type for parts list item %@", self, endpointDataValue);
+            continue;
+        }
+        NSDictionary * descriptorDeviceTypeListDataValue = _readCache[[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)]];
+        if (![MTRArrayValueType isEqualToString:descriptorDeviceTypeListDataValue[MTRTypeKey]] || !descriptorDeviceTypeListDataValue[MTRValueKey]) {
+            return;
+        }
+    }
+
+    [self _callDelegateDeviceCachePrimed];
 }
 
 - (MTRBaseDevice *)newBaseDevice
