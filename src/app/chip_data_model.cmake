@@ -123,7 +123,6 @@ function(chip_configure_data_model APP_TARGET)
         GENERATOR "app-templates"
         OUTPUTS
         "zap-generated/access.h"
-        "zap-generated/CHIPClusters.h"
         "zap-generated/endpoint_config.h"
         "zap-generated/gen_config.h"
         "zap-generated/IMClusterCommandHandler.cpp"
@@ -139,9 +138,9 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
-        ${CHIP_APP_BASE_DIR}/icd/ICDMonitoringTable.cpp
-        ${CHIP_APP_BASE_DIR}/icd/ICDNotifier.cpp
-        ${CHIP_APP_BASE_DIR}/icd/ICDConfigurationData.cpp
+        ${CHIP_APP_BASE_DIR}/icd/server/ICDMonitoringTable.cpp
+        ${CHIP_APP_BASE_DIR}/icd/server/ICDNotifier.cpp
+        ${CHIP_APP_BASE_DIR}/icd/server/ICDConfigurationData.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
         ${CHIP_APP_BASE_DIR}/util/generic-callback-stubs.cpp

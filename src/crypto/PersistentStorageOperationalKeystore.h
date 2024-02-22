@@ -81,12 +81,14 @@ public:
     CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override;
     CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey) override;
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override;
+    CHIP_ERROR ExportOpKeypairForFabric(FabricIndex fabricIndex, Crypto::P256SerializedKeypair & outKeypair) override;
     CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override;
     void RevertPendingKeypair() override;
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                  Crypto::P256ECDSASignature & outSignature) const override;
     Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override;
     void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override;
+    CHIP_ERROR MigrateOpKeypairForFabric(FabricIndex fabricIndex, OperationalKeystore & operationalKeystore) const override;
 
 protected:
     void ResetPendingKey()

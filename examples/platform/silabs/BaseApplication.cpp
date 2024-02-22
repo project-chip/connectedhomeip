@@ -36,7 +36,7 @@
 
 #include "SilabsDeviceDataProvider.h"
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
@@ -129,7 +129,7 @@ StaticTask_t appTaskStruct;
 SilabsLCD slLCD;
 #endif
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 Identify gIdentify = {
@@ -140,12 +140,15 @@ Identify gIdentify = {
     BaseApplication::OnTriggerIdentifyEffect,
 };
 
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 } // namespace
 
 bool BaseApplication::sIsProvisioned           = false;
 bool BaseApplication::sIsFactoryResetTriggered = false;
 LEDWidget * BaseApplication::sAppActionLed     = nullptr;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+BaseApplicationDelegate BaseApplication::sAppDelegate = BaseApplicationDelegate();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 
 #ifdef DIC_ENABLE
 namespace {
@@ -162,6 +165,28 @@ void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_
 }
 } // namespace
 #endif // DIC_ENABLE
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+void BaseApplicationDelegate::OnCommissioningSessionStarted()
+{
+    isComissioningStarted = true;
+}
+void BaseApplicationDelegate::OnCommissioningSessionStopped()
+{
+    isComissioningStarted = false;
+}
+void BaseApplicationDelegate::OnCommissioningWindowClosed()
+{
+    if (!BaseApplication::GetProvisionStatus() && !isComissioningStarted)
+    {
+        int32_t status = wfx_power_save(RSI_SLEEP_MODE_8, STANDBY_POWER_SAVE_WITH_RAM_RETENTION);
+        if (status != SL_STATUS_OK)
+        {
+            ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
+        }
+    }
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 
 /**********************************************************
  * AppTask Definitions
@@ -261,7 +286,6 @@ CHIP_ERROR BaseApplication::Init()
 #if CHIP_ENABLE_OPENTHREAD
     BaseApplication::sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
 #endif
-
     return err;
 }
 
@@ -298,7 +322,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
 {
     bool isPatternSet = false;
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
     if (gIdentify.mActive)
     {
         // Identify in progress
@@ -342,7 +366,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
         }
         isPatternSet = true;
     }
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
     // Identify Patterns have priority over Status patterns
@@ -453,7 +477,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
         {
             // The factory reset sequence was not initiated,
             // Press and Release:
-            // - Open the commissioning window and start BLE advertissement in fast mode when not  commissioned
+            // - Open the commissioning window and start BLE advertisement in fast mode when not  commissioned
             // - Output qr code in logs
             // - Cycle LCD screen
             CancelFunctionTimer();
@@ -477,7 +501,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             }
             else
             {
-                SILABS_LOG("Network is already provisioned, Ble advertissement not enabled");
+                SILABS_LOG("Network is already provisioned, Ble advertisement not enabled");
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
                 // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
                 PlatformMgr().LockChipStack();
@@ -583,7 +607,7 @@ void BaseApplication::StopStatusLEDTimer()
     }
 }
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 void BaseApplication::OnIdentifyStart(Identify * identify)
 {
     ChipLogProgress(Zcl, "onIdentifyStart");
@@ -650,7 +674,7 @@ void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
         ChipLogProgress(Zcl, "No identifier effect");
     }
 }
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
 void BaseApplication::LightTimerEventHandler(TimerHandle_t xTimer)
 {

@@ -158,6 +158,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
@@ -179,6 +180,7 @@ list(
 
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp
 

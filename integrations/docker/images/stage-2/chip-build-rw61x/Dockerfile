@@ -14,9 +14,9 @@ WORKDIR /opt/sdk
 # Setup RW61x SDK
 RUN set -x \
     && mkdir -p rw61x \
-    && wget https://www.nxp.com/lgfiles/bsps/SDK_2_13_2_RD-RW612-BGA.zip \
-    && unzip SDK_2_13_2_RD-RW612-BGA.zip -d rw61x \
-    && rm -rf SDK_2_13_2_RD-RW612-BGA.zip \
+    && wget https://www.nxp.com/lgfiles/bsps/SDK_2_13_3_RD-RW612-BGA.zip \
+    && unzip SDK_2_13_3_RD-RW612-BGA.zip -d rw61x \
+    && rm -rf SDK_2_13_3_RD-RW612-BGA.zip \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

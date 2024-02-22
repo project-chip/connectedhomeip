@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: short
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0057" name="Refrigerator Alarm" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0057" name="Refrigerator Alarm"/>
+  </clusterIds>
   <classification hierarchy="derived" baseCluster="Alarm Base" role="application" picsCode="REFALM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="RESET" name="Reset" summary="Supports the ability to reset alarms">
@@ -73,8 +78,7 @@ Davis, CA 95616, USA
     </bitmap>
   </dataTypes>
   <commands>
-    <command id="0x01" name="ModifyEnabledAlarms" direction="commandToClient">
-      <access invokePrivilege="operate"/>
+    <command id="0x01" name="ModifyEnabledAlarms">
       <disallowConform/>
     </command>
   </commands>

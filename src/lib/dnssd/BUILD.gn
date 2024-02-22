@@ -16,18 +16,55 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/src/platform/device.gni")
 
+source_set("constants") {
+  sources = [ "Constants.h" ]
+
+  public_deps = [ "${chip_root}/src/lib/support" ]
+}
+
+source_set("types") {
+  sources = [ "Types.h" ]
+}
+
+source_set("naming") {
+  sources = [
+    "ServiceNaming.cpp",
+    "ServiceNaming.h",
+  ]
+
+  public_deps = [
+    ":constants",
+    ":types",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support:span",
+  ]
+}
+
 source_set("platform_header") {
-  sources = [ "platform/Dnssd.h" ]
+  sources = [
+    "platform/Dnssd.h",
+    "platform/DnssdBrowseDelegate.h",
+  ]
+  public_deps = [
+    ":constants",
+    ":naming",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/system",
+  ]
 }
 
 static_library("dnssd") {
   public_deps = [
+    ":constants",
     ":platform_header",
-    "${chip_root}/src/app/icd:icd_config",
+    ":types",
+    "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging:messaging_mrp_config",
+    "${chip_root}/src/messaging:configurations",
   ]
 
   sources = [
@@ -37,8 +74,6 @@ static_library("dnssd") {
     "Resolver.h",
     "ResolverProxy.cpp",
     "ResolverProxy.h",
-    "ServiceNaming.cpp",
-    "ServiceNaming.h",
     "TxtFields.cpp",
     "TxtFields.h",
   ]
@@ -53,6 +88,7 @@ static_library("dnssd") {
       "ActiveResolveAttempts.cpp",
       "ActiveResolveAttempts.h",
       "Advertiser_ImplMinimalMdns.cpp",
+      "Advertiser_ImplMinimalMdnsAllocator.h",
       "IncrementalResolve.cpp",
       "IncrementalResolve.h",
       "MinimalMdnsServer.cpp",

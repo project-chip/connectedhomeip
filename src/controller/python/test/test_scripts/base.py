@@ -341,9 +341,9 @@ class BaseTestHelper:
         self.logger.info("Commissioning finished.")
         return True
 
-    def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int):
+    def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
-        if not self.devCtrl.CommissionWithCode(setupPayload, nodeid):
+        if not self.devCtrl.CommissionWithCode(setupPayload, nodeid, chip.discovery.DiscoveryType(discoveryType)):
             self.logger.info(
                 "Failed to finish commissioning device {}".format(setupPayload))
             return False

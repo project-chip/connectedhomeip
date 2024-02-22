@@ -19,6 +19,7 @@ package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
+import chip.devicecontroller.ChipDeviceController.CompletionListener;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
@@ -48,6 +49,11 @@ public class ChipDeviceController {
    */
   public static void loadJni() {
     return;
+  }
+
+  // temp, for kotlin_library
+  public long getDeviceControllerPtr() {
+    return deviceControllerPtr;
   }
 
   /**
@@ -117,10 +123,18 @@ public class ChipDeviceController {
    * paa certificates before commissioning.
    *
    * @param attestationTrustStoreDelegate Delegate for attestation trust store
+   * @param cdTrustKeys certification Declaration Trust Keys
    */
   public void setAttestationTrustStoreDelegate(
+      AttestationTrustStoreDelegate attestationTrustStoreDelegate,
+      @Nullable List<byte[]> cdTrustKeys) {
+    setAttestationTrustStoreDelegate(
+        deviceControllerPtr, attestationTrustStoreDelegate, cdTrustKeys);
+  }
+
+  public void setAttestationTrustStoreDelegate(
       AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
-    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
+    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate, null);
   }
 
   /**
@@ -1317,6 +1331,8 @@ public class ChipDeviceController {
     shutdownCommissioning(deviceControllerPtr);
   }
 
+  public static native byte[] validateAndExtractCSR(byte[] csrElements, byte[] csrNonce);
+
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
 
@@ -1367,7 +1383,9 @@ public class ChipDeviceController {
       long deviceControllerPtr, int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate delegate);
 
   private native void setAttestationTrustStoreDelegate(
-      long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
+      long deviceControllerPtr,
+      AttestationTrustStoreDelegate delegate,
+      @Nullable List<byte[]> cdTrustKeys);
 
   private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
 

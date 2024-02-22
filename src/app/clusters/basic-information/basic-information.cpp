@@ -30,6 +30,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <cstddef>
 #include <cstring>
@@ -41,6 +42,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BasicInformation;
 using namespace chip::app::Clusters::BasicInformation::Attributes;
 using namespace chip::DeviceLayer;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -463,9 +465,9 @@ namespace Clusters {
 namespace BasicInformation {
 bool IsLocalConfigDisabled()
 {
-    bool disabled        = false;
-    EmberAfStatus status = LocalConfigDisabled::Get(0, &disabled);
-    return status == EMBER_ZCL_STATUS_SUCCESS && disabled;
+    bool disabled = false;
+    Status status = LocalConfigDisabled::Get(0, &disabled);
+    return status == Status::Success && disabled;
 }
 } // namespace BasicInformation
 } // namespace Clusters

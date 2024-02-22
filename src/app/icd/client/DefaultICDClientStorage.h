@@ -53,6 +53,28 @@ class DefaultICDClientStorage : public ICDClientStorage
 public:
     using ICDClientInfoIterator = CommonIterator<ICDClientInfo>;
 
+    // ICDClientInfoIterator wrapper to release ICDClientInfoIterator when it is out of scope
+    class ICDClientInfoIteratorWrapper
+    {
+    public:
+        ICDClientInfoIteratorWrapper(ICDClientInfoIterator * apICDClientInfoIterator)
+        {
+            mpICDClientInfoIterator = apICDClientInfoIterator;
+        }
+
+        ~ICDClientInfoIteratorWrapper()
+        {
+            if (mpICDClientInfoIterator != nullptr)
+            {
+                mpICDClientInfoIterator->Release();
+                mpICDClientInfoIterator = nullptr;
+            }
+        }
+
+    private:
+        ICDClientInfoIterator * mpICDClientInfoIterator = nullptr;
+    };
+
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS;
 
     CHIP_ERROR Init(PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore);

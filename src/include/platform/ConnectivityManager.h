@@ -25,7 +25,7 @@
 #include <memory>
 
 #include <app/AttributeAccessInterface.h>
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -202,7 +202,6 @@ public:
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
@@ -475,25 +474,6 @@ inline void ConnectivityManager::ErasePersistentInfo()
 inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 {
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
-}
-
-/*
- * @brief Get runtime value from the thread network based on the given attribute ID.
- *        The info is encoded via the AttributeValueEncoder.
- *
- * @param attributeId Id of the attribute for the requested info.
- * @param aEncoder Encoder to encode the attribute value.
- *
- * @return CHIP_NO_ERROR = Succes.
- *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
- *                                      Use standard read.
- *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
- *         All other errors should be treated as a read error and reported as such.
- */
-inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                  app::AttributeValueEncoder & encoder)
-{
-    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()

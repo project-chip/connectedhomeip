@@ -37,7 +37,6 @@
 #include <openthread/dns_client.h>
 #endif
 
-#include <app/AttributeAccessInterface.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/NetworkCommissioning.h>
@@ -111,7 +110,6 @@ protected:
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     void _ResetThreadNetworkDiagnosticsCounts(void);
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
@@ -123,6 +121,7 @@ protected:
     CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR _InvalidateAllSrpServices();
     CHIP_ERROR _RemoveInvalidSrpServices();
+    CHIP_ERROR _ClearAllSrpHostAndServices();
 
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
     CHIP_ERROR _ClearSrpHost(const char * aHostName);
@@ -204,6 +203,8 @@ private:
     };
 
     SrpClient mSrpClient;
+
+    bool mIsSrpClearAllRequested = false;
 
     static void OnSrpClientNotification(otError aError, const otSrpClientHostInfo * aHostInfo, const otSrpClientService * aServices,
                                         const otSrpClientService * aRemovedServices, void * aContext);

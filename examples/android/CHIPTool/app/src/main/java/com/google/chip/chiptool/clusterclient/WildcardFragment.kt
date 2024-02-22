@@ -27,6 +27,7 @@ import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.ChipPathId
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
+import chip.devicecontroller.model.Status
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.WildcardFragmentBinding
@@ -92,8 +93,8 @@ class WildcardFragment : Fragment() {
         Log.e(TAG, "Report error for $attributePath: $ex")
       }
 
-      override fun onResponse(attributePath: ChipAttributePath?) {
-        val text = "$attributePath : Write Success"
+      override fun onResponse(attributePath: ChipAttributePath, status: Status) {
+        val text = "$attributePath : Write response: $status"
         requireActivity().runOnUiThread { binding.outputTv.text = text }
       }
 
@@ -269,12 +270,18 @@ class WildcardFragment : Fragment() {
           "ResubscriptionAttempt terminationCause:$terminationCause, nextResubscribeIntervalMsec:$nextResubscribeIntervalMsec"
         )
       }
-
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        return
+      }
     deviceController.subscribeToPath(
       subscriptionEstablishedCallback,
       resubscriptionAttemptCallback,
       reportCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       attributePath.ifEmpty { null },
       eventPath.ifEmpty { null },
       minInterval,
@@ -287,9 +294,16 @@ class WildcardFragment : Fragment() {
   }
 
   private suspend fun read(isFabricFiltered: Boolean, eventMin: Long?) {
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        return
+      }
     deviceController.readPath(
       reportCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       attributePath.ifEmpty { null },
       eventPath.ifEmpty { null },
       isFabricFiltered,
@@ -350,10 +364,16 @@ class WildcardFragment : Fragment() {
           version
         )
     }
-
+    val devicePtr =
+      try {
+        addressUpdateFragment.getDevicePointer(requireContext())
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getDevicePointer exception", e)
+        return
+      }
     deviceController.write(
       writeAttributeCallback,
-      addressUpdateFragment.getDevicePointer(requireContext()),
+      devicePtr,
       listOf(writeRequest),
       timedRequestTimeoutMs,
       imTimeoutMs
@@ -378,9 +398,16 @@ class WildcardFragment : Fragment() {
       } else {
         InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
       }
+    val devicePtr =
+      try {
+        addressUpdateFragment.getDevicePointer(requireContext())
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getDevicePointer exception", e)
+        return
+      }
     deviceController.invoke(
       invokeCallback,
-      addressUpdateFragment.getDevicePointer(requireContext()),
+      devicePtr,
       invokeElement,
       timedRequestTimeoutMs,
       imTimeoutMs
@@ -554,7 +581,13 @@ class WildcardFragment : Fragment() {
     val clusterId = 62L // OperationalCredentials
     val attributeId = 5L // CurrentFabricIndex
     val deviceId = addressUpdateFragment.deviceId
-    val devicePointer = ChipClient.getConnectedDevicePointer(context, deviceId)
+    val devicePointer =
+      try {
+        ChipClient.getConnectedDevicePointer(context, deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        return 0U
+      }
     return suspendCoroutine { cont ->
       deviceController.readAttributePath(
         object : ReportCallback {

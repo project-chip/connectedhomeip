@@ -17,6 +17,7 @@ import sys
 import xmlrpc.client
 
 _DEFAULT_KEY = 'default'
+_DEFAULT_WAIT_FOR_MESSAGE_TIMEOUT_SECONDS = 10
 _IP = '127.0.0.1'
 _PORT = 9000
 
@@ -76,6 +77,9 @@ def _get_start_options(request):
             elif name == 'crashLogPath':
                 options.append('--crash_log')
                 options.append(str(value))
+            elif name == 'traceDecode':
+                options.append('--trace_decode')
+                options.append(str(value))
             elif name == 'registerKey':
                 pass
             else:
@@ -113,9 +117,11 @@ class AccessoryServerBridge():
     def waitForMessage(request):
         register_key = _get_option(request, 'registerKey', _DEFAULT_KEY)
         message = _get_option(request, 'message')
+        timeout_in_seconds = _get_option(
+            request, 'timeoutInSeconds', _DEFAULT_WAIT_FOR_MESSAGE_TIMEOUT_SECONDS)
 
         with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
-            proxy.waitForMessage(register_key, [message])
+            proxy.waitForMessage(register_key, [message], timeout_in_seconds)
 
     def createOtaImage(request):
         otaImageFilePath = _get_option(request, 'otaImageFilePath')

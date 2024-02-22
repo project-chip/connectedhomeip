@@ -360,24 +360,7 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        // This method, templated with CommandData, captures all the components needs
-        // from CommandData with as little code as possible. This in theory should
-        // reduce compiled code size.
-        //
-        // TODO(#30453): Verify the accuracy of the theory outlined below.
-        //
-        // Theory on code reduction: Previously, non-essential code was unnecessarily
-        // templated, leading to compilation and duplication N times. The lambda
-        // function below mitigates this issue by isolating only the code segments
-        // that genuinely require templating, thereby minimizing duplicate compiled
-        // code.
-        ConcreteCommandPath responsePath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
-                                             CommandData::GetCommandId() };
-        auto encodeCommandDataClosure    = [&](TLV::TLVWriter & writer) -> CHIP_ERROR {
-            return DataModel::Encode(writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData);
-        };
-        return TryAddingResponse(
-            [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, responsePath, encodeCommandDataClosure); });
+        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aData); });
     }
 
     /**
@@ -445,6 +428,35 @@ public:
         VerifyOrDie(!mGoneAsync);
         return mResponseSender.GetSubjectDescriptor();
     }
+
+#if CHIP_WITH_NLFAULTINJECTION
+
+    enum class NlFaultInjectionType : uint8_t
+    {
+        SeparateResponseMessages,
+        SeparateResponseMessagesAndInvertedResponseOrder,
+        SkipSecondResponse
+    };
+
+    /**
+     * @brief Sends InvokeResponseMessages with injected faults for certification testing.
+     *
+     * The Test Harness (TH) uses this to simulate various server response behaviors,
+     * ensuring the Device Under Test (DUT) handles responses per specification.
+     *
+     * This function strictly validates the DUT's InvokeRequestMessage against the test plan.
+     * If deviations occur, the TH terminates with a detailed error message.
+     *
+     * @param ec Exchange context for sending InvokeResponseMessages to the client.
+     * @param payload Payload of the incoming InvokeRequestMessage from the client.
+     * @param isTimedInvoke Indicates whether the interaction is timed.
+     * @param faultType The specific type of fault to inject into the response.
+     */
+    // TODO(#30453): After refactoring CommandHandler for better unit testability, create a
+    // unit test specifically for the fault injection behavior.
+    void TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
+                                                        bool isTimedInvoke, NlFaultInjectionType faultType);
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 private:
     friend class TestCommandInteraction;
@@ -567,18 +579,21 @@ private:
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     /**
-     * If this function fails, it may leave our TLV buffer in an inconsistent state.  Callers should snapshot as needed before
-     * calling this function, and roll back as needed afterward.
+     * Non-templated function called before DataModel::Encode when attempting to add a response,
+     * which does all the work needed before encoding the actual type-dependent data into the buffer.
      *
-     * @param [in] aRequestCommandPath the concrete path of the command we are
-     *             responding to.
-     * @param [in] aResponseCommandPath the concrete command response path.
-     * @param [in] encodeCommandDataFunction A lambda function responsible for
-     *             encoding the CommandData field.
+     * **Important:** If this function fails, the TLV buffer may be left in an inconsistent state.
+     * Callers should create snapshots as necessary before invoking this function and implement
+     * rollback mechanisms if needed.
+     *
+     * **Usage:** This function is intended to be called exclusively by TryAddResponseData. It was
+     * factored out to optimize code size.
+     *
+     * @param aRequestCommandPath  The concrete path of the command being responded to.
+     * @param aResponseCommandPath The concrete path of the command response.
      */
-    template <typename Function>
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aResponseCommandPath,
-                                  Function && encodeCommandDataFunction)
+    CHIP_ERROR TryAddResponseDataPreEncode(const ConcreteCommandPath & aRequestCommandPath,
+                                           const ConcreteCommandPath & aResponseCommandPath)
     {
         // Return early in case of requests targeted to a group, since they should not add a response.
         VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
@@ -587,11 +602,39 @@ private:
         prepareParams.SetStartOrEndDataStruct(false);
 
         ScopedChange<bool> internalCallToAddResponse(mInternalCallToAddResponseData, true);
-        ReturnErrorOnFailure(PrepareInvokeResponseCommand(aResponseCommandPath, prepareParams));
+        return PrepareInvokeResponseCommand(aResponseCommandPath, prepareParams);
+    }
+
+    // TODO(#31627): It would be awesome if we could remove this template all together.
+    /**
+     * If this function fails, it may leave our TLV buffer in an inconsistent state.
+     * Callers should snapshot as needed before calling this function, and roll back
+     * as needed afterward.
+     *
+     * @param [in] aRequestCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] aData the data for the response.
+     */
+    template <typename CommandData>
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    {
+        // This method, templated with CommandData, captures all the components needs
+        // from CommandData with as little code as possible.
+        //
+        // Previously, non-essential code was unnecessarily templated, leading to
+        // compilation and duplication N times. By isolating only the code segments
+        // that genuinely require templating, minimizes duplicate compiled code.
+        ConcreteCommandPath responseCommandPath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
+                                                    CommandData::GetCommandId() };
+        ReturnErrorOnFailure(TryAddResponseDataPreEncode(aRequestCommandPath, responseCommandPath));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(encodeCommandDataFunction(*writer));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
 
+        // FinishCommand technically should be refactored out as it is not a command that needs templating.
+        // But, because there is only a single function call, keeping it here takes less code. If there is
+        // ever more code between DataModel::Encode and the end of this function, it should be broken out into
+        // TryAddResponseDataPostEncode.
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 

@@ -16,6 +16,7 @@
  */
 
 #include "TargetNavigatorManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <json/json.h>
 
 using namespace std;
@@ -143,4 +144,21 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
+}
+
+uint16_t TargetNavigatorManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    if (!success)
+    {
+        ChipLogError(Zcl, "TargetNavigatorManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }

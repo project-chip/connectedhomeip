@@ -1066,7 +1066,7 @@ tests:
               - name: "arg1"
                 value: 20003
               - name: "arg2"
-                value: 101
+                value: SimpleEnum.UnknownEnumValue
       response:
           # Attempting to echo back the invalid enum value should fail.
           error: FAILURE
@@ -2814,7 +2814,7 @@ tests:
       command: "writeAttribute"
       attribute: "nullable_enum_attr"
       arguments:
-          value: 255
+          value: SimpleEnum.UnknownEnumValue(255)
       response:
           error: CONSTRAINT_ERROR
 

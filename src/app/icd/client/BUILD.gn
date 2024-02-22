@@ -41,10 +41,13 @@ source_set("handler") {
     "CheckInHandler.h",
     "DefaultCheckInDelegate.cpp",
     "DefaultCheckInDelegate.h",
+    "RefreshKeySender.cpp",
+    "RefreshKeySender.h",
   ]
   public_deps = [
     ":manager",
     "${chip_root}/src/app",
+    "${chip_root}/src/controller",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",

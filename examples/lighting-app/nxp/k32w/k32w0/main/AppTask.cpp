@@ -286,8 +286,8 @@ void AppTask::InitServer(intptr_t arg)
     chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
 
     // Init ZCL Data Model and start server
-    static DefaultTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    static DefaultTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
@@ -955,10 +955,10 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     uint8_t newValue = !LightingMgr().IsTurnedOff();
 
     // write the new on/off value
-    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", to_underlying(status));
     }
 }
 

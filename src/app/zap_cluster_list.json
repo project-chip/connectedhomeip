@@ -38,6 +38,7 @@
         "DOOR_LOCK_CLUSTER": [],
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
+        "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [],
         "ENERGY_EVSE_CLUSTER": [],
         "ENERGY_EVSE_MODE_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -64,6 +65,7 @@
         "MEDIA_INPUT_CLUSTER": [],
         "MEDIA_PLAYBACK_CLUSTER": [],
         "MICROWAVE_OVEN_CONTROL_CLUSTER": [],
+        "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
@@ -88,6 +90,7 @@
         "POWER_PROFILE_CLUSTER": [],
         "POWER_SOURCE_CLUSTER": [],
         "POWER_SOURCE_CONFIGURATION_CLUSTER": [],
+        "POWER_TOPOLOGY_CLUSTER": [],
         "PRESSURE_MEASUREMENT_CLUSTER": [],
         "PROXY_CONFIGURATION_CLUSTER": [],
         "PROXY_DISCOVERY_CLUSTER": [],
@@ -181,12 +184,15 @@
             "electrical-energy-measurement-server"
         ],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
+        "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [
+            "electrical-power-measurement-server"
+        ],
         "ENERGY_EVSE_CLUSTER": ["energy-evse-server"],
         "ENERGY_EVSE_MODE_CLUSTER": ["mode-base-server"],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
             "ethernet-network-diagnostics-server"
         ],
-        "ENERGY_PREFERENCE_CLUSTER": [""],
+        "ENERGY_PREFERENCE_CLUSTER": ["energy-preference-server"],
         "FAN_CONTROL_CLUSTER": ["fan-control-server"],
         "FAULT_INJECTION_CLUSTER": ["fault-injection-server"],
         "FIXED_LABEL_CLUSTER": ["fixed-label-server"],
@@ -213,6 +219,7 @@
         "MEDIA_INPUT_CLUSTER": ["media-input-server"],
         "MEDIA_PLAYBACK_CLUSTER": ["media-playback-server"],
         "MICROWAVE_OVEN_CONTROL_CLUSTER": ["microwave-oven-control-server"],
+        "MESSAGES_CLUSTER": ["messages-server"],
         "MODE_SELECT_CLUSTER": ["mode-select-server"],
         "NETWORK_COMMISSIONING_CLUSTER": ["network-commissioning"],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
@@ -221,6 +228,7 @@
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
+        "POWER_TOPOLOGY_CLUSTER": ["power-topology-server"],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": ["operational-credentials-server"],
         "OPERATIONAL_STATE_CLUSTER": ["operational-state-server"],
