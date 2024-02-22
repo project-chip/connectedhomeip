@@ -47,7 +47,7 @@ static CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray element
 
 static CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray nonce, jbyteArray elements,
                                       jbyteArray elementsSignature, jbyteArray dac, jbyteArray pai, jbyteArray cd,
-                                      jbyteArray firmwareInfo, chip::VendorId vendorId, uint16_t productId,
+                                      jbyteArray firmwareInfo, uint16_t vendorId, uint16_t productId,
                                       jobject & outAttestationInfo);
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage, AutoCommissioner * autoCommissioner,
@@ -272,8 +272,8 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     JniReferences::GetInstance().N2J_ByteArray(env, firmwareInfoSpan.data(), static_cast<jint>(firmwareInfoSpan.size()),
                                                javaFirmwareInfo);
 
-    chip::VendorId vendorId =
-        mAutoCommissioner->GetCommissioningParameters().GetRemoteVendorId().ValueOr(chip::VendorId::Unspecified);
+    uint16_t vendorId =
+        mAutoCommissioner->GetCommissioningParameters().GetRemoteVendorId().ValueOr(0x0000); // 0x0000 is Unspecified vendor ID value.
     uint16_t productId =
         mAutoCommissioner->GetCommissioningParameters().GetRemoteProductId().ValueOr(0x0000); // 0x0000 is invalid product ID value.
 
@@ -489,7 +489,7 @@ exit:
 
 CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray nonce, jbyteArray elements,
                                jbyteArray elementsSignature, jbyteArray dac, jbyteArray pai, jbyteArray cd, jbyteArray firmwareInfo,
-                               chip::VendorId vendorId, uint16_t productId, jobject & outAttestationInfo)
+                               uint16_t vendorId, uint16_t productId, jobject & outAttestationInfo)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID constructor;
