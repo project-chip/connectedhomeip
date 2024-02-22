@@ -26,6 +26,11 @@
 namespace chip {
 namespace Controller {
 
+namespace Internal {
+// Cancellation functions on InvokeCommandRequest() are for internal use only.
+typedef std::function<void()> InvokeCancelFn;
+} // namespace Internal
+
 /*
  * A typed command invocation function that takes as input a cluster-object representation of a command request and
  * callbacks for success and failure and either returns a decoded cluster-object representation of the response through
@@ -51,7 +56,7 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
                      const Optional<uint16_t> & timedInvokeTimeoutMs,
                      const Optional<System::Clock::Timeout> & responseTimeout = NullOptional,
-                     std::function<void()> * outCancelFn                      = nullptr)
+                     Internal::InvokeCancelFn * outCancelFn                   = nullptr)
 {
     // InvokeCommandRequest expects responses, so cannot happen over a group session.
     VerifyOrReturnError(!sessionHandle->IsGroupSession(), CHIP_ERROR_INVALID_ARGUMENT);

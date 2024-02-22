@@ -946,11 +946,11 @@ void DeviceCommissioner::CancelCommissioningInteractions()
         ChipLogDetail(Controller, "Cancelling read request for step '%s'", StageToString(mCommissioningStage));
         mReadClient = nullptr; // destructor cancels
     }
-    if (mCommandCancelFn)
+    if (mInvokeCancelFn)
     {
         ChipLogDetail(Controller, "Cancelling command invocation for step '%s'", StageToString(mCommissioningStage));
-        mCommandCancelFn();
-        mCommandCancelFn = nullptr;
+        mInvokeCancelFn();
+        mInvokeCancelFn = nullptr;
     }
 }
 
@@ -1774,7 +1774,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
     DeviceProxy * proxy      = mDeviceBeingCommissioned;
     mDeviceBeingCommissioned = nullptr;
-    mCommandCancelFn         = nullptr;
+    mInvokeCancelFn          = nullptr;
 
     if (mPairingDelegate != nullptr)
     {
@@ -2512,7 +2512,7 @@ DeviceCommissioner::SendCommissioningCommand(DeviceProxy * device, const Request
                                              Optional<System::Clock::Timeout> timeout)
 
 {
-    VerifyOrDie(!mCommandCancelFn); // we don't make parallel calls
+    VerifyOrDie(!mInvokeCancelFn); // we don't make parallel calls
 
     auto onSuccessCb = [context = this, successCb](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                                                    const typename RequestObjectT::ResponseType & responseData) {
@@ -2521,7 +2521,7 @@ DeviceCommissioner::SendCommissioningCommand(DeviceProxy * device, const Request
     auto onFailureCb = [context = this, failureCb](CHIP_ERROR aError) { failureCb(context, aError); };
 
     return InvokeCommandRequest(device->GetExchangeManager(), device->GetSecureSession().Value(), endpoint, request, onSuccessCb,
-                                onFailureCb, NullOptional, timeout, &mCommandCancelFn);
+                                onFailureCb, NullOptional, timeout, &mInvokeCancelFn);
 }
 
 void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,

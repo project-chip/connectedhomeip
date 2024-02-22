@@ -776,7 +776,7 @@ private:
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     bool mRunCommissioningAfterConnection  = false;
-    std::function<void()> mCommandCancelFn;
+    Internal::InvokeCancelFn mInvokeCancelFn;
 
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 
