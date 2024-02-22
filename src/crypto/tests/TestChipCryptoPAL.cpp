@@ -2715,7 +2715,7 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
     };
     // clang-format on
 
-    int caseIdx = 0;
+    [[maybe_unused]] int caseIdx = 0;
     for (const auto & testCase : kTestCases)
     {
         AttestationCertVidPid vidpid;

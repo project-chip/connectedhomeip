@@ -24,9 +24,9 @@
 #include <deque>
 #include <mutex>
 
-constexpr uint16_t kDefaultWebSocketServerPort = 9002;
-constexpr uint16_t kMaxMessageBufferLen        = 8192;
-constexpr char kWebSocketServerReadyMessage[]  = "== WebSocket Server Ready";
+constexpr uint16_t kDefaultWebSocketServerPort                 = 9002;
+constexpr uint16_t kMaxMessageBufferLen                        = 8192;
+[[maybe_unused]] constexpr char kWebSocketServerReadyMessage[] = "== WebSocket Server Ready";
 
 namespace {
 lws * gWebSocketInstance = nullptr;

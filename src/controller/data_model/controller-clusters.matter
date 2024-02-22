@@ -4978,7 +4978,7 @@ provisional cluster EnergyEvse = 153 {
 
 /** This cluster provides an interface to specify preferences for how devices should consume energy. */
 provisional cluster EnergyPreference = 155 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum EnergyPriorityEnum : enum8 {
     kComfort = 0;

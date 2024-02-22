@@ -270,12 +270,18 @@ class WildcardFragment : Fragment() {
           "ResubscriptionAttempt terminationCause:$terminationCause, nextResubscribeIntervalMsec:$nextResubscribeIntervalMsec"
         )
       }
-
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        return
+      }
     deviceController.subscribeToPath(
       subscriptionEstablishedCallback,
       resubscriptionAttemptCallback,
       reportCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       attributePath.ifEmpty { null },
       eventPath.ifEmpty { null },
       minInterval,
@@ -288,9 +294,16 @@ class WildcardFragment : Fragment() {
   }
 
   private suspend fun read(isFabricFiltered: Boolean, eventMin: Long?) {
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        return
+      }
     deviceController.readPath(
       reportCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       attributePath.ifEmpty { null },
       eventPath.ifEmpty { null },
       isFabricFiltered,
@@ -351,10 +364,16 @@ class WildcardFragment : Fragment() {
           version
         )
     }
-
+    val devicePtr =
+      try {
+        addressUpdateFragment.getDevicePointer(requireContext())
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getDevicePointer exception", e)
+        return
+      }
     deviceController.write(
       writeAttributeCallback,
-      addressUpdateFragment.getDevicePointer(requireContext()),
+      devicePtr,
       listOf(writeRequest),
       timedRequestTimeoutMs,
       imTimeoutMs
@@ -379,9 +398,16 @@ class WildcardFragment : Fragment() {
       } else {
         InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
       }
+    val devicePtr =
+      try {
+        addressUpdateFragment.getDevicePointer(requireContext())
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getDevicePointer exception", e)
+        return
+      }
     deviceController.invoke(
       invokeCallback,
-      addressUpdateFragment.getDevicePointer(requireContext()),
+      devicePtr,
       invokeElement,
       timedRequestTimeoutMs,
       imTimeoutMs
@@ -555,7 +581,13 @@ class WildcardFragment : Fragment() {
     val clusterId = 62L // OperationalCredentials
     val attributeId = 5L // CurrentFabricIndex
     val deviceId = addressUpdateFragment.deviceId
-    val devicePointer = ChipClient.getConnectedDevicePointer(context, deviceId)
+    val devicePointer =
+      try {
+        ChipClient.getConnectedDevicePointer(context, deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        return 0U
+      }
     return suspendCoroutine { cont ->
       deviceController.readAttributePath(
         object : ReportCallback {
