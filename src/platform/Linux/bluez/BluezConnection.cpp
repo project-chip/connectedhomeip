@@ -180,7 +180,7 @@ CHIP_ERROR BluezConnection::BluezDisconnect(BluezConnection * conn)
 
     ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, conn->GetPeerAddress());
 
-    success = bluez_device1_call_disconnect_sync(conn->mpDevice, nullptr, &MakeUniquePointerReceiver(error).Get());
+    success = bluez_device1_call_disconnect_sync(conn->mpDevice, nullptr, &error.GetReceiver());
     VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message));
 
 exit:
@@ -284,7 +284,7 @@ CHIP_ERROR BluezConnection::SendIndicationImpl(ConnectionDataBundle * data)
         VerifyOrExit(len <= static_cast<size_t>(std::numeric_limits<gssize>::max()),
                      ChipLogError(DeviceLayer, "FAIL: buffer too large in %s", __func__));
         auto status = g_io_channel_write_chars(data->mConn.mC2Channel.mChannel.get(), buf, static_cast<gssize>(len), &written,
-                                               &MakeUniquePointerReceiver(error).Get());
+                                               &error.GetReceiver());
         VerifyOrExit(status == G_IO_STATUS_NORMAL, ChipLogError(DeviceLayer, "FAIL: C2 Indicate: %s", error->message));
     }
     else
@@ -311,7 +311,7 @@ void BluezConnection::SendWriteRequestDone(GObject * aObject, GAsyncResult * aRe
 {
     BluezGattCharacteristic1 * c1 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &MakeUniquePointerReceiver(error).Get());
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: SendWriteRequest : %s", error->message));
     BLEManagerImpl::HandleWriteComplete(static_cast<BluezConnection *>(apConnection));
@@ -360,7 +360,7 @@ void BluezConnection::SubscribeCharacteristicDone(GObject * aObject, GAsyncResul
 {
     BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &MakeUniquePointerReceiver(error).Get());
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: SubscribeCharacteristic : %s", error->message));
 
@@ -392,7 +392,7 @@ void BluezConnection::UnsubscribeCharacteristicDone(GObject * aObject, GAsyncRes
 {
     BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &MakeUniquePointerReceiver(error).Get());
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: UnsubscribeCharacteristic : %s", error->message));
 

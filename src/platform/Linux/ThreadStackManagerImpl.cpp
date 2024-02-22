@@ -85,7 +85,7 @@ CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackM
     GAutoPtr<GError> err;
     self->mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr,
-        &MakeUniquePointerReceiver(err).Get()));
+        &err.GetReceiver()));
     VerifyOrReturnError(
         self->mProxy != nullptr, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error"));
@@ -123,7 +123,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
         GVariant * value;
 
         GAutoPtr<GVariantIter> iter;
-        g_variant_get(changed_properties, "a{sv}", &MakeUniquePointerReceiver(iter).Get());
+        g_variant_get(changed_properties, "a{sv}", &iter.GetReceiver());
         if (!iter)
             return;
         while (g_variant_iter_loop(iter.get(), "{&sv}", &key, &value))
@@ -193,7 +193,7 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
     if (g_variant_n_children(routes.get()) > 0)
     {
         GAutoPtr<GVariantIter> iter;
-        g_variant_get(routes.get(), "av", &MakeUniquePointerReceiver(iter).Get());
+        g_variant_get(routes.get(), "av", &iter.GetReceiver());
         if (!iter)
             return false;
 
@@ -207,14 +207,13 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
             guchar preference;
             gboolean stable;
             gboolean nextHopIsThisDevice;
-            g_variant_get(route, "(&vqybb)", &MakeUniquePointerReceiver(prefix).Get(), &rloc16, &preference, &stable,
-                          &nextHopIsThisDevice);
+            g_variant_get(route, "(&vqybb)", &prefix.GetReceiver(), &rloc16, &preference, &stable, &nextHopIsThisDevice);
             if (!prefix)
                 continue;
 
             GAutoPtr<GVariant> address;
             guchar prefixLength;
-            g_variant_get(prefix.get(), "(&vy)", &MakeUniquePointerReceiver(address).Get(), &prefixLength);
+            g_variant_get(prefix.get(), "(&vy)", &address.GetReceiver(), &prefixLength);
             if (!address)
                 continue;
 
@@ -273,8 +272,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
         GAutoPtr<GError> err;
         GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                                            g_variant_new("(ss)", "io.openthread.BorderRouter", "ActiveDatasetTlvs"),
-                                                           G_DBUS_CALL_FLAGS_NONE, -1, nullptr,
-                                                           &MakeUniquePointerReceiver(err).Get()));
+                                                           G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
 
         if (err)
         {
@@ -330,7 +328,7 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
     GAutoPtr<GError> err;
     GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                                        g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"),
-                                                       G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &MakeUniquePointerReceiver(err).Get()));
+                                                       G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
 
     if (err)
     {
@@ -390,8 +388,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     else
     {
         GAutoPtr<GError> err;
-        gboolean result =
-            openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
+        gboolean result = openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &err.GetReceiver());
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Reset", err->message);
@@ -413,8 +410,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
     GAutoPtr<GVariant> attachRes;
     GAutoPtr<GError> err;
     {
-        gboolean result = openthread_io_openthread_border_router_call_attach_finish(this_->mProxy.get(), res,
-                                                                                    &MakeUniquePointerReceiver(err).Get());
+        gboolean result = openthread_io_openthread_border_router_call_attach_finish(this_->mProxy.get(), res, &err.GetReceiver());
         if (!result)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
@@ -612,8 +608,8 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
     GAutoPtr<GVariant> scan_result;
     GAutoPtr<GError> err;
     {
-        gboolean result = openthread_io_openthread_border_router_call_scan_finish(
-            mProxy.get(), &MakeUniquePointerReceiver(scan_result).Get(), res, &MakeUniquePointerReceiver(err).Get());
+        gboolean result = openthread_io_openthread_border_router_call_scan_finish(mProxy.get(), &scan_result.GetReceiver(), res,
+                                                                                  &err.GetReceiver());
         if (!result)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
@@ -635,7 +631,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
     if (g_variant_n_children(scan_result.get()) > 0)
     {
         GAutoPtr<GVariantIter> iter;
-        g_variant_get(scan_result.get(), "a(tstayqqynyybb)", &MakeUniquePointerReceiver(iter).Get());
+        g_variant_get(scan_result.get(), "a(tstayqqynyybb)", &iter.GetReceiver());
         if (!iter)
         {
             delete scanResult;
