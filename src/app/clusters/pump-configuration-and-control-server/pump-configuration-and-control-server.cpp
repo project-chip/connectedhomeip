@@ -23,7 +23,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/InteractionModelEngine.h>
+#include <app/InteractionModelFunctions.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 

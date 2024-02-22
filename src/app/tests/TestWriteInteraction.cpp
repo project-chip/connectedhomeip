@@ -339,7 +339,7 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             app::WriteHandler writeHandler;
 
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-            err                            = writeHandler.Init();
+            err                            = writeHandler.Init(InteractionModelEngine::GetInstance());
 
             GenerateWriteRequest(apSuite, apContext, messageIsTimed, buf);
 
