@@ -229,7 +229,11 @@ public:
     {
         gOnReadDoneCallback(mAppContext);
 
-        delete this;
+        // SubscriptionType will delete with pychip_ReadClient_Abort
+        if (mReadClient->IsReadType())
+        {
+            delete this;
+        }
     };
 
     void AdoptReadClient(std::unique_ptr<ReadClient> apReadClient) { mReadClient = std::move(apReadClient); }
