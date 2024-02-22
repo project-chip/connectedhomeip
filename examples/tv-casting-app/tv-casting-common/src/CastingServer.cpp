@@ -695,7 +695,7 @@ void CastingServer::SetDefaultFabricIndex(std::function<void(TargetVideoPlayerIn
             ChipLogError(AppServer, " -- Not initialized");
             continue;
         }
-        NodeId myNodeId = fb.GetNodeId();
+        [[maybe_unused]] NodeId myNodeId = fb.GetNodeId();
         ChipLogProgress(NotSpecified,
                         "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
                         ChipLogValueX64(myNodeId), ChipLogValueX64(fb.GetFabricId()), fabricIndex);

@@ -57,11 +57,9 @@ LDMA_TransferCfg_t ldmaRXConfig;
 
 static osSemaphoreId_t transfer_done_semaphore = NULL;
 
-static bool dma_callback(unsigned int channel, unsigned int sequenceNo, void * userParam)
+static bool dma_callback([[maybe_unused]] unsigned int channel, [[maybe_unused]] unsigned int sequenceNo,
+                         [[maybe_unused]] void * userParam)
 {
-    UNUSED_PARAMETER(channel);
-    UNUSED_PARAMETER(sequenceNo);
-    UNUSED_PARAMETER(userParam);
 #if defined(SL_CATLOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
@@ -69,10 +67,8 @@ static bool dma_callback(unsigned int channel, unsigned int sequenceNo, void * u
     return false;
 }
 
-static void gpio_interrupt(uint8_t interrupt_number)
+static void gpio_interrupt([[maybe_unused]] uint8_t interrupt_number)
 {
-    UNUSED_PARAMETER(interrupt_number);
-
     if (NULL != init_config.rx_irq)
     {
         init_config.rx_irq();

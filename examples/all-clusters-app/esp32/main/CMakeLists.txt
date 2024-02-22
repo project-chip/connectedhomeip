@@ -96,8 +96,11 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-synchronization-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/valve-configuration-and-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/dishwasher-alarm-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/laundry-washer-controls-server"
+            		      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/laundry-washer-controls-server"
+		                  "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/laundry-washer-controls-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/laundry-dryer-controls-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/energy-preference-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/electrical-energy-measurement-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/electrical-power-measurement-server"
 )

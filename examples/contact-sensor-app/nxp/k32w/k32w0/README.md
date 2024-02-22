@@ -22,6 +22,7 @@ network.
 -   [Building](#building)
     -   [Overwrite board config files](#overwrite-board-config-files)
     -   [Known issues building](#known-issues-building)
+-   [Long Idle Time ICD Support](#long-idle-time-icd-support)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
@@ -94,6 +95,11 @@ In this example, to commission the device onto a Project CHIP network, it must
 be discoverable over Bluetooth LE. For security reasons, you must start
 Bluetooth LE advertising manually after powering up the device by pressing
 Button USERINTERFACE.
+
+## LIT ICD Active Mode
+
+If the device is acting as a LIT ICD and it's already commissioned, then Button
+USERINTERFACE can be pressed for forcing the switch to Active Mode.
 
 ### Bluetooth LE Rendezvous
 
@@ -257,6 +263,42 @@ pycryptodome           3.9.8
 ```
 
 The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
+
+## Long Idle Time ICD Support
+
+By default, contact-sensor is compiled as SIT ICD (Short Idle Time
+Intermittently Connected Device) - see rules from k32w0_sdk.gni:
+
+```
+chip_ot_idle_interval_ms = 2000           # 2s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 600            # 10min Idle Mode Interval
+nxp_active_mode_duration_ms = 10000       # 10s Active Mode Interval
+nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
+nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+```
+
+If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified
+as gn argument and the above parameters can be modified to comply with LIT
+requirements (e.g.: LIT devices must configure
+`chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
+
+```
+chip_ot_idle_interval_ms = 15000          # 15s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 3600           # 60min Idle Mode Interval
+nxp_active_mode_duration_ms = 0           # 0 Active Mode Interval
+nxp_active_mode_threshold_ms = 30000      # 30s Active Mode Threshold
+```
+
+ICD parameters that may be disabled once LIT functionality is enabled:
+
+```
+chip_persist_subscriptions: try to re-establish subscriptions from the server side after reboot
+chip_subscription_timeout_resumption: same as above but retries are using a Fibonacci backoff
+```
 
 ### Overwrite board config files
 

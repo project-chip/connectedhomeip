@@ -100,8 +100,6 @@ jobs:
                      --known-failure app/CompatEnumNames.h \
                      --known-failure app/data-model/ListLargeSystemExtensions.h \
                      --known-failure app/EventHeader.h \
-                     --known-failure app/EventLoggingDelegate.h \
-                     --known-failure app/EventLogging.h \
                      --known-failure app/EventLoggingTypes.h \
                      --known-failure app/InteractionModelHelper.h \
                      --known-failure app/ReadClient.h \
