@@ -129,9 +129,7 @@ inline bool LogMetricIfError(MetricKey metricKey, const ::chip::ChipError & err)
     bool success = ::chip::ChipError::IsSuccess(err);
     if (!success)
     {
-        using Type = chip::Tracing::MetricEvent::Type;
-        ::chip::Tracing::MetricEvent _metric_event(Type::kInstantEvent, metricKey, err);
-        ::chip::Tracing::Internal::LogMetricEvent(_metric_event);
+        MATTER_LOG_METRIC(metricKey, err);
     }
     return success;
 }
