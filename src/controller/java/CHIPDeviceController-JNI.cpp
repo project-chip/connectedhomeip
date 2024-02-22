@@ -182,7 +182,7 @@ JNI_METHOD(jint, onNOCChainGeneration)
     jbyteArray ipk                     = nullptr;
 
     Optional<NodeId> adminSubjectOptional;
-    uint64_t adminSubject;
+    uint64_t adminSubject = chip::kUndefinedNodeId;
 
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
 
@@ -209,16 +209,16 @@ JNI_METHOD(jint, onNOCChainGeneration)
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Find getAdminSubject method fail!"));
 
-    rootCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
+    rootCertificate = static_cast<jbyteArray>(env->CallObjectMethod(controllerParams, getRootCertificate));
     VerifyOrExit(rootCertificate != nullptr, err = CHIP_ERROR_BAD_REQUEST);
 
-    intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
+    intermediateCertificate = static_cast<jbyteArray>(env->CallObjectMethod(controllerParams, getIntermediateCertificate));
     VerifyOrExit(intermediateCertificate != nullptr, err = CHIP_ERROR_BAD_REQUEST);
 
-    operationalCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
+    operationalCertificate = static_cast<jbyteArray>(env->CallObjectMethod(controllerParams, getOperationalCertificate));
     VerifyOrExit(operationalCertificate != nullptr, err = CHIP_ERROR_BAD_REQUEST);
 
-    ipk = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
+    ipk = static_cast<jbyteArray>(env->CallObjectMethod(controllerParams, getIpk));
     if (ipk != nullptr)
     {
         JniByteArray jByteArrayIpk(env, ipk);
