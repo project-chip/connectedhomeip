@@ -19,6 +19,7 @@
 #include <lib/core/CHIPError.h>
 #include <tracing/metric_macros.h>
 #include <tracing/metric_keys.h>
+#include <tracing/registry.h>
 
 namespace chip {
 namespace Tracing {
@@ -144,18 +145,12 @@ private:
     Value mValue;
 };
 
-namespace Internal {
-
-void LogMetricEvent(const ::chip::Tracing::MetricEvent & event);
-
-} // namespace Internal
-
 namespace utils {
 
 /**
  * Utility to emit an instant metric if the error is not a success.
  */
-inline bool LogMetricIfError(const ::chip::ChipError & err, MetricKey metricKey)
+inline bool LogMetricIfError(MetricKey metricKey, const ::chip::ChipError & err)
 {
     bool success = ::chip::ChipError::IsSuccess(err);
     if (!success)

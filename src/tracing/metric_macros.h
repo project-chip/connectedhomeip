@@ -17,46 +17,88 @@
  */
 #pragma once
 
-#include <lib/core/CHIPError.h>
 #include <matter/tracing/build_config.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 
 #if MATTER_TRACING_ENABLED
 
-// Utility to always return the 3rd argument from macro parameters
-#define __GET_3RD_ARGUMENT(_a1, _a2, _a3, ...) _a3
 
-// Utility macro to select the VerifyOrExit macro with the correct signature based on the invoked macro
-#define __SELECT_MACRO_FOR_VERIFY_ACTION(...) __GET_3RD_ARGUMENT(__VA_ARGS__, __VERIFY_ACTION_2ARGS, __VERIFY_ACTION_1ARGS, )
+/**
+ *  @def SuccessOrExitWithMetric(kMetriKey, aStatus)
+ *
+ *  @brief
+ *    This checks for the specified status, which is expected to
+ *    commonly be successful (CHIP_NO_ERROR), and branches to
+ *    the local label 'exit' if the status is unsuccessful.
+ *    If unsuccessful, a metric with key kMetriKey is emitted with
+ *    the error code as the value of the metric.
+ *
+ *  Example Usage:
+ *
+ *  @code
+ *  CHIP_ERROR TryHard()
+ *  {
+ *      CHIP_ERROR err;
+ *
+ *      err = TrySomething();
+ *      SuccessOrExitWithMetric(kMetricKey, err);
+ *
+ *      err = TrySomethingElse();
+ *      SuccessOrExitWithMetric(kMetricKey, err);
+ *
+ *  exit:
+ *      return err;
+ *  }
+ *  @endcode
+ *
+ *  @param[in]  kMetricKey  Metric key for the metric event to be emitted
+ *                          if the condition evaluates to false. The value
+ *                          for the metric is result of the expression aStatus.
+ *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
+ *
+ */
+#define SuccessOrExitWithMetric(kMetricKey, aStatus) nlEXPECT(::chip::Tracing::utils::LogMetricIfError(kMetricKey, aStatus), exit)
 
-// Wrapper to capture all arguments and invoke the real wrapper for VerifyOrExit's third argument
-#define __LOG_METRIC_FOR_VERIFY_ACTION(...) __SELECT_MACRO_FOR_VERIFY_ACTION(__VA_ARGS__)(__VA_ARGS__)
+/**
+ *  @def VerifyOrExitWithMetric(kMetricKey, aCondition, anAction)
+ *
+ *  @brief
+ *    This checks for the specified condition, which is expected to
+ *    commonly be true, and both executes @a anAction and branches to
+ *    the local label 'exit' if the condition is false. If the condition
+ *    is false a metric event with the specified key is emitted with value
+ *    set to the result of the expression anAction.
+ *
+ *  Example Usage:
+ *
+ *  @code
+ *  CHIP_ERROR MakeBuffer(const uint8_t *& buf)
+ *  {
+ *      CHIP_ERROR err = CHIP_NO_ERROR;
+ *
+ *      buf = (uint8_t *)malloc(1024);
+ *      VerifyOrExitWithMetric(kMetricKey, buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+ *
+ *      memset(buf, 0, 1024);
+ *
+ *  exit:
+ *      return err;
+ *  }
+ *  @endcode
+ *
+ *  @param[in]  kMetricKey  Metric key for the metric event to be emitted
+ *                          if the aCondition evaluates to false. The value
+ *                          for the metric is result of the expression anAction.
+ *  @param[in]  aCondition  A Boolean expression to be evaluated.
+ *  @param[in]  anAction    An expression or block to execute when the
+ *                          assertion fails.
+ */
+#define VerifyOrExitWithMetric(kMetricKey, aCondition, anAction) nlEXPECT_ACTION(aCondition, exit, MATTER_LOG_METRIC(kMetricKey, anAction))
 
-// Utility macro that takes the action wraps it to emit the metric in a Verify macro, when a metric key is specified
-#define __VERIFY_ACTION_2ARGS(anAction, metricKey) MATTER_LOG_METRIC(metricKey, anAction)
-
-// Macro that takes the action in a Verify macro when a metric key is not specified
-#define __VERIFY_ACTION_1ARGS(anAction) anAction
-
-// Utility macro used by VerifyOrExit macro to handle an optional third metric key argument and emit an event, if specified
-#define LOG_METRIC_FOR_VERIFY_OR_EXIT_ACTION(anAction, ...) __LOG_METRIC_FOR_VERIFY_ACTION(anAction, ##__VA_ARGS__)
-
-// Utility macro to select the SuccessOrExit macro with the correct signature based on the invoked macro
-#define __SELECT_MACRO_FOR_SUCCESS_OR_EXIT(...) __GET_3RD_ARGUMENT(__VA_ARGS__, __SUCCESS_OR_EXIT_2ARGS, __SUCCESS_OR_EXIT_1ARGS, )
-
-// Wrapper to capture all arguments and invoke the real wrapper for SuccessOrExit's second argument
-#define __LOG_METRIC_FOR_SUCCESS_OR_EXIT(...) __SELECT_MACRO_FOR_SUCCESS_OR_EXIT(__VA_ARGS__)(__VA_ARGS__)
-
-// Utility macro that takes the status and wraps it to emit the metric in a SuccessOrExit macro, when a metric key is specified
-#define __SUCCESS_OR_EXIT_2ARGS(aStatus, metricKey)                                                                                \
-    chip::Tracing::utils::LogMetricIfError(aStatus, metricKey)
-
-// Utility macro that just evaluates the status when no metric key is specified
-#define __SUCCESS_OR_EXIT_1ARGS(aStatus) ::chip::ChipError::IsSuccess((aStatus))
-
-// Utility macro used by SuccessOrExit macro to handle an optional second metric key argument and emit an event, if specified
-#define LOG_METRIC_FOR_SUCCESS_OR_EXIT(aStatus, ...) __LOG_METRIC_FOR_SUCCESS_OR_EXIT(aStatus, ##__VA_ARGS__)
-
-////////////////////// Metric LOGGING
+/*
+ * Utility Macros to support optional arguments for MATTER_LOG_METRIC_XYZ macros
+ */
 
 // Utility to always return the 4th argument from macro parameters
 #define __GET_4TH_ARG(_a1, _a2, _a3, _a4, ...) _a4
@@ -92,6 +134,11 @@
         ::chip::Tracing::MetricEvent _metric_event(type, key, value);                                       \
         ::chip::Tracing::Internal::LogMetricEvent(_metric_event);                                                                        \
     } while (false)
+
+
+////////////////////////
+// Metric logging macros
+////////////////////////
 
 /**
  *  @def MATTER_LOG_METRIC
@@ -156,20 +203,26 @@
 
 #else // Tracing is disabled
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Remap Success, Return, and Verify macros to the ones without metrics
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SuccessOrExitWithMetric(kMetricKey, aStatus) SuccessOrExit(aStatus)
+
+#define VerifyOrExitWithMetric(kMetricKey, aCondition, anAction) VerifyOrExit(aCondition, anAction)
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Map all MATTER_LOG_METRIC_XYZ macros to noops
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define __MATTER_LOG_METRIC_DISABLE(...)                                                                                           \
     do                                                                                                                             \
     {                                                                                                                              \
     } while (false)
 
-// Noop for logging metrics
 #define MATTER_LOG_METRIC(...) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_METRIC_BEGIN(key, ...) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_METRIC_END(key, ...) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
-
-// Default behavior is to just execute the action
-#define LOG_METRIC_FOR_VERIFY_OR_EXIT_ACTION(anAction, ...) anAction
-
-// Default behavior is to just evaluate the status
-#define LOG_METRIC_FOR_SUCCESS_OR_EXIT(aStatus, ...) ::chip::ChipError::IsSuccess((aStatus))
 
 #endif // MATTER_TRACING_ENABLED

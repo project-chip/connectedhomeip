@@ -141,7 +141,6 @@ source_set("verifymacros") {
     ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:error",
-    "${chip_root}/src/tracing:metrics",
     "${nlassert_root}:nlassert",
   ]
 }
