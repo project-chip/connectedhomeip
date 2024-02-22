@@ -83,7 +83,7 @@ void InitializeMetricsCollection()
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Value = %@, TimePoint = %@, Duration = %@ us", self.value, self.timePointMicroseconds, self.durationMicroseconds];
+    return [NSString stringWithFormat:@"MTRMetricsData: Value = %@, TimePoint = %@, Duration = %@ us", self.value, self.timePointMicroseconds, self.durationMicroseconds];
 }
 
 - (NSDictionary *)toDictionary
