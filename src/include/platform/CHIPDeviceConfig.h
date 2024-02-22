@@ -599,10 +599,10 @@
  * in slow advertising mode. The maximum interval should be greater and not equal to the
  * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN.
  *
- * Defaults to 1920 (1200 ms).
+ * Defaults to 2056 (1285 ms).
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX
-#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX 1920
+#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX 2056
 #endif
 
 /**
