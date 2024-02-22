@@ -33,6 +33,7 @@
 
 extern "C" {
 #include <src/utils/common.h>
+#include <supp_events.h>
 #include <wpa_supplicant/wpa_supplicant_i.h>
 }
 
@@ -173,6 +174,7 @@ public:
     static constexpr uint32_t kConnectionRecoveryMaxIntervalMs     = CONFIG_CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL;
     static constexpr uint32_t kConnectionRecoveryJitterMs          = CONFIG_CHIP_WIFI_CONNECTION_RECOVERY_JITTER;
     static constexpr uint32_t kConnectionRecoveryMaxRetries        = CONFIG_CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER;
+    static constexpr uint32_t kSupplicantReadyTimeoutMs            = 500;
 
     CHIP_ERROR Init();
     CHIP_ERROR Scan(const ByteSpan & ssid, ScanResultCallback resultCallback, ScanDoneCallback doneCallback,
@@ -198,8 +200,12 @@ private:
     constexpr static uint32_t kWifiManagementEvents = NET_EVENT_WIFI_SCAN_RESULT | NET_EVENT_WIFI_SCAN_DONE |
         NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT | NET_EVENT_WIFI_IFACE_STATUS;
 
+    constexpr static uint32_t kSupplicantEvents = NET_EVENT_WPA_SUPP_READY | NET_EVENT_WPA_SUPP_CMD_NOT_READY |
+        NET_EVENT_WPA_SUPP_IFACE_ADDED | NET_EVENT_WPA_SUPP_IFACE_REMOVED;
+
     // Event handling
     static void WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
+    static void WiFiSupplicantEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
     static void ScanResultHandler(Platform::UniquePtr<uint8_t> data);
     static void ScanDoneHandler(Platform::UniquePtr<uint8_t> data);
     static void ConnectHandler(Platform::UniquePtr<uint8_t> data);
@@ -217,14 +223,20 @@ private:
     // To avoid frequent recovery attempts when the signal to an access point is poor quality
     // The connection recovery interval will be cleared after the defined delay in kConnectionRecoveryDelayToReset.
     static void Recover(System::Layer * layer, void * param);
+    static void SupplicantInitTimeout(System::Layer * layer, void * param);
     void ResetRecoveryTime();
     System::Clock::Milliseconds32 CalculateNextRecoveryTime();
 
+    bool mSupplicantReady{ false };
+    bool mInterfaceUp{ false };
+    bool mSupplicantInitTimeoutElapsed{ false };
+    net_if * mNetIf{ nullptr };
     ConnectionParams mWiFiParams{};
     ConnectionHandling mHandling;
     wifi_iface_state mWiFiState;
     wifi_iface_state mCachedWiFiState;
     net_mgmt_event_callback mWiFiMgmtClbk{};
+    net_mgmt_event_callback mSuppMgmtClbk{};
     ScanResultCallback mScanResultCallback{ nullptr };
     ScanDoneCallback mScanDoneCallback{ nullptr };
     WiFiNetwork mWantedNetwork{};

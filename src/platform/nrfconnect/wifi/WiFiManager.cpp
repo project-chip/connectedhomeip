@@ -145,6 +145,33 @@ const Map<uint32_t, WiFiManager::NetEventHandler, 5>
                                     { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler },
                                     { NET_EVENT_WIFI_DISCONNECT_COMPLETE, WiFiManager::DisconnectHandler } });
 
+void WiFiManager::WiFiSupplicantEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
+{
+    switch (mgmtEvent)
+    {
+    case NET_EVENT_WPA_SUPP_READY:
+        Instance().mSupplicantReady = true;
+        break;
+    case NET_EVENT_WPA_SUPP_NOT_READY:
+        Instance().mSupplicantReady = false;
+        break;
+    case NET_EVENT_WPA_SUPP_IFACE_ADDED:
+        Instance().mInterfaceUp = true;
+        break;
+    case NET_EVENT_WPA_SUPP_IFACE_REMOVED:
+        Instance().mInterfaceUp = false;
+        break;
+    default:
+        break;
+    }
+
+    if (Instance().mSupplicantReady && Instance().mInterfaceUp)
+    {
+        // In this case the Supplicant and Interface is fully ready.
+        DeviceLayer::SystemLayer().CancelTimer(SupplicantInitTimeout, nullptr);
+    }
+}
+
 void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
 {
     if (0 == strcmp(iface->if_dev->dev->name, "wlan0"))
@@ -183,14 +210,18 @@ CHIP_ERROR WiFiManager::Init()
         {
             return CHIP_ERROR_INVALID_ADDRESS;
         }
-
         return CHIP_NO_ERROR;
     });
 
     net_mgmt_init_event_callback(&mWiFiMgmtClbk, WifiMgmtEventHandler, kWifiManagementEvents);
     net_mgmt_add_event_callback(&mWiFiMgmtClbk);
+    net_mgmt_init_event_callback(&mSuppMgmtClbk, WiFiSupplicantEventHandler, kSupplicantEvents);
+    net_mgmt_add_event_callback(&mSuppMgmtClbk);
 
-    ChipLogDetail(DeviceLayer, "WiFiManager has been initialized");
+    // Set the timer and wait for the WiFi supplicant and interface ready.
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kSupplicantReadyTimeoutMs), SupplicantInitTimeout, nullptr);
+
+    ChipLogDetail(DeviceLayer, "WiFiManager initialization requested");
 
     return CHIP_NO_ERROR;
 }
@@ -595,6 +626,14 @@ CHIP_ERROR WiFiManager::SetLowPowerMode(bool onoff)
 
     ChipLogDetail(DeviceLayer, "Low power mode is already in requested state [%d]", onoff);
     return CHIP_NO_ERROR;
+}
+
+void WiFiManager::SupplicantInitTimeout(System::Layer * layer, void * param)
+{
+    ChipLogError(DeviceLayer, "Wi-Fi supplicant and interface have not been initialized!");
+    // Wi-Fi driver must be initialized within the given timeout, when it is still not ready, do not to allow any further
+    // operations.
+    VerifyOrDie(Instance().mSupplicantReady && Instance().mInterfaceUp);
 }
 
 } // namespace DeviceLayer
