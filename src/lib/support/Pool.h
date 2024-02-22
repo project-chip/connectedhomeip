@@ -188,8 +188,14 @@ struct HeapObjectList : HeapObjectListNode
 
 /// Provides iteration over active objects in a Bitmap pool.
 ///
-/// The iterator is valid only if the Pool is not changed (no objects are created
-/// or released)/
+/// Creating and releasing items within a pool does not invalidate
+/// an iterator, however there are no guarantees which objects the
+/// iterator will return (i.e. newly created objects while iterating
+/// may be visible or not to the iterator depending where they are
+/// allocated).
+///
+/// You are not prevented from releasing the object the iterator
+/// currently points at. In that case, iterator should be advanced.
 template <class T>
 class BitmapActiveObjectIterator
 {
