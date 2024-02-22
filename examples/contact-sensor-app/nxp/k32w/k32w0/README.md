@@ -22,7 +22,7 @@ network.
 -   [Building](#building)
     -   [Overwrite board config files](#overwrite-board-config-files)
     -   [Known issues building](#known-issues-building)
--   [Long Idle Time ICD Support](#lit-icd)
+-   [Long Idle Time ICD Support](#long-idle-time-icd-support)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
@@ -265,7 +265,9 @@ pycryptodome           3.9.8
 The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
 
 ## Long Idle Time ICD Support
-By default, contact-sensor is compiled as SIT ICD (Short Idle Time Intermittently Connected Device) - see rules from k32w0_sdk.gni:
+
+By default, contact-sensor is compiled as SIT ICD (Short Idle Time
+Intermittently Connected Device) - see rules from k32w0_sdk.gni:
 
 ```
 chip_ot_idle_interval_ms = 2000           # 2s Idle Intervals
@@ -277,8 +279,10 @@ nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
 nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 ```
 
-If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified as gn argument and the above parameters can be modified to
-comply with LIT requirements (e.g.: LIT devices must configure `chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
+If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified
+as gn argument and the above parameters can be modified to comply with LIT
+requirements (e.g.: LIT devices must configure
+`chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
 
 ```
 chip_ot_idle_interval_ms = 15000          # 15s Idle Intervals

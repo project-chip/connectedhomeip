@@ -19,10 +19,10 @@ import("//build_overrides/openthread.gni")
 import("${k32w0_sdk_build_root}/k32w0_executable.gni")
 import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/app/icd/icd.gni")
 
 declare_args() {
   chip_software_version = 0
@@ -123,17 +123,11 @@ k32w0_executable("contact_sensor_app") {
 
   #lit and sit are using different zap files
   if (chip_enable_icd_lit) {
-    deps += [
-      "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/",
-    ]
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
 
-    defines += [
-      "CHIP_ENABLE_LIT=1",
-    ]
+    defines += [ "CHIP_ENABLE_LIT=1" ]
   } else {
-      deps += [
-        "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/",
-      ]
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/" ]
   }
 
   cflags = [ "-Wconversion" ]

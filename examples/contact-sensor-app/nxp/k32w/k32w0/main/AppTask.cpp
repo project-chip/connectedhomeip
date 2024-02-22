@@ -524,7 +524,7 @@ void AppTask::HandleKeyboard(void)
             else
 #endif
 
-            ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
+                ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
 #if !(defined OM15082)
         case gKBD_EventLongPB1_c:
