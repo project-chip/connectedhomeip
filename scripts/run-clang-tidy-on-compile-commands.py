@@ -371,7 +371,11 @@ __LOG_LEVELS__ = {
     "--file-exclude-regex",
     # NOTE: if trying '/third_party/' note that a lot of sources are routed through
     # paths like `../../examples/chip-tool/third_party/connectedhomeip/src/`
-    default="/(repo|zzz_generated)/",
+    #
+    # NOTE: src/platform/Linux disabled due to glib errors. Seemed like a better
+    #       tradeoff that completely disabling EnumCastoutOfRange which seems
+    #       to catch errors
+    default="/(repo|zzz_generated|src/platform/Linux)/",
     help="Regular expression to apply to the file paths for running. Skip overrides includes.",
 )
 @click.option(
