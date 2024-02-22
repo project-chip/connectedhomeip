@@ -268,10 +268,10 @@ void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult 
 
     VerifyOrReturn(success == TRUE, {
         ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message);
-        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false, nullptr);
+        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false);
     });
 
-    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(true, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(true);
     ChipLogDetail(DeviceLayer, "BluezPeripheralRegisterAppDone done");
 }
 

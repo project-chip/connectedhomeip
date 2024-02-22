@@ -93,6 +93,7 @@ gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 
     // We can use it to update the state of the advertisement in the CHIP layer.
     ChipLogDetail(DeviceLayer, "BLE advertisement stopped by BlueZ");
     mIsAdvertising = false;
+    BLEManagerImpl::NotifyBLEPeripheralAdvReleased();
     return TRUE;
 }
 
@@ -235,7 +236,7 @@ void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
     ChipLogDetail(DeviceLayer, "RegisterAdvertisement complete");
 
 exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(success == TRUE, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(success == TRUE);
 }
 
 CHIP_ERROR BluezAdvertisement::StartImpl()
@@ -293,7 +294,7 @@ void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
     ChipLogDetail(DeviceLayer, "UnregisterAdvertisement complete");
 
 exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(success == TRUE, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(success == TRUE);
 }
 
 CHIP_ERROR BluezAdvertisement::StopImpl()

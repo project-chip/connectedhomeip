@@ -65,6 +65,9 @@ public:
     ///
     /// BLE advertising is stopped asynchronously. Application will be notified of
     /// completion via a call to BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete().
+    ///
+    /// It is also possible that the advertising is released by BlueZ. In that case,
+    /// the application will be notified by BLEManagerImpl::NotifyBLEPeripheralAdvReleased().
     CHIP_ERROR Stop();
 
 private:
