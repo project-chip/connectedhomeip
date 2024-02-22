@@ -49,7 +49,7 @@ constexpr uint8_t kMaxInvalidSessionRetries        = 1;  // Max # of query image
 constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending the initial image query after commissioning
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 
-#ifdef NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR
+#if NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR >= 0
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR);
 #else
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
