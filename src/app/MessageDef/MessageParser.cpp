@@ -16,7 +16,7 @@
 
 #include "MessageParser.h"
 #include "MessageDefHelper.h"
-#include <app/InteractionModelRevision.h>
+#include <app/SpecificationDefinedRevisions.h>
 
 namespace chip {
 namespace app {

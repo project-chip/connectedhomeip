@@ -22,7 +22,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
-#include <app/InteractionModelRevision.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>

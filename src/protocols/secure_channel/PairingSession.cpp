@@ -18,7 +18,7 @@
 
 #include <protocols/secure_channel/PairingSession.h>
 
-#include <app/InteractionModelRevision.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
