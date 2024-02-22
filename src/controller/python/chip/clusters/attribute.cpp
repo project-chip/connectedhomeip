@@ -225,18 +225,17 @@ public:
 
     void OnReportEnd() override { gOnReportEndCallback(mAppContext); }
 
-    void OnDone(ReadClient *) override
+    void OnDone(ReadClient * apReadClient) override
     {
         gOnReadDoneCallback(mAppContext);
 
         // SubscriptionType will delete with pychip_ReadClient_Abort
-        if (mReadClient->IsReadType())
+        if (apReadClient->IsReadType())
         {
+            delete apReadClient;
             delete this;
         }
     };
-
-    void AdoptReadClient(std::unique_ptr<ReadClient> apReadClient) { mReadClient = std::move(apReadClient); }
 
     void SetAutoResubscribe(bool autoResubscribe) { mAutoResubscribe = autoResubscribe; }
 
@@ -245,7 +244,6 @@ private:
 
     PyObject * mAppContext;
 
-    std::unique_ptr<ReadClient> mReadClient;
     bool mAutoResubscribe = true;
 };
 
@@ -459,6 +457,7 @@ void pychip_ReadClient_Abort(ReadClient * apReadClient, ReadClientCallback * apC
     VerifyOrDie(apReadClient != nullptr);
     VerifyOrDie(apCallback != nullptr);
 
+    delete apReadClient;
     delete apCallback;
 }
 
@@ -608,10 +607,6 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
 
     *pReadClient = readClient.get();
     *pCallback   = callback.get();
-
-    callback->AdoptReadClient(std::move(readClient));
-
-    callback.release();
 
 exit:
     return ToPyChipError(err);
