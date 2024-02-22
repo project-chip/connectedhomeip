@@ -165,3 +165,9 @@ value.
 ```
 $ echo '{"Name":"NitrogenDioxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
 ```
+
+Generate event `TotalVolatileOrganicCompoundsConcentrationMeasurement`, to change the TVOC value.
+
+```
+$ echo '{"Name":"TotalVolatileOrganicCompoundsConcentrationMeasurement","NewValue":100}' > /tmp/chip_air_quality_fifo_<PID>
+```
