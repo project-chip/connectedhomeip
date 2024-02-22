@@ -233,6 +233,8 @@ static_library("app") {
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.h",
+    "EventLogging.h",
+    "EventLoggingDelegate.h",
     "EventManagement.cpp",
     "EventManagement.h",
     "FailSafeContext.cpp",

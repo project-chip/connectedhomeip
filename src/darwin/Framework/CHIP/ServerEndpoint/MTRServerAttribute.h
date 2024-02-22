@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  * MTRDeviceController.  An attribute has an identifier and a value, and may or
  * may not be writable.
  */
+NS_SWIFT_SENDABLE
 MTR_NEWLY_AVAILABLE
 @interface MTRServerAttribute : NSObject
 
