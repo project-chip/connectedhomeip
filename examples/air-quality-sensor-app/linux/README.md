@@ -165,6 +165,7 @@ value.
 ```
 $ echo '{"Name":"NitrogenDioxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
 ```
+
 Generate event `Pm1ConcentrationMeasurement`, to change the PM1 value.
 
 ```
