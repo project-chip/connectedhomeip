@@ -101,7 +101,6 @@ jobs:
                      --known-failure app/EventHeader.h \
                      --known-failure app/EventLoggingTypes.h \
                      --known-failure app/InteractionModelHelper.h \
-                     --known-failure app/ReadClient.h \
                      --known-failure app/ReadHandler.h \
                      --known-failure app/ReadPrepareParams.h \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
@@ -131,7 +130,6 @@ jobs:
                      --known-failure app/util/odd-sized-integers.h \
                      --known-failure app/util/util.cpp \
                      --known-failure app/util/util.h \
-                     --known-failure app/WriteClient.h \
                      --known-failure app/WriteHandler.h \
                      --known-failure lib/core/CHIPVendorIdentifiers.hpp \
                      --known-failure platform/DeviceSafeQueue.cpp \
