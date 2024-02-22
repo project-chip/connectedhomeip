@@ -21,6 +21,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 
+#define __LOG_METRIC_CONCAT_IMPL(a, b) a##b
+#define __LOG_METRIC_MACRO_CONCAT(a, b) __LOG_METRIC_CONCAT_IMPL(a, b)
+
 #if MATTER_TRACING_ENABLED
 
 
@@ -153,8 +156,7 @@
  *      The above example generates an instant metric event with key kMetricPASESession.
  *      The metric also holds the 32 bit value corresponding to the ChipError object 'err'.
  *
- *  @param[in]  key The key representing the metric name/event. The name is one the kMetricXYZ string literal
- *                  constants as defined in metric_event.h.
+ *  @param[in]  key The key representing the metric name/event.
  *
  *  @param[in]  value An optional value for the metric. This value corresponds to one of the values supported
  *                    in MetricEvent::Value
@@ -162,7 +164,7 @@
 #define MATTER_LOG_METRIC(key, ...) __MATTER_LOG_METRIC(chip::Tracing::MetricEvent::Type::kInstantEvent, key, ##__VA_ARGS__)
 
 /**
- * @def MATTER_TRACE_BEGIN
+ * @def MATTER_LOG_METRIC_BEGIN
  *
  * @brief
  * Generate a metric with the Begin Type
@@ -173,8 +175,7 @@
  *  @endcode
  *      The above example generates a Begin metric event with key kMetricPASESession.
  *
- *  @param[in]  key The key representing the metric name/event. The name is one the kMetricXYZ string literal
- *                  constants as defined in metric_event.h.
+ *  @param[in]  key The key representing the metric name/event.
  *
  *  @param[in]  value An optional value for the metric. This value corresponds to one of the values supported
  *                    in MetricEvent::Value
@@ -182,7 +183,7 @@
 #define MATTER_LOG_METRIC_BEGIN(key, ...) __MATTER_LOG_METRIC(chip::Tracing::MetricEvent::Type::kBeginEvent, key, ##__VA_ARGS__)
 
 /**
- * @def MATTER_TRACE_END
+ * @def MATTER_LOG_METRIC_END
  *
  * @brief
  * Generate a metric with the End Type
@@ -193,13 +194,49 @@
  *  @endcode
  *      The above example generates an End metric event with key kMetricPASESession.
  *
- *  @param[in]  key The key representing the metric name/event. The name is one the kMetricXYZ string literal
- *                  constants as defined in metric_event.h.
+ *  @param[in]  key The key representing the metric name/event.
  *
  *  @param[in]  value An optional value for the metric. This value corresponds to one of the values supported
  *                    in MetricEvent::Value
  */
 #define MATTER_LOG_METRIC_END(key, ...) __MATTER_LOG_METRIC(chip::Tracing::MetricEvent::Type::kEndEvent, key, ##__VA_ARGS__)
+
+
+/**
+ * @def MATTER_LOG_METRIC_SCOPE
+ *
+ * @brief
+ * Generate a scoped metric tracking Begin and End within a given scope.
+ *
+ *  Example usage:
+ *  @code
+ *      MATTER_LOG_METRIC_SCOPE(chip::Tracing::kMetricPASESession);
+ *  @endcode
+ *      The above example generates an Begin and the End metric using RAII.
+ *
+ *  @param[in]  key The key representing the metric name/event.
+ */
+#define MATTER_LOG_METRIC_SCOPE(key) ::chip::Tracing::utils::ScopedMetricEvent __LOG_METRIC_MACRO_CONCAT(_metric_scope, __COUNTER__)(key)
+
+/**
+ * @def MATTER_LOG_METRIC_SCOPE_WITH_ERROR
+ *
+ * @brief
+ * Generate a scoped metric tracking Begin and End within a given scope. In addition, it creates the object using
+ * the name specified. This object is meant to be used as ChipError object. The End metric will also hold this error
+ * value.
+ *
+ *  Example usage:
+ *  @code
+ *      MATTER_LOG_METRIC_SCOPE_WITH_ERROR(chip::Tracing::kMetricPASESession, err, CHIP_NO_ERROR);
+ *  @endcode
+ *      The above example generates an Begin and the End metric using RAII.
+ *
+ *  @param[in]  key The key representing the metric name/event.
+ *  @param[in]  errorObj The name of the object for the ScopedMetricEvent.
+ *  @param[in]  errorValue The initial error code value.
+ */
+#define MATTER_LOG_METRIC_SCOPE_WITH_ERROR(key, errorObj, errorValue) chip::Tracing::utils::ScopedMetricEvent errorObj(key, errorValue)
 
 #else // Tracing is disabled
 
@@ -224,5 +261,24 @@
 #define MATTER_LOG_METRIC(...) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_METRIC_BEGIN(key, ...) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_METRIC_END(key, ...) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
+#define MATTER_LOG_METRIC_SCOPE(key) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
+
+/**
+ * @def MATTER_LOG_METRIC_SCOPE_WITH_ERROR
+ *
+ * @brief
+ * When tracing is disabled, this defaults to creating an ChipError object with a specified value.
+ *
+ *  Example usage:
+ *  @code
+ *      MATTER_LOG_METRIC_SCOPE_WITH_ERROR(chip::Tracing::kMetricPASESession, err, CHIP_NO_ERROR);
+ *  @endcode
+ *      The above example generates a ChipError with the specified value.
+ *
+ *  @param[in]  key The key representing the metric name/event. This parameter is ignored since tracing is disabled.
+ *  @param[in]  errorObj The name of the ChipError object.
+ *  @param[in]  errorValue The initial error code value.
+ */
+#define MATTER_LOG_METRIC_SCOPE_WITH_ERROR(key, errorObj, errorValue) chip::ChipError errorObj = errorValue
 
 #endif // MATTER_TRACING_ENABLED

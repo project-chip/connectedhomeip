@@ -23,11 +23,7 @@ declare_args() {
   #
   # Additionally, if tracing is enabled, the main() function has to add
   # backends explicitly
-  matter_enable_tracing_support = current_os == "android"
-
-  if (chip_device_platform == "darwin") {
-    matter_enable_tracing_support = true
-  }
+  matter_enable_tracing_support = (current_os == "android") || (chip_device_platform == "darwin")
 
   # Defines the trace backend. Current matter tracing splits the logic
   # into two parts:

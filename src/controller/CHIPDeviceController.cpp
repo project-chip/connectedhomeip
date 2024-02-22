@@ -27,7 +27,6 @@
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
-#include <tracing/metric_keys.h>
 #endif
 #ifndef __STDC_FORMAT_MACROS
 #define __STDC_FORMAT_MACROS
@@ -631,9 +630,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, co
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
-    MATTER_LOG_METRIC_BEGIN(chip::Tracing::kMetricPASESession);
 
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    MATTER_LOG_METRIC_SCOPE_WITH_ERROR(chip::Tracing::kMetricPASESession, err, CHIP_NO_ERROR);
     CommissioneeDeviceProxy * device   = nullptr;
     CommissioneeDeviceProxy * current  = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
@@ -708,6 +706,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CONFIG_NETWORK_LAYER_BLE
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
     {
+        MATTER_LOG_METRIC_SCOPE(chip::Tracing::kMetricPASESessionBLE);
+
         if (params.HasConnectionObject())
         {
             SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE, err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()));
@@ -763,7 +763,6 @@ exit:
         }
     }
 
-    MATTER_LOG_METRIC_END(chip::Tracing::kMetricPASESession);
     return err;
 }
 

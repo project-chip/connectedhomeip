@@ -29,7 +29,6 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
 #include <tracing/metric_event.h>
-#include <tracing/metric_keys.h>
 
 using namespace chip;
 using namespace chip::app;
