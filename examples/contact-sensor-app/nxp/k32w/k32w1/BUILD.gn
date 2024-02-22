@@ -23,6 +23,7 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
 
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -74,6 +75,8 @@ k32w1_sdk("sdk") {
 k32w1_executable("contact_sensor_app") {
   output_name = "chip-k32w1-contact-example"
 
+  defines = []
+
   sources = [
     "${k32w1_platform_dir}/util/LEDWidget.cpp",
     "${k32w1_platform_dir}/util/include/LEDWidget.h",
@@ -89,7 +92,6 @@ k32w1_executable("contact_sensor_app") {
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/contact-sensor-app/nxp/zap",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform:syscalls_stub",
@@ -107,6 +109,15 @@ k32w1_executable("contact_sensor_app") {
       "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
       "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
     ]
+  }
+
+  #lit and sit are using different zap files
+  if (chip_enable_icd_lit) {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
+
+    defines += [ "CHIP_ENABLE_LIT=1" ]
+  } else {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/" ]
   }
 
   cflags = [ "-Wconversion" ]
