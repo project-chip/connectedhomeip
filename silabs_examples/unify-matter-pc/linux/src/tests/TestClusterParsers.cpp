@@ -372,7 +372,7 @@ static void TestMPCParserInvokeOnOffSUOnOff(nlTestSuite * inSuite, void * aConte
     NL_TEST_ASSERT(inSuite, (SL_STATUS_OK == mpc_attribute_parser_invoke(path, &reader, onoffClustRevNode)));
     NL_TEST_ASSERT(inSuite, (onoffClustRevNode.reported_exists()));
     // attribute_store_get_reported_string(onoffClustRevNode, value, 256);
-    NL_TEST_ASSERT(inSuite, (onoffClustRevNode.reported<uint16_t>() == 3));
+    NL_TEST_ASSERT(inSuite, (onoffClustRevNode.reported<uint16_t>() == 0xff));
 }
 
 /**

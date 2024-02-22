@@ -14,7 +14,7 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::Thermostat;
 
-using TestContext = Test::ClusterContext<ThermostatAttributeAccess, ThermostatClusterCommandHandler>;
+using TestContext = unify::matter_bridge::Test::ClusterContext<ThermostatAttributeAccess, ThermostatClusterCommandHandler>;
 
 static int Initialize(void * context)
 {

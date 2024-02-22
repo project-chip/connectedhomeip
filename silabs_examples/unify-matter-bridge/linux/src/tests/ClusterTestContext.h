@@ -141,26 +141,6 @@ public:
  
         return SUCCESS;
     }
-    
-    /**
-     * @brief
-     *   It's necessary to call this function as a part of your teardown of the
-     *   entire test suite.
-     *
-     * @param[inout]  inContext   A pointer to test suite-specific context
-     *                            provided by the test suite driver.
-     */
-    static int Finalize(void * context)
-    {
-        auto * ctx = static_cast<ClusterContext *>(context);
-        
-        if (ctx->nlTestTearDown(context) != SUCCESS)
-            return FAILURE;
-            
-        ctx->UMB_Finalize();
-
-        return SUCCESS;
-    }
 
     /**
      * @brief
@@ -173,16 +153,18 @@ public:
      */
     static int Finalize(void * context, bool enableEvents)
     {
+        auto * ctx = static_cast<ClusterContext *>(context);
+        
         if(enableEvents)
         {
             chip::app::EventManagement::DestroyEventManagement();
             engine->Shutdown();
-        }
-
-        if (UnifyBridgeContext::Finalize(context) != SUCCESS)
-        {
+        }    
+        
+        if (ctx->nlTestTearDown(context) != SUCCESS)
             return FAILURE;
-        }
+            
+        ctx->UMB_Finalize();
 
         return SUCCESS;
     }
