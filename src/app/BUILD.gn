@@ -148,6 +148,7 @@ static_library("interaction-model") {
     "InteractionModelDelegatePointers.h",
     "InteractionModelEngine.cpp",
     "InteractionModelEngine.h",
+    "InteractionModelHelper.h",
     "InteractionModelTimeout.h",
     "OperationalSessionSetup.cpp",
     "OperationalSessionSetup.h",
