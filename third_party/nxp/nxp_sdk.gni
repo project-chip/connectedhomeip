@@ -45,7 +45,7 @@ declare_args() {
   nxp_software_version = 1
 
   # Defines the current software string version
-  nxp_software_version_string = "1.1"
+  nxp_software_version_string = "1.3"
 
   # ICD Matter Configuration flags
   nxp_ot_idle_interval_ms = 2000            # 2s Idle Intervals

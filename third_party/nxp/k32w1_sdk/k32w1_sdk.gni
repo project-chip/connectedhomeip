@@ -349,6 +349,15 @@ template("k32w1_sdk") {
       defines += [ "USE_HW_AES" ]
     }
 
+    if (nxp_software_version != "") {
+      defines +=
+          [ "NXP_CONFIG_DEVICE_SOFTWARE_VERSION=${nxp_software_version}" ]
+    }
+
+    if (nxp_software_version_string != "") {
+      defines += [ "NXP_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${nxp_software_version_string}\"" ]
+    }
+
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
