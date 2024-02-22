@@ -80,20 +80,19 @@ SemaphoreHandle_t spi_sem_sync_hdl;
  **********************************************************/
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
-    uint32_t status = SL_STATUS_OK;
+    sl_status_t status = SL_STATUS_OK;
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
     status = sl_board_enable_display();
-    if (SL_STATUS_OK != status)
+    if (SL_STATUS_OK == status)
     {
-        SILABS_LOG("sl_board_enable_display failed with error: %x", status);
-        xSemaphoreGive(spi_sem_sync_hdl);
-        return status;
+        SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
     }
-    SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
-
-    return SL_STATUS_OK;
+#if SL_SPICTRL_MUX
+    xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
+    return status;
 }
 
 /********************************************************
@@ -105,34 +104,25 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
  **********************************************************/
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 {
-    uint32_t status = SL_STATUS_OK;
+    sl_status_t status = SL_STATUS_OK;
+    status = sl_board_disable_display();
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
-    status = sl_board_disable_display();
-    if (SL_STATUS_OK != status)
-    {
-        SILABS_LOG("sl_board_disable_display failed with error: %x", status);
-        xSemaphoreGive(spi_sem_sync_hdl);
-        return status;
-    }
-    return SL_STATUS_OK;
+    return status;
 }
 #endif // SL_LCDCTRL_MUX
 
 #if SL_SPICTRL_MUX
-
 void SPIDRV_SetBaudrate(uint32_t baudrate)
 {
-    if (USART_BaudrateGet(SPI_USART) == baudrate)
+    if (USART_BaudrateGet(SPI_USART) != baudrate)
     {
-        // USART synced to baudrate already
-        return;
+        USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
+        usartInit.msbf                   = true;
+        usartInit.baudrate               = baudrate;
+        USART_InitSync(SPI_USART, &usartInit);
     }
-    USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
-    usartInit.msbf                   = true;
-    usartInit.baudrate               = baudrate;
-    USART_InitSync(SPI_USART, &usartInit);
 }
 
 /********************************************************

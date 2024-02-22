@@ -80,8 +80,6 @@
 #if defined(EFR32MG24)
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
-#define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_EUSART_VCOM_BAUDRATE
-#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
 #endif
 
 #define CONCAT(A, B) (A##B)
@@ -193,7 +191,6 @@ void rsi_hal_board_init(void)
 }
 
 #if SL_SPICTRL_MUX
-
 sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
 #if SL_SPICTRL_MUX
@@ -212,22 +209,23 @@ sl_status_t sl_wfx_host_spi_cs_assert(void)
 
 sl_status_t sl_wfx_host_spi_cs_deassert(void)
 {
+sl_status_t status = SL_STATUS_OK;
     if (spi_enabled)
     {
-        if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        status = SPIDRV_DeInit(SL_SPIDRV_HANDLE);
+        if (SL_STATUS_OK == status)
         {
-            xSemaphoreGive(spi_sem_sync_hdl);
-            SILABS_LOG("%s error.", __func__);
-            return SL_STATUS_FAIL;
-        }
 #if defined(EFR32MG24)
-        GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-        GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+            GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+            GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
 #endif // EFR32MG24
-        spi_enabled = false;
+            spi_enabled = false;
+        }
     }
-    xSemaphoreGive(spi_sem_sync_hdl);
-    return SL_STATUS_OK;
+#if SL_SPICTRL_MUX
+        xSemaphoreGive(spi_sem_sync_hdl);
+#endif //SL_SPICTRL_MUX
+        return status;
 }
 #endif // SL_SPICTRL_MUX
 
@@ -297,46 +295,33 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 #if SL_LCDCTRL_MUX
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
-    uint32_t status = SL_STATUS_OK;
+    sl_status_t status = SL_STATUS_OK;
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
     status = sl_board_enable_display();
-    if (SL_STATUS_OK != status)
+    if (SL_STATUS_OK == status)
     {
-        SILABS_LOG("sl_board_enable_display failed with error: %x", status);
-        xSemaphoreGive(spi_sem_sync_hdl);
-        return status;
-    }
-    // sl_memlcd_refresh takes care of SPIDRV_Init()
-    if (SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get()))
-    {
-#if SL_SPICTRL_MUX
-        xSemaphoreGive(spi_sem_sync_hdl);
-#endif // SL_SPICTRL_MUX
-        SILABS_LOG("%s error.", __func__);
-        return SL_STATUS_FAIL;
-    }
-    return SL_STATUS_OK;
-}
-
-sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
-{
-    uint32_t status = SL_STATUS_OK;
-    USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
-    CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
-    GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
-    status = sl_board_disable_display();
-    if (SL_STATUS_OK != status)
-    {
-        SILABS_LOG("sl_board_disable_display failed with error: %x", status);
-        xSemaphoreGive(spi_sem_sync_hdl);
-        return status;
+        // sl_memlcd_refresh takes care of SPIDRV_Init()
+        status = sl_memlcd_refresh(sl_memlcd_get());
     }
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
-    return SL_STATUS_OK;
+    return status;
+}
+
+sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
+{
+    sl_status_t status = SL_STATUS_OK;
+    USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
+    CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
+    GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
+    status = sl_board_disable_display();
+#if SL_SPICTRL_MUX
+    xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
+    return status;
 }
 #endif // SL_LCDCTRL_MUX
 
