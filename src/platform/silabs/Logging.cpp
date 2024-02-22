@@ -55,7 +55,9 @@
 #endif
 
 #if SILABS_LOG_OUT_UART
+#if SIWX_917
 #include "rsi_debug.h"
+#endif // SIWX_917
 #include "uart.h"
 #endif
 
@@ -136,6 +138,7 @@ static void PrintLog(const char * msg)
         sz = strlen(msg);
 
 #if SILABS_LOG_OUT_UART
+#if SIWX_917
         for (/* Empty */; sz != 0; --sz)
         {
             Board_UARTPutChar(*msg++);
@@ -143,6 +146,9 @@ static void PrintLog(const char * msg)
         // To print next log in new line with proper formatting
         Board_UARTPutChar('\r');
         Board_UARTPutChar('\n');
+#else
+        uartLogWrite(msg, sz);
+#endif // SIWX_917
 #elif PW_RPC_ENABLED
         PigweedLogger::putString(msg, sz);
 #else
