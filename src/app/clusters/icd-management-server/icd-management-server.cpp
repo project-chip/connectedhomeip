@@ -425,9 +425,14 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * comman
 bool emberAfIcdManagementClusterStayActiveRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           const Commands::StayActiveRequest::DecodableType & commandData)
 {
+// Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
+// as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
+// server in those examples.
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     IcdManagement::Commands::StayActiveResponse::Type response;
     response.promisedActiveDuration = Server::GetInstance().GetICDManager().StayActiveRequest(commandData.stayActiveDuration);
     commandObj->AddResponse(commandPath, response);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     return true;
 }
 

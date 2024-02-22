@@ -551,11 +551,11 @@ public:
         // Verify That ICDManager starts in Idle
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
-        // Trigger a subscription report Put the ICD manager into active mode
+        // Trigger a subscription report. Put the ICD manager into active mode.
         notifier.NotifySubscriptionReport();
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
-        // Advance time by the duration of the stay active request - 1
+        // Advance time by the ActiveModeDuration - 1
         AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms);
         // Confirm ICD manager is in active mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
