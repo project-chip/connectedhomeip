@@ -57,40 +57,46 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)invalidate;
 
 /**
- * The access grants the Matter stack can observe.  Only modified while in
- * Initializing state or on the Matter queue.
+ * Add the cluster to an endpoint with the given endpoint ID.  Will return NO
+ * if the cluster is already added to an endpoint.
  */
-@property (nonatomic, strong, readonly) NSSet<MTRAccessGrant *> * matterAccessGrants;
+- (BOOL)addToEndpoint:(chip::EndpointId)endpoint;
+
+/**
+ * The access grants the Matter stack can observe.  Only modified while
+ * associating with a controller or on the Matter queue.
+ */
+@property (atomic, copy, readonly) NSArray<MTRAccessGrant *> * matterAccessGrants;
 
 /**
  * parentEndpoint will be kInvalidEndpointId until the cluster is added to an endpoint.
  */
-@property (nonatomic, assign) chip::EndpointId parentEndpoint;
+@property (atomic, assign, readonly) chip::EndpointId parentEndpoint;
 
 /**
  * The attribute metadata for the cluster.  Only valid after associateWithController: has succeeded.
  */
-@property (nonatomic, assign, readonly) chip::Span<const EmberAfAttributeMetadata> matterAttributeMetadata;
+@property (atomic, assign, readonly) chip::Span<const EmberAfAttributeMetadata> matterAttributeMetadata;
 
 /**
  * The list of accepted command IDs.
  */
-@property (nonatomic, copy, nullable) NSArray<NSNumber *> * acceptedCommands;
+@property (atomic, copy, nullable) NSArray<NSNumber *> * acceptedCommands;
 
 /**
  * The list of generated command IDs.
  */
-@property (nonatomic, copy, nullable) NSArray<NSNumber *> * generatedCommands;
+@property (atomic, copy, nullable) NSArray<NSNumber *> * generatedCommands;
 
 /**
  * The list of accepted commands IDs in the format the Matter stack needs.
  */
-@property (nonatomic, assign, nullable, readonly) chip::CommandId * matterAcceptedCommands;
+@property (atomic, assign, nullable, readonly) chip::CommandId * matterAcceptedCommands;
 
 /**
  * The list of generated commands IDs in the format the Matter stack needs.
  */
-@property (nonatomic, assign, nullable, readonly) chip::CommandId * matterGeneratedCommands;
+@property (atomic, assign, nullable, readonly) chip::CommandId * matterGeneratedCommands;
 
 @end
 
