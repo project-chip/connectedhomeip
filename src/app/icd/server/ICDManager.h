@@ -110,8 +110,8 @@ public:
     OperationalState GetOperationalState() { return mOperationalState; }
 
     /**
-     * @brief Extends the Active Mode duration for whichever is smallest between 30000 milliseconds and stayActiveDuration, taking
-     * in account the remaining active time.
+     * @brief Ensures that the remaining Active Mode duration is at least the smaller of 30000 milliseconds and stayActiveDuration.
+     *
      * @param stayActiveDuration The duration (in milliseconds) requested by the client to stay in Active Mode
      * @return The duration (in milliseconds) the device will stay in Active Mode
      */

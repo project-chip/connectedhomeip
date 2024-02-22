@@ -425,15 +425,9 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * comman
 bool emberAfIcdManagementClusterStayActiveRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           const Commands::StayActiveRequest::DecodableType & commandData)
 {
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
     IcdManagement::Commands::StayActiveResponse::Type response;
     response.promisedActiveDuration = Server::GetInstance().GetICDManager().StayActiveRequest(commandData.stayActiveDuration);
     commandObj->AddResponse(commandPath, response);
-#else
-    // Note: We only keep this line around for platforms examples that enable the ICD management server without building the sample
-    // as an ICD.
-    commandObj->AddStatus(commandPath, InteractionModel::Status::UnsupportedCommand);
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     return true;
 }
 
