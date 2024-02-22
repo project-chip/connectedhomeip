@@ -102,6 +102,8 @@ static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier 
 static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 static NSString * const kErrorCDCertStoreInit = @"Init failure while initializing Certificate Declaration Signing Keys store";
 
+chip::Tracing::MetricKey kMTRPairingSetup = "pairing-setup-session";
+
 typedef void (^SyncWorkQueueBlock)(void);
 typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
 typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
@@ -606,6 +608,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
+    MATTER_LOG_METRIC_BEGIN(kMTRPairingSetup);
+
     auto block = ^BOOL {
         // Try to get a QR code if possible (because it has a better
         // discriminator, etc), then fall back to manual code if that fails.
