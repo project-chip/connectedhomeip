@@ -264,8 +264,7 @@ void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult 
     GAutoPtr<GError> error;
     BluezGattManager1 * gattMgr = BLUEZ_GATT_MANAGER1(aObject);
 
-    gboolean success =
-        bluez_gatt_manager1_call_register_application_finish(gattMgr, aResult, &MakeUniquePointerReceiver(error).Get());
+    gboolean success = bluez_gatt_manager1_call_register_application_finish(gattMgr, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, {
         ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message);
@@ -614,16 +613,16 @@ void BluezEndpoint::SetupGattServer(GDBusConnection * aConn)
 CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
 {
     GAutoPtr<GError> err;
-    GAutoPtr<GDBusConnection> conn(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &MakeUniquePointerReceiver(err).Get()));
+    GAutoPtr<GDBusConnection> conn(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &err.GetReceiver()));
     VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, err->message));
 
     SetupGattServer(conn.get());
 
-    mpObjMgr = g_dbus_object_manager_client_new_sync(
-        conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
-        nullptr /* unused user data in the Proxy Type Func */, nullptr /*destroy notify */, nullptr /* cancellable */,
-        &MakeUniquePointerReceiver(err).Get());
+    mpObjMgr = g_dbus_object_manager_client_new_sync(conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
+                                                     bluez_object_manager_client_get_proxy_type,
+                                                     nullptr /* unused user data in the Proxy Type Func */,
+                                                     nullptr /*destroy notify */, nullptr /* cancellable */, &err.GetReceiver());
     VerifyOrReturnError(mpObjMgr != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", err->message));
 
@@ -729,7 +728,7 @@ CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice)
     for (uint16_t i = 0; i < kMaxConnectRetries; i++)
     {
         GAutoPtr<GError> error;
-        if (bluez_device1_call_connect_sync(&aDevice, mConnectCancellable.get(), &MakeUniquePointerReceiver(error).Get()))
+        if (bluez_device1_call_connect_sync(&aDevice, mConnectCancellable.get(), &error.GetReceiver()))
         {
             ChipLogDetail(DeviceLayer, "ConnectDevice complete");
             return CHIP_NO_ERROR;

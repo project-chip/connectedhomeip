@@ -258,6 +258,9 @@ def cmd_list(context):
     '--microwave-oven-app',
     help='what microwave oven app to use')
 @click.option(
+    '--rvc-app',
+    help='what rvc app to use')
+@click.option(
     '--chip-repl-yaml-tester',
     help='what python script to use for running yaml tests using chip-repl as controller')
 @click.option(
@@ -288,7 +291,7 @@ def cmd_list(context):
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
-            tv_app, bridge_app, lit_icd_app, microwave_oven_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
+            tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
         sys.exit(2)
@@ -321,6 +324,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if microwave_oven_app is None:
         microwave_oven_app = paths_finder.get('chip-microwave-oven-app')
 
+    if rvc_app is None:
+        rvc_app = paths_finder.get('chip-rvc-app')
+
     if chip_repl_yaml_tester is None:
         chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
 
@@ -341,6 +347,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         bridge_app=[bridge_app],
         lit_icd_app=[lit_icd_app],
         microwave_oven_app=[microwave_oven_app],
+        rvc_app=[rvc_app],
         chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester],
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
