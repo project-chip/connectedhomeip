@@ -16,7 +16,7 @@ import("//build_overrides/build.gni")
 
 declare_args() {
   # Root directory for lwIP.
-  lwip_root = "//third_party/connectedhomeip/third_party/lwip"
+  lwip_root = "//third_party/lwip"
 }
 
 lwip_remove_configs = [ "${build_root}/config/compiler:warnings_default" ]

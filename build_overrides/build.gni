@@ -14,5 +14,5 @@
 
 declare_args() {
   # Root directory for build files.
-  build_root = "//third_party/connectedhomeip/build"
+  build_root = "//build"
 }

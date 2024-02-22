@@ -14,5 +14,5 @@
 
 declare_args() {
   # Root directory for nlio.
-  nlio_root = "//third_party/connectedhomeip/third_party/nlio"
+  nlio_root = "//third_party/nlio"
 }
