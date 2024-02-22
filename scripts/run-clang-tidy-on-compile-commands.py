@@ -373,7 +373,7 @@ __LOG_LEVELS__ = {
     # paths like `../../examples/chip-tool/third_party/connectedhomeip/src/`
     #
     # NOTE: src/platform/Linux disabled due to glib errors. Seemed like a better
-    #       tradeoff that completely disabling EnumCastoutOfRange which seems
+    #       trade-off than completely disabling EnumCastoutOfRange which seems
     #       to catch errors
     default="/(repo|zzz_generated|src/platform/Linux)/",
     help="Regular expression to apply to the file paths for running. Skip overrides includes.",
