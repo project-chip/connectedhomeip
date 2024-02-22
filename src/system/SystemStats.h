@@ -73,8 +73,8 @@ enum
     kNumEntries
 };
 
-typedef int8_t count_t;
-#define CHIP_SYS_STATS_COUNT_MAX INT8_MAX
+typedef uint16_t count_t;
+#define CHIP_SYS_STATS_COUNT_MAX UINT16_MAX
 
 extern count_t ResourcesInUse[kNumEntries];
 extern count_t HighWatermarks[kNumEntries];
