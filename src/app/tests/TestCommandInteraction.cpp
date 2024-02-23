@@ -617,7 +617,7 @@ void TestCommandInteraction::FillCurrentInvokeResponseBuffer(nlTestSuite * apSui
 
     // AddResponseData's overhead calculation depends on the size of ForcedSizeBuffer. If the buffer exceeds 255 bytes, an extra
     // length byte is required. Since tests using FillCurrentInvokeResponseBuffer currently end up with sizeToFill > 255, we
-    // inform the calculation of this expectation. Nonetheless, we also validate this assumption for correctness. 
+    // inform the calculation of this expectation. Nonetheless, we also validate this assumption for correctness.
     bool isForcedSizeBufferLargerThan255 = true;
     uint32_t overheadSizeNeededForAddingResponse = GetAddResponseDataOverheadSizeForPath(apSuite, aRequestCommandPath, isForcedSizeBufferLargerThan255);
     NL_TEST_ASSERT(apSuite, remainingSize > (aSizeToLeaveInBuffer + overheadSizeNeededForAddingResponse));
