@@ -60,7 +60,7 @@
  *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
  *
  */
-#define SuccessOrExitWithMetric(kMetricKey, aStatus) nlEXPECT(::chip::Tracing::utils::LogMetricIfError(kMetricKey, aStatus), exit)
+#define SuccessOrExitWithMetric(kMetricKey, aStatus) nlEXPECT(::chip::Tracing::ErrorHandling::LogMetricIfError(kMetricKey, aStatus), exit)
 
 /**
  *  @def VerifyOrExitWithMetric(kMetricKey, aCondition, anAction)
@@ -175,11 +175,8 @@
  *      The above example generates a Begin metric event with key kMetricPASESession.
  *
  *  @param[in]  key The key representing the metric name/event.
- *
- *  @param[in]  value An optional value for the metric. This value corresponds to one of the values supported
- *                    in MetricEvent::Value
  */
-#define MATTER_LOG_METRIC_BEGIN(key, ...) __MATTER_LOG_METRIC(chip::Tracing::MetricEvent::Type::kBeginEvent, key, ##__VA_ARGS__)
+#define MATTER_LOG_METRIC_BEGIN(key) __MATTER_LOG_METRIC(chip::Tracing::MetricEvent::Type::kBeginEvent, key)
 
 /**
  * @def MATTER_LOG_METRIC_END
@@ -215,7 +212,7 @@
  *  @param[in]  key The key representing the metric name/event.
  */
 #define MATTER_LOG_METRIC_SCOPE(key)                                                                                               \
-    ::chip::Tracing::utils::ScopedMetricEvent __LOG_METRIC_MACRO_CONCAT(_metric_scope, __COUNTER__)(key)
+    ::chip::Tracing::ScopedMetricEvent __LOG_METRIC_MACRO_CONCAT(_metric_scope, __COUNTER__)(key)
 
 /**
  * @def MATTER_LOG_METRIC_SCOPE_WITH_ERROR
@@ -236,7 +233,7 @@
  *  @param[in]  errorValue The initial error code value.
  */
 #define MATTER_LOG_METRIC_SCOPE_WITH_ERROR(key, errorObj, errorValue)                                                              \
-    chip::Tracing::utils::ScopedMetricEvent errorObj(key, errorValue)
+    chip::Tracing::ScopedMetricEvent errorObj(key, errorValue)
 
 #else // Tracing is disabled
 

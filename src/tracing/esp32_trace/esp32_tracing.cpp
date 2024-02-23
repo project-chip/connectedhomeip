@@ -180,6 +180,7 @@ void ESP32Backend::LogMetricEvent(const MetricEvent & event)
         ESP_LOGI("mtr", "The value of %s is error with code %lu ", event.key(), event.ValueUInt32());
         esp_diag_metrics_add_uint(event.key(), event.ValueUInt32());
         break;
+    case ValueType::kUndefined:
     default:
         ESP_LOGI("mtr", "The value of %s is of an UNKNOWN TYPE", event.key());
         break;

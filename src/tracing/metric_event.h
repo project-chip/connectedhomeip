@@ -20,15 +20,16 @@
 #include <tracing/metric_keys.h>
 #include <tracing/metric_macros.h>
 #include <tracing/registry.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Tracing {
 
 /**
- * Define a metric that can be logged. A metric consists of a key-value pair. The value is
- * currently limited to simple scalar values.
+ * Define a metric that can be logged. A metric consists of a key and an optional value pair.
+ * The value is currently limited to simple scalar values.
  *
- * Additionally a metric is tagged as either an instant event or marked with a begin and end
+ * Additionally a metric is tagged as either an instant event or marked with a begin/end
  * for the event. When the latter is used, a duration can be associated between the two events.
  */
 class MetricEvent
@@ -39,15 +40,19 @@ public:
     MetricEvent & operator=(const MetricEvent &) = default;
     MetricEvent & operator=(MetricEvent &&)      = default;
 
-public:
     // This specifies the different categories of metric events that can created. In addition to
     // emitting an event, events paired with a kBeginEvent and kEndEvent can be used to track
     // duration for the event. A kInstantEvent represents a one shot event.
     enum class Type
     {
-        kBeginEvent,  // Marks the begin of an event. This must be tied with an End event.
-        kEndEvent,    // Marks the end of an event. This is typically preceeded with a Begin event.
-        kInstantEvent // No duration
+        // This specifies an event marked to track the Begin of an operation
+        kBeginEvent,
+
+        // This specifies an event marked to track the End of an operation
+        kEndEvent,
+
+        // This specifies a one shot event
+        kInstantEvent
     };
 
     // This defines the different types of values that can stored when a metric is emitted
@@ -60,6 +65,7 @@ public:
 
         enum class Type : uint8_t
         {
+            kUndefined,    // Value is not valid
             kInt32,        // int32_t
             kUInt32,       // uint32_t
             kChipErrorCode // chip::ChipError
@@ -70,6 +76,8 @@ public:
             int32_t int32_value;
             uint32_t uint32_value;
 
+            Store() {}
+
             Store(int32_t v) : int32_value(v) {}
 
             Store(uint32_t v) : uint32_value(v) {}
@@ -78,6 +86,8 @@ public:
         Store store;
         Type type;
 
+        Value() : type(Type::kUndefined) {}
+
         Value(uint32_t value) : store(value), type(Type::kUInt32) {}
 
         Value(int32_t value) : store(value), type(Type::kInt32) {}
@@ -85,7 +95,9 @@ public:
         Value(const ChipError & err) : store(err.AsInteger()), type(Type::kChipErrorCode) {}
     };
 
-    MetricEvent(Type type, MetricKey key, int32_t value = 0) : mType(type), mKey(key), mValue(value) {}
+    MetricEvent(Type type, MetricKey key) : mType(type), mKey(key) {}
+
+    MetricEvent(Type type, MetricKey key, int32_t value) : mType(type), mKey(key), mValue(value) {}
 
     MetricEvent(Type type, MetricKey key, uint32_t value) : mType(type), mKey(key), mValue(value) {}
 
@@ -107,11 +119,23 @@ public:
 
     Value value() const { return mValue; }
 
-    uint32_t ValueUInt32() const { return mValue.store.uint32_value; }
+    uint32_t ValueUInt32() const
+    {
+        VerifyOrDie(mValue.type == Value::Type::kUInt32);
+        return mValue.store.uint32_value;
+    }
 
-    int32_t ValueInt32() const { return mValue.store.int32_value; }
+    int32_t ValueInt32() const
+    {
+        VerifyOrDie(mValue.type == Value::Type::kInt32);
+        return mValue.store.int32_value;
+    }
 
-    uint32_t ValueErrorCode() const { return mValue.store.uint32_value; }
+    uint32_t ValueErrorCode() const
+    {
+        VerifyOrDie(mValue.type == Value::Type::kChipErrorCode);
+        return mValue.store.uint32_value;
+    }
 
 private:
     Type mType;
@@ -119,7 +143,7 @@ private:
     Value mValue;
 };
 
-namespace utils {
+namespace ErrorHandling {
 
 /**
  * Utility to emit an instant metric if the error is not a success.
@@ -133,6 +157,8 @@ inline bool LogMetricIfError(MetricKey metricKey, const ::chip::ChipError & err)
     }
     return success;
 }
+
+} // namespace ErrorHandling
 
 /**
  * This utility class helps generate a Begin and End metric event within the scope of a block using RAII.
@@ -175,8 +201,6 @@ private:
     MetricKey mKey;
     ChipError mError;
 };
-
-} // namespace utils
 
 } // namespace Tracing
 } // namespace chip

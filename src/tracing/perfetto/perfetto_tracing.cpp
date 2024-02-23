@@ -141,6 +141,7 @@ void PerfettoBackend::LogMetricEvent(const MetricEvent & event)
     case ValueType::kChipErrorCode:
         TRACE_EVENT_INSTANT("Matter", event.key(), "error", event.ValueErrorCode());
         break;
+    case ValueType::kUndefined:
     default:
         TRACE_EVENT_INSTANT("Matter", event.key(), "type", "UNKNOWN");
         break;

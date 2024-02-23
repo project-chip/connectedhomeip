@@ -314,6 +314,7 @@ void JsonBackend::LogMetricEvent(const MetricEvent & event)
     case ValueType::kChipErrorCode:
         value["value"] = event.ValueErrorCode();
         break;
+    case ValueType::kUndefined:
     default:
         value["value"] = "UNKNOWN";
         break;

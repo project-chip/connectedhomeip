@@ -59,6 +59,9 @@ void InitializeMetricsCollection()
     case ValueType::kChipErrorCode:
         _value = [NSNumber numberWithInteger:event.ValueUInt32()];
         break;
+    case ValueType::kUndefined:
+    default:
+        _value = nil;
     }
 
     _timePoint = chip::System::SystemClock().GetMonotonicMicroseconds64();
@@ -170,6 +173,7 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     case ValueType::kChipErrorCode:
         MTR_LOG_INFO("Received metric event, key: %s, type: %d, error value: %u", event.key(), event.type(), event.ValueUInt32());
         break;
+    case ValueType::kUndefined:
     default:
         MTR_LOG_INFO("Received metric event, key: %s, type: %d, unknown value", event.key(), event.type());
         return;
