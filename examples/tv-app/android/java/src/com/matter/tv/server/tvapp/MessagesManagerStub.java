@@ -52,7 +52,7 @@ public class MessagesManagerStub implements MessagesManager {
       int priority,
       int messageControl,
       long startTime,
-      int duration,
+      long duration,
       String messageText,
       HashMap<Long, String> responseOptions) {
     Log.d(

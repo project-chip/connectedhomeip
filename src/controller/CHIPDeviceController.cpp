@@ -3040,8 +3040,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         request.breadcrumb.Emplace(breadcrumb);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
-        ChipLogProgress(Controller, "SendCommand kWiFiNetworkEnable, supportsConcurrentConnection=%d",
-                        params.GetSupportsConcurrentConnection().Value());
+        ChipLogProgress(Controller, "SendCommand kWiFiNetworkEnable, supportsConcurrentConnection=%s",
+                        params.GetSupportsConcurrentConnection().HasValue()
+                            ? (params.GetSupportsConcurrentConnection().Value() ? "true" : "false")
+                            : "missing");
         err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
 
         if (err != CHIP_NO_ERROR)

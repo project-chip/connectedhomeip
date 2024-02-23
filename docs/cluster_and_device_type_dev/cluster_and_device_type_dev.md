@@ -238,7 +238,9 @@ pure CommandHandlerInterface implementations.
         -   **MatterReportingAttributeChangeCallback**
 -   **Events**
     -   No direct ember support
-    -   Call LogEvent function in EventLogging.h
+    -   Call LogEvent function in EventLogging.h. Caller has to either lock the
+        Matter stack lock or queue the event to the Matter event queue when
+        using LogEvent.
 
 #### A note on Dynamic Endpoints
 
