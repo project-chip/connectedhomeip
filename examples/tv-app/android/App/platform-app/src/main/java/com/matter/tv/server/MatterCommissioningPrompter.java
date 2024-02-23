@@ -121,7 +121,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
                             .setTitle("Connection Cancelled")
                             .create()
                             .show();
-          
+
       NotificationCompat.Builder builder =
         new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_check_24)
@@ -189,7 +189,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
                   .setTitle("Connection Starting")
                   .create()
                   .show();
-          
+
       NotificationCompat.Builder builder =
         new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_baseline_check_24)
@@ -216,7 +216,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
               () -> {
 
       AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
-      abuilder.setMessage("Success. " + commissioneeName 
+      abuilder.setMessage("Success. " + commissioneeName
           + " can now cast to this device. Visit settings to manage access control for casting.")
                             .setTitle("Connection Complete")
                             .create()
@@ -242,7 +242,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
               () -> {
 
       AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
-      abuilder.setMessage("Failed. " + commissioneeName 
+      abuilder.setMessage("Failed. " + commissioneeName
                     + " experienced error: " + error + ".")
                                       .setTitle("Connection Failed")
                                       .create()
@@ -279,7 +279,7 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
                         OnMessageResponse(message.messageId, -1); // ignore
                       })
                     .create()
-                    .show();  
+                    .show();
       } else {
         AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
         abuilder.setMessage("" + message.messageId + ":" + message.messageText)
@@ -287,15 +287,15 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
                     .setPositiveButton(
                       message.responseOptions[0].label,
                       (dialog, which) -> {
-                        OnMessageResponse(message.messageId, message.responseOptions[0].id); 
+                        OnMessageResponse(message.messageId, message.responseOptions[0].id);
                       })
                     .setNegativeButton(
                       message.responseOptions[1].label,
                       (dialog, which) -> {
-                        OnMessageResponse(message.messageId, message.responseOptions[1].id); 
+                        OnMessageResponse(message.messageId, message.responseOptions[1].id);
                       })
                     .create()
-                    .show();  
+                    .show();
       }
     });
   }
