@@ -1309,7 +1309,7 @@ public class ChipDeviceController {
   /**
    * Extract skid from paa cert.
    *
-   * This method was deprecated. Please use {@link DeviceAttestation.extractSkidFromPaaCert}.
+   * <p>This method was deprecated. Please use {@link DeviceAttestation.extractSkidFromPaaCert}.
    */
   @Deprecated
   public byte[] extractSkidFromPaaCert(byte[] paaCert) {
