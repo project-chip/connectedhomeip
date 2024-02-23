@@ -17,7 +17,7 @@
  */
 
  package chip.devicecontroller;
- 
+
  public class DeviceAttestation {
   /**
    * Extract skid from paa cert.
@@ -36,7 +36,7 @@
   public static native byte[] extractAkidFromPaiCert(byte[] paiCert);
 
   /**
-   * Validate device Attestation. If device attestation fails, {@link ChipDeviceControllerException} exception occurs. 
+   * Validate device Attestation. If device attestation fails, {@link ChipDeviceControllerException} exception occurs.
    *
    * @param vendorId Vendor ID from the node
    * @param productId Product ID from the node
@@ -53,4 +53,3 @@
       byte[] dacCert,
       byte[] attestationElements) throws ChipDeviceControllerException;
  }
- 

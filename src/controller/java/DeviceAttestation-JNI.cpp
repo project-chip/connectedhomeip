@@ -208,7 +208,7 @@ void ThrowException(JNIEnv * env, CHIP_ERROR err)
 {
     jclass controllerExceptionCls;
     CHIP_ERROR classRefErr = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipDeviceControllerException", controllerExceptionCls);
-    
+
     if (classRefErr != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to GetLocalClassRef: %" CHIP_ERROR_FORMAT, classRefErr.Format());
