@@ -150,6 +150,7 @@ public:
     ScopedMetricEvent(MetricKey key, const ChipError & error = CHIP_NO_ERROR) : mKey(key), mError(error)
     {
         MATTER_LOG_METRIC_BEGIN(mKey);
+        IgnoreUnusedVariable(mKey);
     }
 
     ~ScopedMetricEvent() { MATTER_LOG_METRIC_END(mKey, mError); }
