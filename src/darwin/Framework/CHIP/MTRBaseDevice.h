@@ -547,9 +547,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Download log of the desired type from the device.
  *
- * Note: The consumer of this API should move the file that the url points to or open it for reading before the
- * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
- *
  * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
  * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
  *                   has been retrieved by that point (which might be none or a partial log).
