@@ -325,7 +325,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB)
     {
         value = DecodeGeneralTLVValue(env, apData);
-        err = CHIP_NO_ERROR;
+        err   = CHIP_NO_ERROR;
     }
 
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode attribute with error %s", ErrorStr(err));
@@ -481,7 +481,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB)
     {
         value = DecodeGeneralTLVValue(env, apData);
-        err = CHIP_NO_ERROR;
+        err   = CHIP_NO_ERROR;
     }
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode event with error %s", ErrorStr(err));
                    aEventHeader.LogPath());
@@ -917,7 +917,7 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
 
 jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
     jobject retValue = nullptr;
 
     TLV::TLVReader readerForJavaObject;
@@ -925,63 +925,64 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData)
 
     switch (readerForJavaObject.GetType())
     {
-        case TLV::kTLVType_SignedInteger:
-        {
-            int64_t signedValue;
-            VerifyOrReturnValue(readerForJavaObject.Get(signedValue) == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
-            err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(signedValue), retValue);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
-            return retValue;
-        }
-        case TLV::kTLVType_UnsignedInteger:
-        {
-            uint64_t unsignedValue;
-            VerifyOrReturnValue(readerForJavaObject.Get(unsignedValue) == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
-            err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(unsignedValue), retValue);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
-            return retValue;
-        }
-        case TLV::kTLVType_Boolean:
-        {
-            bool booleanValue;
-            VerifyOrReturnValue(readerForJavaObject.Get(booleanValue) == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
-            err = JniReferences::GetInstance().CreateBoxedObject<jboolean>("java/lang/Boolean", "(Z)V", static_cast<jboolean>(booleanValue), retValue);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
-            return retValue;
-        }
-        case TLV::kTLVType_FloatingPointNumber:
-        {
-            double doubleValue;
-            VerifyOrReturnValue(readerForJavaObject.Get(doubleValue) == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
-            err = JniReferences::GetInstance().CreateBoxedObject<jdouble>("java/lang/Double", "(D)V", static_cast<jdouble>(doubleValue), retValue);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
-            return retValue;
-        }
-        case TLV::kTLVType_UTF8String:
-        {
-            uint32_t bufferLen = readerForJavaObject.GetLength();
-            std::unique_ptr<char[]> buffer = std::unique_ptr<char[]>(new char[bufferLen + 1]);
-            err = readerForJavaObject.GetString(buffer.get(), bufferLen + 1);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
-            chip::CharSpan valueSpan(buffer.get(), bufferLen);
-            chip::JniReferences::GetInstance().CharToStringUTF(valueSpan, retValue);
-            return retValue;
-        }
-        case TLV::kTLVType_ByteString:
-        {
-            uint32_t bufferLen = readerForJavaObject.GetLength();
-            std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen + 1]);
-            err = readerForJavaObject.GetBytes(buffer.get(), bufferLen + 1);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+    case TLV::kTLVType_SignedInteger: {
+        int64_t signedValue;
+        VerifyOrReturnValue(readerForJavaObject.Get(signedValue) == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "Get TLV Value fail!"));
+        err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(signedValue),
+                                                                    retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+        return retValue;
+    }
+    case TLV::kTLVType_UnsignedInteger: {
+        uint64_t unsignedValue;
+        VerifyOrReturnValue(readerForJavaObject.Get(unsignedValue) == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "Get TLV Value fail!"));
+        err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(unsignedValue),
+                                                                    retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+        return retValue;
+    }
+    case TLV::kTLVType_Boolean: {
+        bool booleanValue;
+        VerifyOrReturnValue(readerForJavaObject.Get(booleanValue) == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "Get TLV Value fail!"));
+        err = JniReferences::GetInstance().CreateBoxedObject<jboolean>("java/lang/Boolean", "(Z)V",
+                                                                       static_cast<jboolean>(booleanValue), retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+        return retValue;
+    }
+    case TLV::kTLVType_FloatingPointNumber: {
+        double doubleValue;
+        VerifyOrReturnValue(readerForJavaObject.Get(doubleValue) == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "Get TLV Value fail!"));
+        err = JniReferences::GetInstance().CreateBoxedObject<jdouble>("java/lang/Double", "(D)V", static_cast<jdouble>(doubleValue),
+                                                                      retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+        return retValue;
+    }
+    case TLV::kTLVType_UTF8String: {
+        uint32_t bufferLen             = readerForJavaObject.GetLength();
+        std::unique_ptr<char[]> buffer = std::unique_ptr<char[]>(new char[bufferLen + 1]);
+        err                            = readerForJavaObject.GetString(buffer.get(), bufferLen + 1);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+        chip::CharSpan valueSpan(buffer.get(), bufferLen);
+        chip::JniReferences::GetInstance().CharToStringUTF(valueSpan, retValue);
+        return retValue;
+    }
+    case TLV::kTLVType_ByteString: {
+        uint32_t bufferLen                = readerForJavaObject.GetLength();
+        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen + 1]);
+        err                               = readerForJavaObject.GetBytes(buffer.get(), bufferLen + 1);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
 
-            jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(bufferLen));
-            env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(bufferLen),
-                                    reinterpret_cast<const jbyte *>(buffer.get()));
+        jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(bufferLen));
+        env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(bufferLen), reinterpret_cast<const jbyte *>(buffer.get()));
 
-            return static_cast<jobject>(valueByteArray);
-        }
-        default:
-            return nullptr;
+        return static_cast<jobject>(valueByteArray);
+    }
+    default:
+        return nullptr;
     }
 }
 
