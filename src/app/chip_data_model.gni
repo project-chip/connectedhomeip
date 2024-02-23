@@ -35,13 +35,6 @@ _app_root = get_path_info(".", "abspath")
 template("chip_data_model") {
   _data_model_name = target_name
 
-  declare_args() {
-    # Allow building ota-requestor-app with a non-spec-compliant floor
-    # (i.e. smaller than 2 minutes) for action delays.
-    non_spec_compliant_ota_action_delay_floor = -1
-    time_sync_enable_tsc_feature = 1
-  }
-
   if (defined(invoker.idl)) {
     _idl = invoker.idl
   } else {
@@ -244,8 +237,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/DefaultTimeSyncDelegate.cpp",
           "${_app_root}/clusters/${cluster}/TimeSyncDataProvider.cpp",
         ]
-        defines +=
-            [ "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}" ]
       } else if (cluster == "scenes-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -359,9 +350,5 @@ template("chip_data_model") {
     }
 
     cflags += [ "-Wconversion" ]
-
-    if (non_spec_compliant_ota_action_delay_floor >= 0) {
-      cflags += [ "-DNON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}" ]
-    }
   }
 }
