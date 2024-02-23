@@ -210,30 +210,10 @@
  *      The above example generates an Begin and the End metric using RAII.
  *
  *  @param[in]  key The key representing the metric name/event.
+ *  @param[in]  error Reference to a ChipError object that is used as the value of the End event.
  */
-#define MATTER_LOG_METRIC_SCOPE(key)                                                                                               \
-    ::chip::Tracing::ScopedMetricEvent __LOG_METRIC_MACRO_CONCAT(_metric_scope, __COUNTER__)(key)
-
-/**
- * @def MATTER_LOG_METRIC_SCOPE_WITH_ERROR
- *
- * @brief
- * Generate a scoped metric tracking Begin and End within a given scope. In addition, it creates the object using
- * the name specified. This object is meant to be used as ChipError object. The End metric will also hold this error
- * value.
- *
- *  Example usage:
- *  @code
- *      MATTER_LOG_METRIC_SCOPE_WITH_ERROR(chip::Tracing::kMetricPASESession, err, CHIP_NO_ERROR);
- *  @endcode
- *      The above example generates an Begin and the End metric using RAII.
- *
- *  @param[in]  key The key representing the metric name/event.
- *  @param[in]  errorObj The name of the object for the ScopedMetricEvent.
- *  @param[in]  errorValue The initial error code value.
- */
-#define MATTER_LOG_METRIC_SCOPE_WITH_ERROR(key, errorObj, errorValue)                                                              \
-    chip::Tracing::ScopedMetricEvent errorObj(key, errorValue)
+#define MATTER_LOG_METRIC_SCOPE(key, error)                                                                                               \
+    ::chip::Tracing::ScopedMetricEvent __LOG_METRIC_MACRO_CONCAT(_metric_scope, __COUNTER__)(key, error)
 
 #else // Tracing is disabled
 
@@ -258,23 +238,5 @@
 #define MATTER_LOG_METRIC_BEGIN(...) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_METRIC_END(...) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_METRIC_SCOPE(...) __MATTER_LOG_METRIC_DISABLE(__VA_ARGS__)
-
-/**
- * @def MATTER_LOG_METRIC_SCOPE_WITH_ERROR
- *
- * @brief
- * When tracing is disabled, this defaults to creating an ChipError object with a specified value.
- *
- *  Example usage:
- *  @code
- *      MATTER_LOG_METRIC_SCOPE_WITH_ERROR(chip::Tracing::kMetricPASESession, err, CHIP_NO_ERROR);
- *  @endcode
- *      The above example generates a ChipError with the specified value.
- *
- *  @param[in]  key The key representing the metric name/event. This parameter is ignored since tracing is disabled.
- *  @param[in]  errorObj The name of the ChipError object.
- *  @param[in]  errorValue The initial error code value.
- */
-#define MATTER_LOG_METRIC_SCOPE_WITH_ERROR(key, errorObj, errorValue) chip::ChipError errorObj = errorValue
 
 #endif // MATTER_TRACING_ENABLED

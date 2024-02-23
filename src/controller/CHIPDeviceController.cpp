@@ -630,8 +630,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, co
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
 
-    MATTER_LOG_METRIC_SCOPE_WITH_ERROR(chip::Tracing::kMetricPASESession, err, CHIP_NO_ERROR);
+    MATTER_LOG_METRIC_SCOPE(chip::Tracing::kMetricPASESession, err);
     CommissioneeDeviceProxy * device   = nullptr;
     CommissioneeDeviceProxy * current  = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
@@ -706,8 +707,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CONFIG_NETWORK_LAYER_BLE
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
     {
-        MATTER_LOG_METRIC_SCOPE(chip::Tracing::kMetricPASESessionBLE);
-
         if (params.HasConnectionObject())
         {
             SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE,

@@ -162,44 +162,29 @@ inline bool LogMetricIfError(MetricKey metricKey, const ::chip::ChipError & err)
 
 /**
  * This utility class helps generate a Begin and End metric event within the scope of a block using RAII.
- * This class is also meant to be used in expressions where ChipError object are typically used to capture
- * error values.
  */
 class ScopedMetricEvent
 {
 public:
-    ScopedMetricEvent(const ScopedMetricEvent &)             = default;
-    ScopedMetricEvent(ScopedMetricEvent &&)                  = default;
-    ScopedMetricEvent & operator=(const ScopedMetricEvent &) = default;
-    ScopedMetricEvent & operator=(ScopedMetricEvent &&)      = default;
+    ScopedMetricEvent(const ScopedMetricEvent &)             = delete;
+    ScopedMetricEvent(ScopedMetricEvent &&)                  = delete;
+    ScopedMetricEvent & operator=(const ScopedMetricEvent &) = delete;
+    ScopedMetricEvent & operator=(ScopedMetricEvent &&)      = delete;
 
-    ScopedMetricEvent(MetricKey key, const ChipError & error = CHIP_NO_ERROR) : mKey(key), mError(error)
+    ScopedMetricEvent(MetricKey key, ChipError & error) : mKey(key), mError(error)
     {
         MATTER_LOG_METRIC_BEGIN(mKey);
         IgnoreUnusedVariable(mKey);
     }
 
-    ~ScopedMetricEvent() { MATTER_LOG_METRIC_END(mKey, mError); }
-
-    operator ChipError() const { return mError; }
-
-    ScopedMetricEvent & operator=(const ChipError & err)
+    ~ScopedMetricEvent()
     {
-        mError = err;
-        return *this;
+        MATTER_LOG_METRIC_END(mKey, mError);
     }
-
-    friend bool operator==(const ScopedMetricEvent & event, const ChipError & err) { return event.mError == err; }
-
-    friend bool operator!=(const ScopedMetricEvent & event, const ChipError & err) { return event.mError != err; }
-
-    friend bool operator==(const ChipError & err, const ScopedMetricEvent & event) { return event.mError == err; }
-
-    friend bool operator!=(const ChipError & err, const ScopedMetricEvent & event) { return event.mError != err; }
 
 private:
     MetricKey mKey;
-    ChipError mError;
+    ChipError & mError;
 };
 
 } // namespace Tracing
