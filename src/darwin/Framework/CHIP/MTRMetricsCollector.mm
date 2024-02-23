@@ -193,7 +193,7 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
 
     [_metricsDataCollection setValue:data forKey:metricsKey];
 
-    // If the event is a being or end event, implicitly emit a corresponding instant event
+    // If the event is a begin or end event, implicitly emit a corresponding instant event
     if (event.type() == MetricEvent::Type::kBeginEvent || event.type() == MetricEvent::Type::kEndEvent) {
         MetricEvent instantEvent(MetricEvent::Type::kInstantEvent, event.key(), event.value());
         data = [[MTRMetricsData alloc] initWithMetricEvent:instantEvent];

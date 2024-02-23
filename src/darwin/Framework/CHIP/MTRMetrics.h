@@ -21,7 +21,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * A representation of collection of metrics data for an operation.
+ * A representation of a collection of metrics data for an operation.
  */
 MTR_NEWLY_AVAILABLE
 @interface MTRMetrics : NSObject
@@ -30,7 +30,7 @@ MTR_NEWLY_AVAILABLE
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * @brief Returns the names of all the metrics data collected
+ * @brief Returns the names of all the metrics data items collected.
  */
 @property (nonatomic, readonly, copy) NSArray<NSString *> * allKeys;
 

@@ -17,7 +17,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetrics_Internal.h"
 #include <Foundation/Foundation.h>
-#include <MTRMetrics.h>
+#include <Matter/MTRMetrics.h>
 #import <Matter/MTRDefines.h>
 
 @implementation MTRMetrics {

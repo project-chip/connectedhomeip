@@ -31,7 +31,7 @@ void InitializeMetricsCollection();
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Return the singleton MTRMetricsCollector to vend MTRMetric snapshots
+ * Return the singleton MTRMetricsCollector to vend MTRMetrics snapshots
  */
 + (instancetype)sharedInstance;
 
