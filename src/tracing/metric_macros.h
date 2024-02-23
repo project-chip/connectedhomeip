@@ -27,13 +27,13 @@
 #if MATTER_TRACING_ENABLED
 
 /**
- *  @def SuccessOrExitWithMetric(kMetriKey, aStatus)
+ *  @def SuccessOrExitWithMetric(kMetriKey, error)
  *
  *  @brief
- *    This checks for the specified status, which is expected to
+ *    This checks for the specified error, which is expected to
  *    commonly be successful (CHIP_NO_ERROR), and branches to
- *    the local label 'exit' if the status is unsuccessful.
- *    If unsuccessful, a metric with key kMetriKey is emitted with
+ *    the local label 'exit' if the error is not success.
+ *    If error is not a success, a metric with key kMetriKey is emitted with
  *    the error code as the value of the metric.
  *
  *  Example Usage:
@@ -57,10 +57,10 @@
  *  @param[in]  kMetricKey  Metric key for the metric event to be emitted
  *                          if the condition evaluates to false. The value
  *                          for the metric is result of the expression aStatus.
- *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
+ *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
  *
  */
-#define SuccessOrExitWithMetric(kMetricKey, aStatus) nlEXPECT(::chip::Tracing::ErrorHandling::LogMetricIfError(kMetricKey, aStatus), exit)
+#define SuccessOrExitWithMetric(kMetricKey, error) nlEXPECT(::chip::Tracing::ErrorHandling::LogMetricIfError((kMetricKey), (error)), exit)
 
 /**
  *  @def VerifyOrExitWithMetric(kMetricKey, aCondition, anAction)
@@ -97,7 +97,7 @@
  *                          assertion fails.
  */
 #define VerifyOrExitWithMetric(kMetricKey, aCondition, anAction)                                                                   \
-    nlEXPECT_ACTION(aCondition, exit, MATTER_LOG_METRIC(kMetricKey, anAction))
+    nlEXPECT_ACTION(aCondition, exit, MATTER_LOG_METRIC((kMetricKey), (anAction)))
 
 /*
  * Utility Macros to support optional arguments for MATTER_LOG_METRIC_XYZ macros
