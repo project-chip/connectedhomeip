@@ -282,6 +282,8 @@ public:
 
     virtual bool IsDestinationRegisteredLIT() { return false; }
 
+    virtual bool ShouldQueue() { return false; }
+
 protected:
     // mStorageDirectory lives here so we can just set it in RunAsInteractive.
     chip::Optional<char *> mStorageDirectory;

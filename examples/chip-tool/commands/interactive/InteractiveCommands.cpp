@@ -396,17 +396,17 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
 
 void InteractiveCommand::StartCommandExecutorThread()
 {
-    commandExecutorThread = std::thread(&InteractiveCommand::CommandExecutor, this);
+    commandExecutorQueueThread = std::thread(&InteractiveCommand::CommandExecutor, this);
 }
 
 void InteractiveCommand::JoinCommandExecutorThread()
 {
     {
-        std::lock_guard<std::mutex> lock(commandExecutorMutex);
+        std::lock_guard<std::mutex> lock(commandExecutorQueueMutex);
         commandExecutorQueue.push(CommandExecutorTask(false));
-        commandExecutorCv.notify_all();
+        commandExecutorQueueCv.notify_all();
     }
-    commandExecutorThread.join();
+    commandExecutorQueueThread.join();
 }
 
 void InteractiveCommand::CommandExecutor()
@@ -417,8 +417,8 @@ void InteractiveCommand::CommandExecutor()
         // Hold the lock as short as possible. Since OnCheckInComplete also uses the lock.
         // If the lock covers execution call it will be a deadlock when a check-in message arrived during executing the commands.
         {
-            std::unique_lock lock(commandExecutorMutex);
-            commandExecutorCv.wait(lock, [this]() { return !commandExecutorQueue.empty(); });
+            std::unique_lock lock(commandExecutorQueueMutex);
+            commandExecutorQueueCv.wait(lock, [this]() { return !commandExecutorQueue.empty(); });
 
             while (!commandExecutorQueue.empty())
             {
@@ -433,10 +433,12 @@ void InteractiveCommand::CommandExecutor()
             {
             case CommandExecutorTask::Kind::STOP:
                 return;
-            case CommandExecutorTask::Kind::ON_CHECK_IN_COMPLETE:
+            case CommandExecutorTask::Kind::ON_CHECK_IN_COMPLETE: {
+                std::lock_guard<std::mutex> lock(commandExecutorMutex);
                 mHandler->RunAllQueuedCommandsForNode(task.payload.Get<chip::ScopedNodeId>(), GetStorageDirectory(),
                                                       NeedsOperationalAdvertising());
-                break;
+            }
+            break;
             }
         }
     }
@@ -444,9 +446,9 @@ void InteractiveCommand::CommandExecutor()
 
 void InteractiveCommand::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
 {
-    std::lock_guard<std::mutex> lock(commandExecutorMutex);
+    std::lock_guard<std::mutex> lock(commandExecutorQueueMutex);
     commandExecutorQueue.push(CommandExecutorTask(clientInfo.peer_node));
-    commandExecutorCv.notify_all();
+    commandExecutorQueueCv.notify_all();
 }
 
 bool InteractiveCommand::ParseCommand(char * command, int * status)
@@ -462,7 +464,10 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 
     ClearLine();
 
-    *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
+    {
+        std::lock_guard<std::mutex> lock(commandExecutorMutex);
+        *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
+    }
 
     return true;
 }

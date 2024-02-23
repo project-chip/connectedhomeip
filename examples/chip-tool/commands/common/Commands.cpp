@@ -223,7 +223,6 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
                                 const chip::Optional<char *> & interactiveStorageDirectory, bool interactiveAdvertiseOperational)
 {
     Command * command = nullptr;
-    bool queueCommand = false;
 
     if (argc <= 1)
     {
@@ -232,22 +231,6 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (strncmp(argv[1], "dumpstate", 9) == 0)
-    {
-        DumpState();
-        return CHIP_NO_ERROR;
-    }
-    if (strncmp(argv[1], "queue", 5) == 0)
-    {
-        if (!interactive)
-        {
-            ChipLogError(chipTool, "Commands can be queued in interactive mode only.");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        queueCommand = true;
-        argc--;
-        argv++;
-    }
     if (strncmp(argv[0], kQueuedCommandModeName, strlen(kQueuedCommandModeName)) == 0)
     {
         ChipLogProgress(chipTool, "Running previously queued command.");
@@ -330,22 +313,12 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
 
     if (interactive)
     {
-        if (!queueCommand)
+        if (!command->ShouldQueue())
         {
             return command->RunAsInteractive(interactiveStorageDirectory, interactiveAdvertiseOperational);
         }
 
         chip::ScopedNodeId destination = command->GetDestination();
-        if (destination.GetNodeId() == chip::kUndefinedNodeId)
-        {
-            ChipLogError(chipTool, "The command cannot be queued!");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        if (!command->IsDestinationRegisteredLIT())
-        {
-            ChipLogError(chipTool, "The destination is not a registered LIT device.");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
         std::vector<std::string> queuedCommand;
         for (int i = 1; i < argc; i++)
         {
@@ -353,7 +326,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
         }
 
         mQueuedCommands[destination].emplace_back(queuedCommand);
-        ChipLogError(chipTool, "The command is queued for node %" PRIu32 ":" ChipLogFormatX64,
+        ChipLogError(chipTool, "The command is queued for LIT-ICD node %" PRIu32 ":" ChipLogFormatX64,
                      static_cast<uint32_t>(destination.GetFabricIndex()), ChipLogValueX64(destination.GetNodeId()));
         return CHIP_NO_ERROR;
     }
@@ -377,27 +350,6 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
 #endif // CONFIG_USE_LOCAL_STORAGE
 
     return command->Run();
-}
-
-void Commands::DumpState() const
-{
-    fprintf(stderr, ".mQueuedCommands = \n");
-    for (const auto & queue : mQueuedCommands)
-    {
-        auto peer = queue.first;
-        fprintf(stderr, "  [%" PRIu32 ":" ChipLogFormatX64 "] = \n", static_cast<uint32_t>(peer.GetFabricIndex()),
-                ChipLogValueX64(peer.GetNodeId()));
-        for (const auto & command : queue.second)
-        {
-            std::string commandStr;
-            for (auto & arg : command)
-            {
-                commandStr += arg;
-                commandStr += " ";
-            }
-            fprintf(stderr, "    %s\n", commandStr.c_str());
-        }
-    }
 }
 
 void Commands::RunAllQueuedCommandsForNode(chip::ScopedNodeId nodeId, const chip::Optional<char *> & interactiveStorageDirectory,
@@ -433,6 +385,16 @@ void Commands::RunAllQueuedCommandsForNode(chip::ScopedNodeId nodeId, const chip
         ChipLogError(chipTool, "Command execution complete!");
         ChipLogError(chipTool, "Execution result: %s", chip::ErrorStr(err));
     }
+}
+
+std::vector<std::vector<std::string>> Commands::GetQueuedCommandsForNode(chip::ScopedNodeId nodeId) const
+{
+    auto commands = mQueuedCommands.find(nodeId);
+    if (commands == mQueuedCommands.end())
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    return commands->second;
 }
 
 Commands::CommandSetMap::iterator Commands::GetCommandSet(std::string commandSetName)

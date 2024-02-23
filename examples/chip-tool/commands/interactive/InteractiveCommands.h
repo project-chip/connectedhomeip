@@ -82,9 +82,11 @@ private:
     };
 
     std::mutex commandExecutorMutex;
-    std::condition_variable commandExecutorCv;
+
+    std::mutex commandExecutorQueueMutex;
+    std::condition_variable commandExecutorQueueCv;
     std::queue<CommandExecutorTask> commandExecutorQueue;
-    std::thread commandExecutorThread;
+    std::thread commandExecutorQueueThread;
 };
 
 class InteractiveStartCommand : public InteractiveCommand

@@ -90,7 +90,7 @@ void ModelCommand::CheckPeerICDType()
 bool ModelCommand::IsDestinationRegisteredLIT()
 {
     app::ICDClientInfo info;
-    auto destinationPeerId = chip::ScopedNodeId(mDestinationId, CurrentCommissioner().GetFabricIndex());
+    auto destinationPeerId = GetDestination();
     auto iter              = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
     if (iter == nullptr)
     {
@@ -107,4 +107,9 @@ bool ModelCommand::IsDestinationRegisteredLIT()
         }
     }
     return false;
+}
+
+bool ModelCommand::ShouldQueue()
+{
+    return IsDestinationRegisteredLIT() && mIsPeerLIT.ValueOr(true);
 }

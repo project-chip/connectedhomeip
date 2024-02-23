@@ -42,4 +42,17 @@ public:
     CHIP_ERROR RunCommand() override;
 };
 
+class ICDQueueCommand : public ICDCommand
+{
+public:
+    ICDQueueCommand(Commands * commands, CredentialIssuerCommands * credIssuerCmds) :
+        ICDCommand("queue", credIssuerCmds, "List queued commands pending active mode notification from LIT-ICD."),
+        mCommands(commands)
+    {}
+    CHIP_ERROR RunCommand() override;
+
+private:
+    Commands * mCommands;
+};
+
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig);

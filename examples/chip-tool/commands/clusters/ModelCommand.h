@@ -76,6 +76,8 @@ public:
 
     bool IsDestinationRegisteredLIT() override;
 
+    bool ShouldQueue() override;
+
 protected:
     bool IsPeerLIT() { return mIsPeerLIT.ValueOr(false); }
 

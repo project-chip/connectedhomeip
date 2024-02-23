@@ -50,8 +50,10 @@ public:
     void RunAllQueuedCommandsForNode(chip::ScopedNodeId nodeId, const chip::Optional<char *> & interactiveStorageDirectory,
                                      bool interactiveAdvertiseOperational);
 
+    std::vector<std::vector<std::string>> GetQueuedCommandsForNode(chip::ScopedNodeId nodeId) const;
+
 private:
-    struct ScopedNodeIdComparer
+    struct ScopedNodeIdComparator
     {
         bool operator()(const chip::ScopedNodeId & lhs, const chip::ScopedNodeId & rhs) const
         {
@@ -100,7 +102,7 @@ private:
     void Register(const char * commandSetName, commands_list commandsList, const char * helpText, bool isCluster);
 
     CommandSetMap mCommandSets;
-    std::map<chip::ScopedNodeId, std::vector<std::vector<std::string>>, ScopedNodeIdComparer> mQueuedCommands;
+    std::map<chip::ScopedNodeId, std::vector<std::vector<std::string>>, ScopedNodeIdComparator> mQueuedCommands;
 #ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE
