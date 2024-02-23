@@ -47,8 +47,7 @@ static CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray element
 
 static CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray nonce, jbyteArray elements,
                                       jbyteArray elementsSignature, jbyteArray dac, jbyteArray pai, jbyteArray cd,
-                                      jbyteArray firmwareInfo, uint16_t vendorId, uint16_t productId,
-                                      jobject & outAttestationInfo);
+                                      jbyteArray firmwareInfo, uint16_t vendorId, uint16_t productId, jobject & outAttestationInfo);
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage, AutoCommissioner * autoCommissioner,
                                                            jobject javaObjectRef)
@@ -279,8 +278,8 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
 
     jobject attestationInfo;
     err = N2J_AttestationInfo(env, javaAttestationChallenge, javaAttestationNonce, javaAttestationElements,
-                              javaAttestationElementsSignature, javaDAC, javaPAI, javaCD, javaFirmwareInfo, static_cast<uint16_t>(vendorId), productId,
-                              attestationInfo);
+                              javaAttestationElementsSignature, javaDAC, javaPAI, javaCD, javaFirmwareInfo,
+                              static_cast<uint16_t>(vendorId), productId, attestationInfo);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to create AttestationInfo");

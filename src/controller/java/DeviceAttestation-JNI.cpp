@@ -54,7 +54,8 @@ JNI_METHOD(jbyteArray, extractSkidFromPaaCert)
 
         VerifyOrExit(chip::CanCastTo<uint32_t>(outBytes.size()), err = CHIP_ERROR_INTERNAL);
 
-        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<jsize>(outBytes.size()), outJbytes);
+        err =
+            chip::JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<jsize>(outBytes.size()), outJbytes);
         SuccessOrExit(err);
     }
 
@@ -86,7 +87,8 @@ JNI_METHOD(jbyteArray, extractAkidFromPaiCert)
 
         VerifyOrExit(chip::CanCastTo<uint32_t>(outBytes.size()), err = CHIP_ERROR_INTERNAL);
 
-        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<jsize>(outBytes.size()), outJbytes);
+        err =
+            chip::JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<jsize>(outBytes.size()), outJbytes);
         SuccessOrExit(err);
     }
 
@@ -105,7 +107,7 @@ JNI_METHOD(void, validateAttestationInfo)
  jbyteArray attestationElements)
 {
     chip::Credentials::AttestationVerificationResult attestationError = chip::Credentials::AttestationVerificationResult::kSuccess;
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    CHIP_ERROR err                                                    = CHIP_NO_ERROR;
 
     VerifyOrExit(paaCert != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(paiCert != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -151,12 +153,14 @@ JNI_METHOD(void, validateAttestationInfo)
                          attestationError = chip::Credentials::AttestationVerificationResult::kPaiVendorIdMismatch);
         }
 
-        VerifyOrExit(!paaVidPid.mProductId.HasValue(), attestationError = chip::Credentials::AttestationVerificationResult::kPaaFormatInvalid);
+        VerifyOrExit(!paaVidPid.mProductId.HasValue(),
+                     attestationError = chip::Credentials::AttestationVerificationResult::kPaaFormatInvalid);
 
         err = chip::Crypto::ValidateCertificateChain(
             paaCertBytes.byteSpan().data(), paaCertBytes.byteSpan().size(), paiCertBytes.byteSpan().data(),
             paiCertBytes.byteSpan().size(), dacCertBytes.byteSpan().data(), dacCertBytes.byteSpan().size(), chainValidationResult);
-        VerifyOrExit(err == CHIP_NO_ERROR, attestationError = static_cast<chip::Credentials::AttestationVerificationResult>(chainValidationResult));
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     attestationError = static_cast<chip::Credentials::AttestationVerificationResult>(chainValidationResult));
 
         err = chip::Crypto::ExtractSKIDFromX509Cert(paaCertBytes.byteSpan(), paaSKID);
         VerifyOrExit(err == CHIP_NO_ERROR, attestationError = chip::Credentials::AttestationVerificationResult::kPaaFormatInvalid);
@@ -183,7 +187,8 @@ JNI_METHOD(void, validateAttestationInfo)
                                                                 attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan,
                                                                 vendorReserved);
 
-        VerifyOrExit(err == CHIP_NO_ERROR, attestationError = chip::Credentials::AttestationVerificationResult::kAttestationElementsMalformed);
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     attestationError = chip::Credentials::AttestationVerificationResult::kAttestationElementsMalformed);
 
         attestationError =
             dacVertifier->ValidateCertificationDeclarationSignature(certificationDeclarationSpan, certificationDeclarationPayload);
@@ -207,7 +212,8 @@ exit:
 void ThrowException(JNIEnv * env, CHIP_ERROR err)
 {
     jclass controllerExceptionCls;
-    CHIP_ERROR classRefErr = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipDeviceControllerException", controllerExceptionCls);
+    CHIP_ERROR classRefErr = chip::JniReferences::GetInstance().GetLocalClassRef(
+        env, "chip/devicecontroller/ChipDeviceControllerException", controllerExceptionCls);
 
     if (classRefErr != CHIP_NO_ERROR)
     {
