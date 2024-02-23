@@ -17,8 +17,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("unify-matter-bridge-common") {
   zap_file = "unify-matter-bridge.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/silabs_examples/unify-matter-bridge/linux/zap-generated/unify-matter-bridge-common/zap-generated"
   is_server = true
 }

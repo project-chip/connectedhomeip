@@ -2359,6 +2359,8 @@ endpoint 1 {
     handle command RecallScene;
     handle command GetSceneMembership;
     handle command GetSceneMembershipResponse;
+    handle command CopyScene;
+    handle command CopySceneResponse;
   }
 }
 

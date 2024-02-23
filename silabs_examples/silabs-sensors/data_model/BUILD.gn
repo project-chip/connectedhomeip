@@ -31,9 +31,6 @@ chip_data_model("sensor_data_model") {
   }
 
   zap_file = "./sensor-${network}-app.zap"
-
-  # TODO remove this once the cleanup is fully completed regarding the af-gen-event.h
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
 
   public_configs = [":config"]

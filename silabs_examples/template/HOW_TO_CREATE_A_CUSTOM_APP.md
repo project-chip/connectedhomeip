@@ -2,17 +2,18 @@
 
 <hr>
 
--   [How to Create an EFR32 Matter Application](#how-to-create-an-efr32-matter-application)
-    -   [Introduction](#introduction)
-    -   [Create your app](#create-your-app)
-        -   [Create a new directory](#create-a-new-directory)
-        -   [Modify the application](#modify-the-application)
-            -   [Using ZAP to configure clusters](#using-zap-to-configure-clusters)
-                -   [Create a Data Model](#create-a-data-model)
-                -   [Cluster Configuration and Generation](#cluster-configuration-and-generation)
-            -   [Modifying the GN Build files](#modifying-the-gn-build-files)
-            -   [Modifying the source code](#modifying-the-source-code)
-        -   [Running your app](#running-your-app)
+- [How to Create an EFR32 Matter Application](#how-to-create-an-efr32-matter-application)
+  - [Introduction](#introduction)
+  - [Create your app](#create-your-app)
+    - [Create a new directory](#create-a-new-directory)
+    - [Modify the application](#modify-the-application)
+      - [Using ZAP to configure clusters](#using-zap-to-configure-clusters)
+        - [Create a Data Model](#create-a-data-model)
+        - [Cluster Configuration and Generation](#cluster-configuration-and-generation)
+      - [Modifying the GN Build files](#modifying-the-gn-build-files)
+      - [Modifying the source code](#modifying-the-source-code)
+    - [Running your app](#running-your-app)
+          - [Last modified August 5th, 2022.](#last-modified-august-5th-2022)
 
 <hr>
 
@@ -93,13 +94,6 @@ namely: [zzz_generated][3]/**your_app**/zap-generated. To do so, go back to
 	zap_file = "sl_template.zap"
 	# to:
 	zap_file = "your_app.zap"
-```
-
-```gn
-	# Finally, modify the following line
-	zap_pregenerated_dir = "${chip_root}/zzz_generated/sl_template/zap-generated"
-	# to become:
-	zap_pregenerated_dir = "${chip_root}/zzz_generated/your_app/zap-generated"
 ```
 
 Now, we have our own configurable data model. We can now modify the cluster

@@ -22,7 +22,5 @@ config("config") {
 
 chip_data_model("newLight_DataModel_config") {
   zap_file = "sl_newLight.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/sl_newLight/zap-generated"
   is_server = true
 }

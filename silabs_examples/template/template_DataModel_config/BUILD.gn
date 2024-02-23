@@ -18,7 +18,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("template_DataModel_config") {
   zap_file = "sl_template.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/sl_template/zap-generated"
   is_server = true
 }
