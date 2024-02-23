@@ -41,8 +41,17 @@ public:
     BluezObjectIterator() = default;
     explicit BluezObjectIterator(GList * position) : mPosition(position) {}
 
-    reference operator*() const { return *BLUEZ_OBJECT(mPosition->data); }
-    pointer operator->() const { return BLUEZ_OBJECT(mPosition->data); }
+    reference operator*() const
+    {
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
+        return *BLUEZ_OBJECT(mPosition->data);
+    }
+
+    pointer operator->() const
+    {
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
+        return BLUEZ_OBJECT(mPosition->data);
+    }
     bool operator==(const BluezObjectIterator & other) const { return mPosition == other.mPosition; }
     bool operator!=(const BluezObjectIterator & other) const { return mPosition != other.mPosition; }
 

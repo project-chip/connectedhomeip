@@ -45,14 +45,17 @@ namespace {
 gboolean BluezIsServiceOnDevice(BluezGattService1 * aService, BluezDevice1 * aDevice)
 {
     const auto * servicePath = bluez_gatt_service1_get_device(aService);
-    const auto * devicePath  = g_dbus_proxy_get_object_path(G_DBUS_PROXY(aDevice));
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
+    const auto * devicePath = g_dbus_proxy_get_object_path(G_DBUS_PROXY(aDevice));
     return strcmp(servicePath, devicePath) == 0 ? TRUE : FALSE;
 }
 
 gboolean BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService1 * aService)
 {
-    const auto * charPath    = bluez_gatt_characteristic1_get_service(aChar);
+    const auto * charPath = bluez_gatt_characteristic1_get_service(aChar);
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     const auto * servicePath = g_dbus_proxy_get_object_path(G_DBUS_PROXY(aService));
+
     ChipLogDetail(DeviceLayer, "Char %s on service %s", charPath, servicePath);
     return strcmp(charPath, servicePath) == 0 ? TRUE : FALSE;
 }
@@ -111,6 +114,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         for (l = objects; l != nullptr; l = l->next)
         {
+            // NOLINTNEXTLINE(bugprone-casting-through-void)
             BluezGattService1 * service = bluez_object_get_gatt_service1(BLUEZ_OBJECT(l->data));
             if (service != nullptr)
             {
@@ -128,6 +132,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         for (l = objects; l != nullptr; l = l->next)
         {
+            // NOLINTNEXTLINE(bugprone-casting-through-void)
             BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(BLUEZ_OBJECT(l->data));
             if (char1 != nullptr)
             {
@@ -227,6 +232,7 @@ void BluezConnection::SetupWriteHandler(int aSocketFd)
     g_io_channel_set_close_on_unref(channel, TRUE);
     g_io_channel_set_buffered(channel, FALSE);
 
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL));
     g_source_set_callback(watchSource, G_SOURCE_FUNC(WriteHandlerCallback), this, nullptr);
 
@@ -248,6 +254,7 @@ void BluezConnection::SetupNotifyHandler(int aSocketFd, bool aAdditionalAdvertis
     g_io_channel_set_close_on_unref(channel, TRUE);
     g_io_channel_set_buffered(channel, FALSE);
 
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL));
     g_source_set_callback(watchSource, G_SOURCE_FUNC(NotifyHandlerCallback), this, nullptr);
 
@@ -305,6 +312,7 @@ CHIP_ERROR BluezConnection::SendIndication(chip::System::PacketBufferHandle apBu
 
 void BluezConnection::SendWriteRequestDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     BluezGattCharacteristic1 * c1 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
     GAutoPtr<GError> error;
     gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &error.GetReceiver());
@@ -354,6 +362,7 @@ void BluezConnection::OnCharacteristicChanged(GDBusProxy * aInterface, GVariant 
 
 void BluezConnection::SubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
     GAutoPtr<GError> error;
     gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error.GetReceiver());
@@ -367,6 +376,8 @@ CHIP_ERROR BluezConnection::SubscribeCharacteristicImpl(BluezConnection * connec
 {
     BluezGattCharacteristic1 * c2 = nullptr;
     VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
+
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     c2 = BLUEZ_GATT_CHARACTERISTIC1(connection->mpC2);
 
     // Get notifications on the TX characteristic change (e.g. indication is received)
@@ -386,6 +397,7 @@ CHIP_ERROR BluezConnection::SubscribeCharacteristic()
 
 void BluezConnection::UnsubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
     GAutoPtr<GError> error;
     gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error.GetReceiver());

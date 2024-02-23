@@ -229,12 +229,14 @@ static gboolean BluezCharacteristicConfirmError(BluezGattCharacteristic1 * aChar
 
 static gboolean BluezIsDeviceOnAdapter(BluezDevice1 * aDevice, BluezAdapter1 * aAdapter)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     return strcmp(bluez_device1_get_adapter(aDevice), g_dbus_proxy_get_object_path(G_DBUS_PROXY(aAdapter))) == 0 ? TRUE : FALSE;
 }
 
 BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName,
                                                                    const char * aUUID, const char * const * aFlags)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     const char * servicePath = g_dbus_object_get_object_path(g_dbus_interface_get_object(G_DBUS_INTERFACE(aService)));
     GAutoPtr<char> charPath(g_strdup_printf("%s/%s", servicePath, aCharName));
     BluezObjectSkeleton * object;
@@ -253,6 +255,8 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
     bluez_gatt_characteristic1_set_value(characteristic, value);
 
     bluez_object_skeleton_set_gatt_characteristic1(object, characteristic);
+
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     g_dbus_object_manager_server_export(mpRoot, G_DBUS_OBJECT_SKELETON(object));
     g_object_unref(object);
 
@@ -262,6 +266,8 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
 void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
+
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     BluezGattManager1 * gattMgr = BLUEZ_GATT_MANAGER1(aObject);
 
     gboolean success = bluez_gatt_manager1_call_register_application_finish(gattMgr, aResult, &error.GetReceiver());
@@ -284,9 +290,11 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 
     VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     gattMgr.reset(bluez_object_get_gatt_manager1(BLUEZ_OBJECT(adapterObject)));
     VerifyOrExit(gattMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL gattMgr in %s", __func__));
 
@@ -307,6 +315,7 @@ exit:
 /// Update the table of open BLE connections whenever a new device is spotted or its attributes have changed.
 void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     const char * objectPath      = g_dbus_proxy_get_object_path(G_DBUS_PROXY(apDevice));
     BluezConnection * connection = GetBluezConnection(objectPath);
 
@@ -347,6 +356,7 @@ void BluezEndpoint::BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClie
     VerifyOrReturn(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
     VerifyOrReturn(strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0, );
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     BluezDevice1 * device = BLUEZ_DEVICE1(aInterface);
     VerifyOrReturn(BluezIsDeviceOnAdapter(device, mAdapter.get()));
 
@@ -361,16 +371,19 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 * device)
     // When a device is connected for first time, this function will be triggered.
     // The future connections for the same device will trigger ``Connect'' property change.
     // TODO: Factor common code in the two function.
-    BluezConnection * conn;
-    VerifyOrExit(bluez_device1_get_connected(device), ChipLogError(DeviceLayer, "FAIL: device is not connected"));
+    BluezConnection * conn = nullptr;
 
+    // NOLINTBEGIN(bugprone-casting-through-void)
+    VerifyOrExit(bluez_device1_get_connected(device), ChipLogError(DeviceLayer, "FAIL: device is not connected"));
     conn = GetBluezConnection(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
     VerifyOrExit(conn == nullptr,
                  ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %p new device: %s", conn,
                               g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
 
-    conn                       = chip::Platform::New<BluezConnection>(*this, device);
-    mpPeerDevicePath           = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
+    conn             = chip::Platform::New<BluezConnection>(*this, device);
+    mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
+    // NOLINTEND(bugprone-casting-through-void)
+
     mConnMap[mpPeerDevicePath] = conn;
 
     ChipLogDetail(DeviceLayer, "BLE device connected: conn %p, device %s, path %s", conn, conn->GetPeerAddress(), mpPeerDevicePath);
@@ -383,6 +396,7 @@ void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBu
 {
     // TODO: right now we do not handle addition/removal of adapters
     // Primary focus here is to handle addition of a device
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(aObject)));
     VerifyOrReturn(device.get() != nullptr);
 
@@ -415,6 +429,8 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
 
     // includes -- unclear whether required.  Might be filled in later
     bluez_object_skeleton_set_gatt_service1(object, service);
+
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     g_dbus_object_manager_server_export(mpRoot, G_DBUS_OBJECT_SKELETON(object));
     g_object_unref(object);
 
@@ -429,11 +445,13 @@ void BluezEndpoint::SetupAdapter()
     GList * objects = g_dbus_object_manager_get_objects(mpObjMgr);
     for (auto l = objects; l != nullptr && mAdapter.get() == nullptr; l = l->next)
     {
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
         GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(BLUEZ_OBJECT(l->data)));
         if (adapter.get() != nullptr)
         {
             if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
             {
+                // NOLINTNEXTLINE(bugprone-casting-through-void)
                 if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter.get())), expectedPath) == 0)
                 {
                     mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter.get())));

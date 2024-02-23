@@ -81,6 +81,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
                      }),
                      this);
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     g_dbus_object_manager_server_export(mRoot.get(), G_DBUS_OBJECT_SKELETON(object));
     g_object_unref(object);
 
@@ -118,6 +119,7 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char 
     mRoot.reset(reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.GetGattApplicationObjectManager())));
     mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter())));
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     g_object_get(G_OBJECT(mRoot.get()), "object-path", &rootPath.GetReceiver(), nullptr);
     g_snprintf(mAdvPath, sizeof(mAdvPath), "%s/advertising", rootPath.get());
     g_strlcpy(mAdvUUID, aAdvUUID, sizeof(mAdvUUID));
@@ -224,6 +226,7 @@ void BluezAdvertisement::Shutdown()
 
 void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
     GAutoPtr<GError> error;
     gboolean success = FALSE;
@@ -249,9 +252,11 @@ CHIP_ERROR BluezAdvertisement::StartImpl()
     VerifyOrExit(!mIsAdvertising, ChipLogError(DeviceLayer, "FAIL: Advertising has already been enabled in %s", __func__));
     VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     advMgr.reset(bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapterObject)));
     VerifyOrExit(advMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
@@ -282,6 +287,7 @@ CHIP_ERROR BluezAdvertisement::Start()
 
 void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
     GAutoPtr<GError> error;
     gboolean success = FALSE;
@@ -305,9 +311,11 @@ CHIP_ERROR BluezAdvertisement::StopImpl()
     VerifyOrExit(mIsAdvertising, ChipLogError(DeviceLayer, "FAIL: Advertising has already been disabled in %s", __func__));
     VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     advMgr.reset(bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapterObject)));
     VerifyOrExit(advMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 

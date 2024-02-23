@@ -77,6 +77,7 @@ bool AdapterIterator::Advance()
 
     while (mCurrentListItem != nullptr)
     {
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
         BluezAdapter1 * adapter = bluez_object_get_adapter1(BLUEZ_OBJECT(mCurrentListItem->data));
         if (adapter == nullptr)
         {
@@ -98,6 +99,7 @@ uint32_t AdapterIterator::GetIndex() const
 {
     // PATH is of the for  BLUEZ_PATH / hci<nr>, i.e. like '/org/bluez/hci0'
     // Index represents the number after hci
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     const char * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(mCurrentAdapter.get()));
     unsigned index    = 0;
 

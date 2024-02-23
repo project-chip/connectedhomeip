@@ -1676,9 +1676,13 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         return false;
     }
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     WpaFiW1Wpa_supplicant1BSSProxy * bssProxy = WPA_FI_W1_WPA_SUPPLICANT1_BSS_PROXY(bss.get());
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     GAutoPtr<GVariant> ssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "SSID"));
+
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     GAutoPtr<GVariant> bssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "BSSID"));
 
     // Network scan is performed in the background, so the BSS
@@ -1789,7 +1793,10 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         return res;
     };
     auto GetNetworkSecurityType = [IsNetworkWPAPSK, IsNetworkWPA2PSK](WpaFiW1Wpa_supplicant1BSSProxy * proxy) -> uint8_t {
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
         GAutoPtr<GVariant> wpa(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "WPA"));
+
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
         GAutoPtr<GVariant> rsn(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "RSN"));
 
         uint8_t res = IsNetworkWPAPSK(wpa.get()) | IsNetworkWPA2PSK(rsn.get());

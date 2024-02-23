@@ -270,6 +270,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
 
     {
         GAutoPtr<GError> err;
+
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
         GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                                            g_variant_new("(ss)", "io.openthread.BorderRouter", "ActiveDatasetTlvs"),
                                                            G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
@@ -326,6 +328,8 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
     VerifyOrReturnError(mProxy, false);
 
     GAutoPtr<GError> err;
+
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                                        g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"),
                                                        G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));

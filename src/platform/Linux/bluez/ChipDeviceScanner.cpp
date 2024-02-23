@@ -215,6 +215,7 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
 
 void ChipDeviceScanner::SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(object)));
     VerifyOrReturn(device.get() != nullptr);
 
@@ -225,6 +226,7 @@ void ChipDeviceScanner::SignalInterfaceChanged(GDBusObjectManagerClient * manage
                                                GDBusProxy * aInterface, GVariant * aChangedProperties,
                                                const gchar * const * aInvalidatedProps, ChipDeviceScanner * self)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(object)));
     VerifyOrReturn(device.get() != nullptr);
 
@@ -233,6 +235,7 @@ void ChipDeviceScanner::SignalInterfaceChanged(GDBusObjectManagerClient * manage
 
 void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     if (strcmp(bluez_device1_get_adapter(&device), g_dbus_proxy_get_object_path(G_DBUS_PROXY(mAdapter.get()))) != 0)
     {
         return;
@@ -251,6 +254,7 @@ void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
 
 void ChipDeviceScanner::RemoveDevice(BluezDevice1 & device)
 {
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     if (strcmp(bluez_device1_get_adapter(&device), g_dbus_proxy_get_object_path(G_DBUS_PROXY(mAdapter.get()))) != 0)
     {
         return;
@@ -263,6 +267,7 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 & device)
         return;
     }
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     const auto devicePath = g_dbus_proxy_get_object_path(G_DBUS_PROXY(&device));
     GAutoPtr<GError> error;
 
