@@ -91,7 +91,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                 TimeUnit.MILLISECONDS);
 
     this.nsdManager.discoverServices(
-      targetServiceInfo.getServiceType(), NsdManager.PROTOCOL_DNS_SD, this);
+        targetServiceInfo.getServiceType(), NsdManager.PROTOCOL_DNS_SD, this);
   }
 
   @Override
