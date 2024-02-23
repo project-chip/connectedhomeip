@@ -315,6 +315,8 @@ void JsonBackend::LogMetricEvent(const MetricEvent & event)
         value["value"] = event.ValueErrorCode();
         break;
     case ValueType::kUndefined:
+        value["value"] = ::Json::Value();
+        break;
     default:
         value["value"] = "UNKNOWN";
         break;

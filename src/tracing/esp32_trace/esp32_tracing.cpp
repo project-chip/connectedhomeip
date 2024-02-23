@@ -177,10 +177,12 @@ void ESP32Backend::LogMetricEvent(const MetricEvent & event)
         esp_diag_metrics_add_uint(event.key(), event.ValueUInt32());
         break;
     case ValueType::kChipErrorCode:
-        ESP_LOGI("mtr", "The value of %s is error with code %lu ", event.key(), event.ValueUInt32());
-        esp_diag_metrics_add_uint(event.key(), event.ValueUInt32());
+        ESP_LOGI("mtr", "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
+        esp_diag_metrics_add_uint(event.key(), event.ValueErrorCode());
         break;
     case ValueType::kUndefined:
+        ESP_LOGI("mtr", "The value of %s is undefined", event.key());
+        break;
     default:
         ESP_LOGI("mtr", "The value of %s is of an UNKNOWN TYPE", event.key());
         break;

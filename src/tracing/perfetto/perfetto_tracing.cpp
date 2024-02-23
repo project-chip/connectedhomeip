@@ -142,6 +142,8 @@ void PerfettoBackend::LogMetricEvent(const MetricEvent & event)
         TRACE_EVENT_INSTANT("Matter", event.key(), "error", event.ValueErrorCode());
         break;
     case ValueType::kUndefined:
+        TRACE_EVENT_INSTANT("Matter", event.key());
+        break;
     default:
         TRACE_EVENT_INSTANT("Matter", event.key(), "type", "UNKNOWN");
         break;

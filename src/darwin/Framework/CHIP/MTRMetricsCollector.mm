@@ -57,7 +57,7 @@ void InitializeMetricsCollection()
         _value = [NSNumber numberWithInteger:event.ValueUInt32()];
         break;
     case ValueType::kChipErrorCode:
-        _value = [NSNumber numberWithInteger:event.ValueUInt32()];
+        _value = [NSNumber numberWithInteger:event.ValueErrorCode()];
         break;
     case ValueType::kUndefined:
     default:
@@ -171,9 +171,11 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
         MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %u", event.key(), event.type(), event.ValueUInt32());
         break;
     case ValueType::kChipErrorCode:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, error value: %u", event.key(), event.type(), event.ValueUInt32());
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, error value: %u", event.key(), event.type(), event.ValueErrorCode());
         break;
     case ValueType::kUndefined:
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: nil", event.key(), event.type());
+        break;
     default:
         MTR_LOG_INFO("Received metric event, key: %s, type: %d, unknown value", event.key(), event.type());
         return;
