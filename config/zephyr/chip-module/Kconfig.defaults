@@ -40,9 +40,11 @@ config LOG_DEFAULT_LEVEL
 
 endif
 
+# disable synchronous printk to avoid blocking IRQs which
+# may affect time sensitive components
 config PRINTK_SYNC
 	bool
-	default y
+	default n
 
 config ASSERT
 	bool
