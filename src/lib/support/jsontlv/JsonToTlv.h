@@ -41,6 +41,6 @@ CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer);
  * the tag is encoded using FullyQualified_6Bytes tag, the Vendor ID SHALL be set to the manufacturer code, the profile number set
  * to 0 and the tag number set to the MEI suffix.
  */
-CHIP_ERROR ConvertTlvTag(const uint32_t tagNumber, TLV::Tag & tag);
+CHIP_ERROR ConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag);
 
 } // namespace chip

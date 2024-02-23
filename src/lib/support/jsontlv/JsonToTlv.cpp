@@ -200,7 +200,7 @@ CHIP_ERROR InternalConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag, const uint3
     }
     else
     {
-        tag = TLV::ProfileTag(profileId, static_cast<uint32_t>(tagNumber));
+        tag = TLV::ProfileTag(profileId, tagNumber);
     }
     return CHIP_NO_ERROR;
 }
@@ -494,7 +494,7 @@ CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer)
     return EncodeTlvElement(json, writer, elementCtx);
 }
 
-CHIP_ERROR ConvertTlvTag(const uint32_t tagNumber, TLV::Tag & tag)
+CHIP_ERROR ConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag)
 {
     return InternalConvertTlvTag(tagNumber, tag);
 }
