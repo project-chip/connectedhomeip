@@ -18,7 +18,6 @@
 #pragma once
 
 #include <system/SystemClock.h>
-#include <transport/Session.h>
 
 namespace chip {
 namespace app {
