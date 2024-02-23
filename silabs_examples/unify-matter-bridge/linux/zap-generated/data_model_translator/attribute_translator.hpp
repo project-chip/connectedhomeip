@@ -221,11 +221,14 @@ private:
 // Skipping Activated Carbon Filter Monitoring
 // Skipping Boolean State Configuration
 // Skipping Valve Configuration and Control
+// Skipping Electrical Power Measurement
 // Skipping Electrical Energy Measurement
 // Skipping Demand Response Load Control
+// Skipping Messages
 // Skipping Device Energy Management
 // Skipping Energy EVSE
 // Skipping Energy Preference
+// Skipping Power Topology
 // Skipping Energy EVSE Mode
 // Skipping Device Energy Management Mode
 
