@@ -503,12 +503,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
 
+    // If Check if cache is already primed and client hasn't been informed yet, call the -deviceCachePrimed: callback
+    if (!_delegateDeviceCachePrimedCalled && [self _isCachePrimedWithInitialConfigurationData]) {
+        [self _callDelegateDeviceCachePrimed];
+    }
+
     if (setUpSubscription) {
         [self _setupSubscription];
     }
-
-    // Check if cache is already primed from storage
-    [self _checkIfCacheIsPrimed];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -637,6 +639,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
+
+    // As subscription is established, check if the delegate needs to be informed
+    if (!_delegateDeviceCachePrimedCalled) {
+        [self _callDelegateDeviceCachePrimed];
+    }
 
     [self _changeState:MTRDeviceStateReachable];
 
@@ -768,11 +775,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _receivingReport = NO;
     _receivingPrimingReport = NO;
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
-
-    // First subscription report is priming report
-    if (!_delegateDeviceCachePrimedCalled) {
-        [self _callDelegateDeviceCachePrimed];
-    }
 
 // For unit testing only
 #ifdef DEBUG
@@ -1993,17 +1995,24 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
 {
+    os_unfair_lock_lock(&self->_lock);
+
     if (reportChanges) {
-        [self _handleAttributeReport:attributeValues];
+        [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeValues]];
     } else {
-        os_unfair_lock_lock(&self->_lock);
         for (NSDictionary * responseValue in attributeValues) {
             MTRAttributePath * path = responseValue[MTRAttributePathKey];
             NSDictionary * dataValue = responseValue[MTRDataKey];
             _readCache[path] = dataValue;
         }
-        os_unfair_lock_unlock(&self->_lock);
     }
+
+    // If cache is set from storage and is primed with initial configuration data, then assume the client had beeen informed in the past, and mark that the callback has been called
+    if ([self _isCachePrimedWithInitialConfigurationData]) {
+        _delegateDeviceCachePrimedCalled = YES;
+    }
+
+    os_unfair_lock_unlock(&self->_lock);
 }
 
 // If value is non-nil, associate with expectedValueID
@@ -2181,25 +2190,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 // This method checks if there is a need to inform delegate that the attribute cache has been "primed"
-//   - The delegate callback is only called once
-- (void)_checkIfCacheIsPrimed
+- (BOOL)_isCachePrimedWithInitialConfigurationData
 {
     os_unfair_lock_assert_owner(&self->_lock);
-
-    // Only send the callback once per lifetime of MTRDevice
-    if (_delegateDeviceCachePrimedCalled) {
-        return;
-    }
 
     // Check if root node descriptor exists
     NSDictionary * rootDescriptorPartsListDataValue = _readCache[[MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)]];
     if (!rootDescriptorPartsListDataValue || ![MTRArrayValueType isEqualToString:rootDescriptorPartsListDataValue[MTRTypeKey]]) {
-        return;
+        return NO;
     }
     NSArray * partsList = rootDescriptorPartsListDataValue[MTRValueKey];
     if (![partsList isKindOfClass:[NSArray class]] || !partsList.count) {
         MTR_LOG_ERROR("%@ unexpected type %@ for parts list %@", self, [partsList class], partsList);
-        return;
+        return NO;
     }
 
     // Check if we have cached descriptor clusters for each listed endpoint
@@ -2215,11 +2218,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
         NSDictionary * descriptorDeviceTypeListDataValue = _readCache[[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)]];
         if (![MTRArrayValueType isEqualToString:descriptorDeviceTypeListDataValue[MTRTypeKey]] || !descriptorDeviceTypeListDataValue[MTRValueKey]) {
-            return;
+            return NO;
         }
     }
 
-    [self _callDelegateDeviceCachePrimed];
+    return YES;
 }
 
 - (MTRBaseDevice *)newBaseDevice

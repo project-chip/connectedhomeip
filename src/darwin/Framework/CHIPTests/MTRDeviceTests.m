@@ -2878,18 +2878,21 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
 
     XCTestExpectation * resubGotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received for resubscription"];
-    XCTestExpectation * gotDeviceCachePrimedAgain = [self expectationWithDescription:@"Device cache primed upon load from persistence"];
     delegate.onReportEnd = ^{
         [resubGotReportsExpectation fulfill];
         __strong __auto_type strongDelegate = weakDelegate;
         strongDelegate.onReportEnd = nil;
     };
+    __block BOOL onDeviceCachePrimedCalled = NO;
     delegate.onDeviceCachePrimed = ^{
-        [gotDeviceCachePrimedAgain fulfill];
+        onDeviceCachePrimedCalled = YES;
     };
     [device setDelegate:delegate queue:queue];
 
-    [self waitForExpectations:@[ gotDeviceCachePrimedAgain, resubGotReportsExpectation ] timeout:60];
+    [self waitForExpectations:@[ resubGotReportsExpectation ] timeout:60];
+
+    // Make sure that the new callback is only ever called once, the first time subscription was primed
+    XCTAssertFalse(onDeviceCachePrimedCalled);
 
     NSUInteger attributesReportedWithSecondSubscription = [device unitTestAttributesReportedSinceLastCheck];
 

@@ -405,6 +405,10 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
 
 /**
  * Notifies delegate when the device attribute cache has been primed with initial configuration data of the device
+ *
+ * This is called when the MTRDevice object goes from not knowing the device to having cached the first attribute reports that include basic mandatory information, e.g. Descriptor clusters.
+ *
+ * The intention is that after this is called, the client should be able to call read for mandatory attributes and likely expect non-nil values.
  */
 - (void)deviceCachePrimed:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
