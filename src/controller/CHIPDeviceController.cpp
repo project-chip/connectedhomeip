@@ -66,7 +66,6 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <tracing/macros.h>
-#include <tracing/metric_event.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
@@ -631,8 +630,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
     CHIP_ERROR err                     = CHIP_NO_ERROR;
-
-    MATTER_LOG_METRIC_SCOPE(chip::Tracing::kMetricPASESession, err);
     CommissioneeDeviceProxy * device   = nullptr;
     CommissioneeDeviceProxy * current  = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
@@ -709,18 +706,16 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     {
         if (params.HasConnectionObject())
         {
-            SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE,
-                                    err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()));
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()));
         }
         else if (params.HasDiscoveredObject())
         {
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-            SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE,
-                                    err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetDiscoveredObject(), this,
-                                                                                             OnDiscoveredDeviceOverBleSuccess,
-                                                                                             OnDiscoveredDeviceOverBleError));
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetDiscoveredObject(), this,
+                                                                                   OnDiscoveredDeviceOverBleSuccess,
+                                                                                   OnDiscoveredDeviceOverBleError));
             ExitNow(CHIP_NO_ERROR);
         }
         else if (params.HasDiscriminator())
@@ -731,9 +726,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
             SetupDiscriminator discriminator;
             discriminator.SetLongValue(params.GetDiscriminator());
-            SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionBLE,
-                                    err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
-                                        discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
+                              discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
             ExitNow(CHIP_NO_ERROR);
         }
         else
@@ -743,7 +737,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     }
 #endif
     session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), params.GetMRPConfig());
-    VerifyOrExitWithMetric(chip::Tracing::kMetricPASESessionPair, session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
     // Allocate the exchange immediately before calling PASESession::Pair.
     //
@@ -752,10 +746,10 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     // exchange context right before calling Pair ensures that if allocation
     // succeeds, PASESession has taken ownership.
     exchangeCtxt = mSystemState->ExchangeMgr()->NewContext(session.Value(), &device->GetPairing());
-    VerifyOrExitWithMetric(chip::Tracing::kMetricPASESessionPair, exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = device->GetPairing().Pair(*mSystemState->SessionMgr(), params.GetSetupPINCode(), GetLocalMRPConfig(), exchangeCtxt, this);
-    SuccessOrExitWithMetric(chip::Tracing::kMetricPASESessionPair, err);
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)

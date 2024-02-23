@@ -43,8 +43,6 @@
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTROTAProviderDelegate.h>
 
-#import <tracing/metric_event.h>
-
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;
 @class MTRDevice;
@@ -58,8 +56,6 @@ namespace Controller {
 } // namespace chip
 
 NS_ASSUME_NONNULL_BEGIN
-
-extern chip::Tracing::MetricKey kMTRPairingSetup;
 
 @interface MTRDeviceController ()
 
