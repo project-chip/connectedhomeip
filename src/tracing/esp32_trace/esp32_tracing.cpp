@@ -166,7 +166,7 @@ void ESP32Backend::LogMetricEvent(const MetricEvent & event)
     }
 
     using ValueType = MetricEvent::Value::Type;
-    switch (event.value().type)
+    switch (event.ValueType())
     {
     case ValueType::kInt32:
         ESP_LOGI("mtr", "The value of %s is %ld ", event.key(), event.ValueInt32());

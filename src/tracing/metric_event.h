@@ -117,7 +117,10 @@ public:
 
     MetricKey key() const { return mKey; }
 
-    Value value() const { return mValue; }
+    Value::Type ValueType() const
+    {
+        return mValue.type;
+    }
 
     uint32_t ValueUInt32() const
     {

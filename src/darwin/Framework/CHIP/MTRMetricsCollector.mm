@@ -49,7 +49,7 @@ void InitializeMetricsCollection()
     }
 
     using ValueType = MetricEvent::Value::Type;
-    switch (event.value().type) {
+    switch (event.ValueType()) {
     case ValueType::kInt32:
         _value = [NSNumber numberWithInteger:event.ValueInt32()];
         break;
@@ -163,7 +163,7 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     std::lock_guard lock(_lock);
 
     using ValueType = MetricEvent::Value::Type;
-    switch (event.value().type) {
+    switch (event.ValueType()) {
     case ValueType::kInt32:
         MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %d", event.key(), event.type(), event.ValueInt32());
         break;
@@ -201,7 +201,7 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
 
     // If the event is a begin or end event, implicitly emit a corresponding instant event
     if (event.type() == MetricEvent::Type::kBeginEvent || event.type() == MetricEvent::Type::kEndEvent) {
-        MetricEvent instantEvent(MetricEvent::Type::kInstantEvent, event.key(), event.value());
+        MetricEvent instantEvent(MetricEvent::Type::kInstantEvent, event.key());
         data = [[MTRMetricsData alloc] initWithMetricEvent:instantEvent];
         metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(instantEvent)];
         [_metricsDataCollection setValue:data forKey:metricsKey];

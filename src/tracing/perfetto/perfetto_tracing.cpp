@@ -130,7 +130,7 @@ void PerfettoBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
 void PerfettoBackend::LogMetricEvent(const MetricEvent & event)
 {
     using ValueType = MetricEvent::Value::Type;
-    switch (event.value().type)
+    switch (event.ValueType())
     {
     case ValueType::kInt32:
         TRACE_EVENT_INSTANT("Matter", event.key(), "value", event.ValueInt32());
