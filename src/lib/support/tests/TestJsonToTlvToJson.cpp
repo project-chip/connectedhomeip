@@ -703,8 +703,10 @@ void TestConverter_Array_Empty_ImplicitProfileTag4(nlTestSuite * inSuite, void *
     writer.ImplicitProfileId = kImplicitProfileId;
 
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(
-        gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(0x000Fu, 0, 0x4240u), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite,
+                   CHIP_NO_ERROR ==
+                       writer.StartContainer(TLV::ProfileTag((1000000 >> 16) & 0xFFFF, 0, 1000000 & 0xFFFF), TLV::kTLVType_Array,
+                                             containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
@@ -1067,8 +1069,10 @@ void TestConverter_Array_Strings(nlTestSuite * inSuite, void * inContext)
     writer.ImplicitProfileId = kImplicitProfileId;
 
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-    NL_TEST_ASSERT(
-        gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ProfileTag(0x0001u, 0, 0x86A0u), TLV::kTLVType_Array, containerType2));
+    NL_TEST_ASSERT(gSuite,
+                   CHIP_NO_ERROR ==
+                       writer.StartContainer(TLV::ProfileTag((100000 >> 16) & 0xFFFF, 0, 100000 & 0xFFFF), TLV::kTLVType_Array,
+                                             containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "ABC"));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "Options"));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutString(TLV::AnonymousTag(), "more"));
@@ -1826,6 +1830,40 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+// Full Qualified Profile tags, Unsigned Integer structure: {65536 = 42, 4294901760 = 17000, 4294967295 = 500000000000}
+void TestConverter_Struct_MEITags(nlTestSuite * inSuite, void * inContext)
+{
+    gSuite = inSuite;
+
+    uint8_t buf[256];
+    TLV::TLVWriter writer;
+    TLV::TLVType containerType;
+    TLV::TLVType containerType2;
+
+    writer.Init(buf);
+    writer.ImplicitProfileId = kImplicitProfileId;
+
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::ContextTag(0), TLV::kTLVType_Structure, containerType2));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(0xFFFFu, 0, 0), static_cast<uint64_t>(17000)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(0x0001u, 0, 0), static_cast<uint64_t>(42)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Put(TLV::ProfileTag(0xFFFFu, 0, 0xFFFFu), static_cast<uint64_t>(500000000000)));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+
+    std::string jsonString = "{\n"
+                             "   \"0:STRUCT\" : {\n"
+                             "      \"65536:UINT\" : 42,\n"
+                             "      \"4294901760:UINT\" : 17000,\n"
+                             "      \"4294967295:UINT\" : \"500000000000\"\n"
+                             "   }\n"
+                             "}\n";
+
+    ByteSpan tlvSpan(buf, writer.GetLengthWritten());
+    CheckValidConversion(jsonString, tlvSpan, jsonString);
+}
+
 int Initialize(void * apSuite)
 {
     VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
@@ -1891,6 +1929,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("Test Json Tlv Converter - Complex Structure from the README File", TestConverter_Structure_FromReadme),
     NL_TEST_DEF("Test Json Tlv Converter - Tlv to Json Error Cases", TestConverter_TlvToJson_ErrorCases),
     NL_TEST_DEF("Test Json Tlv Converter - Json To Tlv Error Cases", TestConverter_JsonToTlv_ErrorCases),
+    NL_TEST_DEF("Test Json Tlv Converter - Structure with MEI Elements", TestConverter_Struct_MEITags),
     NL_TEST_SENTINEL()
 };
 

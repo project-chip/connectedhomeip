@@ -16,6 +16,7 @@
  */
 
 #include <algorithm>
+#include <errno.h>
 #include <json/json.h>
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
@@ -179,7 +180,12 @@ bool CompareByTag(const ElementContext & a, const ElementContext & b)
     return IsContextTag(a.tag);
 }
 
-CHIP_ERROR InternalConvertTlvTag(const uint32_t tagNumber, TLV::Tag & tag, const uint32_t profileId = kTemporaryImplicitProfileId)
+// The profileId parameter is used when encoding a tag for a TLV element to specify the profile that the tag belongs to.
+// If the vendor ID is zero but the tag ID does not fit within an 8-bit value, the function uses Implicit Profile Tag.
+// Here, the kTemporaryImplicitProfileId serves as a default value for cases where no explicit profile ID is provided by
+// the caller. This allows for the encoding of tags that are not vendor-specific or context-specific but are instead
+// associated with a temporary implicit profile ID (0xFF01).
+CHIP_ERROR InternalConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag, const uint32_t profileId = kTemporaryImplicitProfileId)
 {
     uint16_t vendor_id = static_cast<uint16_t>(tagNumber >> 16);
     uint16_t tag_id    = static_cast<uint16_t>(tagNumber & 0xFFFF);
@@ -211,13 +217,47 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, ui
     if (nameFields.size() == 2)
     {
         VerifyOrReturnError(IsUnsignedInteger(nameFields[0]), CHIP_ERROR_INVALID_ARGUMENT);
-        tagNumber   = static_cast<uint32_t>(std::strtoul(nameFields[0].c_str(), nullptr, 10));
+
+        char * endPtr;
+        errno                = 0;
+        unsigned long result = strtoul(nameFields[0].c_str(), &endPtr, 10);
+
+        if (nameFields[0].c_str() == endPtr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else if (errno == ERANGE || result > UINT32_MAX)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else
+        {
+            tagNumber = static_cast<uint32_t>(result);
+        }
+
         elementType = nameFields[1].c_str();
     }
     else if (nameFields.size() == 3)
     {
         VerifyOrReturnError(IsUnsignedInteger(nameFields[1]), CHIP_ERROR_INVALID_ARGUMENT);
-        tagNumber   = static_cast<uint32_t>(std::strtoul(nameFields[1].c_str(), nullptr, 10));
+
+        char * endPtr;
+        errno                = 0;
+        unsigned long result = strtoul(nameFields[1].c_str(), &endPtr, 10);
+
+        if (nameFields[1].c_str() == endPtr)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else if (errno == ERANGE || result > UINT32_MAX)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else
+        {
+            tagNumber = static_cast<uint32_t>(result);
+        }
+
         elementType = nameFields[2].c_str();
     }
     else
@@ -463,6 +503,9 @@ CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer)
     ElementContext elementCtx;
     elementCtx.type = { TLV::kTLVType_Structure, false };
 
+    // Use kTemporaryImplicitProfileId as the default value for cases where no explicit implicit profile ID is provided by
+    // the caller. This allows for the encoding of tags that are not vendor-specific or context-specific but are instead
+    // associated with a temporary implicit profile ID (0xFF01).
     if (writer.ImplicitProfileId == TLV::kProfileIdNotSpecified)
     {
         writer.ImplicitProfileId = kTemporaryImplicitProfileId;
