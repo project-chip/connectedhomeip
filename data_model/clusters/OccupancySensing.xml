@@ -54,13 +54,19 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0406" name="Occupancy Sensing" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0406" name="Occupancy Sensing" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Physical Contact Occupancy feature with mandatory OccupancySensorTypeBitmap"/>
     <revision revision="3" summary="New data model format and notation"/>
+    <revision revision="4" summary="Remove nullable from PhysicalContact delay attributes and ability to not report transitions"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0406" name="Occupancy Sensing"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="OCC" scope="Endpoint"/>
   <dataTypes>
     <enum name="OccupancySensorTypeEnum">
@@ -159,12 +165,10 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0030" name="PhysicalContactOccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0031" name="PhysicalContactUnoccupiedToOccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0032" name="PhysicalContactUnoccupiedToOccupiedThreshold" type="uint8" default="1">

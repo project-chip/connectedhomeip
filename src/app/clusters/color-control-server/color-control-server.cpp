@@ -109,14 +109,14 @@ public:
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kXy))
         {
             uint16_t xValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::CurrentX::Get(endpoint, &xValue))
+            if (Status::Success != Attributes::CurrentX::Get(endpoint, &xValue))
             {
                 xValue = 0x616B; // Default X value according to spec
             }
             AddAttributeValuePair(pairs, Attributes::CurrentX::Id, xValue, attributeCount);
 
             uint16_t yValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::CurrentY::Get(endpoint, &yValue))
+            if (Status::Success != Attributes::CurrentY::Get(endpoint, &yValue))
             {
                 yValue = 0x607D; // Default Y value according to spec
             }
@@ -133,7 +133,7 @@ public:
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kHueAndSaturation))
         {
             uint8_t saturationValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::CurrentSaturation::Get(endpoint, &saturationValue))
+            if (Status::Success != Attributes::CurrentSaturation::Get(endpoint, &saturationValue))
             {
                 saturationValue = 0x00;
             }
@@ -143,21 +143,21 @@ public:
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorLoop))
         {
             uint8_t loopActiveValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorLoopActive::Get(endpoint, &loopActiveValue))
+            if (Status::Success != Attributes::ColorLoopActive::Get(endpoint, &loopActiveValue))
             {
                 loopActiveValue = 0x00;
             }
             AddAttributeValuePair(pairs, Attributes::ColorLoopActive::Id, loopActiveValue, attributeCount);
 
             uint8_t loopDirectionValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue))
+            if (Status::Success != Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue))
             {
                 loopDirectionValue = 0x00;
             }
             AddAttributeValuePair(pairs, Attributes::ColorLoopDirection::Id, loopDirectionValue, attributeCount);
 
             uint16_t loopTimeValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorLoopTime::Get(endpoint, &loopTimeValue))
+            if (Status::Success != Attributes::ColorLoopTime::Get(endpoint, &loopTimeValue))
             {
                 loopTimeValue = 0x0019; // Default loop time value according to spec
             }
@@ -167,7 +167,7 @@ public:
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorTemperature))
         {
             uint16_t temperatureValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorTemperatureMireds::Get(endpoint, &temperatureValue))
+            if (Status::Success != Attributes::ColorTemperatureMireds::Get(endpoint, &temperatureValue))
             {
                 temperatureValue = 0x00FA; // Default temperature value according to spec
             }
@@ -175,7 +175,7 @@ public:
         }
 
         uint8_t modeValue;
-        if (EMBER_ZCL_STATUS_SUCCESS != Attributes::EnhancedColorMode::Get(endpoint, &modeValue))
+        if (Status::Success != Attributes::EnhancedColorMode::Get(endpoint, &modeValue))
         {
             modeValue = ColorControl::EnhancedColorMode::kCurrentXAndCurrentY; // Default mode value according to spec
         }
@@ -446,7 +446,7 @@ bool ColorControlServer::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;
-    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == Status::Success);
 
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
@@ -2509,11 +2509,11 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
 uint16_t ColorControlServer::getTemperatureCoupleToLevelMin(EndpointId endpoint)
 {
     uint16_t colorTemperatureCoupleToLevelMin;
-    EmberAfStatus status;
+    Status status;
 
     status = Attributes::CoupleColorTempToLevelMinMireds::Get(endpoint, &colorTemperatureCoupleToLevelMin);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Status::Success)
     {
         // Not less than the physical min.
         Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &colorTemperatureCoupleToLevelMin);
@@ -2552,14 +2552,14 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
 
     // Initialize startUpColorTempMireds to "maintain previous value" value null
     app::DataModel::Nullable<uint16_t> startUpColorTemp;
-    EmberAfStatus status = Attributes::StartUpColorTemperatureMireds::Get(endpoint, startUpColorTemp);
+    Status status = Attributes::StartUpColorTemperatureMireds::Get(endpoint, startUpColorTemp);
 
-    if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpColorTemp.IsNull())
+    if (status == Status::Success && !startUpColorTemp.IsNull())
     {
         uint16_t updatedColorTemp = MAX_TEMPERATURE_VALUE;
         status                    = Attributes::ColorTemperatureMireds::Get(endpoint, &updatedColorTemp);
 
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
+        if (status == Status::Success)
         {
             uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
             Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
@@ -2576,7 +2576,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                 updatedColorTemp = startUpColorTemp.Value();
                 status           = Attributes::ColorTemperatureMireds::Set(endpoint, updatedColorTemp);
 
-                if (status == EMBER_ZCL_STATUS_SUCCESS)
+                if (status == Status::Success)
                 {
                     // Set ColorMode attributes to reflect ColorTemperature.
                     uint8_t updateColorMode = ColorControl::EnhancedColorMode::kColorTemperature;
@@ -2607,7 +2607,7 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
         // Check whether our color temperature has actually changed.  If not, do
         // nothing, and wait for it to change.
         uint16_t currentColorTemp;
-        if (Attributes::ColorTemperatureMireds::Get(endpoint, &currentColorTemp) != EMBER_ZCL_STATUS_SUCCESS)
+        if (Attributes::ColorTemperatureMireds::Get(endpoint, &currentColorTemp) != Status::Success)
         {
             // Why can't we read our attribute?
             return;
@@ -2906,9 +2906,9 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
     if (colorMode == ColorControl::EnhancedColorMode::kColorTemperature)
     {
         app::DataModel::Nullable<uint8_t> currentLevel;
-        EmberAfStatus status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
+        Status status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS || currentLevel.IsNull())
+        if (status != Status::Success || currentLevel.IsNull())
         {
             currentLevel.SetNonNull((uint8_t) 0x7F);
         }

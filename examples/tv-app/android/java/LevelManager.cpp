@@ -83,9 +83,9 @@ void LevelManager::PostLevelChanged(chip::EndpointId endpoint, uint8_t value)
 
 jboolean LevelManager::SetLevel(jint endpoint, jint value)
 {
-    EmberAfStatus status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(static_cast<chip::EndpointId>(endpoint),
-                                                                                      static_cast<uint8_t>(value));
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    chip::Protocols::InteractionModel::Status status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(
+        static_cast<chip::EndpointId>(endpoint), static_cast<uint8_t>(value));
+    return status == chip::Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR LevelManager::InitializeWithObjects(jobject managerObject)
@@ -112,6 +112,7 @@ CHIP_ERROR LevelManager::InitializeWithObjects(jobject managerObject)
 
 void LevelManager::HandleLevelChanged(uint8_t value)
 {
+    DeviceLayer::StackUnlock unlock;
     ChipLogProgress(Zcl, "LevelManager::HandleLevelChanged");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

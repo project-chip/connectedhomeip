@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050C" name="Application Launcher" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x050C" name="Application Launcher"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="APPLAUNCHER" scope="Endpoint"/>
   <features>
     <feature bit="0" code="AP" name="ApplicationPlatform" summary="Support for attributes and commands required for endpoint to support launching any application within the supported application catalogs">
@@ -111,7 +116,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="LaunchApp" response="LauncherResponse">
+    <command id="0x00" name="LaunchApp" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Application" type="ApplicationStruct">
@@ -124,7 +129,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x01" name="StopApp" response="LauncherResponse">
+    <command id="0x01" name="StopApp" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Application" type="ApplicationStruct" default="MS">
@@ -134,7 +139,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x02" name="HideApp" response="LauncherResponse">
+    <command id="0x02" name="HideApp" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Application" type="ApplicationStruct" default="MS">
@@ -145,7 +150,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x03" name="LauncherResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>

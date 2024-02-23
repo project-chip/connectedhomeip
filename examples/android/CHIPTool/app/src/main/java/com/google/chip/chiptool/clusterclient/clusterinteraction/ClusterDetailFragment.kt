@@ -67,7 +67,15 @@ class ClusterDetailFragment : Fragment() {
     _binding = ClusterDetailFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
     deviceId = checkNotNull(requireArguments().getLong(DEVICE_ID))
-    scope.launch { devicePtr = getConnectedDevicePointer(requireContext(), deviceId) }
+    scope.launch {
+      try {
+        devicePtr = getConnectedDevicePointer(requireContext(), deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return@launch
+      }
+    }
     endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
     historyCommand = requireArguments().getSerializable(HISTORY_COMMAND) as HistoryCommand?
     deviceController.setCompletionListener(GenericChipDeviceListener())
@@ -199,10 +207,19 @@ class ClusterDetailFragment : Fragment() {
 
   private fun castStringToType(data: String, type: Class<*>, underlyingType: Class<*>): Any? {
     return when (type) {
-      Int::class.java -> data.toInt()
-      Boolean::class.java -> data.toBoolean()
+      Int::class.java,
+      java.lang.Integer::class.java -> data.toInt()
+      Boolean::class.java,
+      java.lang.Boolean::class.java -> data.toBoolean()
       ByteArray::class.java -> data.encodeToByteArray()
-      Long::class.java -> data.toLong()
+      Long::class.java,
+      java.lang.Long::class.java -> data.toLong()
+      Short::class.java,
+      java.lang.Short::class.java -> data.toShort()
+      Double::class.java,
+      java.lang.Double::class.java -> data.toDouble()
+      Float::class.java,
+      java.lang.Float::class.java -> data.toFloat()
       Optional::class.java ->
         if (data.isEmpty()) Optional.empty()
         else Optional.of(castStringToType(data, underlyingType, underlyingType)!!)

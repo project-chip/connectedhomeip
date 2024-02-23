@@ -28,8 +28,9 @@ chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
 sl_use_subscription_synching = true
 icd_enforce_sit_slow_poll_limit = true
+chip_enable_icd_lit = true
 
 # ICD Matter Configuration flags
-sl_idle_mode_interval_s = 3600  # 60min Idle Mode Interval
-sl_active_mode_interval_ms = 0  # 0 Active Mode Interval
+sl_idle_mode_duration_s = 3600  # 60min Idle Mode Duration
+sl_active_mode_duration_ms = 0  # 0 Active Mode Duration
 sl_active_mode_threshold_ms = 30000  # 30s Active Mode Threshold

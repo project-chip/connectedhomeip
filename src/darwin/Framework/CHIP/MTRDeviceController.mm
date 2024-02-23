@@ -32,6 +32,7 @@
 #import "MTRConversion.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
+#import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDevice_Internal.h"
@@ -173,12 +174,31 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                 return nil;
             }
 
+            id<MTRDeviceControllerStorageDelegate> storageDelegateToUse = storageDelegate;
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+            if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
+                storageDelegateToUse = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:storageDelegate];
+            }
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
             _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
-                                                                            storageDelegate:storageDelegate
+                                                                            storageDelegate:storageDelegateToUse
                                                                        storageDelegateQueue:storageDelegateQueue];
             if (_controllerDataStore == nil) {
                 return nil;
             }
+        } else {
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+            if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
+                dispatch_queue_t localTestStorageQueue = dispatch_queue_create("org.csa-iot.matter.framework.devicecontroller.localteststorage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+                MTRDeviceControllerLocalTestStorage * localTestStorage = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:nil];
+                _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
+                                                                                storageDelegate:localTestStorage
+                                                                           storageDelegateQueue:localTestStorageQueue];
+                if (_controllerDataStore == nil) {
+                    return nil;
+                }
+            }
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
         }
 
         // Ensure the otaProviderDelegate, if any, is valid.
@@ -864,6 +884,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         if ([self isRunning]) {
             _nodeIDToDeviceMap[nodeID] = deviceToReturn;
         }
+
+        // Load persisted attributes if they exist.
+        NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
+        if (attributesFromCache) {
+            [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
+        }
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 
@@ -977,9 +1003,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     [self asyncDispatchToMatterQueue:^() {
         [self->_serverEndpoints addObject:endpoint];
         [endpoint registerMatterEndpoint];
+        MTR_LOG_DEFAULT("Added server endpoint %u to controller %@", static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
+            self->_uniqueIdentifier);
     }
         errorHandler:^(NSError * error) {
-            MTR_LOG_ERROR("Unexpected failure dispatching to Matter queue on running controller in addServerEndpoint");
+            MTR_LOG_ERROR("Unexpected failure dispatching to Matter queue on running controller in addServerEndpoint, adding endpoint %u",
+                static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue));
         }];
     return YES;
 }
@@ -1002,12 +1031,16 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     // tearing it down.
     [self asyncDispatchToMatterQueue:^() {
         [self removeServerEndpointOnMatterQueue:endpoint];
+        MTR_LOG_DEFAULT("Removed server endpoint %u from controller %@", static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue),
+            self->_uniqueIdentifier);
         if (queue != nil && completion != nil) {
             dispatch_async(queue, completion);
         }
     }
         errorHandler:^(NSError * error) {
             // Error means we got shut down, so the endpoint is removed now.
+            MTR_LOG_DEFAULT("controller %@ already shut down, so endpoint %u has already been removed", self->_uniqueIdentifier,
+                static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue));
             if (queue != nil && completion != nil) {
                 dispatch_async(queue, completion);
             }
@@ -1300,12 +1333,17 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                             queue:(dispatch_queue_t)queue
                        completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    [_factory downloadLogFromNodeWithID:nodeID
-                             controller:self
-                                   type:type
-                                timeout:timeout
-                                  queue:queue
-                             completion:completion];
+    [self asyncDispatchToMatterQueue:^() {
+        [self->_factory downloadLogFromNodeWithID:nodeID
+                                       controller:self
+                                             type:type
+                                          timeout:timeout
+                                            queue:queue
+                                       completion:completion];
+    }
+        errorHandler:^(NSError * error) {
+            completion(nil, error);
+        }];
 }
 
 - (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath

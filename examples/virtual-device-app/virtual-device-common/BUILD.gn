@@ -19,8 +19,5 @@ import("${chip_root}/src/lib/lib.gni")
 
 chip_data_model("virtual-device-common") {
   zap_file = "virtual-device-app.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/virtual-device-app/zap-generated"
   is_server = true
 }

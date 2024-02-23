@@ -167,7 +167,7 @@ tests:
               - name: "UserIndex"
                 value: null
               - name: "UserStatus"
-                value: 5
+                value: UserStatusEnum.UnknownEnumValue(5)
               - name: "UserType"
                 value: 10
       response:

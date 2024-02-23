@@ -15516,7 +15516,7 @@ NS_ASSUME_NONNULL_BEGIN
             encodableStruct.duration.SetNull();
         } else {
             auto & nonNullValue_0 = encodableStruct.duration.SetNonNull();
-            nonNullValue_0 = self.duration.unsignedShortValue;
+            nonNullValue_0 = self.duration.unsignedLongLongValue;
         }
     }
     {

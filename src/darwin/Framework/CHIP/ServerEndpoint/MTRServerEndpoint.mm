@@ -154,20 +154,18 @@ MTR_DIRECT_MEMBERS
         return NO;
     }
 
-    if (serverCluster.parentEndpoint != kInvalidEndpointId) {
-        MTR_LOG_ERROR("Cannot add cluster to endpoint %llu; already added to endpoint %" PRIu32, _endpointID.unsignedLongLongValue, serverCluster.parentEndpoint);
-        return NO;
-    }
-
     for (MTRServerCluster * existingCluster in _serverClusters) {
         if ([existingCluster.clusterID isEqual:serverCluster.clusterID]) {
-            MTR_LOG_ERROR("Cannot add second cluster with ID %llx on endpoint %llu", serverCluster.clusterID.unsignedLongLongValue, _endpointID.unsignedLongLongValue);
+            MTR_LOG_ERROR("Cannot add second cluster with ID " ChipLogFormatMEI " on endpoint %llu", ChipLogValueMEI(serverCluster.clusterID.unsignedLongLongValue), _endpointID.unsignedLongLongValue);
             return NO;
         }
     }
 
+    if (![serverCluster addToEndpoint:static_cast<EndpointId>(_endpointID.unsignedLongLongValue)]) {
+        return NO;
+    }
     [_serverClusters addObject:serverCluster];
-    serverCluster.parentEndpoint = static_cast<EndpointId>(_endpointID.unsignedLongLongValue);
+
     return YES;
 }
 
@@ -317,6 +315,9 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     _deviceController = controller;
 
+    MTR_LOG_DEFAULT("Associated %@, cluster count %llu, with controller",
+        self, static_cast<unsigned long long>(clusterCount));
+
     return YES;
 }
 
@@ -347,7 +348,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
         &_matterEndpointMetadata,
         Span<DataVersion>(_matterDataVersions.get(), _matterEndpointMetadata.clusterCount),
         Span<EmberAfDeviceType>(_matterDeviceTypes.get(), _deviceTypes.count));
-    if (status != EMBER_ZCL_STATUS_SUCCESS) {
+    if (status != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Unexpected failure to define our Matter endpoint");
     }
 
@@ -398,7 +399,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     NSMutableArray<MTRAccessGrant *> * grants = [[_matterAccessGrants allObjects] mutableCopy];
     for (MTRServerCluster * cluster in _serverClusters) {
         if ([cluster.clusterID isEqual:clusterID]) {
-            [grants addObjectsFromArray:[cluster.matterAccessGrants allObjects]];
+            [grants addObjectsFromArray:cluster.matterAccessGrants];
         }
     }
 
@@ -413,6 +414,11 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 - (NSArray<MTRServerCluster *> *)serverClusters
 {
     return [_serverClusters copy];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRServerEndpoint id %u>", static_cast<EndpointId>(_endpointID.unsignedLongLongValue)];
 }
 
 @end

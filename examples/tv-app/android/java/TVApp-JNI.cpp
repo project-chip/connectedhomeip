@@ -27,6 +27,7 @@
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "MessagesManager.h"
 #include "MyUserPrompter-JNI.h"
 #include "OnOffManager.h"
 #include "WakeOnLanManager.h"
@@ -135,6 +136,11 @@ JNI_METHOD(void, setLowPowerManager)(JNIEnv *, jobject, jint endpoint, jobject m
 JNI_METHOD(void, setMediaPlaybackManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
 {
     MediaPlaybackManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(void, setMessagesManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    MessagesManager::NewManager(endpoint, manager);
 }
 
 JNI_METHOD(void, setChannelManager)(JNIEnv *, jobject, jint endpoint, jobject manager)

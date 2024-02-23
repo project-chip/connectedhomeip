@@ -23,7 +23,7 @@ limitations under the License.
     <field name="SetTopology" mask="0x04"/>
     <field name="DynamicPowerFlow" mask="0x08"/>
   </bitmap>
-  <cluster code="0x009C">
+  <cluster code="0x009C" apiMaturity="provisional">
     <domain>Measurement &amp; Sensing</domain>
     <name>Power Topology</name>
     <code>0x009C</code>
