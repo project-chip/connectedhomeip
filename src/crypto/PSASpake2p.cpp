@@ -32,14 +32,6 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_
 
     VerifyOrReturnError(context_len <= sizeof(mContext), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    psa_pake_cipher_suite_t cs = PSA_PAKE_CIPHER_SUITE_INIT;
-    psa_pake_cs_set_algorithm(&cs, PSA_ALG_SPAKE2P);
-    psa_pake_cs_set_primitive(&cs, PSA_PAKE_PRIMITIVE(PSA_PAKE_PRIMITIVE_TYPE_ECC, PSA_ECC_FAMILY_SECP_R1, 256));
-    psa_pake_cs_set_hash(&cs, PSA_ALG_SHA_256);
-
-    psa_status_t status = psa_pake_setup(&mOperation, &cs);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
     memcpy(mContext, context, context_len);
     mContextLen = context_len;
 
@@ -63,8 +55,29 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
     VerifyOrReturnError(w0in_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(Lin_len == kP256_Point_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mRole               = PSA_PAKE_ROLE_SERVER;
-    psa_status_t status = psa_pake_set_role(&mOperation, PSA_PAKE_ROLE_SERVER);
+    uint8_t password[kSpake2p_WS_Length + kP256_Point_Length];
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_pake_cipher_suite_t cp      = PSA_PAKE_CIPHER_SUITE_INIT;
+
+    psa_pake_cs_set_algorithm(&cp, PSA_ALG_SPAKE2P_MATTER);
+    psa_pake_cs_set_primitive(&cp, PSA_PAKE_PRIMITIVE(PSA_PAKE_PRIMITIVE_TYPE_ECC, PSA_ECC_FAMILY_SECP_R1, 256));
+
+    memcpy(password + 0, w0in, w0in_len);
+    memcpy(password + w0in_len, Lin, Lin_len);
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
+    psa_set_key_algorithm(&attributes, PSA_ALG_SPAKE2P_MATTER);
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_SPAKE2P_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_R1));
+
+    psa_status_t status = psa_import_key(&attributes, password, w0in_len + Lin_len, &mKey);
+
+    psa_reset_key_attributes(&attributes);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    status = psa_pake_setup(&mOperation, mKey, &cp);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    mRole  = PSA_PAKE_ROLE_SERVER;
+    status = psa_pake_set_role(&mOperation, PSA_PAKE_ROLE_SERVER);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_set_peer(&mOperation, peer_identity, peer_identity_len);
@@ -73,23 +86,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
     status = psa_pake_set_user(&mOperation, my_identity, my_identity_len);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    uint8_t password[kSpake2p_WS_Length + kP256_Point_Length];
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-
-    memcpy(password + 0, w0in, w0in_len);
-    memcpy(password + w0in_len, Lin, Lin_len);
-    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
-    psa_set_key_algorithm(&attributes, PSA_ALG_SPAKE2P);
-    psa_set_key_type(&attributes, PSA_KEY_TYPE_PASSWORD);
-
-    status = psa_import_key(&attributes, password, w0in_len + Lin_len, &mKey);
-    psa_reset_key_attributes(&attributes);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
-    status = psa_pake_set_password_key(&mOperation, mKey);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
-    status = psa_pake_input(&mOperation, PSA_PAKE_STEP_CONTEXT, mContext, mContextLen);
+    status = psa_pake_set_context(&mOperation, mContext, mContextLen);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -103,8 +100,29 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
     VerifyOrReturnError(w0in_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(w1in_len <= kSpake2p_WS_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mRole               = PSA_PAKE_ROLE_CLIENT;
-    psa_status_t status = psa_pake_set_role(&mOperation, PSA_PAKE_ROLE_CLIENT);
+    uint8_t password[kSpake2p_WS_Length * 2];
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_pake_cipher_suite_t cp      = PSA_PAKE_CIPHER_SUITE_INIT;
+
+    psa_pake_cs_set_algorithm(&cp, PSA_ALG_SPAKE2P_MATTER);
+    psa_pake_cs_set_primitive(&cp, PSA_PAKE_PRIMITIVE(PSA_PAKE_PRIMITIVE_TYPE_ECC, PSA_ECC_FAMILY_SECP_R1, 256));
+
+    memcpy(password + 0, w0in, w0in_len);
+    memcpy(password + w0in_len, w1in, w1in_len);
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
+    psa_set_key_algorithm(&attributes, PSA_ALG_SPAKE2P_MATTER);
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_SPAKE2P_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+
+    psa_status_t status = psa_import_key(&attributes, password, w0in_len + w1in_len, &mKey);
+
+    psa_reset_key_attributes(&attributes);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    status = psa_pake_setup(&mOperation, mKey, &cp);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    mRole  = PSA_PAKE_ROLE_CLIENT;
+    status = psa_pake_set_role(&mOperation, PSA_PAKE_ROLE_CLIENT);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_pake_set_user(&mOperation, my_identity, my_identity_len);
@@ -113,23 +131,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
     status = psa_pake_set_peer(&mOperation, peer_identity, peer_identity_len);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    uint8_t password[kSpake2p_WS_Length * 2];
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-
-    memcpy(password + 0, w0in, w0in_len);
-    memcpy(password + w0in_len, w1in, w1in_len);
-    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
-    psa_set_key_algorithm(&attributes, PSA_ALG_SPAKE2P);
-    psa_set_key_type(&attributes, PSA_KEY_TYPE_PASSWORD);
-
-    status = psa_import_key(&attributes, password, w0in_len + w1in_len, &mKey);
-    psa_reset_key_attributes(&attributes);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
-    status = psa_pake_set_password_key(&mOperation, mKey);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-
-    status = psa_pake_input(&mOperation, PSA_PAKE_STEP_CONTEXT, mContext, mContextLen);
+    status = psa_pake_set_context(&mOperation, mContext, mContextLen);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -181,20 +183,16 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
 
 CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(uint8_t * out, size_t * out_len)
 {
-    VerifyOrReturnError(out != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_len != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    auto & keyId = key.AsMutable<psa_key_id_t>();
 
-    /*
-     * TODO: either:
-     * - use psa_pake_shared_secret() proposed in https://github.com/ARM-software/psa-api/issues/86
-     * - refactor Matter's GetKeys API to take an abstract shared secret instead of raw secret bytes.
-     */
-    oberon_spake2p_operation_t & oberonCtx = mOperation.MBEDTLS_PRIVATE(ctx).oberon_spake2p_ctx;
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
 
-    VerifyOrReturnError((oberonCtx.hash_len / 2) <= *out_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_DERIVE);
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
+    psa_set_key_algorithm(&attributes, PSA_ALG_HKDF(PSA_ALG_SHA_256));
 
-    memcpy(out, oberonCtx.shared, oberonCtx.hash_len / 2);
-    *out_len = oberonCtx.hash_len / 2;
+    psa_status_t status = psa_pake_get_shared_key(&mOperation, &attributes, &keyId);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
