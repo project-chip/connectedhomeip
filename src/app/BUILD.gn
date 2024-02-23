@@ -47,7 +47,7 @@ declare_args() {
   # (i.e. smaller than 2 minutes) for action delays.
   non_spec_compliant_ota_action_delay_floor = -1
 
-  # enable type sync client for use in `time-synchronization-server` (if linked)
+  # enable time sync client for use in `time-synchronization-server` (if linked)
   # TODO: this should probably be migrated to be time-synchronization-server specific
   #       if the cluster build targets are decoupled as stand-alone units.
   time_sync_enable_tsc_feature = 1
