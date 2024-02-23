@@ -520,12 +520,12 @@ class SubscriptionTransaction:
 
         return minIntervalSec.value, maxIntervalSec.value
 
-    def GetSubscriptionTimeout(self) -> int:
+    def GetSubscriptionTimeoutMs(self) -> int:
         '''
-        Returns the timeout after which we consider the subscription to have
+        Returns the timeout(milliseconds) after which we consider the subscription to have
         dropped, if we have received no messages within that amount of time.
 
-        Returns 0 if a subscription has not yet been established (and
+        Returns 0 milliseconds if a subscription has not yet been established (and
         hence the MaxInterval is not yet known), or if the subscription session
         is gone and hence the relevant MRP parameters can no longer be determined.
         '''
