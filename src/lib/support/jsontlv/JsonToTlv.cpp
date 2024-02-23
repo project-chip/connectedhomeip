@@ -221,15 +221,9 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, ui
         char * endPtr;
         errno                = 0;
         unsigned long result = strtoul(nameFields[0].c_str(), &endPtr, 10);
-
-        if (nameFields[0].c_str() == endPtr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        else if (errno == ERANGE || result > UINT32_MAX)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
+        VerifyOrReturnError(nameFields[0].c_str() != endPtr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError((errno != ERANGE && result <= UINT32_MAX), CHIP_ERROR_INVALID_ARGUMENT);
+        
         tagNumber   = static_cast<uint32_t>(result);
         elementType = nameFields[1].c_str();
     }
@@ -240,15 +234,9 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, ui
         char * endPtr;
         errno                = 0;
         unsigned long result = strtoul(nameFields[1].c_str(), &endPtr, 10);
-
-        if (nameFields[1].c_str() == endPtr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        else if (errno == ERANGE || result > UINT32_MAX)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
+        VerifyOrReturnError(nameFields[0].c_str() != endPtr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError((errno != ERANGE && result <= UINT32_MAX), CHIP_ERROR_INVALID_ARGUMENT);
+        
         tagNumber   = static_cast<uint32_t>(result);
         elementType = nameFields[2].c_str();
     }
