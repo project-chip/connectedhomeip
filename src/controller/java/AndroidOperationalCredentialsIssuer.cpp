@@ -272,14 +272,14 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     JniReferences::GetInstance().N2J_ByteArray(env, firmwareInfoSpan.data(), static_cast<jint>(firmwareInfoSpan.size()),
                                                javaFirmwareInfo);
 
-    uint16_t vendorId =
-        mAutoCommissioner->GetCommissioningParameters().GetRemoteVendorId().ValueOr(0x0000); // 0x0000 is Unspecified vendor ID value.
+    chip::VendorId vendorId =
+        mAutoCommissioner->GetCommissioningParameters().GetRemoteVendorId().ValueOr(chip::VendorId::Unspecified);
     uint16_t productId =
         mAutoCommissioner->GetCommissioningParameters().GetRemoteProductId().ValueOr(0x0000); // 0x0000 is invalid product ID value.
 
     jobject attestationInfo;
     err = N2J_AttestationInfo(env, javaAttestationChallenge, javaAttestationNonce, javaAttestationElements,
-                              javaAttestationElementsSignature, javaDAC, javaPAI, javaCD, javaFirmwareInfo, vendorId, productId,
+                              javaAttestationElementsSignature, javaDAC, javaPAI, javaCD, javaFirmwareInfo, static_cast<uint16_t>(vendorId), productId,
                               attestationInfo);
     if (err != CHIP_NO_ERROR)
     {
