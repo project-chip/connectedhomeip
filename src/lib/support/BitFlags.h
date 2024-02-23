@@ -202,7 +202,8 @@ public:
      *
      * This MAY return enum values that are not inside the range of valid enumerations.
      */
-    operator FlagsEnum() const {
+    operator FlagsEnum() const
+    {
         // TODO: fix lint: https://github.com/project-chip/connectedhomeip/issues/32249
         // NOLINTNEXTLINE(*.EnumCastOutOfRange)
         return static_cast<FlagsEnum>(mValue);
@@ -210,7 +211,6 @@ public:
 
     bool operator==(const BitFlags<FlagsEnum> & other) const { return mValue == other.mValue; }
     bool operator!=(const BitFlags<FlagsEnum> & other) const { return mValue != other.mValue; }
-
 
     // TODO:  This is a convenience for exact equality, however this hides away that
     //        a bitflag is used instead of an exact enum.
