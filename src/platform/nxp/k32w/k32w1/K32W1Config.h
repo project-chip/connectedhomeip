@@ -49,7 +49,7 @@ constexpr inline uint16_t K32WConfigKey(uint8_t chipId, uint8_t nvmId)
  * naturally provides implementations for the delegated members referenced by
  * the template class (e.g. the ReadConfigValue() method).
  */
-class K32WConfig
+class NXPConfig
 {
 public:
     // Category ids used by the CHIP Device Layer

@@ -45,7 +45,7 @@ uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
 {
     CHIP_ERROR err                    = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     uint8_t keyId                     = 0;
-    uint8_t nvmIdKvsKey               = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSKey;
+    uint8_t nvmIdKvsKey               = chip::DeviceLayer::Internal::NXPConfig::kFileId_KVSKey;
     bool bFreeIdxFound                = false;
     char keyString[kMaxKeyValueBytes] = { 0 };
     size_t keyStringSize              = 0;
@@ -55,7 +55,7 @@ uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
     {
         nvmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(nvmIdKvsKey, keyId);
         err =
-            chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueStr(nvmInternalId, keyString, kMaxKeyValueBytes, keyStringSize);
+            chip::DeviceLayer::Internal::NXPConfig::ReadConfigValueStr(nvmInternalId, keyString, kMaxKeyValueBytes, keyStringSize);
 
         if (err == CHIP_NO_ERROR)
         {
@@ -78,7 +78,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
                                           size_t offset_bytes)
 {
     CHIP_ERROR err         = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    uint8_t nvmIdKvsValue  = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSValue;
+    uint8_t nvmIdKvsValue  = chip::DeviceLayer::Internal::NXPConfig::kFileId_KVSValue;
     size_t read_bytes      = 0;
     uint8_t keyId          = 0;
     uint16_t nvmInternalId = 0;
@@ -92,7 +92,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         // This is the ID of the actual data
         nvmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(nvmIdKvsValue, keyId);
         ChipLogProgress(DeviceLayer, "KVS, get the value of Matter key [%s] with NVM id: %i", key, nvmInternalId);
-        err = chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueBin(nvmInternalId, (uint8_t *) value, value_size, read_bytes);
+        err = chip::DeviceLayer::Internal::NXPConfig::ReadConfigValueBin(nvmInternalId, (uint8_t *) value, value_size, read_bytes);
 
         // According to Get api read_bytes_size can be null
         if (read_bytes_size)
@@ -115,8 +115,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     CHIP_ERROR err         = CHIP_ERROR_INVALID_ARGUMENT;
     bool_t putKey          = false;
-    uint8_t nvmIdKvsKey    = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSKey;
-    uint8_t nvmIdKvsValue  = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSValue;
+    uint8_t nvmIdKvsKey    = chip::DeviceLayer::Internal::NXPConfig::kFileId_KVSKey;
+    uint8_t nvmIdKvsValue  = chip::DeviceLayer::Internal::NXPConfig::kFileId_KVSValue;
     uint16_t nvmInternalId = 0;
     uint16_t freeKeyId;
     uint8_t keyId;
@@ -135,7 +135,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     nvmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(nvmIdKvsValue, keyId);
     ChipLogProgress(DeviceLayer, "KVS, save in flash the value of the Matter key [%s] with NVM id: %i", key, nvmInternalId);
 
-    err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueBin(nvmInternalId, (uint8_t *) value, value_size);
+    err = chip::DeviceLayer::Internal::NXPConfig::WriteConfigValueBin(nvmInternalId, (uint8_t *) value, value_size);
 
     /* save the 'key' in flash such that it can be retrieved later on */
     if (err == CHIP_NO_ERROR)
@@ -145,7 +145,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
             nvmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(nvmIdKvsKey, keyId);
             ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with NVM id: %i", key, nvmInternalId);
 
-            err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueStr(nvmInternalId, key, strlen(key) + 1);
+            err = chip::DeviceLayer::Internal::NXPConfig::WriteConfigValueStr(nvmInternalId, key, strlen(key) + 1);
 
             if (err != CHIP_NO_ERROR)
             {
@@ -168,8 +168,8 @@ exit:
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     CHIP_ERROR err         = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-    uint8_t nvmIdKvsKey    = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSKey;
-    uint8_t nvmIdKvsValue  = chip::DeviceLayer::Internal::K32WConfig::kFileId_KVSValue;
+    uint8_t nvmIdKvsKey    = chip::DeviceLayer::Internal::NXPConfig::kFileId_KVSKey;
+    uint8_t nvmIdKvsValue  = chip::DeviceLayer::Internal::NXPConfig::kFileId_KVSValue;
     uint8_t keyId          = 0;
     uint16_t nvmInternalId = 0;
 
@@ -183,7 +183,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
         nvmInternalId = chip::DeviceLayer::Internal::K32WConfigKey(nvmIdKvsKey, keyId);
 
         ChipLogProgress(DeviceLayer, "KVS, delete from flash the Matter key [%s] with NVM id: %i", key, nvmInternalId);
-        err = chip::DeviceLayer::Internal::K32WConfig::ClearConfigValue(nvmInternalId);
+        err = chip::DeviceLayer::Internal::NXPConfig::ClearConfigValue(nvmInternalId);
 
         /* also delete the 'key string' from flash */
         if (err == CHIP_NO_ERROR)
@@ -192,7 +192,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
             ChipLogProgress(DeviceLayer, "KVS, delete from flash the value of the Matter key [%s] with NVM id: %i", key,
                             nvmInternalId);
 
-            err = chip::DeviceLayer::Internal::K32WConfig::ClearConfigValue(nvmInternalId);
+            err = chip::DeviceLayer::Internal::NXPConfig::ClearConfigValue(nvmInternalId);
 
             if (err != CHIP_NO_ERROR)
             {

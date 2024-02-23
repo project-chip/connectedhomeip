@@ -52,7 +52,9 @@ CHIP_ERROR BLEManagerImpl::InitHostController(BLECallbackDelegate::GapGenericCal
     PLATFORM_InitBle();
 
     (void) RNG_Init();
+#if K32W1_SDK_2_12
     RNG_SetPseudoRandomNoSeed(NULL);
+#endif
 
     /* Has to be called after RNG_Init(), once seed is generated. */
     (void) Controller_SetRandomSeed();
