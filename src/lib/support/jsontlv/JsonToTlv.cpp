@@ -230,11 +230,7 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, ui
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
-        {
-            tagNumber = static_cast<uint32_t>(result);
-        }
-
+        tagNumber   = static_cast<uint32_t>(result);
         elementType = nameFields[1].c_str();
     }
     else if (nameFields.size() == 3)
@@ -253,11 +249,7 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, ui
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
-        {
-            tagNumber = static_cast<uint32_t>(result);
-        }
-
+        tagNumber   = static_cast<uint32_t>(result);
         elementType = nameFields[2].c_str();
     }
     else
