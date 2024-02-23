@@ -34,9 +34,6 @@ config("config") {
 chip_data_model("tv-casting-common") {
   zap_file = "tv-casting-app.zap"
 
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/tv-casting-app/zap-generated"
-
   sources = [
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
     "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",
