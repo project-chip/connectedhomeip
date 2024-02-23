@@ -379,7 +379,8 @@ private:
     static void AddInvokeResponseData(nlTestSuite * apSuite, void * apContext, CommandHandler * apCommandHandler,
                                       bool aNeedStatusCode, CommandId aResponseCommandId = kTestCommandIdWithData,
                                       CommandId aRequestCommandId = kTestCommandIdWithData);
-    static uint32_t GetAddResponseDataOverheadSizeForPath(nlTestSuite * apSuite, const ConcreteCommandPath & aRequestCommandPath, bool aIsForcedSizeBufferLargerThan255);
+    static uint32_t GetAddResponseDataOverheadSizeForPath(nlTestSuite * apSuite, const ConcreteCommandPath & aRequestCommandPath,
+                                                          bool aIsForcedSizeBufferLargerThan255);
     static void FillCurrentInvokeResponseBuffer(nlTestSuite * apSuite, CommandHandler * apCommandHandler,
                                                 const ConcreteCommandPath & aRequestCommandPath, uint32_t aSizeToLeaveInBuffer);
     static void ValidateCommandHandlerEncodeInvokeResponseMessage(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode);
@@ -578,7 +579,9 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
     }
 }
 
-uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSuite * apSuite, const ConcreteCommandPath & aRequestCommandPath, bool aIsForcedSizeBufferLargerThan255)
+uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSuite * apSuite,
+                                                                       const ConcreteCommandPath & aRequestCommandPath,
+                                                                       bool aIsForcedSizeBufferLargerThan255)
 {
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
     CommandHandler commandHandler(kCommandHandlerTestOnlyMarker, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
@@ -595,12 +598,13 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSui
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     uint32_t remainingSizeBefore = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
 
-    // When ForcedSizeBuffer exceeds 255, an extra byte is needed for length, affecting the overhead size required by AddResponseData.
+    // When ForcedSizeBuffer exceeds 255, an extra byte is needed for length, affecting the overhead size required by
+    // AddResponseData.
     uint32_t sizeOfForcedSizeBuffer = aIsForcedSizeBufferLargerThan255 ? 256 : 0;
-    err = commandHandler.AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeOfForcedSizeBuffer));
+    err                             = commandHandler.AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeOfForcedSizeBuffer));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     uint32_t remainingSizeAfter = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
-    uint32_t delta = remainingSizeBefore - remainingSizeAfter - sizeOfForcedSizeBuffer;
+    uint32_t delta              = remainingSizeBefore - remainingSizeAfter - sizeOfForcedSizeBuffer;
 
     return delta;
 }
@@ -619,7 +623,8 @@ void TestCommandInteraction::FillCurrentInvokeResponseBuffer(nlTestSuite * apSui
     // length byte is required. Since tests using FillCurrentInvokeResponseBuffer currently end up with sizeToFill > 255, we
     // inform the calculation of this expectation. Nonetheless, we also validate this assumption for correctness.
     bool isForcedSizeBufferLargerThan255 = true;
-    uint32_t overheadSizeNeededForAddingResponse = GetAddResponseDataOverheadSizeForPath(apSuite, aRequestCommandPath, isForcedSizeBufferLargerThan255);
+    uint32_t overheadSizeNeededForAddingResponse =
+        GetAddResponseDataOverheadSizeForPath(apSuite, aRequestCommandPath, isForcedSizeBufferLargerThan255);
     NL_TEST_ASSERT(apSuite, remainingSize > (aSizeToLeaveInBuffer + overheadSizeNeededForAddingResponse));
     uint32_t sizeToFill = remainingSize - aSizeToLeaveInBuffer - overheadSizeNeededForAddingResponse;
 
