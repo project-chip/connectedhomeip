@@ -61,13 +61,15 @@ public class MessagesManagerStub implements MessagesManager {
     int i = 0;
 
     for (Map.Entry<Long, String> set : responseOptions.entrySet()) {
-      Log.d(TAG, "presentMessages option: key:" + set.getKey().longValue() + " value:" + set.getValue());
+      Log.d(
+          TAG,
+          "presentMessages option: key:" + set.getKey().longValue() + " value:" + set.getValue());
       options[i] = new MessageResponseOption(set.getKey().longValue(), set.getValue());
       i++;
     }
 
-    Message message = new Message(
-      messageId, priority, messageControl, startTime, duration, messageText, options);
+    Message message =
+        new Message(messageId, priority, messageControl, startTime, duration, messageText, options);
     messages.put(messageId, message);
 
     UserPrompter prompter = UserPrompterResolver.getUserPrompter();
