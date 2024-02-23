@@ -139,7 +139,13 @@ class BasicClientFragment : Fragment() {
     val attributeId = BasicInformation.Attribute.valueOf(attributeName).id
 
     val devicePtr =
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
 
     ChipClient.getDeviceController(requireContext())
       .readPath(
@@ -182,7 +188,13 @@ class BasicClientFragment : Fragment() {
   private suspend fun sendWriteAttribute(attribute: BasicInformation.Attribute, tlv: ByteArray) {
     val clusterId = BasicInformation.ID
     val devicePtr =
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
 
     ChipClient.getDeviceController(requireContext())
       .write(

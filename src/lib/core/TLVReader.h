@@ -86,6 +86,8 @@ class DLL_EXPORT TLVReader
     friend class TLVUpdater;
 
 public:
+    TLVReader();
+
     /**
      * Initializes a TLVReader object from another TLVReader object.
      *

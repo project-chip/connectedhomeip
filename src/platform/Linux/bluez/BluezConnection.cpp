@@ -60,7 +60,7 @@ gboolean BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService
 } // namespace
 
 BluezConnection::BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice) :
-    mpDevice(BLUEZ_DEVICE1(g_object_ref(apDevice)))
+    mpDevice(reinterpret_cast<BluezDevice1 *>(g_object_ref(apDevice)))
 {
     Init(aEndpoint);
 }
@@ -101,9 +101,9 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
     if (!aEndpoint.mIsCentral)
     {
-        mpService = BLUEZ_GATT_SERVICE1(g_object_ref(aEndpoint.mpService));
-        mpC1      = BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC1));
-        mpC2      = BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC2));
+        mpService = reinterpret_cast<BluezGattService1 *>(g_object_ref(aEndpoint.mpService));
+        mpC1      = reinterpret_cast<BluezGattCharacteristic1 *>(g_object_ref(aEndpoint.mpC1));
+        mpC2      = reinterpret_cast<BluezGattCharacteristic1 *>(g_object_ref(aEndpoint.mpC2));
     }
     else
     {
@@ -111,9 +111,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         for (l = objects; l != nullptr; l = l->next)
         {
-            BluezObject * object        = BLUEZ_OBJECT(l->data);
-            BluezGattService1 * service = bluez_object_get_gatt_service1(object);
-
+            BluezGattService1 * service = bluez_object_get_gatt_service1(BLUEZ_OBJECT(l->data));
             if (service != nullptr)
             {
                 if ((BluezIsServiceOnDevice(service, mpDevice)) == TRUE &&
@@ -130,9 +128,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         for (l = objects; l != nullptr; l = l->next)
         {
-            BluezObject * object             = BLUEZ_OBJECT(l->data);
-            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(object);
-
+            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(BLUEZ_OBJECT(l->data));
             if (char1 != nullptr)
             {
                 if ((BluezIsCharOnService(char1, mpService) == TRUE) &&
@@ -180,7 +176,7 @@ CHIP_ERROR BluezConnection::BluezDisconnect(BluezConnection * conn)
 
     ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, conn->GetPeerAddress());
 
-    success = bluez_device1_call_disconnect_sync(conn->mpDevice, nullptr, &MakeUniquePointerReceiver(error).Get());
+    success = bluez_device1_call_disconnect_sync(conn->mpDevice, nullptr, &error.GetReceiver());
     VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message));
 
 exit:
@@ -284,7 +280,7 @@ CHIP_ERROR BluezConnection::SendIndicationImpl(ConnectionDataBundle * data)
         VerifyOrExit(len <= static_cast<size_t>(std::numeric_limits<gssize>::max()),
                      ChipLogError(DeviceLayer, "FAIL: buffer too large in %s", __func__));
         auto status = g_io_channel_write_chars(data->mConn.mC2Channel.mChannel.get(), buf, static_cast<gssize>(len), &written,
-                                               &MakeUniquePointerReceiver(error).Get());
+                                               &error.GetReceiver());
         VerifyOrExit(status == G_IO_STATUS_NORMAL, ChipLogError(DeviceLayer, "FAIL: C2 Indicate: %s", error->message));
     }
     else
@@ -311,7 +307,7 @@ void BluezConnection::SendWriteRequestDone(GObject * aObject, GAsyncResult * aRe
 {
     BluezGattCharacteristic1 * c1 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &MakeUniquePointerReceiver(error).Get());
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: SendWriteRequest : %s", error->message));
     BLEManagerImpl::HandleWriteComplete(static_cast<BluezConnection *>(apConnection));
@@ -360,7 +356,7 @@ void BluezConnection::SubscribeCharacteristicDone(GObject * aObject, GAsyncResul
 {
     BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &MakeUniquePointerReceiver(error).Get());
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: SubscribeCharacteristic : %s", error->message));
 
@@ -392,7 +388,7 @@ void BluezConnection::UnsubscribeCharacteristicDone(GObject * aObject, GAsyncRes
 {
     BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &MakeUniquePointerReceiver(error).Get());
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: UnsubscribeCharacteristic : %s", error->message));
 

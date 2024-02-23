@@ -647,28 +647,26 @@
  * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN
  *
  * The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
- * in the extended advertising mode. The minimum interval shall not be smaller than the default value
- * and should not be equal to the CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX.
+ * in the extended advertising mode. The minimum interval shall not be smaller than the default value.
  *
- * Defaults to 1920 (1200 ms).
+ * Defaults to 2056 (1285 ms).
  */
-#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN 1920
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN 2056
 
 /**
  * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
  *
  * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
- * in the extended advertising mode. The maximum interval should be greater and not equal to the
- * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN.
+ * in the extended advertising mode. The maximum interval should be greater.
  *
- * Defaults to 1936 (1210 ms).
+ * Defaults to 2056 (1285 ms).
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
-#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX 1936
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX 2056
 #endif
 
-static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX,
-              "Max Extended Advertising Interval cannot be smaller or equal to the Min Extended Advertising Interval");
+static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX,
+              "Max Extended Advertising Interval cannot be larger to the Min Extended Advertising Interval");
 
 #endif
 
