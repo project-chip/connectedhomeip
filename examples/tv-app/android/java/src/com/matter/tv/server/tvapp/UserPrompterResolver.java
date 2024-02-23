@@ -40,6 +40,7 @@ public class UserPrompterResolver {
   }
 
   static UserPrompter globalPrompter = null;
+
   public static void setUserPrompter(UserPrompter prompter) {
     globalPrompter = prompter;
   }

@@ -45,25 +45,28 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + ". Commissionee: "
             + commissioneeName);
 
-    getActivity().runOnUiThread(
-                () -> {
-      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-      builder
-        .setMessage(commissioneeName + " is requesting permission to cast to this device, approve?")
-        .setTitle("Allow access to " + commissioneeName)
-        .setPositiveButton(
-            "Ok",
-            (dialog, which) -> {
-              OnPromptAccepted();
-            })
-        .setNegativeButton(
-            "Cancel",
-            (dialog, which) -> {
-              OnPromptDeclined();
-            })
-        .create()
-        .show();
-    });
+    getActivity()
+        .runOnUiThread(
+            () -> {
+              AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+              builder
+                  .setMessage(
+                      commissioneeName
+                          + " is requesting permission to cast to this device, approve?")
+                  .setTitle("Allow access to " + commissioneeName)
+                  .setPositiveButton(
+                      "Ok",
+                      (dialog, which) -> {
+                        OnPromptAccepted();
+                      })
+                  .setNegativeButton(
+                      "Cancel",
+                      (dialog, which) -> {
+                        OnPromptDeclined();
+                      })
+                  .create()
+                  .show();
+            });
   }
 
   @Override
@@ -77,30 +80,30 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + ". Commissionee: "
             + commissioneeName);
 
-    getActivity().runOnUiThread(
-              () -> {
+    getActivity()
+        .runOnUiThread(
+            () -> {
+              EditText editText = new EditText(getActivity());
+              AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-      EditText editText = new EditText(getActivity());
-      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-      builder
-        .setMessage("Please enter PIN displayed in casting app.")
-        .setTitle("Allow access to " + commissioneeName)
-        .setView(editText)
-        .setPositiveButton(
-            "Ok",
-            (dialog, which) -> {
-              String pinCode = editText.getText().toString();
-              OnPinCodeEntered(Integer.parseInt(pinCode));
-            })
-        .setNegativeButton(
-            "Cancel",
-            (dialog, which) -> {
-              OnPinCodeDeclined();
-            })
-        .create()
-        .show();
-    });
+              builder
+                  .setMessage("Please enter PIN displayed in casting app.")
+                  .setTitle("Allow access to " + commissioneeName)
+                  .setView(editText)
+                  .setPositiveButton(
+                      "Ok",
+                      (dialog, which) -> {
+                        String pinCode = editText.getText().toString();
+                        OnPinCodeEntered(Integer.parseInt(pinCode));
+                      })
+                  .setNegativeButton(
+                      "Cancel",
+                      (dialog, which) -> {
+                        OnPinCodeDeclined();
+                      })
+                  .create()
+                  .show();
+            });
   }
 
   public void hidePromptsOnCancel(int vendorId, int productId, String commissioneeName) {
@@ -113,30 +116,34 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + ". Commissionee: "
             + commissioneeName);
 
-    getActivity().runOnUiThread(
-              () -> {
+    getActivity()
+        .runOnUiThread(
+            () -> {
+              AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
+              abuilder
+                  .setMessage("Cancelled connection to " + commissioneeName)
+                  .setTitle("Connection Cancelled")
+                  .create()
+                  .show();
 
-      AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
-      abuilder.setMessage("Cancelled connection to " + commissioneeName)
-                            .setTitle("Connection Cancelled")
-                            .create()
-                            .show();
-          
-      NotificationCompat.Builder builder =
-        new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_baseline_check_24)
-            .setContentTitle("Connection Cancelled")
-            .setContentText(
-                "Cancelled connection to "
-                    + commissioneeName)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+              NotificationCompat.Builder builder =
+                  new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
+                      .setSmallIcon(R.drawable.ic_baseline_check_24)
+                      .setContentTitle("Connection Cancelled")
+                      .setContentText("Cancelled connection to " + commissioneeName)
+                      .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-      notificationManager.notify(SUCCESS_ID, builder.build());
-    });
+              notificationManager.notify(SUCCESS_ID, builder.build());
+            });
   }
 
-  public void promptWithCommissionerPasscode(int vendorId, int productId, String commissioneeName,
-                                      long passcode, int pairingHint, String pairingInstruction) {
+  public void promptWithCommissionerPasscode(
+      int vendorId,
+      int productId,
+      String commissioneeName,
+      long passcode,
+      int pairingHint,
+      String pairingInstruction) {
     Log.d(
         TAG,
         "Received prompt for Commissioner Passcode:"
@@ -148,28 +155,37 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + ". Commissionee: "
             + commissioneeName);
 
-    getActivity().runOnUiThread(
-              () -> {
+    getActivity()
+        .runOnUiThread(
+            () -> {
+              EditText editText = new EditText(getActivity());
+              AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-      EditText editText = new EditText(getActivity());
-      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-      builder
-        .setMessage("Please enter "+passcode+" in "+commissioneeName+" app. "+pairingInstruction+" ["+pairingHint+"]")
-        .setTitle("Passcode" + passcode)
-        .setPositiveButton(
-            "Ok",
-            (dialog, which) -> {
-              OnCommissionerPasscodeOK();
-            })
-        .setNegativeButton(
-            "Cancel",
-            (dialog, which) -> {
-              OnCommissionerPasscodeCancel();
-            })
-        .create()
-        .show();
-    });
+              builder
+                  .setMessage(
+                      "Please enter "
+                          + passcode
+                          + " in "
+                          + commissioneeName
+                          + " app. "
+                          + pairingInstruction
+                          + " ["
+                          + pairingHint
+                          + "]")
+                  .setTitle("Passcode" + passcode)
+                  .setPositiveButton(
+                      "Ok",
+                      (dialog, which) -> {
+                        OnCommissionerPasscodeOK();
+                      })
+                  .setNegativeButton(
+                      "Cancel",
+                      (dialog, which) -> {
+                        OnCommissionerPasscodeCancel();
+                      })
+                  .create()
+                  .show();
+            });
   }
 
   public void promptCommissioningStarted(int vendorId, int productId, String commissioneeName) {
@@ -181,26 +197,25 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + productId
             + ". Commissionee: "
             + commissioneeName);
-    getActivity().runOnUiThread(
-              () -> {
-
-      AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
-      abuilder.setMessage("Starting connection to " + commissioneeName)
+    getActivity()
+        .runOnUiThread(
+            () -> {
+              AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
+              abuilder
+                  .setMessage("Starting connection to " + commissioneeName)
                   .setTitle("Connection Starting")
                   .create()
                   .show();
-          
-      NotificationCompat.Builder builder =
-        new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_baseline_check_24)
-            .setContentTitle("Connection Starting")
-            .setContentText(
-                "Starting connection to "
-                    + commissioneeName)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-      notificationManager.notify(SUCCESS_ID, builder.build());
-    });
+              NotificationCompat.Builder builder =
+                  new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
+                      .setSmallIcon(R.drawable.ic_baseline_check_24)
+                      .setContentTitle("Connection Starting")
+                      .setContentText("Starting connection to " + commissioneeName)
+                      .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+              notificationManager.notify(SUCCESS_ID, builder.build());
+            });
   }
 
   public void promptCommissioningSucceeded(int vendorId, int productId, String commissioneeName) {
@@ -212,92 +227,98 @@ public class MatterCommissioningPrompter extends UserPrompterResolver implements
             + productId
             + ". Commissionee: "
             + commissioneeName);
-    getActivity().runOnUiThread(
-              () -> {
+    getActivity()
+        .runOnUiThread(
+            () -> {
+              AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
+              abuilder
+                  .setMessage(
+                      "Success. "
+                          + commissioneeName
+                          + " can now cast to this device. Visit settings to manage access control for casting.")
+                  .setTitle("Connection Complete")
+                  .create()
+                  .show();
 
-      AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
-      abuilder.setMessage("Success. " + commissioneeName 
-          + " can now cast to this device. Visit settings to manage access control for casting.")
-                            .setTitle("Connection Complete")
-                            .create()
-                            .show();
+              NotificationCompat.Builder builder =
+                  new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
+                      .setSmallIcon(R.drawable.ic_baseline_check_24)
+                      .setContentTitle("Connection Complete")
+                      .setContentText(
+                          "Success. "
+                              + commissioneeName
+                              + " can now cast to this device. Visit settings to manage access control for casting.")
+                      .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-      NotificationCompat.Builder builder =
-        new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_baseline_check_24)
-            .setContentTitle("Connection Complete")
-            .setContentText(
-                "Success. "
-                    + commissioneeName
-                    + " can now cast to this device. Visit settings to manage access control for casting.")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-      notificationManager.notify(SUCCESS_ID, builder.build());
-    });
+              notificationManager.notify(SUCCESS_ID, builder.build());
+            });
   }
 
   public void promptCommissioningFailed(String commissioneeName, String error) {
     Log.d(TAG, "Received prompt for failure Commissionee: " + commissioneeName);
-    getActivity().runOnUiThread(
-              () -> {
+    getActivity()
+        .runOnUiThread(
+            () -> {
+              AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
+              abuilder
+                  .setMessage("Failed. " + commissioneeName + " experienced error: " + error + ".")
+                  .setTitle("Connection Failed")
+                  .create()
+                  .show();
 
-      AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
-      abuilder.setMessage("Failed. " + commissioneeName 
-                    + " experienced error: " + error + ".")
-                                      .setTitle("Connection Failed")
-                                      .create()
-                                      .show();
+              NotificationCompat.Builder builder =
+                  new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
+                      .setSmallIcon(R.drawable.ic_baseline_clear_24)
+                      .setContentTitle("Connection Failed")
+                      .setContentText(
+                          "Failed. " + commissioneeName + " experienced error: " + error + ".")
+                      .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-      NotificationCompat.Builder builder =
-        new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_baseline_clear_24)
-            .setContentTitle("Connection Failed")
-            .setContentText("Failed. " + commissioneeName + " experienced error: " + error + ".")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-      notificationManager.notify(FAIL_ID, builder.build());
-    });
+              notificationManager.notify(FAIL_ID, builder.build());
+            });
   }
 
   public void promptWithMessage(Message message) {
     Log.d(TAG, "Received message prompt for " + message.messageText);
-    getActivity().runOnUiThread(
-              () -> {
-
-      if (message.responseOptions.length != 2) {
-        AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
-        abuilder.setMessage("" + message.messageId + ":" + message.messageText)
+    getActivity()
+        .runOnUiThread(
+            () -> {
+              if (message.responseOptions.length != 2) {
+                AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
+                abuilder
+                    .setMessage("" + message.messageId + ":" + message.messageText)
                     .setTitle("New Message from Test")
                     .setPositiveButton(
-                      "Ok",
-                      (dialog, which) -> {
-                        OnMessageResponse(message.messageId, 0); // ack
-                      })
+                        "Ok",
+                        (dialog, which) -> {
+                          OnMessageResponse(message.messageId, 0); // ack
+                        })
                     .setNegativeButton(
-                      "Ignore",
-                      (dialog, which) -> {
-                        OnMessageResponse(message.messageId, -1); // ignore
-                      })
+                        "Ignore",
+                        (dialog, which) -> {
+                          OnMessageResponse(message.messageId, -1); // ignore
+                        })
                     .create()
-                    .show();  
-      } else {
-        AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
-        abuilder.setMessage("" + message.messageId + ":" + message.messageText)
+                    .show();
+              } else {
+                AlertDialog.Builder abuilder = new AlertDialog.Builder(getActivity());
+                abuilder
+                    .setMessage("" + message.messageId + ":" + message.messageText)
                     .setTitle("New Message from Test")
                     .setPositiveButton(
-                      message.responseOptions[0].label,
-                      (dialog, which) -> {
-                        OnMessageResponse(message.messageId, message.responseOptions[0].id); 
-                      })
+                        message.responseOptions[0].label,
+                        (dialog, which) -> {
+                          OnMessageResponse(message.messageId, message.responseOptions[0].id);
+                        })
                     .setNegativeButton(
-                      message.responseOptions[1].label,
-                      (dialog, which) -> {
-                        OnMessageResponse(message.messageId, message.responseOptions[1].id); 
-                      })
+                        message.responseOptions[1].label,
+                        (dialog, which) -> {
+                          OnMessageResponse(message.messageId, message.responseOptions[1].id);
+                        })
                     .create()
-                    .show();  
-      }
-    });
+                    .show();
+              }
+            });
   }
 
   private void createNotificationChannel() {
