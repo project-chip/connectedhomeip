@@ -90,6 +90,7 @@ CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackM
         self->mProxy != nullptr, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error"));
 
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     g_signal_connect(self->mProxy.get(), "g-properties-changed", G_CALLBACK(OnDbusPropertiesChanged), self);
 
     return CHIP_NO_ERROR;

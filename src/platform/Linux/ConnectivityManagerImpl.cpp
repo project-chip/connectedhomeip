@@ -510,6 +510,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
 
+        // NOLINTBEGIN(*.EnumCastOutOfRange)
         g_signal_connect(
             mWpaSupplicant.iface, "properties-changed",
             G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * properties, ConnectivityManagerImpl * self) {
@@ -521,6 +522,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
                              return self->_OnWpaInterfaceScanDone(proxy, success);
                          }),
                          this);
+        // NOLINTEND(*.EnumCastOutOfRange)
     }
     else
     {
@@ -750,6 +752,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * sourceObject, GAsyncRes
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant proxy");
 
+        // NOLINTBEGIN(*.EnumCastOutOfRange)
         g_signal_connect(
             mWpaSupplicant.proxy, "interface-added",
             G_CALLBACK(+[](WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties,
@@ -760,6 +763,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * sourceObject, GAsyncRes
             G_CALLBACK(+[](WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties,
                            ConnectivityManagerImpl * self) { return self->_OnWpaInterfaceRemoved(proxy, path, properties); }),
             this);
+        // NOLINTEND(*.EnumCastOutOfRange)
 
         wpa_fi_w1_wpa_supplicant1_call_get_interface(
             mWpaSupplicant.proxy, sWiFiIfName, nullptr,

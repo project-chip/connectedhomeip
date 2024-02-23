@@ -281,9 +281,12 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
     GAutoPtr<GError> error;
 
+    // NOLINTBEGIN(*.EnumCastOutOfRange)
     self->mObjectAddedSignal = g_signal_connect(self->mManager, "object-added", G_CALLBACK(SignalObjectAdded), self);
+
     self->mInterfaceChangedSignal =
         g_signal_connect(self->mManager, "interface-proxy-properties-changed", G_CALLBACK(SignalInterfaceChanged), self);
+    // NOLINTEND(*.EnumCastOutOfRange)
 
     ChipLogProgress(Ble, "BLE removing known devices.");
     for (BluezObject & object : BluezObjectList(self->mManager))

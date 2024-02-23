@@ -381,6 +381,7 @@ CHIP_ERROR BluezConnection::SubscribeCharacteristicImpl(BluezConnection * connec
     c2 = BLUEZ_GATT_CHARACTERISTIC1(connection->mpC2);
 
     // Get notifications on the TX characteristic change (e.g. indication is received)
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     g_signal_connect(c2, "g-properties-changed", G_CALLBACK(OnCharacteristicChanged), connection);
     bluez_gatt_characteristic1_call_start_notify(connection->mpC2, nullptr, SubscribeCharacteristicDone, connection);
 
