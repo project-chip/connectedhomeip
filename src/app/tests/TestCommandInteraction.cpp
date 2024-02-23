@@ -595,8 +595,8 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSui
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     uint32_t remainingSizeBefore = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
 
+    // When ForcedSizeBuffer exceeds 255, an extra byte is needed for length, affecting the overhead size required by AddResponseData.
     uint32_t sizeOfForcedSizeBuffer = aIsForcedSizeBufferLargerThan255 ? 256 : 0;
-    // When ForcedSizeBuffer is >= 256 an extra byte is used for length.
     err = commandHandler.AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeOfForcedSizeBuffer));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     uint32_t remainingSizeAfter = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
@@ -615,15 +615,15 @@ void TestCommandInteraction::FillCurrentInvokeResponseBuffer(nlTestSuite * apSui
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     uint32_t remainingSize = apCommandHandler->mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
 
-    // AddResponseData's overhead calculation depends on the size of ForcedSizeBuffer. If the buffer exceeds 256 bytes, an extra
-    // length byte is required. Since tests using FillCurrentInvokeResponseBuffer currently end up with sizeToFill >= 256, we
+    // AddResponseData's overhead calculation depends on the size of ForcedSizeBuffer. If the buffer exceeds 255 bytes, an extra
+    // length byte is required. Since tests using FillCurrentInvokeResponseBuffer currently end up with sizeToFill > 255, we
     // inform the calculation of this expectation. Nonetheless, we also validate this assumption for correctness. 
     bool isForcedSizeBufferLargerThan255 = true;
     uint32_t overheadSizeNeededForAddingResponse = GetAddResponseDataOverheadSizeForPath(apSuite, aRequestCommandPath, isForcedSizeBufferLargerThan255);
     NL_TEST_ASSERT(apSuite, remainingSize > (aSizeToLeaveInBuffer + overheadSizeNeededForAddingResponse));
     uint32_t sizeToFill = remainingSize - aSizeToLeaveInBuffer - overheadSizeNeededForAddingResponse;
 
-    // Validating assumption. If this fails, it means overheadSizeNeededForAddingResponse is likely to large.
+    // Validating assumption. If this fails, it means overheadSizeNeededForAddingResponse is likely too large.
     NL_TEST_ASSERT(apSuite, sizeToFill >= 256);
 
     err = apCommandHandler->AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeToFill));
