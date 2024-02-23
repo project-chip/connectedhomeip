@@ -175,6 +175,7 @@ public:
     {
         MATTER_LOG_METRIC_BEGIN(mKey);
         IgnoreUnusedVariable(mKey);
+        IgnoreUnusedVariable(mError);
     }
 
     ~ScopedMetricEvent()
