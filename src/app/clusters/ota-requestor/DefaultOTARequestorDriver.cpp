@@ -38,6 +38,8 @@
 #include "DefaultOTARequestorDriver.h"
 #include "OTARequestorInterface.h"
 
+#include <app/AppConfig.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace {
