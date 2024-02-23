@@ -104,17 +104,18 @@ void JNIMyUserPrompter::PromptForCommissionOKPermission(uint16_t vendorId, uint1
     DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptForCommissionOKPermissionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
+        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
+        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptForCommissionOKPermissionMethod,
-                            static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue());
+                            static_cast<jint>(vendorId), static_cast<jint>(productId), jcommissioneeName);
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in PromptForCommissionOKPermission");
@@ -146,17 +147,18 @@ void JNIMyUserPrompter::PromptForCommissionPasscode(uint16_t vendorId, uint16_t 
     DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptForCommissionPincodeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
+        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
+        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptForCommissionPincodeMethod, static_cast<jint>(vendorId),
-                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
+                            static_cast<jint>(productId), jcommissioneeName);
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in PromptForCommissionPincode");
@@ -186,17 +188,18 @@ void JNIMyUserPrompter::HidePromptsOnCancel(uint16_t vendorId, uint16_t productI
     DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptForCommissionOKPermissionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
+        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
+        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mHidePromptsOnCancelMethod, static_cast<jint>(vendorId),
-                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
+                            static_cast<jint>(productId), jcommissioneeName);
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in HidePromptsOnCancel");
@@ -238,20 +241,22 @@ void JNIMyUserPrompter::PromptWithCommissionerPasscode(uint16_t vendorId, uint16
     DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    std::string stringCommissioneeName(commissioneeName);
-    std::string stringPairingInstruction(pairingInstruction);
 
     VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptForCommissionOKPermissionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
-        UtfString jniPairingInstruction(env, stringPairingInstruction.data());
+        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
+        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+
+        jstring jpairingInstruction = env->NewStringUTF(pairingInstruction);
+        VerifyOrExit(jpairingInstruction != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptWithCommissionerPasscodeMethod,
-                            static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue(),
-                            static_cast<jlong>(passcode), static_cast<jint>(pairingHint), jniPairingInstruction.jniValue());
+                            static_cast<jint>(vendorId), static_cast<jint>(productId), jcommissioneeName,
+                            static_cast<jlong>(passcode), static_cast<jint>(pairingHint), jpairingInstruction);
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in PromptWithCommissionerPasscode");
@@ -279,17 +284,18 @@ void JNIMyUserPrompter::PromptCommissioningStarted(uint16_t vendorId, uint16_t p
     DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptForCommissionOKPermissionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
+        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
+        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningStartedMethod, static_cast<jint>(vendorId),
-                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
+                            static_cast<jint>(productId), jcommissioneeName);
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in PromptCommissioningStarted");
@@ -315,17 +321,18 @@ void JNIMyUserPrompter::PromptCommissioningSucceeded(uint16_t vendorId, uint16_t
     DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptCommissioningSucceededMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
+        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
+        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+
         env->ExceptionClear();
         env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningSucceededMethod, static_cast<jint>(vendorId),
-                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
+                            static_cast<jint>(productId), jcommissioneeName);
 
         if (env->ExceptionCheck())
         {
@@ -352,19 +359,21 @@ void JNIMyUserPrompter::PromptCommissioningFailed(const char * commissioneeName,
     DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    std::string stringCommissioneeName(commissioneeName);
 
     VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mPromptCommissioningFailedMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        std::string stringError(error.AsString());
-        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
-        UtfString jniCommissioneeError(env, stringError.data());
+        jstring jcommissioneeError = env->NewStringUTF(error.AsString());
+        VerifyOrExit(jcommissioneeError != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+
+        jstring jcommissioneeName = env->NewStringUTF(commissioneeName);
+        VerifyOrExit(jcommissioneeName != nullptr, ChipLogError(Zcl, "Could not create jstring"); err = CHIP_ERROR_INTERNAL);
+
         env->ExceptionClear();
-        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningFailedMethod, jniCommissioneeName.jniValue(),
-                            jniCommissioneeError.jniValue());
+        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningFailedMethod, jcommissioneeName,
+                            jcommissioneeError);
 
         if (env->ExceptionCheck())
         {

@@ -86,8 +86,8 @@ JNI_METHOD(void, OnCommissionerPasscodeCancel)(JNIEnv *, jobject)
 JNI_METHOD(void, OnMessageResponse)(JNIEnv * env, jobject, jstring jMessageId, jlong jOptionId)
 {
     chip::DeviceLayer::StackLock lock;
-    uint64_t optionid = (uint64_t) jOptionId;
-    ChipLogProgress(Zcl, "OnMessageResponse option id: %lld", optionid);
+    uint32_t optionid = static_cast<uint32_t>(jOptionId);
+    ChipLogProgress(Zcl, "OnMessageResponse option id: %u", optionid);
 
     JniUtfString messageId(env, jMessageId);
     if (jMessageId != nullptr)

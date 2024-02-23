@@ -382,11 +382,11 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
                     return CHIP_ERROR_INTERNAL;
                 }
 
-                jobject jlong = env->NewObject(longClass, longCtor, response.messageResponseID.Value());
-                VerifyOrReturnError(jlong != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not create Long"));
+                jobject jlongobj = env->NewObject(longClass, longCtor, static_cast<uint64_t>(response.messageResponseID.Value()));
+                VerifyOrReturnError(jlongobj != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not create Long"));
 
                 // add to HashMap
-                env->CallObjectMethod(joptions, hashMapPut, jlong, jlabel);
+                env->CallObjectMethod(joptions, hashMapPut, jlongobj, jlabel);
                 if (env->ExceptionCheck())
                 {
                     ChipLogError(DeviceLayer, "Java exception in MessagesManager::HandlePresentMessagesRequest");
