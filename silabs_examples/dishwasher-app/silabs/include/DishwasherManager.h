@@ -27,7 +27,6 @@
 #include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
 #include <lib/core/ClusterEnums.h>
 
 #include <lib/core/CHIPError.h>

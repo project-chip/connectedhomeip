@@ -38,16 +38,16 @@ using namespace chip::app;
  * @param attributeMetadata
  * @param buffer
  * @param maxReadLength
- * @return EmberAfStatus
+ * @return CHIP_ERROR
  */
-EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+CHIP_ERROR emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength)
 {
     sl_log_debug(LOG_TAG, "emberAfExternalAttributeReadCallback: endpoint: %d cluster: %d attribute: %d\n", endpoint, clusterId,
                  attributeMetadata->attributeId);
     memcpy(buffer, &attributeMetadata->defaultValue, attributeMetadata->size);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return CHIP_NO_ERROR;
 }
 
 void OnIdentifyStart(::Identify *)

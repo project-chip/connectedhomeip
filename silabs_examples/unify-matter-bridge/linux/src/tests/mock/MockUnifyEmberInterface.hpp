@@ -35,7 +35,7 @@ public:
     // All the endpoints cleared
     std::vector<chip::EndpointId> cleared_endpoints;
 
-    EmberAfStatus emberAfSetDynamicEndpointUnify(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
+    CHIP_ERROR emberAfSetDynamicEndpointUnify(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
                                                  const chip::Span<chip::DataVersion> & dataVersionStorage,
                                                  chip::Span<const EmberAfDeviceType> deviceTypeList,
                                                  chip::EndpointId parentEndpointId) override

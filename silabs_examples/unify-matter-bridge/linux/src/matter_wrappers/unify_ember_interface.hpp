@@ -73,13 +73,13 @@ public:
     // Matter ember interface stack wrappers (Please add wrappers here if functions are missing)
     // src/app/util/attribute-storage.h
     virtual uint16_t emberAfGetDynamicIndexFromEndpointUnify(chip::EndpointId id) { return emberAfGetDynamicIndexFromEndpoint(id); }
-    virtual EmberAfStatus emberAfSetDynamicEndpointUnify(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
+    virtual CHIP_ERROR emberAfSetDynamicEndpointUnify(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
                                                          const chip::Span<chip::DataVersion> & dataVersionStorage,
                                                          chip::Span<const EmberAfDeviceType> deviceTypeList = {},
                                                          chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
     {
-        EmberAfStatus emberStatus = emberAfSetDynamicEndpoint(index, id, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
-        return emberStatus;
+        CHIP_ERROR err = emberAfSetDynamicEndpoint(index, id, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
+        return err;
     }
     virtual chip::EndpointId emberAfClearDynamicEndpointUnify(uint16_t index)
     {

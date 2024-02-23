@@ -234,14 +234,14 @@ void matter_node_state_monitor::register_dynamic_endpoint(const struct bridged_e
                      bridge.matter_endpoint);
     }
 
-    EmberAfStatus status = unify_ember_interface.emberAfSetDynamicEndpointUnify(
+    CHIP_ERROR error = unify_ember_interface.emberAfSetDynamicEndpointUnify(
         bridge.index, bridge.matter_endpoint, const_cast<EmberAfEndpointType *>(*bridge.ember_endpoint),
         bridge.ember_endpoint.data_version_span(), bridge.ember_endpoint.device_type_span(bridge.matter_type), 1);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (error != CHIP_NO_ERROR)
     {
         sl_log_error(LOG_TAG, "The unify node [%s] is not added on matter bridge as a dynamic endpoint", bridge.unify_unid.c_str());
     }
-    if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
+    if (error == CHIP_ERROR_NO_MEMORY)
     {
         sl_log_error(LOG_TAG,
                      "There are not sufficient space to add the unify node [%s] on "
