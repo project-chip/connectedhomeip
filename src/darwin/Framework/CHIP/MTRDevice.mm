@@ -2195,7 +2195,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     os_unfair_lock_assert_owner(&self->_lock);
 
     // Check if root node descriptor exists
-    NSDictionary * rootDescriptorPartsListDataValue = _readCache[[MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)]];
+    NSDictionary * rootDescriptorPartsListDataValue = _readCache[[MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)]];
     if (!rootDescriptorPartsListDataValue || ![MTRArrayValueType isEqualToString:rootDescriptorPartsListDataValue[MTRTypeKey]]) {
         return NO;
     }
