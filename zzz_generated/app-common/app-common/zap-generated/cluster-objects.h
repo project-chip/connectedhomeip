@@ -21506,7 +21506,7 @@ public:
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
     chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
     DataModel::Nullable<uint32_t> startTime;
-    DataModel::Nullable<uint16_t> duration;
+    DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::List<const Structs::MessageResponseOptionStruct::Type>> responses;
 
@@ -21522,7 +21522,7 @@ public:
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
     chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
     DataModel::Nullable<uint32_t> startTime;
-    DataModel::Nullable<uint16_t> duration;
+    DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::DecodableType>> responses;
 
@@ -21573,7 +21573,7 @@ public:
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
     chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
     DataModel::Nullable<uint32_t> startTime;
-    DataModel::Nullable<uint16_t> duration;
+    DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::List<const Structs::MessageResponseOptionStruct::Type>> responses;
 
@@ -21594,7 +21594,7 @@ public:
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
     chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
     DataModel::Nullable<uint32_t> startTime;
-    DataModel::Nullable<uint16_t> duration;
+    DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::DecodableType>> responses;
     CHIP_ERROR Decode(TLV::TLVReader & reader);

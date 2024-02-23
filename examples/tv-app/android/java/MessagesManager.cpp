@@ -183,10 +183,10 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
             }
 
             jfieldID durationField = env->GetFieldID(messageClass, "duration", "I");
-            jint jduration         = env->GetIntField(messageObject, durationField);
+            jlong jduration        = env->GetLongField(messageObject, durationField);
             if (jduration >= 0)
             {
-                message.duration = DataModel::Nullable<uint16_t>(static_cast<uint16_t>(jduration));
+                message.duration = DataModel::Nullable<uint64_t>(static_cast<uint64_t>(jduration));
             }
 
             jfieldID getResponseOptionsField =
@@ -301,7 +301,7 @@ exit:
 
 CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
-    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
+    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
     const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     DeviceLayer::StackUnlock unlock;
@@ -336,11 +336,11 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
             return CHIP_ERROR_INTERNAL;
         }
 
-        jint jcontrol  = static_cast<jint>(messageControl.Raw());
-        jint jduration = -1;
+        jint jcontrol   = static_cast<jint>(messageControl.Raw());
+        jlong jduration = -1;
         if (!duration.IsNull())
         {
-            jduration = static_cast<jint>(duration.Value());
+            jduration = static_cast<jlong>(duration.Value());
         }
         jlong jstartTime = -1;
         if (!startTime.IsNull())
