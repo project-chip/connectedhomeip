@@ -388,6 +388,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @endcode
  *
  *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
+ *
  */
 #define SuccessOrExit(aStatus) nlEXPECT(::chip::ChipError::IsSuccess((aStatus)), exit)
 
@@ -419,6 +420,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @param[in]  aCondition  A Boolean expression to be evaluated.
  *  @param[in]  anAction    An expression or block to execute when the
  *                          assertion fails.
+ *
  */
 #define VerifyOrExit(aCondition, anAction) nlEXPECT_ACTION(aCondition, exit, anAction)
 
