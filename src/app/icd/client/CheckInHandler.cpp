@@ -55,7 +55,7 @@ CHIP_ERROR CheckInHandler::Init(Messaging::ExchangeManager * exchangeManager, IC
     mpExchangeManager  = exchangeManager;
     mpICDClientStorage = clientStorage;
     mpCheckInDelegate  = delegate;
-    mpImEngine = engine;
+    mpImEngine         = engine;
     return mpExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn, this);
 }
 

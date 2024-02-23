@@ -39,8 +39,8 @@ public:
     void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
 private:
-    ICDClientStorage * mpStorage = nullptr;
-    InteractionModelEngine * mpImEngine             = nullptr;
+    ICDClientStorage * mpStorage        = nullptr;
+    InteractionModelEngine * mpImEngine = nullptr;
 };
 
 } // namespace app

@@ -28,7 +28,7 @@ CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage, InteractionM
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mpStorage = storage;
+    mpStorage  = storage;
     mpImEngine = engine;
     return CHIP_NO_ERROR;
 }

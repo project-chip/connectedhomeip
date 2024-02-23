@@ -41,7 +41,8 @@ class CheckInHandler : public Messaging::ExchangeDelegate, public Messaging::Uns
 {
 
 public:
-    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage, CheckInDelegate * delegate, InteractionModelEngine *engine);
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage, CheckInDelegate * delegate,
+                    InteractionModelEngine * engine);
     void Shutdown();
 
     CheckInHandler();
@@ -87,7 +88,7 @@ private:
     Messaging::ExchangeManager * mpExchangeManager = nullptr;
     CheckInDelegate * mpCheckInDelegate            = nullptr;
     ICDClientStorage * mpICDClientStorage          = nullptr;
-    InteractionModelEngine *mpImEngine             = nullptr;
+    InteractionModelEngine * mpImEngine            = nullptr;
 };
 
 } // namespace app
