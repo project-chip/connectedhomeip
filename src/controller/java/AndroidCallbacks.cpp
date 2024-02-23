@@ -41,6 +41,8 @@ static const int MILLIS_SINCE_EPOCH = 1;
 // Add the bytes for attribute tag(1:control + 8:tag + 8:length) and structure(1:struct + 1:close container)
 static const int EXTRA_SPACE_FOR_ATTRIBUTE_TAG = 19;
 
+jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData);
+
 GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback,
                                                        const char * callbackClassSignature) :
     mOnSuccess(OnDeviceConnectedFn, this),
@@ -322,12 +324,15 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     // If we don't know this attribute, suppress it.
     if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB)
     {
+        value = DecodeGeneralTLVValue(env, apData);
         err = CHIP_NO_ERROR;
     }
 
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode attribute with error %s", ErrorStr(err));
                    aPath.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+#else
+    value = DecodeGeneralTLVValue(env, apData);
 #endif
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
@@ -475,11 +480,14 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     // If we don't know this event, just skip it.
     if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB)
     {
+        value = DecodeGeneralTLVValue(env, apData);
         err = CHIP_NO_ERROR;
     }
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode event with error %s", ErrorStr(err));
                    aEventHeader.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+#else
+    value = DecodeGeneralTLVValue(env, apData);
 #endif
 
     // Create TLV byte array to pass to Java layer
@@ -905,6 +913,76 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(wrapperCallback, onErrorMethod, exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+}
+
+jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jobject retValue = nullptr;
+
+    TLV::TLVReader readerForJavaObject;
+    readerForJavaObject.Init(*apData);
+
+    switch (readerForJavaObject.GetType())
+    {
+        case TLV::kTLVType_SignedInteger:
+        {
+            int64_t signedValue;
+            VerifyOrReturnValue(readerForJavaObject.Get(signedValue) == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+            err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(signedValue), retValue);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+            return retValue;
+        }
+        case TLV::kTLVType_UnsignedInteger:
+        {
+            uint64_t unsignedValue;
+            VerifyOrReturnValue(readerForJavaObject.Get(unsignedValue) == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+            err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(unsignedValue), retValue);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+            return retValue;
+        }
+        case TLV::kTLVType_Boolean:
+        {
+            bool booleanValue;
+            VerifyOrReturnValue(readerForJavaObject.Get(booleanValue) == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+            err = JniReferences::GetInstance().CreateBoxedObject<jboolean>("java/lang/Boolean", "(Z)V", static_cast<jboolean>(booleanValue), retValue);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+            return retValue;
+        }
+        case TLV::kTLVType_FloatingPointNumber:
+        {
+            double doubleValue;
+            VerifyOrReturnValue(readerForJavaObject.Get(doubleValue) == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+            err = JniReferences::GetInstance().CreateBoxedObject<jdouble>("java/lang/Double", "(D)V", static_cast<jdouble>(doubleValue), retValue);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+            return retValue;
+        }
+        case TLV::kTLVType_UTF8String:
+        {
+            uint32_t bufferLen = readerForJavaObject.GetLength();
+            std::unique_ptr<char[]> buffer = std::unique_ptr<char[]>(new char[bufferLen + 1]);
+            err = readerForJavaObject.GetString(buffer.get(), bufferLen + 1);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+            chip::CharSpan valueSpan(buffer.get(), bufferLen);
+            chip::JniReferences::GetInstance().CharToStringUTF(valueSpan, retValue);
+            return retValue;
+        }
+        case TLV::kTLVType_ByteString:
+        {
+            uint32_t bufferLen = readerForJavaObject.GetLength();
+            std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen + 1]);
+            err = readerForJavaObject.GetBytes(buffer.get(), bufferLen + 1);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+
+            jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(bufferLen));
+            env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(bufferLen),
+                                    reinterpret_cast<const jbyte *>(buffer.get()));
+
+            return static_cast<jobject>(valueByteArray);
+        }
+        default:
+            return nullptr;
+    }
 }
 
 jlong newConnectedDeviceCallback(JNIEnv * env, jobject self, jobject callback)
