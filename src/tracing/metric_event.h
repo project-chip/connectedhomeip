@@ -17,10 +17,10 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <tracing/metric_keys.h>
 #include <tracing/metric_macros.h>
 #include <tracing/registry.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Tracing {
@@ -117,10 +117,7 @@ public:
 
     MetricKey key() const { return mKey; }
 
-    Value::Type ValueType() const
-    {
-        return mValue.type;
-    }
+    Value::Type ValueType() const { return mValue.type; }
 
     uint32_t ValueUInt32() const
     {
@@ -181,10 +178,7 @@ public:
         IgnoreUnusedVariable(mError);
     }
 
-    ~ScopedMetricEvent()
-    {
-        MATTER_LOG_METRIC_END(mKey, mError);
-    }
+    ~ScopedMetricEvent() { MATTER_LOG_METRIC_END(mKey, mError); }
 
 private:
     MetricKey mKey;

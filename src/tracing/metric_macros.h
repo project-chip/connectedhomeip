@@ -60,7 +60,8 @@
  *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
  *
  */
-#define SuccessOrExitWithMetric(kMetricKey, error) nlEXPECT(::chip::Tracing::ErrorHandling::LogMetricIfError((kMetricKey), (error)), exit)
+#define SuccessOrExitWithMetric(kMetricKey, error)                                                                                 \
+    nlEXPECT(::chip::Tracing::ErrorHandling::LogMetricIfError((kMetricKey), (error)), exit)
 
 /**
  *  @def VerifyOrExitWithMetric(kMetricKey, aCondition, anAction)
@@ -212,7 +213,7 @@
  *  @param[in]  key The key representing the metric name/event.
  *  @param[in]  error Reference to a ChipError object that is used as the value of the End event.
  */
-#define MATTER_LOG_METRIC_SCOPE(key, error)                                                                                               \
+#define MATTER_LOG_METRIC_SCOPE(key, error)                                                                                        \
     ::chip::Tracing::ScopedMetricEvent __LOG_METRIC_MACRO_CONCAT(_metric_scope, __COUNTER__)(key, error)
 
 #else // Tracing is disabled
