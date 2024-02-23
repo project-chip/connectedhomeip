@@ -395,11 +395,16 @@ declare_args() {
 }
 
 config("sanitize_address") {
+  defines = []
   cflags = [
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
   ]
   ldflags = cflags
+
+  if (target_os == "mac" || target_os == "ios") {
+    defines += [ "_LIBCPP_HAS_NO_ASAN" ]
+  }
 }
 
 config("sanitize_thread") {
