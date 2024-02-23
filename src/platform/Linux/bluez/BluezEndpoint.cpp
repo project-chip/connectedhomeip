@@ -551,6 +551,7 @@ void BluezEndpoint::SetupGattService()
 
     // C1 characteristic
     mpC1 = CreateGattCharacteristic(mpService, "c1", CHIP_PLAT_BLE_UUID_C1_STRING, c1_flags);
+    // NOLINTBEGIN(*.EnumCastOutOfRange)
     g_signal_connect(mpC1, "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
@@ -578,6 +579,7 @@ void BluezEndpoint::SetupGattService()
                          return self->BluezCharacteristicConfirm(aChar, aInv);
                      }),
                      this);
+    // NOLINTEND(*.EnumCastOutOfRange)
 
     ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(mpC1));
     ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(mpC2));
@@ -639,6 +641,7 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
     VerifyOrReturnError(mpObjMgr != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", err->message));
 
+    // NOLINTBEGIN(*.EnumCastOutOfRange)
     g_signal_connect(mpObjMgr, "object-added", G_CALLBACK(+[](GDBusObjectManager * aMgr, GDBusObject * aObj, BluezEndpoint * self) {
                          return self->BluezSignalOnObjectAdded(aMgr, aObj);
                      }),
@@ -654,6 +657,7 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
                          return self->BluezSignalInterfacePropertiesChanged(aMgr, aObj, aIface, aChangedProps, aInvalidatedProps);
                      }),
                      this);
+    // NOLINTEND(*.EnumCastOutOfRange)
 
     SetupAdapter();
 
