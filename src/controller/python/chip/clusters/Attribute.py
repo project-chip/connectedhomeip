@@ -601,10 +601,13 @@ class SubscriptionTransaction:
             print("Subscription was already terminated previously!")
             return
 
-        handle = chip.native.GetLibraryHandle()
-        builtins.chipStack.Call(
-            lambda: handle.pychip_ReadClient_Abort(
-                self._readTransaction._pReadClient, self._readTransaction._pReadCallback))
+        # Abort only when no error occurs.
+        # If an error occurs, pReadClient has been deleted internally.
+        if self._readTransaction._resultError is None:
+            handle = chip.native.GetLibraryHandle()
+            builtins.chipStack.Call(
+                lambda: handle.pychip_ReadClient_Abort(
+                    self._readTransaction._pReadClient, self._readTransaction._pReadCallback))
         self._isDone = True
 
     def __del__(self):
