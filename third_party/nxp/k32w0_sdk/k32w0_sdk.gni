@@ -49,19 +49,18 @@ declare_args() {
   ota_custom_entry_address = "0x000C1000"
   use_antenna_diversity = 0
 
-  #ICD Matter Configuration flags
-
-  chip_ot_idle_interval_ms = 2000  # 2s Idle Intervals
-  chip_ot_active_interval_ms = 500  # 500ms Active Intervals
-
-  nxp_idle_mode_interval_s = 600  # 10min Idle Mode Interval
-  nxp_active_mode_interval_ms = 10000  # 10s Active Mode Interval
-  nxp_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
-  nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
-
   chip_with_ota_encryption = 0
   chip_with_ota_key = "1234567890ABCDEFA1B2C3D4E5F6F1B4"
   chip_with_sdk_package = 1
+
+  # ICD Matter Configuration flags
+  nxp_ot_idle_interval_ms = 2000  # 2s Idle Intervals
+  nxp_ot_active_interval_ms = 500  # 500ms Active Intervals
+
+  nxp_idle_mode_duration_s = 600  # 10min Idle Mode Interval
+  nxp_active_mode_duration_ms = 10000  # 10s Active Mode Interval
+  nxp_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
+  nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -367,12 +366,12 @@ template("k32w0_sdk") {
       "gResetSystemReset_d=1",
 
       # TODO: move these platform specific defines to args.gni
-      "NXP_OT_IDLE_INTERVAL=${chip_ot_idle_interval_ms}",
-      "NXP_OT_ACTIVE_INTERVAL=${chip_ot_active_interval_ms}",
+      "NXP_OT_IDLE_INTERVAL=${nxp_ot_idle_interval_ms}",
+      "NXP_OT_ACTIVE_INTERVAL=${nxp_ot_active_interval_ms}",
       "NXP_ICD_ENABLED=1",
       "NXP_ACTIVE_MODE_THRESHOLD=${nxp_active_mode_threshold_ms}",
-      "NXP_ACTIVE_MODE_INTERVAL=${nxp_active_mode_interval_ms}",
-      "NXP_IDLE_MODE_INTERVAL=${nxp_idle_mode_interval_s}",
+      "NXP_ACTIVE_MODE_DURATION_MS=${nxp_active_mode_duration_ms}",
+      "NXP_IDLE_MODE_DURATION_SEC=${nxp_idle_mode_duration_s}",
       "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
 

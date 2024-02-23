@@ -140,16 +140,24 @@ static_library("interaction-model") {
     "CASEClientPool.h",
     "CASESessionManager.cpp",
     "CASESessionManager.h",
+    "CommandSender.cpp",
+    "CommandSender.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "InteractionModelDelegatePointers.cpp",
     "InteractionModelDelegatePointers.h",
     "InteractionModelEngine.cpp",
     "InteractionModelEngine.h",
+    "InteractionModelHelper.h",
     "InteractionModelTimeout.h",
     "OperationalSessionSetup.cpp",
     "OperationalSessionSetup.h",
     "OperationalSessionSetupPool.h",
+    "PendingResponseTracker.h",
+    "PendingResponseTrackerImpl.cpp",
+    "PendingResponseTrackerImpl.h",
+    "ReadClient.h",  # TODO: cpp is only included conditionally. Needs logic
+                     # fixing
     "RequiredPrivilege.cpp",
     "RequiredPrivilege.h",
     "StatusResponse.cpp",
@@ -157,6 +165,10 @@ static_library("interaction-model") {
     "SubscriptionResumptionStorage.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
+    "TimedRequest.cpp",
+    "TimedRequest.h",
+    "WriteClient.cpp",
+    "WriteClient.h",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
     "reporting/ReportScheduler.h",
@@ -183,6 +195,10 @@ static_library("interaction-model") {
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
+
+  if (chip_enable_read_client) {
+    sources += [ "ReadClient.cpp" ]
+  }
 
   if (chip_persist_subscriptions) {
     sources += [
@@ -228,7 +244,6 @@ static_library("app") {
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
     "CommandResponseSender.h",
-    "CommandSender.cpp",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",
@@ -240,26 +255,17 @@ static_library("app") {
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "OTAUserConsentCommon.h",
-    "PendingResponseTracker.h",
-    "PendingResponseTrackerImpl.cpp",
-    "PendingResponseTrackerImpl.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
-    "TimedRequest.cpp",
-    "TimedRequest.h",
     "TimerDelegates.cpp",
     "TimerDelegates.h",
-    "WriteClient.cpp",
     "WriteHandler.cpp",
 
     # TODO: the following items cannot be included due to interaction-model circularity
     #       (app depending on im and im including these headers):
     #       Name with _ so that linter does not recognize it
     # "CommandHandler._h"
-    # "CommandSender._h",
-    # "ReadClient._h",
     # "ReadHandler._h",
-    # "WriteClient._h",
     # "WriteHandler._h"
 
     # TODO: the following items cannot be included due to platform includes not being
@@ -288,10 +294,6 @@ static_library("app") {
       "BufferedReadCallback.h",
       "ClusterStateCache.cpp",
       "ClusterStateCache.h",
-      "ReadClient.cpp",
-
-      # TODO: cannot include "ReadClient._h" because interaction-model backreference
-      #       Name with _ so that linter does not recognize it
     ]
   }
 
