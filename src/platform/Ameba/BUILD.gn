@@ -14,8 +14,8 @@
 
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
-
 assert(chip_device_platform == "ameba")
 
 static_library("Ameba") {
@@ -69,6 +69,16 @@ static_library("Ameba") {
     sources += [
       "AmebaOTAImageProcessor.cpp",
       "AmebaOTAImageProcessor.h",
+    ]
+  }
+
+  if (chip_crypto == "platform") {
+    sources += [
+      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.cpp",
+      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.h",
+      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLSCert.cpp",
+      "crypto/AmebaPersistentStorageOperationalKeystore.cpp",
+      "crypto/AmebaPersistentStorageOperationalKeystore.h",
     ]
   }
 }

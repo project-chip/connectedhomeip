@@ -15,7 +15,9 @@
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 
 chip_device_platform = "ameba"
 
@@ -23,7 +25,10 @@ chip_project_config_include = ""
 chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
 
-mbedtls_target = "//mbedtls:mbedtls"
+if (chip_crypto == "") {
+  mbedtls_target = "//mbedtls:mbedtls"
+}
+
 lwip_platform = "external"
 
 chip_build_tests = false
