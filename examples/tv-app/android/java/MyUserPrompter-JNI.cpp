@@ -51,6 +51,29 @@ JNIMyUserPrompter::JNIMyUserPrompter(jobject provider)
         env->ExceptionClear();
     }
 
+    mHidePromptsOnCancelMethod = env->GetMethodID(JNIMyUserPrompterClass, "hidePromptsOnCancel", "(IILjava/lang/String;)V");
+    if (mHidePromptsOnCancelMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'hidePromptsOnCancel' method");
+        env->ExceptionClear();
+    }
+
+    mPromptWithCommissionerPasscodeMethod =
+        env->GetMethodID(JNIMyUserPrompterClass, "promptWithCommissionerPasscode", "(IILjava/lang/String;JILjava/lang/String;)V");
+    if (mPromptWithCommissionerPasscodeMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptWithCommissionerPasscode' method");
+        env->ExceptionClear();
+    }
+
+    mPromptCommissioningStartedMethod =
+        env->GetMethodID(JNIMyUserPrompterClass, "promptCommissioningStarted", "(IILjava/lang/String;)V");
+    if (mPromptCommissioningStartedMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access JNIMyUserPrompter 'promptCommissioningStarted' method");
+        env->ExceptionClear();
+    }
+
     mPromptCommissioningSucceededMethod =
         env->GetMethodID(JNIMyUserPrompterClass, "promptCommissioningSucceeded", "(IILjava/lang/String;)V");
     if (mPromptCommissioningSucceededMethod == nullptr)
@@ -158,8 +181,37 @@ exit:
  */
 void JNIMyUserPrompter::HidePromptsOnCancel(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
-    // TODO
-    ChipLogError(Zcl, "JNIMyUserPrompter::HidePromptsOnCancel Needs Implementation");
+    ChipLogError(Zcl, "JNIMyUserPrompter::HidePromptsOnCancel");
+
+    DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    std::string stringCommissioneeName(commissioneeName);
+
+    VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPromptForCommissionOKPermissionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+    {
+        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
+        env->ExceptionClear();
+        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mHidePromptsOnCancelMethod, static_cast<jint>(vendorId),
+                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(DeviceLayer, "Java exception in HidePromptsOnCancel");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            err = CHIP_ERROR_INCORRECT_STATE;
+            goto exit;
+        }
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HidePromptsOnCancel error: %s", err.AsString());
+    }
 }
 
 /**
@@ -168,7 +220,6 @@ void JNIMyUserPrompter::HidePromptsOnCancel(uint16_t vendorId, uint16_t productI
  */
 bool JNIMyUserPrompter::DisplaysPasscodeAndQRCode()
 {
-    // TODO
     ChipLogError(Zcl, "JNIMyUserPrompter::DisplaysPasscodeAndQRCode Needs Implementation");
     return false;
 }
@@ -182,8 +233,40 @@ bool JNIMyUserPrompter::DisplaysPasscodeAndQRCode()
 void JNIMyUserPrompter::PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
                                                        uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction)
 {
-    // TODO
-    ChipLogError(Zcl, "JNIMyUserPrompter::PromptWithCommissionerPasscode Needs Implementation");
+    ChipLogError(Zcl, "JNIMyUserPrompter::PromptWithCommissionerPasscode");
+
+    DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    std::string stringCommissioneeName(commissioneeName);
+    std::string stringPairingInstruction(pairingInstruction);
+
+    VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPromptForCommissionOKPermissionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+    {
+        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
+        UtfString jniPairingInstruction(env, stringPairingInstruction.data());
+        env->ExceptionClear();
+        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptWithCommissionerPasscodeMethod,
+                            static_cast<jint>(vendorId), static_cast<jint>(productId), jniCommissioneeName.jniValue(),
+                            static_cast<jlong>(passcode), static_cast<jint>(pairingHint), jniPairingInstruction.jniValue());
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(DeviceLayer, "Java exception in PromptWithCommissionerPasscode");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            err = CHIP_ERROR_INCORRECT_STATE;
+            goto exit;
+        }
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "PromptWithCommissionerPasscode error: %s", err.AsString());
+    }
 }
 
 /**
@@ -191,8 +274,37 @@ void JNIMyUserPrompter::PromptWithCommissionerPasscode(uint16_t vendorId, uint16
  */
 void JNIMyUserPrompter::PromptCommissioningStarted(uint16_t vendorId, uint16_t productId, const char * commissioneeName)
 {
-    // TODO
-    ChipLogError(Zcl, "JNIMyUserPrompter::PromptCommissioningStarted Needs Implementation");
+    ChipLogError(Zcl, "JNIMyUserPrompter::PromptCommissioningStarted");
+
+    DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    std::string stringCommissioneeName(commissioneeName);
+
+    VerifyOrExit(mJNIMyUserPrompterObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mPromptForCommissionOKPermissionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
+
+    {
+        UtfString jniCommissioneeName(env, stringCommissioneeName.data());
+        env->ExceptionClear();
+        env->CallVoidMethod(mJNIMyUserPrompterObject.ObjectRef(), mPromptCommissioningStartedMethod, static_cast<jint>(vendorId),
+                            static_cast<jint>(productId), jniCommissioneeName.jniValue());
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(DeviceLayer, "Java exception in PromptCommissioningStarted");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            err = CHIP_ERROR_INCORRECT_STATE;
+            goto exit;
+        }
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "PromptCommissioningStarted error: %s", err.AsString());
+    }
 }
 
 /*
