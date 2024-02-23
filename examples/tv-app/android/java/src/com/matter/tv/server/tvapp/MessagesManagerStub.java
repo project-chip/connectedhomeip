@@ -36,7 +36,7 @@ public class MessagesManagerStub implements MessagesManager {
     responseOptions.put(new Long(1), "Yes");
     responseOptions.put(new Long(2), "No");
     presentMessages(
-        "31323334353637383930313233343536", 1, 1, 30, 60, "TestMessage", responseOptions);
+        "31323334353637383930313233343536", 1, 1, 30, 60000, "TestMessage", responseOptions);
     Log.d(TAG, "MessagesManagerStub: added dummy message");
   }
 

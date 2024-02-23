@@ -74,7 +74,7 @@ void MessagesManager::InitializeWithObjects(jobject managerObject)
     }
 
     mPresentMessagesMethod =
-        env->GetMethodID(managerClass, "presentMessages", "(Ljava/lang/String;IIJILjava/lang/String;Ljava/util/HashMap;)Z");
+        env->GetMethodID(managerClass, "presentMessages", "(Ljava/lang/String;IIJJLjava/lang/String;Ljava/util/HashMap;)Z");
     if (mPresentMessagesMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MessagesManager 'presentMessages' method");
@@ -182,7 +182,7 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
                 message.startTime = DataModel::Nullable<uint32_t>(static_cast<uint32_t>(jstartTime));
             }
 
-            jfieldID durationField = env->GetFieldID(messageClass, "duration", "I");
+            jfieldID durationField = env->GetFieldID(messageClass, "duration", "J");
             jlong jduration        = env->GetLongField(messageObject, durationField);
             if (jduration >= 0)
             {
