@@ -43,13 +43,13 @@ CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView 
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(msgBuf->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
 
-    static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
+    static_assert(std::is_same<decltype(msgBuf->TotalLength()), size_t>::value,
                   "Addition to generate payloadLength might overflow");
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
 
     uint8_t * data    = msgBuf->Start();
-    uint16_t totalLen = msgBuf->TotalLength();
+    uint32_t totalLen = static_cast<uint32_t>(msgBuf->TotalLength());
 
     MessageAuthenticationCode mac;
     ReturnErrorOnFailure(context.Encrypt(data, totalLen, data, nonce, packetHeader, mac));
@@ -57,8 +57,8 @@ CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView 
     uint16_t taglen = 0;
     ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], msgBuf->AvailableDataLength(), &taglen));
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
-    msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
+    VerifyOrReturnError(CanCastTo<size_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
+    msgBuf->SetDataLength(static_cast<size_t>(totalLen + taglen));
 
     return CHIP_NO_ERROR;
 }
@@ -69,7 +69,7 @@ CHIP_ERROR Decrypt(const CryptoContext & context, CryptoContext::ConstNonceView 
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t * data = msg->Start();
-    uint16_t len   = msg->DataLength();
+    uint32_t len   = static_cast<uint32_t>(msg->DataLength());
 
     PacketBufferHandle origMsg;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

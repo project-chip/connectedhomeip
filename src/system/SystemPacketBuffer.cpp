@@ -117,7 +117,8 @@ void PacketBuffer::InternalCheck(const PacketBuffer * buffer)
         VerifyOrDieWithMsg(::chip::Platform::MemoryDebugCheckPointer(buffer, buffer->alloc_size + kStructureSize), chipSystemLayer,
                            "invalid packet buffer pointer");
         VerifyOrDieWithMsg(buffer->alloc_size >= buffer->ReservedSize() + buffer->len, chipSystemLayer,
-                           "packet buffer overflow %u < %u+%u", buffer->alloc_size, buffer->ReservedSize(), buffer->len);
+                           "packet buffer overflow %u < %u+%u", static_cast<uint32_t>(buffer->alloc_size), buffer->ReservedSize(),
+                           static_cast<uint32_t>(buffer->len));
     }
 }
 #endif // CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
@@ -136,7 +137,7 @@ void PacketBufferHandle::InternalRightSize()
     // Reallocate only if enough space will be saved.
     const uint8_t * const start   = mBuffer->ReserveStart();
     const uint8_t * const payload = mBuffer->Start();
-    const uint16_t usedSize       = static_cast<uint16_t>(payload - start + mBuffer->len);
+    const size_t usedSize         = static_cast<size_t>(static_cast<uint32_t>(payload - start) + mBuffer->len);
     if (usedSize + kRightSizingThreshold > mBuffer->alloc_size)
     {
         return;
@@ -156,7 +157,7 @@ void PacketBufferHandle::InternalRightSize()
     newBuffer->tot_len       = mBuffer->tot_len;
     newBuffer->len           = mBuffer->len;
     newBuffer->ref           = 1;
-    newBuffer->alloc_size    = static_cast<uint16_t>(usedSize);
+    newBuffer->alloc_size    = usedSize;
     memcpy(newStart, start, usedSize);
 
     PacketBuffer::Free(mBuffer);
@@ -203,25 +204,36 @@ void PacketBuffer::SetStart(uint8_t * aNewStart)
         aNewStart = kEnd;
 
     ptrdiff_t lDelta = aNewStart - static_cast<uint8_t *>(this->payload);
-    if (lDelta > this->len)
-        lDelta = this->len;
+    if (lDelta > static_cast<int32_t>(this->len))
+        lDelta = static_cast<int32_t>(this->len);
 
-    this->len     = static_cast<uint16_t>(static_cast<ptrdiff_t>(this->len) - lDelta);
-    this->tot_len = static_cast<uint16_t>(static_cast<ptrdiff_t>(this->tot_len) - lDelta);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    this->len     = static_cast<uint16_t>(static_cast<int32_t>(this->len) - lDelta);
+    this->tot_len = static_cast<uint16_t>(static_cast<int32_t>(this->tot_len) - lDelta);
+#else
+    this->len     = static_cast<size_t>(static_cast<int32_t>(this->len) - lDelta);
+    this->tot_len = static_cast<size_t>(static_cast<int32_t>(this->tot_len) - lDelta);
+#endif
     this->payload = aNewStart;
 }
 
-void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
+void PacketBuffer::SetDataLength(size_t aNewLen, PacketBuffer * aChainHead)
 {
-    const uint16_t kMaxDataLen = this->MaxDataLength();
+    const size_t kMaxDataLen = this->MaxDataLength();
 
     if (aNewLen > kMaxDataLen)
         aNewLen = kMaxDataLen;
 
-    ptrdiff_t lDelta = static_cast<ptrdiff_t>(aNewLen) - static_cast<ptrdiff_t>(this->len);
+    int32_t lDelta = static_cast<int32_t>(aNewLen) - static_cast<int32_t>(this->len);
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    VerifyOrDieWithMsg(aNewLen < UINT16_MAX, chipSystemLayer, "LwIP buffer length cannot exceed UINT16_MAX");
+    this->len     = static_cast<uint16_t>(aNewLen);
+    this->tot_len = static_cast<uint16_t>(static_cast<int32_t>(this->tot_len) + lDelta);
+#else
     this->len     = aNewLen;
-    this->tot_len = static_cast<uint16_t>(this->tot_len + lDelta);
+    this->tot_len = static_cast<size_t>(static_cast<int32_t>(this->tot_len) + lDelta);
+#endif
 
     // SetDataLength is often called after a client finished writing to the buffer,
     // so it's a good time to check for possible corruption.
@@ -230,12 +242,16 @@ void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
     while (aChainHead != nullptr && aChainHead != this)
     {
         Check(aChainHead);
-        aChainHead->tot_len = static_cast<uint16_t>(aChainHead->tot_len + lDelta);
-        aChainHead          = aChainHead->ChainedBuffer();
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        aChainHead->tot_len = static_cast<uint16_t>(static_cast<int32_t>(aChainHead->tot_len) + lDelta);
+#else
+        aChainHead->tot_len = static_cast<size_t>(static_cast<int32_t>(aChainHead->tot_len) + lDelta);
+#endif
+        aChainHead = aChainHead->ChainedBuffer();
     }
 }
 
-uint16_t PacketBuffer::MaxDataLength() const
+size_t PacketBuffer::MaxDataLength() const
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (!(PBUF_STRUCT_DATA_CONTIGUOUS(this)))
@@ -243,12 +259,12 @@ uint16_t PacketBuffer::MaxDataLength() const
         return DataLength();
     }
 #endif
-    return static_cast<uint16_t>(AllocSize() - ReservedSize());
+    return static_cast<size_t>(AllocSize() - ReservedSize());
 }
 
-uint16_t PacketBuffer::AvailableDataLength() const
+size_t PacketBuffer::AvailableDataLength() const
 {
-    return static_cast<uint16_t>(this->MaxDataLength() - this->DataLength());
+    return (this->MaxDataLength() - this->DataLength());
 }
 
 uint16_t PacketBuffer::ReservedSize() const
@@ -292,8 +308,8 @@ void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
 
     while (true)
     {
-        uint16_t old_total_length = lCursor->tot_len;
-        lCursor->tot_len          = static_cast<uint16_t>(lCursor->tot_len + aPacket->tot_len);
+        size_t old_total_length = lCursor->tot_len;
+        lCursor->tot_len        = lCursor->tot_len + aPacket->tot_len;
         VerifyOrDieWithMsg(lCursor->tot_len >= old_total_length, chipSystemLayer, "buffer chain too large");
         if (!lCursor->HasChainedBuffer())
         {
@@ -316,37 +332,48 @@ void PacketBuffer::CompactHead()
         this->payload = kStart;
     }
 
-    uint16_t lAvailLength = this->AvailableDataLength();
+    size_t lAvailLength = this->AvailableDataLength();
 
     while (lAvailLength > 0 && HasChainedBuffer())
     {
         PacketBuffer & lNextPacket = *ChainedBuffer();
         VerifyOrDieWithMsg(lNextPacket.ref == 1, chipSystemLayer, "next buffer %p is not exclusive to this chain", &lNextPacket);
 
-        uint16_t lMoveLength = lNextPacket.len;
+        size_t lMoveLength = lNextPacket.len;
         if (lMoveLength > lAvailLength)
             lMoveLength = lAvailLength;
 
         memcpy(static_cast<uint8_t *>(this->payload) + this->len, lNextPacket.payload, lMoveLength);
 
         lNextPacket.payload = static_cast<uint8_t *>(lNextPacket.payload) + lMoveLength;
+        lAvailLength        = lAvailLength - lMoveLength;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         this->len           = static_cast<uint16_t>(this->len + lMoveLength);
-        lAvailLength        = static_cast<uint16_t>(lAvailLength - lMoveLength);
         lNextPacket.len     = static_cast<uint16_t>(lNextPacket.len - lMoveLength);
         lNextPacket.tot_len = static_cast<uint16_t>(lNextPacket.tot_len - lMoveLength);
+#else
+        this->len           = this->len + lMoveLength;
+        lNextPacket.len     = lNextPacket.len - lMoveLength;
+        lNextPacket.tot_len = lNextPacket.tot_len - lMoveLength;
+#endif
 
         if (lNextPacket.len == 0)
             this->next = this->FreeHead(&lNextPacket);
     }
 }
 
-void PacketBuffer::ConsumeHead(uint16_t aConsumeLength)
+void PacketBuffer::ConsumeHead(size_t aConsumeLength)
 {
     if (aConsumeLength > this->len)
         aConsumeLength = this->len;
     this->payload = static_cast<uint8_t *>(this->payload) + aConsumeLength;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     this->len     = static_cast<uint16_t>(this->len - aConsumeLength);
     this->tot_len = static_cast<uint16_t>(this->tot_len - aConsumeLength);
+#else
+    this->len     = this->len - aConsumeLength;
+    this->tot_len = this->tot_len - aConsumeLength;
+#endif
 }
 
 /**
@@ -360,18 +387,18 @@ void PacketBuffer::ConsumeHead(uint16_t aConsumeLength)
  *
  *  @return the first buffer from the current chain that contains any remaining data.  If no data remains, nullptr is returned.
  */
-PacketBuffer * PacketBuffer::Consume(uint16_t aConsumeLength)
+PacketBuffer * PacketBuffer::Consume(size_t aConsumeLength)
 {
     PacketBuffer * lPacket = this;
 
     while (lPacket != nullptr && aConsumeLength > 0)
     {
-        const uint16_t kLength = lPacket->DataLength();
+        const size_t kLength = lPacket->DataLength();
 
         if (aConsumeLength >= kLength)
         {
             lPacket        = PacketBuffer::FreeHead(lPacket);
-            aConsumeLength = static_cast<uint16_t>(aConsumeLength - kLength);
+            aConsumeLength = aConsumeLength - kLength;
         }
         else
         {
@@ -478,7 +505,13 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     static_assert(PacketBuffer::kStructureSize == sizeof(PacketBuffer), "PacketBuffer size mismatch");
     static_assert(PacketBuffer::kStructureSize < UINT16_MAX, "Check for overflow more carefully");
     static_assert(SIZE_MAX >= INT_MAX, "Our additions might not fit in size_t");
-    static_assert(PacketBuffer::kMaxSizeWithoutReserve <= UINT16_MAX, "PacketBuffer may have size not fitting uint16_t");
+    static_assert(PacketBuffer::kMaxSizeWithoutReserve <= UINT32_MAX, "PacketBuffer may have size not fitting uint32_t");
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // LwIP based APIs have a maximum buffer size of UINT16_MAX. Ensure that
+    // limit is met during allocation.
+    VerifyOrDieWithMsg(aAvailableSize + aReservedSize < UINT16_MAX, chipSystemLayer,
+                       "LwIP based systems can handle only up to UINT16_MAX!");
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // When `aAvailableSize` fits in uint16_t (as tested below) and size_t is at least 32 bits (as asserted above),
     // these additions will not overflow.
@@ -488,7 +521,8 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return PacketBufferHandle());
 
-    if (aAvailableSize > UINT16_MAX || lAllocSize > PacketBuffer::kMaxSizeWithoutReserve || lBlockSize > UINT16_MAX)
+    // TODO: Change the max to a lower value
+    if (aAvailableSize > UINT32_MAX || lAllocSize > PacketBuffer::kMaxSizeWithoutReserve || lBlockSize > UINT32_MAX)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
         return PacketBufferHandle();
@@ -541,13 +575,13 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     lPacket->next                   = nullptr;
     lPacket->ref                    = 1;
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
-    lPacket->alloc_size = static_cast<uint16_t>(lAllocSize);
+    lPacket->alloc_size = lAllocSize;
 #endif
 
     return PacketBufferHandle(lPacket);
 }
 
-PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aDataSize, uint16_t aAdditionalSize,
+PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aDataSize, size_t aAdditionalSize,
                                                    uint16_t aReservedSize)
 {
     if (aDataSize > UINT16_MAX)
@@ -561,7 +595,11 @@ PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aD
     if (buffer.mBuffer != nullptr)
     {
         memcpy(buffer.mBuffer->payload, aData, aDataSize);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
         buffer.mBuffer->len = buffer.mBuffer->tot_len = static_cast<uint16_t>(aDataSize);
+#else
+        buffer.mBuffer->len = buffer.mBuffer->tot_len = aDataSize;
+#endif
     }
     return buffer;
 }
@@ -677,7 +715,7 @@ PacketBufferHandle PacketBufferHandle::CloneData() const
 
     for (PacketBuffer * original = mBuffer; original != nullptr; original = original->ChainedBuffer())
     {
-        uint16_t originalDataSize     = original->MaxDataLength();
+        size_t originalDataSize       = original->MaxDataLength();
         uint16_t originalReservedSize = original->ReservedSize();
 
         if (originalDataSize + originalReservedSize > PacketBuffer::kMaxSizeWithoutReserve)
@@ -691,7 +729,7 @@ PacketBufferHandle PacketBufferHandle::CloneData() const
             }
             // Otherwise, reduce the requested data size. This subtraction can not underflow because the above test
             // guarantees originalReservedSize <= PacketBuffer::kMaxSizeWithoutReserve.
-            originalDataSize = static_cast<uint16_t>(PacketBuffer::kMaxSizeWithoutReserve - originalReservedSize);
+            originalDataSize = PacketBuffer::kMaxSizeWithoutReserve - originalReservedSize;
         }
 
         PacketBufferHandle clone = PacketBufferHandle::New(originalDataSize, originalReservedSize);
@@ -725,7 +763,7 @@ System::PacketBufferHandle PacketBufferWriterUtil::Finalize(BufferWriter & aBuff
     {
         // Since mPacket was successfully allocated to hold the maximum length,
         // we know that the actual length fits in a uint16_t.
-        aPacket->SetDataLength(static_cast<uint16_t>(aBufferWriter.Needed()));
+        aPacket->SetDataLength(aBufferWriter.Needed());
     }
     else
     {

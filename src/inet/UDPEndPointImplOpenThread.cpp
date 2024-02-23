@@ -237,7 +237,7 @@ CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System:
     message = otUdpNewMessage(mOTInstance, NULL);
     VerifyOrExit(message != NULL, error = OT_ERROR_NO_BUFS);
 
-    error = otMessageAppend(message, msg->Start(), msg->DataLength());
+    error = otMessageAppend(message, msg->Start(), static_cast<uint16_t>(msg->DataLength()));
 
     if (error == OT_ERROR_NONE)
     {

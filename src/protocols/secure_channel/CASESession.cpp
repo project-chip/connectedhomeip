@@ -1580,7 +1580,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
     const uint8_t * buf   = msg->Start();
-    const uint16_t bufLen = msg->DataLength();
+    const uint32_t bufLen = static_cast<uint32_t>(msg->DataLength());
 
     constexpr size_t kCaseOverheadForFutureTbeData = 128;
 

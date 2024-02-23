@@ -415,7 +415,10 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
     {
         return CHIP_ERROR_POSIX(errno);
     }
-    if (lenSent != msg->DataLength())
+
+    size_t len = static_cast<size_t>(lenSent);
+
+    if (len != msg->DataLength())
     {
         return CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG;
     }
@@ -611,7 +614,7 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         {
             lStatus = CHIP_ERROR_POSIX(errno);
         }
-        else if (rcvLen > lBuffer->AvailableDataLength())
+        else if (lBuffer->AvailableDataLength() < static_cast<size_t>(rcvLen))
         {
             lStatus = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
         }

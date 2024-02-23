@@ -1007,7 +1007,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                   "(connHandle=%d, attHandle=%d, data_len=%u)",
                   conId, att_handle, pBuf->DataLength());
 
-    mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);
+    mbed_err = gatt_server.write(att_handle, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()), false);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:

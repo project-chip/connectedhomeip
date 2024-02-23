@@ -707,7 +707,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     params->attr = &sChipoBleAttributes[kCHIPoBLE_CCC_AttributeIndex];
     params->func = HandleTXIndicated;
     params->data = pBuf->Start();
-    params->len  = pBuf->DataLength();
+    params->len  = static_cast<uint16_t>(pBuf->DataLength());
 
     status = bt_gatt_indicate(conId, params);
     VerifyOrExit(status == 0, err = MapErrorZephyr(status));
@@ -886,7 +886,7 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
     }
 
     return bt_gatt_attr_read(conId, attr, buf, len, offset, sInstance.c3CharDataBufferHandle->Start(),
-                             sInstance.c3CharDataBufferHandle->DataLength());
+                             static_cast<uint16_t>(sInstance.c3CharDataBufferHandle->DataLength()));
 }
 #endif
 

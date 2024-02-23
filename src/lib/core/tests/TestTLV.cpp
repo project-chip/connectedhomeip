@@ -274,7 +274,7 @@ void TestBufferContents(const System::PacketBufferHandle & buffer, const uint8_t
     System::PacketBufferHandle buf = buffer.Retain();
     while (!buf.IsNull())
     {
-        uint16_t len = buf->DataLength();
+        uint32_t len = static_cast<uint32_t>(buf->DataLength());
         EXPECT_LE(len, expectedLen);
 
         EXPECT_EQ(memcmp(buf->Start(), expectedVal, len), 0);
@@ -2978,8 +2978,8 @@ TEST_F(TestTLV, CheckBufferOverflow)
     System::PacketBufferTLVReader reader;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
-    uint16_t maxDataLen            = buf->MaxDataLength();
-    uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
+    uint32_t maxDataLen            = static_cast<uint32_t>(buf->MaxDataLength());
+    uint32_t reserve = static_cast<uint32_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
     // Repeatedly write and read a TLV encoding to a chain of PacketBuffers. Use progressively larger
     // and larger amounts of space in the first buffer to force the encoding to overlap the

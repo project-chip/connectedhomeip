@@ -31,7 +31,7 @@ namespace System {
 CHIP_ERROR TLVPacketBufferBackingStore::OnInit(chip::TLV::TLVReader & reader, const uint8_t *& bufStart, uint32_t & bufLen)
 {
     bufStart = mHeadBuffer->Start();
-    bufLen   = mHeadBuffer->DataLength();
+    bufLen   = static_cast<uint32_t>(mHeadBuffer->DataLength());
     return CHIP_NO_ERROR;
 }
 
@@ -54,7 +54,7 @@ CHIP_ERROR TLVPacketBufferBackingStore::GetNextBuffer(chip::TLV::TLVReader & rea
     else
     {
         bufStart = mCurrentBuffer->Start();
-        bufLen   = mCurrentBuffer->DataLength();
+        bufLen   = static_cast<uint32_t>(mCurrentBuffer->DataLength());
     }
 
     return CHIP_NO_ERROR;
@@ -63,7 +63,7 @@ CHIP_ERROR TLVPacketBufferBackingStore::GetNextBuffer(chip::TLV::TLVReader & rea
 CHIP_ERROR TLVPacketBufferBackingStore::OnInit(chip::TLV::TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen)
 {
     bufStart = mHeadBuffer->Start() + mHeadBuffer->DataLength();
-    bufLen   = mHeadBuffer->AvailableDataLength();
+    bufLen   = static_cast<uint32_t>(mHeadBuffer->AvailableDataLength());
     return CHIP_NO_ERROR;
 }
 
@@ -72,11 +72,11 @@ CHIP_ERROR TLVPacketBufferBackingStore::FinalizeBuffer(chip::TLV::TLVWriter & wr
     uint8_t * endPtr = bufStart + dataLen;
 
     intptr_t length = endPtr - mCurrentBuffer->Start();
-    if (!CanCastTo<uint16_t>(length))
+    if (!CanCastTo<uint32_t>(length))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mCurrentBuffer->SetDataLength(static_cast<uint16_t>(length), mHeadBuffer);
+    mCurrentBuffer->SetDataLength(static_cast<uint32_t>(length), mHeadBuffer);
 
     return CHIP_NO_ERROR;
 }
@@ -107,7 +107,7 @@ CHIP_ERROR TLVPacketBufferBackingStore::GetNewBuffer(chip::TLV::TLVWriter & writ
     else
     {
         bufStart = mCurrentBuffer->Start();
-        bufLen   = mCurrentBuffer->MaxDataLength();
+        bufLen   = static_cast<uint32_t>(mCurrentBuffer->MaxDataLength());
     }
 
     return CHIP_NO_ERROR;

@@ -601,7 +601,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     ESP_LOGD(TAG, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, data->DataLength());
 
-    om = ble_hs_mbuf_from_flat(data->Start(), data->DataLength());
+    om = ble_hs_mbuf_from_flat(data->Start(), static_cast<uint16_t>(data->DataLength()));
     if (om == NULL)
     {
         ChipLogError(DeviceLayer, "ble_hs_mbuf_from_flat failed:");
