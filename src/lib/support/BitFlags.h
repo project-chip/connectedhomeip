@@ -200,10 +200,22 @@ public:
     /**
      * Get the flags as the type FlagsEnum.
      *
-     * @note            This allows easily storing flags as a base FlagsEnum in a POD type,
-     *                  and enables equality comparisons.
+     * This MAY return enum values that are not inside the range of valid enumerations.
      */
-    operator FlagsEnum() const { return static_cast<FlagsEnum>(mValue); }
+    operator FlagsEnum() const {
+        // TODO: fix lint: https://github.com/project-chip/connectedhomeip/issues/32249
+        // NOLINTNEXTLINE(*.EnumCastOutOfRange)
+        return static_cast<FlagsEnum>(mValue);
+    }
+
+    bool operator==(const BitFlags<FlagsEnum> & other) const { return mValue == other.mValue; }
+    bool operator!=(const BitFlags<FlagsEnum> & other) const { return mValue != other.mValue; }
+
+
+    // TODO:  This is a convenience for exact equality, however this hides away that
+    //        a bitflag is used instead of an exact enum.
+    //        Should consider removing existence of this.
+    bool operator==(FlagsEnum other) const { return (*this == BitFlags<FlagsEnum>(other)); }
 
     /**
      * Set and/or clear all flags with a value of the underlying storage type.

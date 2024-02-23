@@ -294,6 +294,8 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
     test_payload.commissioningFlow = CommissioningFlow::kCustom;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload());
 
+    // Intentionally out of range
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     test_payload.commissioningFlow = static_cast<CommissioningFlow>(1 << kCommissioningFlowFieldLengthInBits);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
