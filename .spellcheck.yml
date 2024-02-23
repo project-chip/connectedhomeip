@@ -68,3 +68,4 @@ matrix:
       - '**/*.md|!third_party/**|!examples/common/**/repo/**|!docs/ERROR_CODES.md|!docs/clusters.md|!docs/testing/yaml_schema.md|!docs/testing/yaml_pseudocluster.md'
     aspell:
       ignore-case: true
+      camel-case: true
