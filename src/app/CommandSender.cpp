@@ -325,10 +325,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(apExchangeContext));
 
-    // TODO(#30453) When timeout occurs for batch commands what should be done? Should all individual
-    // commands have a path specific error of timeout, or do we give or NoCommandResponse.
     OnErrorCallback(CHIP_ERROR_TIMEOUT);
-
     Close();
 }
 
