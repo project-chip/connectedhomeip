@@ -154,7 +154,7 @@ sl_status_t sl_si91x_host_init(sl_si91x_host_init_configuration * config)
         SILABS_LOG("sl_board_disable_display failed with error: %x", status);
         return status;
     }
-#endif //SL_SPICTRL_MUX
+#endif // SL_SPICTRL_MUX
     init_config.rx_irq  = config->rx_irq;
     init_config.rx_done = config->rx_done;
 

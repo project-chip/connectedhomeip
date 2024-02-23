@@ -195,7 +195,7 @@ sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
 #if SL_SPICTRL_MUX
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
-#endif //SL_SPICTRL_MUX
+#endif                // SL_SPICTRL_MUX
     if (!spi_enabled) // Reduce sl_spidrv_init_instances
     {
         sl_spidrv_init_instances();
@@ -223,9 +223,9 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
         }
     }
 #if SL_SPICTRL_MUX
-        xSemaphoreGive(spi_sem_sync_hdl);
-#endif //SL_SPICTRL_MUX
-        return status;
+    xSemaphoreGive(spi_sem_sync_hdl);
+#endif // SL_SPICTRL_MUX
+    return status;
 }
 #endif // SL_SPICTRL_MUX
 
@@ -315,7 +315,7 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
     GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
-    sl_status_t status = sl_board_disable_display();
+    sl_status_t status                                    = sl_board_disable_display();
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX

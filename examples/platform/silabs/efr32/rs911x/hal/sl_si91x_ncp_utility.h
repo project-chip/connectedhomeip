@@ -32,9 +32,10 @@
 #include "spi_multiplex.h"
 
 #if defined(CHIP_9117)
-#include "sl_board_configuration_SiWx917.h"
 #include "em_usart.h"
+#include "sl_board_configuration_SiWx917.h"
 #include "sl_spidrv_exp_config.h"
+
 #endif // CHIP_9117
 
 #define USART_INITSYNC_BAUDRATE 12500000
@@ -45,4 +46,4 @@ sl_status_t spi_board_init(void);
 
 extern uint32_t rx_ldma_channel;
 extern uint32_t tx_ldma_channel;
-#endif //SL_SI91X_NCP_UTILITY_H
+#endif // SL_SI91X_NCP_UTILITY_H
