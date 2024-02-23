@@ -44,10 +44,14 @@ Internal::RamStorage KeyValueStoreManagerImpl::sGroupsStorage       = { kNvmId_K
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
+#if CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+static CHIP_ERROR MoveKeysAndValues();
+#endif // CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+
 static inline bool IsKeyRelatedToGroups(const char * key)
 {
     std::string _key(key);
-    if (_key.find("f/") == std::string::npos)
+    if (_key.find("f/") != 0)
         return false;
 
     return (_key.find("/g") != std::string::npos) || (_key.find("/k/") != std::string::npos);
@@ -140,6 +144,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init()
     {
         ChipLogProgress(DeviceLayer, "Cannot init KVS groups storage with id: %d. Error: %s", kNvmId_KvsGroups, ErrorStr(err));
     }
+
+#if CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+    ChipLogProgress(DeviceLayer, "Moving some keys to dedicated storage");
+    MoveKeysAndValues();
+#endif /* CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE */
 
     return err;
 }
@@ -285,6 +294,54 @@ void KeyValueStoreManagerImpl::ConvertError(CHIP_ERROR & err)
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 }
+
+#if CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+static CHIP_ERROR MoveToDedicatedStorage(const char * key, uint8_t * buffer, uint16_t len, uint16_t keyId, uint16_t valId)
+{
+    ReturnErrorOnFailure(GetKeyStorage(key)->Write(keyId, (uint8_t *) key, strlen(key) + 1));
+
+    ReturnErrorOnFailure(KeyValueStoreManagerImpl::sValuesStorage.Read(valId, 0, buffer, &len));
+    ReturnErrorOnFailure(GetValStorage(key)->Write(valId, buffer, len));
+
+    ReturnErrorOnFailure(KeyValueStoreManagerImpl::sKeysStorage.Delete(keyId, -1));
+    ReturnErrorOnFailure(KeyValueStoreManagerImpl::sValuesStorage.Delete(valId, -1));
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR MoveKeysAndValues()
+{
+    uint16_t len                = 1024; // Should be enough for Matter keys
+    uint16_t keyId              = 0;
+    uint16_t valId              = 0;
+    uint16_t keySize            = kMaxKeyValueBytes;
+    char key[kMaxKeyValueBytes] = { 0 };
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+
+    buffer.Calloc(len);
+    ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+
+    for (uint8_t id = 0; id < kMaxNumberOfKeys; id++)
+    {
+        keySize = kMaxKeyValueBytes;
+        keyId   = Internal::RamStorageKey::GetInternalId(kKeyId_KvsKeys, id);
+        valId   = Internal::RamStorageKey::GetInternalId(kKeyId_KvsValues, id);
+
+        auto err = KeyValueStoreManagerImpl::sKeysStorage.Read(keyId, 0, (uint8_t *) key, &keySize);
+        if (err == CHIP_NO_ERROR)
+        {
+            if (!IsKeyRelatedToGroups(key) && !IsKeyRelatedToSubscriptions(key))
+                continue;
+
+            err = MoveToDedicatedStorage(key, buffer.Get(), len, keyId, valId);
+            VerifyOrDo(err != CHIP_NO_ERROR, ChipLogProgress(DeviceLayer, "Key [%s] was moved successfully", key));
+            VerifyOrDo(err == CHIP_NO_ERROR, ChipLogProgress(DeviceLayer, "Error in moving key [%s] to dedicated storage", key));
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+#endif // CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
 
 } // namespace PersistedStorage
 } // namespace DeviceLayer
