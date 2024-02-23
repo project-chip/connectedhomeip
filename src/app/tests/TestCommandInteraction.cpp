@@ -1568,7 +1568,8 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleIdenticalCommands(n
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite,
-                   mockCommandSenderExtendedDelegate.onResponseCalledTimes == 0 && mockCommandSenderExtendedDelegate.onFinalCalledTimes == 1 &&
+                   mockCommandSenderExtendedDelegate.onResponseCalledTimes == 0 &&
+                       mockCommandSenderExtendedDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderExtendedDelegate.onErrorCalledTimes == 1);
     NL_TEST_ASSERT(apSuite, !chip::isCommandDispatched);
 
