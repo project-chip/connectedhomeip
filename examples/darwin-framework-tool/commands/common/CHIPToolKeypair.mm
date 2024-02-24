@@ -80,9 +80,9 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
         _mPublicKey = SecKeyCreateWithData((__bridge CFDataRef) publicKeyNSData, (__bridge CFDictionaryRef) attributes, nullptr);
     }
 
-    if ( _mPublicKey )
+    if (_mPublicKey)
         return CFRetain(_mPublicKey);
-    
+
     return NULL;
 }
 

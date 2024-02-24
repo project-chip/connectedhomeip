@@ -821,7 +821,7 @@ MTR_DIRECT_MEMBERS
         // consumers must provide a root certificate whenever an ICA is used.
         SecKeyRef publicKey = NULL;
 
-        if ( [keypair respondsToSelector:@selector(copyPublicKey)] ) {
+        if ([keypair respondsToSelector:@selector(copyPublicKey)]) {
             publicKey = [keypair copyPublicKey];
         } else {
             publicKey = [keypair publicKey];
@@ -829,8 +829,8 @@ MTR_DIRECT_MEMBERS
         }
 
         CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(publicKey, &pubKey);
-        
-        if ( publicKey != NULL) {
+
+        if (publicKey != NULL) {
             CFRelease(publicKey);
             publicKey = NULL
         }
