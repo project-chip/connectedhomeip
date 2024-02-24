@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @brief Return a copy of the public key for the keypair.
  */
-@property (nonatomic, readonly, copy) SecKeyRef      MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, copy) SecKeyRef copyPublicKey MTR_NEWLY_AVAILABLE;
 
 /**
  * @brief Return public key for the keypair. DEPRECATED
