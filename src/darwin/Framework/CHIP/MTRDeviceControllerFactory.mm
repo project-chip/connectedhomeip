@@ -893,10 +893,10 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         // consumers must provide a root certificate whenever an ICA is used.
         SecKeyRef publicKey = NULL;
 
-        if ([keypair respondsToSelector:@selector(copyPublicKey)]) {
-            publicKey = [keypair copyPublicKey];
+        if ([params.nocSigner respondsToSelector:@selector(copyPublicKey)]) {
+            publicKey = [params.nocSigner copyPublicKey];
         } else {
-            publicKey = [keypair publicKey];
+            publicKey = [params.nocSigner publicKey];
             CFRetain(publicKey);
         }
 
