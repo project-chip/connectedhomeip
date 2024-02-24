@@ -39,6 +39,7 @@
 #import "MTRFabricInfo_Internal.h"
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricsCollector.h"
 #import "MTROTAProviderDelegateBridge.h"
 #import "MTROperationalBrowser.h"
 #import "MTRP256KeypairBridge.h"
@@ -47,7 +48,6 @@
 #import "MTRServerCluster_Internal.h"
 #import "MTRServerEndpoint_Internal.h"
 #import "MTRSessionResumptionStorageBridge.h"
-#import "MTRMetricsCollector.h"
 #import "NSDataSpanConversion.h"
 
 #import <os/lock.h>

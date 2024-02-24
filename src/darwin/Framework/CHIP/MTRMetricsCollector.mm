@@ -99,7 +99,7 @@ static NSString * kMTRMetricDataDurationKey = @"duration_us";
 
 @end
 
-@interface  MTRMetricsCollector()
+@interface MTRMetricsCollector ()
 
 - (void)registerTracingBackend;
 
@@ -120,7 +120,6 @@ void ShutdownMetricsCollection()
 {
     [[MTRMetricsCollector sharedInstance] unregisterTracingBackend];
 }
-
 
 @implementation MTRMetricsCollector {
     os_unfair_lock _lock;
