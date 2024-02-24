@@ -20,7 +20,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-void InitializeMetricsCollection();
+/**
+ * This function initializes any backend required to collect metrics data.
+ */
+void StartupMetricsCollection();
+
+/**
+ * This function shuts down any backend created to collect metrics data.
+ */
+void ShutdownMetricsCollection();
 
 /**
  * A representation of metrics data for an operation.

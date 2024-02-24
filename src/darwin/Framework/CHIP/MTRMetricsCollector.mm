@@ -30,13 +30,6 @@ static NSString * kMTRMetricDataValueKey = @"value";
 static NSString * kMTRMetricDataTimepointKey = @"time_point";
 static NSString * kMTRMetricDataDurationKey = @"duration_us";
 
-void InitializeMetricsCollection()
-{
-    if ([MTRMetricsCollector sharedInstance]) {
-        MTR_LOG_INFO("Initialized metrics collection backend for Darwin");
-    }
-}
-
 @implementation MTRMetricsData {
     chip::System::Clock::Microseconds64 _timePoint;
     chip::System::Clock::Microseconds64 _duration;
@@ -106,6 +99,29 @@ void InitializeMetricsCollection()
 
 @end
 
+@interface  MTRMetricsCollector()
+
+- (void)registerTracingBackend;
+
+- (void)unregisterTracingBackend;
+
+@end
+
+void StartupMetricsCollection()
+{
+    if ([MTRMetricsCollector sharedInstance]) {
+        MTR_LOG_INFO("Initialized metrics collection backend for Darwin");
+
+        [[MTRMetricsCollector sharedInstance] registerTracingBackend];
+    }
+}
+
+void ShutdownMetricsCollection()
+{
+    [[MTRMetricsCollector sharedInstance] unregisterTracingBackend];
+}
+
+
 @implementation MTRMetricsCollector {
     os_unfair_lock _lock;
     NSMutableDictionary<NSString *, MTRMetricsData *> * _metricsDataCollection;
@@ -117,10 +133,9 @@ void InitializeMetricsCollection()
     static MTRMetricsCollector * singleton = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        // initialize the singleton.
+        // Initialize the singleton and register the event handler
         singleton = [[MTRMetricsCollector alloc] init];
         if (singleton) {
-            chip::Tracing::Register(singleton->_tracingBackend);
             singleton->_tracingBackend.SetMetricEventHandler(^(MetricEvent event) {
                 if (singleton) {
                     [singleton handleMetricEvent:event];
@@ -139,6 +154,20 @@ void InitializeMetricsCollection()
     _lock = OS_UNFAIR_LOCK_INIT;
     _metricsDataCollection = [NSMutableDictionary dictionary];
     return self;
+}
+
+- (void)registerTracingBackend
+{
+    std::lock_guard lock(_lock);
+    chip::Tracing::Register(_tracingBackend);
+    MTR_LOG_INFO("Registered tracing backend with the registry");
+}
+
+- (void)unregisterTracingBackend
+{
+    std::lock_guard lock(_lock);
+    chip::Tracing::Unregister(_tracingBackend);
+    MTR_LOG_INFO("Unregistered tracing backend with the registry");
 }
 
 static inline NSString * suffixNameForMetricType(MetricEvent::Type type)

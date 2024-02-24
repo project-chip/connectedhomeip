@@ -15,7 +15,7 @@
  */
 
 #import "MTRFramework.h"
-#include "MTRMetricsCollector.h"
+#import "MTRMetricsCollector.h"
 
 #include <dispatch/dispatch.h>
 #include <lib/support/CHIPMem.h>
@@ -36,7 +36,7 @@ void MTRFrameworkInit()
         // (see MTRSetLogCallback()). Logging to os_log is always enabled.
         chip::Logging::SetLogFilter(chip::Logging::kLogCategory_None);
 
-        // Setup metrics collection and tracing framework
-        InitializeMetricsCollection();
+        // Startup metrics collection and tracing framework
+        StartupMetricsCollection();
     });
 }
