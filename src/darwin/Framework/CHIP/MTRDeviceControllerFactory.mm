@@ -897,7 +897,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             publicKey = [params.nocSigner copyPublicKey];
         } else {
             publicKey = [params.nocSigner publicKey];
-            CFRetain(publicKey);
+            if (publicKey)
+                CFRetain(publicKey);
         }
 
         CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(publicKey, &pubKey);
