@@ -905,7 +905,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
         if (publicKey != NULL) {
             CFRelease(publicKey);
-            publicKey = NULL
+            publicKey = NULL;
         }
 
         if (err != CHIP_NO_ERROR) {
