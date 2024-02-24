@@ -35,11 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * @brief Return public key for the keypair.
  */
-- (SecKeyRef)publicKey MTR_DEPRECATED(
-    "Please implement copyPublicKey", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
-;
-- (SecKeyRef)copyPublicKey;
-MTR_NEWLY_AVAILABLE
+- (SecKeyRef)publicKey; // MTR_DEPRECATED("Please implement copyPublicKey", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
+- (SecKeyRef)copyPublicKey; // MTR_NEWLY_AVAILABLE
 
 @optional
 /**
