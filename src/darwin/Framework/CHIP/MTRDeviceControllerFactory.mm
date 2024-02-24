@@ -891,7 +891,22 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     } else {
         // No root certificate means the nocSigner is using the root keys, because
         // consumers must provide a root certificate whenever an ICA is used.
-        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.publicKey, &pubKey);
+        SecKeyRef publicKey = NULL;
+
+        if ( [keypair respondsToSelector:@selector(copyPublicKey)] ) {
+            publicKey = [keypair copyPublicKey];
+        } else {
+            publicKey = [keypair publicKey];
+            CFRetain(publicKey);
+        }
+
+        CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(publicKey, &pubKey);
+        
+        if ( publicKey != NULL) {
+            CFRelease(publicKey);
+            publicKey = NULL
+        }
+
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Can't extract public key from MTRKeypair: %s", ErrorStr(err));
             return NO;
