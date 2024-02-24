@@ -901,7 +901,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         }
 
         CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(publicKey, &pubKey);
-        
+
         if ( publicKey != NULL) {
             CFRelease(publicKey);
             publicKey = NULL

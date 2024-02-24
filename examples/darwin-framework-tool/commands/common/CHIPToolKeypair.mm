@@ -61,7 +61,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
 
     if ( _mPublicKey )
         return CFRetain(_mPublicKey);
-    
+
     return NULL;
 }
 
