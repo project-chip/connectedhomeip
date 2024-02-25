@@ -80,7 +80,9 @@ tests:
               type: bitmap32
               hasMasksClear: [0x2]
 
-    - label: "Step 3e: Given OO.S.F02(OFFONLY) TH reads from the DUT the FeatureMap attribute."
+    - label:
+          "Step 3e: Given OO.S.F02(OFFONLY) TH reads from the DUT the FeatureMap
+          attribute."
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: ( OO.S.F02 && !OO.S.F00 && !OO.S.F01 )
@@ -88,7 +90,9 @@ tests:
           constraints:
               type: bitmap32
               hasMasksSet: [0x4]
-    - label: "Step 3f: Given OO.S.F02(OFFONLY) TH reads from the DUT the FeatureMap attribute."
+    - label:
+          "Step 3f: Given OO.S.F02(OFFONLY) TH reads from the DUT the FeatureMap
+          attribute."
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: ( !( OO.S.F02 && !OO.S.F00 && !OO.S.F01 ) )

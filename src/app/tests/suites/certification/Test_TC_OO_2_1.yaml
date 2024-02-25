@@ -72,7 +72,9 @@ tests:
       response:
           value: 30
 
-    - label: "Step 7: TH writes the OnTime attribute as 'initial-On-time' to restore the original value"
+    - label:
+          "Step 7: TH writes the OnTime attribute as 'initial-On-time' to
+          restore the original value"
       PICS: OO.S.A4001
       command: "writeAttribute"
       attribute: "OnTime"
@@ -104,7 +106,9 @@ tests:
       response:
           value: 30
 
-    - label: "Step 11: TH writes the OffWaitTime attribute as 'initial-Off-waittime' to restore the original value"
+    - label:
+          "Step 11: TH writes the OffWaitTime attribute as
+          'initial-Off-waittime' to restore the original value"
       PICS: OO.S.A4002
       command: "writeAttribute"
       attribute: "OffWaitTime"
