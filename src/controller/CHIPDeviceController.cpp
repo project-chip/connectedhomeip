@@ -944,7 +944,7 @@ void DeviceCommissioner::CancelCommissioningInteractions()
     if (mReadClient)
     {
         ChipLogDetail(Controller, "Cancelling read request for step '%s'", StageToString(mCommissioningStage));
-        mReadClient = nullptr; // destructor cancels
+        mReadClient.reset(); // destructor cancels
     }
     if (mInvokeCancelFn)
     {
@@ -1919,7 +1919,7 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
 void DeviceCommissioner::OnDone(app::ReadClient * readClient)
 {
     VerifyOrDie(readClient != nullptr && readClient == mReadClient.get());
-    mReadClient = nullptr;
+    mReadClient.reset();
     switch (mCommissioningStage)
     {
     case CommissioningStage::kReadCommissioningInfo:
