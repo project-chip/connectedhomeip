@@ -177,8 +177,7 @@ tests:
               excludes: [1, 2]
 
     - label:
-          "Step 6d: TH reads the feature dependent(OO.S.F00) commands in
-          AcceptedCommandList"
+          "Step 6d: TH reads the feature dependent(OO.S.F00) commands in AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       PICS: OO.S.F00
@@ -188,8 +187,7 @@ tests:
               contains: [64, 65, 66]
 
     - label:
-          "Step 6e: TH reads the feature dependent(OO.S.F00) commands in
-          AcceptedCommandList"
+          "Step 6e: TH reads the feature dependent(OO.S.F00) commands in AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       PICS: ( !OO.S.F00 )
