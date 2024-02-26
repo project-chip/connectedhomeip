@@ -69,6 +69,44 @@ void TestConcreteDataAttributePathMatchesConcreteAttributePathInequality(nlTestS
     NL_TEST_ASSERT(aSuite, !data_path.MatchesConcreteAttributePath(path));
 }
 
+void TestConcreteDataAttributePathEqualityDefaultConstructor(nlTestSuite * aSuite, void * aContext)
+{
+    ConcreteDataAttributePath one;
+    ConcreteDataAttributePath two;
+    NL_TEST_ASSERT(aSuite, one == two);
+}
+
+void TestConcreteDataAttributePathEqualityConcreteAttributePathConstructor(nlTestSuite * aSuite, void * aContext)
+{
+    ConcreteAttributePath path(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3);
+    ConcreteDataAttributePath one(path);
+    ConcreteDataAttributePath two(path);
+    NL_TEST_ASSERT(aSuite, one == two);
+}
+
+void TestConcreteDataAttributePathEqualityConcreteAttributePathArgsConstructor(nlTestSuite * aSuite, void * aContext)
+{
+    ConcreteDataAttributePath one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3);
+    ConcreteDataAttributePath two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3);
+    NL_TEST_ASSERT(aSuite, one == two);
+}
+
+void TestConcreteDataAttributePathEqualityDataVersionConstructor(nlTestSuite * aSuite, void * aContext)
+{
+    ConcreteDataAttributePath one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aDataVersion=*/MakeOptional(4U));
+    ConcreteDataAttributePath two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aDataVersion=*/MakeOptional(4U));
+    NL_TEST_ASSERT(aSuite, one == two);
+}
+
+void TestConcreteDataAttributePathEqualityListConstructor(nlTestSuite * aSuite, void * aContext)
+{
+    ConcreteDataAttributePath one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3,
+                                  ConcreteDataAttributePath::ListOperation::ReplaceAll, /*aListIndex=*/5);
+    ConcreteDataAttributePath two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3,
+                                  ConcreteDataAttributePath::ListOperation::ReplaceAll, /*aListIndex=*/5);
+    NL_TEST_ASSERT(aSuite, one == two);
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestConcreteAttributePathEqualityDefaultConstructor", TestConcreteAttributePathEqualityDefaultConstructor),
     NL_TEST_DEF("TestConcreteAttributePathEquality", TestConcreteAttributePathEquality),
@@ -77,6 +115,14 @@ const nlTest sTests[] = {
                 TestConcreteDataAttributePathMatchesConcreteAttributePathEquality),
     NL_TEST_DEF("TestConcreteDataAttributePathMatchesConcreteAttributePathInequality",
                 TestConcreteDataAttributePathMatchesConcreteAttributePathInequality),
+    NL_TEST_DEF("TestConcreteDataAttributePathEqualityDefaultConstructor", TestConcreteDataAttributePathEqualityDefaultConstructor),
+    NL_TEST_DEF("TestConcreteDataAttributePathEqualityConcreteAttributePathConstructor",
+                TestConcreteDataAttributePathEqualityConcreteAttributePathConstructor),
+    NL_TEST_DEF("TestConcreteDataAttributePathEqualityConcreteAttributePathArgsConstructor",
+                TestConcreteDataAttributePathEqualityConcreteAttributePathArgsConstructor),
+    NL_TEST_DEF("TestConcreteDataAttributePathEqualityDataVersionConstructor",
+                TestConcreteDataAttributePathEqualityDataVersionConstructor),
+    NL_TEST_DEF("TestConcreteDataAttributePathEqualityListConstructor", TestConcreteDataAttributePathEqualityListConstructor),
     NL_TEST_SENTINEL()
 };
 
