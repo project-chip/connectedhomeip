@@ -37,6 +37,22 @@ class EEVSEBaseTestHelper:
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
+    def check_value_in_range(self, attribute: str, value: int, lower_value: int, upper_value: int):
+        asserts.assert_greater_equal(value, lower_value,
+                                     f"Unexpected '{attribute}' value - expected {lower_value}, was {value}")
+        asserts.assert_less_equal(value, upper_value,
+                                  f"Unexpected '{attribute}' value - expected {upper_value}, was {value}")
+
+    async def check_evse_attribute_in_range(self, attribute, lower_value: int, upper_value: int, endpoint: int = None, allow_null: bool = False):
+        value = await self.read_evse_attribute_expect_success(endpoint=endpoint, attribute=attribute)
+        if allow_null and value is NullValue:
+            # skip the range check
+            logger.info("value is NULL - OK")
+            return value
+
+        self.check_value_in_range(attribute, value, lower_value, upper_value)
+        return value
+
     async def get_supported_energy_evse_attributes(self, endpoint: int = None):
         return await self.read_evse_attribute_expect_success(endpoint, "AttributeList")
 

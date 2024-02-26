@@ -35,6 +35,31 @@ using chip::Protocols::InteractionModel::Status;
  */
 CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
 
+/**
+ * @brief   Helper function to get current timestamp and work out the day of week based on localtime
+ *
+ * @param   reference to hold the day of week as a bitmap
+ *
+ * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ */
+CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap);
+
+/**
+ * @brief   Helper function to get current timestamp and work out the day of week
+ *
+ * NOTE that the time_t is converted using localtime to provide the timestamp
+ * in local time. If this is not supported on some platforms an alternative
+ * implementation may be required.
+ *
+ * @param   unixEpoch (as time_t)
+ *
+ * @return  bitmap value for day of week
+ * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ */
+uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch);
+
+CHIP_ERROR GetMinutesPastMidnight(uint32_t & minutesPastMidnight);
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -203,6 +228,12 @@ public:
      */
     Status ScheduleCheckOnEnabledTimeout();
 
+    /**
+     * @brief   Helper function to get know if the EV is plugged in based on state
+     *          (regardless of if it is actually transferring energy)
+     */
+    bool IsEvsePluggedIn();
+
     // -----------------------------------------------------------------
     // Internal API to allow an EVSE to change its internal state etc
     Status HwSetMaxHardwareCurrentLimit(int64_t currentmA);
@@ -259,9 +290,16 @@ public:
 
     /* PREF attributes */
     DataModel::Nullable<uint32_t> GetNextChargeStartTime() override;
+    CHIP_ERROR SetNextChargeStartTime(DataModel::Nullable<uint32_t> newValue);
+
     DataModel::Nullable<uint32_t> GetNextChargeTargetTime() override;
+    CHIP_ERROR SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newValue);
+
     DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() override;
+    CHIP_ERROR SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newValue);
+
     DataModel::Nullable<Percent> GetNextChargeTargetSoC() override;
+    CHIP_ERROR SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue);
 
     DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() override;
     CHIP_ERROR SetApproximateEVEfficiency(DataModel::Nullable<uint16_t>) override;
@@ -300,6 +338,7 @@ private:
     EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
     Status NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent);
     Status NotifyApplicationStateChange();
+    Status NotifyApplicationChargingPreferencesChange();
     Status GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue);
 
     /* Local State machine handling */

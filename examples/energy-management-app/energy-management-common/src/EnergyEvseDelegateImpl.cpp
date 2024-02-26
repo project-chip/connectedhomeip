@@ -252,9 +252,9 @@ Status EnergyEvseDelegate::SetTargets(
     status = SaveTargets(chargingTargetSchedules);
 
     /* The Application needs to be told that the Targets have been updated
-     * so it can potentially re-optimise the charging start time etc
+     * so it can potentially re-optimize the charging start time etc
      */
-    // TODO
+    NotifyApplicationChargingPreferencesChange();
 
     return Status::Success;
 }
@@ -424,6 +424,11 @@ Status EnergyEvseDelegate::ClearTargets()
     {
         return Status::Failure;
     }
+
+    /* The Application needs to be told that the Targets have been deleted
+     * so it can potentially re-optimize the charging start time etc
+     */
+    NotifyApplicationChargingPreferencesChange();
 
 exit:
     return status;
@@ -1104,6 +1109,20 @@ Status EnergyEvseDelegate::NotifyApplicationStateChange()
     return Status::Success;
 }
 
+Status EnergyEvseDelegate::NotifyApplicationChargingPreferencesChange()
+{
+    EVSECbInfo cbInfo;
+
+    cbInfo.type = EVSECallbackType::ChargingPreferencesChanged;
+
+    if (mCallbacks.handler != nullptr)
+    {
+        mCallbacks.handler(&cbInfo, mCallbacks.arg);
+    }
+
+    return Status::Success;
+}
+
 Status EnergyEvseDelegate::GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue)
 {
     EVSECbInfo cbInfo;
@@ -1573,17 +1592,97 @@ DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeStartTime()
 {
     return mNextChargeStartTime;
 }
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeStartTime(DataModel::Nullable<uint32_t> newValue)
+{
+    DataModel::Nullable<uint32_t> oldValue = mNextChargeStartTime;
+
+    mNextChargeStartTime = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "NextChargeStartTime updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "NextChargeStartTime updated to %d", mNextChargeStartTime.Value());
+        }
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeStartTime::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeTargetTime()
 {
     return mNextChargeTargetTime;
 }
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newValue)
+{
+    DataModel::Nullable<uint32_t> oldValue = mNextChargeTargetTime;
+
+    mNextChargeTargetTime = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetTime updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetTime updated to %d", mNextChargeTargetTime.Value());
+        }
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeTargetTime::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<int64_t> EnergyEvseDelegate::GetNextChargeRequiredEnergy()
 {
     return mNextChargeRequiredEnergy;
 }
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newValue)
+{
+    DataModel::Nullable<int64_t> oldValue = mNextChargeRequiredEnergy;
+
+    mNextChargeRequiredEnergy = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to %ld",
+                          static_cast<long>(mNextChargeRequiredEnergy.Value()));
+        }
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeRequiredEnergy::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<Percent> EnergyEvseDelegate::GetNextChargeTargetSoC()
 {
     return mNextChargeTargetSoC;
+}
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue)
+{
+    DataModel::Nullable<Percent> oldValue = mNextChargeTargetSoC;
+
+    mNextChargeTargetSoC = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetSoC updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetSoC updated to %d %%", mNextChargeTargetSoC.Value());
+        }
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeTargetSoC::Id);
+    }
+    return CHIP_NO_ERROR;
 }
 
 /* ApproximateEVEfficiency */
@@ -1597,7 +1696,7 @@ CHIP_ERROR EnergyEvseDelegate::SetApproximateEVEfficiency(DataModel::Nullable<ui
     DataModel::Nullable<uint16_t> oldValue = mApproximateEVEfficiency;
 
     mApproximateEVEfficiency = newValue;
-    if ((oldValue != newValue))
+    if (oldValue != newValue)
     {
         if (newValue.IsNull())
         {
@@ -1652,6 +1751,115 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetSessionEnergyDischarged()
     return mSession.mSessionEnergyDischarged;
 }
 
+/**
+ * @brief   Helper function to get know if the EV is plugged in based on state
+ *          (regardless of if it is actually transferring energy)
+ */
+bool EnergyEvseDelegate::IsEvsePluggedIn()
+{
+    return (mState == StateEnum::kPluggedInCharging || mState == StateEnum::kPluggedInDemand ||
+            mState == StateEnum::kPluggedInDischarging || mState == StateEnum::kPluggedInNoDemand);
+}
+
+/**
+ * @brief This function samples the start-time, and energy meter to hold the session info
+ *
+ * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
+ * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
+ */
+void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMeterValue)
+{
+    /* Get Timestamp */
+    uint32_t chipEpoch = 0;
+    CHIP_ERROR err     = GetEpochTS(chipEpoch);
+    if (err != CHIP_NO_ERROR)
+    {
+        /* Note that the error will be also be logged inside GetErrorTS() -
+         * adding context here to help debugging */
+        ChipLogError(AppServer, "EVSE: Unable to get current time when starting session - err:%" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
+    mStartTime = chipEpoch;
+
+    mSessionEnergyChargedAtStart    = chargingMeterValue;
+    mSessionEnergyDischargedAtStart = dischargingMeterValue;
+
+    if (mSessionID.IsNull())
+    {
+        mSessionID = MakeNullable(static_cast<uint32_t>(0));
+    }
+    else
+    {
+        uint32_t sessionID = mSessionID.Value() + 1;
+        mSessionID         = MakeNullable(sessionID);
+    }
+
+    /* Reset other session values */
+    mSessionDuration         = MakeNullable(static_cast<uint32_t>(0));
+    mSessionEnergyCharged    = MakeNullable(static_cast<int64_t>(0));
+    mSessionEnergyDischarged = MakeNullable(static_cast<int64_t>(0));
+
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionID::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionDuration::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+
+    // Write values to persistent storage.
+    ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, SessionID::Id);
+    GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSessionID);
+
+    // TODO persist mStartTime
+    // TODO persist mSessionEnergyChargedAtStart
+    // TODO persist mSessionEnergyDischargedAtStart
+}
+
+/*---------------------- EvseSession functions --------------------------*/
+
+/**
+ * @brief This function updates the session attrs to allow read attributes to return latest values
+ */
+void EvseSession::RecalculateSessionDuration()
+{
+    /* Get Timestamp */
+    uint32_t chipEpoch = 0;
+    CHIP_ERROR err     = GetEpochTS(chipEpoch);
+    if (err != CHIP_NO_ERROR)
+    {
+        /* Note that the error will be also be logged inside GetErrorTS() -
+         * adding context here to help debugging */
+        ChipLogError(AppServer, "EVSE: Unable to get current time when updating session duration - err:%" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return;
+    }
+
+    uint32_t duration = chipEpoch - mStartTime;
+    mSessionDuration  = MakeNullable(duration);
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionDuration::Id);
+}
+
+/**
+ * @brief This function updates the EnergyCharged meter value
+ *
+ * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
+ */
+void EvseSession::UpdateEnergyCharged(int64_t chargingMeterValue)
+{
+    mSessionEnergyCharged = MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart);
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
+}
+
+/**
+ * @brief This function updates the EnergyDischarged meter value
+ *
+ * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
+ */
+void EvseSession::UpdateEnergyDischarged(int64_t dischargingMeterValue)
+{
+    mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+}
+
+/*---------------------- Non class helper functions --------------------------*/
 /**
  * @brief   Helper function to get current timestamp in Epoch format
  *
@@ -1737,97 +1945,28 @@ CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap)
 }
 
 /**
- * @brief This function samples the start-time, and energy meter to hold the session info
+ * @brief   Helper function to get current timestamp and work out the current number of minutes
+ *          past midnight based on localtime
  *
- * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
- * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
+ * @param   reference to hold the number of minutes past midnight
  */
-void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMeterValue)
+CHIP_ERROR GetMinutesPastMidnight(uint32_t & minutesPastMidnight)
 {
-    /* Get Timestamp */
-    uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = GetEpochTS(chipEpoch);
+    chip::System::Clock::Milliseconds64 cTMs;
+    CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
     if (err != CHIP_NO_ERROR)
     {
-        /* Note that the error will be also be logged inside GetErrorTS() -
-         * adding context here to help debugging */
-        ChipLogError(AppServer, "EVSE: Unable to get current time when starting session - err:%" CHIP_ERROR_FORMAT, err.Format());
-        return;
+        ChipLogError(Zcl, "EVSE: unable to get current time to check user schedules error=%" CHIP_ERROR_FORMAT, err.Format());
+        return err;
     }
-    mStartTime = chipEpoch;
+    time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
 
-    mSessionEnergyChargedAtStart    = chargingMeterValue;
-    mSessionEnergyDischargedAtStart = dischargingMeterValue;
+    // Define a timezone structure and initialize it to the local timezone
+    // This will capture any daylight saving time changes
+    struct tm local_time;
+    localtime_r(&unixEpoch, &local_time);
 
-    if (mSessionID.IsNull())
-    {
-        mSessionID = MakeNullable(static_cast<uint32_t>(0));
-    }
-    else
-    {
-        uint32_t sessionID = mSessionID.Value() + 1;
-        mSessionID         = MakeNullable(sessionID);
-    }
+    minutesPastMidnight = static_cast<uint32_t>((local_time.tm_hour * 60) + local_time.tm_min);
 
-    /* Reset other session values */
-    mSessionDuration         = MakeNullable(static_cast<uint32_t>(0));
-    mSessionEnergyCharged    = MakeNullable(static_cast<int64_t>(0));
-    mSessionEnergyDischarged = MakeNullable(static_cast<int64_t>(0));
-
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionID::Id);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionDuration::Id);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
-
-    // Write values to persistent storage.
-    ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, SessionID::Id);
-    GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSessionID);
-
-    // TODO persist mStartTime
-    // TODO persist mSessionEnergyChargedAtStart
-    // TODO persist mSessionEnergyDischargedAtStart
-}
-
-/**
- * @brief This function updates the session attrs to allow read attributes to return latest values
- */
-void EvseSession::RecalculateSessionDuration()
-{
-    /* Get Timestamp */
-    uint32_t chipEpoch = 0;
-    CHIP_ERROR err     = GetEpochTS(chipEpoch);
-    if (err != CHIP_NO_ERROR)
-    {
-        /* Note that the error will be also be logged inside GetErrorTS() -
-         * adding context here to help debugging */
-        ChipLogError(AppServer, "EVSE: Unable to get current time when updating session duration - err:%" CHIP_ERROR_FORMAT,
-                     err.Format());
-        return;
-    }
-
-    uint32_t duration = chipEpoch - mStartTime;
-    mSessionDuration  = MakeNullable(duration);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionDuration::Id);
-}
-
-/**
- * @brief This function updates the EnergyCharged meter value
- *
- * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
- */
-void EvseSession::UpdateEnergyCharged(int64_t chargingMeterValue)
-{
-    mSessionEnergyCharged = MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
-}
-
-/**
- * @brief This function updates the EnergyDischarged meter value
- *
- * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
- */
-void EvseSession::UpdateEnergyDischarged(int64_t dischargingMeterValue)
-{
-    mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
-    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+    return err;
 }

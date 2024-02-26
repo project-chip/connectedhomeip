@@ -143,13 +143,13 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_set_targets_command(chargingTargetSchedules=targets)
 
         self.step("7a")
-        await self.check_evse_attribute("NextChargeStartTime", NullValue)  # TODO value should be 0-1438
+        await self.check_evse_attribute_in_range("NextChargeStartTime", 0, 1438)
 
         self.step("7b")
-        await self.check_evse_attribute("NextChargeTargetTime", NullValue)  # TODO value should be 1439
+        await self.check_evse_attribute("NextChargeTargetTime", 1439)
 
         self.step("7c")
-        await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)  # TODO value should be 25000000
+        await self.check_evse_attribute("NextChargeRequiredEnergy", 25000000)
 
         self.step("7d")
         await self.check_evse_attribute("NextChargeTargetSoC", NullValue)
@@ -169,13 +169,13 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_set_targets_command(chargingTargetSchedules=targets_step_9)
 
         self.step("9a")
-        await self.check_evse_attribute("NextChargeStartTime", NullValue)  # TODO value should be 0-1438
+        await self.check_evse_attribute_in_range("NextChargeStartTime", 0, 1438)
 
         self.step("9b")
-        await self.check_evse_attribute("NextChargeTargetTime", NullValue)  # TODO value should be 1439
+        await self.check_evse_attribute("NextChargeTargetTime", 1439)
 
         self.step("9c")
-        await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)  # TODO value should be 25000000
+        await self.check_evse_attribute("NextChargeRequiredEnergy", 25000000)
 
         self.step("9d")
         await self.check_evse_attribute("NextChargeTargetSoC", NullValue)

@@ -30,7 +30,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 
 CHIP_ERROR EVSEManufacturer::Init()
 {
@@ -94,6 +93,200 @@ CHIP_ERROR EVSEManufacturer::Shutdown()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR FindNextTarget(const uint8_t dayOfWeekMap, uint32_t minutesPastMidnight_m, DataModel::Nullable<uint32_t> & targetTime_m,
+                          DataModel::Nullable<Percent> & targetSoC, DataModel::Nullable<int64_t> & addedEnergy_mWh)
+{
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    EvseTargetEntry chargingTargetScheduleEntry;
+    EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
+
+    int32_t minTimeToTarget_m = 1440; // 24 hours
+    int32_t timeToTarget_m;
+    bool bFound = false;
+
+    EVSEManufacturer * mn = GetEvseManufacturer();
+    VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    EnergyEvseDelegate * dg = mn->GetEvseDelegate();
+    VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    EvseTargetIterator * it = nullptr;
+    SuccessOrExit(err = dg->PrepareGetTargets(&it));
+    VerifyOrExit(it != nullptr, err = CHIP_ERROR_UNINITIALIZED);
+
+    while (it->Next(chargingTargetScheduleEntry))
+    {
+        if (chargingTargetScheduleEntry.dayOfWeekMap.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F)) & dayOfWeekMap)
+        {
+            // We've found today's schedule
+            for (const EvseChargingTarget & chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
+            {
+                timeToTarget_m = chargingTarget.targetTimeMinutesPastMidnight - minutesPastMidnight_m;
+                if (timeToTarget_m < 0)
+                {
+                    // This target is in the past - ignore it
+                    continue;
+                }
+
+                if (timeToTarget_m < minTimeToTarget_m)
+                {
+                    // This is the closest target found in the day's targets so far
+                    minTimeToTarget_m = timeToTarget_m;
+                    targetTime_m.SetNonNull(chargingTarget.targetTimeMinutesPastMidnight);
+                    if (chargingTarget.targetSoC.HasValue())
+                    {
+                        targetSoC.SetNonNull(chargingTarget.targetSoC.Value());
+                    }
+                    else
+                    {
+                        targetSoC.SetNull();
+                    }
+                    if (chargingTarget.addedEnergy.HasValue())
+                    {
+                        addedEnergy_mWh.SetNonNull(chargingTarget.addedEnergy.Value());
+                    }
+                    else
+                    {
+                        addedEnergy_mWh.SetNull();
+                    }
+                    bFound = true;
+                }
+            }
+        }
+    }
+
+    if (!bFound)
+    {
+        err = CHIP_ERROR_NOT_FOUND;
+    }
+
+exit:
+    // Release iterator and any memory
+    dg->GetTargetsFinished();
+    return err;
+}
+
+/**
+ * @brief   Simple example to demonstrate how an EVSE can compute the start time
+ *          and duration of a charging schedule
+ */
+CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
+{
+    CHIP_ERROR err;
+    EVSEManufacturer * mn = GetEvseManufacturer();
+    VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    EnergyEvseDelegate * dg = mn->GetEvseDelegate();
+    VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    uint8_t dayOfWeekMap = 0;
+    ReturnErrorOnFailure(GetDayOfWeekNow(dayOfWeekMap));
+
+    uint32_t minutesPastMidnight_m = 0;
+    ReturnErrorOnFailure(GetMinutesPastMidnight(minutesPastMidnight_m));
+
+    DataModel::Nullable<uint32_t> startTime_m;
+    DataModel::Nullable<uint32_t> targetTime_m;
+    DataModel::Nullable<Percent> targetSoC;
+    DataModel::Nullable<int64_t> addedEnergy_mWh;
+
+    uint32_t power_W;
+    uint32_t chargingDuration_s;
+    uint32_t chargingDuration_m;
+
+    // Initialise the values to Null - if the FindNextTarget finds one, then it will update the value
+    startTime_m.SetNull();
+    targetSoC.SetNull();
+    addedEnergy_mWh.SetNull();
+
+    uint8_t dayOffset = 0;
+    while (dayOffset < 2)
+    {
+        err = FindNextTarget(dayOfWeekMap, minutesPastMidnight_m, targetTime_m, targetSoC, addedEnergy_mWh);
+        if (err == CHIP_ERROR_NOT_FOUND)
+        {
+            // We didn't find one for today, try tomorrow
+            dayOffset++;
+            dayOfWeekMap = (dayOfWeekMap << 1) & 0x7f;
+            if (dayOfWeekMap == 0x00)
+            {
+                dayOfWeekMap = 0x01; // Must be Saturday and shifted off, so set it to Sunday
+            }
+        }
+        else
+        {
+            break; // We found a target or we error'd out for some other reason
+        }
+    }
+
+    if (err == CHIP_NO_ERROR && dg->IsEvsePluggedIn())
+    {
+        if (!targetSoC.IsNull())
+        {
+            if (targetSoC.Value() != 100)
+            {
+                ChipLogError(AppServer, "EVSE WARNING: TargetSoC is not 100%% and we don't know the EV SoC!");
+            }
+            // We don't know the Vehicle SoC so we must charge now
+            // TODO make this use the SoC featureMap to determine if this is an error
+            startTime_m.SetNonNull(minutesPastMidnight_m);
+        }
+        else
+        {
+            // We expect to use AddedEnergy to determine the charging start time
+            if (addedEnergy_mWh.IsNull())
+            {
+                ChipLogError(AppServer, "EVSE ERROR: Neither TargetSoC or AddedEnergy has been provided");
+                return CHIP_ERROR_INTERNAL;
+            }
+            // Simple optimizer - assume a flat tariff throughout the day
+            // Compute power from nominal voltage and maxChargingRate
+            // GetMaximumChargeCurrent returns mA, but to help avoid overflow
+            // We use V (not mV) and compute power to the nearest Watt
+            power_W = static_cast<uint32_t>((230 * dg->GetMaximumChargeCurrent()) /
+                                            1000); // TODO don't use 230V - not all markets will use that
+            // TODO resolve GetMaximumChargeCurrent not allowed to be 0!
+            power_W = 7000;
+
+            // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
+            // to avoid using floats we multiply by 36 and then divide by 100 (instead of x3600 and dividing by 1000)
+            chargingDuration_s = static_cast<uint32_t>(((addedEnergy_mWh.Value() / power_W) * 36) / 100);
+            chargingDuration_m = chargingDuration_s / 60;
+
+            // Add in 15 minutes leeway to account for slow starting vehicles
+            // that need to condition the battery or if it is cold etc
+            chargingDuration_m += 15;
+        }
+
+        // A price optimizer can look for cheapest time of day
+        // However for now we'll start charging as late as possible
+        int tempStartTime_m = targetTime_m.Value() - chargingDuration_m + (dayOffset * 1440);
+        // if tempStartTime_m is negative it means that it will take more than 24hrs to charge the vehicle
+
+        if ((tempStartTime_m < 0) || (tempStartTime_m < static_cast<int>(minutesPastMidnight_m)))
+        {
+            // we need to turn on the EVSE now - it won't have enough time to reach the target
+            startTime_m.SetNonNull(minutesPastMidnight_m);
+            // TODO call function to turn on the EV
+        }
+        else
+        {
+            // we turn off the EVSE for now
+            startTime_m.SetNonNull(tempStartTime_m);
+        }
+    }
+
+    // Update the attributes to allow a UI to inform the user
+    dg->SetNextChargeStartTime(startTime_m);
+    dg->SetNextChargeTargetTime(targetTime_m);
+    dg->SetNextChargeRequiredEnergy(addedEnergy_mWh);
+    dg->SetNextChargeTargetSoC(targetSoC);
+
+    return err;
+}
+
 /**
  * @brief   Allows a client application to initialise the Accuracy, Measurement types etc
  */
@@ -133,6 +326,8 @@ CHIP_ERROR EVSEManufacturer::SendPowerReading(EndpointId aEndpointId, int64_t aA
 
     return CHIP_NO_ERROR;
 }
+
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 
 /**
  * @brief   Allows a client application to send cumulative energy readings into the system
@@ -452,6 +647,11 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
         {
             *(cb->EnergyMeterReadingRequest.energyMeterValuePtr) = pClass->mLastDischargingEnergyMeter;
         }
+        break;
+
+    case EVSECallbackType::ChargingPreferencesChanged:
+        ChipLogProgress(AppServer, "EVSE callback - ChargingPreferencesChanged");
+        pClass->ComputeChargingSchedule();
         break;
 
     default:

@@ -219,12 +219,6 @@ CHIP_ERROR EvseTargetsDelegate::Load(std::vector<EvseTargetEntry> & targetEntryV
                     // Something wrong - we've lost alignment
                     return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
                 }
-                //         if (type == TLV::kTLVType_List)
-                //         {
-                //             // We've reached the end of the container
-                //             break;
-                //         }
-
                 if (tag == TLV::ContextTag(TargetEntryTag::kTargetTime))
                 {
                     ReturnErrorOnFailure(reader.Get(evseTarget.targetTimeMinutesPastMidnight));
