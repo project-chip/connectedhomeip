@@ -1106,7 +1106,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Args:
             prompt_msg (str): Message for TH UI prompt. Indicates what is expected from the user.
-            input_msg (str): Prompt for input function, used when running tests manually. Defaults to "Press Enter when done.\n".
+            input_msg (str, optional): Prompt for input function, used when running tests manually. Defaults to "Press Enter when done.\n".
             prompt_msg_placeholder (str, optional): TH UI prompt input placeholder. Defaults to "Submit anything to continue".
             default_value (str, optional): TH UI prompt default value. Defaults to "y".
 
