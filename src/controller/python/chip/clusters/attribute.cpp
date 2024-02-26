@@ -472,6 +472,22 @@ PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, ui
     return ToPyChipError(err);
 }
 
+void pychip_ReadClient_GetSubscriptionTimeoutMs(ReadClient * pReadClient, uint32_t * milliSec)
+{
+    VerifyOrDie(pReadClient != nullptr);
+
+    Optional<System::Clock::Timeout> duration = pReadClient->GetSubscriptionTimeout();
+
+    // The return value of GetSubscriptionTimeout cannot be 0
+    // so milliSec=0 can be considered as the subscription has been abnormal.
+    *milliSec = 0;
+    if (duration.HasValue())
+    {
+        System::Clock::Milliseconds32 msec = std::chrono::duration_cast<System::Clock::Milliseconds32>(duration.Value());
+        *milliSec                          = msec.count();
+    }
+}
+
 PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
                                    DeviceProxy * device, uint8_t * readParamsBuf, void ** attributePathsFromPython,
                                    size_t numAttributePaths, void ** dataversionFiltersFromPython, size_t numDataversionFilters,

@@ -520,6 +520,21 @@ class SubscriptionTransaction:
 
         return minIntervalSec.value, maxIntervalSec.value
 
+    def GetSubscriptionTimeoutMs(self) -> int:
+        '''
+        Returns the timeout(milliseconds) after which we consider the subscription to have
+        dropped, if we have received no messages within that amount of time.
+        Returns 0 milliseconds if a subscription has not yet been established (and
+        hence the MaxInterval is not yet known), or if the subscription session
+        is gone and hence the relevant MRP parameters can no longer be determined.
+        '''
+        timeoutMs = ctypes.c_uint32(0)
+        handle = chip.native.GetLibraryHandle()
+        builtins.chipStack.Call(
+            lambda: handle.pychip_ReadClient_GetSubscriptionTimeoutMs(self._readTransaction._pReadClient, ctypes.pointer(timeoutMs))
+        )
+        return timeoutMs.value
+
     def SetResubscriptionAttemptedCallback(self, callback: Callable[[SubscriptionTransaction, int, int], None], isAsync=False):
         '''
         Sets the callback function that gets invoked anytime a re-subscription is attempted. The callback is expected
