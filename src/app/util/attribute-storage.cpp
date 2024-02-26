@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#include "app/util/common.h"
+#include <app/util/attribute-storage.h>
+
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
-#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
@@ -36,10 +36,7 @@ using chip::Protocols::InteractionModel::Status;
 //   - zap-generated/callback.h is needed because endpoint_config will call the
 //     corresponding callbacks (via GENERATED_FUNCTION_ARRAYS) and the include
 //     for it is:
-//       util/common.h
-//           -> util/af.h
-//           -> util/config.h
-//           -> zap-generated/endpoint_config.h
+//     util/config.h -> zap-generated/endpoint_config.h
 #include <app-common/zap-generated/callback.h>
 
 using namespace chip;
