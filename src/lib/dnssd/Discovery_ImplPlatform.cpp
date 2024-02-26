@@ -631,7 +631,8 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId)
 {
     // Resolve requests can only be issued once DNSSD is initialized and there is
     // no caching currently
-    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    // When the DNSSD is kInitializing, can also try to resolve.
+    VerifyOrReturnError(mState != State::kUninitialized, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64 " ...",
                     ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));

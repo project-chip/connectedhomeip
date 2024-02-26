@@ -386,10 +386,15 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
         mErrorCallback(mAsyncReturnContext, CHIP_ERROR_INTERNAL);
         break;
     case AVAHI_CLIENT_S_COLLISION:
-    case AVAHI_CLIENT_S_REGISTERING:
-        ChipLogProgress(DeviceLayer, "Avahi re-register required");
+        ChipLogProgress(DeviceLayer, "Avahi collision, force to reset");
         StopPublish();
         mErrorCallback(mAsyncReturnContext, CHIP_ERROR_FORCED_RESET);
+        // Should restart the resolve service of the host.
+        break;
+    case AVAHI_CLIENT_S_REGISTERING:
+        // now is registering, we should just StopPublish() without reset
+        ChipLogProgress(DeviceLayer, "Avahi registering");
+        StopPublish();
         break;
     case AVAHI_CLIENT_CONNECTING:
         ChipLogProgress(DeviceLayer, "Avahi connecting");
