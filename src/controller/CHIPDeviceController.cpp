@@ -835,7 +835,8 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 
     if (mCommissioningStage != CommissioningStage::kSecurePairing)
     {
-        ChipLogError(Controller, "Commissioning already in progress - not restarting");
+        ChipLogError(Controller, "Commissioning already in progress (stage '%s') - not restarting",
+                     StageToString(mCommissioningStage));
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -1745,7 +1746,10 @@ void DeviceCommissioner::DisarmDone()
 
 void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus)
 {
+    ChipLogProgress(Controller, "Commissioning complete for node ID 0x" ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
+                    (completionStatus.err == CHIP_NO_ERROR ? "success" : completionStatus.err.AsString()));
     mCommissioningStage = CommissioningStage::kSecurePairing;
+
     if (mPairingDelegate == nullptr)
     {
         return;
