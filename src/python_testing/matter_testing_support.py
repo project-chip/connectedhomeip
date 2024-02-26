@@ -1096,12 +1096,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             info.filter_value = setup_payload.long_discriminator
 
         return info
-    
+
     def wait_for_user_input(self,
                             prompt_msg: str,
-                            input_msg: str="Press Enter when done.\n",
-                            prompt_msg_placeholder: str="Submit anything to continue",
-                            default_value: str="y") -> str:
+                            input_msg: str = "Press Enter when done.\n",
+                            prompt_msg_placeholder: str = "Submit anything to continue",
+                            default_value: str = "y") -> str:
         """Ask for user input and wait for it.
 
         Args:
@@ -1112,12 +1112,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Returns:
             str: User input
-        """        
+        """
         if self.runner_hook:
             self.runner_hook.show_prompt(msg=prompt_msg,
-                                        placeholder=prompt_msg_placeholder,
-                                        default_value=default_value)
+                                         placeholder=prompt_msg_placeholder,
+                                         default_value=default_value)
         return input(input_msg)
+
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
     test_run_config = TestRunConfig()
