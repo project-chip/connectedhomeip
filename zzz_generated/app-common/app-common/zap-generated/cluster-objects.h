@@ -13302,6 +13302,7 @@ public:
 namespace StayActiveRequest {
 enum class Fields : uint8_t
 {
+    kStayActiveDuration = 0,
 };
 
 struct Type
@@ -13310,6 +13311,8 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StayActiveRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    uint32_t stayActiveDuration = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -13324,6 +13327,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StayActiveRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
 
+    uint32_t stayActiveDuration = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StayActiveRequest
@@ -21506,7 +21510,7 @@ public:
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
     chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
     DataModel::Nullable<uint32_t> startTime;
-    DataModel::Nullable<uint16_t> duration;
+    DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::List<const Structs::MessageResponseOptionStruct::Type>> responses;
 
@@ -21522,7 +21526,7 @@ public:
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
     chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
     DataModel::Nullable<uint32_t> startTime;
-    DataModel::Nullable<uint16_t> duration;
+    DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::DecodableType>> responses;
 
@@ -21573,7 +21577,7 @@ public:
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
     chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
     DataModel::Nullable<uint32_t> startTime;
-    DataModel::Nullable<uint16_t> duration;
+    DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::List<const Structs::MessageResponseOptionStruct::Type>> responses;
 
@@ -21594,7 +21598,7 @@ public:
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
     chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
     DataModel::Nullable<uint32_t> startTime;
-    DataModel::Nullable<uint16_t> duration;
+    DataModel::Nullable<uint64_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::DecodableType>> responses;
     CHIP_ERROR Decode(TLV::TLVReader & reader);

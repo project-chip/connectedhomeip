@@ -5881,6 +5881,23 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
+                }public enum StayActiveRequestCommandField {StayActiveDuration(0),;
+                    private final int id;
+                    StayActiveRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static StayActiveRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (StayActiveRequestCommandField field : StayActiveRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
                 }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();

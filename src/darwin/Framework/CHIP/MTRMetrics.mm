@@ -16,7 +16,9 @@
  */
 #import "MTRLogging_Internal.h"
 #import "MTRMetrics_Internal.h"
+#include <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
+#include <Matter/MTRMetrics.h>
 
 @implementation MTRMetrics {
     NSMutableDictionary<NSString *, id> * _metricsData;
@@ -24,8 +26,14 @@
 
 - (instancetype)init
 {
+    NSAssert(false, @"'init' unavailable, use initWithCapacity: instead");
+    return nil;
+}
+
+- (instancetype)initWithCapacity:(NSUInteger)numItems
+{
     if (self = [super init]) {
-        _metricsData = [NSMutableDictionary dictionary];
+        _metricsData = [NSMutableDictionary dictionaryWithCapacity:numItems];
     }
     return self;
 }
