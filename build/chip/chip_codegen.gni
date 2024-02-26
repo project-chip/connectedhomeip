@@ -211,9 +211,7 @@ template("_chip_build_time_zapgen") {
     if (!defined(public_deps)) {
       public_deps = []
     }
-    public_deps += [
-      ":${_name}_zap",
-    ]
+    public_deps += [ ":${_name}_zap" ]
   }
 }
 
