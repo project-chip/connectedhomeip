@@ -24,7 +24,6 @@ declare_args() {
   setupDiscriminator = 3840
 }
 
-
 group("chip-lock-app")
 {
   deps = [
@@ -90,4 +89,5 @@ group("default") {
         "//third_party/connectedhomeip/third_party/nlio:nlio",
         "//third_party/connectedhomeip/third_party/nlunit-test:nlunit-test",
 ]
+
 }
