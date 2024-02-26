@@ -41,7 +41,7 @@ static const int MILLIS_SINCE_EPOCH = 1;
 // Add the bytes for attribute tag(1:control + 8:tag + 8:length) and structure(1:struct + 1:close container)
 static const int EXTRA_SPACE_FOR_ATTRIBUTE_TAG = 19;
 
-jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR &err);
+jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR & err);
 
 GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback,
                                                        const char * callbackClassSignature) :
@@ -918,7 +918,7 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
-jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR &err)
+jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR & err)
 {
     jobject retValue = nullptr;
 
@@ -983,13 +983,16 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralVal
     case TLV::kTLVType_Array: {
         TLV::TLVType containerType;
         err = readerForGeneralValueObject.EnterContainer(containerType);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "EnterContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "EnterContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
         err = chip::JniReferences::GetInstance().CreateArrayList(retValue);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
-        while(readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        while (readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
         {
             jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                                ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
             err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
         }
         return retValue;
@@ -997,13 +1000,16 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralVal
     case TLV::kTLVType_List: {
         TLV::TLVType containerType;
         err = readerForGeneralValueObject.EnterContainer(containerType);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "EnterContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "EnterContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
         err = chip::JniReferences::GetInstance().CreateArrayList(retValue);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
-        while(readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        while (readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
         {
             jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                                ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
             err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
         }
         return retValue;
