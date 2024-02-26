@@ -414,6 +414,11 @@ public:
         {
             if (mEnd != nullptr)
             {
+                // Iteration depth is used to support `Release` while an iterator is active.
+                //
+                // Code was historically using this functionality, so we support it here
+                // as well: while iteration is active, iteration depth is > 0. When it
+                // goes to 0, then any deferred `Release()` calls are executed.
                 mEnd->mIterationDepth++;
             }
         }
