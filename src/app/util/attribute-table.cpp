@@ -16,11 +16,9 @@
  */
 
 // this file contains all the common includes for clusters in the zcl-util
+#inclue "attribute-table.h"
 
 #include <app/util/attribute-storage.h>
-
-// for pulling in defines dealing with EITHER server or client
-#include "app/util/common.h"
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
 #include <app/util/odd-sized-integers.h>

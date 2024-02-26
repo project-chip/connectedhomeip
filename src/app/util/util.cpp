@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 
-#include "app/util/common.h"
+#include "util.h"
+
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
