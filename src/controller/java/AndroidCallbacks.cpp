@@ -41,7 +41,7 @@ static const int MILLIS_SINCE_EPOCH = 1;
 // Add the bytes for attribute tag(1:control + 8:tag + 8:length) and structure(1:struct + 1:close container)
 static const int EXTRA_SPACE_FOR_ATTRIBUTE_TAG = 19;
 
-jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData);
+jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR &err);
 
 GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback,
                                                        const char * callbackClassSignature) :
@@ -316,15 +316,16 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     readerForJavaTLV.Init(*apData);
 
     jobject value = nullptr;
-#ifdef USE_JAVA_TLV_ENCODE_DECODE
     TLV::TLVReader readerForJavaObject;
     readerForJavaObject.Init(*apData);
-
+#ifdef USE_JAVA_TLV_ENCODE_DECODE
     value = DecodeAttributeValue(aPath, readerForJavaObject, &err);
     // If we don't know this attribute, suppress it.
     if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB)
     {
-        value = DecodeGeneralTLVValue(env, apData);
+        TLV::TLVReader readerForGeneralValueObject;
+        readerForGeneralValueObject.Init(*apData);
+        value = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
         err   = CHIP_NO_ERROR;
     }
 
@@ -332,7 +333,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
                    aPath.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 #else
-    value = DecodeGeneralTLVValue(env, apData);
+    value = DecodeGeneralTLVValue(env, readerForJavaObject, err);
 #endif
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
@@ -473,21 +474,23 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     }
 
     jobject value = nullptr;
-#ifdef USE_JAVA_TLV_ENCODE_DECODE
     TLV::TLVReader readerForJavaObject;
     readerForJavaObject.Init(*apData);
+#ifdef USE_JAVA_TLV_ENCODE_DECODE
     value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
     // If we don't know this event, just skip it.
     if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB)
     {
-        value = DecodeGeneralTLVValue(env, apData);
+        TLV::TLVReader readerForGeneralValueObject;
+        readerForGeneralValueObject.Init(*apData);
+        value = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
         err   = CHIP_NO_ERROR;
     }
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode event with error %s", ErrorStr(err));
                    aEventHeader.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 #else
-    value = DecodeGeneralTLVValue(env, apData);
+    value = DecodeGeneralTLVValue(env, readerForJavaObject, err);
 #endif
 
     // Create TLV byte array to pass to Java layer
@@ -915,19 +918,15 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
-jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData)
+jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR &err)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
     jobject retValue = nullptr;
 
-    TLV::TLVReader readerForJavaObject;
-    readerForJavaObject.Init(*apData);
-
-    switch (readerForJavaObject.GetType())
+    switch (readerForGeneralValueObject.GetType())
     {
     case TLV::kTLVType_SignedInteger: {
-        int64_t signedValue;
-        VerifyOrReturnValue(readerForJavaObject.Get(signedValue) == CHIP_NO_ERROR, nullptr,
+        int64_t signedValue = 0;
+        VerifyOrReturnValue(readerForGeneralValueObject.Get(signedValue) == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(Controller, "Get TLV Value fail!"));
         err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(signedValue),
                                                                     retValue);
@@ -935,8 +934,8 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData)
         return retValue;
     }
     case TLV::kTLVType_UnsignedInteger: {
-        uint64_t unsignedValue;
-        VerifyOrReturnValue(readerForJavaObject.Get(unsignedValue) == CHIP_NO_ERROR, nullptr,
+        uint64_t unsignedValue = 0;
+        VerifyOrReturnValue(readerForGeneralValueObject.Get(unsignedValue) == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(Controller, "Get TLV Value fail!"));
         err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(unsignedValue),
                                                                     retValue);
@@ -944,8 +943,8 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData)
         return retValue;
     }
     case TLV::kTLVType_Boolean: {
-        bool booleanValue;
-        VerifyOrReturnValue(readerForJavaObject.Get(booleanValue) == CHIP_NO_ERROR, nullptr,
+        bool booleanValue = false;
+        VerifyOrReturnValue(readerForGeneralValueObject.Get(booleanValue) == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(Controller, "Get TLV Value fail!"));
         err = JniReferences::GetInstance().CreateBoxedObject<jboolean>("java/lang/Boolean", "(Z)V",
                                                                        static_cast<jboolean>(booleanValue), retValue);
@@ -953,8 +952,8 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData)
         return retValue;
     }
     case TLV::kTLVType_FloatingPointNumber: {
-        double doubleValue;
-        VerifyOrReturnValue(readerForJavaObject.Get(doubleValue) == CHIP_NO_ERROR, nullptr,
+        double doubleValue = 0.0;
+        VerifyOrReturnValue(readerForGeneralValueObject.Get(doubleValue) == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(Controller, "Get TLV Value fail!"));
         err = JniReferences::GetInstance().CreateBoxedObject<jdouble>("java/lang/Double", "(D)V", static_cast<jdouble>(doubleValue),
                                                                       retValue);
@@ -962,18 +961,18 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData)
         return retValue;
     }
     case TLV::kTLVType_UTF8String: {
-        uint32_t bufferLen             = readerForJavaObject.GetLength();
+        uint32_t bufferLen             = readerForGeneralValueObject.GetLength();
         std::unique_ptr<char[]> buffer = std::unique_ptr<char[]>(new char[bufferLen + 1]);
-        err                            = readerForJavaObject.GetString(buffer.get(), bufferLen + 1);
+        err                            = readerForGeneralValueObject.GetString(buffer.get(), bufferLen + 1);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
         chip::CharSpan valueSpan(buffer.get(), bufferLen);
         chip::JniReferences::GetInstance().CharToStringUTF(valueSpan, retValue);
         return retValue;
     }
     case TLV::kTLVType_ByteString: {
-        uint32_t bufferLen                = readerForJavaObject.GetLength();
+        uint32_t bufferLen                = readerForGeneralValueObject.GetLength();
         std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen + 1]);
-        err                               = readerForJavaObject.GetBytes(buffer.get(), bufferLen + 1);
+        err                               = readerForGeneralValueObject.GetBytes(buffer.get(), bufferLen + 1);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
 
         jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(bufferLen));
@@ -981,7 +980,39 @@ jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader * apData)
 
         return static_cast<jobject>(valueByteArray);
     }
+    case TLV::kTLVType_Array: {
+        TLV::TLVType containerType;
+        err = readerForGeneralValueObject.EnterContainer(containerType);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "EnterContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        err = chip::JniReferences::GetInstance().CreateArrayList(retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        while(readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
+        {
+            jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
+        }
+        return retValue;
+    }
+    case TLV::kTLVType_List: {
+        TLV::TLVType containerType;
+        err = readerForGeneralValueObject.EnterContainer(containerType);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "EnterContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        err = chip::JniReferences::GetInstance().CreateArrayList(retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        while(readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
+        {
+            jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
+        }
+        return retValue;
+    }
+    case TLV::kTLVType_Null: {
+        return nullptr;
+    }
     default:
+        err = CHIP_ERROR_WRONG_TLV_TYPE;
         return nullptr;
     }
 }
