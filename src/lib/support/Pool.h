@@ -94,14 +94,14 @@ protected:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
     size_t IndexOf(void * element);
 
-    /// Returns the first index that is allocated.
+    /// Returns the first index that is active (i.e. allocated data).
     ///
-    /// If nothing is allocated, this will return mCapacity
-    size_t FirstAllocatedIndex();
+    /// If nothing is active, this will return mCapacity
+    size_t FirstActiveIndex();
 
     /// Returns the next active index after `start`.
     ///
-    /// If nothing else allocated, returns mCapacity
+    /// If nothing else active/allocated, returns mCapacity
     size_t NextActiveIndexAfter(size_t start);
 
     using Lambda = Loop (*)(void * context, void * object);
@@ -265,7 +265,7 @@ public:
     BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
     ~BitMapObjectPool() { VerifyOrDie(Allocated() == 0); }
 
-    BitmapActiveObjectIterator<T> begin() { return BitmapActiveObjectIterator<T>(this, FirstAllocatedIndex()); }
+    BitmapActiveObjectIterator<T> begin() { return BitmapActiveObjectIterator<T>(this, FirstActiveIndex()); }
     BitmapActiveObjectIterator<T> end() { return BitmapActiveObjectIterator<T>(this, N); }
 
     template <typename... Args>

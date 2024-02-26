@@ -127,7 +127,7 @@ Loop StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, Lambda lamb
     return Loop::Finish;
 }
 
-size_t StaticAllocatorBitmap::FirstAllocatedIndex()
+size_t StaticAllocatorBitmap::FirstActiveIndex()
 {
     size_t idx = 0;
     for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
