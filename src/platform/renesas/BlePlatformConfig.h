@@ -18,9 +18,8 @@
  */
 
 /**
- *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on renesas platforms.
+ * @file
+ * Platform-specific configuration overrides for the CHIP BLE Layer on Renesas platforms.
  *
  */
 
@@ -31,4 +30,4 @@
 
 // ========== Platform-specific Configuration Overrides =========
 
-/* none so far */
+// TODO

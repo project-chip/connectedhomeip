@@ -19,8 +19,6 @@ declare_args() {
   renesas_sdk_target = ""
 }
 
-#assert(renesas_sdk_target != "", "renesas_sdk_target must be specified")
-
 group("renesas_sdk") {
   public_deps = [ renesas_sdk_target ]
 }

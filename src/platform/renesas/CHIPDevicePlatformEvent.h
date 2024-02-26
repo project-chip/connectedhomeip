@@ -17,9 +17,8 @@
  */
 
 /**
- *    @file
- *          Defines platform-specific event types and data for the Chip
- *          Device Layer on the platform.
+ * @file
+ * Defines platform-specific event types and data for the Chip Device Layer on the platform.
  */
 
 #pragma once

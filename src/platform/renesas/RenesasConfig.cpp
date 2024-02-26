@@ -17,8 +17,8 @@
  */
 
 /**
- *    @file
- *          Utilities for accessing persisted device configuration.
+ * @file
+ * Utilities for accessing persisted device configuration.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>

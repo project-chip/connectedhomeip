@@ -18,8 +18,8 @@
  */
 
 /**
- *    @file
- *          Defines compile-time configuration overrides for the chip Device Layer.
+ * @file
+ * Defines compile-time configuration overrides for the chip Device Layer.
  */
 
 #pragma once

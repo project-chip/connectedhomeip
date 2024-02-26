@@ -17,8 +17,8 @@
  */
 
 /**
- *    @file
- *    Platform-specific configuration overrides for CHIP.
+ * @file
+ * Platform-specific configuration overrides for CHIP.
  */
 
 #pragma once

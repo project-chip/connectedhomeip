@@ -17,8 +17,8 @@
  */
 
 /**
- *    @file
- *          Platform-specific configuration overrides for the CHIP system layer.
+ * @file
+ * Platform-specific configuration overrides for the CHIP system layer.
  *
  */
 

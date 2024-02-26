@@ -17,15 +17,16 @@
  */
 
 /**
- *    @file
- *          Stub for PlatformManagerImpl for renesas platform.
+ * @file
+ * Stub for PlatformManagerImpl for renesas platform.
  */
 #include <platform/PlatformManager.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-/** Singleton instance of the KeyValueStoreManager implementation object.
+/**
+ * Singleton instance of the KeyValueStoreManager implementation object.
  */
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 

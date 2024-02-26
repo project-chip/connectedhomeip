@@ -28,7 +28,6 @@ chip_target_style = "embedded"
 chip_crypto = "platform"
 
 chip_device_platform = "renesas"
-print("=========chip_device_platform: ${chip_device_platform}")
 chip_mdns = "platform"
 
 chip_enable_openthread = false

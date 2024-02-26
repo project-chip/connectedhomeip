@@ -61,18 +61,12 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
 #endif
 {
-    // Allow the ConnectivityManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
 private:
-    // ===== Members that implement the ConnectivityManager abstract interface.
-
     bool _HaveServiceConnectivity(void);
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-
-    // ===== Members for internal use by the following friends.
 
     friend ConnectivityManager & ConnectivityMgr(void);
     friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
@@ -82,7 +76,6 @@ private:
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
- *
  * Chip applications should use this to access features of the ConnectivityManager object
  * that are common to all platforms.
  */
@@ -93,7 +86,6 @@ inline ConnectivityManager & ConnectivityMgr(void)
 
 /**
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
- *
  * Chip applications can use this to gain access to features of the ConnectivityManager
  * that are specific to the renesas platform.
  */
