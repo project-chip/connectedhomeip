@@ -23,9 +23,6 @@ _app_root = get_path_info(".", "abspath")
 # Defines a source_set for CHIP data model.
 #
 # Arguments:
-#  zap_pregenerated_dir
-#    Path to the ZAP "gen" dir.
-#
 #  zap_file
 #    Path to the ZAP input file.
 #
@@ -38,13 +35,6 @@ _app_root = get_path_info(".", "abspath")
 template("chip_data_model") {
   _data_model_name = target_name
 
-  declare_args() {
-    # Allow building ota-requestor-app with a non-spec-compliant floor
-    # (i.e. smaller than 2 minutes) for action delays.
-    non_spec_compliant_ota_action_delay_floor = -1
-    time_sync_enable_tsc_feature = 1
-  }
-
   if (defined(invoker.idl)) {
     _idl = invoker.idl
   } else {
@@ -52,14 +42,6 @@ template("chip_data_model") {
     # '.zap' use '.matter' as extension. This is currently the case in the
     # sample apps, but may change in the future
     _idl = string_replace(invoker.zap_file, ".zap", ".matter")
-  }
-
-  config("${_data_model_name}_config") {
-    include_dirs = []
-
-    if (defined(invoker.zap_pregenerated_dir)) {
-      include_dirs += [ "${invoker.zap_pregenerated_dir}/.." ]
-    }
   }
 
   chip_zapgen("${_data_model_name}_zapgen") {
@@ -82,26 +64,13 @@ template("chip_data_model") {
       prune_outputs = []
     }
 
-    # TODO: It is unclear here why `zap_pregenerated_dir` has any relevance
-    #       in including IMClusterCommandHandler or not.
-    #
-    #       This logic has been carried over from previous code during compile
-    #       time codegen addition, however the rationale of why pregenerated
-    #       dir controls IMClusterCommandHandler needs to be explained and
-    #       potentially controlled by a clearer variable (is this for controllers?
-    #       is this during app compile but not others? I am unclear what
-    #       zap_pregenerated_dir is supposed to convey. Existence of a directory
-    #       does not obviously map to "need command handler cpp compiled in").
-    if (defined(invoker.zap_pregenerated_dir) &&
-        !chip_build_controller_dynamic_server) {
+    if (!chip_build_controller_dynamic_server) {
       outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
     } else {
       if (defined(prune_outputs)) {
         prune_outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
       }
     }
-
-    public_configs = [ ":${_data_model_name}_config" ]
 
     if (!defined(deps)) {
       deps = []
@@ -120,8 +89,6 @@ template("chip_data_model") {
       "app/cluster-init-callback.cpp",
     ]
 
-    public_configs = [ ":${_data_model_name}_config" ]
-
     if (!defined(deps)) {
       deps = []
     }
@@ -136,7 +103,6 @@ template("chip_data_model") {
     forward_variables_from(invoker,
                            "*",
                            [
-                             "zap_pregenerated_dir",
                              "zap_file",
                              "is_server",
                              "external_clusters",
@@ -271,8 +237,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/DefaultTimeSyncDelegate.cpp",
           "${_app_root}/clusters/${cluster}/TimeSyncDataProvider.cpp",
         ]
-        defines +=
-            [ "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}" ]
       } else if (cluster == "scenes-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -386,15 +350,5 @@ template("chip_data_model") {
     }
 
     cflags += [ "-Wconversion" ]
-
-    if (non_spec_compliant_ota_action_delay_floor >= 0) {
-      cflags += [ "-DNON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}" ]
-    }
-
-    if (!defined(public_configs)) {
-      public_configs = []
-    }
-
-    public_configs += [ ":${_data_model_name}_config" ]
   }
 }
