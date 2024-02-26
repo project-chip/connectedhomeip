@@ -346,6 +346,12 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         pass
 
+    def show_prompt(self,
+                    msg: str,
+                    placeholder: Optional[str] = None,
+                    default_value: Optional[str] = None) -> None:
+        pass
+
 
 @dataclass
 class MatterTestConfig:
@@ -1090,6 +1096,28 @@ class MatterBaseTest(base_test.BaseTestClass):
             info.filter_value = setup_payload.long_discriminator
 
         return info
+
+    def wait_for_user_input(self,
+                            prompt_msg: str,
+                            input_msg: str = "Press Enter when done.\n",
+                            prompt_msg_placeholder: str = "Submit anything to continue",
+                            default_value: str = "y") -> str:
+        """Ask for user input and wait for it.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt. Indicates what is expected from the user.
+            input_msg (str, optional): Prompt for input function, used when running tests manually. Defaults to "Press Enter when done.\n".
+            prompt_msg_placeholder (str, optional): TH UI prompt input placeholder. Defaults to "Submit anything to continue".
+            default_value (str, optional): TH UI prompt default value. Defaults to "y".
+
+        Returns:
+            str: User input
+        """
+        if self.runner_hook:
+            self.runner_hook.show_prompt(msg=prompt_msg,
+                                         placeholder=prompt_msg_placeholder,
+                                         default_value=default_value)
+        return input(input_msg)
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):

@@ -56,20 +56,8 @@ template("chip_data_model") {
       "zap-generated/endpoint_config.h",
     ]
 
-    # NOTE: these are ALSO auto-generated but handled below:
-    #       "zap-generated/IMClusterCommandHandler.cpp"
-    #         -> contains one large DispatchSingleClusterCommand and DispatchServerCommand
-
-    if (chip_code_pre_generated_directory == "") {
-      prune_outputs = []
-    }
-
     if (!chip_build_controller_dynamic_server) {
       outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
-    } else {
-      if (defined(prune_outputs)) {
-        prune_outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
-      }
     }
 
     if (!defined(deps)) {
