@@ -130,7 +130,7 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
         mpCheckInDelegate->OnCheckInComplete(clientInfo);
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
         mpImEngine->OnActiveModeNotification(clientInfo.peer_node);
-#endif //CHIP_CONFIG_ENABLE_READ_CLIENT
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
     }
 
     return CHIP_NO_ERROR;
