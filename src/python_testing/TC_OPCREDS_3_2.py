@@ -30,6 +30,8 @@ class TC_OPCREDS_3_2(MatterBaseTest):
     @async_test_body
     async def test_TC_OPCREDS_3_2(self):
 
+        
+
         # It is not necessary implement factory reset to DUT
         self.print_step(1, "Step 1: Factory Reset DUT")
 
@@ -51,6 +53,16 @@ class TC_OPCREDS_3_2(MatterBaseTest):
         # CommissioningBuildingBlocks just return a boolean. I need to get the NOC Response
         # so I just I will add a new step for now update the fabric label just to get the NOC response.
         opcreds = Clusters.OperationalCredentials
+
+
+        nocResponse = await self.read_single_attribute_check_success(
+            dev_ctrl=th1_new_admin_ctrl, node_id=th1_dut_nodeid, cluster=opcreds, attribute=opcreds.Attributes.NOCs, fabric_filtered=False)
+        )
+
+        print("Here is NOCResponse below")
+        print(nocResponse)
+        print("Here is NOCResponse")
+
         cmd = opcreds.Commands.UpdateFabricLabel(label="Label1")
         resp = await self.send_single_cmd(cmd=cmd, dev_ctrl=th1_new_admin_ctrl, node_id=th1_dut_nodeid)
         self.print_step(3, "When DUT sends NOC response save FabricIndex as FabricIndex_TH1")
@@ -62,9 +74,6 @@ class TC_OPCREDS_3_2(MatterBaseTest):
 
         self.print_step(5, "From TH1 read the CurrentFabricIndex")
         print(TH1_CurrentFabricIndex)
-
-        
-
 
 if __name__ == "__main__":
     default_matter_test_main()
