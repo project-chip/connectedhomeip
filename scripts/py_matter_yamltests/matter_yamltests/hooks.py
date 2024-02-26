@@ -13,9 +13,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from .parser import TestStep
-
 from typing import Optional
+
+from .parser import TestStep
 
 
 class TestParserHooks():
