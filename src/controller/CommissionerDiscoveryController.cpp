@@ -47,7 +47,7 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
 {
     if (!mReady)
     {
-        ChipLogDetail(Controller, "CommissionerDiscoveryController not read. Current instance=%s", mCurrentInstance);
+        ChipLogDetail(Controller, "CommissionerDiscoveryController not ready. Current instance=%s", mCurrentInstance);
         return;
     }
     // first check if this is a cancel
@@ -163,7 +163,7 @@ void CommissionerDiscoveryController::Ok()
                 }
             }
             // handle NoAppsFound CDC case
-            if (!hasTargetApp)
+            if (!hasTargetApp && client->GetNoPasscode())
             {
                 ChipLogError(AppServer, "UX Ok: target apps specified but none found, sending CDC");
                 CommissionerDeclaration cd;
