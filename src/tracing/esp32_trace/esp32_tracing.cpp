@@ -157,32 +157,58 @@ void ESP32Backend::TraceCounter(const char * label)
 
 void ESP32Backend::LogMetricEvent(const MetricEvent & event)
 {
+    using ValueType = MetricEvent::Value::Type;
     if (!mRegistered)
     {
-        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key() /* Unique key 8 */,
-                                  event.key() /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
-                                  ESP_DIAG_DATA_TYPE_INT /* data_type */);
+
+        switch (event.ValueType())
+        {
+        case ValueType::kUInt32:
+            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key() /* Unique key 8 */,
+                                      event.key() /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
+                                      ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+            break;
+
+        case ValueType::kInt32:
+            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key() /* Unique key 8 */,
+                                      event.key() /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
+                                      ESP_DIAG_DATA_TYPE_INT /* data_type */);
+            break;
+
+        case ValueType::kChipErrorCode:
+            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key() /* Unique key 8 */,
+                                      event.key() /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
+                                      ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+            break;
+
+        case ValueType::kUndefined:
+            ESP_LOGE("mtr", "failed to register %s as its value is undefined", event.key());
+            break;
+        }
         mRegistered = true;
     }
 
-    using ValueType = MetricEvent::Value::Type;
     switch (event.ValueType())
     {
     case ValueType::kInt32:
         ESP_LOGI("mtr", "The value of %s is %ld ", event.key(), event.ValueInt32());
         esp_diag_metrics_add_int(event.key(), event.ValueInt32());
         break;
+
     case ValueType::kUInt32:
         ESP_LOGI("mtr", "The value of %s is %lu ", event.key(), event.ValueUInt32());
         esp_diag_metrics_add_uint(event.key(), event.ValueUInt32());
         break;
+
     case ValueType::kChipErrorCode:
         ESP_LOGI("mtr", "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
         esp_diag_metrics_add_uint(event.key(), event.ValueErrorCode());
         break;
+
     case ValueType::kUndefined:
         ESP_LOGI("mtr", "The value of %s is undefined", event.key());
         break;
+
     default:
         ESP_LOGI("mtr", "The value of %s is of an UNKNOWN TYPE", event.key());
         break;
