@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,18 +17,9 @@
  */
 #pragma once
 
-namespace chip {
-namespace Tracing {
+/* Ensure we do not have double tracing macros defined */
+#if defined(MATTER_TRACE_BEGIN)
+#error "Tracing macros seem to be double defined"
+#endif
 
-// These structures are forward-declared so that tracing itself has no direct dependencies
-// on actual types. This allows tracing to be used anywhere lib/support could be used.
-
-struct MessageSendInfo;
-struct MessageReceivedInfo;
-struct NodeLookupInfo;
-struct NodeDiscoveredInfo;
-struct NodeDiscoveryFailedInfo;
-class MetricEvent;
-
-} // namespace Tracing
-} // namespace chip
+#include <platform/Darwin/Tracing.h>
