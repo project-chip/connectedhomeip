@@ -35,11 +35,6 @@ declare_args() {
   setup_discriminator = 3840
 }
 
-### if (chip_pw_tokenizer_logging) {
-###  import("//build_overrides/pigweed.gni")
-###  import("$dir_pw_tokenizer/database.gni")
-### }
-
 assert(current_os == "freertos")
 
 k32w1_platform_dir = "${chip_root}/examples/platform/nxp/k32w/k32w1"
@@ -111,7 +106,7 @@ k32w1_executable("contact_sensor_app") {
   ]
 
   #lit and sit are using different zap files
-  if (chip_enable_lit) {
+  if (chip_enable_icd_lit) {
     deps += [
       "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/",
     ]
@@ -127,13 +122,13 @@ k32w1_executable("contact_sensor_app") {
 
   if (chip_openthread_ftd) {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+      "${openthread_root}:libopenthread-cli-ftd",
+      "${openthread_root}:libopenthread-ftd",
     ]
   } else {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+      "${openthread_root}:libopenthread-cli-mtd",
+      "${openthread_root}:libopenthread-mtd",
     ]
   }
 
@@ -171,21 +166,8 @@ k32w1_executable("contact_sensor_app") {
   output_dir = root_out_dir
 }
 
-### if (chip_pw_tokenizer_logging) {
-###   pw_tokenizer_database("contact_sensor_app.database") {
-###     database = "$root_build_dir/chip-k32w0x-contact-example-database.bin"
-###     create = "binary"
-###     deps = [ ":contact_sensor_app" ]
-###     optional_paths = [ "$root_build_dir/chip-k32w0x-contact-example" ]
-###   }
-### }
-
-
 group("k32w1") {
   deps = [ ":contact_sensor_app" ]
-###   if (chip_pw_tokenizer_logging) {
-###     deps += [ ":contact_sensor_app.database" ]
-###   }
 }
 
 group("default") {

@@ -1,4 +1,3 @@
-<a name="matter-k32w1-lighting-example-application"></a>
 
 # Matter K32W1 Lighting Example Application
 
@@ -40,7 +39,6 @@ network.
 
 </hr>
 
-<a name="introduction"></a>
 
 ## Introduction
 
@@ -60,7 +58,6 @@ controller and obtain configuration from it. The actions required before
 establishing full communication are described below.
 
 
-<a name="bluetooth-le-advertising"></a>
 
 ### Bluetooth LE Advertising
 
@@ -69,7 +66,6 @@ be discoverable over Bluetooth LE. For security reasons, you must start
 Bluetooth LE advertising manually after powering up the device by pressing
 Button SW2.
 
-<a name="bluetooth-le-rendezvous"></a>
 
 ### Bluetooth LE Rendezvous
 
@@ -83,7 +79,6 @@ the UART console.
 
 ### Thread Provisioning
 
-<a name="device-ui"></a>
 
 ## Device UI
 
@@ -110,14 +105,14 @@ states are depicted:
 
 NOTE:
     LED2 will be disabled when CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR is enabled.
-    On K32W1 EVK board, PTB0 is wired to LED2 also is wired to CS (Chip Select) 
+    On K32W1 EVK board, `PTB0` is wired to LED2 also is wired to CS (Chip Select)
     External Flash Memory. OTA image is stored in external memory because of it's size.
     If LED2 is enabled then it will affect External Memory CS and OTA will not work.
 
 **RGB LED** shows the state of the simulated light bulb. When the LED is lit the
 light bulb is on; when not lit, the light bulb is off.
 
-**Button SW2** can be used to start BLE adevertising. A SHORT press of the buttton 
+**Button SW2** can be used to start BLE advertising. A SHORT press of the button
 will enable Bluetooth LE advertising for a predefined period of time. A LONG Press
 Button SW2 initiates a factory reset. After an initial period of 3 seconds, LED 2
 and RGB LED will flash in unison to signal the pending reset. After 6 seconds will
@@ -130,7 +125,6 @@ can be used to mimic a user manually operating a switch. The button behaves as a
 toggle, swapping the state every time it is short pressed. When long pressed, it
 does a clean soft reset that takes into account Matter shutdown procedure.
 
-<a name="building"></a>
 
 ## Building
 
@@ -150,29 +144,29 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w1
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w1$ gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=true chip_crypto=\"platform\""
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w1$ ninja -C out/debug
 ```
 
-In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
+In case that Openthread CLI is needed, `chip_with_ot_cli` build argument must be
 set to 1.
 
 After a successful build, the `elf` and `srec` files are found in `out/debug/` - see the files prefixed with `chip-k32w1-light-example`.
 
-<a name="smu2-memory"></a>
 
-### SMU2 Memory
+### `SMU2` Memory
 
-Some Matter instances and global variables can be placed in the NBU's SMU2 memory. When compiling with OpenThread FTD support (`chip_openthread_ftd=true`) and with `use_smu2_static=true`, the following components are placed in SMU2 memory:
+Some Matter instances and global variables can be placed in the `NBU` `SMU2` memory. When compiling with OpenThread FTD support (`chip_openthread_ftd=true`) and with `use_smu2_static=true`, the following components are placed in `SMU2` memory:
 * `gImageProcessor` from OTAImageProcessorImpl.cpp.
 * `gApplicationProcessor` from OTAHooks.cpp.
 * `Server::sServer` from Server.cpp.
 * `ThreadStackManagerImpl::sInstance` from ThreadStackManagerImpl.cpp.
 
-These instances and global variables are placed in SMU2 memory through name matching in the application linker script. They should not be changed or, if changed, the names must be updated in `k32w1_app.ld`. See [k32w1_app.ld](../../../../platform/nxp/k32w/k32w1/app/ldscripts/k32w1_app.ld) for names and SMU2 memory range size.
+These instances and global variables are placed in `SMU2` memory through name matching in the application linker script. They should not be changed or, if changed, the names must be updated in `k32w1_app.ld`. See [k32w1_app.ld](../../../../platform/nxp/k32w/k32w1/app/ldscripts/k32w1_app.ld) for names and `SMU2` memory range size.
 
-The OpenThread buffers can be allocated from a 13KB SMU2 range after a successful commmissioning process until a factory reset is initiated. This way, the OpenThread buffers will be dynamically allocated instead of statically, freeing some SRAM. To enable this feature compile with OpenThread FTD support (`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
+The OpenThread buffers can be allocated from a 13KB `SMU2` range after a successful commmissioning process until a factory reset is initiated. This way, the OpenThread buffers will be dynamically allocated instead of statically, freeing some SRAM. To enable this feature compile with OpenThread FTD support (`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
 
 ### LED PWM
 
@@ -188,25 +182,22 @@ Use `chip_with_factory_data=1` in the gn build command to enable factory data.
 For a full guide on manufacturing flow, please see
 [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
 
-<a name="flashing"></a>
 
 ## Flashing
 
-Two images must be written to the board: one for the host (CM33) and one for the NBU (CM3).
+Two images must be written to the board: one for the host (CM33) and one for the `NBU` (CM3).
 
-The image needed on the host side is the one generated in `out/debug/` while the one needed on the NBU side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
+The image needed on the host side is the one generated in `out/debug/` while the one needed on the `NBU` side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
 
-<a name="flashing-the-nbu-image"></a>
 
-### Flashing the NBU image
+### Flashing the `NBU` image
 
-NBU image should be written only when a new NXP-SDK is released.
+`NBU` image should be written only when a new NXP-SDK is released.
 
-[K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK) can be used for updating the NBU/radio core:
-- Section 2.4 – Get Software – install SPSDK (Secure Provisioning Command Line Tool)
-- Section 3.3 – Updating NBU for Wireless examples - use the corresponding .sb3 file found in the SDK package at path `middleware\wireless\ieee-802.15.4\bin\k32w1\`
+[K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK) can be used for updating the `NBU/radio` core:
+- Section 2.5 – Get Software – install `SPSDK` (Secure Provisioning Command Line Tool)
+- Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding .sb3 file found in the SDK package at path `middleware\wireless\ieee-802.15.4\bin\k32w1\`
 
-<a name="flashing-the-host-image"></a>
 
 ### Flashing the host image
 
@@ -233,7 +224,6 @@ quit
 $  jlink -device K32W1480 -if SWD -speed 4000 -autoconnect 1 -CommanderScript commands_script
 ```
 
-<a name="debugging"></a>
 
 ## Debugging
 
@@ -277,28 +267,25 @@ Run -> Debug Configurations... -> C/C++ Application
 
 ![Debug K32W1](../../../../platform/nxp/k32w/k32w1/doc/images/debug_k32w1.jpg)
 
-<a name="ota"></a>
 
 ## OTA
 
-<a name="convert-srec-into-sb3-file"></a>
 
-### Convert srec into sb3 file
+### Convert `srec` into `sb3` file
 
 The OTA image files must be encrypted using Over The Air Programming Tool ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)). Bootloader will load the new OTA image only if it detects that the file was encrypted with the OTAP correct keys. 
 
-.srec file is input for Over The air Programming (OTAP) application (unencrypted) and it's converted to .sb3 format (encrypted).
+.srec file is input for Over The air Programming (`OTAP`) application (unencrypted) and it's converted to `.sb3`` format (encrypted).
 
-In OTAP application
-- select OTA protocol => OTAP Matter
+In `OTAP` application
+- select OTA protocol => `OTAP` Matter
 - Browse File 
 - follow default options (KW45/K32W148, Preserve NVM) 
 - image information: will update "Application Core (MCU)" - this will generate the image only for the CM33 core
 - keep other settings at default values
 
-<a name="convert-sb3-into-ota-file"></a>
 
-### Convert sb3 into ota file
+### Convert `sb3` into `ota` file
 
 In order to build an OTA image, use NXP wrapper over the standard tool
 `src/app/ota_image_tool.py`:
@@ -321,7 +308,6 @@ Here is an example that generates an OTA image with application update TLV from 
 
 A note regarding OTA image header version (`-vn` option). An application binary has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For having a correct OTA process, the OTA header version should be the same as the binary embedded software version. A user can set a custom software version in the gn build args by setting `chip_software_version` to the wanted version.
 
-<a name="running-ota"></a>
 
 ### Running OTA
 
@@ -399,7 +385,6 @@ Start the OTA process:
 user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 ```
 
-<a name="known-issues"></a>
 
 ### Known issues
 

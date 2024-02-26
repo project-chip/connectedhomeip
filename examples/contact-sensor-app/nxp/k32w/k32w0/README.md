@@ -276,7 +276,7 @@ nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
 nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 ```
 
-If LIT ICD support is needed then `chip_enable_lit=true` must be specified as gn argument and the above parameters can be modified to
+If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified as gn argument and the above parameters can be modified to
 comply with LIT requirements (e.g.: LIT devices must configure `chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
 
 ```

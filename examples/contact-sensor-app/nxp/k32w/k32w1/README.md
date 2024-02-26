@@ -1,4 +1,3 @@
-<a name="matter-k32w1-contact-sensor-example-application"></a>
 
 # Matter K32W1 Contact Sensor Example Application
 
@@ -37,7 +36,6 @@ network.
 
     </hr>
 
-<a name="introduction"></a>
 
 ## Introduction
 
@@ -57,7 +55,6 @@ controller and obtain configuration from it. The actions required before
 establishing full communication are described below.
 
 
-<a name="bluetooth-le-advertising"></a>
 
 ### Bluetooth LE Advertising
 
@@ -66,7 +63,6 @@ be discoverable over Bluetooth LE. For security reasons, you must start
 Bluetooth LE advertising manually after powering up the device by pressing
 Button SW2.
 
-<a name="bluetooth-le-rendezvous"></a>
 
 ### Bluetooth LE Rendezvous
 
@@ -80,7 +76,6 @@ the UART console.
 
 ### Thread Provisioning
 
-<a name="device-ui"></a>
 
 ## Device UI
 
@@ -130,7 +125,6 @@ The button behaves as a toggle, swapping the state every time it is short presse
 When long pressed, it does a clean soft reset that takes into account Matter
 shutdown procedure.
 
-<a name="building"></a>
 
 ## Building
 
@@ -147,6 +141,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w1
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=false chip_crypto=\"platform\""
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ ninja -C out/debug
@@ -170,7 +165,7 @@ nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
 nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 ```
 
-If LIT ICD support is needed then `chip_enable_lit=true` must be specified as gn argument and the above parameters can be modified to
+If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified as gn argument and the above parameters can be modified to
 comply with LIT requirements (e.g.: LIT devices must configure `chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
 
 ```
@@ -197,25 +192,22 @@ Use `chip_with_factory_data=1` in the gn build command to enable factory data.
 For a full guide on manufacturing flow, please see
 [Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
 
-<a name="flashing"></a>
 
 ## Flashing
 
-Two images must be written to the board: one for the host (CM33) and one for the NBU (CM3).
+Two images must be written to the board: one for the host (CM33) and one for the `NBU` (CM3).
 
-The image needed on the host side is the one generated in `out/debug/` while the one needed on the NBU side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
+The image needed on the host side is the one generated in `out/debug/` while the one needed on the `NBU` side can be found in the downloaded NXP-SDK package at path -	`middleware\wireless\ieee-802.15.4\bin\k32w1\k32w1_nbu_ble_15_4_dyn_matter_$version.sb3`.
 
-<a name="flashing-the-nbu-image"></a>
 
-### Flashing the NBU image
+### Flashing the `NBU` image
 
-NBU image should be written only when a new NXP-SDK is released.
+`NBU` image should be written only when a new NXP-SDK is released.
 
-[K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK) can be used for updating the NBU/radio core:
-- Section 2.4 – Get Software – install SPSDK (Secure Provisioning Command Line Tool)
-- Section 3.3 – Updating NBU for Wireless examples - use the corresponding .sb3 file found in the SDK package at path `middleware\wireless\ieee-802.15.4\bin\k32w1\`
+[K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK) can be used for updating the `NBU/radio` core:
+- Section 2.5 – Get Software – install `SPSDK` (Secure Provisioning Command Line Tool)
+- Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding `.sb3` file found in the SDK package at path `middleware\wireless\ieee-802.15.4\bin\k32w1\`
 
-<a name="flashing-the-host-image"></a>
 
 ### Flashing the host image
 
@@ -242,7 +234,6 @@ quit
 $  jlink -device K32W1480 -if SWD -speed 4000 -autoconnect 1 -CommanderScript commands_script
 ```
 
-<a name="debugging"></a>
 
 ## Debugging
 
@@ -286,28 +277,25 @@ Run -> Debug Configurations... -> C/C++ Application
 
 ![Debug K32W1](../../../../platform/nxp/k32w/k32w1/doc/images/debug_k32w1.jpg)
 
-<a name="ota"></a>
 
 ## OTA
 
-<a name="convert-srec-into-sb3-file"></a>
 
-### Convert srec into sb3 file
+### Convert `srec` into `sb3` file
 
-The OTA image files must be encrypted using Over The Air Programming Tool ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)). Bootloader will load the new OTA image only if it detects that the file was encrypted with the OTAP correct keys. 
+The OTA image files must be encrypted using Over The Air Programming Tool ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)). Bootloader will load the new OTA image only if it detects that the file was encrypted with the `OTAP` correct keys. 
 
-.srec file is input for Over The air Programming (OTAP) application (unencrypted) and it's converted to .sb3 format (encrypted).
+`.srec` file is input for Over The air Programming (`OTAP`) application (unencrypted) and it's converted to `.sb3` format (encrypted).
 
-In OTAP application
-- select OTA protocol => OTAP Matter
+In `OTAP` application
+- select OTA protocol => `OTAP` Matter
 - Browse File 
 - follow default options (KW45/K32W148, Preserve NVM) 
 - image information: will update "Application Core (MCU)" - this will generate the image only for the CM33 core
 - keep other settings at default values
 
-<a name="convert-sb3-into-ota-file"></a>
 
-### Convert sb3 into ota file
+### Convert `sb3` into `ota` file
 
 In order to build an OTA image, use NXP wrapper over the standard tool
 `src/app/ota_image_tool.py`:
@@ -321,7 +309,7 @@ Note that "standard" TLV format is used. Matter TLV format is only used for fact
 
 Please see more in the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
 
-Here is an example that generates an OTA image with application update TLV from a sb3 file:
+Here is an example that generates an OTA image with application update TLV from a `sb3` file:
 
 ```
 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 43033 -vs "1.0" -da sha256 --app-input-file ~/binaries/chip-k32w1-43033.sb3 ~/binaries/chip-k32w1-43033.ota
@@ -330,7 +318,6 @@ Here is an example that generates an OTA image with application update TLV from 
 
 A note regarding OTA image header version (`-vn` option). An application binary has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For having a correct OTA process, the OTA header version should be the same as the binary embedded software version. A user can set a custom software version in the gn build args by setting `chip_software_version` to the wanted version.
 
-<a name="running-ota"></a>
 
 ### Running OTA
 
@@ -425,7 +412,6 @@ contact sensor and the internal state are disabled. Console logs can be used ins
 Also, please note that once the board is flashed with MCUXpresso the debugger
 disconnects because the board enters low power.
 
-<a name="known-issues"></a>
 
 ### Known issues
 

@@ -59,7 +59,7 @@ declare_args() {
   # Enables support for Long Idle Time ICD.
   # LIT may require enablement of deep power
   # save in the NXP SDK in the future
-  chip_enable_lit = false
+  chip_enable_icd_lit = false
 }
 
 declare_args() {
