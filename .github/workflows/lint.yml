@@ -96,7 +96,6 @@ jobs:
                      --known-failure app/CommandHandler.h \
                      --known-failure app/CommandHandlerInterface.h \
                      --known-failure app/CommandSenderLegacyCallback.h \
-                     --known-failure app/CompatEnumNames.h \
                      --known-failure app/data-model/ListLargeSystemExtensions.h \
                      --known-failure app/EventHeader.h \
                      --known-failure app/EventLoggingTypes.h \
