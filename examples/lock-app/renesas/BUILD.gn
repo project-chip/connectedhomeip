@@ -28,7 +28,6 @@ group("chip-lock-app")
 {
   deps = [
     "${chip_root}/src/lib",
-    "${chip_root}/third_party/jsoncpp",
   ]
 }
 
