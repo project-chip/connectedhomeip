@@ -23,6 +23,7 @@ declare_args() {
   sdk_release = 1
 }
 
+openthread_root ="//third_party/connectedhomeip/third_party/openthread/ot-nxp/openthread-k32w1"
 nxp_platform = "k32w/k32w1"
 nxp_sdk_name = "k32w1_sdk"
 nxp_device_layer = "nxp/${nxp_platform}"

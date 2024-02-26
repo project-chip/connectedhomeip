@@ -21,8 +21,6 @@
 
 #include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
-
 #include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTAFirmwareProcessor.h>
 #if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
