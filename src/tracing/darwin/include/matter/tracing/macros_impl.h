@@ -1,6 +1,7 @@
-/**
+/*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,11 +15,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-// App framework
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/attribute-table.h>
-#include <app/util/util.h>
+/* Ensure we do not have double tracing macros defined */
+#if defined(MATTER_TRACE_BEGIN)
+#error "Tracing macros seem to be double defined"
+#endif
+
+#include <platform/Darwin/Tracing.h>

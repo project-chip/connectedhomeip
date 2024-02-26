@@ -114,7 +114,6 @@ jobs:
                      --known-failure app/util/attribute-table.h \
                      --known-failure app/util/binding-table.cpp \
                      --known-failure app/util/binding-table.h \
-                     --known-failure app/util/common.h \
                      --known-failure app/util/config.h \
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \

@@ -74,7 +74,7 @@ void MessagesManager::InitializeWithObjects(jobject managerObject)
     }
 
     mPresentMessagesMethod =
-        env->GetMethodID(managerClass, "presentMessages", "(Ljava/lang/String;IIJILjava/lang/String;Ljava/util/HashMap;)Z");
+        env->GetMethodID(managerClass, "presentMessages", "(Ljava/lang/String;IIJJLjava/lang/String;Ljava/util/HashMap;)Z");
     if (mPresentMessagesMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MessagesManager 'presentMessages' method");
@@ -182,7 +182,7 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
                 message.startTime = DataModel::Nullable<uint32_t>(static_cast<uint32_t>(jstartTime));
             }
 
-            jfieldID durationField = env->GetFieldID(messageClass, "duration", "I");
+            jfieldID durationField = env->GetFieldID(messageClass, "duration", "J");
             jlong jduration        = env->GetLongField(messageObject, durationField);
             if (jduration >= 0)
             {
@@ -382,11 +382,11 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
                     return CHIP_ERROR_INTERNAL;
                 }
 
-                jobject jlong = env->NewObject(longClass, longCtor, response.messageResponseID.Value());
-                VerifyOrReturnError(jlong != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not create Long"));
+                jobject jlongobj = env->NewObject(longClass, longCtor, static_cast<uint64_t>(response.messageResponseID.Value()));
+                VerifyOrReturnError(jlongobj != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not create Long"));
 
                 // add to HashMap
-                env->CallObjectMethod(joptions, hashMapPut, jlong, jlabel);
+                env->CallObjectMethod(joptions, hashMapPut, jlongobj, jlabel);
                 if (env->ExceptionCheck())
                 {
                     ChipLogError(DeviceLayer, "Java exception in MessagesManager::HandlePresentMessagesRequest");
