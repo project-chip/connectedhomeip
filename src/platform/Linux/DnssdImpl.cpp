@@ -383,7 +383,7 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
         break;
     case AVAHI_CLIENT_FAILURE:
         ChipLogError(DeviceLayer, "Avahi client failure");
-	// error happend, we should to restart dnssd.
+        // error happend, we should to restart dnssd.
         mErrorCallback(mAsyncReturnContext, CHIP_ERROR_FORCED_RESET);
         break;
     case AVAHI_CLIENT_S_COLLISION:
