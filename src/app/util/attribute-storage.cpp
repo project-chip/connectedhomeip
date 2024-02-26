@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "attribute-storage.h"
+#include <app/util/attribute-storage.h>
 
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
