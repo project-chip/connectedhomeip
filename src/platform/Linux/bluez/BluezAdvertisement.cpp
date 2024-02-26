@@ -75,11 +75,13 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     // empty secondary channel for now
 
     bluez_object_skeleton_set_leadvertisement1(object, adv);
+    // NOLINTBEGIN(*.EnumCastOutOfRange)
     g_signal_connect(adv, "handle-release",
                      G_CALLBACK(+[](BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInv, BluezAdvertisement * self) {
                          return self->BluezLEAdvertisement1Release(aAdv, aInv);
                      }),
                      this);
+    // NOLINTEND(*.EnumCastOutOfRange)
 
     // NOLINTNEXTLINE(bugprone-casting-through-void)
     g_dbus_object_manager_server_export(mRoot.get(), G_DBUS_OBJECT_SKELETON(object));
