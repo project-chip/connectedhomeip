@@ -577,11 +577,22 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
             params.mKeepSubscriptions         = pyParams.keepSubscriptions;
             callback->SetAutoResubscribe(pyParams.autoResubscribe);
 
-            dataVersionFilters.release();
-            attributePaths.release();
-            eventPaths.release();
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            if (!pyParams.autoResubscribe)
+            {
+                // We want to allow certain kinds of spec-invalid subscriptions so we
+                // can test how the server reacts to them.
+                err = readClient->SendSubscribeRequestWithoutValidation(params);
+            }
+            else
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            {
+                dataVersionFilters.release();
+                attributePaths.release();
+                eventPaths.release();
 
-            err = readClient->SendAutoResubscribeRequest(std::move(params));
+                err = readClient->SendAutoResubscribeRequest(std::move(params));
+            }
             SuccessOrExit(err);
         }
         else
