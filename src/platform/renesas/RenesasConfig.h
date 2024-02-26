@@ -19,9 +19,8 @@
  */
 
 /**
- *    @file
- *          Utilities for accessing persisted device configuration on
- *          renesas platforms.
+ * @file
+ * Utilities for accessing persisted device configuration on renesas platforms.
  */
 
 #pragma once

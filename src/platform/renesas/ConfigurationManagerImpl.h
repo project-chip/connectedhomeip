@@ -17,9 +17,8 @@
  */
 
 /**
- *    @file
- *          Provides an implementation of the ConfigurationManager object
- *          for Renesas platform.
+ * @file
+ * Provides an implementation of the ConfigurationManager object for Renesas platform.
  */
 
 #pragma once
@@ -37,7 +36,6 @@ namespace DeviceLayer {
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::RenesasConfig>
 {
 public:
-    // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
@@ -45,7 +43,6 @@ public:
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
 
 private:
-    // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR Init(void) override;
     bool CanFactoryReset(void) override;
@@ -53,9 +50,6 @@ private:
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
-    // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
-
-    // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
     CHIP_ERROR ReadConfigValue(Key key, bool & val) override;
     CHIP_ERROR ReadConfigValue(Key key, uint32_t & val) override;
     CHIP_ERROR ReadConfigValue(Key key, uint64_t & val) override;
@@ -69,14 +63,12 @@ private:
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
     void RunConfigUnitTest(void) override;
 
-    // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
 };
 
 /**
  * Returns the platform-specific implementation of the ConfigurationManager object.
- *
  * Applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the selected platform.
  */

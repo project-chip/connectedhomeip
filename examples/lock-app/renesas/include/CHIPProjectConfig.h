@@ -18,11 +18,10 @@
  */
 
 /**
- *    @file
- *          Example project configuration file for CHIP.
- *
- *          This is a place to put application or project-specific overrides
- *          to the default configuration values for general CHIP features.
+ * @file
+ * Example project configuration file for CHIP.
+ * This is a place to put application or project-specific overrides
+ * to the default configuration values for general CHIP features.
  *
  */
 

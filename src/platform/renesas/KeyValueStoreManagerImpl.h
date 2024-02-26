@@ -35,7 +35,6 @@ public:
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 private:
-    // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();
 
@@ -44,7 +43,6 @@ private:
 
 /**
  * Returns the public interface of the KeyValueStoreManager singleton object.
- *
  * Chip applications should use this to access features of the KeyValueStoreManager object
  * that are common to all platforms.
  */
@@ -55,9 +53,8 @@ inline KeyValueStoreManager & KeyValueStoreMgr(void)
 
 /**
  * Returns the platform-specific implementation of the KeyValueStoreManager singleton object.
- *
  * Chip applications can use this to gain access to features of the KeyValueStoreManager
- * that are specific to the ESP32 platform.
+ * that are specific to the renesas platform.
  */
 inline KeyValueStoreManagerImpl & KeyValueStoreMgrImpl(void)
 {

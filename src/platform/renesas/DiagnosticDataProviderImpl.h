@@ -28,14 +28,12 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the PlatformManager singleton object for Linux platforms.
+ * Concrete implementation of the PlatformManager singleton object for renesas platforms.
  */
 class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
 public:
     static DiagnosticDataProviderImpl & GetDefaultInstance();
-
-    // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
@@ -47,7 +45,6 @@ public:
 
 /**
  * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
- *
  * Applications can use this to gain access to features of the DiagnosticDataProvider
  * that are specific to the selected platform.
  */

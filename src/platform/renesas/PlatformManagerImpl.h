@@ -16,8 +16,8 @@
  */
 
 /**
- *    @file
- *          Stub platform manager for renesas platform.
+ * @file
+ * Stub platform manager for renesas platform.
  */
 
 #pragma once
@@ -31,20 +31,16 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the PlatformManager singleton object for Linux platforms.
+ * Concrete implementation of the PlatformManager singleton object for Renesas platforms.
  */
 class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
 {
-    // Allow the PlatformManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
     friend PlatformManager;
 
 public:
-    // ===== Platform-specific members that may be accessed directly by the application.
     bool _IsChipStackLockedByCurrentThread() const { return true; };
 
 private:
-    // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack() { return CHIP_NO_ERROR; }
     void _Shutdown() {}
@@ -106,8 +102,6 @@ private:
     bool _TryLockChipStack() { return true; }
     void _UnlockChipStack() {}
 
-    // ===== Members for internal use by the following friends.
-
     friend PlatformManager & PlatformMgr();
     friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
@@ -120,7 +114,6 @@ private:
 
 /**
  * Returns the public interface of the PlatformManager singleton object.
- *
  * chip applications should use this to access features of the PlatformManager object
  * that are common to all platforms.
  */
@@ -131,9 +124,8 @@ inline PlatformManager & PlatformMgr()
 
 /**
  * Returns the platform-specific implementation of the PlatformManager singleton object.
- *
  * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
+ * that are specific to the renesas platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl()
 {

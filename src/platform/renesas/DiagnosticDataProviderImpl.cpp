@@ -16,9 +16,8 @@
  */
 
 /**
- *    @file
- *          Provides an implementation of the DiagnosticDataProvider object
- *          for renesas platform.
+ * @file
+ * Provides an implementation of the DiagnosticDataProvider object for renesas platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -39,8 +38,6 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-    // @Neethu If you get errors on xPortGetFreeHeapSize, check if this function call is enabled in FreeRTOSConfig.h.
-    // Note that there are multiple in the Smart-Bridge project. Make sure that you modify the correct one.
     size_t freeHeapSize = xPortGetFreeHeapSize();
     currentHeapFree     = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
@@ -48,8 +45,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-    // @Neethu If you get errors on xPortGetFreeHeapSize, check if this function call is enabled in FreeRTOSConfig.h.
-    // Note that there are multiple in the Smart-Bridge project. Make sure that you modify the correct one.
     // Calculate the Heap used based on Total heap - Free heap
     int64_t heapUsed = (configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize());
 
@@ -61,8 +56,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-    // @Neethu If you get errors on xPortGetFreeHeapSize, check if this function call is enabled in FreeRTOSConfig.h.
-    // Note that there are multiple in the Smart-Bridge project. Make sure that you modify the correct one.
     // FreeRTOS records the lowest amount of available heap during runtime
     // currentHeapHighWatermark wants the highest heap usage point so we calculate it here
     int64_t HighestHeapUsageRecorded = (configTOTAL_HEAP_SIZE - xPortGetMinimumEverFreeHeapSize());

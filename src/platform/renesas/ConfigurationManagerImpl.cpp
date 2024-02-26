@@ -17,9 +17,8 @@
  */
 
 /**
- *    @file
- *          Provides the implementation of the Device Layer ConfigurationManager object
- *          for Renesas platform.
+ * @file
+ * Provides the implementation of the Device Layer ConfigurationManager object for Renesas platform.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>

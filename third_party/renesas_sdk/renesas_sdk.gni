@@ -19,8 +19,6 @@ import("//build_overrides/renesas_sdk.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
-  # Location of the Renesas SDK.
-  ##renesas_sdk_root = "${renesas_sdk_build_root}/repos"
   renesas_sdk_verbose = false
   _sdk_debug = 0
 
@@ -64,6 +62,7 @@ template("renesas_sdk") {
       "-nostartfiles",
     ]
   }
+
   source_set(target_name) {
     sources = [ ]
 
