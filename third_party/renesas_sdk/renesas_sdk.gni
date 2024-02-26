@@ -36,6 +36,7 @@ declare_args() {
 }
 
 template("renesas_sdk") {
+
   config("${target_name}_config") {
     include_dirs = []
     defines = []
@@ -49,9 +50,7 @@ template("renesas_sdk") {
       defines += invoker.defines
     }
 
-    include_dirs += [
-  
-    ]
+    include_dirs += [ ]
 
     cflags = [ "--specs=nano.specs" ]
     if (is_debug) {
@@ -65,17 +64,7 @@ template("renesas_sdk") {
   }
 
   source_set(target_name) {
-    sources = [
-      
-    ]
-
-    if (chip_enable_ota_requestor) {
-      sources += [
-   
-      ]
-    }
-
-    #sources += get_target_outputs(":${target_name}_gen_lib_installer")
+    sources = [ ]
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
@@ -83,7 +72,8 @@ template("renesas_sdk") {
 
     defines = [
       "CHIP_HAVE_CONFIG_H=1",
-      "CHIP_SYSTEM_CONFIG_USE_LWIP=1"
+      "CHIP_SYSTEM_CONFIG_USE_LWIP=1",
+      "FSL_RTOS_FREE_RTOS=1",
     ]
 
     public_configs = [ ":${target_name}_config" ]
@@ -91,4 +81,3 @@ template("renesas_sdk") {
     deps = [ ]
   }
 }
-

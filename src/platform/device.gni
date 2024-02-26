@@ -223,8 +223,6 @@ declare_args() {
   chip_enable_segger_rtt = chip_device_platform != "qpg"
 }
 
-print("=========chip_device_platform: ${chip_device_platform}")
-print("=========current_os: ${current_os}")
 assert(
     (current_os != "freertos" && chip_device_platform == "none") ||
         chip_device_platform == "fake" ||
