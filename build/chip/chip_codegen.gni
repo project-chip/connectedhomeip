@@ -373,7 +373,6 @@ template("chip_zapgen") {
                                "input",
                                "outputs",
                                "public_configs",
-                               "prune_outputs",
                              ])
     }
   } else {
@@ -435,7 +434,6 @@ template("chip_zapgen") {
                              [
                                "deps",
                                "public_configs",
-                               "prune_outputs",
                              ])
       if (!defined(public_configs)) {
         public_configs = []
