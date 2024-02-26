@@ -103,7 +103,7 @@ private:
         {
             if (hostNameLowerCase[i] <= 'F' && hostNameLowerCase[i] >= 'A')
             {
-                hostNameLowerCase[i] = 'a' + hostNameLowerCase[i] - 'A';
+                hostNameLowerCase[i] = static_cast<uint8_t>('a' + hostNameLowerCase[i] - 'A');
             }
         }
         return PayloadContains(payload, ByteSpan(mHostNameBuffer)) || PayloadContains(payload, ByteSpan(hostNameLowerCase));
