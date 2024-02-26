@@ -149,7 +149,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TestConcreteReadAttributePathEqualityDefaultConstructor", TestConcreteReadAttributePathDefaultConstructorEquality),
     NL_TEST_DEF("TestConcreteReadAttributePathInequalityDifferentListIndex",
                 TestConcreteReadAttributePathInequalityDifferentListIndex),
-    NL_TEST_DEF("TestConcreteDataAttributePathEqualityDefaultConstructor", TestConcreteDataAttributePathDefaultConstructorEquality),
+    NL_TEST_DEF("TestConcreteDataAttributePathEqualityDefaultConstructor", TestConcreteDataAttributePathEqualityDefaultConstructor),
     NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentDataVersion",
                 TestConcreteDataAttributePathInequalityDifferentDataVersion),
     NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentListOp", TestConcreteDataAttributePathInequalityDifferentListOp),
