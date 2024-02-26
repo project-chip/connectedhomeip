@@ -54,9 +54,9 @@ static_library("cluster-objects") {
 
 source_set("enums") {
   sources = [
-    "CompatEnumNames.h",
     "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums-check.h",
     "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
+    "CompatEnumNames.h",
   ]
 
   public_configs = [ ":includes" ]
