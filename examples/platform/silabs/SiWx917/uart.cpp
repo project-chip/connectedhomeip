@@ -32,6 +32,7 @@ extern "C" {
 
 #define USART_BAUDRATE 115200 // Baud rate <9600-7372800>
 #define UART_CONSOLE_ERR -1   // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
+#define UART_CONSOLE_SUCCESS 1 // Positive value if UART Console action is success.
 
 sl_usart_handle_t usart_handle;
 
@@ -116,6 +117,30 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
         return status;
     }
     return BufLength;
+}
+
+/**
+ * @brief Write Logs to the Uart. Appends a return character
+ *
+ * @param log pointer to the logs
+ * @param length number of bytes to write
+ * @return int16_t Amount of bytes written or ERROR (-1)
+ */
+int16_t uartLogWrite(const char * log, uint16_t length)
+{
+    if (log == NULL || length < 1)
+    {
+        return UART_CONSOLE_ERR;
+    }
+    for (/* Empty */; length != 0; --length)
+    {
+        Board_UARTPutChar(*log++);
+    }
+    // To print next log in new line with proper formatting
+    Board_UARTPutChar('\r');
+    Board_UARTPutChar('\n');
+
+    return UART_CONSOLE_SUCCESS;
 }
 
 /*
