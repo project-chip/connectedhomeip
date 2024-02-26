@@ -48,8 +48,7 @@ public:
 
     enum class ICDManagementEvents : uint8_t
     {
-        kTableUpdated              = 0x01,
-        kStayActiveRequestReceived = 0x02,
+        kTableUpdated = 0x01,
     };
 
     using KeepActiveFlags = BitFlags<KeepActiveFlagsValues>;

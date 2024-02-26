@@ -4078,6 +4078,7 @@ class ChipClusters:
                 "commandId": 0x00000003,
                 "commandName": "StayActiveRequest",
                 "args": {
+                    "stayActiveDuration": "int",
                 },
             },
         },
