@@ -58,12 +58,11 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 5: TH writes the OnTime attribute to the DUT"
+    - label: "Step 5: TH writes the OnTime attribute as 30"
       PICS: OO.S.A4001
       command: "writeAttribute"
       attribute: "OnTime"
       arguments:
-       type: int16u
        value: 30
 
     - label: "Step 6: TH reads the OnTime attribute from the DUT"
@@ -71,9 +70,7 @@ tests:
       command: "readAttribute"
       attribute: "OnTime"
       response:
-          constraints:
-              type: int16u
-              value: 30
+          value: 30
 
     - label: "Step 7: TH writes the OnTime attribute to as 'initial-On-time' to restore the original value"
       PICS: OO.S.A4001
@@ -93,7 +90,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 9: TH writes the OffWaitTime attribute to the DUT"
+    - label: "Step 9: TH writes the OffWaitTime attribute as 30"
       PICS: OO.S.A4002
       command: "writeAttribute"
       attribute: "OffWaitTime"
@@ -105,9 +102,7 @@ tests:
       command: "readAttribute"
       attribute: "OffWaitTime"
       response:
-          constraints:
-              type: int16u
-              value: 30
+          value: 30
 
     - label: "Step 11: TH writes the OffWaitTime attribute to as 'initial-Off-waittime' to restore the original value"
       PICS: OO.S.A4002
