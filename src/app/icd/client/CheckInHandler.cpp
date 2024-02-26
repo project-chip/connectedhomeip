@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelTimeout.h>
 #include <app/icd/client/CheckInHandler.h>

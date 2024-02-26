@@ -19,6 +19,7 @@
 #include "CheckInDelegate.h"
 #include "controller/InvokeInteraction.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AppConfig.h>
 #include <app/CommandPathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
