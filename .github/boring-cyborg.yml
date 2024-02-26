@@ -49,9 +49,6 @@ labelPRBasedOnFilePath:
     github:
         - .github
 
-    workflows:
-        - .github/workflows/*
-
     tools:
         - tools/*
 
