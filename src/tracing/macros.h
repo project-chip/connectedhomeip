@@ -30,10 +30,6 @@
 // Tracing macro to trace monotonically increasing counter values.
 //  MATTER_TRACE_COUNTER(label)
 
-// Tracing macro to represent historical metric data i.e the data points which represent different
-// values at different point of time.
-//  MATTER_TRACE_METRIC(label, value)
-
 #include <matter/tracing/macros_impl.h>
 #include <tracing/log_declares.h>
 #include <tracing/registry.h>
@@ -87,7 +83,6 @@
 #define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_COUNTER(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_TRACE_METRIC(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
 #define MATTER_LOG_MESSAGE_SEND(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_MESSAGE_RECEIVED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)

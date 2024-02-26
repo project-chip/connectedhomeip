@@ -43,6 +43,15 @@ declare_args() {
 
   enable_eventlist_attribute = false
 
+  # Allow building ota-requestor-app with a non-spec-compliant floor
+  # (i.e. smaller than 2 minutes) for action delays.
+  non_spec_compliant_ota_action_delay_floor = -1
+
+  # enable time sync client for use in `time-synchronization-server` (if linked)
+  # TODO: this should probably be migrated to be time-synchronization-server specific
+  #       if the cluster build targets are decoupled as stand-alone units.
+  time_sync_enable_tsc_feature = 1
+
   # Systems that can spare a bit of RAM for InteractionModelEngine/delegate
   # pointers should do so (allows InteractionModelEngine decoupling and less usage
   # of global pointers)
@@ -65,6 +74,8 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
     "CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE=${chip_im_static_global_interaction_model_engine}",
+    "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}",
+    "NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}",
   ]
 
   visibility = [ ":app_config" ]

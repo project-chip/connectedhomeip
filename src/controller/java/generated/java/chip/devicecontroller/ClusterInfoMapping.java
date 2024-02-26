@@ -24325,7 +24325,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo messagespresentMessagesRequeststartTimeCommandParameterInfo = new CommandParameterInfo("startTime", Long.class, Long.class);
     messagespresentMessagesRequestCommandParams.put("startTime",messagespresentMessagesRequeststartTimeCommandParameterInfo);
 
-    CommandParameterInfo messagespresentMessagesRequestdurationCommandParameterInfo = new CommandParameterInfo("duration", Integer.class, Integer.class);
+    CommandParameterInfo messagespresentMessagesRequestdurationCommandParameterInfo = new CommandParameterInfo("duration", Long.class, Long.class);
     messagespresentMessagesRequestCommandParams.put("duration",messagespresentMessagesRequestdurationCommandParameterInfo);
 
     CommandParameterInfo messagespresentMessagesRequestmessageTextCommandParameterInfo = new CommandParameterInfo("messageText", String.class, String.class);
@@ -24343,7 +24343,7 @@ public class ClusterInfoMapping {
         commandArguments.get("messageControl")
         , (Long)
         commandArguments.get("startTime")
-        , (Integer)
+        , (Long)
         commandArguments.get("duration")
         , (String)
         commandArguments.get("messageText")
