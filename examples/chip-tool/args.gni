@@ -31,3 +31,5 @@ matter_log_json_payload_decode_full = true
 # make chip-tool very strict by default
 chip_tlv_validate_char_string_on_read = true
 chip_tlv_validate_char_string_on_write = true
+
+chip_static_data_model_BACKEND = "${chip_root}/src/controller/data_model:data_model"
