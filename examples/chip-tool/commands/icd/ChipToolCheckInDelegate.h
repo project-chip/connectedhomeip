@@ -20,28 +20,19 @@
 
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
-
-namespace chip {
-namespace app {
-
-using namespace std;
-
-class InteractionModelEngine;
+#include <app/InteractionModelEngine.h>
 
 /// Callbacks for check in protocol
-class DefaultCheckInDelegate : public CheckInDelegate
+class ChipToolCheckInDelegate : public chip::app::CheckInDelegate
 {
 public:
-    virtual ~DefaultCheckInDelegate() {}
-    CHIP_ERROR Init(ICDClientStorage * storage, InteractionModelEngine * engine);
-    void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
-    RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
-    void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
+    virtual ~ChipToolCheckInDelegate() {}
+    CHIP_ERROR Init(chip::app::ICDClientStorage * storage, chip::app::InteractionModelEngine * engine);
+    void OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo) override;
+    chip::app::RefreshKeySender * OnKeyRefreshNeeded(chip::app::ICDClientInfo & clientInfo, chip::app::ICDClientStorage * clientStorage) override;
+    void OnKeyRefreshDone(chip::app::RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
 private:
-    ICDClientStorage * mpStorage        = nullptr;
-    InteractionModelEngine * mpImEngine = nullptr;
+    chip::app::ICDClientStorage * mpStorage        = nullptr;
+    chip::app::InteractionModelEngine * mpImEngine = nullptr;
 };
-
-} // namespace app
-} // namespace chip

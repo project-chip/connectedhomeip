@@ -26,14 +26,14 @@
 #include "../clusters/DataModelLogger.h"
 #include "../common/CHIPCommand.h"
 #include "../common/Commands.h"
-#include "../icd/CheckInDelegate.h"
+#include "../icd/ChipToolCheckInDelegate.h"
 #include <lib/support/Variant.h>
 
 #include <websocket-server/WebSocketServer.h>
 
 class Commands;
 
-class InteractiveCommand : public CHIPCommand, public CheckInDelegate
+class InteractiveCommand : public CHIPCommand, public ChipToolCheckInDelegate
 {
 public:
     InteractiveCommand(const char * name, Commands * commandsHandler, const char * helpText,
@@ -56,6 +56,8 @@ public:
 protected:
     void StartCommandExecutorThread();
     void JoinCommandExecutorThread();
+
+    ChipToolCheckInDelegate * GetCheckInDelegate() override { return this; }
 
 private:
     void CommandExecutor();

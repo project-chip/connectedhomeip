@@ -39,8 +39,6 @@ source_set("handler") {
     "CheckInDelegate.h",
     "CheckInHandler.cpp",
     "CheckInHandler.h",
-    "DefaultCheckInDelegate.cpp",
-    "DefaultCheckInDelegate.h",
     "RefreshKeySender.cpp",
     "RefreshKeySender.h",
   ]

@@ -18,6 +18,7 @@
 
 #include "CHIPCommand.h"
 
+#include <commands/icd/ChipToolCheckInDelegate.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <lib/core/CHIPConfig.h>
@@ -50,7 +51,7 @@ chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGr
 // All fabrics share the same ICD client storage.
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
-CheckInDelegate CHIPCommand::sCheckInDelegate;
+ChipToolCheckInDelegate CHIPCommand::sCheckInDelegate;
 chip::app::CheckInHandler CHIPCommand::sCheckInHandler;
 
 namespace {
@@ -151,9 +152,9 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     auto engine = chip::app::InteractionModelEngine::GetInstance();
     VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage, engine));
+    ReturnLogErrorOnFailure(GetCheckInDelegate()->Init(&sICDClientStorage, engine));
     ReturnLogErrorOnFailure(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &sICDClientStorage, &sCheckInDelegate, engine));
+                                                 &sICDClientStorage, GetCheckInDelegate(), engine));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));

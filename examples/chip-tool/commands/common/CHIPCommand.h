@@ -28,11 +28,10 @@
 
 #include <TracingCommandLineArgument.h>
 #include <app/icd/client/CheckInHandler.h>
-#include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
-#include <commands/icd/CheckInDelegate.h>
+#include <commands/icd/ChipToolCheckInDelegate.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
@@ -118,10 +117,6 @@ public:
         StopWaiting();
     }
 
-    void AddExtraCheckInDelegate(chip::app::CheckInDelegate * delegate) { sCheckInDelegate.AddExtraDelegate(delegate); }
-
-    void RemoveExtraCheckInDelegate(chip::app::CheckInDelegate * delegate) { sCheckInDelegate.RemoveExtraDelegate(delegate); }
-
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
     // stack. The rules for Run() are as follows:
@@ -149,6 +144,8 @@ protected:
     // use member values that Shutdown will normally reset.
     virtual bool DeferInteractiveCleanup() { return false; }
 
+    virtual ChipToolCheckInDelegate * GetCheckInDelegate() { return &sCheckInDelegate; }
+
     // If true, the controller will be created with server capabilities enabled,
     // such as advertising operational nodes over DNS-SD and accepting incoming
     // CASE sessions.
@@ -169,7 +166,7 @@ protected:
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
     static chip::app::DefaultICDClientStorage sICDClientStorage;
-    static CheckInDelegate sCheckInDelegate;
+    static ChipToolCheckInDelegate sCheckInDelegate;
     static chip::app::CheckInHandler sCheckInHandler;
     CredentialIssuerCommands * mCredIssuerCmds;
 

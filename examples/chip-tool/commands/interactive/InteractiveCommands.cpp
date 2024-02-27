@@ -306,7 +306,6 @@ std::string InteractiveStartCommand::GetHistoryFilePath() const
 
 CHIP_ERROR InteractiveServerCommand::RunCommand()
 {
-    CHIPCommand::AddExtraCheckInDelegate(this);
     // Logs needs to be redirected in order to refresh the screen appropriately when something
     // is dumped to stdout while the user is typing a command.
     chip::Logging::SetLogRedirectCallback(InteractiveServerLoggingCallback);
@@ -316,7 +315,6 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
     RemoteDataModelLogger::SetDelegate(this);
     ReturnErrorOnFailure(mWebSocketServer.Run(mPort, this));
 
-    CHIPCommand::RemoveExtraCheckInDelegate(this);
     JoinCommandExecutorThread();
 
     gInteractiveServerResult.Reset();
@@ -361,8 +359,6 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
 
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
-    CHIPCommand::AddExtraCheckInDelegate(this);
-
     read_history(GetHistoryFilePath().c_str());
 
     // Logs needs to be redirected in order to refresh the screen appropriately when something
@@ -389,7 +385,6 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     }
 
     JoinCommandExecutorThread();
-    CHIPCommand::RemoveExtraCheckInDelegate(this);
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
 }
@@ -446,6 +441,8 @@ void InteractiveCommand::CommandExecutor()
 
 void InteractiveCommand::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
 {
+    ChipToolCheckInDelegate::OnCheckInComplete(clientInfo);
+
     std::lock_guard<std::mutex> lock(commandExecutorQueueMutex);
     commandExecutorQueue.push(CommandExecutorTask(clientInfo.peer_node));
     commandExecutorQueueCv.notify_all();
