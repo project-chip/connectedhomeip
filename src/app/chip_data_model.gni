@@ -120,7 +120,7 @@ template("chip_data_model") {
               "*\bgen_config.h",
             ])
 
-    public_deps = [
+    deps = [
       ":${_data_model_name}_codegen_generate",
       ":${_data_model_name}_zapgen_generate",
       "${chip_root}/src/app/util:privilege-constants",
@@ -141,7 +141,7 @@ template("chip_data_model") {
               "*\bcluster-init-callback.cpp",
             ])
 
-    public_deps = [
+    deps = [
       ":${_data_model_name}_codegen_generate",
       "${chip_root}/src/app/common:ids",
       "${chip_root}/src/lib/support:span",
@@ -157,7 +157,7 @@ template("chip_data_model") {
               get_target_outputs(":${_data_model_name}_zapgen_generate"),
               [ "*\bIMClusterCommandHandler.cpp" ])
 
-      public_deps = [
+      deps = [
         ":${_data_model_name}_zapgen_generate",
         "${chip_root}/src/app",
         "${chip_root}/src/app:interaction-model",
