@@ -203,9 +203,8 @@ private:
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
 
-
-#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)   
-    protected:
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
+protected:
     static void OnSendIndicationTimeout(System::Layer * aLayer, void * appState);
 #endif
 };
