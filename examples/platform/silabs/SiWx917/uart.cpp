@@ -30,8 +30,8 @@ extern "C" {
 #include <stddef.h>
 #include <string.h>
 
-#define USART_BAUDRATE 115200  // Baud rate <9600-7372800>
-#define UART_CONSOLE_ERR -1    // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
+#define USART_BAUDRATE 115200 // Baud rate <9600-7372800>
+#define UART_CONSOLE_ERR -1   // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
 
 sl_usart_handle_t usart_handle;
 
