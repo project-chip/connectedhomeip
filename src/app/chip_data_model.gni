@@ -158,21 +158,23 @@ template("chip_data_model") {
     }
   }
 
-  source_set("${_data_model_name}-command-dispatch") {
-    sources = [ "${_zapgen_gen_dir}/zap-generated/IMClusterCommandHandler.cpp" ]
-
-    deps = [
-      "${chip_root}/src/app",
-      "${chip_root}/src/app:interaction-model",
-      "${chip_root}/src/app/common:cluster-objects",
-      "${chip_root}/src/app/common:enums",
-      "${chip_root}/src/app/common:ids",
-      "${chip_root}/src/lib/core",
-      "${chip_root}/src/lib/support",
-    ]
-
-    if (chip_code_pre_generated_directory == "") {
-      deps += [ ":${_data_model_name}_zapgen_generate" ]
+  if (!chip_build_controller_dynamic_server) {
+    source_set("${_data_model_name}-command-dispatch") {
+      sources = [ "${_zapgen_gen_dir}/zap-generated/IMClusterCommandHandler.cpp" ]
+    
+      deps = [
+        "${chip_root}/src/app",
+        "${chip_root}/src/app:interaction-model",
+        "${chip_root}/src/app/common:cluster-objects",
+        "${chip_root}/src/app/common:enums",
+        "${chip_root}/src/app/common:ids",
+        "${chip_root}/src/lib/core",
+        "${chip_root}/src/lib/support",
+      ]
+    
+      if (chip_code_pre_generated_directory == "") {
+        deps += [ ":${_data_model_name}_zapgen_generate" ]
+      }
     }
   }
 
