@@ -14,11 +14,30 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/app/common_flags.gni")
 
 source_set("types") {
   sources = [
     "attribute-metadata.h",
     "basic-types.h",
     "types_stub.h",
+  ]
+}
+
+source_set("privilege-constants") {
+  sources = [ "privilege-constants.h" ]
+}
+
+source_set("privilege-storage") {
+  sources = [
+    "privilege-storage.cpp",
+    "privilege-storage.h",
+  ]
+
+  deps = [
+    ":privilege-constants",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_static_data_model_BACKEND}-endpoint-metadata",
   ]
 }

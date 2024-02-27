@@ -120,10 +120,16 @@ template("chip_data_model") {
               "\bgen_config.h",
             ])
 
-    deps = [
+    public_deps = [
       ":${_data_model_name}_codegen_generate",
       ":${_data_model_name}_zapgen_generate",
+      "${chip_root}/src/app/util:privilege-constants",
       "${chip_root}/src/lib/core:chip_config_header",
+    ]
+
+    public_configs = [
+      ":${_data_model_name}_codegen_config",
+      ":${_data_model_name}_zapgen_config",
     ]
   }
 
@@ -135,12 +141,14 @@ template("chip_data_model") {
               "\bcluster-init-callback.cpp",
             ])
 
-    deps = [
+    public_deps = [
       ":${_data_model_name}_codegen_generate",
       "${chip_root}/src/app/common:ids",
       "${chip_root}/src/lib/support:span",
       "${chip_root}/src/protocols/interaction_model",
     ]
+
+    public_configs = [ ":${_data_model_name}_codegen_config" ]
   }
 
   if (!chip_build_controller_dynamic_server) {
@@ -149,7 +157,7 @@ template("chip_data_model") {
               get_target_outputs(":${_data_model_name}_zapgen_generate"),
               [ "\bIMClusterCommandHandler.cpp" ])
 
-      deps = [
+      public_deps = [
         ":${_data_model_name}_zapgen_generate",
         "${chip_root}/src/app",
         "${chip_root}/src/app:interaction-model",
@@ -159,6 +167,8 @@ template("chip_data_model") {
         "${chip_root}/src/lib/core",
         "${chip_root}/src/lib/support",
       ]
+
+      public_configs = [ ":${_data_model_name}_zapgen_config" ]
     }
   }
 
@@ -198,7 +208,6 @@ template("chip_data_model") {
       "${_app_root}/util/binding-table.h",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/message.cpp",
-      "${_app_root}/util/privilege-storage.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
 

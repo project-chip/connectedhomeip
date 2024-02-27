@@ -17,4 +17,11 @@ declare_args() {
   chip_app_use_echo = false
   chip_enable_read_client = true
   chip_build_controller_dynamic_server = false
+
+  # MUST be set my an application to the relevant `chip_data_model` target
+  # that is to be used by the application.
+  #
+  # The data model specifies what the endpoint composition and metadata is
+  # built into "src/app" interaction model.
+  chip_static_data_model_BACKEND = "BACKEND-NOT-SET"
 }
