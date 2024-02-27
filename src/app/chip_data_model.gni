@@ -115,9 +115,9 @@ template("chip_data_model") {
     sources += filter_include(
             get_target_outputs(":${_data_model_name}_zapgen_generate"),
             [
-              "\baccess.h",
-              "\bendpoint_config.h",
-              "\bgen_config.h",
+              "*\baccess.h",
+              "*\bendpoint_config.h",
+              "*\bgen_config.h",
             ])
 
     public_deps = [
@@ -137,8 +137,8 @@ template("chip_data_model") {
     sources = filter_include(
             get_target_outputs(":${_data_model_name}_codegen_generate"),
             [
-              "\bcallback-stup.cpp",
-              "\bcluster-init-callback.cpp",
+              "*\bcallback-stub.cpp",
+              "*\bcluster-init-callback.cpp",
             ])
 
     public_deps = [
@@ -155,7 +155,7 @@ template("chip_data_model") {
     source_set("${_data_model_name}-command-dispatch") {
       sources = filter_include(
               get_target_outputs(":${_data_model_name}_zapgen_generate"),
-              [ "\bIMClusterCommandHandler.cpp" ])
+              [ "*\bIMClusterCommandHandler.cpp" ])
 
       public_deps = [
         ":${_data_model_name}_zapgen_generate",
