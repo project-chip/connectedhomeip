@@ -142,7 +142,12 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster()
     status = PowerSource::Attributes::Description::Set(EndpointId(0 /*RootNode*/), CharSpan::fromCharString("Primary Mains Power"));
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
 
-    // TODO set the EndpointList - GetPowerTopologyDelegate()->SetEndpointList(Span<EndpointId>(EndpointId(1)));
+    chip::EndpointId endpointArray[] = { 1 /* EVSE Endpoint */ };
+    Span<EndpointId> endpointList    = Span<EndpointId>(endpointArray);
+
+    // Note per API - we do not need to maintain the span after the SetEndpointList has been called
+    // since it takes a copy (see power-source-server.cpp)
+    PowerSourceServer::Instance().SetEndpointList(0 /* Root Node */, endpointList);
 
     return CHIP_NO_ERROR;
 }

@@ -31,3 +31,13 @@ CHIP_ERROR PowerTopologyDelegate::GetActiveEndpointAtIndex(size_t index, Endpoin
 {
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
+
+CHIP_ERROR PowerTopologyInstance::Init()
+{
+    return Instance::Init();
+}
+
+void PowerTopologyInstance::Shutdown()
+{
+    Instance::Shutdown();
+}

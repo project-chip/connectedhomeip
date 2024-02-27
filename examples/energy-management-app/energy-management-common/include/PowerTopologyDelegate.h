@@ -36,6 +36,30 @@ public:
     CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override;
 };
 
+class PowerTopologyInstance : public Instance
+{
+public:
+    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, Feature aFeature,
+                          OptionalAttributes aOptionalAttributes) :
+        PowerTopology::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttributes)
+    {
+        mDelegate = &aDelegate;
+    }
+
+    // Delete copy constructor and assignment operator.
+    PowerTopologyInstance(const PowerTopologyInstance &)             = delete;
+    PowerTopologyInstance(const PowerTopologyInstance &&)            = delete;
+    PowerTopologyInstance & operator=(const PowerTopologyInstance &) = delete;
+
+    CHIP_ERROR Init();
+    void Shutdown();
+
+    PowerTopologyDelegate * GetDelegate() { return mDelegate; };
+
+private:
+    PowerTopologyDelegate * mDelegate;
+};
+
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

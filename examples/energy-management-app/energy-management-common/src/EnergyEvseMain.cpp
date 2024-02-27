@@ -56,8 +56,8 @@ static std::unique_ptr<ElectricalPowerMeasurementInstance> gEPMInstance;
 // Electrical Energy Measurement cluster uses ember to initialise
 static std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
 
-static std::unique_ptr<PowerTopology::Delegate> gPTDelegate;
-static std::unique_ptr<PowerTopology::Instance> gPTInstance;
+static std::unique_ptr<PowerTopologyDelegate> gPTDelegate;
+static std::unique_ptr<PowerTopologyInstance> gPTInstance;
 
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
 {
@@ -228,9 +228,9 @@ CHIP_ERROR PowerTopologyInit()
     }
 
     gPTInstance =
-        std::make_unique<PowerTopology::Instance>(EndpointId(ENERGY_EVSE_ENDPOINT), *gPTDelegate,
-                                                  BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
-                                                  BitMask<PowerTopology::OptionalAttributes, uint32_t>(0));
+        std::make_unique<PowerTopologyInstance>(EndpointId(ENERGY_EVSE_ENDPOINT), *gPTDelegate,
+                                                BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
+                                                BitMask<PowerTopology::OptionalAttributes, uint32_t>(0));
 
     if (!gPTInstance)
     {
@@ -375,7 +375,7 @@ CHIP_ERROR EVSEManufacturerInit()
     }
 
     /* Now create EVSEManufacturer */
-    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gEPMInstance.get());
+    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gEPMInstance.get(), gPTInstance.get());
     if (!gEvseManufacturer)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EvseManufacturer");
@@ -426,17 +426,18 @@ void EvseApplicationInit()
         return;
     }
 
-    if (EVSEManufacturerInit() != CHIP_NO_ERROR)
+    if (PowerTopologyInit() != CHIP_NO_ERROR)
     {
+        EVSEManufacturerShutdown();
         DeviceEnergyManagementShutdown();
         EnergyEvseShutdown();
         EnergyMeterShutdown();
         return;
     }
 
-    if (PowerTopologyInit() != CHIP_NO_ERROR)
+    /* Do this last so that the instances for other clusters can be wrapped inside */
+    if (EVSEManufacturerInit() != CHIP_NO_ERROR)
     {
-        EVSEManufacturerShutdown();
         DeviceEnergyManagementShutdown();
         EnergyEvseShutdown();
         EnergyMeterShutdown();
@@ -449,8 +450,8 @@ void EvseApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
-    PowerTopologyShutdown();          /* Free the PowerTopology */
     EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */
+    PowerTopologyShutdown();          /* Free the PowerTopology */
     EnergyMeterShutdown();            /* Free the Energy Meter */
     EnergyEvseShutdown();             /* Free the EnergyEvse */
     DeviceEnergyManagementShutdown(); /* Free the DEM */
