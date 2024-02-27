@@ -257,6 +257,10 @@ template("_chip_build_time_zapgen") {
 #    ]
 #  }
 #
+# Guarantees a target named "${target_name}_generate" exists and contains all
+# generated files (this works even in the case of using a pre-generated directory
+# by using a copy target to import pre-generated data)
+#
 template("chip_codegen") {
   _name = target_name
 
@@ -371,6 +375,10 @@ template("chip_codegen") {
 #       # ... more to follow
 #    ]
 #  }
+#
+# Guarantees a target named "${target_name}_generate" exists and contains all
+# generated files (this works even in the case of using a pre-generated directory
+# by using a copy target to import pre-generated data)
 #
 template("chip_zapgen") {
   _name = target_name
