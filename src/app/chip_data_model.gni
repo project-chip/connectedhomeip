@@ -32,6 +32,26 @@ _app_root = get_path_info(".", "abspath")
 #
 # Forwards all the remaining variables to the source_set.
 #
+#
+#
+# Additional underlying source sets that will be provided
+#
+#   - ${name}-endpoint-metadata
+#     contains HEADERS that define endpoint metadata from zap/matter files:
+#        - zap-generated/gen_config.h
+#        - zap-generated/endpoint_config.h
+#        - zap-generated/access.h
+#        - PluginApplicationCallbacks.h
+#   - ${name}-callbacks
+#     contains the callback implementation for cluster init:
+#        - cluster-init-callback.cpp
+#        - callback-stub.cpp (contains __weak__ implementations. TODO: we should not be using
+#          weak linkage over time at all)
+#   - ${name}-command-dispatch:
+#     contains the implementation of `DispatchServerCommand` which forwards data to
+#     `emberAf....Cluster...Callback` callbacks
+#        - zap-generated/IMClusterCommandHandler.cpp
+#
 template("chip_data_model") {
   _data_model_name = target_name
 
@@ -84,6 +104,48 @@ template("chip_data_model") {
     deps += [
       ":${_data_model_name}_zapgen",
       "${chip_root}/src/app/common:cluster-objects",
+    ]
+  }
+
+  # Fixed source sets for allowing reasonable dependencies on things:
+  source_set("${_data_model_name}-endpoint-metadata") {
+    sources = [
+      "app/PluginApplicationCallbacks.h",
+      "zap-generated/access.h",
+      "zap-generated/endpoint_config.h",
+      "zap-generated/gen_config.h",
+    ]
+
+    deps = [
+      ":${_data_model_name}_codegen",
+      ":${_data_model_name}_zapgen",
+      "${chip_root}/src/lib/core:chip_config_header",
+    ]
+  }
+
+  source_set("${_data_model_name}-callbacks") {
+    sources = [
+      "app/callback-stub.cpp",
+      "app/cluster-init-callback.cpp",
+    ]
+    deps = [
+      ":${_data_model_name}_codegen",
+      "${chip_root}/src/protocols/interaction_model",
+      "${chip_root}/src/support:span",
+    ]
+  }
+
+  source_set("${_data_model_name}-command-dispatch") {
+    sources = [ "zap-generated/IMClusterCommandHandler.cpp" ]
+    deps = [
+      ":${_data_model_name}_codegen",
+      "${chip_root}/src/app",
+      "${chip_root}/src/app:interaction-model",
+      "${chip_root}/src/app/common:cluster-objects",
+      "${chip_root}/src/app/common:enums",
+      "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/core",
+      "${chip_root}/src/support",
     ]
   }
 
