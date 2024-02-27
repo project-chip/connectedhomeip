@@ -132,11 +132,14 @@ template("chip_data_model") {
       "${_zapgen_gen_dir}/zap-generated/gen_config.h",
     ]
 
-    deps = [
-      ":${_data_model_name}_codegen_codegen",
-      ":${_data_model_name}_zapgen_zap",
-      "${chip_root}/src/lib/core:chip_config_header",
-    ]
+    deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
+
+    if (chip_code_pre_generated_directory == "") {
+      deps += [
+        ":${_data_model_name}_codegen_generate",
+        ":${_data_model_name}_zapgen_generate",
+      ]
+    }
   }
 
   source_set("${_data_model_name}-callbacks") {
@@ -144,17 +147,21 @@ template("chip_data_model") {
       "${_codegen_gen_dir}/app/callback-stub.cpp",
       "${_codegen_gen_dir}/app/cluster-init-callback.cpp",
     ]
+
     deps = [
-      ":${_data_model_name}_codegen_codegen",
       "${chip_root}/src/lib/support:span",
       "${chip_root}/src/protocols/interaction_model",
     ]
+
+    if (chip_code_pre_generated_directory == "") {
+      deps += [ ":${_data_model_name}_codegen_generate" ]
+    }
   }
 
   source_set("${_data_model_name}-command-dispatch") {
     sources = [ "${_zapgen_gen_dir}/zap-generated/IMClusterCommandHandler.cpp" ]
+
     deps = [
-      ":${_data_model_name}_zapgen_zap",
       "${chip_root}/src/app",
       "${chip_root}/src/app:interaction-model",
       "${chip_root}/src/app/common:cluster-objects",
@@ -163,6 +170,10 @@ template("chip_data_model") {
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
     ]
+
+    if (chip_code_pre_generated_directory == "") {
+      deps += [ ":${_data_model_name}_zapgen_generate" ]
+    }
   }
 
   source_set(_data_model_name) {
