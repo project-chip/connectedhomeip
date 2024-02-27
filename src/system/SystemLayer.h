@@ -142,6 +142,9 @@ public:
      *   This method searches for the timer matching the provided parameters.
      *   and returns whether it is still "running" and waiting to trigger or not.
      *
+     *   @note This is used to verify by how long the ExtendTimer method extends the timer, as it may ignore an extension request
+     *        if it is shorter than the current timer's remaining time.
+     *
      *   @param[in]  onComplete         A pointer to the function called when timer expires.
      *   @param[in]  appState           A pointer to the application state object used when timer expires.
      *
@@ -149,6 +152,17 @@ public:
      *           with the corresponding appState context. False otherwise.
      */
     virtual bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) = 0;
+
+    /**
+     * @brief
+     *   This method searches for the timer matching the provided parameters
+     *   and returns the remaining time left before it expires.
+     *   @param[in]  onComplete         A pointer to the function called when timer expires.
+     *   @param[in]  appState           A pointer to the application state object used when timer expires.
+     *
+     *  @return The remaining time left before the timer expires.
+     */
+    virtual Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) = 0;
 
     /**
      * @brief This method cancels a one-shot timer, started earlier through @p StartTimer().  This method must

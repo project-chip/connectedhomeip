@@ -154,20 +154,18 @@ MTR_DIRECT_MEMBERS
         return NO;
     }
 
-    if (serverCluster.parentEndpoint != kInvalidEndpointId) {
-        MTR_LOG_ERROR("Cannot add cluster to endpoint %llu; already added to endpoint %" PRIu32, _endpointID.unsignedLongLongValue, serverCluster.parentEndpoint);
-        return NO;
-    }
-
     for (MTRServerCluster * existingCluster in _serverClusters) {
         if ([existingCluster.clusterID isEqual:serverCluster.clusterID]) {
-            MTR_LOG_ERROR("Cannot add second cluster with ID %llx on endpoint %llu", serverCluster.clusterID.unsignedLongLongValue, _endpointID.unsignedLongLongValue);
+            MTR_LOG_ERROR("Cannot add second cluster with ID " ChipLogFormatMEI " on endpoint %llu", ChipLogValueMEI(serverCluster.clusterID.unsignedLongLongValue), _endpointID.unsignedLongLongValue);
             return NO;
         }
     }
 
+    if (![serverCluster addToEndpoint:static_cast<EndpointId>(_endpointID.unsignedLongLongValue)]) {
+        return NO;
+    }
     [_serverClusters addObject:serverCluster];
-    serverCluster.parentEndpoint = static_cast<EndpointId>(_endpointID.unsignedLongLongValue);
+
     return YES;
 }
 
@@ -401,7 +399,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     NSMutableArray<MTRAccessGrant *> * grants = [[_matterAccessGrants allObjects] mutableCopy];
     for (MTRServerCluster * cluster in _serverClusters) {
         if ([cluster.clusterID isEqual:clusterID]) {
-            [grants addObjectsFromArray:[cluster.matterAccessGrants allObjects]];
+            [grants addObjectsFromArray:cluster.matterAccessGrants];
         }
     }
 

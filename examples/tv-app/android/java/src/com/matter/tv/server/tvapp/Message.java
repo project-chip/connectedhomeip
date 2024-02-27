@@ -23,7 +23,7 @@ public class Message {
   public int priority;
   public int messageControl;
   public long startTime;
-  public int duration;
+  public long duration;
   public String messageText;
   public MessageResponseOption responseOptions[];
 
@@ -32,7 +32,7 @@ public class Message {
       int priority,
       int messageControl,
       long startTime,
-      int duration,
+      long duration,
       String messageText,
       MessageResponseOption responseOptions[]) {
     this.messageId = messageId;

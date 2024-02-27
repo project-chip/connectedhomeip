@@ -17,8 +17,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("network-manager-common") {
   zap_file = "network-manager-app.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/network-manager-app/zap-generated"
   is_server = true
 }

@@ -29,7 +29,7 @@ class MessagesClusterMessageStruct(
   val priority: UInt,
   val messageControl: UInt,
   val startTime: ULong?,
-  val duration: UInt?,
+  val duration: ULong?,
   val messageText: String,
   val responses: Optional<List<MessagesClusterMessageResponseOptionStruct>>
 ) {
@@ -97,7 +97,7 @@ class MessagesClusterMessageStruct(
         }
       val duration =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_DURATION))
+          tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_DURATION))
           null

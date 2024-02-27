@@ -28,7 +28,7 @@ CHIP_ERROR DownloadLogCommand::RunCommand()
     ChipLogProgress(chipTool, "Downloading logs from node 0x" ChipLogFormatX64, ChipLogValueX64(mNodeId));
 
     MTRDeviceController * commissioner = CurrentCommissioner();
-    auto * device = [MTRDevice deviceWithNodeID:@(mNodeId) controller:commissioner];
+    auto * device = [MTRBaseDevice deviceWithNodeID:@(mNodeId) controller:commissioner];
 
     auto logType = static_cast<MTRDiagnosticLogType>(mLogType);
     auto queue = dispatch_queue_create("com.chip.bdx.downloader", DISPATCH_QUEUE_SERIAL);

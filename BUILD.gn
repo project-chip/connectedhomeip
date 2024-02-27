@@ -182,7 +182,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps += [
         "${chip_root}/src/app/server/java",
         "${chip_root}/src/controller/java",
+        "${chip_root}/src/controller/java:jsontlv",
         "${chip_root}/src/controller/java:onboarding_payload",
+        "${chip_root}/src/controller/java:tlv",
         "${chip_root}/src/platform/android:java",
       ]
     }

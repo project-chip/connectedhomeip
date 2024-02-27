@@ -23,9 +23,6 @@ config("config") {
 chip_data_model("log-source-common") {
   zap_file = "log-source-app.zap"
 
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/log-source-app/zap-generated"
-
   deps = [ "${chip_root}/src/protocols/bdx" ]
 
   is_server = true

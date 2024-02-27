@@ -4314,6 +4314,7 @@ public:
     IcdManagementStayActiveRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("stay-active-request", credsIssuerConfig)
     {
+        AddArgument("StayActiveDuration", 0, UINT32_MAX, &mRequest.stayActiveDuration);
         ClusterCommand::AddArguments();
     }
 
@@ -6837,7 +6838,7 @@ public:
         AddArgument("Priority", 0, UINT8_MAX, &mRequest.priority);
         AddArgument("MessageControl", 0, UINT8_MAX, &mRequest.messageControl);
         AddArgument("StartTime", 0, UINT32_MAX, &mRequest.startTime);
-        AddArgument("Duration", 0, UINT16_MAX, &mRequest.duration);
+        AddArgument("Duration", 0, UINT64_MAX, &mRequest.duration);
         AddArgument("MessageText", &mRequest.messageText);
         AddArgument("Responses", &mComplex_Responses, "", Argument::kOptional);
         ClusterCommand::AddArguments();

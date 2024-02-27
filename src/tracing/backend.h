@@ -64,13 +64,13 @@ public:
     virtual void TraceInstant(const char * label, const char * group) {}
 
     virtual void TraceCounter(const char * label) {}
-    virtual void TraceMetric(const char * label, int32_t value) {}
     virtual void LogMessageSend(MessageSendInfo &) { TraceInstant("MessageSent", "Messaging"); }
     virtual void LogMessageReceived(MessageReceivedInfo &) { TraceInstant("MessageReceived", "Messaging"); }
 
     virtual void LogNodeLookup(NodeLookupInfo &) { TraceInstant("Lookup", "DNSSD"); }
     virtual void LogNodeDiscovered(NodeDiscoveredInfo &) { TraceInstant("Node Discovered", "DNSSD"); }
     virtual void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) { TraceInstant("Discovery Failed", "DNSSD"); }
+    virtual void LogMetricEvent(const MetricEvent &) { TraceInstant("Metric Event", "Metric"); }
 };
 
 } // namespace Tracing

@@ -39,6 +39,7 @@
 #import "MTRFabricInfo_Internal.h"
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricsCollector.h"
 #import "MTROTAProviderDelegateBridge.h"
 #import "MTROperationalBrowser.h"
 #import "MTRP256KeypairBridge.h"
@@ -349,6 +350,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     }
 
     _diagnosticLogsDownloader = nil;
+
+    ShutdownMetricsCollection();
 }
 
 - (CHIP_ERROR)_initFabricTable:(FabricTable &)fabricTable
@@ -413,6 +416,10 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         MTR_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
         return YES;
     }
+
+    // Register any tracing backends. This has to be done before starting the event loop to run registering
+    // the tracing backend in the right queue context
+    StartupMetricsCollection();
 
     DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 

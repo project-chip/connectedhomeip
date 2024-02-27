@@ -9794,6 +9794,7 @@ namespace StayActiveRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStayActiveDuration), stayActiveDuration);
     return encoder.Finalize();
 }
 
@@ -9807,6 +9808,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStayActiveDuration))
+        {
+            err = DataModel::Decode(reader, stayActiveDuration);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StayActiveRequest.

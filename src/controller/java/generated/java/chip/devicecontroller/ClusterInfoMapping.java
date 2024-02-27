@@ -23352,10 +23352,16 @@ public class ClusterInfoMapping {
     icdManagementClusterInteractionInfoMap.put("unregisterClient", icdManagementunregisterClientInteractionInfo);
 
     Map<String, CommandParameterInfo> icdManagementstayActiveRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo icdManagementstayActiveRequeststayActiveDurationCommandParameterInfo = new CommandParameterInfo("stayActiveDuration", Long.class, Long.class);
+    icdManagementstayActiveRequestCommandParams.put("stayActiveDuration",icdManagementstayActiveRequeststayActiveDurationCommandParameterInfo);
     InteractionInfo icdManagementstayActiveRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.IcdManagementCluster) cluster)
           .stayActiveRequest((ChipClusters.IcdManagementCluster.StayActiveResponseCallback) callback
+           , (Long)
+             commandArguments.get("stayActiveDuration")
+
             );
         },
         () -> new DelegatedIcdManagementClusterStayActiveResponseCallback(),
@@ -24325,7 +24331,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo messagespresentMessagesRequeststartTimeCommandParameterInfo = new CommandParameterInfo("startTime", Long.class, Long.class);
     messagespresentMessagesRequestCommandParams.put("startTime",messagespresentMessagesRequeststartTimeCommandParameterInfo);
 
-    CommandParameterInfo messagespresentMessagesRequestdurationCommandParameterInfo = new CommandParameterInfo("duration", Integer.class, Integer.class);
+    CommandParameterInfo messagespresentMessagesRequestdurationCommandParameterInfo = new CommandParameterInfo("duration", Long.class, Long.class);
     messagespresentMessagesRequestCommandParams.put("duration",messagespresentMessagesRequestdurationCommandParameterInfo);
 
     CommandParameterInfo messagespresentMessagesRequestmessageTextCommandParameterInfo = new CommandParameterInfo("messageText", String.class, String.class);
@@ -24343,7 +24349,7 @@ public class ClusterInfoMapping {
         commandArguments.get("messageControl")
         , (Long)
         commandArguments.get("startTime")
-        , (Integer)
+        , (Long)
         commandArguments.get("duration")
         , (String)
         commandArguments.get("messageText")

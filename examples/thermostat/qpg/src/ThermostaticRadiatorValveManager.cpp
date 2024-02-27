@@ -23,7 +23,7 @@
 
 #include "AppConfig.h"
 #include "AppTask.h"
-#include "app/util/common.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/logging/CHIPLogging.h>
 

@@ -442,8 +442,6 @@ android_library("java") {
   deps = [
     ":chipcluster",
     ":chipclusterID",
-    ":jsontlv",
-    ":tlv",
     "${chip_root}/third_party/java_deps:annotation",
   ]
 

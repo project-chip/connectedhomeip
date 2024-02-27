@@ -45,7 +45,6 @@ void TestUnescaping(nlTestSuite * inSuite, void * inContext)
     // Test valid cases
     NL_TEST_ASSERT(inSuite, UnescapeKey("") == "");
     NL_TEST_ASSERT(inSuite, UnescapeKey("abcd1234,!") == "abcd1234,!");
-    std::string out = UnescapeKey("abcd1234,!");
     NL_TEST_ASSERT(inSuite, UnescapeKey("ab\\x0acd\\x20\\x3d12\\x5c34\\x7f") == "ab\ncd =12\\34\x7f");
     NL_TEST_ASSERT(inSuite, UnescapeKey("\\x20") == " ");
     NL_TEST_ASSERT(inSuite, UnescapeKey("\\x3d\\x3d\\x3d") == "===");

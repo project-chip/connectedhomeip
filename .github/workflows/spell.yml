@@ -25,19 +25,20 @@ on:
             - ".github/.wordlist.txt"
 
 jobs:
-    check-reviewdog:
-        name: Check Spelling - reviewdog
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - uses: reviewdog/action-misspell@v1
-              with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
+#    Seems redundant; removed as pyspelling is customized while this is not
+#    check-reviewdog:
+#        name: Check Spelling - reviewdog
+#        runs-on: ubuntu-latest
+#        steps:
+#            - name: Checkout
+#              uses: actions/checkout@v4
+#            - uses: reviewdog/action-misspell@v1
+#              with:
+#                  github_token: ${{ secrets.GITHUB_TOKEN }}
     check-spellcheck:
         name: Check Spelling - pyspelling
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - uses: igsekor/pyspelling-any@v1.0.4
+            - uses: rojopolis/spellcheck-github-actions@0.36.0

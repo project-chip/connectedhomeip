@@ -49,7 +49,7 @@
 
 - (void)test001_TestAllKeys
 {
-    MTRMetrics * metrics = [MTRMetrics new];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:4];
     [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
     [metrics setValue:@"metricsCounter2" forKey:@"com.matter.metrics.counter2"];
     [metrics setValue:@"metricsCounter3" forKey:@"com.matter.metrics.counter3"];
@@ -65,7 +65,7 @@
 }
 - (void)test002_TestOneKey
 {
-    MTRMetrics * metrics = [MTRMetrics new];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:1];
     [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
 
     NSArray<NSString *> * keys = [metrics allKeys];
@@ -75,7 +75,7 @@
 
 - (void)test003_TestMultipleKeys
 {
-    MTRMetrics * metrics = [MTRMetrics new];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:3];
     [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
     [metrics setValue:@"metricsCounter2" forKey:@"com.matter.metrics.counter2"];
     [metrics setValue:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil] forKey:@"com.matter.metrics.counter3"];
@@ -90,7 +90,7 @@
 
 - (void)test004_TestValueForKey
 {
-    MTRMetrics * metrics = [MTRMetrics new];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:1];
     [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
 
     XCTAssertEqualObjects([metrics valueForKey:@"com.matter.metrics.counter1"], @"metricsCounter1");
@@ -98,7 +98,7 @@
 
 - (void)test005_TestMultipleValueForKeys
 {
-    MTRMetrics * metrics = [MTRMetrics new];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:3];
     [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
     [metrics setValue:@"metricsCounter2" forKey:@"com.matter.metrics.counter2"];
     [metrics setValue:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil] forKey:@"com.matter.metrics.counter3"];
@@ -110,7 +110,7 @@
 
 - (void)test006_TestValueRemoval
 {
-    MTRMetrics * metrics = [MTRMetrics new];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:2];
     [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
     [metrics setValue:@"metricsCounter2" forKey:@"com.matter.metrics.counter2"];
 

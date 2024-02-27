@@ -28,7 +28,5 @@ chip_data_model("zap") {
     zap_file = "thermostat_matter_thread.zap"
   }
 
-  # Defining zap_pregenerated_dir is required by chip_data_model.gni in order to build IMClusterCommandHandler.cpp
-  zap_pregenerated_dir = ""
   is_server = true
 }

@@ -68,8 +68,6 @@ public:
                      const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-    chip::Protocols::InteractionModel::Status StayActiveRequest(chip::FabricIndex fabricIndex);
-
 private:
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     /**

@@ -20,6 +20,7 @@
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -182,6 +183,15 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
                                clusterId:(NSNumber * _Nullable)clusterId
                              attributeId:(NSNumber * _Nullable)attributeId
                               completion:(MTRValuesHandler)completion;
+
+/**
+ * Requests downloading some logs
+ */
+- (void)downloadLogWithController:(id _Nullable)controller
+                           nodeId:(uint64_t)nodeId
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                       completion:(void (^)(NSString * _Nullable url, NSError * _Nullable error))completion;
 
 @end
 

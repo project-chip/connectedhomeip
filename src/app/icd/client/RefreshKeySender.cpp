@@ -19,6 +19,7 @@
 #include "CheckInDelegate.h"
 #include "controller/InvokeInteraction.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AppConfig.h>
 #include <app/CommandPathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
@@ -28,10 +29,11 @@ namespace chip {
 namespace app {
 
 RefreshKeySender::RefreshKeySender(CheckInDelegate * checkInDelegate, const ICDClientInfo & icdClientInfo,
-                                   ICDClientStorage * icdClientStorage, const RefreshKeyBuffer & refreshKeyBuffer) :
-    mICDClientInfo(icdClientInfo),
-    mpICDClientStorage(icdClientStorage), mpCheckInDelegate(checkInDelegate), mOnConnectedCallback(HandleDeviceConnected, this),
-    mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+                                   ICDClientStorage * icdClientStorage, InteractionModelEngine * engine,
+                                   const RefreshKeyBuffer & refreshKeyBuffer) :
+    mpCheckInDelegate(checkInDelegate),
+    mICDClientInfo(icdClientInfo), mpICDClientStorage(icdClientStorage), mpImEngine(engine),
+    mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 
 {
     mNewKey = refreshKeyBuffer;
@@ -64,6 +66,9 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
         }
 
         mpCheckInDelegate->OnCheckInComplete(mICDClientInfo);
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+        mpImEngine->OnActiveModeNotification(mICDClientInfo.peer_node);
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
         mpCheckInDelegate->OnKeyRefreshDone(this, CHIP_NO_ERROR);
     };
 

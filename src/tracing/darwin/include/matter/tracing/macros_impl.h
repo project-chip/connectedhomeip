@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,18 +15,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-/**
- * CHIP_DEVICE_DATA_MODEL_REVISION
- *
- * A monotonic number identifying the revision number of the Data Model against
- * which the Node is certified.
- *
- * See section 7.1.1. "Revision History" in the "Data Model Specification"
- * chapter of the core Matter specification.
- */
-#ifndef CHIP_DEVICE_DATA_MODEL_REVISION
-#define CHIP_DEVICE_DATA_MODEL_REVISION 17
+/* Ensure we do not have double tracing macros defined */
+#if defined(MATTER_TRACE_BEGIN)
+#error "Tracing macros seem to be double defined"
 #endif
+
+#include <platform/Darwin/Tracing.h>

@@ -27,6 +27,8 @@
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <system/SystemLayer.h>
 
+#include "Types.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -105,8 +107,8 @@ private:
     /// so that it can be re-discovered if it's still advertising.
     void RemoveDevice(BluezDevice1 & device);
 
-    GDBusObjectManager * mManager         = nullptr;
-    BluezAdapter1 * mAdapter              = nullptr;
+    GDBusObjectManager * mManager = nullptr;
+    GAutoPtr<BluezAdapter1> mAdapter;
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;

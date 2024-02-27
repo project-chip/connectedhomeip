@@ -58,7 +58,7 @@ limitations under the License.
     <item fieldId="1" name="Priority" type="MessagePriorityEnum" optional="false"/>
     <item fieldId="2" name="MessageControl" type="MessageControlBitmap" default="0" optional="false"/>
     <item fieldId="3" name="StartTime" type="epoch_s" default="0" optional="false" isNullable="true"/>
-    <item fieldId="4" name="Duration" type="int16u" default="0" optional="false" isNullable="true"/>
+    <item fieldId="4" name="Duration" type="int64u" default="0" optional="false" isNullable="true"/>
     <item fieldId="5" name="MessageText" type="char_string" length="256" optional="false"/>
     <item fieldId="6" name="Responses" type="MessageResponseOptionStruct" array="true" length="4" optional="true"/>
   </struct>
@@ -88,7 +88,7 @@ limitations under the License.
       <arg name="Priority" type="MessagePriorityEnum" optional="false"/>
       <arg name="MessageControl" type="MessageControlBitmap" default="0" optional="false"/>
       <arg name="StartTime" type="epoch_s" default="0" optional="false" isNullable="true"/>
-      <arg name="Duration" type="int16u" default="0" optional="false" isNullable="true"/>
+      <arg name="Duration" type="int64u" default="0" optional="false" isNullable="true"/>
       <arg name="MessageText" type="char_string" length="256" optional="false"/>
       <arg name="Responses" type="MessageResponseOptionStruct" array="true" length="4" optional="true"/>
     </command>

@@ -123,8 +123,9 @@ tests:
           Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
           OR
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
-          ->For T0 and 30s we have to get advertisement range between 20ms to 60ms
-          ->For 30s and 15mins we have to get advertisement range between 150ms to 1200ms
+          ->Between [0 .. 30s[ expect advertisement range between 20ms to 60ms.
+          ->Between [30s .. 900s[ expect advertisement range between 150ms to 1285ms. Allow +/- 10ms margin on the measured value.
+          ->Starting at 900s expect advertisement range larger or equal to 1200ms.
       disabled: true
 
     - label: "Step 6: TH does not respond to DUT. User power cycles the DUT"

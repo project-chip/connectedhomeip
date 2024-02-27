@@ -7130,7 +7130,7 @@ public static class MessagesClusterMessageStruct {
   public Integer priority;
   public Integer messageControl;
   public @Nullable Long startTime;
-  public @Nullable Integer duration;
+  public @Nullable Long duration;
   public String messageText;
   public Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses;
   private static final long MESSAGE_I_D_ID = 0L;
@@ -7146,7 +7146,7 @@ public static class MessagesClusterMessageStruct {
     Integer priority,
     Integer messageControl,
     @Nullable Long startTime,
-    @Nullable Integer duration,
+    @Nullable Long duration,
     String messageText,
     Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses
   ) {
@@ -7180,7 +7180,7 @@ public static class MessagesClusterMessageStruct {
     Integer priority = null;
     Integer messageControl = null;
     @Nullable Long startTime = null;
-    @Nullable Integer duration = null;
+    @Nullable Long duration = null;
     String messageText = null;
     Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -7207,7 +7207,7 @@ public static class MessagesClusterMessageStruct {
       } else if (element.contextTagNum() == DURATION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          duration = castingValue.value(Integer.class);
+          duration = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == MESSAGE_TEXT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {

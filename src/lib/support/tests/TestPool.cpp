@@ -234,25 +234,54 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
         objIds.insert(i);
     }
 
+    // Default constructor of an iterator should be pointing to the pool end.
+    {
+        typename ObjectPoolIterator<S, P>::Type defaultIterator;
+        NL_TEST_ASSERT(inSuite, defaultIterator == pool.end());
+    }
+
     // Verify that iteration visits all objects.
     size_t count = 0;
-    size_t sum   = 0;
-    pool.ForEachActiveObject([&](S * object) {
-        NL_TEST_ASSERT(inSuite, object != nullptr);
-        if (object == nullptr)
-        {
-            // NL_TEST_ASSERT doesn't stop running the test and we want to avoid nullptr dereference.
+    {
+        size_t sum = 0;
+        pool.ForEachActiveObject([&](S * object) {
+            NL_TEST_ASSERT(inSuite, object != nullptr);
+            if (object == nullptr)
+            {
+                // NL_TEST_ASSERT doesn't stop running the test and we want to avoid nullptr dereference.
+                return Loop::Continue;
+            }
+            NL_TEST_ASSERT(inSuite, objIds.count(object->mId) == 1);
+            objIds.erase(object->mId);
+            ++count;
+            sum += object->mId;
             return Loop::Continue;
+        });
+        NL_TEST_ASSERT(inSuite, count == kSize);
+        NL_TEST_ASSERT(inSuite, sum == kSize * (kSize - 1) / 2);
+        NL_TEST_ASSERT(inSuite, objIds.size() == 0);
+    }
+
+    // Test begin/end iteration
+    {
+        // re-create the above test environment, this time using iterators
+        for (size_t i = 0; i < kSize; ++i)
+        {
+            objIds.insert(i);
         }
-        NL_TEST_ASSERT(inSuite, objIds.count(object->mId) == 1);
-        objIds.erase(object->mId);
-        ++count;
-        sum += object->mId;
-        return Loop::Continue;
-    });
-    NL_TEST_ASSERT(inSuite, count == kSize);
-    NL_TEST_ASSERT(inSuite, sum == kSize * (kSize - 1) / 2);
-    NL_TEST_ASSERT(inSuite, objIds.size() == 0);
+        count      = 0;
+        size_t sum = 0;
+        for (auto v = pool.begin(); v != pool.end(); ++v)
+        {
+            NL_TEST_ASSERT(inSuite, objIds.count((*v)->mId) == 1);
+            objIds.erase((*v)->mId);
+            ++count;
+            sum += (*v)->mId;
+        }
+        NL_TEST_ASSERT(inSuite, count == kSize);
+        NL_TEST_ASSERT(inSuite, sum == kSize * (kSize - 1) / 2);
+        NL_TEST_ASSERT(inSuite, objIds.size() == 0);
+    }
 
     // Verify that returning Loop::Break stops iterating.
     count = 0;
@@ -284,6 +313,42 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
     });
     NL_TEST_ASSERT(inSuite, count == (kSize - 1) * kSize / 2);
     NL_TEST_ASSERT(inSuite, objIds.size() == 0);
+
+    // Verify that iteration can be nested for iterator types
+    {
+        count = 0;
+        for (auto v : pool)
+        {
+            objIds.insert(v->mId);
+            if (++count == kSize / 2)
+            {
+                break;
+            }
+        }
+
+        count = 0;
+        for (auto outer : pool)
+        {
+            if (objIds.count(outer->mId) != 1)
+            {
+                continue;
+            }
+
+            for (auto inner : pool)
+            {
+                if (inner == outer)
+                {
+                    objIds.erase(inner->mId);
+                }
+                else
+                {
+                    ++count;
+                }
+            }
+        }
+        NL_TEST_ASSERT(inSuite, count == (kSize - 1) * kSize / 2);
+        NL_TEST_ASSERT(inSuite, objIds.size() == 0);
+    }
 
     count = 0;
     pool.ForEachActiveObject([&](S * object) {
@@ -333,6 +398,68 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
     }
     NL_TEST_ASSERT(inSuite, count >= kSize / 2);
     NL_TEST_ASSERT(inSuite, count <= kSize);
+
+    // Test begin/end iteration
+    {
+        count = 0;
+        for (auto object : pool)
+        {
+            ++count;
+            if ((object->mId % 2) == 0)
+            {
+                objArray[object->mId] = nullptr;
+                // NOTE: this explicitly tests if pool supports releasing while iterating
+                //       this MUST be supported by contract of Pool iterators
+                pool.ReleaseObject(object);
+            }
+            else
+            {
+                objIds.insert(object->mId);
+            }
+        }
+        NL_TEST_ASSERT(inSuite, count == kSize);
+        NL_TEST_ASSERT(inSuite, objIds.size() == kSize / 2);
+
+        // validate we iterate only over active objects
+        for (auto object : pool)
+        {
+            NL_TEST_ASSERT(inSuite, (object->mId % 2) == 1);
+        }
+
+        for (size_t i = 0; i < kSize; ++i)
+        {
+            if ((i % 2) == 0)
+            {
+                NL_TEST_ASSERT(inSuite, objArray[i] == nullptr);
+            }
+            else
+            {
+                NL_TEST_ASSERT(inSuite, objArray[i] != nullptr);
+                NL_TEST_ASSERT(inSuite, objArray[i]->mId == i);
+            }
+        }
+
+        count = 0;
+        for (auto object : pool)
+        {
+            ++count;
+            if ((object->mId % 2) != 1)
+            {
+                continue;
+            }
+            size_t id = object->mId - 1;
+            NL_TEST_ASSERT(inSuite, objArray[id] == nullptr);
+            objArray[id] = pool.CreateObject(id);
+            NL_TEST_ASSERT(inSuite, objArray[id] != nullptr);
+        }
+        for (size_t i = 0; i < kSize; ++i)
+        {
+            NL_TEST_ASSERT(inSuite, objArray[i] != nullptr);
+            NL_TEST_ASSERT(inSuite, objArray[i]->mId == i);
+        }
+        NL_TEST_ASSERT(inSuite, count >= kSize / 2);
+        NL_TEST_ASSERT(inSuite, count <= kSize);
+    }
 
     pool.ReleaseAll();
 }

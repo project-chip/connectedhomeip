@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <app/CASESessionManager.h>
 #include <app/OperationalSessionSetup.h>
 #include <lib/support/Pool.h>
 #include <transport/Session.h>

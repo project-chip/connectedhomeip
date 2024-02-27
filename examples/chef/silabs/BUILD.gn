@@ -48,8 +48,6 @@ declare_args() {
 
 chip_data_model("chef-common") {
   zap_file = "${chef_project_dir}/devices/${sample_name}.zap"
-
-  zap_pregenerated_dir = "${chef_project_dir}/out/${sample_name}/zap-generated/"
   is_server = true
 }
 

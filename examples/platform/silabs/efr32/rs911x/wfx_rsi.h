@@ -92,7 +92,11 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
 #if SL_ICD_ENABLED
+#if SLI_SI917
+int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
+#else
 int32_t wfx_rsi_power_save();
+#endif /* SLI_SI917 */
 #endif /* SL_ICD_ENABLED */
 
 #ifdef __cplusplus

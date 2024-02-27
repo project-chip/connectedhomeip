@@ -74,7 +74,7 @@ public:
     CHIP_ERROR Init(bool aIsCentral, const char * apBleAddr);
     void Shutdown();
 
-    BluezAdapter1 * GetAdapter() const { return mpAdapter; }
+    BluezAdapter1 * GetAdapter() const { return mAdapter.get(); }
 
     CHIP_ERROR RegisterGattApplication();
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mpRoot; }
@@ -127,7 +127,7 @@ private:
 
     // Objects (interfaces) subscribed to by this service
     GDBusObjectManager * mpObjMgr = nullptr;
-    BluezAdapter1 * mpAdapter     = nullptr;
+    GAutoPtr<BluezAdapter1> mAdapter;
 
     // Objects (interfaces) published by this service
     GDBusObjectManagerServer * mpRoot = nullptr;
