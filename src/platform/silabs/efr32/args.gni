@@ -32,7 +32,6 @@ if (chip_crypto == "") {
 }
 
 chip_device_platform = "efr32"
-
 #Net work configuration OpenThread
 lwip_platform = "silabs"
 chip_mdns = "platform"
@@ -42,6 +41,7 @@ chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false
 
 chip_build_tests = false
+chip_enable_multi_ota_requestor = false
 
 # Transitional CommissionableDataProvider not used anymore
 # examples/platform/silabs/efr32/SilabsDeviceDataProvider is now used.
