@@ -115,7 +115,6 @@ class MyCommissionerCallback : public CommissionerCallback
 AutoCommissioner gAutoCommissioner;
 
 DeviceCommissioner gCommissioner;
-CommissionerDiscoveryController gCommissionerDiscoveryController;
 MyCommissionerCallback gCommissionerCallback;
 MyServerStorageDelegate gServerStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
@@ -211,8 +210,8 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     ReturnLogErrorOnFailure(
         chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, fabricIndex, defaultIpk, compressedFabricIdSpan));
 
-    gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
-    gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
+    GetCommissionerDiscoveryController()->SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
+    GetCommissionerDiscoveryController()->SetCommissionerCallback(&gCommissionerCallback);
 
     // advertise operational since we are an admin
     app::DnssdServer::Instance().AdvertiseOperational();
@@ -439,11 +438,6 @@ CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index)
 DeviceCommissioner * GetDeviceCommissioner()
 {
     return &gCommissioner;
-}
-
-CommissionerDiscoveryController * GetCommissionerDiscoveryController()
-{
-    return &gCommissionerDiscoveryController;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

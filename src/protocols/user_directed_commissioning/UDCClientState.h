@@ -59,6 +59,8 @@ struct TargetAppInfo
     uint16_t vendorId  = 0;
     uint16_t productId = 0;
     TargetAppCheckState checkState = TargetAppCheckState::kNotInitialized;
+    uint32_t passcode              = 0;
+    bool foundApp                  = false;
 };
 
 /**

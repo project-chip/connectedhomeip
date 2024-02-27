@@ -34,6 +34,29 @@
 using namespace ::chip;
 using namespace chip::Protocols::UserDirectedCommissioning;
 
+// keep a separate timer thread for blocking calls that should not block the main chip thread
+// chip::System::LayerImpl gExternalWorkerLayer;
+// bool gInited = false;
+
+chip::System::Layer * GetExternalWorkerLayer()
+{
+    // if (!gInited)
+    // {
+    //     gExternalWorkerLayer.SetDispatchQueue(chip::DeviceLayer::PlatformMgr().GetWorkQueue());
+    //     gExternalWorkerLayer.Init();
+    //     gInited = true;
+    // }
+    // return &gExternalWorkerLayer;
+    return &DeviceLayer::SystemLayer();
+}
+
+CommissionerDiscoveryController gCommissionerDiscoveryController;
+
+CommissionerDiscoveryController * GetCommissionerDiscoveryController()
+{
+    return &gCommissionerDiscoveryController;
+}
+
 void CommissionerDiscoveryController::ResetState()
 {
     mCurrentInstance[0] = '\0';
@@ -43,8 +66,28 @@ void CommissionerDiscoveryController::ResetState()
     mReady              = true;
 }
 
+void CommissionerDiscoveryController::CheckValidSession()
+{
+    if (mReady)
+    {
+        return;
+    }
+    if (mUdcServer != nullptr)
+    {
+        UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+        if (client != nullptr)
+        {
+            // everything looks good
+            return;
+        }
+    }
+    ResetState();
+}
+
 void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClientState state)
 {
+    CheckValidSession();
+
     if (!mReady)
     {
         ChipLogDetail(Controller, "CommissionerDiscoveryController not ready. Current instance=%s", mCurrentInstance);
@@ -110,9 +153,56 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     ChipLogDetail(Controller, "------Via Shell Enter: controller ux ok|cancel");
 }
 
+/// Callback for getting execution into the main chip thread
+void CallbackOk(System::Layer * aSystemLayer, void * aAppState)
+{
+    ChipLogError(AppServer, "UX Ok: now on main thread");
+    GetCommissionerDiscoveryController()->InternalOk();
+}
+
+/// Callback for getting execution out of the main chip thread
+void CallbackExternalWorkerOk(System::Layer * aSystemLayer, void * aAppState)
+{
+    ChipLogError(AppServer, "UX Ok: out of main thread");
+
+    UDCClientState * client = static_cast<UDCClientState *>(aAppState);
+
+    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+    Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
+                                        sizeof(rotatingIdString));
+    CharSpan rotatingIdSpan = chip::CharSpan(rotatingIdString, sizeof(rotatingIdString));
+
+    uint8_t targetAppCount = client->GetNumTargetAppInfos();
+    if (targetAppCount > 0)
+    {
+        for (uint8_t i = 0; i < targetAppCount; i++)
+        {
+            TargetAppInfo info;
+            if (client->GetTargetAppInfo(i, info))
+            {
+                GetCommissionerDiscoveryController()->GetPasscodeService()->LookupTargetContentApp(
+                    client->GetVendorId(), client->GetProductId(), rotatingIdSpan, info);
+            }
+        }
+        return;
+    }
+
+    GetCommissionerDiscoveryController()->GetPasscodeService()->FetchCommissionPasscodeFromContentApp(
+        client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
+}
+
 void CommissionerDiscoveryController::Ok()
 {
-    chip::DeviceLayer::StackLock lock;
+    ChipLogError(AppServer, "UX Ok: moving to main thread");
+    // need to ensure callback is on main chip thread
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackOk, nullptr);
+}
+
+void CommissionerDiscoveryController::InternalOk()
+{
+    ChipLogError(AppServer, "UX InternalOk");
+
+    CheckValidSession();
 
     if (!mPendingConsent)
     {
@@ -143,32 +233,33 @@ void CommissionerDiscoveryController::Ok()
         return;
     }
 
-    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-    Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
-                                        sizeof(rotatingIdString));
-    CharSpan rotatingIdSpan = chip::CharSpan(rotatingIdString, sizeof(rotatingIdString));
+    ChipLogError(AppServer, "UX Ok: moving out of main thread");
 
-    uint8_t targetAppCount = client->GetNumTargetAppInfos();
-    if (targetAppCount > 0)
-    {
-        for (uint8_t i = 0; i < targetAppCount; i++)
-        {
-            TargetAppInfo info;
-            if (client->GetTargetAppInfo(i, info))
-            {
-                mPasscodeService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan, info);
-            }
-        }
-        return;
-    }
+    // spawn external blocking work out of main chip thread
+    GetExternalWorkerLayer()->StartTimer(System::Clock::Seconds32(0), CallbackExternalWorkerOk, static_cast<void *>(client));
 
-    mPasscodeService->FetchCommissionPasscodeFromContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
-    return;
+    ChipLogError(AppServer, "UX Ok: done moving out of main thread");
+}
+
+/// Callback for getting execution into the main chip thread
+void CallbackHandleTargetContentAppCheck(System::Layer * aSystemLayer, void * aAppState)
+{
+    TargetAppInfo * target = static_cast<TargetAppInfo *>(aAppState);
+    GetCommissionerDiscoveryController()->InternalHandleTargetContentAppCheck(*target, target->passcode);
+    delete target;
 }
 
 void CommissionerDiscoveryController::HandleTargetContentAppCheck(TargetAppInfo target, uint32_t passcode)
 {
-    chip::DeviceLayer::StackLock lock;
+    // need to ensure callback is on main chip thread
+    target.passcode      = passcode;
+    TargetAppInfo * info = new TargetAppInfo(target);
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackHandleTargetContentAppCheck, info);
+}
+
+void CommissionerDiscoveryController::InternalHandleTargetContentAppCheck(TargetAppInfo target, uint32_t passcode)
+{
+    CheckValidSession();
 
     bool foundTargetApp      = false;
     bool foundPendingTargets = false;
@@ -261,9 +352,24 @@ void CommissionerDiscoveryController::HandleTargetContentAppCheck(TargetAppInfo 
     return;
 }
 
+/// Callback for getting execution into the main chip thread
+void CallbackHandleContentAppPasscodeResponse(System::Layer * aSystemLayer, void * aAppState)
+{
+    uint32_t * tmpPasscode = static_cast<uint32_t *>(aAppState);
+    GetCommissionerDiscoveryController()->InternalHandleContentAppPasscodeResponse(*tmpPasscode);
+    delete tmpPasscode;
+}
+
 void CommissionerDiscoveryController::HandleContentAppPasscodeResponse(uint32_t passcode)
 {
-    chip::DeviceLayer::StackLock lock;
+    uint32_t * tmpPasscode = new uint32_t(passcode);
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackHandleContentAppPasscodeResponse,
+                                          static_cast<void *>(tmpPasscode));
+}
+
+void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse(uint32_t passcode)
+{
+    CheckValidSession();
 
     if (mUdcServer == nullptr)
     {
@@ -369,9 +475,24 @@ void CommissionerDiscoveryController::HandleContentAppPasscodeResponse(uint32_t 
     ChipLogDetail(Controller, "------Via Shell Enter: controller ux ok [passcode]");
 }
 
+/// Callback for getting execution into the main chip thread
+void CallbackCommissionWithPasscode(System::Layer * aSystemLayer, void * aAppState)
+{
+    uint32_t * tmpPasscode = static_cast<uint32_t *>(aAppState);
+    GetCommissionerDiscoveryController()->InternalCommissionWithPasscode(*tmpPasscode);
+    delete tmpPasscode;
+}
+
 void CommissionerDiscoveryController::CommissionWithPasscode(uint32_t passcode)
 {
-    chip::DeviceLayer::StackLock lock;
+    uint32_t * tmpPasscode = new uint32_t(passcode);
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackCommissionWithPasscode,
+                                          static_cast<void *>(tmpPasscode));
+}
+
+void CommissionerDiscoveryController::InternalCommissionWithPasscode(uint32_t passcode)
+{
+    CheckValidSession();
 
     if (!mPendingConsent)
     {
@@ -410,7 +531,7 @@ void CommissionerDiscoveryController::CommissionWithPasscode(uint32_t passcode)
 
 void CommissionerDiscoveryController::Cancel()
 {
-    chip::DeviceLayer::StackLock lock;
+    CheckValidSession();
 
     if (!mPendingConsent)
     {
@@ -457,6 +578,20 @@ void CommissionerDiscoveryController::CommissioningFailed(CHIP_ERROR error)
         ChipLogDetail(Controller, "------PROMPT USER: commissioning failed ");
         mUserPrompter->PromptCommissioningFailed(GetCommissioneeName(), error);
     }
+    if (mUdcServer == nullptr)
+    {
+        ChipLogError(AppServer, "UX Cancel: no udc server");
+        return;
+    }
+    UDCClientState * client = mUdcServer->GetUDCClients().FindUDCClientState(mCurrentInstance);
+    if (client == nullptr || client->GetUDCClientProcessingState() != UDCClientProcessingState::kCommissioningNode)
+    {
+        ChipLogError(AppServer, "UX Cancel: invalid state for cancel");
+        return;
+    }
+    client->SetUDCClientProcessingState(UDCClientProcessingState::kCommissioningFailed);
+    client->Reset();
+
     ResetState();
 }
 

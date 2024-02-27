@@ -97,7 +97,6 @@ CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, PeerAddres
 CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index);
 
 DeviceCommissioner * GetDeviceCommissioner();
-CommissionerDiscoveryController * GetCommissionerDiscoveryController();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 

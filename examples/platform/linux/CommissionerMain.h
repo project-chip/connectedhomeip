@@ -38,6 +38,5 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, c
 void ShutdownCommissioner();
 
 DeviceCommissioner * GetDeviceCommissioner();
-CommissionerDiscoveryController * GetCommissionerDiscoveryController();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

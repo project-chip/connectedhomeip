@@ -258,6 +258,11 @@ public:
     void ResetState();
 
     /**
+     * Check whether we have a valid session (and reset state if not).
+     */
+    void CheckValidSession();
+
+    /**
      * UserConfirmationProvider callback.
      *
      * Notification that a UDC protocol message was received.
@@ -271,6 +276,7 @@ public:
      * indicated in the UserPrompter's PromptForCommissionOKPermission callback
      */
     void Ok();
+    void InternalOk();
 
     /**
      * This method should be called after the user has declined to give consent for commissioning of the client
@@ -287,6 +293,7 @@ public:
      *
      */
     void HandleContentAppPasscodeResponse(uint32_t passcode);
+    void InternalHandleContentAppPasscodeResponse(uint32_t passcode);
 
     /**
      * @brief
@@ -297,12 +304,14 @@ public:
      *
      */
     void HandleTargetContentAppCheck(chip::Protocols::UserDirectedCommissioning::TargetAppInfo target, uint32_t passcode);
+    void InternalHandleTargetContentAppCheck(chip::Protocols::UserDirectedCommissioning::TargetAppInfo target, uint32_t passcode);
 
     /**
      * This method should be called with the passcode for the client
      * indicated in the UserPrompter's PromptForCommissionPasscode callback
      */
     void CommissionWithPasscode(uint32_t passcode);
+    void InternalCommissionWithPasscode(uint32_t passcode);
 
     /**
      * This method should be called by the commissioner to indicate that commissioning succeeded.
@@ -354,6 +363,7 @@ public:
      * Assign a PasscodeService
      */
     inline void SetPasscodeService(PasscodeService * passcodeService) { mPasscodeService = passcodeService; }
+    inline PasscodeService * GetPasscodeService() { return mPasscodeService; }
 
     /**
      * Assign a Commissioner Callback to perform commissioning once user consent has been given
@@ -395,5 +405,7 @@ protected:
     CommissionerCallback * mCommissionerCallback           = nullptr;
     PostCommissioningListener * mPostCommissioningListener = nullptr;
 };
+
+CommissionerDiscoveryController * GetCommissionerDiscoveryController();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
