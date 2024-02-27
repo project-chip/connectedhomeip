@@ -22,14 +22,8 @@
 #include <lib/support/Span.h>
 
 namespace chip {
-
-/**
- * Class to sync real time on esp32 using ntp server.
- */
-
-class Esp32TimeSync
+namespace Esp32TimeSync
 {
-public:
     void Init(const char * aSntpServerName, uint16_t aSyncSntpIntervalDay);
-};
+} // namespace Esp32TimeSync
 } // namespace chip

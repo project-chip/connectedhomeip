@@ -21,14 +21,14 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#define REF_TIME 1546300800 /* 01-Jan-2019 00:00:00 */
-/* Timer interval once every day (24 Hours) */
-#define TIME_PERIOD_SEC 86400000ULL
+static constexpr time_t kMinValidTimeStampEpoch = 1704067200; // 1 Jan 2019
+static constexpr uint32_t kSecondsInADay = 24*60*60;
+
 namespace {
 const uint8_t kMaxNtpServerStringSize = 128;
 char mSntpServerName[kMaxNtpServerStringSize];
 
-static CHIP_ERROR GetLocalTimeString(char * buf, size_t buf_len)
+CHIP_ERROR GetLocalTimeString(char * buf, size_t buf_len)
 {
     struct tm timeinfo;
     char strftime_buf[64];
@@ -41,7 +41,7 @@ static CHIP_ERROR GetLocalTimeString(char * buf, size_t buf_len)
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
     size_t print_size = snprintf(buf, buf_len, "%s, DST: %s", strftime_buf, timeinfo.tm_isdst ? "Yes" : "No");
-    if (print_size >= buf_len)
+    if (print_size >= (buf_len - 1))
     {
         ChipLogError(DeviceLayer, "Buffer size %d insufficient for localtime string. Required size: %d", static_cast<int>(buf_len),
                      static_cast<int>(print_size));
@@ -50,17 +50,17 @@ static CHIP_ERROR GetLocalTimeString(char * buf, size_t buf_len)
     return CHIP_NO_ERROR;
 }
 
-static bool ValidateTime()
+bool ValidateTime()
 {
     time_t now;
     time(&now);
-    return (now > REF_TIME);
+    return (now > kMinValidTimeStampEpoch);
 }
 
-static CHIP_ERROR PrintCurrentTime()
+CHIP_ERROR PrintCurrentTime()
 {
     char local_time[64] = { 0 };
-    ReturnErrorCodeIf(GetLocalTimeString(local_time, sizeof(local_time)) != CHIP_NO_ERROR, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorOnFailure(GetLocalTimeString(local_time, sizeof(local_time)));
     if (!ValidateTime())
     {
         ChipLogProgress(DeviceLayer, "Time not synchronised yet.");
@@ -70,7 +70,7 @@ static CHIP_ERROR PrintCurrentTime()
     return CHIP_NO_ERROR;
 }
 
-static void TimeSyncCallback(struct timeval * tv)
+void TimeSyncCallback(struct timeval * tv)
 {
     ChipLogProgress(DeviceLayer, "SNTP Synchronised.");
     if (PrintCurrentTime() != CHIP_NO_ERROR)
@@ -82,8 +82,8 @@ static void TimeSyncCallback(struct timeval * tv)
 } // anonymous namespace
 
 namespace chip {
-
-void Esp32TimeSync::Init(const char * aSntpServerName, const uint16_t aSyncSntpIntervalDay)
+namespace Esp32TimeSync {
+void Init(const char * aSntpServerName, const uint16_t aSyncSntpIntervalDay)
 {
     chip::Platform::CopyString(mSntpServerName, aSntpServerName);
     if (esp_sntp_enabled())
@@ -93,8 +93,9 @@ void Esp32TimeSync::Init(const char * aSntpServerName, const uint16_t aSyncSntpI
     ChipLogProgress(DeviceLayer, "Initializing SNTP. Using the SNTP server: %s", mSntpServerName);
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
     esp_sntp_setservername(0, mSntpServerName);
-    esp_sntp_set_sync_interval(TIME_PERIOD_SEC * aSyncSntpIntervalDay);
+    esp_sntp_set_sync_interval(kSecondsInADay * aSyncSntpIntervalDay);
     esp_sntp_init();
     sntp_set_time_sync_notification_cb(TimeSyncCallback);
 }
+} // namespace Esp32TimeSync
 } // namespace chip
