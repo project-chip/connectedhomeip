@@ -32,6 +32,7 @@ constructor(
   val udpListenPort: Int = UDP_PORT_AUTO,
   val vendorId: Int = VENDOR_ID_TEST,
   val countryCode: String? = null,
+  val enableServerInteractions: Boolean = false,
 ) {
   companion object {
     /** Matter assigned vendor ID for Google. */
