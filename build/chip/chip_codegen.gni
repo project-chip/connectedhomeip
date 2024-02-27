@@ -217,6 +217,9 @@ template("_chip_build_time_zapgen") {
 #   generator
 #     Name of the generator to use (e.g. java-jni, java-class, cpp-app)
 #
+#     outputs MUST share the same directory prefix (e.g. 'app/' or 'tlv/meta'
+#     or 'jni')
+#
 #   outputs
 #     Explicit names of the expected outputs. Enforced to validate that
 #     expected outputs are generated when processing input files.
@@ -340,6 +343,9 @@ template("chip_codegen") {
 #     Explicit names of the expected outputs. Enforced to validate that
 #     expected outputs are generated when processing input files.
 #
+#     outputs MUST share the same directory prefix (e.g. 'app/' or 'tlv/meta'
+#     or 'jni')
+#
 #   deps, public_configs
 #     Forwarded to the resulting source set
 #
@@ -365,16 +371,16 @@ template("chip_codegen") {
 #
 # Example usage:
 #
-#  chip_codegen("java-jni-generate") {
-#    input = "controller-clusters.matter"
-#    generator = "java-jni"
+# chip_zapgen("controller-clusters-zap") {
+#     input = "controller-clusters.zap"
+#     generator = "app-templates"
 #
-#    outputs = [
-#       "jni/IdentifyClient-ReadImpl.cpp",
-#       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
-#       # ... more to follow
-#    ]
-#  }
+#     outputs = [
+#       "zap-generated/access.h",
+#       "zap-generated/gen_config.h",
+#       "zap-generated/endpoint_config.h",
+#     ]
+# }
 #
 # Guarantees a target named "${target_name}_generate" exists and contains all
 # generated files (this works even in the case of using a pre-generated directory
