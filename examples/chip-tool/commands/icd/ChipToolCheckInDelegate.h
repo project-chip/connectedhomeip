@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include <app/InteractionModelEngine.h>
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
-#include <app/InteractionModelEngine.h>
 
 /// Callbacks for check in protocol
 class ChipToolCheckInDelegate : public chip::app::CheckInDelegate
@@ -29,7 +29,8 @@ public:
     virtual ~ChipToolCheckInDelegate() {}
     CHIP_ERROR Init(chip::app::ICDClientStorage * storage, chip::app::InteractionModelEngine * engine);
     void OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo) override;
-    chip::app::RefreshKeySender * OnKeyRefreshNeeded(chip::app::ICDClientInfo & clientInfo, chip::app::ICDClientStorage * clientStorage) override;
+    chip::app::RefreshKeySender * OnKeyRefreshNeeded(chip::app::ICDClientInfo & clientInfo,
+                                                     chip::app::ICDClientStorage * clientStorage) override;
     void OnKeyRefreshDone(chip::app::RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
 private:
