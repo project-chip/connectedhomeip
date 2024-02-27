@@ -1872,6 +1872,7 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
         MutableByteSpan tlvSpan(buf);
         err = JsonToTlv(testCase.mJsonString, tlvSpan);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
+#ifdef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
         if (err != testCase.mExpectedResult)
         {
             std::string errStr{ err.Format() };
@@ -1880,6 +1881,7 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
             printf("Case: %s, Error: %" CHIP_ERROR_FORMAT ", Expected: %" CHIP_ERROR_FORMAT ", Data: %s\n", testCase.mNameString,
                    errStr.c_str(), expectedErrStr.c_str(), testCase.mJsonString.c_str());
         }
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
     }
 }
 
