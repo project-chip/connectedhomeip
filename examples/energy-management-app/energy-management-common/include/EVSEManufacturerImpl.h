@@ -83,6 +83,11 @@ public:
     CHIP_ERROR InitializePowerMeasurementCluster();
 
     /**
+     * @brief   Allows a client application to initialise the PowerSource cluster
+     */
+    CHIP_ERROR InitializePowerSourceCluster();
+
+    /**
      * @brief   Allows a client application to send in power readings into the system
      *
      * @param[in]  aEndpointId       - Endpoint to send to EPM Cluster
