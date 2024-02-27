@@ -103,7 +103,8 @@ jobs:
               # target versions instead?
               run: |
                   mkdir -p /tmp/darwin/framework-tests
-                  ../../../out/debug/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
+                  echo "This is a simple log" > /tmp/darwin/framework-tests/end_user_support_log.txt
+                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --end_user_support_log /tmp/darwin/framework-tests/end_user_support_log.txt > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 --dac_provider ../../../credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json --product-id 32768 --discriminator 3839 --secured-device-port 5539 --KVS /tmp/chip-all-clusters-app-kvs2 > >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid-err.log >&2) &
                   # Disable BLE (CHIP_IS_BLE=NO) because the app does not have the permission to use it and that may crash the CI.
 
