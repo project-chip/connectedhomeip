@@ -300,7 +300,7 @@ template("chip_codegen") {
       #       paths like "app/callback-stub.cpp" and "app/PluginApplicationCallbacks.h"
       _outputs = invoker.outputs
       _dir_name = get_path_info(_outputs[0], "dir")
-      outputs = [ "${target_gen_dir}/${_dir_name}/{{source_file_part}}"]
+      outputs = [ "${target_gen_dir}/${_dir_name}/{{source_file_part}}" ]
 
       public_configs = [ ":${_name}_config" ]
     }
@@ -317,7 +317,7 @@ template("chip_codegen") {
       if (!defined(deps)) {
         deps = []
       }
-      deps += [":${_name}_generate"]
+      deps += [ ":${_name}_generate" ]
     }
   }
 }
@@ -450,17 +450,17 @@ template("chip_zapgen") {
       #       paths like "app/callback-stub.cpp" and "app/PluginApplicationCallbacks.h"
       _outputs = invoker.outputs
       _dir_name = get_path_info(_outputs[0], "dir")
-      outputs = [ "${target_gen_dir}/zapgen/${_dir_name}/{{source_file_part}}"]
+      outputs = [ "${target_gen_dir}/zapgen/${_dir_name}/{{source_file_part}}" ]
 
       public_configs = [ ":${_name}_config" ]
     }
 
     source_set(_name) {
       forward_variables_from(invoker,
-          [
-            "deps",
-            "public_configs",
-      ])
+                             [
+                               "deps",
+                               "public_configs",
+                             ])
       if (!defined(public_configs)) {
         public_configs = []
       }
