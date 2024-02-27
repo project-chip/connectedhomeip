@@ -1872,7 +1872,7 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
         MutableByteSpan tlvSpan(buf);
         err = JsonToTlv(testCase.mJsonString, tlvSpan);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
-#ifdef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+#if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
         if (err != testCase.mExpectedResult)
         {
             std::string errStr{ err.Format() };
