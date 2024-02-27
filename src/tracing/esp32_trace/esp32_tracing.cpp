@@ -134,10 +134,7 @@ void RemoveHashFromPermitlist(const char * str)
 #define LOG_HEAP_INFO(label, group, entry_exit)                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        ESP_DIAG_EVENT("MTR_TRC", "%s - %s - %s Min Free heap - %u - LFB - %u Start free heap - %u", entry_exit, label, group,     \
-                       heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT),                                                           \
-                       heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT),                                    \
-                       heap_caps_get_free_size(MALLOC_CAP_8BIT));                                                                  \
+        ESP_DIAG_EVENT("MTR_TRC", "%s - %s - %s", entry_exit, label, group);                                                       \
     } while (0)
 
 void ESP32Backend::LogMessageReceived(MessageReceivedInfo & info) {}
