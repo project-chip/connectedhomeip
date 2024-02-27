@@ -209,7 +209,7 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         else if (val.isString())
         {
             const std::string valStr = val.asString();
-            auto [_, error_code] = std::from_chars(valStr.data(), valStr.data() + valStr.size(), v, 10);
+            auto [_, error_code]     = std::from_chars(valStr.data(), valStr.data() + valStr.size(), v, 10);
             VerifyOrReturnError(error_code == std::errc{}, CHIP_ERROR_INVALID_ARGUMENT);
         }
         else
@@ -229,7 +229,7 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         else if (val.isString())
         {
             const std::string valStr = val.asString();
-            auto [_, error_code] = std::from_chars(valStr.data(), valStr.data() + valStr.size(), v, 10);
+            auto [_, error_code]     = std::from_chars(valStr.data(), valStr.data() + valStr.size(), v, 10);
             VerifyOrReturnError(error_code == std::errc{}, CHIP_ERROR_INVALID_ARGUMENT);
         }
         else

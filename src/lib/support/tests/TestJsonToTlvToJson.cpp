@@ -1824,16 +1824,16 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
                                            "}\n";
 
     std::string invalidBytesBase64Padding1 = "{\n"
-                                           "   \"1:BYTES\" : \"=\"\n"
-                                           "}\n";
+                                             "   \"1:BYTES\" : \"=\"\n"
+                                             "}\n";
 
     std::string invalidBytesBase64Padding2 = "{\n"
-                                           "   \"1:BYTES\" : \"==\"\n"
-                                           "}\n";
+                                             "   \"1:BYTES\" : \"==\"\n"
+                                             "}\n";
 
     std::string invalidBytesBase64Padding3 = "{\n"
-    "   \"1:BYTES\" : \"===\"\n"
-    "}\n";
+                                             "   \"1:BYTES\" : \"===\"\n"
+                                             "}\n";
 
     std::string invalidPositiveInfinityValue = "{\n"
                                                "   \"1:DOUBLE\" : \"+Infinity\"\n"
@@ -1874,10 +1874,11 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
         if (err != testCase.mExpectedResult)
         {
-          std::string errStr{err.Format()};
-          std::string expectedErrStr{testCase.mExpectedResult.Format()};
+            std::string errStr{ err.Format() };
+            std::string expectedErrStr{ testCase.mExpectedResult.Format() };
 
-          printf("Case: %s, Error: %" CHIP_ERROR_FORMAT ", Expected: %" CHIP_ERROR_FORMAT ", Data: %s\n", testCase.mNameString, errStr.c_str(), expectedErrStr.c_str(), testCase.mJsonString.c_str());
+            printf("Case: %s, Error: %" CHIP_ERROR_FORMAT ", Expected: %" CHIP_ERROR_FORMAT ", Data: %s\n", testCase.mNameString,
+                   errStr.c_str(), expectedErrStr.c_str(), testCase.mJsonString.c_str());
         }
     }
 }
