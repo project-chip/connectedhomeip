@@ -24,13 +24,6 @@
 
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-#define BLE_MIN_CONNECTION_INTERVAL_MS 45 // 45 msec
-#define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
-#define BLE_SLAVE_LATENCY_MS 0
-#define BLE_TIMEOUT_MS 400
-#endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #include "FreeRTOS.h"
 #include "timers.h"
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
@@ -211,7 +204,7 @@ private:
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
 
 
- #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)   
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)   
     protected:
     static void OnSendIndicationTimeout(System::Layer * aLayer, void * appState);
 #endif

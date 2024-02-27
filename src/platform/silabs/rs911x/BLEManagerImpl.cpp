@@ -68,6 +68,13 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
+#define BLE_MIN_CONNECTION_INTERVAL_MS 45 // 45 msec
+#define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
+#define BLE_SLAVE_LATENCY_MS 0
+#define BLE_TIMEOUT_MS 400
+#define BLE_DEFAULT_TIMER_PERIOD_MS (1)
+#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (5000)
+
 extern sl_wfx_msg_t event_msg;
 
 StaticTask_t rsiBLETaskStruct;
@@ -246,9 +253,6 @@ namespace {
 #define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
-#define BLE_DEFAULT_TIMER_PERIOD_MS (1)
-#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (10)
-
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 
 const uint8_t UUID_CHIPoBLEService[]       = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
@@ -300,6 +304,17 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 exit:
     return err;
+}
+
+void BLEManagerImpl::OnSendIndicationTimeout(System::Layer * aLayer, void * appState)
+{
+    uint8_t connHandle = 1;
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
+    ChipDeviceEvent event;
+    event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
+    event.CHIPoBLEConnectionError.ConId                          = connHandle;
+    event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 uint16_t BLEManagerImpl::_NumConnections(void)
@@ -424,6 +439,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm: {
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
+        DeviceLayer::SystemLayer().CancelTimer(OnSendIndicationTimeout, this);
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
     }
     break;
@@ -466,11 +482,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return (conState != NULL) ? conState->mtu : 0;
 }
 
-void BLEManagerImpl::OnSendIndicationTimeout(System::Layer * aLayer, void * appState)
-{
-    BLEManagerImpl * pBLEManagerImpl = reinterpret_cast<BLEManagerImpl *>(appState);
-    pBLEManagerImpl->HandleSoftTimerEvent();
-}
+
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                     PacketBufferHandle data)
@@ -935,19 +947,6 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
-    DeviceLayer::SystemLayer().CancelTimer(OnSendIndicationTimeout, this);
-    PlatformMgr().PostEventOrDie(&event);
-}
-
-
-void BLEManagerImpl::HandleSoftTimerEvent(void)
-{
-    uint8_t connHandle = 1;
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
-    ChipDeviceEvent event;
-    event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
-    event.CHIPoBLEConnectionError.ConId                          = connHandle;
-    event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
     PlatformMgr().PostEventOrDie(&event);
 }
 
