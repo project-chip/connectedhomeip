@@ -109,7 +109,7 @@ static_library("nxp_platform") {
       ]
 
       if (chip_convert_dac_private_key == 1) {
-        defines = [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
+        defines += [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
       }
     }
 
