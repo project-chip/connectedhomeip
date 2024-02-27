@@ -149,6 +149,7 @@ template("chip_data_model") {
     ]
 
     deps = [
+      "${chip_root}/src/app/common:ids",
       "${chip_root}/src/lib/support:span",
       "${chip_root}/src/protocols/interaction_model",
     ]
