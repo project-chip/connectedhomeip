@@ -480,8 +480,8 @@ def BuildNxpTarget():
 
     # apps
     target.AppendFixedTargets([
-        TargetPart('lighting', app=NxpApp.LIGHTING),
-        TargetPart('contact-sensor', app=NxpApp.CONTACT)
+        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('(k32w0|k32w1)'),
+        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1)')
     ])
 
     target.AppendModifier(name="factory", enable_factory_data=True)
