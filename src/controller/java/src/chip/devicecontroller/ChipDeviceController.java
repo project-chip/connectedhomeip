@@ -1205,6 +1205,32 @@ public class ChipDeviceController {
         imTimeoutMs);
   }
 
+  /**
+   * @brief ExtendableInvoke command to target device
+   * @param ExtendableInvokeCallback Callback when invoke responses have been received and processed
+   *     for the given batched invoke commands.
+   * @param devicePtr connected device pointer
+   * @param invokeElementList invoke element list
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void extendableInvoke(
+      ExtendableInvokeCallback callback,
+      long devicePtr,
+      List<InvokeElement> invokeElementList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    ExtendableInvokeCallbackJni jniCallback = new ExtendableInvokeCallbackJni(callback);
+    extendableInvoke(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        invokeElementList,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
+  }
+
   /** Create a root (self-signed) X.509 DER encoded certificate */
   public static byte[] createRootCertificate(
       KeypairDelegate keypair, long issuerId, @Nullable Long fabricId) {
@@ -1374,6 +1400,14 @@ public class ChipDeviceController {
       long callbackHandle,
       long devicePtr,
       InvokeElement invokeElement,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs);
+
+  static native void extendableInvoke(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<InvokeElement> invokeElementList,
       int timedRequestTimeoutMs,
       int imTimeoutMs);
 
