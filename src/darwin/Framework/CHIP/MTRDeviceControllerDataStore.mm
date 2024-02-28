@@ -571,7 +571,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
     }
 
     if (storeFailures) {
-        MTR_LOG_ERROR("Store failed in _pruneEmptyStoredAttributesBranches: %lu", storeFailures);
+        MTR_LOG_ERROR("Store failed in _pruneEmptyStoredAttributesBranches: %lu", (unsigned long)storeFailures);
     }
 }
 
@@ -655,7 +655,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
         // In the rare event that store fails, allow all attribute store attempts to go through and prune empty branches at the end altogether.
         if (storeFailures) {
             [self _pruneEmptyStoredAttributesBranches];
-            MTR_LOG_ERROR("Store failed in -storeAttributeValues:forNodeID: %lu", storeFailures);
+            MTR_LOG_ERROR("Store failed in -storeAttributeValues:forNodeID: %lu", (unsigned long)storeFailures);
         }
     });
 }
