@@ -29,8 +29,8 @@ def main():
 
     if args.message:
         if args.very_visible:
-            line_width = 100;
-            wrap_width = line_width - 4 # space and char x 2
+            line_width = 100
+            wrap_width = line_width - 4  # space and char x 2
             print("\033[31m")  # RED
             print(f'🚨 %-{wrap_width}s 🚨' % 'CRITICAL FAILURE:')
             print(f'🚨 %-{wrap_width}s 🚨' % '')
