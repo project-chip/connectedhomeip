@@ -33,3 +33,9 @@ matter_device_software_version = "0x0001"
 matter_device_software_version_string = "1.0"
 
 chip_openthread_ftd = false
+
+# TODO: this dependency is mighty odd here. It was copied over from the original
+#       PR: https://github.com/project-chip/connectedhomeip/pull/17548
+# see also BUILD.gn comment
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lock-app/lock-common:lock-common"
