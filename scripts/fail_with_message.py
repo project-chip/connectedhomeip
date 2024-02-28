@@ -29,11 +29,14 @@ def main():
 
     if args.message:
         if args.very_visible:
+            line_width = 100;
+            wrap_width = line_width - 4 # space and char x 2
             print("\033[31m")  # RED
-            print('🚨'*80)
-            for l in textwrap.wrap(args.message, 76):
-                print('🚨 %-76s 🚨' % args.message)
-            print('🚨'*80)
+            print(f'🚨 %-{wrap_width}s 🚨' % 'CRITICAL FAILURE:')
+            print(f'🚨 %-{wrap_width}s 🚨' % '')
+            for l in textwrap.wrap(args.message, wrap_width):
+                print(f'🚨 %-{wrap_width}s 🚨' % l)
+            print(f'🚨 %-{wrap_width}s 🚨' % '')
             print("\033[0m")  # CLEAR
         else:
             print(args.message)
