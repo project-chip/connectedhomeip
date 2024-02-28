@@ -420,6 +420,7 @@ class HostBuilder(GnBuilder):
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
+            self.extra_gn_options.append('chip_static_data_model_BACKEND="//src/controller/data_model:data_model"')
             self.build_command = 'chip-repl'
 
         if self.app == HostApp.SIMULATED_APP1:
