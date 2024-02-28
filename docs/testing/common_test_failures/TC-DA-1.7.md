@@ -1,8 +1,6 @@
-
-
 ## TC-DA-1.7
 
-This test verifies that the DUTs are correctly following all the requirements for the Device Attestation certificate chain. 
+This test verifies that the DUTs are correctly following all the requirements for the Device Attestation certificate chain.
 
 
 <table>
@@ -21,7 +19,7 @@ This test verifies that the DUTs are correctly following all the requirements fo
   <tr>
    <td>This test requires 2 DUTs
    </td>
-   <td>Two DUTs are used for this test because we need to verify that the DACs are provisioned per individual unit. This needs to be specified on the command line using <code>--dut-node-id nodeid1 nodeid2</code> (for commissioned nodes).  
+   <td>Two DUTs are used for this test because we need to verify that the DACs are provisioned per individual unit. This needs to be specified on the command line using <code>--dut-node-id nodeid1 nodeid2</code> (for commissioned nodes).
    </td>
   </tr>
   <tr>
