@@ -24,5 +24,6 @@ declare_args() {
   #
   # The data model specifies what the endpoint composition and metadata is
   # built into "src/app" interaction model.
-  chip_static_data_model_BACKEND = "${chip_root}/src/app:static-data-model-not-set"
+  chip_static_data_model_BACKEND =
+      "${chip_root}/src/app:static-data-model-not-set"
 }

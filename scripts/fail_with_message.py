@@ -16,8 +16,10 @@
 import argparse
 import sys
 
+
 def main():
-    parser = argparse.ArgumentParser(description="A program that returns a failure code and prints an optional message as it does so")
+    parser = argparse.ArgumentParser(
+        description="A program that returns a failure code and prints an optional message as it does so")
     parser.add_argument('-m', '--message', nargs='?', type=str, help="Message to print out")
 
     args = parser.parse_args()
