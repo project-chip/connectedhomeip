@@ -26,4 +26,7 @@ default_args = {
   chip_openthread_ftd = true
 
   import("//openthread.gni")
+
+  chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lock-app/lock-common:lock-common"
 }
