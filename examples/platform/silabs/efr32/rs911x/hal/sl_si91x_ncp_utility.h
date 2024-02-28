@@ -21,35 +21,29 @@
  * devices such as External Flash and LCD.
  * That can be extended to other families as well.
  */
+#ifndef SL_SI91X_NCP_UTILITY_H
+#define SL_SI91X_NCP_UTILITY_H
 
+#pragma once
+#include "FreeRTOS.h"
+#include "semphr.h"
 #include "silabs_utils.h"
 #include "sl_status.h"
 #include "spi_multiplex.h"
 
 #if defined(CHIP_9117)
-#include "sl_board_configuration_SiWx917.h"
-#else
-#include "sl_board_configuration.h"
-#if defined(EFR32MG12)
 #include "em_usart.h"
+#include "sl_board_configuration_SiWx917.h"
 #include "sl_spidrv_exp_config.h"
-extern SPIDRV_Handle_t sl_spidrv_exp_handle;
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#elif defined(EFR32MG24)
-#include "em_eusart.h"
-#include "sl_spidrv_eusart_exp_config.h"
-#include "sl_spidrv_instances.h"
 
-#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
-#else // EFR32MG12 || EFR32MG24
-#error "Unknown platform"
-#endif
 #endif // CHIP_9117
 
-// variable to identify spi configured for expansion header
-// EUSART configuration available on the SPIDRV
+#define USART_INITSYNC_BAUDRATE 12500000
 
 #if SL_SPICTRL_MUX
 sl_status_t spi_board_init(void);
-static bool spi_enabled = false;
 #endif // SL_SPICTRL_MUX
+
+extern uint32_t rx_ldma_channel;
+extern uint32_t tx_ldma_channel;
+#endif // SL_SI91X_NCP_UTILITY_H
