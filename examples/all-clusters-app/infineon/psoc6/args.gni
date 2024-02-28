@@ -19,3 +19,5 @@ import("${chip_root}/src/platform/Infineon/PSOC6/args.gni")
 
 psoc6_target_project =
     get_label_info(":all_clusters_app_sdk_sources", "label_no_toolchain")
+
+chip_static_data_model_BACKEND = "${chip_root}/examples/all-clusters-app/all-clusters-common:all-clusters-common"

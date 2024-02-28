@@ -21,3 +21,5 @@ mw320_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 declare_args() {
   chip_enable_ota_requestor = true
 }
+
+chip_static_data_model_BACKEND = "${chip_root}/examples/all-clusters-app/all-clusters-common:all-clusters-common"
