@@ -31,7 +31,7 @@ def main():
         if args.very_visible:
             line_width = 100
             wrap_width = line_width - 4  # space and char x 2
-            print("\033[31m")  # RED
+            print("\033[91m")  # RED
             print(f'🚨 %-{wrap_width}s 🚨' % 'CRITICAL FAILURE:')
             print(f'🚨 %-{wrap_width}s 🚨' % '')
             for l in textwrap.wrap(args.message, wrap_width):
