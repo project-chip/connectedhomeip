@@ -441,7 +441,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             }
         }
 
-        if (!commandRef.HasValue() && !commandRefRequired && mpPendingResponseTracker != nullptr && mpPendingResponseTracker->Count() == 1)
+        if (!commandRef.HasValue() && !commandRefRequired && mpPendingResponseTracker != nullptr &&
+            mpPendingResponseTracker->Count() == 1)
         {
             // We have sent out a single invoke request. As per spec, server in this case doesn't need to provide the CommandRef
             // in the response. This is allowed to support communicating with a legacy server. In this case we assume the response

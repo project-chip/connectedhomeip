@@ -311,7 +311,8 @@ public:
     static void TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderExtendableApiWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandSenderExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandSenderExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef(nlTestSuite * apSuite,
+                                                                                                void * apContext);
     static void TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerEncodeSimpleCommandData(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerCommandDataEncoding(nlTestSuite * apSuite, void * apContext);
@@ -472,7 +473,8 @@ void TestCommandInteraction::GenerateInvokeRequest(nlTestSuite * apSuite, void *
 }
 
 void TestCommandInteraction::GenerateInvokeResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                                    CommandId aCommandId, ClusterId aClusterId, EndpointId aEndpointId, Optional<uint16_t> aCommandRef)
+                                                    CommandId aCommandId, ClusterId aClusterId, EndpointId aEndpointId,
+                                                    Optional<uint16_t> aCommandRef)
 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -795,7 +797,8 @@ void TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMs
                        mockCommandSenderExtendedDelegate.onErrorCalledTimes == 0);
 }
 
-void TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef(nlTestSuite * apSuite,
+                                                                                                             void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -812,7 +815,8 @@ void TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMs
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     uint16_t invalidResponseCommandRef = 2;
-    GenerateInvokeResponse(apSuite, apContext, buf, kTestCommandIdWithData, kTestClusterId, kTestEndpointId, MakeOptional(invalidResponseCommandRef));
+    GenerateInvokeResponse(apSuite, apContext, buf, kTestCommandIdWithData, kTestClusterId, kTestEndpointId,
+                           MakeOptional(invalidResponseCommandRef));
     bool moreChunkedMessages = false;
     err                      = commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_KEY_NOT_FOUND);
