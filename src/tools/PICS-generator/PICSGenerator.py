@@ -50,17 +50,14 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     elif "On/Off" == clusterName:
         clusterName = clusterName.replace("/", "-")
 
-    elif "GroupKeyManagement" == clusterName:
+    elif "Group Key Management" == clusterName:
         clusterName = "Group Communication"
 
-    elif "Wake on LAN" == clusterName or "Low Power" == clusterName:
+    elif "Wake On LAN" == clusterName or "Low Power" == clusterName:
         clusterName = "Media Cluster"
 
     elif "Operational Credentials" == clusterName:
         clusterName = "Node Operational Credentials"
-
-    elif "Laundry Dryer Controls" == clusterName:
-        clusterName = "Dryer Controls"
 
     elif "Laundry Washer Controls" == clusterName:
         clusterName = "Washer Controls"
