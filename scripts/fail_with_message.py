@@ -25,7 +25,9 @@ def main():
     args = parser.parse_args()
 
     if args.message:
-        print(args.message)
+        print('🚨'*80)
+        print('🚨 %s' % args.message)
+        print('🚨'*80)
 
     sys.exit(1)
 
