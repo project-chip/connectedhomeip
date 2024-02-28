@@ -334,4 +334,24 @@ action("static-data-model-not-set") {
     "--message",
     "You need to set a valid value for the GN argument 'chip_static_data_model_BACKEND'.",
   ]
+
+  # no output actually ... however we define something since actions require it
+  # this action always fails
+  outputs = [ "${target_gen_dir}/static-data-model-failure.stamp" ]
+}
+
+# fake source sets according to chip_data_model
+source_set("static-data-model-not-set-endpoint-metadata") {
+  sources = []
+  deps = [":static-data-model-not-set"]
+}
+
+source_set("static-data-model-not-set-callbacks") {
+  sources = []
+  deps = [":static-data-model-not-set"]
+}
+
+source_set("static-data-model-not-set-command-dispatch") {
+  sources = []
+  deps = [":static-data-model-not-set"]
 }
