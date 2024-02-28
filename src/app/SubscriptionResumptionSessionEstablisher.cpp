@@ -105,9 +105,10 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
     readHandler->OnSubscriptionResumed(sessionHandle, *establisher);
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     // Reset the resumption retries to 0 if subscription is resumed
-    subscriptionInfo.mResumptionRetries = 0;
+    subscriptionInfo.mResumptionRetries  = 0;
     auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
-    if (subscriptionResumptionStorage) {
+    if (subscriptionResumptionStorage)
+    {
         subscriptionResumptionStorage->Save(subscriptionInfo);
     }
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
