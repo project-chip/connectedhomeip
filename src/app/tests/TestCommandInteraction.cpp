@@ -119,6 +119,12 @@ struct ForcedSizeBuffer
     }
 };
 
+enum class ForcedSizeBufferLengthHint
+{
+    kSizeBetween0and255,
+    kSizeGreaterThan255,
+};
+
 InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aRequestCommandPath)
 {
     // Mock cluster catalog, only support commands on one cluster on one endpoint.
@@ -379,6 +385,8 @@ private:
     static void AddInvokeResponseData(nlTestSuite * apSuite, void * apContext, CommandHandler * apCommandHandler,
                                       bool aNeedStatusCode, CommandId aResponseCommandId = kTestCommandIdWithData,
                                       CommandId aRequestCommandId = kTestCommandIdWithData);
+    static uint32_t GetAddResponseDataOverheadSizeForPath(nlTestSuite * apSuite, const ConcreteCommandPath & aRequestCommandPath,
+                                                          ForcedSizeBufferLengthHint aBufferSizeHint);
     static void FillCurrentInvokeResponseBuffer(nlTestSuite * apSuite, CommandHandler * apCommandHandler,
                                                 const ConcreteCommandPath & aRequestCommandPath, uint32_t aSizeToLeaveInBuffer);
     static void ValidateCommandHandlerEncodeInvokeResponseMessage(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode);
@@ -577,6 +585,36 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
     }
 }
 
+uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSuite * apSuite,
+                                                                       const ConcreteCommandPath & aRequestCommandPath,
+                                                                       ForcedSizeBufferLengthHint aBufferSizeHint)
+{
+    BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
+    CommandHandler commandHandler(kCommandHandlerTestOnlyMarker, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
+    commandHandler.mReserveSpaceForMoreChunkMessages = true;
+    ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
+    ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
+
+    CHIP_ERROR err = mBasicCommandPathRegistry.Add(requestCommandPath1, MakeOptional<uint16_t>(static_cast<uint16_t>(1)));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = mBasicCommandPathRegistry.Add(requestCommandPath2, MakeOptional<uint16_t>(static_cast<uint16_t>(2)));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = commandHandler.AllocateBuffer();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    uint32_t remainingSizeBefore = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
+
+    // When ForcedSizeBuffer exceeds 255, an extra byte is needed for length, affecting the overhead size required by
+    // AddResponseData. In order to have this accounted for in overhead calculation we set the length to be 256.
+    uint32_t sizeOfForcedSizeBuffer = aBufferSizeHint == ForcedSizeBufferLengthHint::kSizeGreaterThan255 ? 256 : 0;
+    err                             = commandHandler.AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeOfForcedSizeBuffer));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    uint32_t remainingSizeAfter = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
+    uint32_t delta              = remainingSizeBefore - remainingSizeAfter - sizeOfForcedSizeBuffer;
+
+    return delta;
+}
+
 void TestCommandInteraction::FillCurrentInvokeResponseBuffer(nlTestSuite * apSuite, CommandHandler * apCommandHandler,
                                                              const ConcreteCommandPath & aRequestCommandPath,
                                                              uint32_t aSizeToLeaveInBuffer)
@@ -587,13 +625,17 @@ void TestCommandInteraction::FillCurrentInvokeResponseBuffer(nlTestSuite * apSui
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     uint32_t remainingSize = apCommandHandler->mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
 
-    // TODO(#30453): Have this value derived from IM layer similar to GetSizeToEndInvokeResponseMessage()
-    // This number was derived by executing this method with aSizeToLeaveInBuffer = 100 and
-    // subsequently analyzing the remaining size to determine the overhead associated with calling
-    // AddResponseData with `ForcedSizeBuffer`.
-    uint32_t sizeNeededForAddingResponse = 27;
-    NL_TEST_ASSERT(apSuite, remainingSize > (aSizeToLeaveInBuffer + sizeNeededForAddingResponse));
-    uint32_t sizeToFill = remainingSize - aSizeToLeaveInBuffer - sizeNeededForAddingResponse;
+    // AddResponseData's overhead calculation depends on the size of ForcedSizeBuffer. If the buffer exceeds 255 bytes, an extra
+    // length byte is required. Since tests using FillCurrentInvokeResponseBuffer currently end up with sizeToFill > 255, we
+    // inform the calculation of this expectation. Nonetheless, we also validate this assumption for correctness.
+    ForcedSizeBufferLengthHint bufferSizeHint = ForcedSizeBufferLengthHint::kSizeGreaterThan255;
+    uint32_t overheadSizeNeededForAddingResponse =
+        GetAddResponseDataOverheadSizeForPath(apSuite, aRequestCommandPath, bufferSizeHint);
+    NL_TEST_ASSERT(apSuite, remainingSize > (aSizeToLeaveInBuffer + overheadSizeNeededForAddingResponse));
+    uint32_t sizeToFill = remainingSize - aSizeToLeaveInBuffer - overheadSizeNeededForAddingResponse;
+
+    // Validating assumption. If this fails, it means overheadSizeNeededForAddingResponse is likely too large.
+    NL_TEST_ASSERT(apSuite, sizeToFill >= 256);
 
     err = apCommandHandler->AddResponseData(aRequestCommandPath, ForcedSizeBuffer(sizeToFill));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1810,11 +1852,11 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
-    Optional<uint16_t> commandRef;
-    commandRef.SetValue(1);
-    mBasicCommandPathRegistry.Add(requestCommandPath1, commandRef);
-    commandRef.SetValue(2);
-    mBasicCommandPathRegistry.Add(requestCommandPath2, commandRef);
+
+    CHIP_ERROR err = mBasicCommandPathRegistry.Add(requestCommandPath1, MakeOptional<uint16_t>(static_cast<uint16_t>(1)));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = mBasicCommandPathRegistry.Add(requestCommandPath2, MakeOptional<uint16_t>(static_cast<uint16_t>(2)));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t sizeToLeave = 0;
     FillCurrentInvokeResponseBuffer(apSuite, &commandHandler, requestCommandPath1, sizeToLeave);
@@ -1836,11 +1878,11 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
-    Optional<uint16_t> commandRef;
-    commandRef.SetValue(1);
-    mBasicCommandPathRegistry.Add(requestCommandPath1, commandRef);
-    commandRef.SetValue(2);
-    mBasicCommandPathRegistry.Add(requestCommandPath2, commandRef);
+
+    CHIP_ERROR err = mBasicCommandPathRegistry.Add(requestCommandPath1, MakeOptional<uint16_t>(static_cast<uint16_t>(1)));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = mBasicCommandPathRegistry.Add(requestCommandPath2, MakeOptional<uint16_t>(static_cast<uint16_t>(2)));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t sizeToLeave = 0;
     FillCurrentInvokeResponseBuffer(apSuite, &commandHandler, requestCommandPath1, sizeToLeave);
@@ -1862,11 +1904,11 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
-    Optional<uint16_t> commandRef;
-    commandRef.SetValue(1);
-    mBasicCommandPathRegistry.Add(requestCommandPath1, commandRef);
-    commandRef.SetValue(2);
-    mBasicCommandPathRegistry.Add(requestCommandPath2, commandRef);
+
+    CHIP_ERROR err = mBasicCommandPathRegistry.Add(requestCommandPath1, MakeOptional<uint16_t>(static_cast<uint16_t>(1)));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = mBasicCommandPathRegistry.Add(requestCommandPath2, MakeOptional<uint16_t>(static_cast<uint16_t>(2)));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t sizeToLeave = 0;
     FillCurrentInvokeResponseBuffer(apSuite, &commandHandler, requestCommandPath1, sizeToLeave);
@@ -1874,7 +1916,7 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
     NL_TEST_ASSERT(apSuite, remainingSize == sizeToLeave);
 
     uint32_t sizeToFill = 50;
-    CHIP_ERROR err      = commandHandler.AddResponseData(requestCommandPath2, ForcedSizeBuffer(sizeToFill));
+    err                 = commandHandler.AddResponseData(requestCommandPath2, ForcedSizeBuffer(sizeToFill));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     remainingSize = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
