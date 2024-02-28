@@ -38,7 +38,7 @@ import logging
 import threading
 import time
 import typing
-from ctypes import (CDLL, CFUNCTYPE, POINTER, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_uint8, c_uint16,
+from ctypes import (CDLL, CFUNCTYPE, POINTER, byref, c_bool, c_char, c_char_p, c_int, c_int32, c_size_t, c_ubyte, c_uint8, c_uint16,
                     c_uint32, c_uint64, c_void_p, create_string_buffer, pointer, py_object, resize, string_at)
 from dataclasses import dataclass
 
@@ -51,12 +51,14 @@ from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
 from .clusters import Objects as GeneratedObjects
+from .clusters.Attribute import AttributeCache, AttributePath
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
 from .exceptions import UnknownAttribute, UnknownCommand
 from .interaction_model import InteractionModelError, SessionParameters, SessionParametersStruct
 from .interaction_model import delegate as im
 from .native import PyChipError
+from .tlv import TLVReader
 
 __all__ = ["ChipDeviceController", "CommissioningParameters"]
 
@@ -2025,3 +2027,58 @@ class BareChipDeviceController(ChipDeviceControllerBase):
         self._set_dev_ctrl(devCtrl)
 
         self._finish_init()
+
+
+class TLVJsonConverter():
+    ''' Converter class used to convert dumped Matter JsonTlv files into a cache. '''
+
+    def __init__(self, name: str = ''):
+        self._ChipStack = builtins.chipStack
+        self._dmLib = None
+
+        self._InitLib()
+
+    def _InitLib(self):
+        if self._dmLib is None:
+            self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
+
+            self._dmLib.pychip_JsonToTlv.argtypes = [c_char_p, POINTER(c_ubyte), c_size_t]
+            self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = c_size_t
+
+    # PER ATTRIBUTE
+    def _attribute_to_tlv(self, json_string: str) -> bytearray:
+        ''' Converts the MatterJsonTlv for one attribute into TLV that can be parsed and put into the cache.'''
+        # We don't currently have a way to size this properly, but we know attributes need to fit into 1 MTU.
+        size = 1280
+        buf = bytearray(size)
+        encoded_bytes = self._dmLib.pychip_JsonToTlv(json_string.encode("utf-8"),  (ctypes.c_ubyte * size).from_buffer(buf), size)
+        return buf[:encoded_bytes]
+
+    def convert_dump_to_cache(self, json_tlv: str) -> AttributeCache:
+        ''' Converts a string containing the MatterJsonTlv dump of an entire device into an AttributeCache object.
+            Input:
+              json_tlv: json string read from the dump file.
+            Returns:
+              AttributeCache with the data from the json_string
+        '''
+        cache = AttributeCache()
+        for endpoint_id_str, endpoint in json_tlv.items():
+            endpoint_id = int(endpoint_id_str, 0)
+            for cluster_id_str, cluster in endpoint.items():
+                s = cluster_id_str.split(':')
+                cluster_id = int(s[0])
+                for attribute_id_str, attribute in cluster.items():
+                    s = attribute_id_str.split(':')
+                    attribute_id = int(s[0])
+                    json_str = json.dumps({attribute_id_str: attribute}, indent=2)
+                    tmp = self._attribute_to_tlv(json_str)
+                    path = AttributePath(EndpointId=endpoint_id, ClusterId=cluster_id, AttributeId=attribute_id)
+                    # Each of these attributes contains only one item
+                    try:
+                        tlvData = next(iter(TLVReader(tmp).get().get("Any", {}).values()))
+                    except StopIteration:
+                        # no data, this is a value decode error
+                        tlvData = ValueDecodeFailure()
+                    cache.UpdateTLV(path=path, dataVersion=0, data=tlvData)
+                    cache.UpdateCachedData(set([path]))
+        return cache

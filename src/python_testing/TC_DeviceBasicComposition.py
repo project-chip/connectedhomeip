@@ -170,6 +170,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
     async def _read_non_standard_attribute_check_unsupported_read(self, endpoint_id, cluster_id, attribute_id) -> bool:
+        # If we're doing this from file, we don't have a way to assess this. Assume this is OK for now.
+        if self.test_from_file:
+            return True
+
         @dataclass
         class TempAttribute(ClusterAttributeDescriptor):
             @ChipUtility.classproperty

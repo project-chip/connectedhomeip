@@ -27,8 +27,9 @@ from typing import Any, Optional
 
 import chip.clusters.ClusterObjects
 import chip.tlv
-from chip.clusters.Attribute import ValueDecodeFailure
+from chip.clusters.Attribute import ValueDecodeFailure, AttributePath, AttributeCache
 from mobly import asserts
+from chip.ChipDeviceCtrl import TLVJsonConverter
 
 
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
@@ -96,13 +97,32 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
     return matter_json_dict
 
 
+def JsonToMatterTlv(json_filename: str) -> dict[int, Any]:
+    converter = TLVJsonConverter()
+    with open(json_filename, "r") as fin:
+        json_tlv = json.load(fin)
+        return converter.convert_dump_to_cache(json_tlv)
+
+
 class BasicCompositionTests:
     async def setup_class_helper(self, default_to_pase: bool = True):
         dev_ctrl = self.default_controller
         self.problems = []
-
+        self.test_from_file = self.user_params.get("test_from_file", None)
         do_test_over_pase = self.user_params.get("use_pase_only", default_to_pase)
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
+
+        def log_test_start():
+            logging.info("###########################################################")
+            logging.info("Start of actual tests")
+            logging.info("###########################################################")
+
+        if self.test_from_file:
+            cache = JsonToMatterTlv(self.test_from_file)
+            self.endpoints = cache.attributeCache
+            self.endpoints_tlv = cache.attributeTLVCache
+            log_test_start()
+            return
 
         if do_test_over_pase:
             setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
@@ -125,9 +145,7 @@ class BasicCompositionTests:
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".txt"), "wt+") as outfile:
                 pprint(wildcard_read.attributes, outfile, indent=1, width=200, compact=True)
 
-        logging.info("###########################################################")
-        logging.info("Start of actual tests")
-        logging.info("###########################################################")
+        log_test_start()
 
         # ======= State kept for use by all tests =======
 
