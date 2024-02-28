@@ -25,3 +25,5 @@ declare_args() {
   # INCLUDE_xSemaphoreGetMutexHolder
   chip_stack_lock_tracking = "none"
 }
+
+chip_static_data_model_BACKEND = "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common:all-clusters-common"

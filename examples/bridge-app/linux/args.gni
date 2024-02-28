@@ -25,3 +25,6 @@ chip_project_config_include_dirs =
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 matter_enable_tracing_support = true
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/bridge-app/bridge-common:bridge-common"
