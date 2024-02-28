@@ -2843,7 +2843,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    // First start with clean slate and
+    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
     [sController removeDevice:device];
     [sController.controllerDataStore clearAllStoredAttributes];
@@ -2853,6 +2853,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Now recreate device and get subscription primed
     device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
     XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
+    XCTestExpectation * gotDeviceCachePrimed = [self expectationWithDescription:@"Device cache primed for the first time"];
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
     __weak __auto_type weakDelegate = delegate;
     delegate.onReportEnd = ^{
@@ -2860,9 +2861,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         __strong __auto_type strongDelegate = weakDelegate;
         strongDelegate.onReportEnd = nil;
     };
+    delegate.onDeviceCachePrimed = ^{
+        [gotDeviceCachePrimed fulfill];
+    };
     [device setDelegate:delegate queue:queue];
 
-    [self waitForExpectations:@[ gotReportsExpectation ] timeout:60];
+    [self waitForExpectations:@[ gotReportsExpectation, gotDeviceCachePrimed ] timeout:60];
 
     NSUInteger attributesReportedWithFirstSubscription = [device unitTestAttributesReportedSinceLastCheck];
 
@@ -2879,9 +2883,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         __strong __auto_type strongDelegate = weakDelegate;
         strongDelegate.onReportEnd = nil;
     };
+    __block BOOL onDeviceCachePrimedCalled = NO;
+    delegate.onDeviceCachePrimed = ^{
+        onDeviceCachePrimedCalled = YES;
+    };
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ resubGotReportsExpectation ] timeout:60];
+
+    // Make sure that the new callback is only ever called once, the first time subscription was primed
+    XCTAssertFalse(onDeviceCachePrimedCalled);
 
     NSUInteger attributesReportedWithSecondSubscription = [device unitTestAttributesReportedSinceLastCheck];
 
