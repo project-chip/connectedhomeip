@@ -111,13 +111,13 @@ template("chip_data_model") {
   source_set("${_data_model_name}-endpoint-metadata") {
     sources = filter_include(
             get_target_outputs(":${_data_model_name}_codegen_generate"),
-            [ "\bPluginApplicationCallbacks.h" ])
+            [ "*/PluginApplicationCallbacks.h" ])
     sources += filter_include(
             get_target_outputs(":${_data_model_name}_zapgen_generate"),
             [
-              "*\baccess.h",
-              "*\bendpoint_config.h",
-              "*\bgen_config.h",
+              "*/access.h",
+              "*/endpoint_config.h",
+              "*/gen_config.h",
             ])
 
     deps = [
@@ -137,8 +137,8 @@ template("chip_data_model") {
     sources = filter_include(
             get_target_outputs(":${_data_model_name}_codegen_generate"),
             [
-              "*\bcallback-stub.cpp",
-              "*\bcluster-init-callback.cpp",
+              "*/callback-stup.cpp",
+              "*/cluster-init-callback.cpp",
             ])
 
     deps = [
@@ -155,7 +155,7 @@ template("chip_data_model") {
     source_set("${_data_model_name}-command-dispatch") {
       sources = filter_include(
               get_target_outputs(":${_data_model_name}_zapgen_generate"),
-              [ "*\bIMClusterCommandHandler.cpp" ])
+              [ "*/IMClusterCommandHandler.cpp" ])
 
       deps = [
         ":${_data_model_name}_zapgen_generate",

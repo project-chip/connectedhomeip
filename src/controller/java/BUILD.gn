@@ -459,6 +459,8 @@ android_library("java") {
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
+    "src/chip/devicecontroller/ExtendableInvokeCallback.java",
+    "src/chip/devicecontroller/ExtendableInvokeCallbackJni.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
     "src/chip/devicecontroller/ICDClientInfo.java",
@@ -493,6 +495,8 @@ android_library("java") {
     "src/chip/devicecontroller/model/EndpointState.java",
     "src/chip/devicecontroller/model/EventState.java",
     "src/chip/devicecontroller/model/InvokeElement.java",
+    "src/chip/devicecontroller/model/InvokeResponseData.java",
+    "src/chip/devicecontroller/model/NoInvokeResponseData.java",
     "src/chip/devicecontroller/model/NodeState.java",
     "src/chip/devicecontroller/model/Status.java",
   ]
