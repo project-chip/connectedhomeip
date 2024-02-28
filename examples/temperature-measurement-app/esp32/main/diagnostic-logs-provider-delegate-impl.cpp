@@ -92,9 +92,8 @@ size_t LogProvider::GetCrashSize()
 
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
     // Verify that the crash is present and sane
-    size_t unusedOutAddr, unusedOutSize;
-    esp_err_t esp_err = esp_core_dump_image_get(&unusedOutAddr, &unusedOutSize);
-    VerifyOrReturnValue(esp_err == ESP_OK, 0, ChipLogError(DeviceLayer, "Failed to get core dump image, esp_err:%d", esp_err));
+    esp_err_t esp_err = esp_core_dump_image_check();
+    VerifyOrReturnValue(esp_err == ESP_OK, 0, ChipLogError(DeviceLayer, "Core dump image check failed, esp_err:%d", esp_err));
 
     outSize = sizeof(esp_core_dump_summary_t);
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
