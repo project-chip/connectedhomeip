@@ -321,3 +321,14 @@ static_library("app") {
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
+
+# This action just fails with a message of "data model is not configured"
+# This has dual purpose:
+#   - give a better error message when the backend is not configured
+#   - allow GN dependency trees to work (otherwise bootstrap fails because
+#     it cannot load dependencies that are not yet set)
+action("static-data-model-not-set") {
+  script = "${chip_root}/scripts/fail_with_message.py"
+
+  args = [ "--message", "You need to set a valid value for the GN argument 'chip_static_data_model_BACKEND'." ]
+}

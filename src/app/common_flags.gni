@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/chip.gni")
 
 declare_args() {
   # Temporary flag for interaction model and echo protocols, set it to true to enable
@@ -23,5 +24,5 @@ declare_args() {
   #
   # The data model specifies what the endpoint composition and metadata is
   # built into "src/app" interaction model.
-  chip_static_data_model_BACKEND = "BACKEND-NOT-SET"
+  chip_static_data_model_BACKEND = "${chip_root}/src/app:static-data-model-not-set"
 }
