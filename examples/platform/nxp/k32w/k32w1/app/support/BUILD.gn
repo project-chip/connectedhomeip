@@ -54,7 +54,7 @@ source_set("freertos_mbedtls_utils") {
 
   if (chip_key_storage == "fwk_nvm") {
     defines = [ "CHIP_PLAT_NVM_SUPPORT=1" ]
-  } else {
+  } else if (chip_key_storage == "littlefs") {
     defines = [ "CHIP_PLAT_NVM_SUPPORT=3" ]
   }
 

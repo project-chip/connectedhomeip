@@ -83,6 +83,19 @@ static_library("nxp_platform") {
       "../../common/NXPConfigKS.cpp",
       "../../common/NXPConfig.h"
     ]
+  } else if (chip_key_storage == "nvs") {
+    defines += [
+      "gAppNvsExternalFlash_c=0",
+      "gAppNvsInternalFlash_c=1",
+      "CONFIG_SETTINGS_RUNTIME=1"
+    ]
+
+    sources += [
+      "../../common/KeyValueStoreManagerImpl.cpp",
+      "../../common/KeyValueStoreManagerImpl.h",
+      "../../common/NXPConfigNVS.cpp",
+      "../../common/NXPConfig.h"
+    ]
   }
 
   public = [

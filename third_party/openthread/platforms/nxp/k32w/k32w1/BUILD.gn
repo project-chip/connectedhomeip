@@ -51,6 +51,8 @@ config("openthread_k32w1_config") {
 
   if (chip_key_storage == "littlefs") {
     defines += [ "OT_PLAT_SAVE_NVM_DATA_ON_IDLE=0" ]
+  } else if (chip_key_storage == "nvs") {
+    defines += [ "CONFIG_SETTINGS_RUNTIME=1" ]
   }
 }
 
@@ -95,6 +97,10 @@ source_set("libopenthread-k32w1") {
     } else if (chip_key_storage == "littlefs") {
       sources += [
         "${openthread_nxp_root}/src/common/flash_fsa.c"
+      ]
+    } else if (chip_key_storage == "nvs") {
+      sources += [
+        "${openthread_nxp_root}/src/common/flash_nvs.c"
       ]
     }
   }
