@@ -103,8 +103,7 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
                 ChipLogError(AppServer, "On UDC: no udc server");
                 return;
             }
-            mUdcServer->SendCDCMessage(cd,
-                                       chip::Transport::PeerAddress::UDP(state.GetPeerAddress().GetIPAddress(), state.GetCdPort()));
+            mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(state.GetPeerAddress().GetIPAddress(), state.GetCdPort()));
             return;
         }
         else
@@ -121,7 +120,7 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     mReady = false;
     Platform::CopyString(mCurrentInstance, state.GetInstanceName());
     mPendingConsent = true;
-    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
+    char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1];
     Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingIdString,
                                         sizeof(rotatingIdString));
 
@@ -151,10 +150,10 @@ void CallbackExternalWorkerOk(System::Layer * aSystemLayer, void * aAppState)
 
     UDCClientState * client = static_cast<UDCClientState *>(aAppState);
 
-    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+    char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
     Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
                                         sizeof(rotatingIdString));
-    CharSpan rotatingIdSpan = chip::CharSpan(rotatingIdString, sizeof(rotatingIdString));
+    CharSpan rotatingIdSpan = CharSpan(rotatingIdString, sizeof(rotatingIdString));
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
     if (targetAppCount > 0)
@@ -327,8 +326,7 @@ void CommissionerDiscoveryController::InternalHandleTargetContentAppCheck(Target
         ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: target apps specified but none found, sending CDC");
         CommissionerDeclaration cd;
         cd.SetNoAppsFound(true);
-        mUdcServer->SendCDCMessage(cd,
-                                   chip::Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
     }
     ChipLogError(AppServer, "UX Ok - HandleContentAppCheck: advancing");
     // otherwise, advance to the next step for trying to obtain a passcode.
@@ -379,10 +377,10 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse(u
         //    - if CommissionerPasscode, then call new UX method to show passcode, send CDC
         if (passcode == 0 && client->GetCommissionerPasscode() && client->GetCdPort() != 0)
         {
-            char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+            char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
             Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
                                                 sizeof(rotatingIdString));
-            CharSpan rotatingIdSpan = chip::CharSpan(rotatingIdString, sizeof(rotatingIdString));
+            CharSpan rotatingIdSpan = CharSpan(rotatingIdString, sizeof(rotatingIdString));
 
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
@@ -396,7 +394,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse(u
                 cd.SetErrorCode(CommissionerDeclaration::CdError::kCommissionerPasscodeDisabled);
                 cd.SetNeedsPasscode(true);
                 mUdcServer->SendCDCMessage(
-                    cd, chip::Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+                    cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
                 return;
             }
             client->SetCachedCommissionerPasscode(passcode);
@@ -407,8 +405,8 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse(u
             {
                 cd.SetQRCodeDisplayed(true);
             }
-            mUdcServer->SendCDCMessage(
-                cd, chip::Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+            mUdcServer->SendCDCMessage(cd,
+                                       Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
 
             // dialog
             ChipLogDetail(Controller,
@@ -434,8 +432,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse(u
         ChipLogError(AppServer, "UX Ok: no app passcode and NoPasscode in UDC, sending CDC");
         CommissionerDeclaration cd;
         cd.SetNeedsPasscode(true);
-        mUdcServer->SendCDCMessage(cd,
-                                   chip::Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
         return;
     }
 
@@ -446,8 +443,7 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse(u
         CommissionerDeclaration cd;
         cd.SetNeedsPasscode(true); // TODO: should this be set?
         cd.SetPasscodeDialogDisplayed(true);
-        mUdcServer->SendCDCMessage(cd,
-                                   chip::Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
+        mUdcServer->SendCDCMessage(cd, Transport::PeerAddress::UDP(client->GetPeerAddress().GetIPAddress(), client->GetCdPort()));
     }
 
     ChipLogDetail(Controller, "------PROMPT USER: please enter passcode displayed in casting app ");
