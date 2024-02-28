@@ -174,7 +174,17 @@ export SYSTEM_VERSION_COMPAT=0
 # Make all possible human redable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg"
+args="$tracing_options"
+args="$args chip_detail_logging=$chip_detail_logging"
+args="$args enable_pylib=$enable_pybindings"
+args="$args enable_rtti=$enable_pybindings"
+args="$args chip_project_config_include_dirs=[\"//config/python\"]"
+args="$args $chip_mdns_arg"
+args="$args $chip_case_retry_arg"
+args="$args $pregen_dir_arg"
+args="$args chip_static_data_model_BACKEND=\"//src/controller/data_model:data_model\""
+
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$args"
 
 function ninja_target() {
     # Print the ninja target required to build a gn label.
