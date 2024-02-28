@@ -480,9 +480,9 @@ inline std::optional<DoorLock::CredentialTypeEnum> from_json(const nlohmann::jso
         { "Fingerprint", DoorLock::CredentialTypeEnum::kFingerprint },
         { "FingerVein", DoorLock::CredentialTypeEnum::kFingerVein },
         { "Face", DoorLock::CredentialTypeEnum::kFace },
-        { "AliroCredentialIssuerKey", DoorLock::CredentialTypeEnum::kAliroCredentialIssuerKey },
-        { "AliroEvictableEndpointKey", DoorLock::CredentialTypeEnum::kAliroEvictableEndpointKey },
-        { "AliroNonEvictableEndpointKey", DoorLock::CredentialTypeEnum::kAliroNonEvictableEndpointKey },
+        { "", DoorLock::CredentialTypeEnum::kAliroCredentialIssuerKey },
+        { "", DoorLock::CredentialTypeEnum::kAliroEvictableEndpointKey },
+        { "", DoorLock::CredentialTypeEnum::kAliroNonEvictableEndpointKey },
     };
 
     auto i = table.find(value);
@@ -515,7 +515,7 @@ inline std::optional<DoorLock::DlLockState> from_json(const nlohmann::json& valu
         { "NotFullyLocked", DoorLock::DlLockState::kNotFullyLocked },
         { "Locked", DoorLock::DlLockState::kLocked },
         { "Unlocked", DoorLock::DlLockState::kUnlocked },
-        { "Undefined", DoorLock::DlLockState::kUnlatched },
+        { "Unlatched", DoorLock::DlLockState::kUnlatched },
     };
 
     auto i = table.find(value);
@@ -540,7 +540,7 @@ inline std::optional<DoorLock::DlLockType> from_json(const nlohmann::json& value
         { "InterconnectedLock", DoorLock::DlLockType::kInterconnectedLock },
         { "DeadLatch", DoorLock::DlLockType::kDeadLatch },
         { "DoorFurniture", DoorLock::DlLockType::kDoorFurniture },
-        { "", DoorLock::DlLockType::kEurocylinder },
+        { "Eurocylinder", DoorLock::DlLockType::kEurocylinder },
     };
 
     auto i = table.find(value);
@@ -661,7 +661,7 @@ inline std::optional<DoorLock::DoorLockUserType> from_json(const nlohmann::json&
         { "WeekDayScheduleUser", DoorLock::DoorLockUserType::kWeekDayScheduleUser },
         { "MasterUser", DoorLock::DoorLockUserType::kMasterUser },
         { "NonAccessUser", DoorLock::DoorLockUserType::kNonAccessUser },
-        { "NotSupported", DoorLock::DoorLockUserType::kNotSupported },
+        { "ForcedUser", DoorLock::DoorLockUserType::kNotSupported },
     };
 
     auto i = table.find(value);
@@ -680,7 +680,7 @@ inline std::optional<DoorLock::DoorStateEnum> from_json(const nlohmann::json& va
         { "ErrorJammed", DoorLock::DoorStateEnum::kDoorJammed },
         { "ErrorForcedOpen", DoorLock::DoorStateEnum::kDoorForcedOpen },
         { "ErrorUnspecified", DoorLock::DoorStateEnum::kDoorUnspecifiedError },
-        { "Undefined", DoorLock::DoorStateEnum::kDoorAjar },
+        { "DoorAjar", DoorLock::DoorStateEnum::kDoorAjar },
     };
 
     auto i = table.find(value);

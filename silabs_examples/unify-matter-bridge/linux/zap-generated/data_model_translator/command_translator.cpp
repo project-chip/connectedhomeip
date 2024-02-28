@@ -823,44 +823,136 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
     } break;
     case Commands::SetUser::Id: {
         Commands::SetUser::DecodableType data;
+        cmd = "SetUser"; // "SetUser";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            Invoke_SetUser(ctxt, data);
+            try {
+                payload["OperationType"] = to_json(data.operationType);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["UserIndex"] = to_json(data.userIndex);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["UserName"] = to_json(data.userName);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["UserUniqueID"] = to_json(data.userUniqueID);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["UserStatus"] = to_json(data.userStatus);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["UserType"] = to_json(data.userType);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["CredentialRule"] = to_json(data.credentialRule);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
         }
     } break;
     case Commands::GetUser::Id: {
         Commands::GetUser::DecodableType data;
+        cmd = "GetUser"; // "GetUser";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            Invoke_GetUser(ctxt, data);
+            try {
+                payload["UserIndex"] = to_json(data.userIndex);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
         }
     } break;
     case Commands::ClearUser::Id: {
         Commands::ClearUser::DecodableType data;
+        cmd = "ClearUser"; // "ClearUser";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            Invoke_ClearUser(ctxt, data);
+            try {
+                payload["UserIndex"] = to_json(data.userIndex);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
         }
     } break;
     case Commands::SetCredential::Id: {
         Commands::SetCredential::DecodableType data;
+        cmd = "SetCredential"; // "SetCredential";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            Invoke_SetCredential(ctxt, data);
+            try {
+                payload["OperationType"] = to_json(data.operationType);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["Credential"] = to_json(data.credential);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["CredentialData"] = to_json(data.credentialData);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["UserIndex"] = to_json(data.userIndex);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["UserStatus"] = to_json(data.userStatus);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try {
+                payload["UserType"] = to_json(data.userType);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
         }
     } break;
     case Commands::GetCredentialStatus::Id: {
         Commands::GetCredentialStatus::DecodableType data;
+        cmd = "GetCredentialStatus"; // "GetCredentialStatus";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            Invoke_GetCredentialStatus(ctxt, data);
+            try {
+                payload["Credential"] = to_json(data.credential);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
         }
     } break;
     case Commands::ClearCredential::Id: {
         Commands::ClearCredential::DecodableType data;
+        cmd = "ClearCredential"; // "ClearCredential";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            Invoke_ClearCredential(ctxt, data);
+            try {
+                payload["Credential"] = to_json(data.credential);
+            } catch (std::exception& ex) {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
         }
     } break;
     case Commands::UnboltDoor::Id: {
         Commands::UnboltDoor::DecodableType data;
+        cmd = "UnboltDoor"; // "UnboltDoor";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            Invoke_UnboltDoor(ctxt, data);
+            if (data.PINCode.HasValue()) {
+                try {
+                    payload["PINCode"] = to_json(data.PINCode.Value());
+                } catch (std::exception& ex) {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
         }
     } break;
     case Commands::SetAliroReaderConfig::Id: {
@@ -957,6 +1049,34 @@ void DoorLockClusterCommandHandler::command_response(const bridged_endpoint* ep,
         break;
     }
     case Commands::ClearHolidaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::SetUser::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::GetUser::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::ClearUser::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::SetCredential::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::GetCredentialStatus::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::ClearCredential::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::UnboltDoor::Id: {
         status = unify_value["Status"];
         break;
     }

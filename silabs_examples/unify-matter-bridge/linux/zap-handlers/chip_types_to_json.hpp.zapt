@@ -84,5 +84,22 @@ template<> nlohmann::json inline to_json(const chip::app::Clusters::{{asUpperCam
     {{/if}}
 }
 {{/zcl_enums}}
+
+{{#zcl_structs}}
+{{#if (unifySupportedStruct label)}}
+template<> nlohmann::json inline to_json(const chip::app::Clusters::{{asUpperCamelCase parent.label}}::Structs::{{label}}::Type& value) {
+    using namespace chip::app::Clusters::{{asUpperCamelCase parent.label}};
+    nlohmann::json obj;
+    {{#if (unifyTypeExists label)}}
+{{#zcl_struct_items}} 
+    obj["{{asUpperCamelCase label}}"] = to_json(value.{{asLowerCamelCase label}});
+{{/zcl_struct_items}}
+    return obj;
+    {{else}}
+    return static_cast<uint8_t>(value);
+    {{/if}}
+}
+{{/if}}
+{{/zcl_structs}}
 {{/if}}
 {{/zcl_clusters}}

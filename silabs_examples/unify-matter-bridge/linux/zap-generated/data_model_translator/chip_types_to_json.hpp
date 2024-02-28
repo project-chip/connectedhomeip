@@ -104,6 +104,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::Identify::IdentifyTypeE
         return "{}";
     }
 }
+
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
@@ -198,6 +199,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::OnOff::StartUpOnOffEnum
         return "{}";
     }
 }
+
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
@@ -246,6 +248,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::LevelControl::StepModeE
         return "{}";
     }
 }
+
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
@@ -510,11 +513,11 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::CredentialTyp
     case CredentialTypeEnum::kFace:
         return "Face";
     case CredentialTypeEnum::kAliroCredentialIssuerKey:
-        return "AliroCredentialIssuerKey";
+        return "";
     case CredentialTypeEnum::kAliroEvictableEndpointKey:
-        return "AliroEvictableEndpointKey";
+        return "";
     case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
-        return "AliroNonEvictableEndpointKey";
+        return "";
     default:
         return "{}";
     }
@@ -546,7 +549,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::DlLockState& 
     case DlLockState::kUnlocked:
         return "Unlocked";
     case DlLockState::kUnlatched:
-        return "Undefined";
+        return "Unlatched";
     default:
         return "{}";
     }
@@ -579,7 +582,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::DlLockType& v
     case DlLockType::kDoorFurniture:
         return "DoorFurniture";
     case DlLockType::kEurocylinder:
-        return "";
+        return "Eurocylinder";
     default:
         return "{}";
     }
@@ -719,7 +722,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::DoorLockUserT
     case DoorLockUserType::kNonAccessUser:
         return "NonAccessUser";
     case DoorLockUserType::kNotSupported:
-        return "NotSupported";
+        return "ForcedUser";
     default:
         return "{}";
     }
@@ -740,7 +743,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::DoorStateEnum
     case DoorStateEnum::kDoorUnspecifiedError:
         return "ErrorUnspecified";
     case DoorStateEnum::kDoorAjar:
-        return "Undefined";
+        return "DoorAjar";
     default:
         return "{}";
     }
@@ -913,6 +916,16 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::UserTypeEnum&
     default:
         return "{}";
     }
+}
+
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type& value)
+{
+    using namespace chip::app::Clusters::DoorLock;
+    nlohmann::json obj;
+    obj["CredentialType"] = to_json(value.credentialType);
+    obj["CredentialIndex"] = to_json(value.credentialIndex);
+    return obj;
 }
 /***************************** Bitmap Converter FIXME**************/
 
@@ -1302,6 +1315,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ThermostatR
         return "{}";
     }
 }
+
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
@@ -1407,6 +1421,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::FanControl::StepDirecti
         return "{}";
     }
 }
+
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
@@ -1457,6 +1472,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::ThermostatUserInterface
         return "{}";
     }
 }
+
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
@@ -1611,6 +1627,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::ColorControl::Saturatio
         return "{}";
     }
 }
+
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
@@ -1626,6 +1643,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::IlluminanceMeasurement:
         return "{}";
     }
 }
+
 /***************************** Bitmap Converter FIXME**************/
 
 /***************************** Bitmap Converter FIXME**************/
@@ -1681,4 +1699,5 @@ nlohmann::json inline to_json(const chip::app::Clusters::OccupancySensing::Occup
         return "{}";
     }
 }
+
 /***************************** Bitmap Converter FIXME**************/

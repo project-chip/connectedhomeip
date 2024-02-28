@@ -236,10 +236,6 @@ private:
 /// Attribute Handler for the Door Lock cluster
 /// Please note that the following attributes are not defined in UCL, and they must be handled
 /// by separate code
-/// - CredentialRulesSupport (optional)
-/// - NumberOfCredentialsSupportedPerUser (optional)
-/// - LocalProgrammingFeatures (optional)
-/// - ExpiringUserTimeout (optional)
 /// - AliroReaderVerificationKey (optional)
 /// - AliroReaderGroupIdentifier (optional)
 /// - AliroReaderGroupSubIdentifier (optional)
@@ -253,7 +249,6 @@ private:
 /// - AcceptedCommandList
 /// - EventList
 /// - AttributeList
-/// - FeatureMap
 /// - ClusterRevision
 ///
 class DoorLockAttributeAccess : public attribute_translator_interface {

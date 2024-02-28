@@ -117,6 +117,7 @@ namespace app {
                     { "AutoRelockTime", AutoRelockTime::Id },
                     { "OperatingMode", OperatingMode::Id },
                     { "SupportedOperatingModes", SupportedOperatingModes::Id },
+                    { "FeatureMap", FeatureMap::Id }
                 };
             } // namespace Attributes
         } // namespace DoorLock

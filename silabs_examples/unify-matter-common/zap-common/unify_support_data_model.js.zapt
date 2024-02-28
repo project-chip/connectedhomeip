@@ -48,5 +48,11 @@ bitmaps: {
     {{/zcl_bitmap_items}}
   },
   {{/zcl_bitmaps}}
-  }
+  },
+  
+structs: {
+  {{#zcl_structs}}
+  "{{asUpperCamelCase label}}" : [{{#zcl_struct_items}}"{{label}}",{{/zcl_struct_items}}]  ,
+  {{/zcl_structs}}
+}
 }

@@ -1449,6 +1449,13 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
         jsn["EnablePrivacyModeButton"] = to_json(value);
         break;
     }
+    case Attributes::LocalProgrammingFeatures::Id: {
+
+        Attributes::LocalProgrammingFeatures::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["LocalProgrammingFeatures"] = to_json(value);
+        break;
+    }
     case Attributes::WrongCodeEntryLimit::Id: {
 
         Attributes::WrongCodeEntryLimit::TypeInfo::DecodableType value;
@@ -1475,6 +1482,13 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
         Attributes::RequirePINforRemoteOperation::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
         jsn["RequirePINforRFOperation"] = to_json(value);
+        break;
+    }
+    case Attributes::ExpiringUserTimeout::Id: {
+
+        Attributes::ExpiringUserTimeout::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["ExpiringUserTimeout"] = to_json(value);
         break;
     }
         // AliroReaderVerificationKey is not supported by UCL
@@ -1811,6 +1825,31 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
         }
         break;
     }
+        // type is DlCredentialRuleMask
+    case MN::CredentialRulesSupport::Id: {
+        using T = MN::CredentialRulesSupport::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "CredentialRulesSupport attribute value is %s", unify_value.dump().c_str());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::CredentialRulesSupport::Id);
+        }
+        break;
+    }
+        // type is int8u
+    case MN::NumberOfCredentialsSupportedPerUser::Id: {
+        using T = MN::NumberOfCredentialsSupportedPerUser::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "NumberOfCredentialsSupportedPerUser attribute value is %s", unify_value.dump().c_str());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
+                MN::NumberOfCredentialsSupportedPerUser::Id);
+        }
+        break;
+    }
         // type is char_string
     case MN::Language::Id: {
         using T = MN::Language::TypeInfo::Type;
@@ -1944,6 +1983,18 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
         }
         break;
     }
+        // type is DlLocalProgrammingFeatures
+    case MN::LocalProgrammingFeatures::Id: {
+        using T = MN::LocalProgrammingFeatures::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "LocalProgrammingFeatures attribute value is %s", unify_value.dump().c_str());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LocalProgrammingFeatures::Id);
+        }
+        break;
+    }
         // type is int8u
     case MN::WrongCodeEntryLimit::Id: {
         using T = MN::WrongCodeEntryLimit::TypeInfo::Type;
@@ -1991,6 +2042,30 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
             attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
                 MN::RequirePINforRemoteOperation::Id);
+        }
+        break;
+    }
+        // type is int16u
+    case MN::ExpiringUserTimeout::Id: {
+        using T = MN::ExpiringUserTimeout::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "ExpiringUserTimeout attribute value is %s", unify_value.dump().c_str());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::ExpiringUserTimeout::Id);
+        }
+        break;
+    }
+        // type is bitmap32
+    case MN::FeatureMap::Id: {
+        using T = MN::FeatureMap::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
+            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::FeatureMap::Id);
         }
         break;
     }

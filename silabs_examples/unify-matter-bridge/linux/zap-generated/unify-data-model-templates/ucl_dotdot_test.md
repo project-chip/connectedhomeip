@@ -56,3 +56,4 @@ ConfigurationParameters
 AoXLocator
 AoXPositionEstimation
 ProtocolController-NetworkManagement
+Descriptor

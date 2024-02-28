@@ -1122,7 +1122,18 @@ namespace app {
         } // namespace ValveConfigurationAndControl
         namespace ElectricalPowerMeasurement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "PowerMode", PowerMode::Id },
+                    { "NumberOfMeasurementTypes", NumberOfMeasurementTypes::Id },
+                    { "Accuracy", Accuracy::Id },
+                    { "ActivePower", ActivePower::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace ElectricalPowerMeasurement
         namespace ElectricalEnergyMeasurement {
@@ -1160,7 +1171,16 @@ namespace app {
         } // namespace DemandResponseLoadControl
         namespace Messages {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "Messages", Messages::Id },
+                    { "ActiveMessageIDs", ActiveMessageIDs::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace Messages
         namespace DeviceEnergyManagement {
@@ -1216,7 +1236,14 @@ namespace app {
         } // namespace EnergyPreference
         namespace PowerTopology {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace PowerTopology
         namespace EnergyEvseMode {
@@ -2268,7 +2295,7 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "TestEventTrigger", TestEventTrigger::Id },
                     { "TimeSnapshot", TimeSnapshot::Id },
-                    { "TimeSnapshotResponse", TimeSnapshotResponse::Id }
+                    { "TimeSnapshotResponse", TimeSnapshotResponse::Id },
                 };
             } // namespace Commands
         } // namespace GeneralDiagnostics
@@ -2289,9 +2316,7 @@ namespace app {
         } // namespace WiFiNetworkDiagnostics
         namespace EthernetNetworkDiagnostics {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "ResetCounts", ResetCounts::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace EthernetNetworkDiagnostics
         namespace TimeSynchronization {
@@ -2553,6 +2578,11 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace ValveConfigurationAndControl
+        namespace ElectricalPowerMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ElectricalPowerMeasurement
         namespace ElectricalEnergyMeasurement {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
@@ -2570,7 +2600,10 @@ namespace app {
         } // namespace DemandResponseLoadControl
         namespace Messages {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "PresentMessagesRequest", PresentMessagesRequest::Id },
+                    { "CancelMessagesRequest", CancelMessagesRequest::Id }
+                };
             } // namespace Commands
         } // namespace Messages
         namespace DeviceEnergyManagement {

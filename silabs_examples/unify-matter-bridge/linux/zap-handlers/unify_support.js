@@ -216,6 +216,13 @@ function getMatterEventEnum(clusterID, eventID, value) {
   return unify_matter_mapping.matter_event_enum(clusterID, eventID, value)
 }
 
+function unifySupportedStruct(label) {
+  switch (label) {
+    case 'CredentialStruct' : return true;
+    default: return false
+  }
+  }
+
 exports.getSpecialValues = getSpecialValues
 exports.attributeHasSpecialValues = attributeHasSpecialValues
 exports.unifySupportedCluster = unifySupportedCluster
@@ -237,3 +244,4 @@ exports.unifyAppendClusterToAttrType = unifyAppendClusterToAttrType
 exports.unifySupportedClusterEvents = unifySupportedClusterEvents
 exports.getMatterEventNameForAttribute = getMatterEventNameForAttribute
 exports.getMatterEventEnum = getMatterEventEnum
+exports.unifySupportedStruct = unifySupportedStruct

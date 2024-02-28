@@ -180,69 +180,6 @@ public:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
 
     ///
-    /// The command SetUser is not defined in UCL and must be manually handled
-    ///
-    virtual void Invoke_SetUser(CommandHandlerInterface::HandlerContext& ctxt,
-        chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType data)
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
-        ctxt.SetCommandHandled();
-    };
-    ///
-    /// The command GetUser is not defined in UCL and must be manually handled
-    ///
-    virtual void Invoke_GetUser(CommandHandlerInterface::HandlerContext& ctxt,
-        chip::app::Clusters::DoorLock::Commands::GetUser::DecodableType data)
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
-        ctxt.SetCommandHandled();
-    };
-    ///
-    /// The command ClearUser is not defined in UCL and must be manually handled
-    ///
-    virtual void Invoke_ClearUser(CommandHandlerInterface::HandlerContext& ctxt,
-        chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType data)
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
-        ctxt.SetCommandHandled();
-    };
-    ///
-    /// The command SetCredential is not defined in UCL and must be manually handled
-    ///
-    virtual void Invoke_SetCredential(CommandHandlerInterface::HandlerContext& ctxt,
-        chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType data)
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
-        ctxt.SetCommandHandled();
-    };
-    ///
-    /// The command GetCredentialStatus is not defined in UCL and must be manually handled
-    ///
-    virtual void Invoke_GetCredentialStatus(CommandHandlerInterface::HandlerContext& ctxt,
-        chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType data)
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
-        ctxt.SetCommandHandled();
-    };
-    ///
-    /// The command ClearCredential is not defined in UCL and must be manually handled
-    ///
-    virtual void Invoke_ClearCredential(CommandHandlerInterface::HandlerContext& ctxt,
-        chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType data)
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
-        ctxt.SetCommandHandled();
-    };
-    ///
-    /// The command UnboltDoor is not defined in UCL and must be manually handled
-    ///
-    virtual void Invoke_UnboltDoor(CommandHandlerInterface::HandlerContext& ctxt,
-        chip::app::Clusters::DoorLock::Commands::UnboltDoor::DecodableType data)
-    {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
-        ctxt.SetCommandHandled();
-    };
-    ///
     /// The command SetAliroReaderConfig is not defined in UCL and must be manually handled
     ///
     virtual void Invoke_SetAliroReaderConfig(CommandHandlerInterface::HandlerContext& ctxt,
