@@ -34,8 +34,8 @@ def main():
             print("\033[1m\033[91m")  # BOLD, RED
             print(f'🚨 %-{wrap_width}s 🚨' % 'CRITICAL FAILURE:')
             print(f'🚨 %-{wrap_width}s 🚨' % '')
-            for l in textwrap.wrap(args.message, wrap_width):
-                print(f'🚨 %-{wrap_width}s 🚨' % l)
+            for message_line in textwrap.wrap(args.message, wrap_width):
+                print(f'🚨 %-{wrap_width}s 🚨' % message_line)
             print(f'🚨 %-{wrap_width}s 🚨' % '')
             print("\033[0m")  # CLEAR
         else:
