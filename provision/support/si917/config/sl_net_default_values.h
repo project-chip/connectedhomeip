@@ -19,9 +19,11 @@
 
 #include "sl_net_wifi_types.h"
 
+#if defined(__GNUC__)
 // Ignore warning of unused variables. It is expected that some or all of these are unused
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
 
 #ifdef SLI_SI91X_ENABLE_IPV6
 #define REQUIRED_IP_TYPE SL_IPV6
@@ -71,6 +73,31 @@
 #define DEFAULT_WIFI_GATEWAY_ADDRESS 0x0A0AA8C0
 #endif
 
+//! Wi-Fi BTR Channel
+#define SL_CHANNEL_NO 14
+
+//! Wi-Fi BTR default Tx power
+#define SL_TX_POWER 127
+
+//! Wi-Fi BTR config default values
+#define DEFAULT_RETRANSMIT_COUNT 15
+#define DEFAULT_QOS_BE_CWMIN     4
+#define DEFAULT_QOS_BE_CWMAX     6
+#define DEFAULT_QOS_BE_AIFSN     3
+#define DEFAULT_QOS_BK_CWMIN     4
+#define DEFAULT_QOS_BK_CWMAX     10
+#define DEFAULT_QOS_BK_AIFSN     7
+#define DEFAULT_QOS_VI_CWMIN     3
+#define DEFAULT_QOS_VI_CWMAX     4
+#define DEFAULT_QOS_VI_AIFSN     1
+#define DEFAULT_QOS_VO_CWMIN     2
+#define DEFAULT_QOS_VO_CWMAX     3
+#define DEFAULT_QOS_VO_AIFSN     1
+
+//! Wi-Fi BTR option to store peer information in MAC layer
+#define MAC_PEER_DS_SUPPORT          1
+#define FEAT_BTR_MAC_PEER_DS_SUPPORT BIT(13)
+
 #define DEFAULT_WIFI_CLIENT_PROFILE \
   (sl_net_wifi_client_profile_t)    \
   {                                 \
@@ -114,6 +141,9 @@
         .client_idle_timeout = 0xFF, \
         .dtim_beacon_count = 3, \
         .maximum_clients = 3, \
+        .beacon_stop = 0, \
+        .tdi_flags =SL_WIFI_TDI_NONE, \
+        .is_11n_enabled = 0, \
     }, \
     .ip = { \
       .mode      = SL_IP_MANAGEMENT_STATIC_IP, \
@@ -127,6 +157,31 @@
     }                        \
   }
 
+#define DEFAULT_WIFI_BTR_PROFILE                                                  \
+  (sl_net_wifi_btr_profile_t)                                                     \
+  {                                                                               \
+    .config = {                                                                   \
+      .btr_chan_info.chan_info        = { .channel   = SL_CHANNEL_NO,             \
+                                          .band      = SL_WIFI_BAND_2_4GHZ,       \
+                                          .bandwidth = SL_WIFI_BANDWIDTH_20MHz }, \
+      .btr_chan_info.tx_power         = SL_TX_POWER,                              \
+      .config_params.set              = 1,                                        \
+      .config_params.retransmit_count = DEFAULT_RETRANSMIT_COUNT,                 \
+      .config_params.cw_params[0]     = { .cwmin = DEFAULT_QOS_BE_CWMIN,          \
+                                          .cwmax = DEFAULT_QOS_BE_CWMAX,          \
+                                          .aifsn = DEFAULT_QOS_BE_AIFSN },        \
+      .config_params.cw_params[1]     = { .cwmin = DEFAULT_QOS_BK_CWMIN,          \
+                                          .cwmax = DEFAULT_QOS_BK_CWMAX,          \
+                                          .aifsn = DEFAULT_QOS_BK_AIFSN },        \
+      .config_params.cw_params[2]     = { .cwmin = DEFAULT_QOS_VI_CWMIN,          \
+                                          .cwmax = DEFAULT_QOS_VI_CWMAX,          \
+                                          .aifsn = DEFAULT_QOS_VI_AIFSN },        \
+      .config_params.cw_params[3]     = { .cwmin = DEFAULT_QOS_VO_CWMIN,          \
+                                          .cwmax = DEFAULT_QOS_VO_CWMAX,          \
+                                          .aifsn = DEFAULT_QOS_VO_AIFSN }         \
+    }                                                                             \
+  }
+
 static sl_net_wifi_psk_credential_entry_t default_wifi_client_credential = {
   .type        = SL_NET_WIFI_PSK,
   .data_length = sizeof(DEFAULT_WIFI_CLIENT_CREDENTIAL) - 1,
@@ -137,6 +192,7 @@ static sl_net_wifi_psk_credential_entry_t default_wifi_ap_credential = { .type =
                                                                          .data_length =
                                                                            sizeof(DEFAULT_WIFI_AP_CREDENTIAL) - 1,
                                                                          .data = DEFAULT_WIFI_AP_CREDENTIAL };
-
+#if defined(__GNUC__)
 // Restore GCC diagnostics
 #pragma GCC diagnostic pop
+#endif

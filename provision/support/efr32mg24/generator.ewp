@@ -221,6 +221,9 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
+                    <state>CHIP_CONFIG_SHA256_CONTEXT_SIZE=256</state>
+                    <state>CHIP_SYSTEM_CONFIG_USE_SOCKETS=1</state>
+                    <state>PROVISION_CHANNEL_ENABLED=1</state>
                     <state>EFR32MG24A010F1024IM48=1</state>
                     <state>SL_APP_PROPERTIES=1</state>
                     <state>configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS=2</state>
@@ -288,7 +291,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>11111110</state>
+                    <state>00000000</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -363,6 +366,8 @@
                     <state>$PROJ_DIR$\..\..\..\zzz_generated\app-common</state>
                     <state>$PROJ_DIR$\..\..\..\third_party\nlassert\repo\include</state>
                     <state>$PROJ_DIR$\..\..\..\third_party\nlio\repo\include</state>
+                    <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\platform\bootloader</state>
+                    <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\protocol\bluetooth\config</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\Device\SiliconLabs\EFR32MG24\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\common\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\CMSIS\Core\Include</state>
@@ -404,7 +409,7 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>3</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
@@ -562,6 +567,9 @@
                 </option>
                 <option>
                     <name>ADefines</name>
+                    <state>CHIP_CONFIG_SHA256_CONTEXT_SIZE=256</state>
+                    <state>CHIP_SYSTEM_CONFIG_USE_SOCKETS=1</state>
+                    <state>PROVISION_CHANNEL_ENABLED=1</state>
                     <state>EFR32MG24A010F1024IM48=1</state>
                     <state>SL_APP_PROPERTIES=1</state>
                     <state>configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS=2</state>
@@ -671,6 +679,8 @@
                     <state>$PROJ_DIR$\..\..\..\zzz_generated\app-common</state>
                     <state>$PROJ_DIR$\..\..\..\third_party\nlassert\repo\include</state>
                     <state>$PROJ_DIR$\..\..\..\third_party\nlio\repo\include</state>
+                    <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\platform\bootloader</state>
+                    <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\protocol\bluetooth\config</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\Device\SiliconLabs\EFR32MG24\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\common\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\CMSIS\Core\Include</state>

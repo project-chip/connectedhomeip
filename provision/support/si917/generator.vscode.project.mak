@@ -3,14 +3,14 @@
 # Makefile Version 15                                              #
 ####################################################################
 
-BASE_SDK_PATH = /home/thiru/matter/stash_slc/matter/third_party/silabs/gecko_sdk
+BASE_SDK_PATH ?= /git/gsdk
 UNAME:=$(shell $(POSIX_TOOL_PATH)uname -s | $(POSIX_TOOL_PATH)sed -e 's/^\(CYGWIN\).*/\1/' | $(POSIX_TOOL_PATH)sed -e 's/^\(MINGW\).*/\1/')
 ifeq ($(UNAME),MINGW)
 # Translate "C:/super" into "/C/super" for MinGW make.
 SDK_PATH := /$(shell $(POSIX_TOOL_PATH)echo $(BASE_SDK_PATH) | sed s/://)
 endif
 SDK_PATH ?= $(BASE_SDK_PATH)
-COPIED_SDK_PATH ?= gecko_sdk_4.4.0
+COPIED_SDK_PATH ?= gecko_sdk_4.4.1
 
 # This uses the explicit build rules below
 PROJECT_SOURCE_FILES =
@@ -46,7 +46,6 @@ C_DEFS += \
  '-DSRAM_BASE=0x0cUL' \
  '-DSLI_SI91X_MCU_ENABLE_IPMU_APIS=1' \
  '-DSL_SI91X_SI917_RAM_MEM_CONFIG=1' \
- '-DconfigUSE_POSIX_ERRNO=1' \
  '-DSLI_SI91X_OFFLOAD_NETWORK_STACK=1' \
  '-DSI917=1' \
  '-DSLI_SI91X_ENABLE_OS=1' \
@@ -82,7 +81,6 @@ ASM_DEFS += \
  '-DSRAM_BASE=0x0cUL' \
  '-DSLI_SI91X_MCU_ENABLE_IPMU_APIS=1' \
  '-DSL_SI91X_SI917_RAM_MEM_CONFIG=1' \
- '-DconfigUSE_POSIX_ERRNO=1' \
  '-DSLI_SI91X_OFFLOAD_NETWORK_STACK=1' \
  '-DSI917=1' \
  '-DSLI_SI91X_ENABLE_OS=1' \
@@ -112,28 +110,28 @@ INCLUDES += \
  -I../../../src/lib/support \
  -I../../../src/platform/silabs \
  -I../../../third_party/silabs/matter_support/matter/si91x/siwx917/BRD4338A/support/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/service/bsd_socket/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/CMSIS/Driver/Include \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/config \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver \
- -I$(SDK_PATH)/../wifi_sdk/components/service/network_manager/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/rom_driver/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/board/silabs/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/config \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/errno/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/icmp \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/firmware_upgrade \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/inc \
- -I$(SDK_PATH)/../wifi_sdk/components/protocol/wifi/inc \
- -I$(SDK_PATH)/../wifi_sdk/resources/certificates \
- -I$(SDK_PATH)/../wifi_sdk/resources/other \
- -I$(SDK_PATH)/../wifi_sdk/components/common/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/service/bsd_socket/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/CMSIS/Driver/Include \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/config \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver \
+ -I$(SDK_PATH)/../wiseconnect/components/service/network_manager/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/rom_driver/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/board/silabs/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/config \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/errno/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/icmp \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/firmware_upgrade \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/inc \
+ -I$(SDK_PATH)/../wiseconnect/components/protocol/wifi/inc \
+ -I$(SDK_PATH)/../wiseconnect/resources/certificates \
+ -I$(SDK_PATH)/../wiseconnect/resources/other \
+ -I$(SDK_PATH)/../wiseconnect/components/common/inc \
  -I$(SDK_PATH)/platform/common/inc \
  -I$(SDK_PATH)/platform/CMSIS/Core/Include \
  -I$(SDK_PATH)/platform/CMSIS/RTOS2/Include \
@@ -175,6 +173,7 @@ C_FLAGS += \
  -fdata-sections \
  -ffunction-sections \
  -fomit-frame-pointer \
+ -Wno-unused-parameter \
  --specs=nano.specs \
  -g
 
@@ -183,7 +182,7 @@ CXX_FLAGS += \
  -mthumb \
  -mfpu=fpv4-sp-d16 \
  -mfloat-abi=softfp \
- -std=c++11 \
+ -std=c++17 \
  -fno-rtti \
  -fno-exceptions \
  -Wall \
@@ -192,7 +191,7 @@ CXX_FLAGS += \
  -fdata-sections \
  -ffunction-sections \
  -fomit-frame-pointer \
- -std=gnu++17 \
+ -Wno-unused-parameter \
  --specs=nano.specs \
  -g
 
@@ -228,383 +227,390 @@ post-build: $(OUTPUT_DIR)/$(PROJECTNAME).out
 ####################################################################
 # SDK Build Rules                                                  #
 ####################################################################
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/board/silabs/src/rsi_board.o: $(SDK_PATH)/../wifi_sdk/components/board/silabs/src/rsi_board.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/board/silabs/src/rsi_board.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/board/silabs/src/rsi_board.o: $(SDK_PATH)/../wiseconnect/components/board/silabs/src/rsi_board.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/board/silabs/src/rsi_board.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/board/silabs/src/rsi_board.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/board/silabs/src/rsi_board.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/board/silabs/src/rsi_board.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/board/silabs/src/rsi_board.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/board/silabs/src/rsi_board.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/board/silabs/src/rsi_board.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/common/src/sl_utility.o: $(SDK_PATH)/../wifi_sdk/components/common/src/sl_utility.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/common/src/sl_utility.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/common/src/sl_utility.o: $(SDK_PATH)/../wiseconnect/components/common/src/sl_utility.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/common/src/sl_utility.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/common/src/sl_utility.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/common/src/sl_utility.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/common/src/sl_utility.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/common/src/sl_utility.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/common/src/sl_utility.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/common/src/sl_utility.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/ipmu_apis.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/iPMU_prog/iPMU_dotc/rsi_system_config_917.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/startup_si91x.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/startup_si91x.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/startup_si91x.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/startup_si91x.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/startup_si91x.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/startup_si91x.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_crc.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_egpio.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_timers.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_udma_wrapper.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_usart.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_power_save.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_temp_sensor.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_ram.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/rsi_hal_mcu_m4_rom.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_platform_wireless.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/errno/src/sl_si91x_errno.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/icmp/sl_net_ping.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/icmp/sl_net_ping.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/icmp/sl_net_ping.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/icmp/sl_net_ping.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/icmp/sl_net_ping.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/icmp/sl_net_ping.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/memory/malloc_buffers.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/memory/malloc_buffers.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/memory/malloc_buffers.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/icmp/sl_net_ping.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/icmp/sl_net_ping.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/icmp/sl_net_ping.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/memory/malloc_buffers.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/memory/malloc_buffers.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/memory/malloc_buffers.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/icmp/sl_net_ping.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/icmp/sl_net_ping.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/icmp/sl_net_ping.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/memory/malloc_buffers.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/memory/malloc_buffers.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/memory/malloc_buffers.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/memory/malloc_buffers.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/memory/malloc_buffers.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/memory/malloc_buffers.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/src/sl_rsi_utility.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/src/sl_rsi_utility.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/src/sl_rsi_utility.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/src/sl_rsi_utility.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/src/sl_rsi_utility.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/src/sl_rsi_utility.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_driver.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_driver.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/src/sl_si91x_driver.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.o: $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_driver.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_driver.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/src/sl_si91x_driver.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/protocol/wifi/si91x/sl_wifi.o: $(SDK_PATH)/../wifi_sdk/components/protocol/wifi/si91x/sl_wifi.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/protocol/wifi/si91x/sl_wifi.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.o: $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/protocol/wifi/si91x/sl_wifi.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/protocol/wifi/si91x/sl_wifi.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/protocol/wifi/si91x/sl_wifi.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/protocol/wifi/src/sl_wifi_callback_framework.o: $(SDK_PATH)/../wifi_sdk/components/protocol/wifi/src/sl_wifi_callback_framework.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/protocol/wifi/src/sl_wifi_callback_framework.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/protocol/wifi/si91x/sl_wifi.o: $(SDK_PATH)/../wiseconnect/components/protocol/wifi/si91x/sl_wifi.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/protocol/wifi/si91x/sl_wifi.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/protocol/wifi/src/sl_wifi_callback_framework.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/protocol/wifi/src/sl_wifi_callback_framework.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/protocol/wifi/src/sl_wifi_callback_framework.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/protocol/wifi/si91x/sl_wifi.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/protocol/wifi/si91x/sl_wifi.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/protocol/wifi/si91x/sl_wifi.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/si91x/sl_net_si91x.o: $(SDK_PATH)/../wifi_sdk/components/service/network_manager/si91x/sl_net_si91x.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/service/network_manager/si91x/sl_net_si91x.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/protocol/wifi/src/sl_wifi_callback_framework.o: $(SDK_PATH)/../wiseconnect/components/protocol/wifi/src/sl_wifi_callback_framework.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/protocol/wifi/src/sl_wifi_callback_framework.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/service/network_manager/si91x/sl_net_si91x.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/si91x/sl_net_si91x.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/si91x/sl_net_si91x.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/protocol/wifi/src/sl_wifi_callback_framework.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/protocol/wifi/src/sl_wifi_callback_framework.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/protocol/wifi/src/sl_wifi_callback_framework.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net.o: $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/si91x/sl_net_si91x.o: $(SDK_PATH)/../wiseconnect/components/service/network_manager/si91x/sl_net_si91x.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/service/network_manager/si91x/sl_net_si91x.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/service/network_manager/si91x/sl_net_si91x.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/si91x/sl_net_si91x.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/si91x/sl_net_si91x.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net_basic_certificate_store.o: $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net_basic_certificate_store.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net_basic_certificate_store.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net.o: $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net_basic_certificate_store.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net_basic_certificate_store.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net_basic_certificate_store.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net_basic_credentials.o: $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net_basic_credentials.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net_basic_credentials.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net_basic_certificate_store.o: $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net_basic_certificate_store.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net_basic_certificate_store.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net_basic_credentials.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net_basic_credentials.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net_basic_credentials.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net_basic_certificate_store.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net_basic_certificate_store.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net_basic_certificate_store.o
 
-$(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net_basic_profiles.o: $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net_basic_profiles.c
-	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net_basic_profiles.c'
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net_basic_credentials.o: $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net_basic_credentials.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net_basic_credentials.c'
 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
-	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wifi_sdk/components/service/network_manager/src/sl_net_basic_profiles.c
-CDEPS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net_basic_profiles.d
-OBJS += $(OUTPUT_DIR)/sdk/_/wifi_sdk/components/service/network_manager/src/sl_net_basic_profiles.o
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net_basic_credentials.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net_basic_credentials.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net_basic_credentials.o
+
+$(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net_basic_profiles.o: $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net_basic_profiles.c
+	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net_basic_profiles.c'
+	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
+	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/../wiseconnect/components/service/network_manager/src/sl_net_basic_profiles.c
+CDEPS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net_basic_profiles.d
+OBJS += $(OUTPUT_DIR)/sdk/_/wiseconnect/components/service/network_manager/src/sl_net_basic_profiles.o
 
 $(OUTPUT_DIR)/sdk/platform/CMSIS/RTOS2/Source/os_systick.o: $(SDK_PATH)/platform/CMSIS/RTOS2/Source/os_systick.c
 	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/platform/CMSIS/RTOS2/Source/os_systick.c'
@@ -640,6 +646,13 @@ $(OUTPUT_DIR)/sdk/platform/common/src/sli_cmsis_os2_ext_task_register.o: $(SDK_P
 	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/platform/common/src/sli_cmsis_os2_ext_task_register.c
 CDEPS += $(OUTPUT_DIR)/sdk/platform/common/src/sli_cmsis_os2_ext_task_register.d
 OBJS += $(OUTPUT_DIR)/sdk/platform/common/src/sli_cmsis_os2_ext_task_register.o
+
+# $(OUTPUT_DIR)/sdk/platform/emdrv/nvm3/src/nvm3_default_common_linker.o: $(SDK_PATH)/platform/emdrv/nvm3/src/nvm3_default_common_linker.c
+# 	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/platform/emdrv/nvm3/src/nvm3_default_common_linker.c'
+# 	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
+# 	$(ECHO)$(CC) $(CFLAGS) -c -o $@ $(SDK_PATH)/platform/emdrv/nvm3/src/nvm3_default_common_linker.c
+# CDEPS += $(OUTPUT_DIR)/sdk/platform/emdrv/nvm3/src/nvm3_default_common_linker.d
+# OBJS += $(OUTPUT_DIR)/sdk/platform/emdrv/nvm3/src/nvm3_default_common_linker.o
 
 $(OUTPUT_DIR)/sdk/platform/emdrv/nvm3/src/nvm3_lock.o: $(SDK_PATH)/platform/emdrv/nvm3/src/nvm3_lock.c
 	@$(POSIX_TOOL_PATH)echo 'Building $(SDK_PATH)/platform/emdrv/nvm3/src/nvm3_lock.c'
@@ -829,6 +842,13 @@ $(OUTPUT_DIR)/project/_/_/_/src/lib/support/Base64.o: ../../../src/lib/support/B
 	$(ECHO)$(CXX) $(CXXFLAGS) -c -o $@ ../../../src/lib/support/Base64.cpp
 CXXDEPS += $(OUTPUT_DIR)/project/_/_/_/src/lib/support/Base64.d
 OBJS += $(OUTPUT_DIR)/project/_/_/_/src/lib/support/Base64.o
+
+$(OUTPUT_DIR)/project/_/_/_/src/lib/support/BytesToHex.o: ../../../src/lib/support/BytesToHex.cpp
+	@$(POSIX_TOOL_PATH)echo 'Building ../../../src/lib/support/BytesToHex.cpp'
+	@$(POSIX_TOOL_PATH)mkdir -p $(@D)
+	$(ECHO)$(CXX) $(CXXFLAGS) -c -o $@ ../../../src/lib/support/BytesToHex.cpp
+CXXDEPS += $(OUTPUT_DIR)/project/_/_/_/src/lib/support/BytesToHex.d
+OBJS += $(OUTPUT_DIR)/project/_/_/_/src/lib/support/BytesToHex.o
 
 $(OUTPUT_DIR)/project/_/_/_/src/lib/support/CHIPMem-Malloc.o: ../../../src/lib/support/CHIPMem-Malloc.cpp
 	@$(POSIX_TOOL_PATH)echo 'Building ../../../src/lib/support/CHIPMem-Malloc.cpp'
@@ -1175,5 +1195,5 @@ OBJS += $(OUTPUT_DIR)/project/_/_/generator/nvm3_si917.o
 
 # Automatically-generated Simplicity Studio Metadata
 # Please do not edit or delete these lines!
-# SIMPLICITY_STUDIO_METADATA=eJztfQtz47iV7l+Zcm3d2r2RxbbbM/24M0m5ZXePN3bb11JnMjdOsSgSkhjzNXxY9qTy3y8AEhQfIAmQAAmndnbT3SKJc77v4A0cHPzz6O7+9r8vFyv9/vZ2dfTx6J8PR/eX1+erq79c6sVXD0cfH44ejv51NMtTLG+/3S8ulzDRj396dp3vnkAY2b7308PRyfzNw9F3wDN9y/a28MG31efj9w9Hf/rjg/djEPr/AGb8HUziRR9d3wIO/GIXx8FHTdvv9/PIdox1NDd9V4sibRknlu3PgemHAAqFqQMQxi9LE/4N02XSHo6g6O+++3HjOxYIv/MMF700fW9jb7N36K3tAPJuefnly+W9fr9a6Qv42XwHhSehDd+grz5qO98FWryzw0RzjTgGoRbFRrTTI3dLHkDdTzairEVJEPhhrEX2h5N3WqpWo2jQaEgiR/dArFtgYyROrD8ZTgIiCXga9VBR3a8u9QvwZJtAhzIkwKkraLLO2jdCS0+TJaERQ5FyzNOgqBNXHPqOZEREBRXL5xCA+9XtcoHTSUBSV0DFAVzHXuuopsJStk62mSklAGrRlCL7UUubAlqzYCSxvwUevV1wbO8RhOiJvvQXc8cShz3Tq1FUNFbBhe8Gvge8WGiLQJDUNTSVdZN8pZtGbDi+0EwlcJr0NIECT+jDneFZDgglAarpYANjjgDGbAZj+1EcAsPNvpVSeBrUMEOSYyKamk5ItmfH8A+ozzPlG6uujQpwboYmadfgP8Vjqinobjr3dgRHYp4Hh1xv9ch61N/OT+YnhZa0Mv4iTUv+Re0bCw8BCu9rX6TjwdIXlG8+nDxXPql95JpJ7RMK5hBQvqp/t7MD6nd1bMi01A9rn9p3N990mG3bxgT0JJYfN+tIExUKFhym69FLFAM3y308AGMuYI5JHqC3lh4YcDyupbmk7e2NjQqGdsh7Lc1i8gXOKg3mhYZMrSE7atBEWs5dyylpjUg1Vq524Ca6Edgczc2I/EromjmVaiT/61Krl1oTg5zcJFUwTRaold4g0kPYkG4Sz5ycBAUPMw8LgCBy4B965KvBpIaIzqW1yFVbKK+t/atYBIShzzGUk2AJCFcrIWHKzbURAT1+CXhGD5LAl6EwobfgWFsR9GUoTOjvlyfP8L/JoRdwMLcAphmgOY/Ls6QhsdCX4bCzgDLUwJ8B6dWTqECggoeZR2mUpASTGiImLjBFqmJyDiUkrNgVqcolJKzYjSgCYawC9gMSnnqsUNkvoWHiUBoKT02hCoaNAfpalcpbBcPBwH2avisrIeEegbe9at0ga/22fRmjUh09yBJOdm0/tGMb5LVhqhlOtp+SzXGawfWa7FBGdAlsv6Zuj1LODYgaiDJm4/SUmoHRmDVmYPOLyiJlaKPdbaZ1QTeyIz1NwFaxFjfLqyXrCuFFm2DK91ee6SQWfUWTmu2pArQrNM1AJjO1VrSjhk2kpdC0jJJWQ8q8KEhSnn99FQRTmLzsLlc/vwZ2Gcwe7PSb88UrYUig9mF59/Ovr4VlBpWX5WcHYn8NHHOgvAyvTl9FSc1g8rK7WVy9BnYZTF52X8+/XrwGegQnL7/l+avIvQwmN7u718Hurhe7b8vz+9Vr4JcD5Wf46XXw+9ST3atoWwjOHvxexSCU4JSzBc+zWdq6IiPIP1CunQvuvXTXwk5OfdyOR+NEd1nmynDVZ9uME+sSkUuFJmOXrbOtEuwvCo0PvrQOAkqwFZpPtM4ZSqAVmia0TgVKoOGUVr8+//r+3dnpuSroq5gYaCg0yG8dyJdBq1M32avmt4sbZQoKwcICW6WZRMdsoQJcmQlC6ySgXkjG3wxrLiTNe1/1QqIKbgKGa8enNuAOfZdrt4bLmxEJN53HKcfmB365d0IRFbODBUoEtoHtq8clh8XuLWKYj7Y3xUZmC5UCKK5cMcMpXNe6ylfI57+G00zhfNTFg88NCRfHTRJN4QHTVUsILC4yG9tVj0oGiovINrBcQz0qOSwuMoG/hxP0yHhSsJyVsfHR2itY2DJQXER+iwJbPSYEFReVULVusgCKi0hsrB2gT3dWoINSDV4PclN5jzJR4/MmzdPaLs/R7tEoEVhcZBIlu6CkTw+EEun70AgCFbOnio6PmhNEEZogKcirCE2iXzA0mx3sQGg4GQq662N/H2HT8c1HPQksIwYTLijUeWIn4So69nNQ4RSnODvYFIAxE0mn1EpSyaExk8GN9RQHwBnYHLAx08HttZJkCDIuKnk7rSylIkJ2ahFEpSgnAm3Es92lJnW6fpViFdS/VtFxNfjKsSkA42zwlaTCt7xrJM96CDYgBJ4J9Cffiac7tdJBrhUqc84ZlqJFMAPGcRR+yjWTtrpk8i2bIK1GaMSTBLJg4VPCx05ryuX5Njp8S/TmpK5yrTz4duQsQ9GKnwFj73sm3jBp63u4N02At0Nh3ayJd07aOFUQMlNTlhEvkan3glqo8O8Hbafda2jjwrvfYJ8q2qJlwDiIKNrHZMDYiSg6hLH5hi5+YLhTRHVgYJJDY3demXSXtIUK707pb0DRhisDxk5E2SaYe8sXJUBRKmNFFwPK+Nj3dSbdxW7hw72Tre7QJeQeukSW7U958LuFTA6Ng4wLFG2Yc2jsZFRdDIw4PT0j11a1hGXI2Kmo2snw9jGRuky4qbxEYazopOWAjZOOvgOGhXYlFaZVxMi7EawkrQM2vo1gJclwuxQp4k7UQamXS1G626omJwKNmcyTYalJJQPGTGSfhFN6SrYwIcjYQlY604Vt7eBSgsZKZrL4ud1kOAPqwhRZFM8zPVCwz6njk+hPCIvBU/WWl8aPvSf3LWs4xDaHw6YMSTNS36BgXrrtxZsJvXQyw2iIc3olRivKlvgkVKpIrL6DOY/FKMmzDrGxenVdc8LsmVQxF4ZArkWc3FmkZCpUUxvg8ZaFeoFSiGM7yl4lQkzDhSNhO+AJOBKOB6/9KUdTBW754CNDxO6DEE1+QoNGowiLfa8rcBPFeBBI7HtDDsdFpKNQyBCxM1AuE7jzQIXDmVQi/U5mBqFvgijyYVLgRZM6tVFZUeCxb6eA7cTrqjRKBVQcTGKoj+tq5JG4FHCxs5l0UZXKg3MpFQoI1KwwFWRcq6c6mk0qN2qpIGNfmlPgpB+ND8MxP9qS1t6achmIRoRAGn7QhOv2ETxsmnCyW7AEOXNDIHGN5NSikCHqMw5SjEgJGFefpBaRDFGvPkktJhVkvfokxRiVkfXok9TiU8LF1yepRYRAErfc3fCi6XH1RvUQOHD+0n0zuQtcP3xpuIOoYHfXcBzf1NfJZjP+sWdCR0vRanUwdbuz3sIEwtDzWe5gah4s0JdGseCpDIWVl9fEczzDQhs2r0WWzJBqG3fgWGGP730kMKTc4AVt64FYRuGBYtFCNQg9Az6KDXPslju3Zcqxsr1CRccQ6zMVpuOmP7YdO35RgxYFFDub1CbIHtvQQIsS+s7wLGf04AMt3FohsjE95LwZAgutvhjOZP1AU6GsQBulpaMUn4mavcwq2dYXBZSIMq0Mt1aInEwVYyWtw7JNN+ge62VQAhQ3dqIKjoBqFRxUizThnihDa7ipOcmaXRs7dPdGCPQkgGW84cLNkgkqKXC9mCoPq+irD3JwnRlLTThRDrOxGpTtTYNFepecTksn64mLXfABCktdVWEUmKJnGPo1uL/AiegaDn/1TQjf7P1wumF6yc2LCqt/gYx3ITAs2JyxFEubuAAmTmynKcHY62i5WXLkWguw/obZ+VGsu2bCNAVEypkGlPb++cPJOz3yTd0zAx0pmcp+hGD2vAmalMGKsVuns8yN0eDl2W+SjWo78g2EtJCfKqwiU1m3xDBfS6xjYxvNBo4Rb/xQITYVUHw0dCJYST4ldDwz6HWiFqESKiYiqB3NmwGVuNSAMdCpVjhfoepDx8ZT2FJ/RWUI1XGNskKThScb/wxIgykKIdPY70JMY2DFhh6/BGDsox8dRMq4WMmkkwW1iOSYGEm4Z2oRSPEwgvcVK0Y+T/EJHuHAdOuO7ZzUQaGIipFIEqlWCwgiRgJ7OwKoi9oZoYUXQiIQJ2MHRuqg1IyRlaRjeOQcySSneboIUvHxkLPAxvZU61mqyHoMUJXhQwHGSWeKUzGMhDpOxlSHp6kmlagUIMnZemkYq7atik61ieHVVkWbrNJwKNCDuLzRQ+JWCVDQ8JBAS/qYvj1dq1hhUoXETmfa0XaJRvsgmw4fr0PmVVYJGnVI7HRsP0ZdwCOYbPhaolKGw04Dh8wzfWfaOWmJSh0SOx0UBVCttquGiINMbMSJIixyKOzw1SlRXAUJq5p2cJOBryBh3uOiPqY8rD2qP+gO11EN0gFitFmpu4ZnbGt3ZzPs9tDcQdZGZJsjOa3lIQjKRIqueFQ41dxp5gHbN/ROCRJFLOwMTBDGUKtpxHAWHsMhjQpUqKAYOE2KvY6RXnlZ9qGbXeMmYJjuNVdA8DOlTbloPMfo85u4Flz/Wjt6Gm7LmxhxBoAFqx1I79IZABdRsKBWADIXXqxDAdBlHCzt6JRw6xhZxju15mYdWdksqn3g0tksQUjWegSLHACnIaGI2tb8gl/Z6fmPSRAWdLPA/AF++8NkQHPt7TUAjtulXoPVAPKgtx2e7HWKJniNCxJleC9jtHVVbC/dDVsiNdp5A7CEFslcxOxt7Ruh1TZ3S7EOnLKl0cKgJomjTiw/nzuHJERZplTCKPMgX15xKJE6xF3LlLaW0/zLbN8wCWX71zeDrUPoGjugazzHt25NcRdM+9ScBGVJbxfIYO9OArKktwtkNFF+RzzZnYWTnwRnRbX4roAssbf1Bgjt8OU7zHnUMxaEG35JllpaYMhafkEqx6NJ1luIVjlLLU1mlFc/yjSLC+N0GF3VOk06wmpRC3CeRSKcYrSt02bQ3VulVOSyFzKaATMvXeAaMwFCOS176j/WOsqvtdpVi8g/0ZeiJI1zw7m97uWaepNVuwTBsmw0Dk2DXMjdTc1IkTsOaJq1VrCmG9nRCJ5DZaA1rR0gR2g7KwCb28vaGB0A8P7NqfRmpwywprUDpPx19Aq+xiXzppo/FrKGUtfV6lV/lluFEER+EpqguJJRbSUPe4VRpa0sGMTYo8BmNsRd3FycB8Cdm+JvVslha0V0WjcIjQF/ENpPaGP0EbzgpOjv0fE3gGjFDyGEGxs4Fhzv4UTjoaapbsb6exICfW04se0iH79x0TYqb8RrGkjCiBjLCptx4aIyNraa0g58pASPCa+gsxEdWlIG4cjWqyvtwDeu9Wo6G9EhSfjgzHjgqio15oG+H+8q7lUlLrZngef5LnaF3/twYIIhaGVNjQRKP8s/ysS2wHz0kSb9bH42f5NTrC5hZae4Wzr5zqkQw/wh9l1b1AGUnJlGwFfnDLm29mHa2hY1+uiElKlimbj40anYM7qd4Gh6W5HahSTgOdYhiEd0q4IdxcI867tQd2JotzXwElGNU6d9ia52REIvGuyuIw13B9bnqaOWRLbyB8eUobjQZp2oDto6UDmw8I0GiijrspTA5RoGS9GWaLpXoDoX09pru5gVtmZ2JKhGBwam+j0O1oI2ppo0EqqDNpaaNBYoooxn7aRWhBc3y6tl2yhpAaeU7RuBV57pJJTYhuWZEy6DaCnIFheElGIjzEdDoLUMl1ZX3bopkH6OAsWLc6LgAVrQ3Ioz/h2tjcawSo8KsqyWwZJbU+IIutGKmdZ2fHi1RFgEEEZ4BaWt6Nwg0Y3QfXo3KrySVgE+tfer2+WpsPYD9mGyrYEBVwpTprY1u3x0uaQpajOcEV5BKf+W/xJP5NvNDhWg2zJsYeHrO4ilmLSyWvH7pAxH2dKTd7rt2R3e4Cx+MAVhugf/Kc+YxK20oJEMGGgg5DiK1DRJqxQ0uqVwEGUQAho024ejQWC4wwsFkSS/MBBNpCQUNXc6Pmbf6mEscWjbhZRol1Nec3tIL6c5P7I5W9DMlROTISXaBVSl9B6m4RUplYNruvwSmirLJ2Fl1QxupejzRxB6QNRFfrxYD8rlVKaiSaSX0ozhwXW2qJovN6bBelAufpQDXCt8ahvjUPZI+LMcmL4lyiuRYj1Morhel+sT0AJ5T+7bge0PEqE7vswBcmoCpAhX5ZJGCXUYyZedn5gMPmiXKWs/C4gYb4EHQpljSQqyotJuhDtDYitCQ5cpZEKmbxyod3R8B7XdKHGZHhUg0chfixx73V6L4AdYxeLmDC9GGSPwgjo1il4ZPUuVP9/OCOz4THGBQ6hGQbZArWVBlVD3YiJXYnlFFHCPd1DVsv+QfTVGO1kB1tRKDnPkRN6hze4dBaht5XATAhDGfsexVrzKR6nOLMtljeuUoss2skfpC8ItXaQkS2clALU2l+ny2aYF2QpVol/KqmwXW7ICWgVBCZNFxewGvi++t+ZGncNgyimWjimdUHQV5sAPY2Pt0PO49OWXxYLl6pbz+xvU5XxmCeePlI9YPVKLaISyBhlpBK5GsDBEvUWfuoYZiooKIAR7DkhKzNsb4N4YLLdG7YAR6GcTZmqGVDsAGRYwjzYcYGkUJbkMdhoig6c1ORHWgMJik6AYJ9NBLSLoAGuBIATIZ9ZKY4njs1Xi3YOYoTfj6SACntBRiC1kHkwIv4qiA/RnKAZtz00HuIigA6wUZzZmoHTvthpIF0SRsQX6OtlsJHjDMMOt4+gCHiRphF6RZ9j6AK/hYAC+D40gAOHEsIsoOkCT3m06wEUEXWBD/x+wMZzQukUEHWB/S0AyoVlz9R0wI+AGuwnbh4P+LqAxisWAB6MTFoAqig7QS/T5zcSYKyA67Yz3YKfuN2owOmAjn+Pp0BLtXSDRDSgTloSDfuZlG9p4fvQ5WFFz6yJ/adg5Osyq9laoUhy5OyHSPLobuq7RseVq23fVSw3D6CBr6ts9qGG7MEFBzNW2g0tbg/HR5XpFePiAbfc1ANgR4skG+84V+MsvXy7vu1Zg0q/0+9VKvvFSftqBgpZq18ogusYh+GP5HU8HWpYR04HW1GgJiL4L51ybU5UTy8X1viCYm0HAagx3Sx7AycqTjQ56aHj3zIj9UMuFaXVFrmF74jQdpFFU4f1jFFPuHXsNaldXlkhRafBciHHQVSwv7hpYsRNpIQh8tAseGuGLZhQvtyhrjLwTmDDi6Ep59BalN2jfh3YsT3sunaJ9bUTgB47Veg7VB9E0vfYWnSmWojcXTdFrmnKUZnJpGu1gxzMA4lGai27Ui9eYJCrP5dMQZPG68IWScjBUNdBQxKFuhWuOE6I8AArCKbqBae2k6CWC6TojQ5bSVDJVq5xSlsmla9TNJHyS1F2UxdP0e3HoBxzBEXmUH2RTNO8erY0UtUQwTadrmPKqUUk6bcTDEUSeQ61rNejDQdUkKMzk0jQ+mtH3cnQSyTStmSOXHMUF4RTd0c44/f4HKZoPoul6vz/h8Mni05uJpuh9/v7NBylaieAGneh+OkPS6LIin9pKc5xwpGvO5ofpGz1KArQTRT4ksGLbezHDlyA94phppePRh/fJ/SDpLX02fDm81+4Lq7lXD0N/8NC1Dyqil4LJtwd3Bj0QZVqpLfcEcILHRjRCRvy9ILXNBYJHITPsXrjaZt/Bo5C5dy9cbfNy0nniyLhToKvqb+5dOHZHhMErqm5Ahq2rm9EU7VdNPwXj4ueruwVK4d+dX69gcvyj37peMccI3qX9y/OHk3dam54GWDdomNoXBz5tkRmpJKxB2V2GG37nhy/i9NLkNvM9vjEcxzeF0i7JpI1EY1i+kiCLGaffL0+e4X9Si2t2PYi9x0Xj0/3F2du3789z4Ph4cCMq2uJlELAv/3eveO+oSu7I1zfpdY/9Mgk8G27ggKhWUQ5g6IpYEPWwQR88HfZZ7AyP6/xyPzQFNRQ093G8xHuv5DNZuUVXxIJIjn1oalpzC1Yww7Mi+cW5rIkJk+wiVNDThufSQ0e8R6jxJUUsiCQbqKCmDc0StpywZZBvn5IiFkSS7VNQw4DmAmyMxOk5uOoBq6SPA984Ritoo2A7h2KhFnSM4c88l0NwQaor6URyA0fa0jKwSRUbqjFsRBTRxpEvEboDDV1UkaxFdyc04RQMn9LN3h6WqA6eD5Ka1QgZpRdlNUwMrv3tlitMc7M2JxWlVcRSFK/Ac3zrOS/kKyFkiXqqcAqIJc79Bb7CtS/9+oy0LLNLrcCpcFUqRfVgc1e1dpkYlb+379OOvq+JI4CmaoHx4viGpVUldintTbVFLcdUX0Ctokult5EoxlLqeNRDsagZdnbjeAlLBrd0XzLBnfXVEDDUCZzSE3wvLBxJBzDFGt+fBV+vQ+vszZtT4+ObOfq/8zdvv0OPIIj80ckJTIyoVNO6ZjI3Qne+37hzyGAL8bknJyfuNl6jmCWx7zvmzrC9ajr4LrIeq09NH0lBpprDt3N8ImMO7QDCj/hCj7l+8vbtuw8/nL0/O4SF/dGFhcj5aIHIDO0AWeKPP2r1Z6knXsli8NmP+NwPMGP476PZ0fLq5u76anG1+lVfrr5dXN3qN7cX364vl0cfj/72T3Q/mOs/Aevh6OPGcCIwg8ZLbCe2vctn7IYfwTd/+/vh8ZLcJvbxb9i5BerOjyMeWrVZ/u5+dalfpKEns5w+vDt4LuooafklDquRxtOwwDrZZldplz9Cd3LQ79mmfxOHaXiB0lsPxOjYKipQ+pPhJOkBOsQZ2jxBQQE+Phz9mFn1480Nfvjds+t40cfs6U8PDw9HuzgOPmrafr8nWQ5zX4siNPZEH80BYoO+/C4zJk4Wh0n60Lbw78Scp3rnuIWZJ2Zm13yZaL41TZwisNySiD8+4DKBT1Cg4VMESziqkKmi+f9Gf2roo7yQEDp/xDbJYEHCSOK/ZkPLh5HEPkSNC8Eiv/YuywDy0rG9RxCiRkhf+ou5Y5XeptdJpCl104gN2IlXBKC7OfBhhh2cTTupL1jb61rqPJZj+kVUF1D7olkGDrBqY5csU7mStAIu6qHBKyxL9dnSrHl2RH+Vpqn31NWHh+/I0HhWHNzP2vctZrVh84y+wj6rbDTMmvcC6K9S0aUh1oy+EjprXHKjvqmkKK0L0V5Uvi+tHNNeVL4vravQXtC/Ly0wtLxPU9NXSmkv0u/r4+Xqw/Q76mRilrtwzwo+8bN8r2BWcbieVVygZ0Wn5FnRU3iWu+/Oim61s5qv64ziezore4LOcteUWdEpZFbyxZgdPDhnBcfKWe7uOKu6Ic5KfoGzggfFrHahGedNFb0EZHcf9EpbuH2CN33hYgPOpKVLBzjTlu+j6E7cEt+fN3Eh+j5rUmp8+7bETddfcaTJI8Kwp8nufWNPQLuLjSN1jzTkdjL2FPnVUxxJ8ouheNKEh26QLU3npXAMkmoXKLGnyW8S4kiS34jEnKbzHqo2Sc1RgLtT1WLNciYphjfkTZpFaO2R7BA4lTcxCWrKmK4haChj6lpA4vZ0lJCWXAnY84IS/7MtAedFEryiWq7gYBHVdm3AkPQkmD+XDMolEkPSk6sdWGS0hnvvLeAQg51DBP0CgN4CDlH5KSL6h5UUIax5dNQnJCmXGEqEiT7pq6Ef+sighSIbIqcS92WIqNYRXq9wfEPkNMfGGyK1GrJuiKyWceCAyGmDpNXCmQ2VVowyNkRWMQDYIDmF2FxD5OSRs4YIOYS1GiSlEm1qmKxKQKUhwki8o0Ey8mBEfaS0TCgGxukVKzGPnjtIbD32bB9xeYCdPolrgW/6CMkD0/RKnMeNYUnNEIpEgBgSf0WUqBQVOTA7qxyQnRWDdMzI+dVZNZ7GLD/NNMvPnM7IiaJZ6TDPrHBEdFY6TjMrHWKZlQ91zignSWbFs5ez4oHIWZtP+ozuaDSr763DR3s7gtNyzwNm/Bab+u38ZH6i5dtZkYb3JclWOhqEh5GdblYKEEHdE+0hEA7Kt4HtD8WFpjinpgApwd4VICUSwgjmehgPIoWmPYdcNxlFVJY0LQuPKo3KCh2vnHRigqqIHb/0lZHtOfTFYAMA3r851YsjP24ZwaDkPQ2QTWBJatasTNdA8uKAPWdcM8H7B5q5swMMi7RBrJjYpKI9Jk5TsQm2jNiQIhg2saVFf4FyS6vuAuWmHwqWi5oM0wzkgMbC4Q8JYtOtQPFyg6jsHyRYdggHk5vEMyVIzwYOUtDj53IKYCrafRJdSArjKJGtHWqc7bubb2hZYZv+y/Jj+CxwE90I7Ehge92kq5bb+mEILEov0mEBEEQO/EOPfFOC/GJ9ECu9lPliRKdefqS5TGDXIbaqHeSjDQyY5bYPpyE2ENweZc6KWQ40qBpqMSu0kb9DtkCd/sq26y/SH2QxPP2pL86/DubHr1RMl8et93L18yRK9ZvzxTSK737+dXzFnwv7vCOqvTqdwMg3i6vxlX49/3oxvtbl+QRUl3cTKP22PL9fTaH20yRKJyhLUKukpniELuZSWnP+RVpxl9Y4SmsAYdelX59/ff/u7PRcjgZpDZq0XPx2cXMuZ4yIJcvBjBtTOaDltdPS2uLCoaraeRp5qmrnt4arCkCI3dUNRyeP0OzfSJ71EGxACDyo8Ml3YlHTqA7FJvLX05PAQodjJOtCMzjDGr6WxKDGNO1R1KBTj+lxojG0hePYbvgaM5MWcfW3RY1ljGIzsEmiUeoPQFuSoyjyduggn6VvbHcMfSOp2QaWa4yiKApGaYLs01EKuH06SnW1R2lI/cBwh6/fMygK9qMU6t/AKEXtt5GKNNKTukGOoS30pA+ysJqxGp7Isn1x64itilwwSvGOxunxItcex27j1KJoLD3YFWg8TfoOGNbBJ1WqxpL3q1RNyUitA9JDnMJH0RcZAnxWGBQ9GeyOaAPU7JNw+PZ8h57qAV+ZigT50XQryvwmzvRAan1CO8WlNQ1RS2gNusi8fAQ16dRvBEUlF26pmnCrN5KevNUbQx9u9UQpCn2XLE7mEwvDfLQFDlwpKtAj03kUV1ubdAhc1WpSIa4lbdAgdv2nSYnQtZ8GJSLXYRpUiF2DaVAS+HsUn894kp4tIif5DSqEzrwbdIicBzeowMekdFEu3UzKxPhTdqlCHaZsJUJnCC06hM8OmnQ5QRShHkaYInKwvhwGg0Q4FLyfVlOWj3HTIXUat0O3vXgjRyeJG9CgU9Tgo1lnJUKJMIXYF9YBT+kp1OyQkLjJHU2+FQmuwzQlyOVaqoLAceTKl41ffJdNVRP6JogiH6oCXiRw65amLARboQt+dB0xTMtz1rGXFoGLfDT58EEwRo6giq6juZvkNkVC/0bRst9b4iY3RQVkKotbLRlte36qwnHkyj+0KjLVoOohU36xekjVU6geMvUcqodMLbh6DFGwt0PgwN5CM3ZrNLAC4caA3xQcgIYun3ZoEHSitEsLtqFMDXlAUCnSfanWCR5j3d26wxraDh3ohJZM+UgorC1wwB5aeyOEM2McGlumRsfwyMREwOSLRRsONCWvpuSR++QpQLvd+PYIfIZxBDXD5z0NikgTjGaIqOC5Z+j0pIzGmKbJl6YJReIoB1mRqUInn0nUlU7n14l8HWlhk6alXHmEqAFh6PlpRAP0LzEVJRVaskwqXQjkjR26uIVPgm1ooAiO5QdpWJwRVQmx2c6PYlS7s+eFjNY9M9DRazGcbNMNyO0owSG4sWipQoySdUp4/MAZvIVFLllb5I1swyMblRUM3RbVb5cUiBzYlgTj8pg3QBIU2H6MSvcjEDTsLAnH3pWm74icWZQUIBdOmQWHM94Tu2DxBtnbG1vouNHFt6BoLr5SJYv1J6jvTlsoghw1VsLblrqK4Xt0XcJxRd2mAeEq1yGJUZj15VWDicyTgopmThIUZps9UK0ZAgstNBuO2NJWU4Sb1SyqmzlsgeigK6x1lSLlZt0ZrJJrFA12A6c6YO+HYsGXujQhguNdCAwL3Q2ajp6xj17ixHb6ArCvAZIeRUPNXbHpY65njRJoZhUglLt3apbVczDQLJCvFyrLyQbImfX75V9W4JqszyqUbB6vIysby6T78iC21szsmoXY8H8/QLv/IEgWFDVUUgTrFYe7WZMUvnFfk5QX9iLUICLhcDjLPQVAjAqJ7qaXnhU6Y4GielRfBqGWJ1QcdzxOBpnCBfZob5qk5i3PYVTH21LUROajHoGi9LUR2aZugjCG5NEdBXCkcbgcRqSKHkMmZuGwyUa3h3ZIDkGUXiepFfhGmrFHu282QLeLHp7PcSDqrpMH3SIDOEZBZn0EL1jkI+iYPbSIRFGpNzZwLNgTYWG9BP2ehADaDQ5tXHxBXX9RpoF+9k+OLSRABLFtHwmojIFwEIhUxBAQqOXB214cAvx4h5svC8AZY+wSh6fn7998yKoB+ieqd4fDH9mTuPATh0zXzQgPo5W5pzZvBJb452u7q1YZOy7wpmMm4w6OzT/BxNb/2LOvPTMXWlgqYYpt9D+G7GvIV18kD1d/w1GCmcdfDVVqRROTpB/dun8/mh0tr27urq8WV6tf9eXq28XVrX53cbM8+nj045+gCR4evkPOSlDVTw9HJ/M3D0fwCUDXScOaBR99W30+fv9w9CeoEyrNdMJPPDj1/onGdZFmQZkqEgrTBrC3fVma8G+YlMg6wqLhB/D/f9z4jgXCg/w0Q0vfkC/hSPPw3eEyFB0BQL0wfJmBADBfUgujh/iae/QEF7bUnK2yyVws89t/MpwknZsI01CP7SUSfMMlJFJUxKHvCBVOrrVb5A47wkTjuzjTHT8LrJNtwSmoj44ftbTwFh/ZabzMOyPewZ9JaCNzxYll+x9J/dVIEU9l5fUa//pOTh1dARf5cwBRtTRrg7urKbZfiJ7pS38xdyysM29MD4auW5+pEi3yWWuWi2JEp+fSU8lwphYbjr8VrSC9SLCwFyRPuClWeH5haipfuOlr8mXhx9ff2ngZz+xPo287kFei0RqC1uld78aAPmWmtg21zp7UXsrXDWnS3aTG7xtSpcO7jlSNaT+cPDMlbRDgmglH8kZbhV2s2WXt7KCnrCYboQH4AIENYvPLPAQIb1OBbgkRpoIoKjU7jVeQPJDmAX3/Udv5LsDXASaaiycC6HbPaKdHjkkelC4LTDdV8RI6rHospxUGXJdSb1wFWqh0IYyCVinhE2UJSt8xtaBKd1m5GGbijKnCGZ4PlHpauWZnYsoURFJY1y4vUoB3DdMQ5gKqSL338MT0e7XcyK9rmzAX8ki8BIvwcle+BnFiqmUwwrmWz9FNzLUMRjjXQoSViYkWkEhpNctXQSpQWcuA5HDObqhUgW0GRfo4QA26FURSWNeuxVSAdw2TcOal62InZlzCIoOpMg1WCYsMpocwptMzPWCR1VopVWdLeIQzrt5WOzHhKhzxfFPPe1WaqCocSXyzW46VIJthmWwGOiwx8z77AJmiFoFrTVvzrbsTlQzWS4EnX66gzlcqdzFPasMGTIMMx1yAVCDfDK2fDXoWm77JattzaSwkYTtVhYvxxDZW+JpTGXtWF8PBtsq/SreW5W5XpSQK17E+jF1PSFCtHreTS92mItrSC9hfgVlSoGPYJLunXX2bZEBHsgm5Rv5V2IWAHcs22U33r8M2GdgxbPMZhzR+FZbJoY5hl+xCbPWtkgEdwybZXd7q2yQDOoZNvp5/vXgdRiFIx7BKdnW6+kbJgI5ik7vXYpO70WyS39CuvlVyqOPY5dNrscqnEW3ySlpagnQkq7ySyRBB+u/o0ijD5UvAyjm14FCPsyhQdrK1yjo88V5DtFNxalmgDE+t5X1F1+yELs9VKF8qtbRyKWDtpELwi1Kj0y8ChqAVgkrN5wXM2Sv0lJqaC5h+V+jd/fyrfn3+9f27s9NzdXhWUQkkrNQEWsAkuUpPpdZGfGPz7eJGoWJK0IgkqNa8XcjcvEZRoSm4gGk2rYhO4djSXESH+rHQiqg6DAmcUb0tiGUqU8vDRaVifR2knVIqXtE9WX52XB0uxdm2dBu2asxzYHL8jA83v6tEvABLWo5nN8WrRLsASx7taRzou1jLc6XHlWiTRNN4WnfVbgJMGvWN7apIPIMljfY2yC44V414Dkwa9fLFx6rxL6OTZ4S9ksU+gyWN9m/Z7dCq8Sa4pBEP1RvEFGBJox0bawfoU57Q7jBADaBkU0x3hozJEPLOlOV6yA2cyhmAAJNGPVG0y09k9/hIgb4PjSBQM+ur+OQZIr8GXEUrFMH9m5w8RFe7BzsQGk7GuO9hoQb5Uk4hmo5vPupJYGVB/ScrKHXr4WOIVXxy4n6E08SF6uBegCaFdrqcpijxHJwU6rgDniYgHwP3Azop5HEfrCh1gk0a8bzvVdgARYxyDBEZ6aUtSlqAgJvcC22M3aZSBzflSI2SI2jEVsUnrQNWkHsBmsQOWFHi8jbbjORZD8EGhMAzgf7kO/GUcQs6TNEKVkqpMCxlK0MGTVLAwWlXa9vaAFPegi1CaKTB6lVlX0IoxwjTbsS2kZe3GWtOfBiilbU8DxPLULZ5y6DJ6esn33Zv6+ulbr0Db4fuIbEm339vs0AFoxRDKMxfJu3p/Q9aiMv1QdhOvQfdxlzmPrR9qmwrn0GTRFvZPj2DJoe2soNXW96g1Q8Md5oongy8c3ByXGUn9ihqIS7Tq+g3oGxjnkGTQ1vhTkyqMxUSjm5LipVdpCsjlONLMLE3WQt7qR5lKg9aQ6mD1siy/WlDtLVQz8FJou4CZbu2HJwc6upuRUQST/1Erq1uWc+wySGubqcus0+PVOYtlfhLFMbKTsoP6CSS13fAsJBnjdJGKKKU6fykqBEO6OQ5PylKXapztDKO0R0GkO4cnfoXqWoBAk4K9SfDUpV4Bk0K7X0STnsOpoU3wSb+oiFnykvCOpiXwMmgPuFNcN3UJV4NB6Vntzqd6YGSfXwd4b/J+Q9YnJFBxB768J7ctzIucxFzmKS9CKbFXN+gMPq67cWbST2Os+zRkEXTK9dbcQqLGttgHARD38G6gdUqapk6SAENlrAwunL8s6nZhg1hgY2RqOGsWsoy1Ko2AJRdiutVRymrtONUoiyr1IHhuz4d8AScVxKma+1PO58pWCwf0GeY5PhORgqcaaeRLgKT42ESuIlyrAkoOT4WjqMc4QyTHL4KZrDU/FUjNBGVtvy4REHomyCKfKgGeNHEhx+oNqAAlONoALaT78XRDFDAJYl3DLHZEy/S0JkXkMnhPvFGHJW1xO03qCxQtaJXsEnbcdPRepiC49UKNjlbLkrEoqGxFxaIppH7fm9NuwRPo01AqXbEXkqMm3yoPukiWyEXSKQDAkra/EE1whkm2eNp5WiXoEkbUahGO8MkfUShGu8KNukjCuX4l7FJHlGoxr6ETN6IQjXaBNRr3cwtW7lwX8VkVi6ETuQ3K7c1+BNUx257OwQOiPijHtYkucD1w5eeA8FKVrqG4/imvk42mykivhGjaCknrQ5Hes42GBmEoef3trHgcXvT/iIGOV2mYfXlLfEckQr36gzdWKuYPeU29ly1Ym00Rc2BjGpkUTULlhUPxKpXLQgR7YSD0DPgo9gwxx9K5TmfWqzie0LFJ/DCrlSpjsdsse3Y8YsqBqDAEs87tTKy8DY00Gq3vjM8y5kgMmaLFVpBirXJodSZIbDQBoDhTDheaKoSFXD/hr0QpQJM1iVluZD5ElFgjVkvFbJCK0hJNlGO/6sdoNimG4iZXWXmCNAFdZM1lYiOVkHSM1+a2U1W+GrsepQ6UQVnY4fu3giBngSw3lt9fd0rZq5Ixe3JdKWpyrH6IIcnpIhRhU9W1ti4T1gA+0+GmgZ86QrbhOO84gDvAEZU+6XG7CblKGRK0+iJbjjOGk4S9U0I3+z9cMrpbOl0CRXYVBUo3oXAsGA3Iqoa2eQ0V+LEdiodjL8llZs+56e1QJvK+Ds/inXXTIQtDSF6Qqde9v75w8k7PfJN3TMDHQGeLi+JubLnTeBe5RDc2K3T1a2N0fvIoOylQtReo8NfMAvQYU3YfE1XFkr2yjcd6+jEzj0Dx4g3fqgU7wosOYR1AkBR5iV8MtYB14lq1Eu4hFJG/WTetKrFugZNIPFqA+IrVc3p6GQU9fTglkLU68j+DVe5s5s1pghS0WD6wn0fAqJTUG9+iA09fgnA+HEpOiiXkYmmnU7qVaOcoxJM1z1TjWqKSDBNX7lC7MsovMEjnIJt3fFPMHSQLeISTDmJ1KutBJNgqns7AmiAsTNCCy/zRiBOxo9p30G+GaVocziGR0JFTBTko8sUVIQyzGCBje2p11NXsUmcCCnEnAJNEvFpwkswUhcSYqI+DUoRqUW6AOpVrm/2ny2172FNtw3v1faw+udNYzQlD2L3JrgXsEqTgkc0VbSpjA1pT9nLVPhWQYklPfVMsER26ASwiSTetcmbM0XI1kGJJW37MeqYH8GEE6US4TIgsWTxfTOm70y9llMiXAclljS6aEe19rmGSTDl2IgTZbjmYMSSVKkMCy+6GM7Uw9uMYgWLSgcamT7t+Kjrdb9owfV4wCBGLkS6a3jGFh1PZaE3zE+A7hS7NiLbHO2oRB7Zs0y/eFSECoi9lLWxhH0LeqsIxSIaMfxMEMYQkWnEALazcBCsBlEqrIGMJ2bGyoCn8RrqFdZ25GISa6XeXhUYsq3Gt2BBt9k448MmuxWOp/QcFNJZWd7kfDIIQ5nYwQjDPQY6RRxDOSlBSBgbrF8JSmUkQ3udacmwMhAxDm5oXteRla1H9BuyDmqeoQms9Sh5cKCZRuUninuXHyjBTk/CT4S/oH0oiR+gnB8mpJHr71+b4YzWHKc2VygcNPcHL399sgl8j4XIKviXcXqEKvKXYc1/IvlS3QbYCfuFuVOsfax9I7R4Vz5SK0yw4JFe6gARS50NYQ35ClpI7pLI1Co9+zkglVnUSwY6XLaRqe1dQ3MpmT9NEso/g9tMpQ5iyMhzG9j+FDlTUz2EhH1qTsShpHkIhWDvTkShpHkIhWiykhSJKkjZ7coTsagoV7VrJtuovL0zssM0mxE4B0Y+/U2shF+S5d0WIOov+SLwY5qMrPESvUoPcFoyV2Y7UjZZcRuVDmRI45iKHWX9uoWWqGVrLG1ER6RmSkMcjxp4yV8ebaYjZEEU1/lJ8Kvc86Ze/dyzYsbes54LY0SFSTmRDpI59ku/JWbWJp5yT7pl2Wi+lQYale3zlBmFXINO081URms0TDeyo1E8pcsUanp7wh+l96lA5+1xKPNTAMD7N6cjNMtl6DW9PeGPsSdaQc65/dncdo2Hmbl09+0Vml9U27kQRH4SmqB5LbTetxw8abpWUCvGNvboLgsbWqTojjMPgDs3QwmbCTk5rYhZ64bRkSuNrILQfkIORo/gBYtDf0/AqgEGNysIK9zYwLHgHAELGpMLTTkfg9+TEOhrw4ltF53FGJtDo3ouFqaBpI6KvKySDy0ugOMjrqntgZrUlnFBF7RyYUabdSAc3dJ1tT1Qj23pmlYuzEg6PjI/JuSq0ibEvBNDP951OnpX+NueBZ7nu9iVcIX4gT0GppV1cZOmvKA9qhplC8xHH+HRz+Zn8zcU89SXtrPYYRzDpl5T8gHz0Nh37fLB8yhOLNv/qCHLEwLVGWSeqt9gem3HvCqzJEOmqX50Sot/xKCclr4XErsgCjzHOqwFj+jaazuKK6c0u1F1yupnK+AlLq99SJp+Go0oAiF3gTik6jv371UShuU/HK+G1dDuDFoPqXpqdWCh4FZKEvVlWlvWYmLKtiDVb72u99Jle10zGTmSAIMdsgbVIj4shVSDyjOn1kOqIeWZVylJJGc1paHILW6WV0ve/nwBp4L9travPNNJuG5JqM5ycNlEi1J29QIYqo0xPw0B1jLdWl1E762bVBS6m7LqIMUHpiChN5b4d7R2G8Mq2wtIOflAi2xNhjFbozWy1P0x4JWKStQ9ZgiFxL0RuEGiG6H79K4XhFLqiU8p3K9ul6eT1nXYD7FaEYOtFKYsee+s9CM9ts3HfhAKiWW7cyzxFLS/sSFUdImxXbn0sJNqqlcrJ1d1R7nnEfP0jL5ue3bPszpDPboKAHQP/rM7i4gbfCElGWjQhKnubFTD3FkdaQYoBRIrC5u4mbV9OOYERvNKjNTiRbSzFyuSgpSpooRBrs2ZHD2MGQbQXWiIFNVLd2495lKdMyYbyAUJwuw/GA2RMnHlQh0TmKhqpbpxW8NentNE+cSwLGKgwzcS9QhCDzgD8RyEqF69igZkLtMZ54OzelGEuDwYhucgRNURF3Ct8Il3vMW0yyCjsADTt0B3nmBSxZXBPN3ELZ335L6doJ1DanXHZ5k6pKZDCXBzUkqpdDuCkLKWDEwPH7POEvU/J47sswUeCFnGvBTtxcTDUOwMhtaKhiBLOFi7vnGMaNcbwyH5MCS4tPYCQVLKLueOve5fzmFiDHZxc4YX4gwOpjCtRkmvbt/UbSlRezSwszarYcQazImsiNrGQhKFnMMJKoYagIjg3vGQpMd+SpaapxWsKGZvA+W7qiKvWXZ3i4LXCW853YQAhLHfMzwAXjvlakSGLkdS8/6whNtUb5A9S845hHe6/EuWJ0uCONp/7hCbwxfBqYYgrFpXw7tsQValq8K4A482YHMD328eI3Cjy8VJya8hHWw67RpSPQI/jI2106dcVCR9WSxEXZZ6fn+Duu3PIi91Q0R7VN7UwhoxkwZZagSeRmQKvPMCiXQNM/R7FN9OrLngV3lvxQ1wbwxRt2PvgBHoZwIKRIZKOwhUKXxygyltMZ1Bh1NkpxEzGBqfm2QLIFi8ExRPbDikoqSBoCwQhAD5IVvp7Uj4TGGzwxczxGa5AwGDJ3TsZQstEAiAWZU2ENxnqAZt+A4HVpQ0EFSr2yAzIB4/whYwLogiYwv0dbLZtHgmMcOqyxsKMEjSOyHqpxv7AazJEwBwHxpBAEJB8IrSBoIjPc9wYEVJQ0GF/j9gIyTAWkVJA0H9loBEgJlyMQPhRMANdgLq40HOUEAxilOCB4UCMq4qbSC4JRJ3IwhbRdhgu+E9ZVHta03cQHjIT3o4KiJlKBh0L6CAHDzIkbpoQh9N9p4lFCX0XuwvDaB6Q6lK6Q2n1aW8Ewabb3mL+rQ17q0/T95/57xUXXsDqYnp728Na+qAgpEn7w8grZv9EeTpp/bPAdv+F/dgR4gnG+wHrVZffvlyeT90Xp5K0e9XK/ZMSblrBxpaKkUrCxvaq2Nh7N1BByoR44wDPVGoiLDplosFbh9RT/yWV4GCYG4GAfthZndLHsDB/pONDpxoeGfMiP1Qy8VpzSpdw/ZE6jzIa1GKd5NRdMR3PIG52hWXZbYoN/iuuDpoLZZbdw2s2Im0EAQ+2h8PjfBFM+rXVVV1R94JFBBx3T3Fg6AovwPHPrRjmThy+S041kYEfjiTBOIgvA2BvUUniSUhyIW3IDBNWeozyW267WBXGXoJVJ8L70SAV3Wkwsg1tGHJ4qThK9hloanqaMMTh7oVrreyoBTEt6AAprWThICIbtceGfLUp7Jb9csql5nkdt26mYRP0jqssoI2JF4c+gFXGE0eGAfpLRh2j9ZGEgAiuk27a5gyK2NJftt4jeuCDg4Abu0KjurCNJDVT2WS23Q/mtH3srQT2W36M0c0WRAK4ltQRDvj9PsfJGE4CG9H8P3JqTwEmfAWBM/fv/kgST8R3aEd3b5rSBs5VzS09g7mcAxZ3Kv0jR4lAdrJIh8SgLHtvZjhS5AeN830tiPTRYwZ+oHTGcYU8CMRo4q+ALtHHWHoCxiW98FHNLeg820BnVAPbJne1n5iEmBB7axLDZegGU4vcCxzn+BR0LpEL4QsaxbBo6AVi14IWVYzSDeO4yhPg7OKoLsv47osXBjQovIOjNjyuhlN0x7WELSgXfx8dbdAKf278+sVFIN/9F1dLeYnQb60f3n+cPJOa9PUAfAGDbb7I8InWTLDlcR1qL3LmMDv/fBFJAKa5G4bHN8YjuObgk1Rkto2jo5heUyCLLaffr88eYb/SS7g2XVE9h4XoU/3F2dv374/zyngo+CNuNoWk4OAJwBr957FrlXdHUl1k14B3TcLwbPhBg6IapXsAIuuigdbL7v0QcZos8XO8Kpn1KXgKihqwXUfx0u8e08+l5eXdFU82GTZjKaIKS9hJTU8KxqjApR1caGTX9QKmliQXXroaP8o7UZJFQ826UYrKGLBtYRtM2xnxrBZSRUPNuk2KyjiwHUBNkbi9B4G9gBY0tgD6ViGLOhrQXkOxaMYvTDdn/muLeECV1fDjOkGzhwkZm+TMj5849iNqGob+75E6GZHdJFKshbfedHEt6D5lDoJ9LJOdRJwkNWtUNC8oyitY9Jz7W+31UDgvfU6qTCtIrgFwgo8x7ee80K+FmQAAoQqvgXOEpeWBb6IvL9J6vPzslRWAEKXCKpyW0AIyIyqftYMQCX37ft0GNI/AyKApquB8eL4hqVVZbKqH0C/BUCPZREhdZMut71FRpHHUue5XhBErUHgUGgVNCXg2SGGOyPeCVlvECmedEkyZFarmUgdOPyNUHFN65ai1eSHr8WJ/f333/WsdAALrUYdk8h14nQUa4vnpPchpLvAEgiVldn+KIo4F9px3CI5SGib7KPokmDhSkMvudJOUja6+4fhsLgvSSXxOteRpUe++QimApJGuc5nOthWrploVmij6yaykEjpryyi+0X640pUaZSL2cTDVsVRTlgCPRDv/RCdDcar/ooWw9B3SYaqBRBFjtPMnR1MhGvtG6FFPlDLNCTvAhBif3nD0ckjtYCmeahqO5FX1CxKqCIQ93YI4CwiQu5dnq8iMNt0q7PlyTFt7NDdGyHQk2AbGsr0ngebqZeNkaN7Sg2PcmTGbq3bHpS2MdD1BsoALLUeeOnDAU9puIYJEOLgP6bv4JdjYqBfNzy+dj+9h3h0wx8izzMo77jVsq+E+r1lwySVLs7qK6rh0p++4qpx/vvLySIScwpgDJkqTGo5+ItosdQAmUNzunj1zLBs5hiF9YpSMJTp4QKQiiQc++kiD0X4UNoz0Je/LleX0Na3Xz9ffdG/LS/15e3iz5erJauUy7+u9Kv7/wslfPu6wuv9T4aToDfvvmeV8fn6fPmzfnf+BWq/+n+XJSlnbz78wCrn5tPlxep6Sdh8vrouy3p4+F+/JX78f7I1oWM0fTvOVtqOTbLTln3EqvT2bnV1A1Hrq6uvvy7uf71b6efLG9bUd/e3f7laXt1+1Rc/n3/9enmtX349/3R9ecEqYHn1y1/1+np48/f35zd1K795fvPmzRn835tv16ySDnzv7qEFVld/uWQuNRD1Fwj65uTk5ObL6tM5c7rrKwge0y2gP+FO/unNMAF/1W8W37Ks0tPi++l8eXmhX/71cvFtBfNThPzF7c0NLBmp/Jvbi0sxQnHluD+/uLrVP92e319g6PpfUBskRTyUfNpXdCbi6/lNmXxaR8miLl+NzaXeX/6FIvT8zSm3vK+XK5Rbd7dfL7/C9vDr4vrbBXsd1vXl6nx1tYAJr6++lolifxgTPrA9x/aqvW57NUf5Wq3mJnsFb2oqTjcmTztBrTNXdzff9PO7K/YW4zoTguuvjqDd5B1Xv9KVtvioz7u7XV79Vb+8v/96O7QO3H7+fH17foFKxC+3939GObv4M3uzyNOS5zozm95yGLOYJVdfV5f3n88Xl8wt/7l+cXkJBw/X6M9iK9WjHWfO/l+uPl8NqGRpbn/9Bov0xZ/11c/3lzCXrm8X57BgrW7v0eDj7habYlkqA6ccEA/oFuer8+vbL7BrvFxeooERm4z71QoPwvAIoljpmEHksa705eWi1hGlDdvhI2pDl21tfi45dmzN6sCS+pnnw4Eoy4dRbJl/+EPrl2xjcoZbhegImPi4lY9i33dug8zm6MeVBb86PJ0n5hz9MneG7WHT+/h522dzM0hKuWTCqRB4PnbPxlC+qSjfBE9nx1F1AVWOasc3Yt1Y2+Uez9/Emz76Yf/4iBZc2pSn32R/Lc3QDuKS8v9AkY6BGWtGEvtb4Gnpl2iJRl/6i7lj9QCG1maggA5o5Kv5JvFM9FCPAP47KiGMw6Q6CpCAwTJiQ6h+jszxDM/XTR3WxymY+64d65sQVn898PEq7wQgoAHAswmCqbIf6g/j2B4544mz1I0R4FZ4fN6mjiJqWUZolRvkDx9G0P383KD9D384qY5EJejfG6Fne9tobjjOBKbP1YPnODSmBBAAy/DQpKvULRpONCYItFeIA2hEU8BAX7j27/goRrlztn9nU+8ajwD1mpCIO0djstgItyCu6m/4rDYkOnbhk5/4BkYDIcS7xF1XQGTP5CuvjsqOXfjkp2xsdmydVNdE5YCgjs8gFPT8GD7/iWOsVlNyaPg68Rw+bWqhj+F84ifWZrpFfua9zwYGxcRtarRTQMwtt2BItP77eOP5x+nTSQA1DGgwrOK78coSaWz1ao93/At+Mq6Z5KLpZZd6V3z8S/ZsIttIQ8Rjn8be8fh2cPnltYxMLDw2aZ4wHm/Qu+PDu3ENNBowHmu1T/GPN+T9ZFYbHSBX/Wufoh9v0AfH+IPj/IORq+VYEOnT64bPmte9hi13DUSFF3xqyz3HcKQLzOgn9HaO/zkGFrIGoae/ddcIyqj+msl7+O74xgh++o//vP22uvu20i+u7v9L+4//vLu//e/LxQptWP7XHCcWXvDsyKTcRYJFX9tRnIsvDUW3XgIHo9X9Fu2AhwPlzo9idWFCUPPUO25uWwD+8+1pCtaK5+lhB2ud2I6FF6LnUGE6SCVUUKj/KpeCyNr36WdzRHeOPf7QZUqCiHem7Kginempd8e0fL/Jrp08doC3jXc/VfeluDIq3dnBmZStulftnjnq+UF1EWK//XDyzj05OXG38brn2K+hXeAutgn8oQchbMM3Op4Zc9r0F2d2fLw1G3pStuRwCoWGyMfh/hnK2brID1RsVR/JWtKrOmnnWao5/pZUcMfaOMY2mqBsiM7cfg0kh92yr4nl/l3s1thLD68VQ9vx6vklQf26dGLyqztXvy60V3/VfXOtrKPQAu5aSJl4hj9yccd7O94d1+ObKNIP8Ioz7dBMHCO0QAA8C3jmS7+dLHUYebBRsGqTM/Z9qCG9jQAah56LI2t+1LIBKf713Y9/enYd9CkIUcgX+PHJPHUgBig8j+1t4aNvq8/H7x+O/pQKIAPa3JEoMeeubyWwRuEwP/MFPjZyl352B238CQPPo8nMscMVTA8lBSCMX5Ym/Pun9FJvPFQumj6AAjDzZQyCP0L4pd8jUbLSGHxLEMd4C5ODiyYP1RATS4SVmBmwvllevaQ0W8GhNcXlEE1zMzT17LSDGaYaUVmBmZZXA/goj1xDb7aKF1CWy9bR7Gh5dXN3fbW4Wv2qL1ffkCf43f3t3eX96upyefTx6J8PR4WoSR8f4IMHOKszngAsr775+BcjtNFRoAg9/oj+QB+g/2ALENjwK+vx2jfTNe/sxUfyjy0wH310JE4/m5/BbMoez8g/0DGc26CerjapzJ7/K/0DCjjKgky+Gsj/glmRakfuNBG0/N8OpgcWlIQydpYXMHzaCJFrWQ2EX/uhvbU9w8k+9xLHgU+zygEfnMywt20Mx9vw1/HJD28+nJydnbx7/6+/H/3r/wPIOWft=END_SIMPLICITY_STUDIO_METADATA
+# SIMPLICITY_STUDIO_METADATA=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=END_SIMPLICITY_STUDIO_METADATA
 # END OF METADATA

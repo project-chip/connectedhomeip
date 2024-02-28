@@ -28,8 +28,8 @@
  ******************************************************************************/
  MEMORY
  {
-   FLASH   (rx)  : ORIGIN = 0x8000000, LENGTH = 0xfe000
-   RAM     (rwx) : ORIGIN = 0x20000000, LENGTH = 0x20000
+   FLASH      (rx)  : ORIGIN = 0x8000000, LENGTH = 0xfe000
+   RAM        (rwx) : ORIGIN = 0x20000000, LENGTH = 0x20000
  }
 
 ENTRY(Reset_Handler)
@@ -48,6 +48,7 @@ SECTIONS
 
     linker_code_begin = .;
     *(SORT_BY_ALIGNMENT(.text*))
+    . = ALIGN(32);
     linker_code_end = .;
 
     KEEP(*(.init))
@@ -66,6 +67,12 @@ SECTIONS
     *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
     *(SORT(.dtors.*))
     *(.dtors)
+
+    __code_classification_validator_start__ = .;
+    . = . + 0x20;
+    *(code_classification_validator)
+    . = ALIGN(32);
+    __code_classification_validator_end__ = .;
 
     *(.rodata*)
     *(.eh_frame*)
@@ -139,7 +146,7 @@ SECTIONS
     __data_start__ = .;
     *(vtable)
     *(SORT_BY_ALIGNMENT(.data*))
-    . = ALIGN (4);
+    . = ALIGN(4);
 
     PROVIDE(__ram_func_section_start = .);
     *(.ram)
@@ -183,6 +190,27 @@ SECTIONS
     __bss_end__ = .;
   } > RAM
 
+  __ramfuncs_start__ = .;
+
+  __vma_ramfuncs_start__ = .;
+  __lma_ramfuncs_start__ = __etext + SIZEOF(.data);
+
+  __text_application_ram_offset__ = . - __vma_ramfuncs_start__;
+  text_application_ram . : AT(__lma_ramfuncs_start__ + __text_application_ram_offset__)
+  {
+    . = ALIGN(4);
+    __text_application_ram_start__ = .;
+    *(text_application_ram)
+    . = ALIGN(4);
+    __text_application_ram_end__ = .;
+  } > RAM
+
+  . = ALIGN(4);
+  __vma_ramfuncs_end__ = .;
+  __lma_ramfuncs_end__ = __lma_ramfuncs_start__ + __text_application_ram_offset__ + SIZEOF(text_application_ram);
+
+  __ramfuncs_end__ = .;
+
   .heap (COPY):
   {
     __HeapBase = .;
@@ -194,8 +222,8 @@ SECTIONS
   } > RAM
 
   __heap_size = __HeapLimit - __HeapBase;
-  __ram_end__ = 0x20000000 + LENGTH(RAM);
-  __main_flash_end__ = 0x8000000 + LENGTH(FLASH);
+  __ram_end__ = 0x20000000 + 0x20000;
+  __main_flash_end__ = 0x8000000 + 0xfe000;
 
    /* This is where we handle flash storage blocks. We use dummy sections for finding the configured
    * block sizes and then "place" them at the end of flash when the size is known. */
@@ -219,6 +247,6 @@ SECTIONS
   ASSERT((linker_storage_begin >= (__etext + SIZEOF(.data))), "FLASH memory overflowed !")
 
 
-  app_flash_end = 0x8000000 + LENGTH(FLASH);
+  app_flash_end = 0x8000000 + 0xfe000;
   ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= app_flash_end, "NVM3 is excessing the flash size !")
 }

@@ -5,18 +5,6 @@ label: Matter Provisioner Generator
 description: >
   Generates the key-pair, and CSR for the DAC
 category: Example|Platform
-sdk_extension:
-  - id: wiseconnect3_sdk
-    version: "3.1.1"
-toolchain_settings:
-  - option: gcc_c++_compiler_option
-    value: -std=gnu++17
-
-config_file:
-  - override:
-      component: "%extension-wiseconnect3_sdk%board_configuration_headers"
-      file_id: freertos_config
-    path: ../../examples/platform/silabs/FreeRTOSConfig.h
 filter:
   - name: "Device Type"
     value: ["SoC"]
@@ -24,6 +12,7 @@ filter:
     value: ["32-bit MCU"]
   - name: "Project Difficulty"
     value: ["Beginner"]
+
 source:
   - path: app.cpp
   - path: main.cpp
@@ -98,6 +87,8 @@ include:
     file_list:
     - path: lib/support/Base64.h
     - path: lib/support/Base64.cpp
+    - path: lib/support/BytesToHex.h
+    - path: lib/support/BytesToHex.cpp
     - path: lib/support/logging/CHIPLogging.h
     - path: lib/support/logging/TextOnlyLogging.cpp
     - path: platform/silabs/SilabsConfig.h
@@ -120,6 +111,10 @@ include:
   - path: ../../third_party/silabs/matter_support/matter/si91x/siwx917/BRD4338A/support/inc
     file_list:
     - path: system_si917.h
+
+sdk_extension:
+  - id: wiseconnect3_sdk
+    version: "3.1.3"
 
 component:
   - id: freertos
@@ -145,7 +140,7 @@ component:
   - id: sl_si91x_mcu
     from: wiseconnect3_sdk
   - id: board_configuration_headers
-    from: wiseconnect3_sdk 
+    from: wiseconnect3_sdk
   - id: brd4338a
     from: wiseconnect3_sdk
 
@@ -160,6 +155,17 @@ define:
     value: "75"
   - name: OPTIMIZE_TINYCRYPT_ASM
   - name: PROVISION_CHANNEL_ENABLED
+    value: "1"
   - name: TINYCRYPT_PRIMITIVES
   - name: MBEDTLS_CONFIG_FILE
     value: \"siwx917-chip-mbedtls-config.h\"
+
+config_file:
+  - override:
+      component: "%extension-wiseconnect3_sdk%board_configuration_headers"
+      file_id: freertos_config
+    path: ../../examples/platform/silabs/FreeRTOSConfig.h
+
+toolchain_settings:
+- { option: cxx_standard, value: c++17 }
+- { option: gcc_compiler_option, value: -Wno-unused-parameter }

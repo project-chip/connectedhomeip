@@ -342,7 +342,8 @@ class Arguments(BaseArguments):
         if args.unique_id is None:
             self.unique_id = None
         else:
-            assert (len(bytearray.fromhex(args.unique_id)) == Arguments.kUniqueIDLength), "Provide a 16 bytes rotating id"
+            uid_len = len(bytearray.fromhex(args.unique_id))
+            assert (0 < uid_len < Arguments.kUniqueIDLength), "Provide a 16 bytes rotating id"
             self.unique_id = bytearray.fromhex(args.unique_id)
 
         if args.commissioning_flow is None:

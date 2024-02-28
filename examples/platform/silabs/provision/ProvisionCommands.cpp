@@ -1,11 +1,11 @@
 #include "ProvisionCommands.h"
 #include "ProvisionEncoder.h"
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <mbedtls/x509_crt.h>
 #include <string.h>
 #include <stdio.h>
-
 
 namespace chip {
 namespace DeviceLayer {
@@ -273,27 +273,22 @@ CHIP_ERROR SetupCommand::Execute(Storage & store)
     {
         ReturnErrorOnFailure(store.SetManufacturingDate(_manufacturing_date, _manufacturing_date_size));
     }
-    // unique_id, discriminator
-    if((0 == _unique_size) || (0 == _discriminator))
+    // unique_id
+    ReturnErrorCodeIf(_unique_size > kUniqueIdLengthMax, CHIP_ERROR_INVALID_ARGUMENT);
+    if(0 == _unique_size)
     {
-        // Calculate hash
-        // char serial_num[kSerialNumberLengthMax];
-        // ReturnErrorOnFailure(store.GetSerialNumber(serial_num, kSerialNumberLengthMax));
-        ReturnErrorOnFailure(Crypto::Hash_SHA256((const uint8_t *)serial_num, serial_size, _hash));
-        _hash_size = chip::Crypto::kSHA256_Hash_Length;
-        if(0 == _unique_size)
-        {
-            // Default unique_id: First 128-bit of the hash
-            _unique_size = kUniqueIdLengthMax;
-            memcpy(_unique_id, _hash, _unique_size);
-        }
-        if(0 == _discriminator)
-        {
-            // // Default discriminator: Last 12-bit of the hash
-            _discriminator = ((_hash[_hash_size - 2] << 8) | _hash[_hash_size - 1]) & 0xfff;
-        }
+        _unique_size = kUniqueIdLengthMax;
+        chip::Crypto::DRBG_get_bytes(_unique_id, _unique_size);
     }
-    ReturnErrorOnFailure(store.SetUniqueId(_unique_id, _unique_size));
+    char hex[2*kUniqueIdLengthMax + 1];
+    ReturnErrorOnFailure(Encoding::BytesToLowercaseHexString(_unique_id, _unique_size, hex, sizeof(hex))) ;
+    ReturnErrorOnFailure(store.SetUniqueId((uint8_t*)hex, std::min(strlen(hex), 2*kUniqueIdLengthMax))); // Do not store the ending zero
+
+    // discriminator
+    if(0 == _discriminator)
+    {
+        chip::Crypto::DRBG_get_bytes((uint8_t *) &_discriminator, sizeof(_discriminator));
+    }
     ReturnErrorOnFailure(store.SetSetupDiscriminator(_discriminator));
 
     // spake2p_verifier

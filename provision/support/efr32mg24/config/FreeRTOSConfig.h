@@ -153,12 +153,6 @@
 //  <i> Default: 1
 #define configENABLE_FPU                        1
 
-//  <q>Use Memory Protection Unit
-//  <i> Using Memory Protection Unit (MPU) requires detailed memory map definition.
-//  <i> This setting is only releavant for MPU enabled ports.
-//  <i> Default: 0
-#define configENABLE_MPU                        0
-
 //  <o>Minimal secure stack size [words] <0-65535>
 //  <i> Stack for idle task Secure side context in words.
 //  <i> This setting is only relevant when TrustZone extension is enabled.
@@ -181,6 +175,9 @@
 #define configUSE_POSIX_ERRNO                 0
 
 //------------- <<< end of configuration section >>> ---------------------------
+
+/* MPU feature is not supported in Silicon Labs port */
+#define configENABLE_MPU                        0
 
 /* Defines needed by FreeRTOS to implement CMSIS RTOS2 API. Do not change! */
 #define configCPU_CLOCK_HZ                      (SystemCoreClock)

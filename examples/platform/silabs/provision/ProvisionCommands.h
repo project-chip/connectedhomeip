@@ -115,57 +115,34 @@ public:
     void EncodeResponse(Encoder & out) const override;
 
 private:
-    // vendor_id
     uint32_t _vendor_id = 0;
-    // vendor_name
     char _vendor_name[64] = { 0 };
     size_t _vendor_name_size = 0;
-    // product_id
     uint32_t _product_id = 0;
-    // product_name
     char _product_name[kProductNameLengthMax] = { 0 };
     size_t _product_name_size = 0;
-    // product_label
     char _product_label[kProductLabelLengthMax] = { 0 };
     size_t _product_label_size = 0;
-    // product_url
     char _product_url[kProductLabelLengthMax] = { 0 };
     size_t _product_url_size = 0;
-    // part_number
     char _part_number[kPartNumberLengthMax] = { 0 };
     size_t _part_number_size = 0;
-    // hw_version
     uint16_t _hw_version = 0;
-    // hw_version_str
     char _hw_version_string[kHardwareVersionStrLengthMax] = { 0 };
     size_t _hw_version_string_size = 0;
-    // manufacturing_date
     char _manufacturing_date[kManufacturingDateLengthMax] = { 0 };
     size_t _manufacturing_date_size = 0;
-    // unique_id
     uint8_t _unique_id[kUniqueIdLengthMax] = { 0 };
     size_t _unique_size = 0;
-
-    // discriminator
     uint16_t _discriminator = 0; // 12-bit
-    // spake2p_iterations
     uint32_t _spake2p_iterations = 0;
-    // spake2p_salt
     char _spake2p_salt[kSpake2pSaltB64LengthMax] = { 0 };
     size_t _spake2p_salt_size = 0;
-    // spake2p_verifier
     char _spake2p_verifier[kSpake2pVerifierB64LengthMax] = { 0 };
     size_t _spake2p_verifier_size = 0;
-    // passcode
     uint32_t _passcode = 0;
-
-    // commissioning_flow
     uint32_t _commissioning_flow = 0;
-    // rendezvous_flags
     uint32_t _rendezvous_flags = 0;
-
-    uint8_t _hash[32] = { 0 };
-    size_t _hash_size = 0;
     uint8_t _setup_payload[kTotalPayloadDataSize] = { 0 };
 };
 
