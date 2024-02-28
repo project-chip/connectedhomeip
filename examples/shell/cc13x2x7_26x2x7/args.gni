@@ -52,3 +52,6 @@ matter_software_ver = "0x0001"
 matter_software_ver_str = "1.0d1"
 
 custom_factory_data = true
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lighting-app/lighting-common:lighting-common"

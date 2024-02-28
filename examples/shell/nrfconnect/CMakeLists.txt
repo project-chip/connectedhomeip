@@ -23,6 +23,10 @@ include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 # Load NCS/Zephyr build system
 set(CONF_FILE prj.conf)
 
+
+get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
+set_property(GLOBAL PROPERTY gn_static_data_model_BACKEND "${CHIP_ROOT}/examples/lighting-app/lighting-common:lighting-common")
+
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
