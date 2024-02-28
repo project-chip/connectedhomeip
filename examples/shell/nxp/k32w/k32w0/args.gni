@@ -21,3 +21,8 @@ import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 k32w0_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_enable_ble = false
+
+# TODO: this dependency is mighty odd here.
+#       This matches the BUILD.gn dependency
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lock-app/lock-common:lock-common"
