@@ -33,6 +33,7 @@ def main():
             print('🚨'*80)
             for l in textwrap.wrap(args.message, 76):
                 print('🚨 %-76s 🚨' % args.message)
+            print('🚨'*80)
             print("\033[0m")  # CLEAR
         else:
             print(args.message)
