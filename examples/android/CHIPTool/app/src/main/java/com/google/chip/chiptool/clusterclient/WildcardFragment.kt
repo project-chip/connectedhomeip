@@ -165,6 +165,7 @@ class WildcardFragment : Fragment() {
     binding.addEventBtn.setOnClickListener { addPathList(SendType.EVENT) }
     binding.addListBtn.setOnClickListener { addRequest() }
     binding.resetBtn.setOnClickListener { resetPath() }
+    binding.writeInvokeresetBtn.setOnClickListener { resetPath() }
 
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
