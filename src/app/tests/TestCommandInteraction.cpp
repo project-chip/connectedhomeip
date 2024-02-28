@@ -311,6 +311,7 @@ public:
     static void TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderExtendableApiWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandSenderExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerEncodeSimpleCommandData(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerCommandDataEncoding(nlTestSuite * apSuite, void * apContext);
@@ -785,10 +786,44 @@ void TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMs
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, moreChunkedMessages == false);
 
+    commandSender.FlushNoCommandResponse();
+
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderExtendedDelegate.onResponseCalledTimes == 1 &&
                        mockCommandSenderExtendedDelegate.onFinalCalledTimes == 0 &&
                        mockCommandSenderExtendedDelegate.onNoResponseCalledTimes == 0 &&
+                       mockCommandSenderExtendedDelegate.onErrorCalledTimes == 0);
+}
+
+void TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager(),
+                                     &pendingResponseTracker);
+
+    uint16_t mockCommandRef = 1;
+    pendingResponseTracker.Add(mockCommandRef);
+    commandSender.mFinishedCommandCount = 1;
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    uint16_t invalidResponseCommandRef = 2;
+    GenerateInvokeResponse(apSuite, apContext, buf, kTestCommandIdWithData, kTestClusterId, kTestEndpointId, MakeOptional(invalidResponseCommandRef));
+    bool moreChunkedMessages = false;
+    err                      = commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_KEY_NOT_FOUND);
+    NL_TEST_ASSERT(apSuite, moreChunkedMessages == false);
+
+    commandSender.FlushNoCommandResponse();
+
+    NL_TEST_ASSERT(apSuite,
+                   mockCommandSenderExtendedDelegate.onResponseCalledTimes == 0 &&
+                       mockCommandSenderExtendedDelegate.onFinalCalledTimes == 0 &&
+                       mockCommandSenderExtendedDelegate.onNoResponseCalledTimes == 1 &&
                        mockCommandSenderExtendedDelegate.onErrorCalledTimes == 0);
 }
 
@@ -2004,6 +2039,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerWithSendEmptyCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand),
     NL_TEST_DEF("TestCommandSenderWithProcessReceivedMsg", chip::app::TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg),
     NL_TEST_DEF("TestCommandSenderExtendableApiWithProcessReceivedMsg", chip::app::TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMsg),
+    NL_TEST_DEF("TestCommandSenderExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef", chip::app::TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef),
     NL_TEST_DEF("TestCommandHandlerEncodeSimpleCommandData", chip::app::TestCommandInteraction::TestCommandHandlerEncodeSimpleCommandData),
     NL_TEST_DEF("TestCommandHandlerCommandDataEncoding", chip::app::TestCommandInteraction::TestCommandHandlerCommandDataEncoding),
     NL_TEST_DEF("TestCommandHandlerCommandEncodeFailure", chip::app::TestCommandInteraction::TestCommandHandlerCommandEncodeFailure),

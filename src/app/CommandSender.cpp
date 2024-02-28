@@ -430,7 +430,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
                 // 2. The current InvokeResponse is for a request we never sent (based on its commandRef).
                 // Used when logging errors related to server violating spec.
                 [[maybe_unused]] ScopedNodeId remoteScopedNode;
-                if (mExchangeCtx.Get()->HasSessionHandle())
+                if (mExchangeCtx.Get() && mExchangeCtx.Get()->HasSessionHandle())
                 {
                     remoteScopedNode = mExchangeCtx.Get()->GetSessionHandle()->GetPeer();
                 }
