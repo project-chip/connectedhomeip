@@ -1,61 +1,62 @@
 # Table of Contents
 
--   [chip.ChipDeviceCtrl](#chip.ChipDeviceCtrl)
-    -   [CommissionableNode](#chip.ChipDeviceCtrl.CommissionableNode)
-        -   [Commission](#chip.ChipDeviceCtrl.CommissionableNode.Commission)
-    -   [DeviceProxyWrapper](#chip.ChipDeviceCtrl.DeviceProxyWrapper)
-    -   [ChipDeviceControllerBase](#chip.ChipDeviceCtrl.ChipDeviceControllerBase)
-        -   [Shutdown](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.Shutdown)
-        -   [ShutdownAll](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ShutdownAll)
-        -   [ExpireSessions](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ExpireSessions)
-        -   [DiscoverCommissionableNodes](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodes)
-        -   [DiscoverCommissionableNodesLongDiscriminator](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesLongDiscriminator)
-        -   [DiscoverCommissionableNodesShortDiscriminator](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesShortDiscriminator)
-        -   [DiscoverCommissionableNodesVendor](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesVendor)
-        -   [DiscoverCommissionableNodesDeviceType](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesDeviceType)
-        -   [DiscoverCommissionableNodesCommissioningEnabled](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverCommissionableNodesCommissioningEnabled)
-        -   [PrintDiscoveredDevices](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.PrintDiscoveredDevices)
-        -   [DiscoverAllCommissioning](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.DiscoverAllCommissioning)
-        -   [OpenCommissioningWindow](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.OpenCommissioningWindow)
-        -   [GetFabricIdInternal](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetFabricIdInternal)
-        -   [GetNodeIdInternal](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetNodeIdInternal)
-        -   [GetConnectedDeviceSync](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetConnectedDeviceSync)
-        -   [ComputeRoundTripTimeout](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ComputeRoundTripTimeout)
-        -   [GetRemoteSessionParameters](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.GetRemoteSessionParameters)
-        -   [TestOnlySendBatchCommands](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendBatchCommands)
-        -   [TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke)
-        -   [SendCommand](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendCommand)
-        -   [SendBatchCommands](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendBatchCommands)
-        -   [SendGroupCommand](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.SendGroupCommand)
-        -   [WriteAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteAttribute)
-        -   [WriteGroupAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteGroupAttribute)
-        -   [Read](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.Read)
-        -   [ReadAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadAttribute)
-        -   [ReadEvent](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ReadEvent)
-        -   [ZCLSend](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSend)
-        -   [ZCLReadAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLReadAttribute)
-        -   [ZCLWriteAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLWriteAttribute)
-        -   [ZCLSubscribeAttribute](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.ZCLSubscribeAttribute)
-        -   [InitGroupTestingData](#chip.ChipDeviceCtrl.ChipDeviceControllerBase.InitGroupTestingData)
-    -   [ChipDeviceController](#chip.ChipDeviceCtrl.ChipDeviceController)
-        -   [Commission](#chip.ChipDeviceCtrl.ChipDeviceController.Commission)
-        -   [CommissionThread](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionThread)
-        -   [CommissionWiFi](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionWiFi)
-        -   [SetWiFiCredentials](#chip.ChipDeviceCtrl.ChipDeviceController.SetWiFiCredentials)
-        -   [SetThreadOperationalDataset](#chip.ChipDeviceCtrl.ChipDeviceController.SetThreadOperationalDataset)
-        -   [ResetCommissioningParameters](#chip.ChipDeviceCtrl.ChipDeviceController.ResetCommissioningParameters)
-        -   [SetTimeZone](#chip.ChipDeviceCtrl.ChipDeviceController.SetTimeZone)
-        -   [SetDSTOffset](#chip.ChipDeviceCtrl.ChipDeviceController.SetDSTOffset)
-        -   [SetDefaultNTP](#chip.ChipDeviceCtrl.ChipDeviceController.SetDefaultNTP)
-        -   [SetTrustedTimeSource](#chip.ChipDeviceCtrl.ChipDeviceController.SetTrustedTimeSource)
-        -   [SetCheckMatchingFabric](#chip.ChipDeviceCtrl.ChipDeviceController.SetCheckMatchingFabric)
-        -   [GetFabricCheckResult](#chip.ChipDeviceCtrl.ChipDeviceController.GetFabricCheckResult)
-        -   [CommissionOnNetwork](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionOnNetwork)
-        -   [CommissionWithCode](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionWithCode)
-        -   [CommissionIP](#chip.ChipDeviceCtrl.ChipDeviceController.CommissionIP)
-        -   [IssueNOCChain](#chip.ChipDeviceCtrl.ChipDeviceController.IssueNOCChain)
-    -   [BareChipDeviceController](#chip.ChipDeviceCtrl.BareChipDeviceController)
-        -   [\_\_init\_\_](#chip.ChipDeviceCtrl.BareChipDeviceController.__init__)
+-   [Table of Contents](#table-of-contents)
+-   [chip.ChipDeviceCtrl](#chipchipdevicectrl)
+    -   [CommissionableNode](#commissionablenode)
+        -   [Commission](#commission)
+    -   [DeviceProxyWrapper](#deviceproxywrapper)
+    -   [ChipDeviceControllerBase](#chipdevicecontrollerbase)
+        -   [Shutdown](#shutdown)
+        -   [ShutdownAll](#shutdownall)
+        -   [ExpireSessions](#expiresessions)
+        -   [DiscoverCommissionableNodes](#discovercommissionablenodes)
+        -   [DiscoverCommissionableNodesLongDiscriminator](#discovercommissionablenodeslongdiscriminator)
+        -   [DiscoverCommissionableNodesShortDiscriminator](#discovercommissionablenodesshortdiscriminator)
+        -   [DiscoverCommissionableNodesVendor](#discovercommissionablenodesvendor)
+        -   [DiscoverCommissionableNodesDeviceType](#discovercommissionablenodesdevicetype)
+        -   [DiscoverCommissionableNodesCommissioningEnabled](#discovercommissionablenodescommissioningenabled)
+        -   [PrintDiscoveredDevices](#printdiscovereddevices)
+        -   [DiscoverAllCommissioning](#discoverallcommissioning)
+        -   [OpenCommissioningWindow](#opencommissioningwindow)
+        -   [GetFabricIdInternal](#getfabricidinternal)
+        -   [GetNodeIdInternal](#getnodeidinternal)
+        -   [GetConnectedDeviceSync](#getconnecteddevicesync)
+        -   [ComputeRoundTripTimeout](#computeroundtriptimeout)
+        -   [GetRemoteSessionParameters](#getremotesessionparameters)
+        -   [TestOnlySendBatchCommands](#testonlysendbatchcommands)
+        -   [TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke](#testonlysendcommandtimedrequestflagwithnotimedinvoke)
+        -   [SendCommand](#sendcommand)
+        -   [SendBatchCommands](#sendbatchcommands)
+        -   [SendGroupCommand](#sendgroupcommand)
+        -   [WriteAttribute](#writeattribute)
+        -   [WriteGroupAttribute](#writegroupattribute)
+        -   [Read](#read)
+        -   [ReadAttribute](#readattribute)
+        -   [ReadEvent](#readevent)
+        -   [ZCLSend](#zclsend)
+        -   [ZCLReadAttribute](#zclreadattribute)
+        -   [ZCLWriteAttribute](#zclwriteattribute)
+        -   [ZCLSubscribeAttribute](#zclsubscribeattribute)
+        -   [InitGroupTestingData](#initgrouptestingdata)
+    -   [ChipDeviceController](#chipdevicecontroller)
+        -   [Commission](#commission-1)
+        -   [CommissionThread](#commissionthread)
+        -   [CommissionWiFi](#commissionwifi)
+        -   [SetWiFiCredentials](#setwificredentials)
+        -   [SetThreadOperationalDataset](#setthreadoperationaldataset)
+        -   [ResetCommissioningParameters](#resetcommissioningparameters)
+        -   [SetTimeZone](#settimezone)
+        -   [SetDSTOffset](#setdstoffset)
+        -   [SetDefaultNTP](#setdefaultntp)
+        -   [SetTrustedTimeSource](#settrustedtimesource)
+        -   [SetCheckMatchingFabric](#setcheckmatchingfabric)
+        -   [GetFabricCheckResult](#getfabriccheckresult)
+        -   [CommissionOnNetwork](#commissiononnetwork)
+        -   [CommissionWithCode](#commissionwithcode)
+        -   [CommissionIP](#commissionip)
+        -   [IssueNOCChain](#issuenocchain)
+    -   [BareChipDeviceController](#barechipdevicecontroller)
+        -   [\_\_init\_\_](#__init__)
 
 <a id="chip.ChipDeviceCtrl"></a>
 
@@ -94,7 +95,7 @@ class DeviceProxyWrapper()
 
 Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to
 be freed when DeviceProxyWrapper goes out of scope. There is a potential issue
-where if this is copied around that a double free will occure, but how this is
+where if this is copied around that a double free will occur, but how this is
 used today that is not an issue that needs to be accounted for and it will
 become very apparent if that happens.
 
@@ -379,8 +380,8 @@ async def SendCommand(nodeid: int,
 
 Send a cluster-object encapsulated command to a node and get returned a future
 that can be awaited upon to receive the response. If a valid responseType is
-passed in, that will be used to deserialize the object. If not, the type will be
-automatically deduced from the metadata received over the wire.
+passed in, that will be used to de-serialize the object. If not, the type will
+be automatically deduced from the metadata received over the wire.
 
 timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None'
 to indicate a non-timed request. interactionTimeoutMs: Overall timeout for the
@@ -488,7 +489,7 @@ to the XYZ attribute on the test cluster to endpoint 1
 
 **Returns**:
 
--   [AttributeStatus] (list - one for each pth)
+-   [AttributeStatus] (list - one for each path)
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.WriteGroupAttribute"></a>
 
@@ -663,15 +664,16 @@ sent.
     SubscriptionTransaction. This is used to set a callback function, which is a
     callable of type Callable[[TypedAttributePath, SubscriptionTransaction],
     None] Get the attribute value from the change path using GetAttribute on the
-    SubscriptionTransasction You can await changes in the main loop using a
+    SubscriptionTransaction You can await changes in the main loop using a
     trigger mechanism from the callback. ex. queue.SimpleQueue
 
--   read request: AsyncReadTransation.ReadResponse.attributes. This is of type
+-   read request: AsyncReadTransaction.ReadResponse.attributes. This is of type
     AttributeCache.attributeCache (Attribute.py), which is a dict mapping
     endpoints to a list of Cluster (ClusterObjects.py) classes (dict[int,
-    List[Cluster]]) Access as ret[endpoint_id][<cluster class>][<Attribute
-    class>] Ex. To access the OnTime attribute from the OnOff cluster on EP 1
-    ret[1][clusters.onoff][Clusters.OnOff.Attributes.OnTime]
+    List[Cluster]]) Access as
+    returned_object[endpoint_id][<Cluster class>][<Attribute class>] Ex. To
+    access the OnTime attribute from the OnOff cluster on endpoint 1
+    ret[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
 
 **Raises**:
 
@@ -940,7 +942,7 @@ Set the DefaultNTP to set during commissioning
 def SetTrustedTimeSource(nodeId: int, endpoint: int)
 ```
 
-Set the trusetd time source nodeId to set during commissioning. This must be a
+Set the trusted time source nodeId to set during commissioning. This must be a
 node on the commissioner fabric.
 
 <a id="chip.ChipDeviceCtrl.ChipDeviceController.SetCheckMatchingFabric"></a>
@@ -1052,7 +1054,7 @@ def __init__(operationalKey: p256keypair.P256Keypair,
              name: str = None)
 ```
 
-Creates a controller without autocommissioner.
+Creates a controller without AutoCommissioner.
 
 The allocated controller uses the noc, icac, rcac and ipk instead of the
 default, random generated certificates / keys. Which is suitable for creating a

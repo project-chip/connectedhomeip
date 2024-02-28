@@ -1,7 +1,7 @@
 # Python framework tests
 
 The python test framework is built on top of the ChipDeviceCtrl.py python
-controller API and the mobly test framework. Python tests are interaction tests,
+controller API and the Mobly test framework. Python tests are interaction tests,
 and can be used for certification testing, and / or integration testing in the
 CI.
 
@@ -33,7 +33,7 @@ Python tests located in src/python_testing
 -   Use ChipDeviceCtrl to interact with the DUT
     -   Controller API is in ChipDeviceCtrl.py (see API doc in file)
     -   some support functions in matter_testing_support.py
--   Use mobly assertions for failing tests
+-   Use Mobly assertions for failing tests
 -   self.step() along with a steps\_ function to mark test plan steps for cert
     tests
 -
@@ -198,7 +198,7 @@ Example
 ## Accessing Clusters and Cluster Elements by ID
 
 [ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/ClusterObjects.py)
-has a set of objects that map ID to the codegen'd object.
+has a set of objects that map ID to the code generated object.
 
 `chip.clusters.ClusterObjects.ALL_CLUSTERS`
 
@@ -253,7 +253,7 @@ Single attribute
 
 `await dev_ctrl.ReadAttribute(node_id, [(1, Clusters.OnOff.Attributes.OnTime)])`
 
-Multipath
+Multi-path
 
 `await dev_ctrl.ReadAttribute(node_id, [(1, Clusters.OnOff.Attributes.OnTime),(1, Clusters.OnOff.Attributes.OnOff)])`
 
@@ -343,15 +343,15 @@ pai = await dev_ctrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Comm
     -   read_single_attribute_expect_error
     -   send_single_cmd
 -   step() function to mark step progress for the test harness
--   skip / skip_step / skip_remaning_steps functions for test harness
+-   skip / skip_step / skip_remaining_steps functions for test harness
     integration
 -   check_pics / pics_guard to handle pics
 
 ## Mobly helpers
 
-The test system is based on mobly, and the
+The test system is based on Mobly, and the
 [matter_testing_support.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_support.py)
-class provides some helpers for mobly integration
+class provides some helpers for Mobly integration
 
 -   default_matter_test_main
     -   Sets up commissioning and finds all tests, parses command arguments
@@ -425,7 +425,7 @@ See
 -   --tests to select tests
 -   --PICS
 -   --int-arg, --bool-arg, --float-arg, --string-arg, --json-arg, --hex-arg
-    -   specify as key:value ex --bool-arg mybool:False
+    -   specify as key:value ex --bool-arg pixit_name:False
     -   used for custom arguments to scripts (PIXITs)
 
 ## PICS and PIXITS
@@ -438,7 +438,7 @@ See
     -   use --int-arg, --bool-arg etc on the command line to specify PIXITs
     -   Warn users if they don’t set required values, add instructions in the
         comments
--   ret = self.user_params.get("pixit_name", default)
+-   pixit_value = self.user_params.get("pixit_name", default)
 
 ## Support functions
 
@@ -474,7 +474,7 @@ second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
 -   basic_composition_support
     -   wildcard read, whole device analysis
 -   CommissioningFlowBlocks
-    -   various commissining support for core tests
+    -   various commissioning support for core tests
 -   spec_parsing_support
     -   parsing data model XML into python readable format
 
