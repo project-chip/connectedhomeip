@@ -1,0 +1,50 @@
+{
+    "name": "Framework templates",
+    "version": "chip-v1",
+    "helpers": [
+        "partials/helper.js",
+        "common/ChipTypesHelper.js",
+        "common/StringHelper.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "common/ClusterTestGeneration.js",
+        "darwin/Framework/CHIP/templates/helper.js"
+    ],
+    "resources": {
+        "availability-data": "availability.yaml",
+        "config-data": "config-data.yaml"
+    },
+    "override": "../../../../../../src/app/zap-templates/common/override.js",
+    "partials": [
+        {
+            "name": "header",
+            "path": "../../../../../../src/app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "decode_value",
+            "path": "partials/decode_value.zapt"
+        }
+    ],
+    "templates": [
+        {
+            "path": "MCAttributeObjects.zapt",
+            "name": "Objc ZCL asynchronous API Internal Header",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCAttributeObjects.h"
+        },
+        {
+            "path": "MCAttributeObjects-src.zapt",
+            "name": "Objc ZCL asynchronous API Internal Header",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCAttributeObjects.mm"
+        },
+        {
+            "path": "MCClusterObjects.zapt",
+            "name": "Objc ZCL asynchronous API Internal Header",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.h"
+        },
+        {
+            "path": "MCClusterObjects-src.zapt",
+            "name": "Objc ZCL asynchronous API Internal Header",
+            "output": "examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.mm"
+        }
+    ]
+}
