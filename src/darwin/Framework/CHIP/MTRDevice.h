@@ -31,6 +31,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 @protocol MTRDeviceDelegate;
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDevice : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -326,6 +327,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 @end
 
+MTR_EXTERN NSString * const MTRPreviousDataKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
+
 @protocol MTRDeviceDelegate <NSObject>
 @required
 /**
@@ -337,6 +341,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * Notifies delegate of attribute reports from the MTRDevice
  *
  * @param attributeReport  An array of response-value objects as described in MTRDeviceResponseHandler
+ *
+ *                In addition to MTRDataKey, each response-value dictionary in the array may also have this key:
+ *
+ *                MTRPreviousDataKey : Same data-value dictionary format as the object for MTRDataKey. This is included when the previous value is known for an attribute.
+ *
+ *                The data-value dictionary also contains this key:
+ *
+ *                MTRDataVersionKey : NSNumber-wrapped uin32_t. Monotonically increaseing data version for the cluster.
  */
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 
@@ -368,6 +380,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * device, especially if the device is sleepy and might not be active very often.
  */
 - (void)deviceBecameActive:(MTRDevice *)device MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Notifies delegate when the device attribute cache has been primed with initial configuration data of the device
+ *
+ * This is called when the MTRDevice object goes from not knowing the device to having cached the first attribute reports that include basic mandatory information, e.g. Descriptor clusters.
+ *
+ * The intention is that after this is called, the client should be able to call read for mandatory attributes and likely expect non-nil values.
+ */
+- (void)deviceCachePrimed:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
 @end
 

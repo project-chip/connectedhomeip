@@ -166,19 +166,19 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
         if (NULL == gDevices[index])
         {
             gDevices[index] = dev;
-            EmberAfStatus ret;
+            CHIP_ERROR err;
             while (true)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
-                ret =
+                err =
                     emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
-                if (ret == EMBER_ZCL_STATUS_SUCCESS)
+                if (err == CHIP_NO_ERROR)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
                                     gCurrentEndpointId, index);
                     return index;
                 }
-                else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+                else if (err != CHIP_ERROR_ENDPOINT_EXISTS)
                 {
                     return -1;
                 }
@@ -201,20 +201,19 @@ CHIP_ERROR RemoveDeviceEndpoint(Device * dev)
     {
         if (gDevices[index] == dev)
         {
-            EndpointId ep   = emberAfClearDynamicEndpoint(index);
-            gDevices[index] = NULL;
-            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
-            UNUSED_VAR(ep);
+            [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
+            gDevices[index]                = NULL;
+            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             return CHIP_NO_ERROR;
         }
     }
     return CHIP_ERROR_INTERNAL;
 }
 
-EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer,
-                                                    uint16_t maxReadLength)
+Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::AttributeId attributeId,
+                                                                          uint8_t * buffer, uint16_t maxReadLength)
 {
     using namespace BridgedDeviceBasicInformation::Attributes;
     ChipLogProgress(DeviceLayer, "HandleReadBridgedDeviceBasicAttribute: attrId=%" PRIu32 ", maxReadLength=%u", attributeId,
@@ -236,13 +235,14 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else
     {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Protocols::InteractionModel::Status::Failure;
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
-EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+Protocols::InteractionModel::Status HandleReadOnOffAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer,
+                                                             uint16_t maxReadLength)
 {
     ChipLogProgress(DeviceLayer, "HandleReadOnOffAttribute: attrId=%" PRIu32 ", maxReadLength=%u", attributeId, maxReadLength);
 
@@ -257,24 +257,25 @@ EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attribute
     }
     else
     {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Protocols::InteractionModel::Status::Failure;
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
-EmberAfStatus HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer)
+Protocols::InteractionModel::Status HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer)
 {
     ChipLogProgress(DeviceLayer, "HandleWriteOnOffAttribute: attrId=%" PRIu32, attributeId);
 
-    ReturnErrorCodeIf((attributeId != OnOff::Attributes::OnOff::Id) || (!dev->IsReachable()), EMBER_ZCL_STATUS_FAILURE);
+    ReturnErrorCodeIf((attributeId != OnOff::Attributes::OnOff::Id) || (!dev->IsReachable()),
+                      Protocols::InteractionModel::Status::Failure);
     dev->SetOnOff(*buffer == 1);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
-EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength)
+Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                         const EmberAfAttributeMetadata * attributeMetadata,
+                                                                         uint8_t * buffer, uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -292,11 +293,12 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         }
     }
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return Protocols::InteractionModel::Status::Failure;
 }
 
-EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                          const EmberAfAttributeMetadata * attributeMetadata,
+                                                                          uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -310,7 +312,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
         }
     }
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return Protocols::InteractionModel::Status::Failure;
 }
 
 namespace {

@@ -799,9 +799,8 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             }
 
-            if (attributePath ==
-                ConcreteDataAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                          Clusters::IcdManagement::Attributes::OperatingMode::Id))
+            if (attributePath.MatchesConcreteAttributePath(ConcreteAttributePath(
+                    kRootEndpointId, Clusters::IcdManagement::Id, Clusters::IcdManagement::Attributes::OperatingMode::Id)))
             {
                 PeerType peerType;
                 TLV::TLVReader operatingModeTlvReader;
@@ -945,7 +944,9 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
     // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
     //
-    const auto & ourMrpConfig = GetDefaultMRPConfig();
+    const auto & localMRPConfig   = GetLocalMRPConfig();
+    const auto & defaultMRPConfig = GetDefaultMRPConfig();
+    const auto & ourMrpConfig     = localMRPConfig.ValueOr(defaultMRPConfig);
     auto publisherTransmissionTimeout =
         GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
                                  System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);

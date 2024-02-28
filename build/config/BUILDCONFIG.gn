@@ -127,7 +127,9 @@ if (_chip_defaults.custom_toolchain != "") {
            "Unsupported target_cpu: ${current_cpu}. Shall be arm for webOS")
   }
 } else {
-  assert(false, "No toolchain specified, please specify custom_toolchain")
+  assert(
+      false,
+      "No toolchain specified, please specify custom_toolchain for host_os='${host_os}', target_os='${target_os}', host_cpu='${host_cpu}', target_cpu='${target_cpu}'")
 }
 
 set_default_toolchain(_default_toolchain)

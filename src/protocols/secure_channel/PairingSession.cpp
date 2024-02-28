@@ -18,9 +18,7 @@
 
 #include <protocols/secure_channel/PairingSession.h>
 
-#include <app/DataModelRevision.h>
-#include <app/InteractionModelRevision.h>
-#include <app/SpecificationVersion.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
@@ -112,13 +110,13 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionActiveThreshold),
                                        mrpLocalConfig.mActiveThresholdTime.count()));
 
-    uint16_t dataModel = CHIP_DEVICE_DATA_MODEL_REVISION;
+    uint16_t dataModel = Revision::kDataModelRevision;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kDataModelRevision), dataModel));
 
-    uint16_t interactionModel = CHIP_DEVICE_INTERACTION_MODEL_REVISION;
+    uint16_t interactionModel = Revision::kInteractionModelRevision;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kInteractionModelRevision), interactionModel));
 
-    uint32_t specVersion = CHIP_DEVICE_SPECIFICATION_VERSION;
+    uint32_t specVersion = Revision::kSpecificationVersion;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSpecificationVersion), specVersion));
 
     uint16_t maxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;

@@ -152,7 +152,7 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     auto rv = fclose(fp);
     if (rv != 0)
     {
-        ChipLogError(NotSpecified, "Error when closing file pointer: %p (%d)", fp, errno);
+        ChipLogError(NotSpecified, "Error when closing file pointer (%d)", errno);
     }
 
     return fileSize;

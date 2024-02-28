@@ -54,16 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0062" name="Scenes Management" revision="6">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0062" name="Scenes Management" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added; CCB 1745"/>
-    <revision revision="2" summary="TransitionTime field added to the RecallScene command"/>
-    <revision revision="3" summary="CCB 2427 3026"/>
-    <revision revision="4" summary="New data model format and notation"/>
-    <revision revision="5" summary="Added Explicit, TableSize and FabricScenes features; support multi-fabric environment; added attributes SceneTableSize and RemainingCapacity; added fabric-scoped scene information list"/>
-    <revision revision="6" summary="Updated the Cluster ID to 0x0062, the name to Scenes Management, removed the provisional status; Removed attributes SceneCount, CurrentScene, CurrentGroup, SceneValid, and NameSupport; Removed Explicit, TableSize and FabricScenes features; Removed EnhancedAddScene, EnhancedAddSceneResponse, EnhancedViewScene, EnhancedViewSceneResponse; TransitionTime field changed milliseconds in AddScene, ViewSceneResponse and RecallScene"/>
+    <revision revision="1" summary="Based on the ZCL Scenes Cluster, Updated the Cluster ID to 0x0062, the name to Scenes Management, removed the provisional status; Removed attributes SceneCount, CurrentScene, CurrentGroup, SceneValid, and NameSupport; Removed Explicit, TableSize and FabricScenes features; Removed EnhancedAddScene, EnhancedAddSceneResponse, EnhancedViewScene, EnhancedViewSceneResponse; TransitionTime field changed milliseconds in AddScene, ViewSceneResponse and RecallScene"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0062" name="Scenes Management"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="S" scope="Endpoint"/>
   <features>
     <feature bit="0" code="SN" name="SceneNames" summary="The ability to store a name for a scene.">
@@ -78,50 +78,39 @@ Davis, CA 95616, USA
     </bitmap>
     <struct name="AttributeValuePairStruct">
       <field id="0" name="AttributeID" type="attribute-id">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="ValueUnsigned8" type="uint8">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
       </field>
       <field id="2" name="ValueSigned8" type="int8">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
       </field>
       <field id="3" name="ValueUnsigned16" type="uint16">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
       </field>
       <field id="4" name="ValueSigned16" type="int16">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
       </field>
       <field id="5" name="ValueUnsigned32" type="uint32">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
       </field>
       <field id="6" name="ValueSigned32" type="int32">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
       </field>
       <field id="7" name="ValueUnsigned64" type="uint64">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
       </field>
       <field id="8" name="ValueSigned64" type="int64">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
       </field>
     </struct>
     <struct name="ExtensionFieldSetStruct">
       <field id="0" name="ClusterID" type="cluster-id">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="AttributeValueList" type="list">
         <entry type="AttributeValuePairStruct"/>
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -132,17 +121,14 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
       </field>
       <field id="2" name="SceneName" type="string">
         <mandatoryConform>
           <feature name="SN"/>
         </mandatoryConform>
-        <constraint type="maxLength" value="16"/>
       </field>
       <field id="3" name="SceneTransitionTime" type="uint32" default="0">
         <mandatoryConform/>
-        <constraint type="max" value="6000000"/>
       </field>
       <field id="4" name="ExtensionFields" type="list" default="empty">
         <entry type="ExtensionFieldSetStruct"/>
@@ -151,24 +137,22 @@ Davis, CA 95616, USA
     </struct>
     <struct name="SceneInfoStruct">
       <field id="0" name="SceneCount" type="uint8" default="0">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="CurrentScene" type="uint8" default="0xFF">
-        <access read="true" fabricSensitive="true"/>
+        <access fabricSensitive="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="2" name="CurrentGroup" type="group-id" default="0">
-        <access read="true" fabricSensitive="true"/>
+        <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="SceneValid" type="bool" default="False">
-        <access read="true" fabricSensitive="true"/>
+        <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="RemainingCapacity" type="uint8" default="MS">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="max" value="253"/>
       </field>
@@ -195,7 +179,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="AddScene" response="AddSceneResponse">
+    <command id="0x00" name="AddScene" direction="commandToServer" response="AddSceneResponse">
       <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
@@ -207,7 +191,7 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="TransitionTime" type="uint32">
         <mandatoryConform/>
-        <constraint type="max" value="6000000"/>
+        <constraint type="max" value="60000000"/>
       </field>
       <field id="3" name="SceneName" type="string">
         <mandatoryConform/>
@@ -220,7 +204,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x00" name="AddSceneResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
@@ -234,7 +217,7 @@ Davis, CA 95616, USA
         <constraint type="max" value="254"/>
       </field>
     </command>
-    <command id="0x01" name="ViewScene" response="ViewSceneResponse">
+    <command id="0x01" name="ViewScene" direction="commandToServer" response="ViewSceneResponse">
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
@@ -246,7 +229,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="ViewSceneResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
@@ -260,7 +242,7 @@ Davis, CA 95616, USA
         <constraint type="max" value="254"/>
       </field>
       <field id="3" name="TransitionTime" type="uint32">
-        <constraint type="max" value="6000000"/>
+        <constraint type="max" value="60000000"/>
       </field>
       <field id="4" name="SceneName" type="string">
         <constraint type="maxLength" value="16"/>
@@ -269,7 +251,7 @@ Davis, CA 95616, USA
         <entry type="ExtensionFieldSetStruct"/>
       </field>
     </command>
-    <command id="0x02" name="RemoveScene" response="RemoveSceneResponse">
+    <command id="0x02" name="RemoveScene" direction="commandToServer" response="RemoveSceneResponse">
       <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
@@ -281,7 +263,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x02" name="RemoveSceneResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
@@ -295,7 +276,7 @@ Davis, CA 95616, USA
         <constraint type="max" value="254"/>
       </field>
     </command>
-    <command id="0x03" name="RemoveAllScenes" response="RemoveAllScenesResponse">
+    <command id="0x03" name="RemoveAllScenes" direction="commandToServer" response="RemoveAllScenesResponse">
       <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
@@ -303,7 +284,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x03" name="RemoveAllScenesResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
@@ -313,7 +293,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x04" name="StoreScene" response="StoreSceneResponse">
+    <command id="0x04" name="StoreScene" direction="commandToServer" response="StoreSceneResponse">
       <access invokePrivilege="manage" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
@@ -325,7 +305,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="StoreSceneResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
@@ -339,7 +318,7 @@ Davis, CA 95616, USA
         <constraint type="max" value="254"/>
       </field>
     </command>
-    <command id="0x05" name="RecallScene" response="Y">
+    <command id="0x05" name="RecallScene" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
@@ -355,7 +334,7 @@ Davis, CA 95616, USA
         <constraint type="max" value="60000000"/>
       </field>
     </command>
-    <command id="0x06" name="GetSceneMembership" response="GetSceneMembershipResponse">
+    <command id="0x06" name="GetSceneMembership" direction="commandToServer" response="GetSceneMembershipResponse">
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
@@ -363,7 +342,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x06" name="GetSceneMembershipResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
@@ -380,7 +358,7 @@ Davis, CA 95616, USA
         <entry type="uint8"/>
       </field>
     </command>
-    <command id="0x40" name="CopyScene" response="CopySceneResponse">
+    <command id="0x40" name="CopyScene" direction="commandToServer" response="CopySceneResponse">
       <access invokePrivilege="manage" fabricScoped="true"/>
       <optionalConform/>
       <field id="0" name="Mode" type="CopyModeBitmap">
@@ -401,9 +379,8 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x40" name="CopySceneResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
-        <attribute name="CopyScene"/>
+        <command name="CopyScene"/>
       </mandatoryConform>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>

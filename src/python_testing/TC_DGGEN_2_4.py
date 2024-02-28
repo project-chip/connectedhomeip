@@ -65,7 +65,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
         return response
 
     @async_test_body
-    async def test_TC_GEN_2_4(self):
+    async def test_TC_DGGEN_2_4(self):
         self.print_step("1a", "Detect Time Synchronization UTCTime attribute presence")
         root_descriptor = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Descriptor)])
         root_server_list = root_descriptor[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]

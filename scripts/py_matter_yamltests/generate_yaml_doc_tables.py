@@ -26,12 +26,16 @@ WARNING = ("<!---\n"
 
 
 def get_type_list_and_vars(typetuple) -> (list[type], bool):
+    "Returns a list of supported types for this type tuple and a bool indicating if variables are supported."
     # If str is one of the supported types, and other base types are supported,
     # this means it supports variables.
     # This is a heuristic, but it's true for now.
     try:
         typelist = list(typetuple)
         if str in typelist:
+            # The tuple passed from the yaml parser is a tuple of type classes
+            # Here, we directly compare to the base type because that's what
+            # we get from the parser (ex. (bool, int, str))
             reduced = [t for t in typelist if t != str]
             if reduced != [list]:
                 return (reduced, True)

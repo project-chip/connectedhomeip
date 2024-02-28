@@ -1,0 +1,411 @@
+#
+#   Copyright (c) 2024 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define new default values of settings used when building Matter samples.
+# This file only changes defaults and thus all symbols here must be promptless
+# and safeguarded so that they only are applied when building Matter.
+
+if CHIP
+
+config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
+	default 1
+
+if CHIP_FACTORY_DATA
+
+config CHIP_DEVICE_VENDOR_ID
+	default 4151 # 0x1037
+
+config CHIP_DEVICE_MANUFACTURING_DATE
+	default "2023-01-01"
+
+config CHIP_DEVICE_PRODUCT_ID
+	default 41510 if SOC_SERIES_RW6XX
+
+endif # CHIP_FACTORY_DATA
+
+config LOG
+	default y
+
+if LOG
+
+choice LOG_MODE
+	default LOG_MODE_MINIMAL
+endchoice
+
+choice MATTER_LOG_LEVEL_CHOICE
+	default MATTER_LOG_LEVEL_DBG
+endchoice
+
+config CHIP_APP_LOG_LEVEL
+	default 4 # debug
+
+config LOG_DEFAULT_LEVEL
+	default 1 # error
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+	default y
+
+endif
+
+config PRINTK_SYNC
+	default y
+
+config ASSERT
+	default y
+
+config ASSERT_NO_COND_INFO
+	default y
+
+config ASSERT_NO_MSG_INFO
+	default y
+
+config HW_STACK_PROTECTION
+	default y
+
+config FPU
+	default y
+
+config SHELL
+	default y
+
+config PTHREAD_IPC
+	bool
+	default n
+
+config POSIX_MAX_FDS
+	int
+	default 8
+
+# Application stack size
+config MAIN_STACK_SIZE
+	default 8192
+
+config INIT_STACKS
+	default y
+
+config NET_MGMT_EVENT_STACK_SIZE
+	default 2048
+
+config NET_MGMT_EVENT_QUEUE_SIZE
+	default 20
+
+config NET_IPV6_MLD
+	default y
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+	default 14
+
+config NET_IF_MAX_IPV4_COUNT
+	default 2
+
+config NET_IF_MAX_IPV6_COUNT
+	default 2
+
+config NET_TC_TX_COUNT
+	default 1
+
+config NET_TC_RX_COUNT
+	default 1
+
+config NET_TC_THREAD_PRIO_CUSTOM
+	default y
+
+choice NET_TC_THREAD_TYPE
+	default NET_TC_THREAD_PREEMPTIVE
+endchoice
+
+config NET_TCP_WORK_QUEUE_THREAD_PRIO
+	default -16
+
+config NET_TC_TX_THREAD_BASE_PRIO
+	default 3
+
+config NET_TC_RX_THREAD_BASE_PRIO
+	default 3
+
+# Network buffers
+config NET_PKT_RX_COUNT
+	default 60
+
+config NET_PKT_TX_COUNT
+	default 40
+
+config NET_BUF_RX_COUNT
+	default 60
+
+config NET_BUF_TX_COUNT
+	default 80
+
+config NET_BUF_DATA_SIZE
+	default 1744
+
+# Bluetooth Low Energy configs
+
+config BT
+	default y
+
+config BT_PERIPHERAL
+	default y
+
+config BT_CENTRAL
+	default n
+
+config BT_PERIPHERAL_PREF_MIN_INT
+	default 36
+
+config BT_PERIPHERAL_PREF_MAX_INT
+	default 36
+
+# Increase BT timeout to 5 s to improve connection reliability and avoid fast drop outs.
+config BT_PERIPHERAL_PREF_TIMEOUT
+	default 500
+
+config BT_GAP_AUTO_UPDATE_CONN_PARAMS
+	default y
+
+# Decrease connection parameters update time, as some Matter controllers request
+# enabling IP networking faster than BT connection parameters are updated, what may result
+# in commissioning instabilities.
+config BT_CONN_PARAM_UPDATE_TIMEOUT
+	default 1000
+
+config BT_GATT_DYNAMIC_DB
+	default y
+
+config BT_DEVICE_NAME_DYNAMIC
+	default y
+
+config BT_DEVICE_NAME_MAX
+	default 15
+
+config BT_MAX_CONN
+	default 1
+
+config BT_L2CAP_TX_MTU
+	default 247
+
+config BT_BUF_ACL_RX_SIZE
+	default 251
+
+config BT_BUF_ACL_TX_SIZE
+	default 251
+
+config BT_RX_STACK_SIZE
+	default 2048 if NO_OPTIMIZATIONS && DEBUG
+	default 1536
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+	bool
+	default n
+
+config HCI_NXP_ENABLE_AUTO_SLEEP
+	default n
+
+config CHIP_OTA_REQUESTOR
+	default n
+
+# Enable extended discovery
+config CHIP_EXTENDED_DISCOVERY
+	default y
+
+config NVS_LOOKUP_CACHE
+	default y
+
+config NVS_LOOKUP_CACHE_SIZE
+	default 512
+
+if CHIP_WIFI
+
+choice SCHED_ALGORITHM
+	default SCHED_MULTIQ
+endchoice
+
+choice LIBC_IMPLEMENTATION
+	default NEWLIB_LIBC
+endchoice
+
+choice WPA_SUPP_LOG_LEVEL_CHOICE
+	default WPA_SUPP_LOG_LEVEL_ERR
+endchoice
+
+config WPA_SUPP_THREAD_STACK_SIZE
+	default 12288
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 2048
+
+config NET_TCP_WORKQ_STACK_SIZE
+	default 2048
+
+# align these numbers to match the OpenThread config
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+	default 6
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+	default 8
+
+config NET_SOCKETS_POLL_MAX
+	default 8
+
+config NET_IPV4_FRAGMENT_MAX_COUNT
+	default 3
+
+config NET_IPV4_FRAGMENT_MAX_PKT
+	default 7
+
+config NET_IPV4_FRAGMENT_TIMEOUT
+	default 3
+
+config NET_IPV6_FRAGMENT_MAX_COUNT
+	default 3
+
+config NET_IPV6_FRAGMENT_MAX_PKT
+	default 7
+
+config NET_IPV6_FRAGMENT_TIMEOUT
+	default 3
+
+# options managed by IP4/IP6 simultaneous support
+# aligned here to match OpenThread config
+config NET_MAX_ROUTERS
+	default 1
+
+config NET_MAX_CONN
+	default 4
+
+config SHELL_STACK_SIZE
+	default 2616
+
+config HEAP_MEM_POOL_SIZE
+	default 122880
+
+config CHIP_MALLOC_SYS_HEAP_SIZE
+	default 28672 # 28 kB
+
+endif
+
+# Configure MBEDTLS lib
+config MBEDTLS
+	default y
+
+config MBEDTLS_CFG_FILE
+	default "config-tls-generic.h"
+
+config MBEDTLS_USER_CONFIG_ENABLE
+    default y
+
+config MBEDTLS_USER_CONFIG_FILE
+    default "nxp-zephyr-mbedtls-config.h"
+
+config MBEDTLS_ENTROPY_ENABLED
+	default y
+
+config MBEDTLS_ZEPHYR_ENTROPY
+	default y
+
+config MBEDTLS_ENABLE_HEAP
+	default y
+
+config MBEDTLS_HEAP_SIZE
+	default 15360
+
+config MBEDTLS_CIPHER_AES_ENABLED
+	default y
+
+config MBEDTLS_CIPHER_CCM_ENABLED
+	default y
+
+config MBEDTLS_CTR_DRBG_ENABLED
+	default y
+
+config MBEDTLS_CIPHER_MODE_CBC_ENABLED
+	default y
+
+config MBEDTLS_ECP_C
+	default y
+
+config MBEDTLS_ECP_DP_SECP256R1_ENABLED
+	default y
+
+if CHIP_CRYPTO_PSA
+
+config MBEDTLS_PSA_CRYPTO_C
+	default y
+
+config WPA_SUPP_CRYPTO_MBEDTLS_PSA
+	default y if WPA_SUPP_CRYPTO
+
+endif
+
+config MCUX_ELS_PKC
+	default y if SOC_SERIES_RW6XX
+
+if MCUX_ELS_PKC
+
+config KSDK_MBEDTLS
+	default n
+
+config MCUX_PSA_CRYPTO_DRIVER_ELS_PKC
+	default y if MBEDTLS_PSA_CRYPTO_C
+
+config ENTROPY_GENERATOR
+	default y
+
+endif # MCUX_ELS_PKC
+
+
+if SHELL
+
+config KERNEL_SHELL
+	default y
+
+config DEVICE_SHELL
+	default y
+
+config REBOOT
+	default y
+
+# Disable not used shell modules
+config SHELL_WILDCARD
+	default n
+
+config SHELL_VT100_COLORS
+	default n
+
+config SHELL_STATS
+	default n
+
+config SENSOR_SHELL
+	default n
+
+config DATE_SHELL
+	default n
+
+config DEVMEM_SHELL
+	default n
+
+config MCUBOOT_SHELL
+	default n
+
+config FLASH_SHELL
+	default n
+
+endif # SHELL
+
+endif
+
+config NXP_FW_LOADER_MONOLITHIC
+	default y if NXP_FW_LOADER

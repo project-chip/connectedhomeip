@@ -37,8 +37,9 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
     MTROTAImageDigestTypeSha3_256,
     MTROTAImageDigestTypeSha3_384,
     MTROTAImageDigestTypeSha3_512,
-};
+} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROTAHeader : NSObject
 
 /**

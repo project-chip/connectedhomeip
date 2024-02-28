@@ -8544,6 +8544,13 @@
 - release: "Future"
   versions: "future"
   provisional:
+      clusters:
+          # Targeting Spring 2024 Matter release
+          - EnergyEVSEMode
+          - DeviceEnergyManagementMode
+          - Messages
+          - ElectricalPowerMeasurement
+          - PowerTopology
       attributes:
           DoorLock:
               # Aliro is not ready yet.
@@ -8575,6 +8582,10 @@
               - SetpointHoldExpiryTimestamp
               - QueuedPreset
               - ActiveScheduleHandle
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - MeiInt8u
       commands:
           DoorLock:
               # Aliro is not ready yet.
@@ -8592,6 +8603,15 @@
           RVCOperationalState:
               # Targeting Spring 2024 Matter release
               - GoHome
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - TestDifferentVendorMeiRequest
+              - TestDifferentVendorMeiResponse
+          GeneralDiagnostics:
+              # Targeting Spring 2024 Matter release
+              - PayloadTestRequest
+              - PayloadTestResponse
       structs:
           Thermostat:
               # Targeting Spring 2024 Matter release
@@ -8601,6 +8621,11 @@
               - PresetTypeStruct
               - ScheduleTypeStruct
               - QueuedPresetStruct
+      events:
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - TestDifferentVendorMeiEvent
       enums:
           Thermostat:
               # Targeting Spring 2024 Matter release
@@ -8630,6 +8655,9 @@
               - PresetTypeFeaturesBitmap
               - ScheduleTypeFeaturesBitmap
               - TemperatureSetpointHoldPolicyBitmap
+          GeneralDiagnostics:
+              # Targeting Spring 2024 Matter release
+              - Feature
       bitmap values:
           DoorLock:
               Feature:
@@ -8643,3 +8671,13 @@
                   - Setpoints
                   - Presets
                   - MatterScheduleConfiguration
+          RVCRunMode:
+              Feature:
+                  # Not really part of the spec, need to think about whether to
+                  # expose this.
+                  - NoFeatures
+          RVCCleanMode:
+              Feature:
+                  # Not really part of the spec, need to think about whether to
+                  # expose this.
+                  - NoFeatures

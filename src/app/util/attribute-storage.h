@@ -25,24 +25,10 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
 
-#if !defined(EMBER_SCRIPTED_TEST)
 #include <app/att-storage.h>
-#endif
-
-#if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
-#define ATTRIBUTE_STORAGE_CONFIGURATION "attribute-storage-test.h"
-#endif
-
-// ATTRIBUTE_STORAGE_CONFIGURATION macro
-// contains the file that contains the initial set-up of the
-// attribute data structures. If it is missing
-// we use the provider sample.
-#ifndef ATTRIBUTE_STORAGE_CONFIGURATION
-//  #error "Must define ATTRIBUTE_STORAGE_CONFIGURATION to specify the App. Builder default attributes file."
 #include <zap-generated/endpoint_config.h>
-#else
-#include ATTRIBUTE_STORAGE_CONFIGURATION
-#endif
+
+#include <protocols/interaction_model/StatusCode.h>
 
 // If we have fixed number of endpoints, then max is the same.
 #ifdef FIXED_ENDPOINT_COUNT
@@ -85,8 +71,9 @@ void emAfCallInits(void);
 // Initial configuration
 void emberAfEndpointConfigure(void);
 
-EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
-                                       uint8_t * buffer, uint16_t readLength, bool write);
+chip::Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
+                                                                   const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
+                                                                   uint16_t readLength, bool write);
 
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
@@ -134,7 +121,11 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::Endpoi
 // cast it.
 EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * cluster, EmberAfClusterMask functionMask);
 
-// Loads attribute defaults and any non-volatile attributes stored
+/**
+ * @brief Loads attribute defaults and any non-volatile attributes stored
+ *
+ * @param endpoint EnpointId. Use chip::kInvalidEndpointId to initialize all endpoints
+ */
 void emberAfInitializeAttributes(chip::EndpointId endpoint);
 
 // After the RAM value has changed, code should call this function. If this
@@ -146,8 +137,9 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, chip::EndpointId endpoin
 void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 // Calls the attribute changed callback for a specific cluster.
-EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status
+emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType,
+                                       uint16_t size, uint8_t * value);
 
 // Note the difference in for server filtering.
 // This method will return the cluster count for BOTH client and server
@@ -206,10 +198,15 @@ CHIP_ERROR SetTagList(chip::EndpointId endpoint,
 //
 // An optional parent endpoint id should be passed for child endpoints of composed device.
 //
-EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
-                                        const chip::Span<chip::DataVersion> & dataVersionStorage,
-                                        chip::Span<const EmberAfDeviceType> deviceTypeList = {},
-                                        chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+// Returns  CHIP_NO_ERROR                   No error.
+//          CHIP_ERROR_NO_MEMORY            MAX_ENDPOINT_COUNT is reached or when no storage is left for clusters
+//          CHIP_ERROR_INVALID_ARGUMENT     The EndpointId value passed is kInvalidEndpointId
+//          CHIP_ERROR_ENDPOINT_EXISTS      If the EndpointId value passed already exists
+//
+CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
+                                     const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                     chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                     chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 

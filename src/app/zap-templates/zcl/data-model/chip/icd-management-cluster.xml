@@ -111,6 +111,7 @@ limitations under the License.
         <command source="client" code="0x03" name="StayActiveRequest" response="StayActiveResponse" optional="true">
             <description>Request the end device to stay in Active Mode for an additional ActiveModeThreshold</description>
             <access op="invoke" privilege="manage"/>
+            <arg name="StayActiveDuration" type="int32u" isNullable="false"/>
         </command>
 
         <command source="server" code="0x04" name="StayActiveResponse" optional="true" disableDefaultResponse="true">

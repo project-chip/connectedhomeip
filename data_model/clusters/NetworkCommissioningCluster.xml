@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!--
-link:../matter-defines.adoc[]
-
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
@@ -56,12 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0031" name="Network Commissioning" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Support determining capabilities for Wi-Fi and Thread interfaces. Additional Wi-Fi directed scanning requirements."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0031" name="Network Commissioning"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="CNET" scope="Node"/>
   <features>
     <feature bit="0" code="WI" name="WiFiNetworkInterface" summary="Wi-Fi related features">
@@ -171,9 +173,9 @@ Davis, CA 95616, USA
       </bitfield>
     </bitmap>
     <struct name="NetworkInfoStruct">
-      <field id="0" name="NetworkID" type="ref_DataTypeOctstr">
+      <field id="0" name="NetworkID" type="octstr">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="32"/>
+        <constraint type="lengthBetween" from="1" to="32"/>
       </field>
       <field id="1" name="Connected" type="bool">
         <mandatoryConform/>
@@ -191,11 +193,11 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </mandatoryConform>
       </field>
-      <field id="2" name="NetworkName" type="ref_DataTypeString">
+      <field id="2" name="NetworkName" type="string">
         <mandatoryConform>
           <feature name="TH"/>
         </mandatoryConform>
-        <constraint type="between" from="1" to="16"/>
+        <constraint type="lengthBetween" from="1" to="16"/>
       </field>
       <field id="3" name="Channel" type="uint16">
         <mandatoryConform>
@@ -229,17 +231,17 @@ Davis, CA 95616, USA
           <feature name="WI"/>
         </mandatoryConform>
       </field>
-      <field id="1" name="SSID" type="ref_DataTypeOctstr">
+      <field id="1" name="SSID" type="octstr">
         <mandatoryConform>
           <feature name="WI"/>
         </mandatoryConform>
-        <constraint type="max" value="32"/>
+        <constraint type="maxLength" value="32"/>
       </field>
-      <field id="2" name="BSSID" type="ref_DataTypeOctstr">
+      <field id="2" name="BSSID" type="octstr">
         <mandatoryConform>
           <feature name="WI"/>
         </mandatoryConform>
-        <constraint type="allowed" value="6"/>
+        <constraint type="maxLength" value="6"/>
       </field>
       <field id="3" name="Channel" type="uint16">
         <mandatoryConform>
@@ -265,10 +267,11 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="min" value="1"/>
     </attribute>
-    <attribute id="0x0001" name="Networks" type="ref_DataTypeList[NetworkInfoStruct Type]" default="empty">
+    <attribute id="0x0001" name="Networks" type="list" default="empty">
+      <entry type="NetworkInfoStruct"/>
       <access read="true" readPrivilege="admin"/>
       <mandatoryConform/>
-      <constraint type="max" value="MaxNetworks"/>
+      <constraint type="maxCount" value="MaxNetworks"/>
     </attribute>
     <attribute id="0x0002" name="ScanMaxTimeSeconds" type="uint8">
       <access read="true" readPrivilege="view"/>
@@ -302,24 +305,25 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0006" name="LastNetworkID" type="ref_DataTypeOctstr" default="null">
+    <attribute id="0x0006" name="LastNetworkID" type="octstr" default="null">
       <access read="true" readPrivilege="admin"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="1" to="32"/>
+      <constraint type="lengthBetween" from="1" to="32"/>
     </attribute>
     <attribute id="0x0007" name="LastConnectErrorValue" type="int32" default="null">
       <access read="true" readPrivilege="admin"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0008" name="SupportedWiFiBands" type="ref_DataTypeList[WiFiBandEnum Type]" default="MS">
+    <attribute id="0x0008" name="SupportedWiFiBands" type="list" default="MS">
+      <entry type="WiFiBandEnum"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="WI"/>
       </mandatoryConform>
-      <constraint type="min" value="1"/>
+      <constraint type="minCount" value="1"/>
     </attribute>
     <attribute id="0x0009" name="SupportedThreadFeatures" type="ThreadCapabilitiesBitmap" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -337,7 +341,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ScanNetworks" response="ScanNetworksResponse">
+    <command id="0x00" name="ScanNetworks" direction="commandToServer" response="ScanNetworksResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <orTerm>
@@ -345,19 +349,18 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </orTerm>
       </mandatoryConform>
-      <field id="0" name="SSID" type="ref_DataTypeOctstr" default="null">
+      <field id="0" name="SSID" type="octstr" default="null">
         <quality nullable="true"/>
         <optionalConform>
           <feature name="WI"/>
         </optionalConform>
-        <constraint type="between" from="1" to="32"/>
+        <constraint type="lengthBetween" from="1" to="32"/>
       </field>
       <field id="1" name="Breadcrumb" type="uint64">
         <optionalConform/>
       </field>
     </command>
     <command id="0x01" name="ScanNetworksResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
           <feature name="WI"/>
@@ -368,54 +371,56 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="DebugText" type="ref_DataTypeString">
+      <field id="1" name="DebugText" type="string">
         <optionalConform/>
-        <constraint type="max" value="512"/>
+        <constraint type="maxLength" value="512"/>
       </field>
-      <field id="2" name="WiFiScanResults" type="ref_DataTypeList[WiFiInterfaceScanResultStruct Type]">
+      <field id="2" name="WiFiScanResults" type="list">
+        <entry type="WiFiInterfaceScanResultStruct"/>
         <mandatoryConform>
           <feature name="WI"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
-      <field id="3" name="ThreadScanResults" type="ref_DataTypeList[ThreadInterfaceScanResultStruct Type]">
+      <field id="3" name="ThreadScanResults" type="list">
+        <entry type="ThreadInterfaceScanResultStruct"/>
         <mandatoryConform>
           <feature name="TH"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x02" name="AddOrUpdateWiFiNetwork" response="NetworkConfigResponse">
+    <command id="0x02" name="AddOrUpdateWiFiNetwork" direction="commandToServer" response="NetworkConfigResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WI"/>
       </mandatoryConform>
-      <field id="0" name="SSID" type="ref_DataTypeOctstr">
+      <field id="0" name="SSID" type="octstr">
         <mandatoryConform/>
-        <constraint type="max" value="32"/>
+        <constraint type="maxLength" value="32"/>
       </field>
-      <field id="1" name="Credentials" type="ref_DataTypeOctstr">
+      <field id="1" name="Credentials" type="octstr">
         <mandatoryConform/>
-        <constraint type="max" value="64"/>
+        <constraint type="maxLength" value="64"/>
       </field>
       <field id="2" name="Breadcrumb" type="uint64">
         <optionalConform/>
       </field>
     </command>
-    <command id="0x03" name="AddOrUpdateThreadNetwork" response="NetworkConfigResponse">
+    <command id="0x03" name="AddOrUpdateThreadNetwork" direction="commandToServer" response="NetworkConfigResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="TH"/>
       </mandatoryConform>
-      <field id="0" name="OperationalDataset" type="ref_DataTypeOctstr">
+      <field id="0" name="OperationalDataset" type="octstr">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint type="maxLength" value="254"/>
       </field>
       <field id="1" name="Breadcrumb" type="uint64">
         <optionalConform/>
       </field>
     </command>
-    <command id="0x04" name="RemoveNetwork" response="NetworkConfigResponse">
+    <command id="0x04" name="RemoveNetwork" direction="commandToServer" response="NetworkConfigResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <orTerm>
@@ -423,16 +428,15 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </orTerm>
       </mandatoryConform>
-      <field id="0" name="NetworkID" type="ref_DataTypeOctstr">
+      <field id="0" name="NetworkID" type="octstr">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="32"/>
+        <constraint type="lengthBetween" from="1" to="32"/>
       </field>
       <field id="1" name="Breadcrumb" type="uint64">
         <optionalConform/>
       </field>
     </command>
     <command id="0x05" name="NetworkConfigResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
           <feature name="WI"/>
@@ -443,16 +447,16 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="DebugText" type="ref_DataTypeString">
+      <field id="1" name="DebugText" type="string">
         <optionalConform/>
-        <constraint type="max" value="512"/>
+        <constraint type="maxLength" value="512"/>
       </field>
       <field id="2" name="NetworkIndex" type="uint8">
         <optionalConform/>
-        <constraint type="between" from="0" to="(MaxNetworks - 1)"/>
+        <constraint type="between" from="0" to="MaxNetworks - 1"/>
       </field>
     </command>
-    <command id="0x06" name="ConnectNetwork" response="ConnectNetworkResponse">
+    <command id="0x06" name="ConnectNetwork" direction="commandToServer" response="ConnectNetworkResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <orTerm>
@@ -460,16 +464,15 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </orTerm>
       </mandatoryConform>
-      <field id="0" name="NetworkID" type="ref_DataTypeOctstr">
+      <field id="0" name="NetworkID" type="octstr">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="32"/>
+        <constraint type="lengthBetween" from="1" to="32"/>
       </field>
       <field id="1" name="Breadcrumb" type="uint64">
         <optionalConform/>
       </field>
     </command>
     <command id="0x07" name="ConnectNetworkResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
           <feature name="WI"/>
@@ -479,7 +482,7 @@ Davis, CA 95616, USA
       <field id="0" name="NetworkingStatus" type="NetworkCommissioningStatusEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="DebugText" type="ref_DataTypeString">
+      <field id="1" name="DebugText" type="string">
         <optionalConform/>
       </field>
       <field id="2" name="ErrorValue" type="int32">
@@ -487,7 +490,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x08" name="ReorderNetwork" response="NetworkConfigResponse">
+    <command id="0x08" name="ReorderNetwork" direction="commandToServer" response="NetworkConfigResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <orTerm>
@@ -495,9 +498,9 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </orTerm>
       </mandatoryConform>
-      <field id="0" name="NetworkID" type="ref_DataTypeOctstr">
+      <field id="0" name="NetworkID" type="octstr">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="32"/>
+        <constraint type="lengthBetween" from="1" to="32"/>
       </field>
       <field id="1" name="NetworkIndex" type="uint8">
         <mandatoryConform/>

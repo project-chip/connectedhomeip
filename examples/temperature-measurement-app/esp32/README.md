@@ -24,6 +24,66 @@ Usage:
   ./out/debug/chip-tool temperaturemeasurement read measured-value <NODE ID> 1
 ```
 
+## Additional details
+
+This example demonstrates the utilization of the diagnostic logs cluster to send
+diagnostic logs to the client.
+
+In this scenario, the [main/diagnostic_logs](main/diagnostic_logs) directory
+contains three files:
+
+```
+main/diagnostic_logs
+├── crash.log
+├── end_user_support.log
+└── network_diag.log
+```
+
+These files contain dummy data.
+
+#### To test the diagnostic logs cluster
+
+```
+# Commission the app
+chip-tool pairing ble-wifi 1 SSID PASSPHRASE 20202021 3840
+
+# Read end user support logs using response payload protocol
+chip-tool diagnosticlogs retrieve-logs-request 0 0 1 0
+
+# Read network diagnostic using BDX protocol
+chip-tool interactive start
+> diagnosticlogs retrieve-logs-request 1 1 1 0 --TransferFileDesignator network-diag.log
+# Retrieve crash over BDX
+> diagnosticlogs retrieve-logs-request 1 1 1 0 --TransferFileDesignator crash.bin
+```
+
+esp-idf supports storing and retrieving
+[core dump in flash](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/core_dump.html#core-dump-to-flash).
+
+To support that, application needs to add core dump partition's entry in
+[partitons.csv](partitions.csv#7) and we need to enable few menuconfig options.
+
+```
+CONFIG_ESP32_ENABLE_COREDUMP_TO_FLASH=y
+CONFIG_ESP32_COREDUMP_DATA_FORMAT_ELF=y
+```
+
+This example's partition table and sdkconfig.default are already modified
+
+-   Retrieve the core dump using diagnostic logs cluster
+
+    ```
+    # Read crash logs over BDX
+    chip-tool interactive start
+    > diagnosticlogs retrieve-logs-request 1 1 1 0 --TransferFileDesignator crash.bin
+    ```
+
+-   Decode the crash logs, using espcoredump.py
+    ```
+    espcoredump.py --chip (CHIP) info_corefile --core /tmp/crash.bin \
+                   --core-format elf build/chip-temperature-measurement-app.elf
+    ```
+
 ## Optimization
 
 Optimization related to WiFi, BLuetooth, Asserts etc are the part of this

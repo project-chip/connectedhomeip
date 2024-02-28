@@ -16,7 +16,7 @@ name: 3.4 [TC-OTCCM-3.1] On Mode functionality with DUT as Server
 
 PICS:
     - OTCCM.S.A0003
-    - OTCCM.S.F00
+    - MOD.S.F00
     - OO.S.C00.Rsp
     - OO.S.C01.Rsp
 
@@ -47,14 +47,14 @@ tests:
           "Precondition: TH writes from the DUT the OnMode attribute.NOTE: To
           execute this test case set onmode to any integer value because as
           default it value has null."
-      PICS: OTCCM.S.A0003 && OTCCM.S.F00
+      PICS: OTCCM.S.A0003 && MOD.S.F00
       command: "writeAttribute"
       attribute: "OnMode"
       arguments:
           value: ConfigureOnMode
 
     - label: "Step 2: TH reads from the DUT the OnMode attribute."
-      PICS: OTCCM.S.A0003 && OTCCM.S.F00
+      PICS: OTCCM.S.A0003 && MOD.S.F00
       command: "readAttribute"
       attribute: "OnMode"
       response:
@@ -63,7 +63,7 @@ tests:
               type: int8u
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
-      PICS: OTCCM.S.A0001 && OTCCM.S.F00
+      PICS: OTCCM.S.A0001 && MOD.S.F00
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -74,6 +74,7 @@ tests:
     - label:
           "If on_mode_dut is equal to old_current_mode_dut proceed to step 4.
           Else proceed to step 6."
+      PICS: OTCCM.S.A0001 && MOD.S.F00 && OTCCM.S.A0003
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
       arguments:
@@ -89,7 +90,7 @@ tests:
 
     - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
       runIf: IsExpectedValue
-      PICS: OTCCM.S.A0000 && OTCCM.S.F00
+      PICS: OTCCM.S.A0000 && MOD.S.F00
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
@@ -101,7 +102,7 @@ tests:
           "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
           to new_mode_th"
       runIf: IsExpectedValue
-      PICS: OTCCM.S.C00.Rsp && OTCCM.S.F00
+      PICS: OTCCM.S.C00.Rsp && MOD.S.F00
       command: "ChangeToMode"
       arguments:
           values:
@@ -113,17 +114,17 @@ tests:
                 value: 0x00
 
     - label: "Step 6:TH sends a Off command to the DUT"
-      PICS: OO.S.C00.Rsp && OTCCM.S.F00
+      PICS: OO.S.C00.Rsp && MOD.S.F00
       cluster: "On/Off"
       command: "Off"
 
     - label: "Step 7:TH sends a On command to the DUT"
-      PICS: OO.S.C01.Rsp && OTCCM.S.F00
+      PICS: OO.S.C01.Rsp && MOD.S.F00
       cluster: "On/Off"
       command: "On"
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
-      PICS: OTCCM.S.A0001 && OTCCM.S.F00
+      PICS: OTCCM.S.A0001 && MOD.S.F00
       command: "readAttribute"
       attribute: "CurrentMode"
       response:

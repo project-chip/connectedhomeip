@@ -37,7 +37,6 @@ namespace chip {
 namespace Shell {
 
 using namespace chip;
-using namespace ::chip::Controller;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 static CHIP_ERROR ResetUDC(bool printHeader)

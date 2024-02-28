@@ -37,11 +37,11 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/SessionParameters.h>
 #include <platform/PlatformManager.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/PairingSession.h>
-#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemClock.h>
@@ -552,6 +552,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
                  to_underlying(mState));
+    MATTER_TRACE_COUNTER("CASETimeout");
     // Discard the exchange so that Clear() doesn't try aborting it.  The
     // exchange will handle that.
     DiscardExchange();
@@ -844,6 +845,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     ByteSpan initiatorRandom;
 
     ChipLogProgress(SecureChannel, "Received Sigma1 msg");
+    MATTER_TRACE_COUNTER("Sigma1");
 
     bool sessionResumptionRequested = false;
     ByteSpan resumptionId;
@@ -1100,6 +1102,7 @@ CHIP_ERROR CASESession::SendSigma2()
     mState = State::kSentSigma2;
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
+    MATTER_TRACE_COUNTER("Sigma2");
 
     return CHIP_NO_ERROR;
 }
@@ -1116,6 +1119,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     uint32_t decodeTagIdSeq = 0;
 
     ChipLogDetail(SecureChannel, "Received Sigma2Resume msg");
+    MATTER_TRACE_COUNTER("Sigma2Resume");
 
     uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
 
@@ -1585,6 +1589,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
 
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
+    MATTER_TRACE_COUNTER("Sigma3");
 
     auto helper = WorkHelper<HandleSigma3Data>::Create(*this, &HandleSigma3b, &CASESession::HandleSigma3c);
     VerifyOrExit(helper, err = CHIP_ERROR_NO_MEMORY);

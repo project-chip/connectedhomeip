@@ -50,6 +50,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  * An optional information item present in the QR code the setup payload was
  * initialized from.
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROptionalQRCodeInfo : NSObject
 
 @property (nonatomic, assign) MTROptionalQRCodeInfoType type MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -74,6 +75,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  * creating from numeric code will not work, because some required information
  * will be missing.
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRSetupPayload : NSObject <NSSecureCoding>
 
 @property (nonatomic, copy) NSNumber * version;

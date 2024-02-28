@@ -30,7 +30,7 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDConfigurationData.h> // nogncheck
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
 namespace chip {
@@ -60,8 +60,8 @@ void ClearLocalMRPConfigOverride()
 
 ReliableMessageProtocolConfig GetDefaultMRPConfig()
 {
-    // Default MRP intervals are defined in spec <2.11.3. Parameters and Constants>
-    static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 300_ms32;
+    // Default MRP intervals are defined in spec <4.12.8. Parameters and Constants>
+    static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 500_ms32;
     static constexpr const System::Clock::Milliseconds32 activeRetransTimeout = 300_ms32;
     static constexpr const System::Clock::Milliseconds16 activeThresholdTime  = 4000_ms16;
     return ReliableMessageProtocolConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
@@ -76,7 +76,7 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
     // which the device can be at sleep and not be able to receive any messages).
     config.mIdleRetransTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
     config.mActiveRetransTimeout += ICDConfigurationData::GetInstance().GetFastPollingInterval();
-    config.mActiveThresholdTime = System::Clock::Milliseconds16(ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
+    config.mActiveThresholdTime = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
 #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

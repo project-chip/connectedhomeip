@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="General"/>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0097"/>
+    <field name="ReceivedConfirmation" mask="0x1"/>
+    <field name="ConfirmationResponse" mask="0x2"/>
+    <field name="ConfirmationReply" mask="0x4"/>
+    <field name="ProtectedMessages" mask="0x8"/>
+  </bitmap>
+
+  <bitmap name="MessageControlBitmap" type="bitmap8">
+    <cluster code="0x0097"/>
+    <field name="ConfirmationRequired" mask="0x1"/>
+    <field name="ResponseRequired" mask="0x2"/>
+    <field name="ReplyMessage" mask="0x4"/>
+    <field name="MessageConfirmed" mask="0x8"/>
+    <field name="MessageProtected" mask="0x10"/>
+  </bitmap>
+
+  <enum name="FutureMessagePreferenceEnum" type="enum8">
+    <cluster code="0x0097"/>
+    <item value="0x00" name="Allowed"/>
+    <item value="0x01" name="Increased" />
+    <item value="0x02" name="Reduced"/>
+    <item value="0x03" name="Disallowed"/>
+    <item value="0x04" name="Banned"/>
+  </enum>
+
+  <enum name="MessagePriorityEnum" type="enum8">
+    <cluster code="0x0097"/>
+    <item value="0x00" name="Low"/>
+    <item value="0x01" name="Medium" />
+    <item value="0x02" name="High"/>
+    <item value="0x03" name="Critical"/>
+  </enum>
+
+
+  <struct name="MessageStruct"> <!-- TODO: enable isFabricScoped="true", as of Jan 2024 it breaks at compile time as command argument PresentMessagesRequest#Messages-->
+    <cluster code="0x0097"/>
+    <item fieldId="0" name="MessageID" type="octet_string" length="16" optional="false"/>
+    <item fieldId="1" name="Priority" type="MessagePriorityEnum" optional="false"/>
+    <item fieldId="2" name="MessageControl" type="MessageControlBitmap" default="0" optional="false"/>
+    <item fieldId="3" name="StartTime" type="epoch_s" default="0" optional="false" isNullable="true"/>
+    <item fieldId="4" name="Duration" type="int64u" default="0" optional="false" isNullable="true"/>
+    <item fieldId="5" name="MessageText" type="char_string" length="256" optional="false"/>
+    <item fieldId="6" name="Responses" type="MessageResponseOptionStruct" array="true" length="4" optional="true"/>
+  </struct>
+
+  <struct name="MessageResponseOptionStruct">
+    <cluster code="0x0097"/>
+    <item fieldId="0" name="MessageResponseID" type="int32u" optional="true"/>
+    <item fieldId="1" name="Label" type="char_string" length="32" optional="true"/>
+  </struct>
+
+  <cluster apiMaturity="provisional">
+    <name>Messages</name>
+    <domain>General</domain>
+    <description>This cluster provides an interface for passing messages to be presented by a device.</description>
+    <code>0x0097</code>
+    <define>MESSAGES_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="3"/><!-- Revision   -->
+    <attribute side="server" code="0x0000" define="LIST_MESSAGES" type="array" entryType="MessageStruct" length="8" writable="false" optional="false">Messages</attribute>
+    <attribute side="server" code="0x0001" define="MESSAGES_CLUSTER_ACTIVE_MESSAGES_IDS" type="ARRAY" entryType="octet_string" max="8" writable="false" optional="false">ActiveMessageIDs</attribute>
+    <command source="client" code="0x00" name="PresentMessagesRequest" isFabricScoped="true" optional="false">
+      <description>
+        Command for requesting messages be presented
+      </description>
+      <arg name="MessageID" type="octet_string" length="16" optional="false"/>
+      <arg name="Priority" type="MessagePriorityEnum" optional="false"/>
+      <arg name="MessageControl" type="MessageControlBitmap" default="0" optional="false"/>
+      <arg name="StartTime" type="epoch_s" default="0" optional="false" isNullable="true"/>
+      <arg name="Duration" type="int64u" default="0" optional="false" isNullable="true"/>
+      <arg name="MessageText" type="char_string" length="256" optional="false"/>
+      <arg name="Responses" type="MessageResponseOptionStruct" array="true" length="4" optional="true"/>
+    </command>
+    <command source="client" code="0x01" name="CancelMessagesRequest" isFabricScoped="true" optional="false">
+      <description>
+        Command for cancelling message present requests
+      </description>
+      <arg name="MessageIDs" type="octet_string" array="true" optional="false"/>
+    </command>
+    <event side="server" code="0x00" name="MessageQueued" priority="info" optional="false">
+      <description>This event SHALL be generated when the message is confirmed by the user, or when the expiration date of the message is reached.</description>
+      <field id="0" name="MessageID" type="octet_string" max="16"/>
+    </event>
+    <event side="server" code="0x01" name="MessagePresented" priority="info" optional="false">
+      <description>This event SHALL be generated when the message is presented to the user.</description>
+      <field id="0" name="MessageID" type="octet_string" max="16"/>
+    </event>
+    <event side="server" code="0x02" name="MessageComplete" priority="info" optional="false">
+      <description>This event SHALL be generated when the message is confirmed by the user, or when the expiration date of the message is reached.</description>
+      <field id="0" name="MessageID" type="octet_string" optional="false"/>
+      <field id="1" name="ResponseID" type="int32u" isNullable="true" optional="true"/>
+      <field id="2" name="Reply" type="char_string" length="256" isNullable="true" optional="true"/>
+      <field id="3" name="FutureMessagesPreference" type="FutureMessagePreferenceEnum" isNullable="true" optional="false"/>
+    </event>
+  </cluster>
+</configurator>

@@ -50,6 +50,11 @@ public:
     bool _TryLockThreadStack() { return false; }            // Intentionally left blank
     void _UnlockThreadStack() {}                            // Intentionally left blank
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    void _WaitOnSrpClearAllComplete() {}
+    void _NotifySrpClearAllComplete() {}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
     bool _HaveRouteToAddress(const Inet::IPAddress & destAddr);
 
     void _OnPlatformEvent(const ChipDeviceEvent * event);
@@ -103,8 +108,6 @@ public:
     CHIP_ERROR _JoinerStart();
 
     void _ResetThreadNetworkDiagnosticsCounts();
-
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
 

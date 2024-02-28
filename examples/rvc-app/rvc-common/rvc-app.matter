@@ -605,6 +605,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -661,10 +665,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -943,7 +959,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
+    kNoFeatures = 0x0;
   }
 
   struct ModeTagStruct {
@@ -959,7 +975,6 @@ cluster RvcRunMode = 84 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -996,7 +1011,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
+    kNoFeatures = 0x0;
   }
 
   struct ModeTagStruct {
@@ -1012,7 +1027,6 @@ cluster RvcCleanMode = 85 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1095,10 +1109,6 @@ cluster RvcOperationalState = 97 {
 
   /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
   command Pause(): OperationalCommandResponse = 0;
-  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
-  command Stop(): OperationalCommandResponse = 1;
-  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
-  command Start(): OperationalCommandResponse = 2;
   /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
   command Resume(): OperationalCommandResponse = 3;
   /** On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device. */
@@ -1114,7 +1124,7 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -1218,8 +1228,8 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -1230,6 +1240,10 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
 
@@ -1304,7 +1318,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 

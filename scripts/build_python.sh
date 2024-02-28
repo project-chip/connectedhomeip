@@ -44,6 +44,7 @@ declare case_retry_delta
 declare install_virtual_env
 declare clean_virtual_env=yes
 declare install_pytest_requirements=yes
+declare install_jupyterlab=no
 
 help() {
 
@@ -67,6 +68,7 @@ Input Options:
   --include_pytest_deps  <yes|no>                           Install requirements.txt for running scripts/tests and
                                                             src/python_testing scripts.
                                                             Defaults to yes.
+  -j, --jupyter-lab                                         Install jupyterlab requirements.
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
 "
@@ -131,6 +133,9 @@ while (($#)); do
         --pregen_dir | -z)
             pregen_dir=$2
             shift
+            ;;
+        --jupyter-lab | -j)
+            install_jupyterlab=yes
             ;;
         -*)
             help
@@ -230,10 +235,19 @@ if [ -n "$install_virtual_env" ]; then
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
     fi
 
+    if [ "$install_jupyterlab" = "yes" ]; then
+        echo_blue "Installing JupyterLab kernels and lsp..."
+        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/jupyterlab_requirements.txt"
+    fi
+
     echo ""
     echo_green "Compilation completed and WHL package installed in: "
     echo_blue "  $ENVIRONMENT_ROOT"
     echo ""
     echo_green "To use please run:"
     echo_bold_white "  source $ENVIRONMENT_ROOT/bin/activate"
+
+    if [ "$install_jupyterlab" = "yes" ]; then
+        echo_bold_white "  jupyter-lab"
+    fi
 fi

@@ -54,6 +54,10 @@ private:
  * context tags to be interpreted within the schema identified by
  * `ClusterID` and `EventId`.
  *
+ * The consumer has to either lock the Matter stack lock or queue the event to
+ * the Matter event queue when using LogEvent. This function is not safe to call
+ * outside of the main Matter processing context.
+ *
  * LogEvent has 2 variant, one for fabric-scoped events and one for non-fabric-scoped events.
  * @param[in] aEventData  The event cluster object
  * @param[in] aEndpoint    The current cluster's Endpoint Id

@@ -108,6 +108,10 @@
     </method>
   </interface>
 
+  <!--
+  This interface shall be exported by Matter GATT application and registered
+  with org.bluez.GattManager1.RegisterApplication method.
+  -->
   <interface name="org.bluez.GattService1">
     <property name="UUID" type="s" access="read" />
     <property name="Device" type="o" access="read" />
@@ -115,6 +119,10 @@
     <!-- <property name="Includes" type="ao" access="read" /> -->
   </interface>
 
+  <!--
+  This interface shall be exported by Matter GATT application and linked
+  with org.bluez.GattService1 object via the Service property.
+  -->
   <interface name="org.bluez.GattCharacteristic1">
     <method name="ReadValue">
       <arg name="options" type="a{sv}" direction="in"/>
@@ -152,6 +160,10 @@
     <property name="NotifyAcquired" type="b" access="read" />
   </interface>
 
+  <!--
+  This interface shall be exported by Matter GATT application and linked
+  with org.bluez.GattCharacteristic1 object via the Characteristic property.
+  -->
   <interface name="org.bluez.GattDescriptor1">
     <method name="ReadValue">
       <arg name="options" type="a{sv}" direction="in"/>
@@ -172,6 +184,10 @@
     </property>
   </interface>
 
+  <!--
+  This interface shall be exported by Matter GATT application and registered
+  with org.bluez.LEAdvertisingManager1.RegisterAdvertisement method.
+  -->
   <interface name="org.bluez.LEAdvertisement1">
     <method name="Release"/>
     <property name="Type" type="s" access="read"/>
@@ -183,13 +199,35 @@
     <property name="ServiceData" type="a{sv}" access="read"/>
     <property name="Data" type="a{yay}" access="read"/>
     <property name="Discoverable" type="b" access="read"/>
+    <!--
+    Do not expose discoverable timeout property, so BlueZ will set it
+    internally to zero, effectively disabling the timeout. Becase of BlueZ
+    bug, which is not fixed until BlueZ 5.73, exposing discoverable timeout
+    as zero will timout the advertisement immediately.
+
     <property name="DiscoverableTimeout" type="q" access="read"/>
+    -->
     <property name="Includes" type="as" access="read"/>
     <property name="LocalName" type="s" access="read"/>
     <property name="Appearance" type="q" access="read"/>
+    <!--
+    Do not expose duration, so BlueZ will use the internal default value.
+
     <property name="Duration" type="q" access="read"/>
+    -->
+    <!--
+    Do not expose timeout property, so BlueZ will not call the Release()
+    method after a timeout.
+
     <property name="Timeout" type="q" access="read"/>
-    <!-- <property name="SecondaryChannel" type="s" access="read"/> -->
+    -->
+    <!--
+    We are not using SecondaryChannel property, so we do not expose it.
+
+    <property name="SecondaryChannel" type="s" access="read"/>
+    -->
+    <property name="MinInterval" type="u" access="read"/>
+    <property name="MaxInterval" type="u" access="read"/>
   </interface>
 
   <interface name="org.bluez.LEAdvertisingManager1">

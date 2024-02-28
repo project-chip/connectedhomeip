@@ -31,7 +31,7 @@
 #ifdef DEBUG
 #define MTR_TESTABLE MTR_EXPORT
 #else
-#define MTR_TESTABLE MTR_HIDDEN
+#define MTR_TESTABLE
 #endif
 
 // clang-format off

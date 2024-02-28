@@ -91,7 +91,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-MTR_HIDDEN
 @interface MTRDeviceControllerStartupParamsInternal : MTRDeviceControllerStartupParams
 
 // Fabric table we can use to do things like allocate operational keys.

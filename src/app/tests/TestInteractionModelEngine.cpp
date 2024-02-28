@@ -52,13 +52,13 @@ public:
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     static void TestSubscriptionResumptionTimer(nlTestSuite * apSuite, void * apContext);
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-    static int GetAttributePathListLength(ObjectList<AttributePathParams> * apattributePathParamsList);
+    static int GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apattributePathParamsList);
 };
 
-int TestInteractionModelEngine::GetAttributePathListLength(ObjectList<AttributePathParams> * apAttributePathParamsList)
+int TestInteractionModelEngine::GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apAttributePathParamsList)
 {
-    int length                               = 0;
-    ObjectList<AttributePathParams> * runner = apAttributePathParamsList;
+    int length                                         = 0;
+    SingleLinkedListNode<AttributePathParams> * runner = apAttributePathParamsList;
     while (runner != nullptr)
     {
         runner = runner->mpNext;
@@ -74,7 +74,7 @@ void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite 
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
                                                                     app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
+    SingleLinkedListNode<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
     AttributePathParams attributePathParams2;
     AttributePathParams attributePathParams3;
@@ -112,7 +112,7 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
                                                                     app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
+    SingleLinkedListNode<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
     AttributePathParams attributePathParams2;
     AttributePathParams attributePathParams3;

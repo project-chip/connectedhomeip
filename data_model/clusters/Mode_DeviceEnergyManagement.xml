@@ -54,38 +54,23 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009F" name="Device Energy Management Mode" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x009F" name="Device Energy Management Mode"/>
+  </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="DEMM" scope="Endpoint"/>
   <dataTypes>
     <struct name="ModeOptionStruct">
-      <field id="0" name="Label">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Mode">
-        <mandatoryConform/>
-      </field>
       <field id="2" name="ModeTags">
         <mandatoryConform/>
         <constraint type="between" from="1" to="8"/>
       </field>
     </struct>
   </dataTypes>
-  <attributes>
-    <attribute id="0x0000" name="SupportedModes">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="CurrentMode">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0002" name="StartUpMode">
-      <provisionalConform/>
-    </attribute>
-    <attribute id="0x0003" name="OnMode">
-      <provisionalConform/>
-    </attribute>
-  </attributes>
 </cluster>

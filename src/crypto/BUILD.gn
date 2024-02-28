@@ -68,6 +68,7 @@ source_set("public_headers") {
     ":crypto_buildconfig",
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
   ]

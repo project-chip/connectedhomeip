@@ -19,6 +19,7 @@
 
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 
 @class MTRSetupPayload;
 @class MTRDeviceController;
@@ -121,30 +122,30 @@ typedef void (^MTRDeviceResubscriptionScheduledHandler)(NSError * error, NSNumbe
 MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 typedef void (^MTRDeviceOpenCommissioningWindowHandler)(MTRSetupPayload * _Nullable payload, NSError * _Nullable error);
 
-extern NSString * const MTRAttributePathKey;
-extern NSString * const MTRCommandPathKey;
-extern NSString * const MTREventPathKey;
-extern NSString * const MTRDataKey;
-extern NSString * const MTRErrorKey;
-extern NSString * const MTRTypeKey;
-extern NSString * const MTRValueKey;
-extern NSString * const MTRContextTagKey;
-extern NSString * const MTRSignedIntegerValueType;
-extern NSString * const MTRUnsignedIntegerValueType;
-extern NSString * const MTRBooleanValueType;
-extern NSString * const MTRUTF8StringValueType;
-extern NSString * const MTROctetStringValueType;
-extern NSString * const MTRFloatValueType;
-extern NSString * const MTRDoubleValueType;
-extern NSString * const MTRNullValueType;
-extern NSString * const MTRStructureValueType;
-extern NSString * const MTRArrayValueType;
-extern NSString * const MTREventNumberKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventPriorityKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventTimeTypeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventSystemUpTimeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventTimestampDateKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventIsHistoricalKey MTR_AVAILABLE(ios(17.3), macos(14.3), watchos(10.3), tvos(17.3));
+MTR_EXTERN NSString * const MTRAttributePathKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRCommandPathKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTREventPathKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRDataKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRErrorKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRTypeKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRValueKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRContextTagKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRSignedIntegerValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRUnsignedIntegerValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRBooleanValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRUTF8StringValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTROctetStringValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRFloatValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRDoubleValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRNullValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRStructureValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTRArrayValueType MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSString * const MTREventNumberKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+MTR_EXTERN NSString * const MTREventPriorityKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+MTR_EXTERN NSString * const MTREventTimeTypeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+MTR_EXTERN NSString * const MTREventSystemUpTimeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+MTR_EXTERN NSString * const MTREventTimestampDateKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+MTR_EXTERN NSString * const MTREventIsHistoricalKey MTR_AVAILABLE(ios(17.3), macos(14.3), watchos(10.3), tvos(17.3));
 
 @class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;
@@ -165,8 +166,7 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  */
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTRAttributeRequestPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-    ;
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable) NSNumber * cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable)
     NSNumber * attribute MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
@@ -184,8 +184,7 @@ MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
  */
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTREventRequestPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
-    ;
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable) NSNumber * cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable) NSNumber * event MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
@@ -195,6 +194,7 @@ MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
     MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @end
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBaseDevice : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -543,6 +543,26 @@ MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                           reportHandler:(MTRDeviceResponseHandler)reportHandler
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Download log of the desired type from the device.
+ *
+ * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
+ * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
+ *                   has been retrieved by that point (which might be none or a partial log).
+ *                   If the timeout is set to 0, the request will not expire and completion will not be called until
+ *                   the log is fully retrieved or an error occurs.
+ * @param queue      The queue on which completion will be called.
+ * @param completion The completion handler that is called after attempting to retrieve the requested log.
+ *                     - In case of success, the completion handler is called with a non-nil URL and a nil error.
+ *                     - If there is an error, a non-nil error is used and the url can be non-nil too if some logs have already been downloaded.
+ */
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
 @end
 
 /**
@@ -550,7 +570,8 @@ MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
  * wildcards).
  */
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-@interface MTRClusterPath : NSObject <NSCopying>
+@interface MTRClusterPath : NSObject <NSCopying, NSSecureCoding>
+
 @property (nonatomic, readonly, copy) NSNumber * endpoint;
 @property (nonatomic, readonly, copy) NSNumber * cluster;
 
@@ -564,7 +585,9 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * A path indicating a specific attribute on a device (i.e. without any
  * wildcards).
  */
-@interface MTRAttributePath : MTRClusterPath
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+@interface MTRAttributePath : MTRClusterPath <NSSecureCoding>
+
 @property (nonatomic, readonly, copy) NSNumber * attribute;
 
 + (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
@@ -578,7 +601,9 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * (i.e. without any wildcards).  There can be multiple instances of actual
  * events for a given event path.
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTREventPath : MTRClusterPath
+
 @property (nonatomic, readonly, copy) NSNumber * event;
 
 + (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID
@@ -590,7 +615,9 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * A path indicating a specific command on a device (i.e. without any
  * wildcards).
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRCommandPath : MTRClusterPath
+
 @property (nonatomic, readonly, copy) NSNumber * command;
 
 + (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID
@@ -598,7 +625,9 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                                     commandID:(NSNumber *)commandID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAttributeReport : NSObject
+
 @property (nonatomic, readonly, copy) MTRAttributePath * path;
 
 /**
@@ -665,7 +694,9 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
     MTREventPriorityCritical = 2
 } MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTREventReport : NSObject
+
 @property (nonatomic, readonly, copy) MTREventPath * path;
 
 /**

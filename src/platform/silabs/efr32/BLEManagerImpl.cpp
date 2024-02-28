@@ -545,7 +545,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     else
     {
-        ChipLogDetail(DeviceLayer, "Start BLE advertissement");
+        ChipLogDetail(DeviceLayer, "Start BLE advertisement");
     }
 
     const uint8_t kResolvableRandomAddrType = 2; // Private resolvable random address type
@@ -582,6 +582,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 #endif
     }
 
+    // TODO(#32274): Explain why we cannot have interval_min == interval_max.
+    if (interval_min == interval_max)
+    {
+        ++interval_max;
+    }
+    ChipLogProgress(DeviceLayer, "Starting advertising with interval_min=%u, intverval_max=%u (units of 625us)",
+                    static_cast<unsigned>(interval_min), static_cast<unsigned>(interval_max));
     ret = sl_bt_advertiser_set_timing(advertising_set_handle, interval_min, interval_max, 0, 0);
     err = MapBLEError(ret);
     SuccessOrExit(err);
@@ -976,7 +983,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
@@ -987,7 +994,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
     else
     {
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisment");
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
         BLEMgrImpl().mFlags.Set(Flags::kExtAdvertisingEnabled);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);

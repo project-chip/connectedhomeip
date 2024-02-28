@@ -30,6 +30,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <src/platform/nxp/k32w/k32w1/DefaultTestEventTriggerDelegate.h>
+#if defined(USE_SMU2_DYNAMIC)
+#include <src/platform/nxp/k32w/k32w1/SMU2Manager.h>
+#endif
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -88,6 +91,9 @@ using namespace chip;
 using namespace chip::app;
 
 AppTask AppTask::sAppTask;
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+static AppTask::FactoryDataProvider sFactoryDataProvider;
+#endif
 
 // This key is for testing/certification only and should not be used in production devices.
 // For production devices this key must be provided from factory data.
@@ -135,8 +141,14 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-    // Initialize device attestation config
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+    ReturnErrorOnFailure(sFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
     // QR code will be used with CHIP Tool
     AppTask::PrintOnboardingInfo();
@@ -213,9 +225,13 @@ void AppTask::InitServer(intptr_t arg)
     initParams.operationalKeystore = &sK32W1PersistentStorageOpKeystore;
 #endif
 
+#if defined(USE_SMU2_DYNAMIC)
+    VerifyOrDie(SMU2::Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
+#endif
+
     // Init ZCL Data Model and start server
-    static DefaultTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    static DefaultTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
@@ -339,7 +355,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) && (pin_no != OTA_BUTTON) && (pin_no != BLE_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) && (pin_no != SOFT_RESET_BUTTON) && (pin_no != BLE_BUTTON))
     {
         return;
     }
@@ -353,9 +369,10 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     {
         button_event.Handler = LightActionEventHandler;
     }
-    else if (pin_no == OTA_BUTTON)
+    else if (pin_no == SOFT_RESET_BUTTON)
     {
-        // button_event.Handler = OTAHandler;
+        // Soft reset ensures that platform manager shutdown procedure is called.
+        button_event.Handler = SoftResetHandler;
     }
     else if (pin_no == BLE_BUTTON)
     {
@@ -379,7 +396,7 @@ button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_messa
         switch (pinNb)
         {
         case BLE_BUTTON:
-            K32W_LOG("pb1 short press");
+            // K32W_LOG("pb1 short press");
             if (sAppTask.mResetTimerActive)
             {
                 ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
@@ -391,7 +408,7 @@ button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_messa
             break;
 
         case LIGHT_BUTTON:
-            K32W_LOG("pb2 short press");
+            // K32W_LOG("pb2 short press");
             ButtonEventHandler(LIGHT_BUTTON, LIGHT_BUTTON_PUSH);
             break;
         }
@@ -401,13 +418,13 @@ button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_messa
         switch (pinNb)
         {
         case BLE_BUTTON:
-            K32W_LOG("pb1 long press");
+            // K32W_LOG("pb1 long press");
             ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
             break;
 
         case LIGHT_BUTTON:
-            K32W_LOG("pb2 long press");
-            ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
+            // K32W_LOG("pb2 long press");
+            ButtonEventHandler(SOFT_RESET_BUTTON, SOFT_RESET_BUTTON_PUSH);
             break;
         }
         break;
@@ -529,28 +546,13 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::OTAHandler(AppEvent * aEvent)
+void AppTask::SoftResetHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.PinNo != OTA_BUTTON)
+    if (aEvent->ButtonEvent.PinNo != SOFT_RESET_BUTTON)
         return;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    if (sAppTask.mFunction != kFunction_NoneSelected)
-    {
-        K32W_LOG("Another function is scheduled. Could not initiate OTA!");
-        return;
-    }
-
-    PlatformMgr().ScheduleWork(StartOTAQuery, 0);
-#endif
+    PlatformMgrImpl().CleanReset();
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-void AppTask::StartOTAQuery(intptr_t arg)
-{
-    GetRequestorInstance()->TriggerImmediateQuery();
-}
-#endif
 
 void AppTask::BleHandler(AppEvent * aEvent)
 {
@@ -807,11 +809,24 @@ void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t 
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
+    portBASE_TYPE taskToWake = pdFALSE;
     if (sAppEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, aEvent, 1))
+        if (__get_IPSR())
         {
-            K32W_LOG("Failed to post event to app task event queue");
+            if (!xQueueSendToFrontFromISR(sAppEventQueue, aEvent, &taskToWake))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
+
+            portYIELD_FROM_ISR(taskToWake);
+        }
+        else
+        {
+            if (!xQueueSend(sAppEventQueue, aEvent, 1))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
         }
     }
 }
@@ -838,10 +853,10 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     uint8_t newValue = !LightingMgr().IsTurnedOff();
 
     // write the new on/off value
-    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", to_underlying(status));
     }
 }
 

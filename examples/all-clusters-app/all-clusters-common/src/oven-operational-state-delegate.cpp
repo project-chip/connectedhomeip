@@ -22,8 +22,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OvenCavityOperationalState;
 
-static OperationalState::Instance * gOvenCavityOperationalStateInstance         = nullptr;
-static OvenCavityOperationalStateDelegate * gOvenCavityOperationalStateDelegate = nullptr;
+static OvenCavityOperationalState::Instance * gOvenCavityOperationalStateInstance = nullptr;
+static OvenCavityOperationalStateDelegate * gOvenCavityOperationalStateDelegate   = nullptr;
+
+OvenCavityOperationalState::Instance * OvenCavityOperationalState::GetOperationalStateInstance()
+{
+    return gOvenCavityOperationalStateInstance;
+}
 
 void OvenCavityOperationalState::Shutdown()
 {
@@ -58,7 +63,7 @@ CHIP_ERROR
 OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
                                                                OperationalState::GenericOperationalState & operationalState)
 {
-    if (index >= ArraySize(mOperationalStateList))
+    if (index >= mOperationalStateList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
@@ -69,5 +74,89 @@ OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
 CHIP_ERROR
 OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
-    return CHIP_ERROR_NOT_FOUND;
+    if (index >= mOperationalPhaseList.size())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
+}
+
+void OvenCavityOperationalStateDelegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
+{
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
+
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
+}
+
+void OvenCavityOperationalStateDelegate::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
+{
+
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
+
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
+}
+
+void OvenCavityOperationalStateDelegate::HandleStartStateCallback(OperationalState::GenericOperationalError & err)
+{
+    OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    GetInstance()->GetCurrentOperationalError(current_err);
+
+    if (current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
+        return;
+    }
+
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
+}
+
+void OvenCavityOperationalStateDelegate::HandleStopStateCallback(OperationalState::GenericOperationalError & err)
+{
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    if (error == CHIP_NO_ERROR)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    }
+    else
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
 }

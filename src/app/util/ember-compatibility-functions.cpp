@@ -36,7 +36,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPCore.h>
@@ -52,6 +51,8 @@
 #include <zap-generated/endpoint_config.h>
 
 #include <limits>
+
+using chip::Protocols::InteractionModel::Status;
 
 using namespace chip;
 using namespace chip::app;
@@ -619,13 +620,13 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     ReturnErrorOnFailure(err);
 
     EmberAfAttributeSearchRecord record;
-    record.endpoint           = aPath.mEndpointId;
-    record.clusterId          = aPath.mClusterId;
-    record.attributeId        = aPath.mAttributeId;
-    EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
-                                                         /* write = */ false);
+    record.endpoint    = aPath.mEndpointId;
+    record.clusterId   = aPath.mClusterId;
+    record.attributeId = aPath.mAttributeId;
+    Status status      = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
+                                                  /* write = */ false);
 
-    if (emberStatus == EMBER_ZCL_STATUS_SUCCESS)
+    if (status == Status::Success)
     {
         EmberAfAttributeType attributeType = attributeMetadata->attributeType;
         bool isNullable                    = attributeMetadata->IsNullable();
@@ -822,17 +823,16 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         }
         default:
             ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-            emberStatus = EMBER_ZCL_STATUS_UNSUPPORTED_READ;
+            status = Status::UnsupportedRead;
         }
     }
 
-    Protocols::InteractionModel::Status imStatus = ToInteractionModelStatus(emberStatus);
-    if (imStatus == Protocols::InteractionModel::Status::Success)
+    if (status == Protocols::InteractionModel::Status::Success)
     {
         return SendSuccessStatus(attributeReport, attributeDataIBBuilder);
     }
 
-    return SendFailureStatus(aPath, aAttributeReports, imStatus, &backup);
+    return SendFailureStatus(aPath, aAttributeReports, status, &backup);
 }
 
 namespace {
@@ -1051,8 +1051,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::InvalidValue);
     }
 
-    auto status = ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                                                                         attributeData, attributeMetadata->attributeType));
+    auto status = emAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, attributeData,
+                                             attributeMetadata->attributeType);
     return apWriteHandler->AddStatus(aPath, status);
 }
 

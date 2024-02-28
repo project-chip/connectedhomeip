@@ -257,6 +257,67 @@ cluster BasicInformation = 40 {
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc */
+cluster LocalizationConfiguration = 43 {
+  revision 1; // NOTE: Default/not specifically set
+
+  attribute access(write: manage) char_string<35> activeLocale = 0;
+  readonly attribute char_string supportedLocales[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
+      or audibly convey time information need a mechanism by which they can be configured to use a
+      user’s preferred format. */
+cluster TimeFormatLocalization = 44 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum CalendarTypeEnum : enum8 {
+    kBuddhist = 0;
+    kChinese = 1;
+    kCoptic = 2;
+    kEthiopian = 3;
+    kGregorian = 4;
+    kHebrew = 5;
+    kIndian = 6;
+    kIslamic = 7;
+    kJapanese = 8;
+    kKorean = 9;
+    kPersian = 10;
+    kTaiwanese = 11;
+    kUseActiveLocale = 255;
+  }
+
+  enum HourFormatEnum : enum8 {
+    k12hr = 0;
+    k24hr = 1;
+    kUseActiveLocale = 255;
+  }
+
+  bitmap Feature : bitmap32 {
+    kCalendarFormat = 0x1;
+  }
+
+  attribute access(write: manage) HourFormatEnum hourFormat = 0;
+  attribute access(write: manage) optional CalendarTypeEnum activeCalendarType = 1;
+  readonly attribute optional CalendarTypeEnum supportedCalendarTypes[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing preferences for the units in which values are conveyed in communication to a
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
@@ -584,6 +645,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -640,10 +705,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -898,6 +975,198 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
   /** Return the list of Group Key Sets associated with the accessing fabric */
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
+}
+
+/** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
+provisional cluster ElectricalPowerMeasurement = 144 {
+  revision 1;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+  }
+
+  enum PowerModeEnum : enum8 {
+    kUnknown = 0;
+    kDC = 1;
+    kAC = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kDirectCurrent = 0x1;
+    kAlternatingCurrent = 0x2;
+    kPolyphasePower = 0x4;
+    kHarmonics = 0x8;
+    kPowerQuality = 0x10;
+  }
+
+  struct MeasurementAccuracyRangeStruct {
+    int64s rangeMin = 0;
+    int64s rangeMax = 1;
+    optional percent100ths percentMax = 2;
+    optional percent100ths percentMin = 3;
+    optional percent100ths percentTypical = 4;
+    optional int64u fixedMax = 5;
+    optional int64u fixedMin = 6;
+    optional int64u fixedTypical = 7;
+  }
+
+  struct MeasurementAccuracyStruct {
+    MeasurementTypeEnum measurementType = 0;
+    boolean measured = 1;
+    int64s minMeasuredValue = 2;
+    int64s maxMeasuredValue = 3;
+    MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
+  }
+
+  struct HarmonicMeasurementStruct {
+    int8u order = 0;
+    nullable int64s measurement = 1;
+  }
+
+  struct MeasurementRangeStruct {
+    MeasurementTypeEnum measurementType = 0;
+    int64s min = 1;
+    int64s max = 2;
+    optional epoch_s startTimestamp = 3;
+    optional epoch_s endTimestamp = 4;
+    optional epoch_s minTimestamp = 5;
+    optional epoch_s maxTimestamp = 6;
+    optional systime_ms startSystime = 7;
+    optional systime_ms endSystime = 8;
+    optional systime_ms minSystime = 9;
+    optional systime_ms maxSystime = 10;
+  }
+
+  info event MeasurementPeriodRanges = 0 {
+    MeasurementRangeStruct ranges[] = 0;
+  }
+
+  readonly attribute PowerModeEnum powerMode = 0;
+  readonly attribute int8u numberOfMeasurementTypes = 1;
+  readonly attribute MeasurementAccuracyStruct accuracy[] = 2;
+  readonly attribute optional MeasurementRangeStruct ranges[] = 3;
+  readonly attribute optional nullable voltage_mv voltage = 4;
+  readonly attribute optional nullable amperage_ma activeCurrent = 5;
+  readonly attribute optional nullable amperage_ma reactiveCurrent = 6;
+  readonly attribute optional nullable amperage_ma apparentCurrent = 7;
+  readonly attribute nullable power_mw activePower = 8;
+  readonly attribute optional nullable power_mw reactivePower = 9;
+  readonly attribute optional nullable power_mw apparentPower = 10;
+  readonly attribute optional nullable voltage_mv RMSVoltage = 11;
+  readonly attribute optional nullable amperage_ma RMSCurrent = 12;
+  readonly attribute optional nullable power_mw RMSPower = 13;
+  readonly attribute optional nullable int64s frequency = 14;
+  readonly attribute optional nullable HarmonicMeasurementStruct harmonicCurrents[] = 15;
+  readonly attribute optional nullable HarmonicMeasurementStruct harmonicPhases[] = 16;
+  readonly attribute optional nullable int64s powerFactor = 17;
+  readonly attribute optional nullable amperage_ma neutralCurrent = 18;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
+provisional cluster ElectricalEnergyMeasurement = 145 {
+  revision 1;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+  }
+
+  bitmap Feature : bitmap32 {
+    kImportedEnergy = 0x1;
+    kExportedEnergy = 0x2;
+    kCumulativeEnergy = 0x4;
+    kPeriodicEnergy = 0x8;
+  }
+
+  struct MeasurementAccuracyRangeStruct {
+    int64s rangeMin = 0;
+    int64s rangeMax = 1;
+    optional percent100ths percentMax = 2;
+    optional percent100ths percentMin = 3;
+    optional percent100ths percentTypical = 4;
+    optional int64u fixedMax = 5;
+    optional int64u fixedMin = 6;
+    optional int64u fixedTypical = 7;
+  }
+
+  struct MeasurementAccuracyStruct {
+    MeasurementTypeEnum measurementType = 0;
+    boolean measured = 1;
+    int64s minMeasuredValue = 2;
+    int64s maxMeasuredValue = 3;
+    MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
+  }
+
+  struct CumulativeEnergyResetStruct {
+    optional nullable epoch_s importedResetTimestamp = 0;
+    optional nullable epoch_s exportedResetTimestamp = 1;
+    optional nullable systime_ms importedResetSystime = 2;
+    optional nullable systime_ms exportedResetSystime = 3;
+  }
+
+  struct EnergyMeasurementStruct {
+    energy_mwh energy = 0;
+    optional epoch_s startTimestamp = 1;
+    optional epoch_s endTimestamp = 2;
+    optional systime_ms startSystime = 3;
+    optional systime_ms endSystime = 4;
+  }
+
+  info event CumulativeEnergyMeasured = 0 {
+    optional EnergyMeasurementStruct energyImported = 0;
+    optional EnergyMeasurementStruct energyExported = 1;
+  }
+
+  info event PeriodicEnergyMeasured = 1 {
+    optional EnergyMeasurementStruct energyImported = 0;
+    optional EnergyMeasurementStruct energyExported = 1;
+  }
+
+  readonly attribute MeasurementAccuracyStruct accuracy = 0;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyImported = 1;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyExported = 2;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyImported = 3;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyExported = 4;
+  readonly attribute optional nullable CumulativeEnergyResetStruct cumulativeEnergyReset = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
@@ -1402,7 +1671,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -1443,6 +1712,27 @@ endpoint 0 {
     ram      attribute clusterRevision default = 3;
   }
 
+  server cluster LocalizationConfiguration {
+    ram      attribute activeLocale;
+    callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeFormatLocalization {
+    ram      attribute hourFormat;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster UnitLocalization {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -1480,6 +1770,7 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute supportedWiFiBands;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -1491,13 +1782,14 @@ endpoint 0 {
   server cluster GeneralDiagnostics {
     callback attribute networkInterfaces;
     callback attribute rebootCount;
+    callback attribute upTime;
     ram      attribute testEventTriggersEnabled;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -1568,7 +1860,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_lightsensor = 262, version 1;
+  device type energy_evse = 1292, version 1;
 
 
   server cluster Identify {
@@ -1594,8 +1886,53 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster ElectricalPowerMeasurement {
+    callback attribute powerMode;
+    callback attribute numberOfMeasurementTypes;
+    callback attribute accuracy;
+    callback attribute ranges;
+    callback attribute voltage;
+    callback attribute activeCurrent;
+    callback attribute reactiveCurrent;
+    callback attribute apparentCurrent;
+    callback attribute activePower;
+    callback attribute reactivePower;
+    callback attribute apparentPower;
+    callback attribute RMSVoltage;
+    callback attribute RMSCurrent;
+    callback attribute RMSPower;
+    callback attribute frequency;
+    callback attribute harmonicCurrents;
+    callback attribute harmonicPhases;
+    callback attribute powerFactor;
+    callback attribute neutralCurrent;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ElectricalEnergyMeasurement {
+    emits event CumulativeEnergyMeasured;
+    emits event PeriodicEnergyMeasured;
+    callback attribute accuracy;
+    callback attribute cumulativeEnergyImported;
+    callback attribute cumulativeEnergyExported;
+    callback attribute periodicEnergyImported;
+    callback attribute periodicEnergyExported;
+    callback attribute cumulativeEnergyReset;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster DeviceEnergyManagement {
@@ -1639,11 +1976,9 @@ endpoint 1 {
     callback attribute supplyState;
     callback attribute faultState;
     callback attribute chargingEnabledUntil;
-    callback attribute dischargingEnabledUntil;
     callback attribute circuitCapacity;
     callback attribute minimumChargeCurrent;
     callback attribute maximumChargeCurrent;
-    callback attribute maximumDischargeCurrent;
     callback attribute userMaximumChargeCurrent;
     callback attribute randomizationDelayWindow;
     callback attribute nextChargeStartTime;
@@ -1651,13 +1986,9 @@ endpoint 1 {
     callback attribute nextChargeRequiredEnergy;
     callback attribute nextChargeTargetSoC;
     callback attribute approximateEVEfficiency;
-    callback attribute stateOfCharge;
-    callback attribute batteryCapacity;
-    callback attribute vehicleID;
     callback attribute sessionID;
     callback attribute sessionDuration;
     callback attribute sessionEnergyCharged;
-    callback attribute sessionEnergyDischarged;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

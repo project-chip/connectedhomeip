@@ -267,8 +267,8 @@ template("siwx917_sdk") {
       defines += [
         "SL_ICD_ENABLED=1",
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
-        "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
-        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_s}",
+        "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
+        "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
         "SL_SI91X_MCU_WIRELESS_BASED_WAKEUP=1",
         "SL_SI91X_MCU_BUTTON_BASED_WAKEUP=1",

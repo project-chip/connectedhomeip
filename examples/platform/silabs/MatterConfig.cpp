@@ -18,6 +18,7 @@
  */
 
 #include "AppConfig.h"
+#include "BaseApplication.h"
 #include "OTAConfig.h"
 #include <MatterConfig.h>
 
@@ -113,7 +114,11 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_DEVICE_CONFIG_THREAD_SSED
+    ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice));
+#else
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice));
+#endif
 #else  // CHIP_CONFIG_ENABLE_ICD_SERVER
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -219,8 +224,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
         SILABS_LOG("Failed to convert the EnableKey string to octstr type value");
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
     }
-    static SilabsTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    // TODO(#31723): Show to customers that they can do `Server::GetInstance().GetTestEventTriggerDelegate().AddHandler()`
+    static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
 #if CHIP_CRYPTO_PLATFORM && !(defined(SIWX_917))
@@ -232,8 +238,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef PERFORMANCE_TEST_ENABLED
     // Set up Test Event Trigger command of the General Diagnostics cluster. Used only in performance testing
-    static SilabsTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    // TODO(#31723): Show to customers that they can do `Server::GetInstance().GetTestEventTriggerDelegate().AddHandler()`
+    static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
@@ -248,6 +255,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+    initParams.appDelegate = &BaseApplication::sAppDelegate;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
 
@@ -297,10 +307,6 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 extern "C" void vApplicationIdleHook(void)
 {
 #if SIWX_917 && CHIP_CONFIG_ENABLE_ICD_SERVER
-    if (ConnectivityMgr().IsWiFiStationConnected())
-    {
-        // Let the M4 sleep once commissioning is done and device is in idle state
-        sl_wfx_host_si91x_sleep_wakeup();
-    }
+    sl_wfx_host_si91x_sleep_wakeup();
 #endif
 }

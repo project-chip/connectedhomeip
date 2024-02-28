@@ -33,12 +33,12 @@ BindingTable::BindingTable()
 
 CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
 {
-    if (entry.type == EMBER_UNUSED_BINDING)
+    if (entry.type == MATTER_UNUSED_BINDING)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     uint8_t newIndex = GetNextAvaiableIndex();
-    if (newIndex >= EMBER_BINDING_TABLE_SIZE)
+    if (newIndex >= MATTER_BINDING_TABLE_SIZE)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -62,7 +62,7 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
     if (error != CHIP_NO_ERROR)
     {
         // Roll back
-        mBindingTable[newIndex].type = EMBER_UNUSED_BINDING;
+        mBindingTable[newIndex].type = MATTER_UNUSED_BINDING;
         return error;
     }
 
@@ -101,7 +101,7 @@ CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
     {
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagCluster), entry.clusterId.Value()));
     }
-    if (entry.type == EMBER_UNICAST_BINDING)
+    if (entry.type == MATTER_UNICAST_BINDING)
     {
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagRemoteEndpoint), entry.remote));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagNodeId), entry.nodeId));
@@ -211,14 +211,14 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     }
     if (reader.GetTag() == TLV::ContextTag(kTagRemoteEndpoint))
     {
-        entry.type = EMBER_UNICAST_BINDING;
+        entry.type = MATTER_UNICAST_BINDING;
         ReturnErrorOnFailure(reader.Get(entry.remote));
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagNodeId)));
         ReturnErrorOnFailure(reader.Get(entry.nodeId));
     }
     else
     {
-        entry.type = EMBER_MULTICAST_BINDING;
+        entry.type = MATTER_MULTICAST_BINDING;
         ReturnErrorCodeIf(reader.GetTag() != TLV::ContextTag(kTagGroupId), CHIP_ERROR_INVALID_TLV_TAG);
         ReturnErrorOnFailure(reader.Get(entry.groupId));
     }
@@ -265,7 +265,7 @@ CHIP_ERROR BindingTable::RemoveAt(Iterator & iter)
         {
             ChipLogError(AppServer, "Failed to remove binding table entry %u from storage", iter.mIndex);
         }
-        mBindingTable[iter.mIndex].type = EMBER_UNUSED_BINDING;
+        mBindingTable[iter.mIndex].type = MATTER_UNUSED_BINDING;
         mNextIndex[iter.mIndex]         = kNextNullIndex;
         mSize--;
     }
@@ -292,14 +292,14 @@ BindingTable::Iterator BindingTable::end()
 
 uint8_t BindingTable::GetNextAvaiableIndex()
 {
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
-        if (mBindingTable[i].type == EMBER_UNUSED_BINDING)
+        if (mBindingTable[i].type == MATTER_UNUSED_BINDING)
         {
             return i;
         }
     }
-    return EMBER_BINDING_TABLE_SIZE;
+    return MATTER_BINDING_TABLE_SIZE;
 }
 
 BindingTable::Iterator BindingTable::Iterator::operator++()
