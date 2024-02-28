@@ -26,6 +26,10 @@ if(NOT is_debug)
     set(SDKCONFIG_DEFAULTS "sdkconfig.optimize.defaults")
 endif()
 
+
+get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
+set_property(GLOBAL PROPERTY gn_static_data_model_BACKEND "${CHIP_ROOT}/examples/temperature-measurement-app/temperature-measurement-common:temperature-measurement-common")
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cmake/idf_flashing.cmake)
 

@@ -21,6 +21,10 @@ cmake_minimum_required(VERSION 3.5)
 set(PROJECT_VER "v1.0")
 set(PROJECT_VER_NUMBER 1)
 
+
+get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
+set_property(GLOBAL PROPERTY gn_static_data_model_BACKEND "${CHIP_ROOT}/examples/energy-management-app/energy-management-common:energy-management-common")
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cmake/idf_flashing.cmake)
 
