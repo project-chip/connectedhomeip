@@ -86,6 +86,10 @@ if (CONFIG_CHIP_CONFIG_IM_PRETTY_PRINT)
     chip_gn_arg_bool("enable_im_pretty_print" "true")
 endif()
 
+get_property(data_model GLOBAL PROPERTY gn_static_data_model_BACKEND)
+chip_gn_arg_append("chip_static_data_model_BACKEND" "\"${data_model}\"")
+
+
 # Config the chip log level by IDF menuconfig
 if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
     chip_gn_arg_bool  ("chip_error_logging" "true")

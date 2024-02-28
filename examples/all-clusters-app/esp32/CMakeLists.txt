@@ -21,6 +21,9 @@ cmake_minimum_required(VERSION 3.5)
 set(PROJECT_VER "v1.0")
 set(PROJECT_VER_NUMBER 1)
 
+get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
+set_property(GLOBAL PROPERTY gn_static_data_model_BACKEND "${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common:all-clusters-common")
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cmake/idf_flashing.cmake)
 
@@ -49,7 +52,6 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
 flashing_script()
 
 if (CONFIG_ENABLE_PW_RPC)
-get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
 include(third_party/connectedhomeip/third_party/pigweed/repo/pw_build/pigweed.cmake)
 include($ENV{PW_ROOT}/pw_assert/backend.cmake)
 include($ENV{PW_ROOT}/pw_log/backend.cmake)
