@@ -267,7 +267,7 @@ def main(argv):
     args.load()
 
     # Gather device info
-    cmmd = Commander(args.conn)
+    cmmd = Commander(args)
     info = cmmd.info()
     paths = Paths(info, args)
     if args.part_number is None:

@@ -114,6 +114,7 @@ class Arguments(BaseArguments):
         self.discriminator = None
         self.spake2p = None
         self.rendezvous_flags = None
+        self.device = None
 
     def configure(self, parser):
         super().configure(parser)
@@ -141,6 +142,7 @@ class Arguments(BaseArguments):
         parser.add_argument('-cf', '--commissioning_flow', type=parseInt, help='[int] Commissioning Flow: 0=Standard, 1=kUserActionRequired, 2=Custom (Default:Standard)')
         parser.add_argument('-rf', '--rendezvous_flags', type=parseInt, help='[int] Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Default=BLE Only)')
         parser.add_argument('-d',  '--discriminator', type=parseInt, help='[int] BLE pairing discriminator.')
+        parser.add_argument('-D',  '--device', type=str, help='Target device.')
         # Attestation
         parser.add_argument('-ct', '--cert_tool', type=str, help='[boolean] Path to the `chip-cert` tool.')
         parser.add_argument('-ki', '--key_id', type=parseInt, help='[int] Key ID')
@@ -186,6 +188,7 @@ class Arguments(BaseArguments):
         c.commissioning_flow = decode(d, 'commissioning_flow', args.commissioning_flow, Arguments.kDefaultCommissioningFlow)
         c.rendezvous_flags = decode(d, 'rendezvous_flags', args.rendezvous_flags, Arguments.kDefaultRendezvousFlags)
         c.discriminator = decode(d, 'discriminator', args.discriminator)
+        c.device = decode(d, 'device', args.device)
         # Attestation
         attest = decode(d, 'attestation', None, {})
         c.cert_tool = decode(attest, 'cert_tool', args.cert_tool)
@@ -234,6 +237,7 @@ class Arguments(BaseArguments):
         encode(d, 'commissioning_flow', self.commissioning_flow)
         encode(d, 'rendezvous_flags', self.rendezvous_flags)
         encode(d, 'discriminator', self.discriminator)
+        encode(d, 'device', self.device)
         # Attestation
         attest = {}
         encode(attest, 'cert_tool', self.attest.cert_tool)
@@ -264,6 +268,7 @@ class Arguments(BaseArguments):
         # Connection
         self.conn = ConnectionArguments()
         self.conn.decode(args)
+        self.device = args.device
 
         self.temp = args.temp
         self.binary = args.binary

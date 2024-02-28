@@ -56,8 +56,9 @@ class DeviceInfo:
 
 class Commander:
 
-    def __init__(self, conn):
-        self.conn = conn
+    def __init__(self, args):
+        self.conn = args.conn
+        self.device = args.device
 
     def execute(self, args, output = True, check = False):
         args.insert(0, 'commander')
@@ -68,6 +69,9 @@ class Commander:
                 args.extend(["--ip", "{}:{}".format(self.conn.ip_addr, self.conn.port)])
             else:
                 args.extend(["--ip", self.conn.ip_addr])
+        if self.device:
+            args.extend(["--device", self.device])
+
         cmd = ' '.join(args)
         return execute(args, output, check)
 
