@@ -15,8 +15,13 @@
  *    limitations under the License.
  */
 
+#include <stdint.h>
+
 #include <algorithm>
 #include <charconv>
+#include <string>
+#include <vector>
+
 #include <json/json.h>
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
@@ -142,7 +147,17 @@ CHIP_ERROR InternalConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag, const uint3
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, uint32_t implicitProfileId)
+template <typename T>
+CHIP_ERROR ParseNumericalField(const std::string& decimalString, T& outValue)
+{
+    const char* start_ptr = decimalString.data();
+    const char* end_ptr = decimalString.data() + decimalString.size();
+    auto [last_converted_ptr, _] = std::from_chars(start_ptr, end_ptr, outValue, 10);
+    VerifyOrReturnError(last_converted_ptr == end_ptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ParseJsonName(const std::string& name, ElementContext & elementCtx, uint32_t implicitProfileId)
 {
     uint32_t tagNumber                  = 0;
     const char * elementType            = nullptr;
@@ -153,14 +168,12 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, ui
 
     if (nameFields.size() == 2)
     {
-        auto [_, error_code] = std::from_chars(nameFields[0].data(), nameFields[0].data() + nameFields[0].size(), tagNumber, 10);
-        VerifyOrReturnError(error_code == std::errc{}, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(ParseNumericalField(nameFields[0], tagNumber));
         elementType = nameFields[1].c_str();
     }
     else if (nameFields.size() == 3)
     {
-        auto [_, error_code] = std::from_chars(nameFields[1].data(), nameFields[1].data() + nameFields[0].size(), tagNumber, 10);
-        VerifyOrReturnError(error_code == std::errc{}, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(ParseNumericalField(nameFields[1], tagNumber));
         elementType = nameFields[2].c_str();
     }
     else
@@ -208,9 +221,7 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         }
         else if (val.isString())
         {
-            const std::string valStr = val.asString();
-            auto [_, error_code]     = std::from_chars(valStr.data(), valStr.data() + valStr.size(), v, 10);
-            VerifyOrReturnError(error_code == std::errc{}, CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(ParseNumericalField(val.asString(), v));
         }
         else
         {
@@ -228,9 +239,7 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         }
         else if (val.isString())
         {
-            const std::string valStr = val.asString();
-            auto [_, error_code]     = std::from_chars(valStr.data(), valStr.data() + valStr.size(), v, 10);
-            VerifyOrReturnError(error_code == std::errc{}, CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(ParseNumericalField(val.asString(), v));
         }
         else
         {
