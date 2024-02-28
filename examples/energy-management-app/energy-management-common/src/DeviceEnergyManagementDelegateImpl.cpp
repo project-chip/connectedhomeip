@@ -27,7 +27,6 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 
 using chip::Optional;
-using namespace chip::app;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
 #if 1

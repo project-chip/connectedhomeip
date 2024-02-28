@@ -19,15 +19,16 @@
 #include "DeviceEnergyManagementDelegateImpl.h"
 #include <string>
 
-using namespace chip::app::Clusters::DeviceEnergyManagement;
-using chip::Optional;
-using namespace chip::app;
-using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+
+using namespace chip::app::DataModel;
 using chip::Protocols::InteractionModel::Status;
+using CostsList = DataModel::List<const Structs::CostStruct::Type>;
+
 
 #define DELEGATE_TEST_DATA        // TODO: comment out if not needed
 
@@ -80,8 +81,20 @@ static void FillCostStruct(Structs::CostStruct::Type & cost)
 }
 
 // Just for testing. TODO: To be removed ?
-static void FillForecast(Structs::ForecastStruct::Type & forecast)
+static void FillForecast(DataModel::Nullable<Structs::ForecastStruct::Type> & nullableForecast)
 {
+    nullableForecast.SetNull();
+    if (!nullableForecast.IsNull())
+    {
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Null but nullableForecast.HasValue",  __FUNCTION__);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Null & nullableForecast.NullValue",  __FUNCTION__);
+    }
+
+    Structs::ForecastStruct::Type forecast;
+
     forecast.forecastId        = static_cast<uint16_t>(1234);
 
     forecast.activeSlotNumber.SetNonNull<uint16_t>(2345);
@@ -131,6 +144,8 @@ static void FillForecast(Structs::ForecastStruct::Type & forecast)
 
     slots[0].costs = Optional<CostsList> {CostsList(costs1, costsCount)};
     slots[1].costs = Optional<CostsList> {CostsList(costs2, costsCount)};
+
+    nullableForecast = MakeNullable(forecast);
 }
 
 namespace chip {
@@ -138,22 +153,12 @@ namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
-//using namespace DeviceEnergyManagement::Attributes::FeatureMap;
-using namespace DeviceEnergyManagement::Attributes;
-
 //DeviceEnergyManagementDelegateImpl::DeviceEnergyManagementDelegateImpl() 
 DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() 
 {
-    // chip::EndpointId endpoint = this->mEndpointId;
     BitMask<DeviceEnergyManagement::Feature> FeatureMap;
     FeatureMap.Set(DeviceEnergyManagement::Feature::kForecastAdjustment);
-    Status status = DeviceEnergyManagement::Attributes::FeatureMap::Set(mEndpointId, FeatureMap.Raw());
-
-    if (EMBER_ZCL_STATUS_SUCCESS != s)
-    {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Failed FeatureMap::Set()",  __FUNCTION__);
-        goto DEPARTURES;
-    }
+    //Status status = DeviceEnergyManagement::Attributes::FeatureMap::Set(mEndpointId, FeatureMap.Raw());
 
 #if 0       // Set  UserOptOut in  ESAState for testing ?
     {
@@ -170,7 +175,6 @@ DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate()
     FillForecast(mForecast);
     ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Enabled Feature ForecastAdjustment",  __FUNCTION__);
 
-DEPARTURES:
     return;
 }
 #endif

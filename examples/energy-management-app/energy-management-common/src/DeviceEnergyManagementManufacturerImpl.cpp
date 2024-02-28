@@ -16,21 +16,26 @@
  *    limitations under the License.
  */
 
+#include "app/clusters/device-energy-management-server/device-energy-management-server.h"
 #include <DeviceEnergyManagementManufacturerImpl.h>
-// #include <EnergyEvseManager.h>
+#include <DeviceEnergyManagementDelegateImpl.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
-// #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
-// #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
-// #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/InteractionModelEngine.h>
+#include <app/util/attribute-storage.h>
+
 
 using chip::Protocols::InteractionModel::Status;
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
+using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 
-static DataModel::Nullable<Structs::ForecastStruct::Type> sForecast;
+static DataModel::Nullable<Structs::ForecastStruct::Type>  sForecast;
 
 struct DeviceEnergyManagementTestEventSaveData
 {
@@ -39,20 +44,13 @@ struct DeviceEnergyManagementTestEventSaveData
 
 static DeviceEnergyManagementTestEventSaveData    sDeviceEnergyManagementTestEventSaveData;
 
+DeviceEnergyManagementDelegate * DeviceEnergyManagementManufacturer::sDelegate = nullptr;
 
 CHIP_ERROR DeviceEnergyManagementManufacturer::Init()
 {
     /* Manufacturers should modify this to do any custom initialisation */
 
-    /* Register callbacks */
-    DeviceEnergyManagementDelegate * dg = GetDeviceEnergyManagementManufacturer()->GetDelegate();
-    if (dg == nullptr)
-    {
-        ChipLogError(AppServer, "EVSE Delegate is not initialized");
-        return CHIP_ERROR_UNINITIALIZED;
-    }
-
-// TODO:    dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(this));
+// TODO:  not need for such a thing in DEM?     dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(this));
 
     /*
      * This is an example implementation for manufacturers to consider
@@ -72,17 +70,6 @@ CHIP_ERROR DeviceEnergyManagementManufacturer::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-DeviceEnergyManagementDelegate * GetDeviceEnergyManagementDelegate()
-{
-    DeviceEnergyManagementManufacturer * mn = GetDeviceEnergyManagementManufacturer();
-    VerifyOrDieWithMsg(mn != nullptr, AppServer, "DeviceEnergyManagementManufacturer is null");
-
-    DeviceEnergyManagementDelegate * dg = mn->GetDelegate();
-    VerifyOrDieWithMsg(dg != nullptr, AppServer, "DeviceEnergyManagement Delegate is null");
-
-    return dg;
-}
-
 void SetTestEventTrigger_zzzzzzzzzz()
 {
     ChipLogProgress(Support, "[zzzzzzzzzz-handle] L-%d", __LINE__ );
@@ -90,15 +77,38 @@ void SetTestEventTrigger_zzzzzzzzzz()
 
 void SetTestEventTrigger_StartTimeAdjustment()
 {
-    DeviceEnergyManagementDelegate * dg = GetDeviceEnergyManagementDelegate();
     ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d", __LINE__ );
 
+    DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
+
     sDeviceEnergyManagementTestEventSaveData.forecast = dg->GetForecast();
+
     //     virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast() override;
     sForecast = dg->GetForecast();
+    if (!sForecast.IsNull())
+    {
+        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d sForecast.forecastId = %d", __LINE__,  sForecast.Value().forecastId);
+        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d sForecast.startTime = %d", __LINE__ , sForecast.Value().startTime);
+        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d sForecast.endTime = %d", __LINE__, sForecast.Value().endTime );
+        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d sForecast.isPauseable = %s", __LINE__, sForecast.Value().isPauseable? "T":"F" );
+#if 0 // TODO:
+        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d [optional/nullable] sForecast.earliestStartTime = %d", __LINE__,
+                                     sForecast.Value().earliestStartTime.HasValue()?
+                                        (!sForecast.Value().earliestStartTime.IsNull()?  sForecast.Value().earliestStartTime.Value().Value() : 555555)
+                                        : 666666);
+        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d [optional] sForecast.latestEndTime = %d", __LINE__,
+                                     sForecast.Value().latestEndTime.HasValue()?  sForecast.Value().latestEndTime.Value() : 666666);
+#endif
+    }
 
-    //  Status  StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) override;
     Status s = dg->StartTimeAdjustRequest(1, AdjustmentCauseEnum::kLocalOptimization);
+    if (s != Status::Success)
+    {
+        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d StartTimeAdjustRequest() Failed", __LINE__ );
+    }
+
+    DataModel::Nullable<Structs::ForecastStruct::Type>  newForecast = dg->GetForecast();
+    // TODO: compare new/old forcasts
 }
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)

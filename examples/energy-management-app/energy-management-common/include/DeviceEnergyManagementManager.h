@@ -19,23 +19,31 @@
 #pragma once
 
 #include <DeviceEnergyManagementDelegateImpl.h>
+// #include <DeviceEnergyManagementManufacturerImpl.h>
 #include <app/clusters/energy-evse-server/energy-evse-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
+
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
+class DeviceEnergyManagementManufacturer;
+
 using namespace chip::app::Clusters::DeviceEnergyManagement;
+//using chip::app::Clusters::DeviceEnergyManagementManufacturer;
+
 class DeviceEnergyManagementManager : public Instance
 {
 public:
-    DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature) :
-        DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature)
-    {
-        mDelegate = &aDelegate;
-    }
+    DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature);
+    //  :
+    //     DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature),
+    //     mDelegate( &aDelegate)
+    // {
+    //     mDEMManufacturer = new DeviceEnergyManagementManufacturer(this, &aDelegate);
+    // }
 
     // Delete copy constructor and assignment operator.
     DeviceEnergyManagementManager(const DeviceEnergyManagementManager &)             = delete;
@@ -48,7 +56,8 @@ public:
     DeviceEnergyManagementDelegate * GetDelegate() { return mDelegate; };
 
 private:
-    DeviceEnergyManagementDelegate * mDelegate;
+    DeviceEnergyManagementDelegate     * mDelegate;
+    DeviceEnergyManagementManufacturer * mDEMManufacturer;
 };
 
 } // namespace Clusters

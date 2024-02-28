@@ -18,31 +18,31 @@
 
 #pragma once
 
-#include <DeviceEnergyManagementManager.h>
+#include <DeviceEnergyManagementDelegateImpl.h>
 
-using chip::Protocols::InteractionModel::Status;
+class DeviceEnergyManagementManager;
+
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace DeviceEnergyManagement {
-
-/**
- * The DeviceEnergyManagementManufacturer example class
- */
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
 
 class DeviceEnergyManagementManufacturer
 {
+private:
+    DeviceEnergyManagementManager  * mInstance;
+    static DeviceEnergyManagementDelegate * sDelegate;
+
 public:
-    DeviceEnergyManagementManufacturer(DeviceEnergyManagementManager * aInstance) { mInstance = aInstance; }
-    DeviceEnergyManagementManager  * GetInstance() { return mInstance; }
-    DeviceEnergyManagementDelegate * GetDelegate()
-    {
-        if (mInstance)
-        {
-            return mInstance->GetDelegate();
-        }
-        return nullptr;
+    DeviceEnergyManagementManufacturer() = delete;
+    DeviceEnergyManagementManufacturer(DeviceEnergyManagementManager * aInstance, DeviceEnergyManagementDelegate * delegate)
+        : mInstance(aInstance)
+    { 
+        DeviceEnergyManagementManufacturer::sDelegate = delegate;
     }
+
+    DeviceEnergyManagementManager  * GetInstance()  { return mInstance; }
 
     /**
      * @brief   Called at start up to apply hardware settings
@@ -54,32 +54,10 @@ public:
      */
     CHIP_ERROR Shutdown();
 
-    /**
-     * @brief   Allows a client application to send in power readings into the system
-     *
-     * @param[in]  aEndpointId     - Endpoint to send to EPM Cluster
-     */
-// TODO:??   CHIP_ERROR SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aCurrent_mA);
+    static DeviceEnergyManagementDelegate * GetDelegate() { return sDelegate; }
 
-
-private:
-    DeviceEnergyManagementManager * mInstance;
-
-    int64_t mLastChargingEnergyMeter    = 0;
 };
 
-/** @brief Helper function to return the singleton EVSEManufacturer instance
- *
- * This is needed by the EVSEManufacturer class to support TestEventTriggers
- * which are called outside of any class context. This allows the EVSEManufacturer
- * class to return the relevant Delegate instance in which to invoke the test
- * events on.
- *
- * This function is typically found in main.cpp or wherever the singleton is created.
- */
-DeviceEnergyManagementManufacturer * GetDeviceEnergyManagementManufacturer();
-
-} // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
