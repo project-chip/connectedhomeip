@@ -62,12 +62,6 @@ if (silabs_board == "") {
   silabs_board = getenv("SILABS_BOARD")
 }
 
-# TODO - Enable LCD once multiplexing changes added MATTER-2763
-if (use_SiWx917) {
-  disable_lcd = true
-  show_qr_code = false
-}
-
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Differentiate between boards
