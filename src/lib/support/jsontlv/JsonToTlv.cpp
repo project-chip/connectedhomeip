@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <charconv>
+#include <sstream>
 #include <string>
 #include <vector>
 
