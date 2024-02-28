@@ -27,6 +27,5 @@ default_args = {
 
   import("//openthread.gni")
 
-  chip_static_data_model_BACKEND =
-    "${chip_root}/examples/smoke-co-alarm-app/smoke-co-alarm-common:smoke-co-alarm-common"
+  chip_static_data_model_BACKEND = "${chip_root}/examples/smoke-co-alarm-app/smoke-co-alarm-common:smoke-co-alarm-common"
 }

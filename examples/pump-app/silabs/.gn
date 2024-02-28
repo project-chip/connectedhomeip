@@ -28,5 +28,5 @@ default_args = {
   import("//openthread.gni")
 
   chip_static_data_model_BACKEND =
-    "${chip_root}/examples/pump-app/pump-common:pump-common"
+      "${chip_root}/examples/pump-app/pump-common:pump-common"
 }
