@@ -140,7 +140,7 @@ matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FA
 matter_add_gn_arg_bool  ("chip_enable_read_client"                CONFIG_CHIP_ENABLE_READ_CLIENT)
 
 get_property(data_model GLOBAL PROPERTY gn_static_data_model_BACKEND)
-chip_gn_arg_append("chip_static_data_model_BACKEND" "\"${data_model}\"")
+matter_add_gn_arg_string("chip_static_data_model_BACKEND"   ${data_model})
 
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
   matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)

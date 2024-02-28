@@ -29,6 +29,10 @@ if(NOT CONF_FILE STREQUAL "prj_no_dfu.conf")
     set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static_dfu.yml)
 endif()
 
+
+get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
+set_property(GLOBAL PROPERTY gn_static_data_model_BACKEND "${CHIP_ROOT}/examples/lit-icd-app/lit-icd-common:lit-icd-common")
+
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
