@@ -148,16 +148,16 @@ CHIP_ERROR InternalConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag, const uint3
 }
 
 template <typename T>
-CHIP_ERROR ParseNumericalField(const std::string& decimalString, T& outValue)
+CHIP_ERROR ParseNumericalField(const std::string & decimalString, T & outValue)
 {
-    const char* start_ptr = decimalString.data();
-    const char* end_ptr = decimalString.data() + decimalString.size();
+    const char * start_ptr       = decimalString.data();
+    const char * end_ptr         = decimalString.data() + decimalString.size();
     auto [last_converted_ptr, _] = std::from_chars(start_ptr, end_ptr, outValue, 10);
     VerifyOrReturnError(last_converted_ptr == end_ptr, CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseJsonName(const std::string& name, ElementContext & elementCtx, uint32_t implicitProfileId)
+CHIP_ERROR ParseJsonName(const std::string & name, ElementContext & elementCtx, uint32_t implicitProfileId)
 {
     uint32_t tagNumber                  = 0;
     const char * elementType            = nullptr;
