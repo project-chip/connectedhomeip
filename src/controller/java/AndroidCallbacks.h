@@ -25,6 +25,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <list>
+#include <unordered_map>
 #include <utility>
 
 namespace chip {
@@ -138,6 +139,20 @@ struct InvokeCallback : public app::CommandSender::Callback
     JniGlobalReference mWrapperCallbackRef;
 };
 
+struct ExtendableInvokeCallback : public app::CommandSender::ExtendableCallback
+{
+    ExtendableInvokeCallback(jobject wrapperCallback);
+    ~ExtendableInvokeCallback();
+
+    void OnResponse(app::CommandSender * commandSender, const app::CommandSender::ResponseData & aResponseData) override;
+    void OnNoResponse(app::CommandSender * commandSender, const app::CommandSender::NoResponseData & aNoResponseData) override;
+    void OnError(const app::CommandSender * apCommandSender, const app::CommandSender::ErrorData & aErrorData) override;
+    void OnDone(app::CommandSender * apCommandSender) override;
+
+    app::CommandSender * mCommandSender = nullptr;
+    JniGlobalReference mWrapperCallbackRef;
+};
+
 jlong newConnectedDeviceCallback(JNIEnv * env, jobject self, jobject callback);
 void deleteConnectedDeviceCallback(JNIEnv * env, jobject self, jlong callbackHandle);
 jlong newReportCallback(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava,
@@ -147,6 +162,8 @@ jlong newWriteAttributesCallback(JNIEnv * env, jobject self);
 void deleteWriteAttributesCallback(JNIEnv * env, jobject self, jlong callbackHandle);
 jlong newInvokeCallback(JNIEnv * env, jobject self);
 void deleteInvokeCallback(JNIEnv * env, jobject self, jlong callbackHandle);
+jlong newExtendableInvokeCallback(JNIEnv * env, jobject self);
+void deleteExtendableInvokeCallback(JNIEnv * env, jobject self, jlong callbackHandle);
 
 } // namespace Controller
 } // namespace chip

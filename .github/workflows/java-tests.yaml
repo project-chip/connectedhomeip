@@ -132,6 +132,17 @@ jobs:
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
+                  '                    
+            - name: Run IM Batch Invoke Test
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "im" \
+                     --tool-args "onnetwork-long-im-batch-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
                   '
             - name: Run IM Read Test
               run: |

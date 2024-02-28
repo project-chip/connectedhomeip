@@ -529,7 +529,7 @@ inline void chipDie(void)
  */
 #if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition)                                                                                                    \
-    nlABORT_ACTION(aCondition, ChipLogDetail(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
+    nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -569,7 +569,7 @@ inline void chipDie(void)
  *
  */
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
-    nlABORT_ACTION(aCondition, ChipLogDetail(aModule, aMessage, ##__VA_ARGS__))
+    nlABORT_ACTION(aCondition, ChipLogError(aModule, aMessage, ##__VA_ARGS__))
 
 /**
  *  @def LogErrorOnFailure(expr)

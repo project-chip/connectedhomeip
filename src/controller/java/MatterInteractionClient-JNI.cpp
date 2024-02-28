@@ -65,3 +65,15 @@ JNI_METHOD(void, invoke)
         ChipLogError(Controller, "JNI IM Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
+
+JNI_METHOD(void, extendableInvoke)
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElementList,
+ jint timedRequestTimeoutMs, jint imTimeoutMs)
+{
+    CHIP_ERROR err =
+        extendableInvoke(env, handle, callbackHandle, devicePtr, invokeElementList, timedRequestTimeoutMs, imTimeoutMs);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "JNI IM Batch Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}

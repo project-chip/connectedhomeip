@@ -673,20 +673,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 {
     CompletionStatus completionStatus;
     completionStatus.err = err;
-
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(Controller, "Successfully finished commissioning step '%s'", StageToString(report.stageCompleted));
-    }
-    else
-    {
-        ChipLogProgress(Controller, "Error on commissioning step '%s': '%s'", StageToString(report.stageCompleted), err.AsString());
-    }
-
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(Controller, "Error on commissioning step '%s': '%s'", StageToString(report.stageCompleted), err.AsString());
         completionStatus.failedStage = MakeOptional(report.stageCompleted);
-        ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
         if (report.Is<AttestationErrorInfo>())
         {
             completionStatus.attestationResult = MakeOptional(report.Get<AttestationErrorInfo>().attestationResult);
@@ -727,19 +717,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     }
     else
     {
+        ChipLogProgress(Controller, "Successfully finished commissioning step '%s'", StageToString(report.stageCompleted));
         switch (report.stageCompleted)
         {
         case CommissioningStage::kReadCommissioningInfo:
             break;
         case CommissioningStage::kReadCommissioningInfo2: {
-            if (!report.Is<ReadCommissioningInfo>())
-            {
-                ChipLogError(Controller,
-                             "[BUG] Should read commissioning info, but report is not ReadCommissioningInfo. THIS IS A BUG.");
-            }
-            ReadCommissioningInfo commissioningInfo = report.Get<ReadCommissioningInfo>();
-
             mDeviceCommissioningInfo = report.Get<ReadCommissioningInfo>();
+
             if (!mParams.GetFailsafeTimerSeconds().HasValue() && mDeviceCommissioningInfo.general.recommendedFailsafe > 0)
             {
                 mParams.SetFailsafeTimerSeconds(mDeviceCommissioningInfo.general.recommendedFailsafe);
@@ -751,11 +736,11 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // Don't send DST unless the device says it needs it
             mNeedsDST = false;
 
-            mParams.SetSupportsConcurrentConnection(commissioningInfo.supportsConcurrentConnection);
+            mParams.SetSupportsConcurrentConnection(mDeviceCommissioningInfo.supportsConcurrentConnection);
 
             if (mParams.GetCheckForMatchingFabric())
             {
-                chip::NodeId nodeId = commissioningInfo.remoteNodeId;
+                chip::NodeId nodeId = mDeviceCommissioningInfo.remoteNodeId;
                 if (nodeId != kUndefinedNodeId)
                 {
                     mParams.SetRemoteNodeId(nodeId);
@@ -764,7 +749,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
             {
-                if (commissioningInfo.icd.isLIT && commissioningInfo.icd.checkInProtocolSupport)
+                if (mDeviceCommissioningInfo.icd.isLIT && mDeviceCommissioningInfo.icd.checkInProtocolSupport)
                 {
                     mNeedIcdRegistration = true;
                     ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
