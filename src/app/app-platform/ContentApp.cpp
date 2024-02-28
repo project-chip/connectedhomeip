@@ -44,6 +44,8 @@ namespace AppPlatform {
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
 #define ZCL_APPLICATION_BASIC_CLUSTER_REVISION (1u)
 
+inline constexpr EndpointId kCastingVideoPlayerEndpointId = 1;
+
 Status ContentApp::HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
 {
     ChipLogProgress(DeviceLayer,
@@ -60,6 +62,36 @@ Status ContentApp::HandleWriteAttribute(ClusterId clusterId, AttributeId attribu
                     ChipLogValueMEI(mEndpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
 
     return Status::Failure;
+}
+
+void ContentApp::AddClientNode(NodeId subjectNodeId)
+{
+    mClientNodes[mNextClientNodeIndex++] = subjectNodeId;
+    if (mClientNodeCount < kMaxClientNodes)
+    {
+        mClientNodeCount++;
+    }
+    if (mNextClientNodeIndex >= kMaxClientNodes)
+    {
+        // if we exceed the max number, then overwrite the oldest entry
+        mNextClientNodeIndex = 0;
+    }
+}
+
+void ContentApp::SendAppObserverCommand(chip::Controller::DeviceCommissioner * commissioner, NodeId clientNodeId, char * data,
+                                        char * encodingHint)
+{
+    ChipLogProgress(Controller, "Attempting to send AppObserver command");
+    if (mContentAppClientCommandSender.IsBusy())
+    {
+        ChipLogProgress(Controller, "SendAppObserverCommand busy");
+        return;
+    }
+
+    mContentAppClientCommandSender.SendContentAppMessage(commissioner, clientNodeId, kCastingVideoPlayerEndpointId, data,
+                                                         encodingHint);
+
+    ChipLogProgress(Controller, "Completed send of AppObserver command");
 }
 
 } // namespace AppPlatform

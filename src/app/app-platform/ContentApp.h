@@ -23,6 +23,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/app-platform/ContentAppClientCommandSender.h>
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
@@ -48,6 +49,8 @@ using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 
+inline constexpr uint8_t kMaxClientNodes = 8;
+
 class DLL_EXPORT ContentApp
 {
 public:
@@ -70,8 +73,21 @@ public:
                                                             uint16_t maxReadLength);
     Protocols::InteractionModel::Status HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
 
+    void AddClientNode(NodeId clientNodeId);
+    uint8_t GetClientNodeCount() const { return mClientNodeCount; }
+    NodeId GetClientNode(uint8_t index) const { return mClientNodes[index]; }
+
+    void SendAppObserverCommand(chip::Controller::DeviceCommissioner * commissioner, NodeId clientNodeId, char * data,
+                                char * encodingHint);
+
 protected:
     EndpointId mEndpointId = 0;
+
+    uint8_t mClientNodeCount     = 0;
+    uint8_t mNextClientNodeIndex = 0;
+    NodeId mClientNodes[kMaxClientNodes];
+
+    ContentAppClientCommandSender mContentAppClientCommandSender;
 };
 
 } // namespace AppPlatform
