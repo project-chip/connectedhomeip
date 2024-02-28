@@ -15,19 +15,28 @@
 
 import argparse
 import sys
+import textwrap
 
 
 def main():
     parser = argparse.ArgumentParser(
         description="A program that returns a failure code and prints an optional message as it does so")
     parser.add_argument('-m', '--message', nargs='?', type=str, help="Message to print out")
+    parser.add_argument('--very_visible', action='store_true', default=False,
+                        help="Makes the message very visible in outputs using unicode chars")
 
     args = parser.parse_args()
 
     if args.message:
-        print('🚨'*80)
-        print('🚨 %s' % args.message)
-        print('🚨'*80)
+        if args.very_visible:
+            print("\033[31m")  # RED
+            print('🚨'*80)
+            for l in textwrap.wrap(args.message, 76):
+                print('🚨 %-76s 🚨' % args.message)
+            print('🚨'*80)
+            print("\033[0m")  # CLEAR
+        else:
+            print(args.message)
 
     sys.exit(1)
 

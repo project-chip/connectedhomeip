@@ -331,6 +331,7 @@ action("static-data-model-not-set") {
   script = "${chip_root}/scripts/fail_with_message.py"
 
   args = [
+    "--very_visible",
     "--message",
     "You need to set a valid value for the GN argument 'chip_static_data_model_BACKEND'.",
   ]
