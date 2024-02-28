@@ -65,7 +65,6 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized" APPEND)
 flashing_script()
 
 if (CONFIG_ENABLE_PW_RPC)
-get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
 include(third_party/connectedhomeip/third_party/pigweed/repo/pw_build/pigweed.cmake)
 include($ENV{PW_ROOT}/pw_assert/backend.cmake)
 include($ENV{PW_ROOT}/pw_log/backend.cmake)
