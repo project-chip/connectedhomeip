@@ -39,3 +39,6 @@ chip_enable_rotating_device_id = true
 chip_enable_ota_requestor = true
 
 custom_toolchain = "${chip_root}/config/beken/toolchain:beken"
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lighting-app/lighting-common:lighting-common"

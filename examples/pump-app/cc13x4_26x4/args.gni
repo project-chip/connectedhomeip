@@ -50,3 +50,6 @@ matter_software_ver = "0x0001"
 matter_software_ver_str = "1.0.1+1"
 
 custom_factory_data = true
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/pump-app/pump-common:pump-common"

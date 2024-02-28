@@ -31,3 +31,5 @@ matter_enable_tracing_support = true
 chip_enable_read_client = false
 chip_enable_energy_evse_trigger = true
 chip_enable_energy_reporting_trigger = true
+
+chip_static_data_model_BACKEND = "${chip_root}/examples/energy-management-app/energy-management-common:energy-management-common"

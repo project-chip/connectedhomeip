@@ -34,3 +34,6 @@ matter_enable_tracing_support = true
 
 # Thread devices do not support WakeOnLan because their mac address is >48bit
 chip_enable_openthread = false
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/tv-app/tv-common:tv-common"

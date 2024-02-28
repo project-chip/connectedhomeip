@@ -25,3 +25,6 @@ chip_project_config_include_dirs =
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 chip_build_libshell = true
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/tv-app/tv-common:tv-common"

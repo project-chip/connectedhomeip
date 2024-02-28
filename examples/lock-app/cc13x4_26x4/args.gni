@@ -52,3 +52,6 @@ matter_software_ver_str = "1.0.1+1"
 # should be maj.min.rev+build with later parts optional for MCUBoot
 
 custom_factory_data = true
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lock-app/lock-common:lock-common"

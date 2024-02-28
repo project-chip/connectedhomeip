@@ -32,3 +32,5 @@ declare_args() {
 
   chip_config_network_layer_ble = true
 }
+
+chip_static_data_model_BACKEND = "${chip_root}/examples/ota-requestor-app/ota-requestor-common:ota-requestor-common"

@@ -25,3 +25,5 @@ declare_args() {
   # INCLUDE_xSemaphoreGetMutexHolder
   chip_stack_lock_tracking = "none"
 }
+
+chip_static_data_model_BACKEND = "${chip_root}/examples/temperature-measurement-app/temperature-measurement-common:temperature-measurement-common"

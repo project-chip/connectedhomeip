@@ -24,3 +24,6 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/lock-app/linux/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 matter_enable_tracing_support = true
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lock-app/lock-common:lock-common"
