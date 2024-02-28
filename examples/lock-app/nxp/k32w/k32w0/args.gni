@@ -25,3 +25,6 @@ chip_enable_ble = true
 chip_enable_icd_server = true
 chip_persist_subscriptions = true
 chip_subscription_timeout_resumption = true
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lock-app/lock-common:lock-common"
