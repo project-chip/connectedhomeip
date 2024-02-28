@@ -343,15 +343,15 @@ action("static-data-model-not-set") {
 # fake source sets according to chip_data_model
 source_set("static-data-model-not-set-endpoint-metadata") {
   sources = []
-  deps = [":static-data-model-not-set"]
+  deps = [ ":static-data-model-not-set" ]
 }
 
 source_set("static-data-model-not-set-callbacks") {
   sources = []
-  deps = [":static-data-model-not-set"]
+  deps = [ ":static-data-model-not-set" ]
 }
 
 source_set("static-data-model-not-set-command-dispatch") {
   sources = []
-  deps = [":static-data-model-not-set"]
+  deps = [ ":static-data-model-not-set" ]
 }
