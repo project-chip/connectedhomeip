@@ -260,7 +260,7 @@ public:
     /**
      * Check whether we have a valid session (and reset state if not).
      */
-    void CheckValidSession();
+    void ValidateSession();
 
     /**
      * UserConfirmationProvider callback.
