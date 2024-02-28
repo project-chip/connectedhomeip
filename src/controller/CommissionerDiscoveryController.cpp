@@ -34,22 +34,6 @@
 using namespace ::chip;
 using namespace chip::Protocols::UserDirectedCommissioning;
 
-// keep a separate timer thread for blocking calls that should not block the main chip thread
-// chip::System::LayerImpl gExternalWorkerLayer;
-// bool gInited = false;
-
-chip::System::Layer * GetExternalWorkerLayer()
-{
-    // if (!gInited)
-    // {
-    //     gExternalWorkerLayer.SetDispatchQueue(chip::DeviceLayer::PlatformMgr().GetWorkQueue());
-    //     gExternalWorkerLayer.Init();
-    //     gInited = true;
-    // }
-    // return &gExternalWorkerLayer;
-    return &DeviceLayer::SystemLayer();
-}
-
 CommissionerDiscoveryController gCommissionerDiscoveryController;
 
 CommissionerDiscoveryController * GetCommissionerDiscoveryController()
@@ -235,8 +219,8 @@ void CommissionerDiscoveryController::InternalOk()
 
     ChipLogError(AppServer, "UX Ok: moving out of main thread");
 
-    // spawn external blocking work out of main chip thread
-    GetExternalWorkerLayer()->StartTimer(System::Clock::Seconds32(0), CallbackExternalWorkerOk, static_cast<void *>(client));
+    // TODO: move this an external Thread
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackExternalWorkerOk, static_cast<void *>(client));
 
     ChipLogError(AppServer, "UX Ok: done moving out of main thread");
 }

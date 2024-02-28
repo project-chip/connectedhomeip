@@ -221,7 +221,7 @@ private:
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
     uint16_t mPairingHint                                         = 0;
 
-    constexpr static size_t kMaxTargetAppInfos = 10;
+    constexpr static size_t kMaxTargetAppInfos = 3;
     uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
     TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
 
