@@ -120,9 +120,9 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
     else
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     {
-        // If the device fails to establish the session for several times, the subscriber might be offline and its subscription
-        // read client will be deleted when the device reconnect to the subscriber. This subscription will be never used again.
-        // So clean up the persistent subscription information storage.
+        // If the device fails to establish the session several times, the subscriber might be offline and its subscription
+        // read client will be deleted when the device reconnects to the subscriber. This subscription will be never used again.
+        // Clean up the persistent subscription information storage.
         auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
         {
