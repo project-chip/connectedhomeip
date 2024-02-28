@@ -27,3 +27,6 @@ lwip_debug = false
 # Disable lock tracking, since our FreeRTOS configuration does not set
 # INCLUDE_xSemaphoreGetMutexHolder
 chip_stack_lock_tracking = "none"
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lighting-app/lighting-common:lighting-common"
