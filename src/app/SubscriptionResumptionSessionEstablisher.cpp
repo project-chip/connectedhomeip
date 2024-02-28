@@ -103,6 +103,14 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
         return;
     }
     readHandler->OnSubscriptionResumed(sessionHandle, *establisher);
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    // Reset the resumption retries to 0 if subscription is resumed
+    subscriptionInfo.mResumptionRetries = 0;
+    auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
+    if (subscriptionResumptionStorage) {
+        subscriptionResumptionStorage->Save(subscriptionInfo);
+    }
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 }
 
 void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId,
@@ -112,10 +120,18 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
     ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
                  error.Format());
+    auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
+    if (!subscriptionResumptionStorage)
+    {
+        ChipLogError(DataManagement, "Failed to get subscription resumption storage");
+        return;
+    }
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     if (subscriptionInfo.mResumptionRetries <= CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)
     {
         InteractionModelEngine::GetInstance()->TryToResumeSubscriptions();
+        subscriptionInfo.mResumptionRetries++;
+        subscriptionResumptionStorage->Save(subscriptionInfo);
     }
     else
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
@@ -123,12 +139,8 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
         // If the device fails to establish the session several times, the subscriber might be offline and its subscription
         // read client will be deleted when the device reconnects to the subscriber. This subscription will be never used again.
         // Clean up the persistent subscription information storage.
-        auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
-        if (subscriptionResumptionStorage)
-        {
-            subscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
-                                                  subscriptionInfo.mSubscriptionId);
-        }
+        subscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
+                                              subscriptionInfo.mSubscriptionId);
     }
 }
 

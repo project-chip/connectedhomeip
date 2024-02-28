@@ -1969,10 +1969,7 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             ChipLogProgress(InteractionModel, "Failed to create SubscriptionResumptionSessionEstablisher");
             return;
         }
-#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-        // Set the subscription resumption retries number
-        subscriptionInfo.mResumptionRetries = imEngine->mNumSubscriptionResumptionRetries;
-#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
         if (subscriptionResumptionSessionEstablisher->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo) !=
             CHIP_NO_ERROR)
         {
