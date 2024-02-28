@@ -55,11 +55,6 @@ declare_args() {
   nxp_active_mode_duration_ms = 10000  # 10s Active Mode Interval
   nxp_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
   nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
-
-  # Enables support for Long Idle Time ICD.
-  # LIT may require enablement of deep power
-  # save in the NXP SDK in the future
-  chip_enable_icd_lit = false
 }
 
 declare_args() {
