@@ -41,8 +41,8 @@ CHIP_ERROR AdapterIterator::Initialize()
     VerifyOrReturnError(mManager, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "Failed to get D-Bus object manager for listing adapters: %s", error->message));
 
-    mObjectList = BluezObjectList(mManager.get());
-    mIterator   = mObjectList.begin();
+    mObjectList.Init(mManager.get());
+    mIterator = mObjectList.begin();
 
     return CHIP_NO_ERROR;
 }
