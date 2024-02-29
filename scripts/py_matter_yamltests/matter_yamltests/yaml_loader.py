@@ -87,6 +87,7 @@ _TEST_STEP_RESPONSE_SCHEMA = {
     'constraints': dict,
     'saveAs': str,
     'saveDataVersschemaionAs': str,
+    'PICS': str,
 }
 
 _TEST_STEP_RESPONSE_CONSTRAINTS_SCHEMA = {
