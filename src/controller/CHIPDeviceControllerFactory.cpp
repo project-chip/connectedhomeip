@@ -270,7 +270,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .exchangeMgr               = stateParams.exchangeMgr,
         .fabricTable               = stateParams.fabricTable,
         .groupDataProvider         = stateParams.groupDataProvider,
-        .mrpLocalConfig            = GetLocalMRPConfig(),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {

@@ -34,7 +34,6 @@ struct CASEClientInitParams
     Messaging::ExchangeManager * exchangeMgr                           = nullptr;
     FabricTable * fabricTable                                          = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
-    Optional<ReliableMessageProtocolConfig> mrpLocalConfig             = Optional<ReliableMessageProtocolConfig>::Missing();
 
     CHIP_ERROR Validate() const
     {

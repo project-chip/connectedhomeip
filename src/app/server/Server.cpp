@@ -313,7 +313,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .groupDataProvider = mGroupsProvider,
-            .mrpLocalConfig    = GetLocalMRPConfig(),
         },
         .clientPool            = &mCASEClientPool,
         .sessionSetupPool      = &mSessionSetupPool,
