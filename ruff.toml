@@ -1,0 +1,16 @@
+exclude = [
+    ".environment",
+    ".git",
+    ".github",
+    ".*",
+    "build",
+    "out",
+    "third_party",
+    "examples/common/QRCode/",
+]
+target-version = "py37"
+
+[lint]
+ignore = [
+    "E721" # We use is for good reasons
+]

@@ -114,7 +114,6 @@ _KNOWN_DECODABLE_TYPES = {
     'event_no': 'chip::EventNumber',
     'fabric_id': 'chip::FabricId',
     'fabric_idx': 'chip::FabricIndex',
-    'fabric_idx': 'chip::FabricIndex',
     'field_id': 'chip::FieldId',
     'group_id': 'chip::GroupId',
     'node_id': 'chip::NodeId',
