@@ -26,14 +26,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-AdapterIterator::~AdapterIterator()
-{
-    if (mManager != nullptr)
-    {
-        g_object_unref(mManager);
-    }
-}
-
 CHIP_ERROR AdapterIterator::Initialize(AdapterIterator * self)
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
@@ -41,15 +33,15 @@ CHIP_ERROR AdapterIterator::Initialize(AdapterIterator * self)
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
     GAutoPtr<GError> error;
-    self->mManager = g_dbus_object_manager_client_new_for_bus_sync(
+    self->mManager.reset(g_dbus_object_manager_client_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
         bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-        nullptr /* destroy notify */, nullptr /* cancellable */, &error.GetReceiver());
+        nullptr /* destroy notify */, nullptr /* cancellable */, &error.GetReceiver()));
 
-    VerifyOrReturnError(self->mManager != nullptr, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(self->mManager, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "Failed to get D-Bus object manager for listing adapters: %s", error->message));
 
-    self->mObjectList = BluezObjectList(self->mManager);
+    self->mObjectList = BluezObjectList(self->mManager.get());
     self->mIterator   = self->mObjectList.begin();
 
     return CHIP_NO_ERROR;

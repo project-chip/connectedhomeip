@@ -48,8 +48,6 @@ namespace Internal {
 class AdapterIterator
 {
 public:
-    ~AdapterIterator();
-
     /// Moves to the next DBUS interface.
     ///
     /// MUST be called before any of the 'current value' methods are
@@ -75,7 +73,7 @@ private:
     /// iterate through.
     bool Advance();
 
-    GDBusObjectManager * mManager = nullptr; // DBus connection
+    GAutoPtr<GDBusObjectManager> mManager;
     BluezObjectList mObjectList;
     BluezObjectIterator mIterator;
     // Data valid only if Next() returns true
