@@ -54,6 +54,14 @@ k32w1_sdk("sdk") {
     "main/include/app_config.h",
   ]
 
+  if (chip_key_storage == "littlefs")
+  {
+    sources += [
+      "${k32w1_platform_dir}/board/peripherals.c",
+      "${k32w1_platform_dir}/board/peripherals.h"
+    ]
+  }
+
   public_deps =
       [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
 
@@ -66,6 +74,11 @@ k32w1_sdk("sdk") {
     "${k32w1_platform_dir}/app/ldscripts",
     "${k32w1_platform_dir}/util/include",
   ]
+
+  if (chip_key_storage == "littlefs")
+  {
+    include_dirs += [ "${k32w1_platform_dir}/board" ]
+  }
 
   defines = []
   if (is_debug) {

@@ -49,22 +49,40 @@ static_library("nxp_platform") {
     "DefaultTestEventTriggerDelegate.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "K32W1Config.cpp",
-    "K32W1Config.h",
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
-    "ble_function_mux.c",
-    "ram_storage.c",
-    "ram_storage.h",
+    "ble_function_mux.c"
   ]
 
   if (chip_use_plain_dac_key) {
     defines += [ "CHIP_USE_PLAIN_DAC_KEY=1" ]
   } else {
     defines += [ "CHIP_USE_PLAIN_DAC_KEY=0" ]
+
+  if (chip_key_storage == "fwk_nvm") {
+    defines += [ "CHIP_PLAT_NVM_SUPPORT=1" ]
+
+    sources += [
+      "KeyValueStoreManagerImpl.cpp",
+      "KeyValueStoreManagerImpl.h",
+      "K32W1Config.cpp",
+      "K32W1Config.h",
+      "ram_storage.c",
+      "ram_storage.h"
+    ]
+  } else if (chip_key_storage == "littlefs") {
+    defines += [
+      "CHIP_PLAT_NVM_SUPPORT=3",
+      "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"platform/nxp/common/KeyValueStoreManagerImpl.h\""
+    ]
+
+    sources += [
+      "../../common/KeyValueStoreManagerImpl.cpp",
+      "../../common/KeyValueStoreManagerImpl.h",
+      "../../common/NXPConfigKS.cpp",
+      "../../common/NXPConfig.h"
+    ]
   }
 
   public = [

@@ -78,8 +78,10 @@ extern "C" WEAK CHIP_ERROR OtaHookInit()
 
 extern "C" WEAK void OtaHookReset()
 {
+#if (CHIP_PLAT_NVM_SUPPORT == 1)
     // Process all idle saves
     NvShutdown();
+#endif
     // Set the bootloader flags
     OTA_SetNewImageFlag();
     ResetMCU();

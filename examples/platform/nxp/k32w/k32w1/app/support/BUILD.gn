@@ -15,6 +15,9 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 
+import("${chip_root}/third_party/nxp/nxp_sdk.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
 config("support_config") {
   include_dirs = [ "../../../../.." ]
 
@@ -48,6 +51,12 @@ source_set("freertos_mbedtls_utils") {
   deps = [ "${chip_root}/src/lib/support" ]
 
   cflags = [ "-Wconversion" ]
+
+  if (chip_key_storage == "fwk_nvm") {
+    defines = [ "CHIP_PLAT_NVM_SUPPORT=1" ]
+  } else {
+    defines = [ "CHIP_PLAT_NVM_SUPPORT=3" ]
+  }
 
   public_configs = [ ":support_config" ]
 }

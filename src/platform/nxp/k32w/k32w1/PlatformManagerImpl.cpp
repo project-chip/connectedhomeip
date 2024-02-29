@@ -29,7 +29,11 @@
 #include <openthread-system.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#ifdef EXTERNAL_CONFIGURATIONMANAGERIMPL_HEADER
+#include EXTERNAL_CONFIGURATIONMANAGERIMPL_HEADER
+#else
 #include <platform/nxp/k32w/k32w1/ConfigurationManagerImpl.h>
+#endif
 #include <platform/nxp/k32w/k32w1/DiagnosticDataProviderImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

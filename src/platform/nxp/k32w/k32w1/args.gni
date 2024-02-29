@@ -23,6 +23,9 @@ declare_args() {
   sdk_release = false
   k32w1_sdk_root = ""
   is_sdk_2_15 = true
+  # The key storage solution. Developers can select between "littlefs" and the
+  # older "fwk_nvm".
+  chip_key_storage = "fwk_nvm"
 }
 
 if(!sdk_release && is_sdk_2_15) {

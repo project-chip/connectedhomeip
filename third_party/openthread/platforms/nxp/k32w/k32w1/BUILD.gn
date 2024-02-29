@@ -48,6 +48,10 @@ config("openthread_k32w1_config") {
       "OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS_MANAGEMENT=0",
     ]
   }
+
+  if (chip_key_storage == "littlefs") {
+    defines += [ "OT_PLAT_SAVE_NVM_DATA_ON_IDLE=0" ]
+  }
 }
 
 source_set("openthread_core_config_k32w1") {
@@ -63,7 +67,6 @@ source_set("openthread_core_config_k32w1") {
 source_set("libopenthread-k32w1") {
   sources = [
     "${openthread_nxp_root}/src/common/crypto.c",
-    "${openthread_nxp_root}/src/common/flash_nvm.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/alarm.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/diag.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/entropy.c",
@@ -83,6 +86,16 @@ source_set("libopenthread-k32w1") {
 
     if (use_hw_aes) {
       sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/aes_sss.cpp" ]
+    }
+
+    if (chip_key_storage == "fwk_nvm") {
+      sources += [
+        "${openthread_nxp_root}/src/common/flash_nvm.c"
+      ]
+    } else if (chip_key_storage == "littlefs") {
+      sources += [
+        "${openthread_nxp_root}/src/common/flash_fsa.c"
+      ]
     }
   }
 
