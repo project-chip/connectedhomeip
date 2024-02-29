@@ -27,6 +27,7 @@ extern "C" {
 #include "assert.h"
 #include "rsi_board.h"
 #include "uart.h"
+#include "rsi_debug.h"
 #include <stddef.h>
 #include <string.h>
 
@@ -131,15 +132,15 @@ int16_t uartLogWrite(const char * log, uint16_t length)
     {
         return UART_CONSOLE_ERR;
     }
-    for (int i = 0; i < length; i++)
+    for (int16_t i = 0; i < length; i++)
     {
-        Board_UARTPutChar(*log++);
+        Board_UARTPutChar(log[i]);
     }
     // To print next log in new line with proper formatting
     Board_UARTPutChar('\r');
     Board_UARTPutChar('\n');
 
-    return length;
+    return length+2;
 }
 
 /*
