@@ -17,9 +17,6 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/util/attribute-metadata.h>
 
-// This duplication of basic utilities is really unfortunate, but we can't link
-// to the normal attribute-storage.cpp because we redefine some of its symbols
-// above.
 bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
 {
     return (attributeType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
