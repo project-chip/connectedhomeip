@@ -24,6 +24,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEncoding.h>
@@ -190,53 +191,6 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
         index++;
     }
     return 0xFFFF;
-}
-
-void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
-{
-    if (src == nullptr)
-    {
-        dest[0] = 0; // Zero out the length of string
-    }
-    else if (src[0] == 0xFF)
-    {
-        dest[0] = src[0];
-    }
-    else
-    {
-        uint8_t length = emberAfStringLength(src);
-        if (size < length)
-        {
-            // Since we have checked that size < length, size must be able to fit into the type of length.
-            length = static_cast<decltype(length)>(size);
-        }
-        memmove(dest + 1, src + 1, length);
-        dest[0] = length;
-    }
-}
-
-void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
-{
-    if (src == nullptr)
-    {
-        dest[0] = dest[1] = 0; // Zero out the length of string
-    }
-    else if ((src[0] == 0xFF) && (src[1] == 0xFF))
-    {
-        dest[0] = 0xFF;
-        dest[1] = 0xFF;
-    }
-    else
-    {
-        uint16_t length = emberAfLongStringLength(src);
-        if (size < length)
-        {
-            // Since we have checked that size < length, size must be able to fit into the type of length.
-            length = static_cast<decltype(length)>(size);
-        }
-        memmove(dest + 2, src + 2, length);
-        Encoding::LittleEndian::Put16(dest, length);
-    }
 }
 
 #if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
