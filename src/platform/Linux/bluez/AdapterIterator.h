@@ -65,7 +65,7 @@ public:
 
 private:
     /// Sets up the DBUS manager and loads the list
-    static CHIP_ERROR Initialize(AdapterIterator * self);
+    CHIP_ERROR Initialize();
 
     /// Loads the next value in the list.
     ///
