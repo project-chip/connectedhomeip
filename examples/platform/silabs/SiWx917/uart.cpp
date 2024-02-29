@@ -26,8 +26,8 @@ extern "C" {
 #endif
 #include "assert.h"
 #include "rsi_board.h"
-#include "uart.h"
 #include "rsi_debug.h"
+#include "uart.h"
 #include <stddef.h>
 #include <string.h>
 
@@ -140,7 +140,7 @@ int16_t uartLogWrite(const char * log, uint16_t length)
     Board_UARTPutChar('\r');
     Board_UARTPutChar('\n');
 
-    return length+2;
+    return length + 2;
 }
 
 /*
