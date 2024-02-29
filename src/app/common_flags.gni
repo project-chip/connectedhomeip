@@ -24,6 +24,11 @@ declare_args() {
   #
   # The data model specifies what the endpoint composition and metadata is
   # built into "src/app" interaction model.
+  #
+  # LIBRARIES:
+  #   - you may set this to "none" to not have the data-model functions
+  #     linked in (e.g. when building a separate library without a static
+  #     data model built-in).
   chip_static_data_model_BACKEND =
       "${chip_root}/src/app:static-data-model-not-set"
 }

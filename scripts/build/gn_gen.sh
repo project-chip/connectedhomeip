@@ -26,8 +26,8 @@ EXTRA_ARGS=""
 if [[ -z "${CHIP_ROOT_PATH}" ]]; then
     CHIP_ROOT_PATH=""
     # If no app, build everything (e.g. tests or sample apps that do not care about the data model)
-    # with a fixed "include everything" data model
-    EXTRA_ARGS="chip_static_data_model_BACKEND=\"//src/controller/data_model:data_model\""
+    # Do not link in a fixed data model at this time.
+    EXTRA_ARGS="chip_static_data_model_BACKEND=\"none\""
 fi
 
 if [[ -n "EXTRA_ARGS" ]]; then

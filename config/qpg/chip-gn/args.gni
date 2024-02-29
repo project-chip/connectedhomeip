@@ -49,3 +49,5 @@ chip_ble_project_config_include = ""
 custom_toolchain = "//config/qpg/chip-gn/toolchain:qpgtoolchain"
 
 pw_build_PIP_CONSTRAINTS = [ "//scripts/setup/constraints.txt" ]
+
+chip_static_data_model_BACKEND = "none"

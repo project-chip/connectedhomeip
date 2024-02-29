@@ -29,15 +29,16 @@ source_set("privilege-constants") {
 }
 
 source_set("privilege-storage") {
-  sources = [
-    "privilege-storage.cpp",
-    "privilege-storage.h",
-  ]
+  sources = [ "privilege-storage.h" ]
 
   deps = [
     ":privilege-constants",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:chip_config_header",
-    "${chip_static_data_model_BACKEND}-endpoint-metadata",
   ]
+
+  if (chip_static_data_model_BACKEND != "none") {
+    sources += [ "privilege-storage.cpp" ]
+    deps += [ "${chip_static_data_model_BACKEND}-endpoint-metadata" ]
+  }
 }
