@@ -31,10 +31,6 @@ template("_chip_build_time_codegen") {
   _name = target_name
   _generator = invoker.generator
 
-  config("${_name}_config") {
-    include_dirs = [ target_gen_dir ]
-  }
-
   pw_python_action("${_name}_generate") {
     script = "${chip_root}/scripts/codegen.py"
 
