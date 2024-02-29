@@ -36,10 +36,12 @@ class EVSEManufacturer
 {
 public:
     EVSEManufacturer(EnergyEvseManager * aEvseInstance,
-                     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * aEPMInstance)
+                     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * aEPMInstance,
+                     DeviceEnergyManagementManager * aDEMInstance)
     {
         mEvseInstance = aEvseInstance;
         mEPMInstance  = aEPMInstance;
+        mDEMInstance  = aDEMInstance;
     }
     EnergyEvseManager * GetEvseInstance() { return mEvseInstance; }
     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance() { return mEPMInstance; }
@@ -58,6 +60,15 @@ public:
         if (mEPMInstance)
         {
             return mEPMInstance->GetDelegate();
+        }
+        return nullptr;
+    }
+
+    DeviceEnergyManagementDelegate * GetDEMDelegate()
+    {
+        if (mDEMInstance)
+        {
+            return mDEMInstance->GetDelegate();
         }
         return nullptr;
     }
@@ -153,6 +164,7 @@ public:
 private:
     EnergyEvseManager * mEvseInstance;
     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * mEPMInstance;
+    DeviceEnergyManagementManager * mDEMInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;
     int64_t mLastDischargingEnergyMeter = 0;
