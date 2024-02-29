@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 /*
@@ -28,3 +29,17 @@ uint8_t emberAfStringLength(const uint8_t * buffer);
  *   (where the first two bytes are assumed to be the length).
  */
 uint16_t emberAfLongStringLength(const uint8_t * buffer);
+
+/*
+ * @brief Function that copies a ZCL string type into a buffer.  The size
+ * parameter should indicate the maximum number of characters to copy to the
+ * destination buffer not including the length byte.
+ */
+void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size);
+
+/*
+ * @brief Function that copies a ZCL long string into a buffer.  The size
+ * parameter should indicate the maximum number of characters to copy to the
+ * destination buffer not including the length bytes.
+ */
+void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
