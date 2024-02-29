@@ -713,8 +713,19 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
  * Time in seconds that a factory new device will advertise commissionable node discovery.
  */
 #ifndef CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+/**
+ * By default, the extended announcement, when enabled, starts its extended advertising 15 mins
+ * after the standard slow advertisement. Time at which the default discovery time would close the
+ * commissioning window and stop the BLE.
+ * Therefore, when CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING is enabled bump the default Discovery timeout
+ * to the maximum allowed by the spec. 48h.
+ */
+#define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (60 * 60 * 48)
+#else
 #define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (15 * 60)
-#endif
+#endif // CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#endif // CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
 
 /**
  * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES

@@ -20,6 +20,7 @@
 #include <EVSEManufacturerImpl.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseManager.h>
+#include <PowerTopologyDelegate.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>
 
@@ -28,6 +29,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/power-topology-server/power-topology-server.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
@@ -42,6 +44,7 @@ using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
+using namespace chip::app::Clusters::PowerTopology;
 
 static std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
 static std::unique_ptr<EnergyEvseManager> gEvseInstance;
@@ -52,6 +55,9 @@ static std::unique_ptr<ElectricalPowerMeasurementDelegate> gEPMDelegate;
 static std::unique_ptr<ElectricalPowerMeasurementInstance> gEPMInstance;
 // Electrical Energy Measurement cluster uses ember to initialise
 static std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
+
+static std::unique_ptr<PowerTopologyDelegate> gPTDelegate;
+static std::unique_ptr<PowerTopologyInstance> gPTInstance;
 
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
 {
@@ -198,6 +204,74 @@ CHIP_ERROR EnergyEvseShutdown()
 }
 
 /*
+ *  @brief  Creates a Delegate and Instance for PowerTopology clusters
+ *
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
+ */
+CHIP_ERROR PowerTopologyInit()
+{
+    CHIP_ERROR err;
+
+    if (gPTDelegate || gPTInstance)
+    {
+        ChipLogError(AppServer, "PowerTopology Instance or Delegate already exist.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    gPTDelegate = std::make_unique<PowerTopologyDelegate>();
+    if (!gPTDelegate)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for PowerTopology Delegate");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    gPTInstance =
+        std::make_unique<PowerTopologyInstance>(EndpointId(ENERGY_EVSE_ENDPOINT), *gPTDelegate,
+                                                BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
+                                                BitMask<PowerTopology::OptionalAttributes, uint32_t>(0));
+
+    if (!gPTInstance)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for PowerTopology Instance");
+        gPTDelegate.reset();
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    err = gPTInstance->Init(); /* Register Attribute & Command handlers */
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Init failed on gPTInstance");
+        gPTInstance.reset();
+        gPTDelegate.reset();
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PowerTopologyShutdown()
+{
+    /* Do this in the order Instance first, then delegate
+     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
+     */
+    if (gPTInstance)
+    {
+        /* deregister attribute & command handlers */
+        gPTInstance->Shutdown();
+        gPTInstance.reset();
+    }
+
+    if (gPTDelegate)
+    {
+        gPTDelegate.reset();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+/*
  *  @brief  Creates a Delegate and Instance for Electrical Power/Energy Measurement clusters
  *
  * The Instance is a container around the Delegate, so
@@ -301,7 +375,7 @@ CHIP_ERROR EVSEManufacturerInit()
     }
 
     /* Now create EVSEManufacturer */
-    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gEPMInstance.get());
+    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gEPMInstance.get(), gPTInstance.get());
     if (!gEvseManufacturer)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EvseManufacturer");
@@ -352,6 +426,16 @@ void EvseApplicationInit()
         return;
     }
 
+    if (PowerTopologyInit() != CHIP_NO_ERROR)
+    {
+        EVSEManufacturerShutdown();
+        DeviceEnergyManagementShutdown();
+        EnergyEvseShutdown();
+        EnergyMeterShutdown();
+        return;
+    }
+
+    /* Do this last so that the instances for other clusters can be wrapped inside */
     if (EVSEManufacturerInit() != CHIP_NO_ERROR)
     {
         DeviceEnergyManagementShutdown();
@@ -367,6 +451,7 @@ void EvseApplicationShutdown()
 
     /* Shutdown in reverse order that they were created */
     EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */
+    PowerTopologyShutdown();          /* Free the PowerTopology */
     EnergyMeterShutdown();            /* Free the Energy Meter */
     EnergyEvseShutdown();             /* Free the EnergyEvse */
     DeviceEnergyManagementShutdown(); /* Free the DEM */

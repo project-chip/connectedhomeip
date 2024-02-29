@@ -74,7 +74,7 @@ CHIP_ERROR InvokeRequestMessage::Parser::PrettyPrint() const
             PRETTY_PRINT_DECDEPTH();
         }
         break;
-        case kInteractionModelRevisionTag:
+        case Revision::kInteractionModelRevisionTag:
             ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
             break;
         default:

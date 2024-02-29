@@ -149,9 +149,11 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
 
-    ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage));
+    auto engine = chip::app::InteractionModelEngine::GetInstance();
+    VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage, engine));
     ReturnLogErrorOnFailure(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &sICDClientStorage, &sCheckInDelegate));
+                                                 &sICDClientStorage, &sCheckInDelegate, engine));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));

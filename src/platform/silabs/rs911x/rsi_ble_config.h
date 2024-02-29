@@ -14,9 +14,7 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
-
-#ifndef RSI_BLE_CONFIG_H
-#define RSI_BLE_CONFIG_H
+#pragma once
 
 #include "rsi_ble_apis.h"
 #if (SIWX_917 | EXP_BOARD)
@@ -316,5 +314,3 @@ typedef struct rsi_ble_s
     uint16_t att_rec_list_count;
     rsi_ble_att_list_t att_rec_list[NO_OF_VAL_ATT];
 } rsi_ble_t;
-
-#endif

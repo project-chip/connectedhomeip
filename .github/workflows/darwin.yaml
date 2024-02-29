@@ -119,13 +119,10 @@ jobs:
               run: |
                   xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
               working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
-            - name: Uploading .ips files in Xcode derived data to debug the failure
-              uses: actions/upload-artifact@v4
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: darwin-framework-derived-data
-                  path: ~/Library/Developer/Xcode/DerivedData/**/*.ips
-                  retention-days: 5
+            - name: Collect crash logs
+              run: |
+                  mkdir -p /tmp/darwin/framework-tests
+                  find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}

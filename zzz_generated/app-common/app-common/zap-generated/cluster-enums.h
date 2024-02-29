@@ -4893,4 +4893,4 @@ namespace SampleMei {} // namespace SampleMei
 } // namespace chip
 
 // Included at the end, so all our definitions above are available.
-#include <app/CompatEnumNames.h>
+#include <app/common/CompatEnumNames.h>

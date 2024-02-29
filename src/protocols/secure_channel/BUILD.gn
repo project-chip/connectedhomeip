@@ -88,5 +88,5 @@ static_library("secure_channel") {
     "${chip_root}/src/transport",
   ]
 
-  deps = [ "${chip_root}/src/app:revision_info" ]
+  deps = [ "${chip_root}/src/app:constants" ]
 }
