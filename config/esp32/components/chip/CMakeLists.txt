@@ -87,7 +87,9 @@ if (CONFIG_CHIP_CONFIG_IM_PRETTY_PRINT)
 endif()
 
 get_property(data_model GLOBAL PROPERTY gn_static_data_model_BACKEND)
-chip_gn_arg_append("chip_static_data_model_BACKEND" "\"${data_model}\"")
+if (NOT "${data_model}" STREQUAL "")
+  chip_gn_arg_append("chip_static_data_model_BACKEND" "\"${data_model}\"")
+endif()
 
 
 # Config the chip log level by IDF menuconfig

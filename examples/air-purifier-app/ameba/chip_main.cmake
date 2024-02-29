@@ -6,7 +6,9 @@ set(chip_dir "${ameba_matter_root}")
 set(chip_dir_output "${matter_output_path}/chip")
 set(dir "${sdk_root}/component/common/api")
 set(chip_main chip_main)
-set(list_chip_main_sources chip_main_sources)
+set(list_chip_main_sources chip_main_sources)get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
+set_property(GLOBAL PROPERTY gn_static_data_model_BACKEND "${CHIP_ROOT}/examples/air-purifier-app/air-purifier-common:air-purifier-common")
+
 
 if (matter_enable_rpc)
 set(pigweed_dir "${chip_dir}/third_party/pigweed/repo")

@@ -109,6 +109,11 @@ string(APPEND CHIP_GN_ARGS "ameba_cpu = \"ameba\"\n")
 string(APPEND CHIP_GN_ARGS "chip_inet_config_enable_ipv4 = false\n")
 string(APPEND CHIP_GN_ARGS "chip_use_transitional_commissionable_data_provider = true\n")
 
+get_property(data_model GLOBAL PROPERTY gn_static_data_model_BACKEND)
+if (NOT "${data_model}" STREQUAL "")
+  string(APPEND CHIP_GN_ARGS "chip_static_data_model_BACKEND=\"${data_model}\"")
+endif()
+
 # Enable persistent storage audit
 if (matter_enable_persistentstorage_audit)
 string(APPEND CHIP_GN_ARGS "chip_support_enable_storage_api_audit = true\n")
