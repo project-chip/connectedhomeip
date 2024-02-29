@@ -196,7 +196,8 @@
     <string name="wildcard_write_value_text">Write Value</string>
     <string name="wildcard_write_data_version_text">Data Version</string>
     <string name="wildcard_write_data_version_help_label">optional</string>
-    <string name="wildcard_invoke_value_text">Invoke Value</string>
+    <string name="wildcard_invoke_value_text">Invoke Value(Json)</string>
+    <string name="wildcard_invoke_value_help_label">Example: {"0:UINT":1}</string>
     <string name="wildcard_empty_error_toast_message">Please add it to the list using Add Button.</string>
     <string name="wildcard_subscribe_established_toast_message">Subscription established</string>
 
