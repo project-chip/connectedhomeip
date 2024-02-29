@@ -262,9 +262,8 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
 void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
-    BluezGattManager1 * gattMgr = BLUEZ_GATT_MANAGER1(aObject);
-
-    gboolean success = bluez_gatt_manager1_call_register_application_finish(gattMgr, aResult, &error.GetReceiver());
+    gboolean success = bluez_gatt_manager1_call_register_application_finish(reinterpret_cast<BluezGattManager1 *>(aObject), aResult,
+                                                                            &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, {
         ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message);
