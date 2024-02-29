@@ -382,7 +382,7 @@ void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBu
 {
     // TODO: right now we do not handle addition/removal of adapters
     // Primary focus here is to handle addition of a device
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject*>(aObject)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObject)));
     VerifyOrReturn(device.get() != nullptr);
 
     if (BluezIsDeviceOnAdapter(device.get(), mAdapter.get()) == TRUE)
