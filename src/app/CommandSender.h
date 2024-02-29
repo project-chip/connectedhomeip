@@ -619,6 +619,7 @@ private:
     PendingResponseTracker * mpPendingResponseTracker = nullptr;
 
     uint16_t mInvokeResponseMessageCount = 0;
+    uint16_t mFinishedCommandCount       = 0;
     uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
     State mState                = State::Idle;
