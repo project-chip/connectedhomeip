@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
  */
 #pragma once
 
-#include <app/util/privilege-constants.h>
-#include <lib/core/DataModelTypes.h>
-
-int MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute);
-int MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute);
-int MatterGetAccessPrivilegeForInvokeCommand(chip::ClusterId cluster, chip::CommandId command);
-int MatterGetAccessPrivilegeForReadEvent(chip::ClusterId cluster, chip::EventId event);
+inline constexpr int kMatterAccessPrivilegeView       = 0;
+inline constexpr int kMatterAccessPrivilegeOperate    = 1;
+inline constexpr int kMatterAccessPrivilegeManage     = 2;
+inline constexpr int kMatterAccessPrivilegeAdminister = 3;
+inline constexpr int kMatterAccessPrivilegeMaxValue   = kMatterAccessPrivilegeAdminister;

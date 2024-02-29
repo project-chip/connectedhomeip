@@ -20,7 +20,7 @@
 // Prevent multiple inclusion
 #pragma once
 
-#include <app/util/privilege-storage.h>
+#include <app/util/privilege-constants.h>
 
 // Prevent changing generated format
 // clang-format off
