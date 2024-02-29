@@ -40,19 +40,12 @@ public:
     ~BluezObjectList() { g_list_free_full(mObjectList, g_object_unref); }
 
     BluezObjectIterator begin() const { return BluezObjectIterator(mObjectList); }
-    BluezObjectIterator end() const { return BluezObjectIterator(); }
+    static BluezObjectIterator end() { return BluezObjectIterator(); }
 
 protected:
-    BluezObjectList() {}
-
     void Initialize(GDBusObjectManager * manager)
     {
-        if (manager == nullptr)
-        {
-            ChipLogError(DeviceLayer, "Manager is NULL in %s", __func__);
-            return;
-        }
-
+        VerifyOrReturn(manager != nullptr, ChipLogError(DeviceLayer, "Manager is NULL in %s", __func__));
         mObjectList = g_dbus_object_manager_get_objects(manager);
     }
 

@@ -17,13 +17,15 @@
 
 #pragma once
 
-#include <string>
+#include <cstdint>
 
 #include <gio/gio.h>
 
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
+#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -74,8 +76,8 @@ private:
     bool Advance();
 
     GDBusObjectManager * mManager = nullptr; // DBus connection
-    GList * mObjectList           = nullptr; // listing of objects on the bus
-    GList * mCurrentListItem      = nullptr; // current item viewed in the list
+    BluezObjectList mObjectList;
+    BluezObjectIterator mIterator;
     // Data valid only if Next() returns true
     GAutoPtr<BluezAdapter1> mCurrentAdapter;
 };
