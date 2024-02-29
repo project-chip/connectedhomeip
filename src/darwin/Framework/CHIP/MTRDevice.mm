@@ -1776,6 +1776,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [baseDevice openCommissioningWindowWithDiscriminator:discriminator duration:duration queue:queue completion:completion];
 }
 
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    auto * baseDevice = [self newBaseDevice];
+    [baseDevice downloadLogOfType:type
+                          timeout:timeout
+                            queue:queue
+                       completion:completion];
+}
+
 #pragma mark - Cache management
 
 // assume lock is held
