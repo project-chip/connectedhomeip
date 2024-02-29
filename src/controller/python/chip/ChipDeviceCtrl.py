@@ -252,8 +252,10 @@ class ChipDeviceControllerBase():
 
         self._InitLib()
 
+        pairingDelegate = c_void_p(None)
         devCtrl = c_void_p(None)
 
+        self.pairingDelegate = pairingDelegate
         self.devCtrl = devCtrl
         self.name = name
         self.fabricCheckNodeId = -1
@@ -262,7 +264,7 @@ class ChipDeviceControllerBase():
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
 
-    def _set_dev_ctrl(self, devCtrl):
+    def _set_dev_ctrl(self, devCtrl, pairingDelegate):
         def HandleCommissioningComplete(nodeid, err):
             if err.is_success:
                 print("Commissioning complete")
@@ -320,25 +322,26 @@ class ChipDeviceControllerBase():
                 if not err.is_success:
                     HandleCommissioningComplete(0, err)
 
+        self.pairingDelegate = pairingDelegate
         self.devCtrl = devCtrl
 
         self.cbHandlePASEEstablishmentCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(
             HandlePASEEstablishmentComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(
-            self.devCtrl, self.cbHandlePASEEstablishmentCompleteFunct)
+            self.pairingDelegate, self.cbHandlePASEEstablishmentCompleteFunct)
 
         self.cbHandleCommissioningCompleteFunct = _DevicePairingDelegate_OnCommissioningCompleteFunct(
             HandleCommissioningComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
-            self.devCtrl, self.cbHandleCommissioningCompleteFunct)
+            self.pairingDelegate, self.cbHandleCommissioningCompleteFunct)
 
         self.cbHandleFabricCheckFunct = _DevicePairingDelegate_OnFabricCheckFunct(HandleFabricCheck)
-        self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(self.cbHandleFabricCheckFunct)
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(self.pairingDelegate, self.cbHandleFabricCheckFunct)
 
         self.cbHandleOpenWindowCompleteFunct = _DevicePairingDelegate_OnOpenWindowCompleteFunct(
             HandleOpenWindowComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
-            self.devCtrl, self.cbHandleOpenWindowCompleteFunct)
+            self.pairingDelegate, self.cbHandleOpenWindowCompleteFunct)
 
         self.cbHandleDeviceUnpairCompleteFunct = _DeviceUnpairingCompleteFunct(HandleUnpairDeviceComplete)
 
@@ -388,8 +391,9 @@ class ChipDeviceControllerBase():
         if self.devCtrl is not None:
             self._ChipStack.Call(
                 lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
-                    self.devCtrl)
+                    self.devCtrl, self.pairingDelegate)
             ).raise_on_error()
+            self.pairingDelegate = None
             self.devCtrl = None
 
         ChipDeviceController.activeList.remove(self)
@@ -725,7 +729,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
-                self.devCtrl, nodeid, timeout, iteration, discriminator, option)
+                self.devCtrl, self.pairingDelegate, nodeid, timeout, iteration, discriminator, option)
         ).raise_on_error()
         self._ChipStack.callbackRes.raise_on_error()
         return self._ChipStack.openCommissioningWindowPincode[nodeid]
@@ -1514,15 +1518,12 @@ class ChipDeviceControllerBase():
             self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
             self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [
-                c_void_p]
+                c_void_p, c_void_p]
             self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [
                 c_void_p, c_uint16, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = PyChipError
-
-            self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
-                c_void_p, c_char_p, c_uint32, c_uint64]
 
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
                 c_char_p, c_uint32]
@@ -1559,7 +1560,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_Commission.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_OnNetworkCommission.argtypes = [
-                c_void_p, c_uint64, c_uint32, c_uint8, c_char_p, c_uint32]
+                c_void_p, c_void_p, c_uint64, c_uint32, c_uint8, c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
@@ -1597,6 +1598,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
                 c_void_p, c_uint32, c_uint16, c_uint64]
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_EstablishPASESession.argtypes = [
                 c_void_p, c_char_p, c_uint64]
             self._dmLib.pychip_DeviceController_EstablishPASESession.restype = PyChipError
@@ -1604,10 +1606,12 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
                 c_void_p]
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
                 c_void_p]
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
                 c_void_p, _ChipDeviceController_IterateDiscoveredCommissionableNodesFunct]
+
             self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode.argtypes = [c_void_p]
             self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode.restype = c_bool
 
@@ -1652,7 +1656,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.restype = PyChipError
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.argtypes = [
-                _DevicePairingDelegate_OnFabricCheckFunct]
+                c_void_p, _DevicePairingDelegate_OnFabricCheckFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.restype = PyChipError
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
@@ -1682,8 +1686,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_GetCompressedFabricId.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
-                c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
+                c_void_p, c_void_p, c_uint64, c_uint16, c_uint32, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = PyChipError
+
             self._dmLib.pychip_TestCommissionerUsed.argtypes = []
             self._dmLib.pychip_TestCommissionerUsed.restype = c_bool
 
@@ -1699,6 +1704,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage.argtypes = [
                 c_uint8]
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage.restype = c_bool
+
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.argtypes = [
                 c_uint8]
             self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport.restype = c_bool
@@ -1711,8 +1717,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
-                c_void_p, py_object, c_char_p, c_size_t, c_uint64
-            ]
+                c_void_p, py_object, c_char_p, c_size_t, c_uint64]
             self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
 
             self._dmLib.pychip_OpCreds_InitGroupTestingData.argtypes = [
@@ -1733,11 +1738,11 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_GetLogFilter = c_uint8
 
             self._dmLib.pychip_OpCreds_AllocateController.argtypes = [c_void_p, POINTER(
-                c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32, c_void_p]
+                c_void_p), POINTER(c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32, c_void_p]
             self._dmLib.pychip_OpCreds_AllocateController.restype = PyChipError
 
             self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.argtypes = [
-                POINTER(c_void_p), c_void_p, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, c_uint16, c_bool]
+                POINTER(c_void_p), POINTER(c_void_p), c_void_p, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, c_uint16, c_bool]
             self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetIpk.argtypes = [c_void_p, POINTER(c_char), c_size_t]
@@ -1759,6 +1764,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback(_IssueNOCChainCallbackPythonCallback)
 
+        pairingDelegate = c_void_p(None)
         devCtrl = c_void_p(None)
 
         c_catTags = (c_uint32 * len(catTags))()
@@ -1770,7 +1776,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._externalKeyPair = keypair
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(c_void_p(
-                opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags), None if keypair is None else keypair.native_object)
+                opCredsContext), pointer(devCtrl), pointer(pairingDelegate), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags), None if keypair is None else keypair.native_object)
         ).raise_on_error()
 
         self._fabricAdmin = fabricAdmin
@@ -1778,7 +1784,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._nodeId = nodeId
         self._caIndex = fabricAdmin.caIndex
 
-        self._set_dev_ctrl(devCtrl=devCtrl)
+        self._set_dev_ctrl(devCtrl=devCtrl, pairingDelegate=pairingDelegate)
 
         self._finish_init()
 
@@ -1926,7 +1932,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
-                self.devCtrl, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None, discoveryTimeoutMsec)
+                self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None, discoveryTimeoutMsec)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
@@ -2010,6 +2016,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
         '''
         super().__init__(name or f"ctrl(v/{adminVendorId})")
 
+        pairingDelegate = c_void_p(None)
         devCtrl = c_void_p(None)
 
         # Device should hold a reference to the key to avoid it being GC-ed.
@@ -2018,9 +2025,9 @@ class BareChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
-                c_void_p(devCtrl), nativeKey, noc, len(noc), icac, len(icac) if icac else 0, rcac, len(rcac), ipk, len(ipk) if ipk else 0, adminVendorId, self._ChipStack.enableServerInteractions)
+                c_void_p(devCtrl), c_void_p(pairingDelegate), nativeKey, noc, len(noc), icac, len(icac) if icac else 0, rcac, len(rcac), ipk, len(ipk) if ipk else 0, adminVendorId, self._ChipStack.enableServerInteractions)
         ).raise_on_error()
 
-        self._set_dev_ctrl(devCtrl)
+        self._set_dev_ctrl(devCtrl, pairingDelegate)
 
         self._finish_init()
