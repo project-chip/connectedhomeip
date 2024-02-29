@@ -115,6 +115,7 @@ class TizenBuilder(GnBuilder):
                 pass
 
         if app == TizenApp.TESTS:
+            self.extra_gn_options.append('chip_static_data_model_BACKEND="none"')
             self.extra_gn_options.append('chip_build_tests=true')
             self.build_command = 'check'
 

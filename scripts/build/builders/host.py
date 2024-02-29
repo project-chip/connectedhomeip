@@ -390,7 +390,7 @@ class HostBuilder(GnBuilder):
         if app == HostApp.TESTS:
             # building tests also seems to mean you CANNOT build applications at the
             # same time. This seems a bit un-intuitive...
-            self.extra_gn_options.append('chip_static_data_model_BACKEND="//src/controller/data_model:data_model"')
+            self.extra_gn_options.append('chip_static_data_model_BACKEND="none"')
             self.extra_gn_options.append('chip_build_tests=true')
             self.build_command = 'check'
 
