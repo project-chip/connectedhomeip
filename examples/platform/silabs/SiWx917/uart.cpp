@@ -132,7 +132,7 @@ int16_t uartLogWrite(const char * log, uint16_t length)
     {
         return UART_CONSOLE_ERR;
     }
-    for (int16_t i = 0; i < length; i++)
+    for (uint16_t i = 0; i < length; i++)
     {
         Board_UARTPutChar(log[i]);
     }
