@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/util/attribute-metadata.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/util/attribute-metadata.h>
 
 // This duplication of basic utilities is really unfortunate, but we can't link
 // to the normal attribute-storage.cpp because we redefine some of its symbols
