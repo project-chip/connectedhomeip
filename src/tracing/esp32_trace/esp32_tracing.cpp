@@ -152,37 +152,41 @@ void ESP32Backend::TraceCounter(const char * label)
     ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
 }
 
+void ESP32Backend::RegisterMetric(const char* key, ValueType type)
+{
+    switch (type)
+    {
+    case ValueType::kUInt32:
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */,
+                                    key /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
+                                    ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+        break;
+
+    case ValueType::kInt32:
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */,
+                                    key /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
+                                    ESP_DIAG_DATA_TYPE_INT /* data_type */);
+        break;
+
+    case ValueType::kChipErrorCode:
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */,
+                                    key /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
+                                    ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+        break;
+
+    case ValueType::kUndefined:
+        ESP_LOGE("mtr", "failed to register %s as its value is undefined", key);
+        break;
+    }
+
+    mRegisteredMetrics[key] = type;
+}
+
 void ESP32Backend::LogMetricEvent(const MetricEvent & event)
 {
-    using ValueType = MetricEvent::Value::Type;
-    if (!mRegistered)
-    {
-
-        switch (event.ValueType())
-        {
-        case ValueType::kUInt32:
-            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key() /* Unique key 8 */,
-                                      event.key() /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
-                                      ESP_DIAG_DATA_TYPE_UINT /* data_type */);
-            break;
-
-        case ValueType::kInt32:
-            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key() /* Unique key 8 */,
-                                      event.key() /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
-                                      ESP_DIAG_DATA_TYPE_INT /* data_type */);
-            break;
-
-        case ValueType::kChipErrorCode:
-            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, event.key() /* Unique key 8 */,
-                                      event.key() /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
-                                      ESP_DIAG_DATA_TYPE_UINT /* data_type */);
-            break;
-
-        case ValueType::kUndefined:
-            ESP_LOGE("mtr", "failed to register %s as its value is undefined", event.key());
-            break;
-        }
-        mRegistered = true;
+    
+    if (mRegisteredMetrics.find(event.key()) == mRegisteredMetrics.end()) {
+        RegisterMetric(event.key(), event.ValueType());
     }
 
     switch (event.ValueType())
@@ -234,6 +238,7 @@ void ESP32Backend::TraceInstant(const char * label, const char * group)
 {
     ESP_DIAG_EVENT("MTR_TRC", "Instant : %s -%s", label, group);
 }
+
 } // namespace Insights
 } // namespace Tracing
 } // namespace chip
