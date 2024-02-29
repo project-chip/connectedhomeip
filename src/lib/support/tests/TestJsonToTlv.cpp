@@ -151,6 +151,12 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                  "}\n";
     ConvertJsonToTlvAndValidate(byteSpan, jsonString);
 
+    // Empty bytes.
+    jsonString = "{\n"
+                 "   \"1:BYTES\" : \"\"\n"
+                 "}\n";
+    ConvertJsonToTlvAndValidate(ByteSpan{}, jsonString);
+
     DataModel::Nullable<uint8_t> nullValue;
     jsonString = "{\n"
                  "   \"1:NULL\" : null\n"

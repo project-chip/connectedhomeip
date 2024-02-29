@@ -103,18 +103,24 @@ void demoUIInit(GLIB_Context_t * context)
 
 sl_status_t updateDisplay(void)
 {
+    sl_status_t status = SL_STATUS_OK;
 #if SIWX_917 && SL_ICD_ENABLED && DISPLAY_ENABLED
     sl_memlcd_post_wakeup_init();
 #endif // SIWX_917 && SL_ICD_ENABLED && DISPLAY_ENABLED
 #if SL_LCDCTRL_MUX
-    sl_wfx_host_pre_lcd_spi_transfer();
+    status = sl_wfx_host_pre_lcd_spi_transfer();
+    if (status != SL_STATUS_OK)
+        return status;
 #endif // SL_LCDCTRL_MUX
-    sl_status_t status = DMD_updateDisplay();
-#if SL_LCDCTRL_MUX
-    sl_wfx_host_post_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+    status = DMD_updateDisplay();
     if (status != DMD_OK)
         return SL_STATUS_FAIL;
+#if SL_LCDCTRL_MUX
+    status = sl_wfx_host_post_lcd_spi_transfer();
+    if (status != SL_STATUS_OK)
+        return status;
+#endif // SL_LCDCTRL_MUX
+
     return SL_STATUS_OK;
 }
 

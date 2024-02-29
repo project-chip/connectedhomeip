@@ -181,7 +181,7 @@
       android:layout_height="wrap_content"
       android:layout_margin="16dp"
       android:visibility="gone"
-      android:inputType="number" />
+      android:inputType="text" />
 
   <TextView
       android:id="@+id/writeValueTypeLabel"
@@ -235,7 +235,8 @@
       android:layout_height="wrap_content"
       android:layout_margin="16dp"
       android:visibility="gone"
-      android:inputType="number"/>
+      android:inputType="text"
+      android:hint="@string/wildcard_invoke_value_help_label"/>
 
   <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/addLayout"
