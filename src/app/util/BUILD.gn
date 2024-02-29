@@ -17,8 +17,18 @@ import("${chip_root}/src/app/common_flags.gni")
 
 source_set("types") {
   sources = [
+    "attribute-metadata.cpp",
     "attribute-metadata.h",
     "basic-types.h",
+    "ember-strings.cpp",
+    "ember-strings.h",
     "types_stub.h",
   ]
+
+  deps = [
+    "${chip_root}/src/app/common:attribute-type",
+    "${chip_root}/src/lib/core:encoding",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }

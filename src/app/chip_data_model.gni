@@ -215,7 +215,6 @@ template("chip_data_model") {
       "${_app_root}/util/binding-table.cpp",
       "${_app_root}/util/binding-table.h",
       "${_app_root}/util/generic-callback-stubs.cpp",
-      "${_app_root}/util/message.cpp",
       "${_app_root}/util/privilege-storage.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
@@ -418,8 +417,10 @@ template("chip_data_model") {
       ":${_data_model_name}_codegen",
       ":${_data_model_name}_zapgen",
       "${chip_root}/src/app",
+      "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/app/common:enums",
+      "${chip_root}/src/app/util:types",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",

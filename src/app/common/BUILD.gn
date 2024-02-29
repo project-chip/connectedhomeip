@@ -18,6 +18,12 @@ config("includes") {
   include_dirs = [ "${chip_root}/zzz_generated/app-common" ]
 }
 
+source_set("attribute-type") {
+  sources = [ "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attribute-type.h" ]
+
+  public_configs = [ ":includes" ]
+}
+
 source_set("ids") {
   sources = [
     "${chip_root}/zzz_generated/app-common/app-common/zap-generated/ids/Attributes.h",
