@@ -18,10 +18,15 @@
 
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
+
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
+#include <app/clusters/power-source-server/power-source-server.h>
 #include <app/server/Server.h>
+
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -31,6 +36,10 @@ using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
+using namespace chip::app::Clusters::PowerSource;
+using namespace chip::app::Clusters::PowerSource::Attributes;
+
+using Protocols::InteractionModel::Status;
 
 CHIP_ERROR EVSEManufacturer::Init()
 {
@@ -48,6 +57,7 @@ CHIP_ERROR EVSEManufacturer::Init()
 
     ReturnErrorOnFailure(InitializePowerMeasurementCluster());
 
+    ReturnErrorOnFailure(InitializePowerSourceCluster());
     /*
      * This is an example implementation for manufacturers to consider
      *
@@ -106,6 +116,38 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     ReturnErrorOnFailure(dg->SetPowerMode(PowerModeEnum::kAc));
+
+    return CHIP_NO_ERROR;
+}
+
+/**
+ * @brief   Allows a client application to initialise the PowerSource cluster
+ */
+CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster()
+{
+    Protocols::InteractionModel::Status status;
+
+    status = PowerSource::Attributes::Status::Set(EndpointId(0) /*RootNode*/, PowerSourceStatusEnum::kActive);
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    status =
+        PowerSource::Attributes::FeatureMap::Set(EndpointId(0 /*RootNode*/), static_cast<uint32_t>(PowerSource::Feature::kWired));
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    status = PowerSource::Attributes::WiredNominalVoltage::Set(EndpointId(0 /*RootNode*/), 230'000); // 230V in mv
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    status = PowerSource::Attributes::WiredMaximumCurrent::Set(EndpointId(0 /*RootNode*/), 32'000); // 32A in mA
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+
+    status = PowerSource::Attributes::WiredCurrentType::Set(EndpointId(0 /*RootNode*/), PowerSource::WiredCurrentTypeEnum::kAc);
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    status = PowerSource::Attributes::Description::Set(EndpointId(0 /*RootNode*/), CharSpan::fromCharString("Primary Mains Power"));
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+
+    chip::EndpointId endpointArray[] = { 1 /* EVSE Endpoint */ };
+    Span<EndpointId> endpointList    = Span<EndpointId>(endpointArray);
+
+    // Note per API - we do not need to maintain the span after the SetEndpointList has been called
+    // since it takes a copy (see power-source-server.cpp)
+    PowerSourceServer::Instance().SetEndpointList(0 /* Root Node */, endpointList);
 
     return CHIP_NO_ERROR;
 }

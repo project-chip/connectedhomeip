@@ -31,7 +31,7 @@ namespace {
 // Gets the CommandRef if available. Error returned if we expected CommandRef and it wasn't
 // provided in the response.
 template <typename ParserT>
-CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefExpected)
+CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefRequired)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t ref;
@@ -40,7 +40,7 @@ CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefExp
     VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, err);
     if (err == CHIP_END_OF_TLV)
     {
-        if (commandRefExpected)
+        if (commandRefRequired)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -364,7 +364,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         bool hasDataResponse = false;
         TLV::TLVReader commandDataReader;
         Optional<uint16_t> commandRef;
-        bool commandRefExpected = mpPendingResponseTracker && (mpPendingResponseTracker->Count() > 1);
+        bool commandRefRequired = (mFinishedCommandCount > 1);
 
         CommandStatusIB::Parser commandStatus;
         err = aInvokeResponse.GetStatus(&commandStatus);
@@ -379,7 +379,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             StatusIB::Parser status;
             commandStatus.GetErrorStatus(&status);
             ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
-            ReturnErrorOnFailure(GetRef(commandStatus, commandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandStatus, commandRef, commandRefRequired));
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -391,7 +391,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
             commandData.GetFields(&commandDataReader);
-            ReturnErrorOnFailure(GetRef(commandData, commandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandData, commandRef, commandRefRequired));
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
         }
@@ -430,7 +430,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
                 // 2. The current InvokeResponse is for a request we never sent (based on its commandRef).
                 // Used when logging errors related to server violating spec.
                 [[maybe_unused]] ScopedNodeId remoteScopedNode;
-                if (mExchangeCtx.Get()->HasSessionHandle())
+                if (mExchangeCtx.Get() && mExchangeCtx.Get()->HasSessionHandle())
                 {
                     remoteScopedNode = mExchangeCtx.Get()->GetSessionHandle()->GetPeer();
                 }
@@ -439,6 +439,15 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
                              ChipLogValueScopedNodeId(remoteScopedNode), commandRef.Value());
                 return err;
             }
+        }
+
+        if (!commandRef.HasValue() && !commandRefRequired && mpPendingResponseTracker != nullptr &&
+            mpPendingResponseTracker->Count() == 1)
+        {
+            // We have sent out a single invoke request. As per spec, server in this case doesn't need to provide the CommandRef
+            // in the response. This is allowed to support communicating with a legacy server. In this case we assume the response
+            // is associated with the only command we sent out.
+            commandRef = mpPendingResponseTracker->PopPendingResponse();
         }
 
         // When using ExtendableCallbacks, we are adhering to a different API contract where path
@@ -490,8 +499,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
 
     if (mpPendingResponseTracker != nullptr)
     {
-        size_t pendingCount = mpPendingResponseTracker->Count();
-        VerifyOrReturnError(pendingCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
+        VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
     }
 
     if (mBatchCommandsEnabled)
@@ -553,6 +561,7 @@ CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinis
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
 
     MoveToState(State::AddedCommand);
+    mFinishedCommandCount++;
 
     if (mpPendingResponseTracker && aFinishCommandParams.commandRef.HasValue())
     {
