@@ -25,4 +25,7 @@ default_args = {
   target_os = "freertos"
   chip_enable_wifi = true
   import("//build_for_wifi_args.gni")
+
+  chip_static_data_model_BACKEND =
+    "${chip_root}/examples/pump-app/pump-common:pump-common"
 }

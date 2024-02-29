@@ -27,4 +27,7 @@ default_args = {
   optimize_debug_level = "s"
 
   import("//openthread.gni")
+
+  chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lighting-app/lighting-common:lighting-common"
 }

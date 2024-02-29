@@ -27,4 +27,7 @@ default_args = {
   chip_openthread_ftd = false
 
   import("//openthread.gni")
+
+  chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lit-icd-app/lit-icd-common:lit-icd-common"
 }
