@@ -14,6 +14,8 @@ configure_file(
     @ONLY
 )
 
+set_property(GLOBAL PROPERTY gn_static_data_model_BACKEND "${CHIP_ROOT}/examples/lock-app/lock-common:lock-common")
+
 set(MBED_PATH ${MBED_OS_PATH} CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
 set(MCUBOOT_PATH ${MBED_MCU_BOOT_PATH} CACHE INTERNAL "")
