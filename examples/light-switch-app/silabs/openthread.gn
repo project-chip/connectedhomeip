@@ -27,6 +27,5 @@ default_args = {
 
   import("//openthread.gni")
 
-  chip_static_data_model_BACKEND =
-    "${chip_root}/examples/light-switch-app/light-switch-common:light-switch-common"
+  chip_static_data_model_BACKEND = "${chip_root}/examples/light-switch-app/light-switch-common:light-switch-common"
 }

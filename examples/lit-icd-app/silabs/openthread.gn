@@ -29,5 +29,5 @@ default_args = {
   import("//openthread.gni")
 
   chip_static_data_model_BACKEND =
-    "${chip_root}/examples/lit-icd-app/lit-icd-common:lit-icd-common"
+      "${chip_root}/examples/lit-icd-app/lit-icd-common:lit-icd-common"
 }

@@ -28,5 +28,5 @@ default_args = {
   import("//openthread.gni")
 
   chip_static_data_model_BACKEND =
-    "${chip_root}/examples/thermostat/thermostat-common:thermostat-common"
+      "${chip_root}/examples/thermostat/thermostat-common:thermostat-common"
 }
