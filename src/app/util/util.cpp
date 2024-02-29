@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -45,11 +44,6 @@ using chip::Protocols::InteractionModel::Status;
 
 //------------------------------------------------------------------------------
 // Globals
-
-const EmberAfClusterName zclClusterNames[] = {
-    CLUSTER_IDS_TO_NAMES            // defined in print-cluster.h
-    { kInvalidClusterId, nullptr }, // terminator
-};
 
 #ifdef MATTER_DM_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 MATTER_DM_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -176,21 +170,6 @@ void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************
-
-uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
-{
-    static_assert(sizeof(ClusterId) == 4, "May need to adjust our index type or somehow define it in terms of cluster id type");
-    uint16_t index = 0;
-    while (zclClusterNames[index].id != kInvalidClusterId)
-    {
-        if (zclClusterNames[index].id == cluster)
-        {
-            return index;
-        }
-        index++;
-    }
-    return 0xFFFF;
-}
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
 {
