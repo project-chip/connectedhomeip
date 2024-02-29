@@ -152,26 +152,23 @@ void ESP32Backend::TraceCounter(const char * label)
     ::Insights::ESPInsightsCounter::GetInstance(label)->ReportMetrics();
 }
 
-void ESP32Backend::RegisterMetric(const char* key, ValueType type)
+void ESP32Backend::RegisterMetric(const char * key, ValueType type)
 {
     switch (type)
     {
     case ValueType::kUInt32:
-        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */,
-                                    key /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
-                                    ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
+                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_UINT /* data_type */);
         break;
 
     case ValueType::kInt32:
-        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */,
-                                    key /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
-                                    ESP_DIAG_DATA_TYPE_INT /* data_type */);
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
+                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
         break;
 
     case ValueType::kChipErrorCode:
-        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */,
-                                    key /* label displayed on dashboard */, "insights.mtr" /* hierarchical path */,
-                                    ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+        esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
+                                  "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_UINT /* data_type */);
         break;
 
     case ValueType::kUndefined:
@@ -184,8 +181,9 @@ void ESP32Backend::RegisterMetric(const char* key, ValueType type)
 
 void ESP32Backend::LogMetricEvent(const MetricEvent & event)
 {
-    
-    if (mRegisteredMetrics.find(event.key()) == mRegisteredMetrics.end()) {
+
+    if (mRegisteredMetrics.find(event.key()) == mRegisteredMetrics.end())
+    {
         RegisterMetric(event.key(), event.ValueType());
     }
 

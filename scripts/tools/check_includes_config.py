@@ -160,6 +160,9 @@ ALLOW: Dict[str, Set[str]] = {
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
     'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map'},
 
+    # esp32 tracing
+    'src/tracing/esp32_trace/esp32_tracing.h': {'unordered_map'},
+
     # Not intended for embedded clients
     'src/app/PendingResponseTrackerImpl.h': {'unordered_set'},
 
