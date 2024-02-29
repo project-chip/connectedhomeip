@@ -50,10 +50,9 @@ CHIP_ERROR CASEClient::EstablishSession(const CASEClientInitParams & params, con
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
     mCASESession.SetGroupDataProvider(params.groupDataProvider);
-    // EstablishSession defaults to using the local MRP config, which is what we want.
     ReturnErrorOnFailure(mCASESession.EstablishSession(*params.sessionManager, params.fabricTable, peer, exchange,
                                                        params.sessionResumptionStorage, params.certificateValidityPolicy, delegate,
-                                                       NullOptional));
+                                                       params.mrpLocalConfig));
 
     return CHIP_NO_ERROR;
 }

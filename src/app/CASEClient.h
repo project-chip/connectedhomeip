@@ -35,6 +35,11 @@ struct CASEClientInitParams
     FabricTable * fabricTable                                          = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
 
+    // mrpLocalConfig should not generally be set to anything other than
+    // NullOptional.  Doing that can lead to different parts of the system
+    // claiming different MRP parameters for the same node.
+    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = NullOptional;
+
     CHIP_ERROR Validate() const
     {
         // sessionResumptionStorage can be nullptr when resumption is disabled.
