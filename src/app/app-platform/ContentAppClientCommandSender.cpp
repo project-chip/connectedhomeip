@@ -34,7 +34,7 @@ CHIP_ERROR ContentAppClientCommandSender::SendContentAppMessage(chip::Controller
     mData          = std::string(data);
     mEncodingHint  = std::string(encodingHint);
 
-    ChipLogProgress(Controller, "Sending command to node 0x%" PRIx64, mDestinationId);
+    ChipLogProgress(Controller, "Sending command to node 0x" ChipLogFormatX64, ChipLogValueX64(mDestinationId));
 
     return commissioner->GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }

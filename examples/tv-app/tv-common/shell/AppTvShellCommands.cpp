@@ -305,6 +305,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
             ChipLogProgress(DeviceLayer, "     node[%d] " ChipLogFormatX64, i, ChipLogValueX64(node));
         }
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else if (strcmp(argv[0], "appobserver") == 0)
     {
         if (argc < 5)
@@ -337,6 +338,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 
         return CHIP_NO_ERROR;
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else if (strcmp(argv[0], "setpin") == 0)
     {
         if (argc < 3)
