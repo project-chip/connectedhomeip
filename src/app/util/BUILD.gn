@@ -20,8 +20,8 @@ source_set("types") {
     "attribute-metadata.cpp",
     "attribute-metadata.h",
     "basic-types.h",
-    "strings.cpp",
-    "strings.h",
+    "ember-strings.cpp",
+    "ember-strings.h",
     "types_stub.h",
   ]
 

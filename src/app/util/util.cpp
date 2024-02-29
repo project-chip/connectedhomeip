@@ -24,8 +24,8 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
-#include <app/util/strings.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEncoding.h>
 #include <protocols/interaction_model/StatusCode.h>

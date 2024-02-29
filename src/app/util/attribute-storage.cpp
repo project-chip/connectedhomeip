@@ -22,8 +22,8 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
-#include <app/util/strings.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
