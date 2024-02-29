@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app/util/af.h>
-#include <app/util/util.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
