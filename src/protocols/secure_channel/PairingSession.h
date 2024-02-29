@@ -238,7 +238,7 @@ protected:
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
     // mRemoteSessionParams is received from other end and set to our session.
-    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
+    ReliableMessageProtocolConfig mLocalMRPConfig = GetDefaultMRPConfig();
     SessionParameters mRemoteSessionParams;
 
 private:
