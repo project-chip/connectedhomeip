@@ -19,3 +19,6 @@ import("${chip_root}/src/platform/Infineon/PSOC6/args.gni")
 
 psoc6_target_project =
     get_label_info(":lighting_app_sdk_sources", "label_no_toolchain")
+
+chip_static_data_model_BACKEND =
+    "${chip_root}/examples/lighting-app/lighting-common:lighting-common"
