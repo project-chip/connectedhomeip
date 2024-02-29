@@ -497,10 +497,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled && mUseExtendableCallback);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
 
-    if (mpPendingResponseTracker != nullptr)
-    {
-        VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
-    }
+    VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
     if (mBatchCommandsEnabled)
     {
