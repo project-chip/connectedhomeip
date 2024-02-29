@@ -104,7 +104,7 @@ public:
     /**
      * Encode the Session Parameters using the provided TLV tag.
      */
-    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const Optional<ReliableMessageProtocolConfig> & mrpLocalConfig,
+    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
                                               TLV::TLVWriter & tlvWriter);
 
 protected:
@@ -238,7 +238,7 @@ protected:
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
     // mRemoteSessionParams is received from other end and set to our session.
-    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
+    ReliableMessageProtocolConfig mLocalMRPConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
     SessionParameters mRemoteSessionParams;
 
 private:
