@@ -17,6 +17,7 @@
 #include <app/util/DataModelHandler.h>
 
 #include <app/util/attribute-storage.h>
+#include <app/util/util.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
