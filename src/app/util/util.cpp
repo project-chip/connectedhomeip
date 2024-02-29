@@ -39,18 +39,6 @@ using namespace chip;
 
 using chip::Protocols::InteractionModel::Status;
 
-//------------------------------------------------------------------------------
-// Forward Declarations
-
-//------------------------------------------------------------------------------
-// Globals
-
-#ifdef MATTER_DM_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
-MATTER_DM_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
-#endif
-
-//------------------------------------------------------------------------------
-
 // Is the device identifying?
 bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
