@@ -122,7 +122,8 @@ void CommissionerDiscoveryController::Ok()
 {
     ChipLogDetail(AppServer, "UX Ok: moving to main thread");
     // need to ensure callback is on main chip thread
-    chip::DeviceLayer::StackLock lock;
+    // chip::DeviceLayer::StackLock lock;
+    assertChipStackLockedByCurrentThread();
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackOk, this);
 }
 

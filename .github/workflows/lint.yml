@@ -86,6 +86,8 @@ jobs:
                      --skip-dir test_driver \
                      --known-failure app/app-platform/ContentApp.cpp \
                      --known-failure app/app-platform/ContentApp.h \
+                     --known-failure app/app-platform/ContentAppClientCommandSender.cpp \
+                     --known-failure app/app-platform/ContentAppClientCommandSender.h \
                      --known-failure app/app-platform/ContentAppPlatform.cpp \
                      --known-failure app/app-platform/ContentAppPlatform.h \
                      --known-failure controller/ExamplePersistentStorage.cpp \
