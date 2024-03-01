@@ -29,6 +29,18 @@ if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
 
+source_set("nxp_diagnostic_logs") {
+  sources = [
+      "../../common/DiagnosticLogsProviderDelegateImpl.cpp",
+      "../../common/DiagnosticLogsProviderDelegateImpl.h",
+  ]
+
+  deps = [
+    ":nxp_platform",
+    "${chip_root}/src/platform:platform"
+  ]
+}
+
 static_library("nxp_platform") {
   defines = [ "CHIP_DEVICE_K32W1=1" ]
 

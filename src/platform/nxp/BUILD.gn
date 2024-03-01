@@ -19,3 +19,11 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 group("nxp") {
   public_deps = [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_platform" ]
 }
+
+# The application can use this target to integrate the default, platform-specific
+# NXP Diagnostic Logs implementation. Each platform should define an
+# "nxp_diagnostic_logs" source set.
+# Usage: deps += [ "${chip_root}/src/platform/nxp:nxp_diagnostic_logs" ]
+group("nxp_diagnostic_logs") {
+  public_deps = [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_diagnostic_logs" ]
+}
