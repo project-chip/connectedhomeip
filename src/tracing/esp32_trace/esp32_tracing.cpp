@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include <esp_err.h>
 #include <esp_heap_caps.h>
 #include <esp_insights.h>
 #include <esp_log.h>
@@ -154,6 +155,20 @@ void ESP32Backend::TraceCounter(const char * label)
 
 void ESP32Backend::RegisterMetric(const char * key, ValueType type)
 {
+    // Check for the same key will not have two different types.
+    if (mRegisteredMetrics.find(key) != mRegisteredMetrics.end())
+    {
+        if (mRegisteredMetrics[key] != type)
+        {
+            ESP_LOGE("SYS.MTR", "Type mismatch for metric key %s", key);
+            return;
+        }
+        else
+        {
+            return;
+        }
+    }
+
     switch (type)
     {
     case ValueType::kUInt32:
@@ -181,7 +196,6 @@ void ESP32Backend::RegisterMetric(const char * key, ValueType type)
 
 void ESP32Backend::LogMetricEvent(const MetricEvent & event)
 {
-
     if (mRegisteredMetrics.find(event.key()) == mRegisteredMetrics.end())
     {
         RegisterMetric(event.key(), event.ValueType());
