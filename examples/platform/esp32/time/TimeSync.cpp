@@ -26,10 +26,11 @@ static constexpr uint32_t kSecondsInADay        = 24 * 60 * 60;
 
 namespace {
 const uint8_t kMaxNtpServerStringSize = 128;
-char mSntpServerName[kMaxNtpServerStringSize];
+char sSntpServerName[kMaxNtpServerStringSize];
 
 CHIP_ERROR GetLocalTimeString(char * buf, size_t buf_len)
 {
+    VerifyOrReturnError(buf_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
     struct tm timeinfo;
     char strftime_buf[64];
     time_t now;
@@ -85,14 +86,14 @@ namespace chip {
 namespace Esp32TimeSync {
 void Init(const char * aSntpServerName, const uint16_t aSyncSntpIntervalDay)
 {
-    chip::Platform::CopyString(mSntpServerName, aSntpServerName);
+    chip::Platform::CopyString(sSntpServerName, aSntpServerName);
     if (esp_sntp_enabled())
     {
         ChipLogProgress(DeviceLayer, "SNTP already initialized.");
     }
-    ChipLogProgress(DeviceLayer, "Initializing SNTP. Using the SNTP server: %s", mSntpServerName);
+    ChipLogProgress(DeviceLayer, "Initializing SNTP. Using the SNTP server: %s", sSntpServerName);
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    esp_sntp_setservername(0, mSntpServerName);
+    esp_sntp_setservername(0, sSntpServerName);
     esp_sntp_set_sync_interval(kSecondsInADay * aSyncSntpIntervalDay);
     esp_sntp_init();
     sntp_set_time_sync_notification_cb(TimeSyncCallback);
