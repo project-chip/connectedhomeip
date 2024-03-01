@@ -194,12 +194,18 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
 PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
     chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+
 PyChipError
 pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
                                                           chip::Controller::DevicePairingDelegate_OnFabricCheckFunct callback);
+
 PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
     chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
     chip::Controller::DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
+
+PyChipError
+pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete(chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+                                                               bool value);
 
 // BLE
 PyChipError pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
@@ -715,6 +721,14 @@ pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(chip::Controller::Scri
                                                           chip::Controller::DevicePairingDelegate_OnFabricCheckFunct callback)
 {
     pairingDelegate->SetFabricCheckCallback(callback);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError
+pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete(chip::Controller::ScriptDevicePairingDelegate * pairingDelegate,
+                                                               bool value)
+{
+    pairingDelegate->SetExpectingPairingComplete(value);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 

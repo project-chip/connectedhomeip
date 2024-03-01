@@ -357,6 +357,11 @@ class ChipDeviceControllerBase():
 
         ChipDeviceController.activeList.add(self)
 
+    def _enablePairingCompeleteCallback(self, value: bool):
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete(self.pairingDelegate, value)
+        ).raise_on_error()
+
     @property
     def fabricAdmin(self) -> FabricAdmin.FabricAdmin:
         return self._fabricAdmin
@@ -440,6 +445,7 @@ class ChipDeviceControllerBase():
         self._ChipStack.commissioningCompleteEvent.clear()
 
         self.state = DCState.COMMISSIONING
+        self._enablePairingCompeleteCallback(True)
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                 self.devCtrl, discriminator, setupPinCode, nodeid)
@@ -490,6 +496,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
+        self._enablePairingCompeleteCallback(True)
         return self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
                 self.devCtrl, setupPinCode, discriminator, nodeid)
@@ -499,6 +506,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
+        self._enablePairingCompeleteCallback(True)
         return self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
@@ -508,6 +516,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
+        self._enablePairingCompeleteCallback(True)
         return self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
                 self.devCtrl, setUpCode.encode("utf-8"), nodeid)
@@ -1659,6 +1668,10 @@ class ChipDeviceControllerBase():
                 c_void_p, _DevicePairingDelegate_OnFabricCheckFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.restype = PyChipError
 
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete.argtypes = [
+                c_void_p, c_bool]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetExpectingPairingComplete.restype = PyChipError
+
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, py_object, _DeviceAvailableCallbackFunct]
             self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = PyChipError
@@ -1930,6 +1943,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
+        self._enablePairingCompeleteCallback(True)
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                 self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None, discoveryTimeoutMsec)
@@ -1953,6 +1967,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
+        self._enablePairingCompeleteCallback(True)
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
                 self.devCtrl, setupPayload, nodeid, discoveryType.value)
@@ -1972,6 +1987,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
+        self._enablePairingCompeleteCallback(True)
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
