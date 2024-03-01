@@ -16,12 +16,21 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/src/app/chip_data_model.gni")
+
+chip_data_model("all-clusters-common") {
+  zap_file = "all-clusters-app.zap"
+
+  zap_pregenerated_dir =
+      "${chip_root}/zzz_generated/all-clusters-app/zap-generated"
+  is_server = true
+}
+
 assert(chip_device_platform == "renesas")
 
 static_library("renesas") {
   sources = [
     "../SingletonConfigurationManager.cpp",
-    #"BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
@@ -49,6 +58,6 @@ static_library("renesas") {
   deps = [ "${chip_root}/src/crypto" ]
 
   public_deps = [ "${chip_root}/src/lib/dnssd:platform_header",
-                "${chip_root}/src/platform:platform_base" ]
+                  "${chip_root}/src/platform:platform_base" ]
 
 }

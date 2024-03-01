@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/src/platform/renesas/args.gni")
@@ -38,14 +39,18 @@ chip_project_config_include_dirs =
     "//../../../../../renesas/fsp/ra/fsp/src/rm_freertos_port/",
     "//../../../../../renesas/fsp/ra/fsp/inc/",
     "//../../../../../renesas/fsp/ra/fsp/inc/api",
+    "//../../../../../renesas/fsp/ra/fsp/src/r_sce/common/",
+    "//../../../../../renesas/fsp/ra/fsp/src/r_sce/",
+    "//../../../../../renesas/fsp/ra/fsp/src/rm_psa_crypto/inc/",
     "//../../../../../../application_ICS2000/ra_cfg/fsp_cfg/bsp",
     "//../../../../../../application_ICS2000/ra_cfg/fsp_cfg",
     "//../../../../../../application_ICS2000/ra_gen/",
     "//../../../../../../common/common_ra_cfg/fsp_cfg/bsp/",
     "//../../../../../../common/common_ra_cfg/fsp_cfg/",
-    "//../../../../../ARM-software/CMSIS_5/CMSIS/Core/Include/",
     "//../../../../../../common/common_peripherals/include/",
     "//../../../../../../common/lwip-port/",
     "//../../../../../../common/generic/",
+    "//../../../../../ARM-software/CMSIS_5/CMSIS/Core/Include/",
+    "//../../../../../ARMmbed/mbedtls/include/",
     "//../../../../../segger-rtt/rtt/"
     ]

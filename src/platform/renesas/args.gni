@@ -24,8 +24,8 @@ custom_toolchain = "${build_root}/toolchain/arm_gcc"
 arm_platform_config = "${renesas_sdk_build_root}/renesas_arm.gni"
 
 chip_target_style = "embedded"
-#chip_crypto = "mbedtls"
-chip_crypto = "platform"
+chip_external_mbedtls = true
+chip_crypto = "mbedtls"
 
 chip_device_platform = "renesas"
 chip_mdns = "platform"
@@ -37,9 +37,10 @@ chip_enable_ble = false
 lwip_platform = "external"
 
 chip_inet_config_enable_ipv4 = false
-chip_inet_config_enable_ipv6 = false
+chip_inet_config_enable_ipv6 = true
 chip_inet_config_enable_tcp_endpoint = false
-chip_inet_config_enable_udp_endpoint = false
+chip_inet_config_enable_udp_endpoint = true
+chip_max_discovered_ip_addresses = 4
 chip_system_config_use_open_thread_inet_endpoints = false
 chip_with_lwip = true
 chip_inet_config_enable_dns_resolver = false
@@ -48,11 +49,8 @@ chip_system_config_locking = "none"
 chip_system_config_use_sockets = false
 chip_build_default_attestation_verifier = true
 
-
-optimize_debug_level = "s"
+no_exceptions = true
+optimize_debug_level = "g"
 lwip_debug = false
-default_configs_optimize = [ "$dir_pw_build:optimize_size" ]
 
 chip_build_tests = false
-
-

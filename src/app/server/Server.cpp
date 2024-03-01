@@ -75,7 +75,8 @@ class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolve
 public:
     bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override
     {
-        return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
+        //return chip::app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
+        return false;
     }
 } sDeviceTypeResolver;
 

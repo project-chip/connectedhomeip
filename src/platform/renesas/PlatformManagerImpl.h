@@ -37,79 +37,18 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 {
     friend PlatformManager;
 
-public:
-    bool _IsChipStackLockedByCurrentThread() const { return true; };
-
 private:
-
-    CHIP_ERROR _InitChipStack() { return CHIP_NO_ERROR; }
-    void _Shutdown() {}
-
     CHIP_ERROR _AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
     void _HandleServerStarted() {}
     void _HandleServerShuttingDown() {}
     CHIP_ERROR _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    void _RunEventLoop()
-    {
-        do
-        {
-            ProcessDeviceEvents();
-        } while (mShouldRunEventLoop);
-    }
-
-    void ProcessDeviceEvents()
-    {
-        while (!mQueue.empty())
-        {
-            const ChipDeviceEvent & event = mQueue.front();
-            _DispatchEvent(&event);
-            mQueue.pop();
-        }
-    }
-
-    CHIP_ERROR _StartEventLoopTask() { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    CHIP_ERROR _StopEventLoopTask()
-    {
-        mShouldRunEventLoop = false;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR _PostEvent(const ChipDeviceEvent * event)
-    {
-        mQueue.emplace(*event);
-        return CHIP_NO_ERROR;
-    }
-
-    void _DispatchEvent(const ChipDeviceEvent * event)
-    {
-        switch (event->Type)
-        {
-        case DeviceEventType::kChipLambdaEvent:
-            event->LambdaEvent();
-            break;
-
-        default:
-            break;
-        }
-    }
-
-    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    void _LockChipStack() {}
-    bool _TryLockChipStack() { return true; }
-    void _UnlockChipStack() {}
-
     friend PlatformManager & PlatformMgr();
     friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
-
-    bool mShouldRunEventLoop = true;
-    std::queue<ChipDeviceEvent> mQueue;
 };
 
 /**

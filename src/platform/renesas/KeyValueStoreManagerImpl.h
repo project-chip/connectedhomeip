@@ -34,6 +34,7 @@ public:
     CHIP_ERROR _Delete(const char * key) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
+    CHIP_ERROR Init() { return CHIP_NO_ERROR; };
 private:
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();

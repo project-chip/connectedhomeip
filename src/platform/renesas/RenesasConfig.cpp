@@ -91,7 +91,7 @@ CHIP_ERROR RenesasConfig::WriteConfigValueBin(Key key, const void * data, size_t
     if (dataLen == 0)
         return CHIP_NO_ERROR;
 
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR RenesasConfig::ClearConfigValue(Key key)

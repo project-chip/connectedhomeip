@@ -24,12 +24,21 @@ declare_args() {
   setupDiscriminator = 3840
 }
 
-group("chip-lock-app")
+static_library("chip-lock-app")
 {
+  output_name = "libRenesasChip"
+  output_dir = "${root_out_dir}/lib"
+  complete_static_lib = true
   deps = [
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
+    "${chip_root}/src/controller",
+    "//third_party/connectedhomeip/src/app:app",
+    "${chip_root}/src/platform/logging:stdio",
+    "${chip_root}/examples/lock-app/lock-common",
+    "//third_party/connectedhomeip/src/credentials:credentials"
   ]
+  libs = ["lib", "access", "credentials"]
 }
 
 group("renesas") {
@@ -40,6 +49,16 @@ group("default") {
   deps = [
         "//:chip-lock-app",
         "//:renesas",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-cluster-service",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-common",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-common_codegen",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-common_codegen_codegen",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-common_codegen_codegen._metadata_path_list.txt",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-common_zapgen",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-common_zapgen_files",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-common_zapgen_files._metadata_path_list.txt",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-common_zapgen_zap_pregen",
+        "//third_party/connectedhomeip/examples/lock-app/lock-common:lock-common_zapgen_zap_pregen._metadata_path_list.txt",
         "//third_party/connectedhomeip/src/access:access",
         "//third_party/connectedhomeip/src/app:app",
         "//third_party/connectedhomeip/src/app:app_config",
