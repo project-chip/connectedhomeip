@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import "zap-generated/MCClusterObjects.h"
 #import "MCCluster_Internal.h"
+#import "zap-generated/MCClusterObjects.h"
 
 #import "MCEndpoint_Internal.h"
 

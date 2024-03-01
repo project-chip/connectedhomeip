@@ -27,8 +27,8 @@ namespace casting {
 namespace core {
 
 template <typename TypeInfo>
-using ReadResponseSuccessCallbackFn =
-    std::function<void(void * context, chip::Optional<typename TypeInfo::DecodableType> before, typename TypeInfo::DecodableArgType after)>;
+using ReadResponseSuccessCallbackFn  = std::function<void(void * context, chip::Optional<typename TypeInfo::DecodableType> before,
+                                                         typename TypeInfo::DecodableArgType after)>;
 using ReadResponseFailureCallbackFn  = std::function<void(void * context, CHIP_ERROR err)>;
 using WriteResponseSuccessCallbackFn = std::function<void(void * context)>;
 using WriteResponseFailureCallbackFn = std::function<void(void * context, CHIP_ERROR err)>;
@@ -72,8 +72,7 @@ public:
      * before (if the Attribute had been previously read)
      * @param failureCb Called when there is a failure in reading the Attribute
      */
-    void Read(void * context, ReadResponseSuccessCallbackFn<TypeInfo> successCb,
-              ReadResponseFailureCallbackFn failureCb)
+    void Read(void * context, ReadResponseSuccessCallbackFn<TypeInfo> successCb, ReadResponseFailureCallbackFn failureCb)
     {
         memory::Strong<core::Endpoint> endpoint = this->GetEndpoint().lock();
         if (endpoint)
@@ -85,8 +84,7 @@ public:
                 attributeContext,
                 // FindOrEstablishSession success handler
                 [](void * _context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
-                    ReadAttributeContext<TypeInfo> * _attributeContext =
-                        static_cast<ReadAttributeContext<TypeInfo> *>(_context);
+                    ReadAttributeContext<TypeInfo> * _attributeContext = static_cast<ReadAttributeContext<TypeInfo> *>(_context);
                     ChipLogProgress(AppServer, "<Attribute>::Read() Found or established session");
 
                     // Read attribute
@@ -137,8 +135,7 @@ public:
                 },
                 // FindOrEstablishSession failure handler
                 [](void * _context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
-                    ReadAttributeContext<TypeInfo> * _attributeContext =
-                        static_cast<ReadAttributeContext<TypeInfo> *>(_context);
+                    ReadAttributeContext<TypeInfo> * _attributeContext = static_cast<ReadAttributeContext<TypeInfo> *>(_context);
                     ChipLogError(AppServer,
                                  "<Attribute>::Read() failure in retrieving session info for peerId.nodeId: "
                                  "0x" ChipLogFormatX64 ", peer.fabricIndex: %d with error: %" CHIP_ERROR_FORMAT,
@@ -245,15 +242,14 @@ public:
      * @param minIntervalFloorSeconds the requested minimum interval boundary floor in seconds for attribute udpates
      * @param maxIntervalCeilingSeconds the requested maximum interval boundary ceiling in seconds for attribute udpates
      */
-    void Subscribe(void * context, ReadResponseSuccessCallbackFn<TypeInfo> successCb,
-                   ReadResponseFailureCallbackFn failureCb, uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds)
+    void Subscribe(void * context, ReadResponseSuccessCallbackFn<TypeInfo> successCb, ReadResponseFailureCallbackFn failureCb,
+                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds)
     {
         memory::Strong<core::Endpoint> endpoint = this->GetEndpoint().lock();
         if (endpoint)
         {
-            SubscribeAttributeContext<TypeInfo> * attributeContext =
-                new SubscribeAttributeContext<TypeInfo>(this, endpoint, context, successCb, failureCb,
-                                                                                minIntervalFloorSeconds, maxIntervalCeilingSeconds);
+            SubscribeAttributeContext<TypeInfo> * attributeContext = new SubscribeAttributeContext<TypeInfo>(
+                this, endpoint, context, successCb, failureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds);
 
             endpoint->GetCastingPlayer()->FindOrEstablishSession(
                 attributeContext,
@@ -385,9 +381,8 @@ template <typename TypeInfo>
 struct SubscribeAttributeContext
 {
     SubscribeAttributeContext(void * attribute, memory::Strong<core::Endpoint> endpoint, void * clientContext,
-                              ReadResponseSuccessCallbackFn<TypeInfo> successCb,
-                              ReadResponseFailureCallbackFn failureCb, uint16_t minIntervalFloorSeconds,
-                              uint16_t maxIntervalCeilingSeconds) :
+                              ReadResponseSuccessCallbackFn<TypeInfo> successCb, ReadResponseFailureCallbackFn failureCb,
+                              uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds) :
         mEndpoint(endpoint),
         mClientContext(clientContext), mSuccessCb(successCb), mFailureCb(failureCb)
     {
