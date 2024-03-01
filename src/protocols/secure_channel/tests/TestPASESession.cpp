@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
