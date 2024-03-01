@@ -629,9 +629,10 @@ bool DiscoveryImplPlatform::IsInitialized()
 
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId)
 {
-    // Resolve requests can only be issued once DNSSD is initialized and there is
-    // no caching currently
-    // When the DNSSD is kInitializing, can also try to resolve.
+    // It only determines that it is not in an uninitialized state, and cannot force initialization to be completed.
+    // There are differences between platforms.
+    // e.g. when a collision occurs on the Linux platform, initialization has not been completed at this time, but you can
+    // still try to parse.
     VerifyOrReturnError(mState != State::kUninitialized, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64 " ...",
