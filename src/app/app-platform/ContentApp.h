@@ -23,7 +23,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/app-platform/ContentAppClientCommandSender.h>
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
@@ -34,6 +33,7 @@
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 #include <app/util/attribute-storage.h>
+#include <controller/CHIPDeviceController.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -50,6 +50,44 @@ using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 
 inline constexpr uint8_t kMaxClientNodes = 8;
+
+class ContentAppClientCommandSender
+{
+public:
+    ContentAppClientCommandSender() :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    {}
+
+    bool IsBusy() const { return mIsBusy; }
+    CHIP_ERROR SendContentAppMessage(chip::Controller::DeviceCommissioner * commissioner, chip::NodeId destinationId,
+                                     chip::EndpointId endPointId, char * data, char * encodingHint);
+
+protected:
+    CHIP_ERROR SendMessage(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
+
+    void Cleanup();
+
+private:
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    const chip::SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
+
+    using ContentAppMessageResponseDecodableType =
+        chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::DecodableType;
+
+    static void OnCommandResponse(void * context, const ContentAppMessageResponseDecodableType & response);
+    static void OnCommandFailure(void * context, CHIP_ERROR error);
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    bool mIsBusy                 = false;
+    chip::NodeId mDestinationId  = 0;
+    chip::EndpointId mEndPointId = 0;
+
+    std::string mData;
+    std::string mEncodingHint;
+};
 
 class DLL_EXPORT ContentApp
 {

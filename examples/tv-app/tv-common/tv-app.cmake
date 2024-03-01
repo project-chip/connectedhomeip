@@ -1,32 +1,33 @@
 #
-#   Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 cmake_minimum_required(VERSION 3.21)
 
 set(CHIP_TV_COMMON_BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
-if (NOT CHIP_ROOT)
+
+if(NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CHIP_TV_COMMON_BASE_DIR}/../../.. REALPATH)
 endif()
 
 # Add common lock sources to the specific target
 # [Args]:
-#   target - target name
-    # Available options are:
-#   SCOPE   sources scope for the target, PRIVATE as default
-#   SHELL_CMD add shell commands support
+# target - target name
+# Available options are:
+# SCOPE   sources scope for the target, PRIVATE as default
+# SHELL_CMD add shell commands support
 macro(chip_add_tv_app_common target)
     set(SCOPE PRIVATE)
     set(oneValueArgs
@@ -34,15 +35,16 @@ macro(chip_add_tv_app_common target)
         SHELL_CMD
     )
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "" ${ARGN})
-    if (ARG_SCOPE)
+
+    if(ARG_SCOPE)
         set(SCOPE ${ARG_SCOPE})
     endif()
 
     target_include_directories(${target}
         ${SCOPE}
-            ${CHIP_TV_COMMON_BASE_DIR}/include
-            ${CHIP_TV_COMMON_BASE_DIR}/clusters
-            ${CHIP_ROOT}/src/app/app-platform
+        ${CHIP_TV_COMMON_BASE_DIR}/include
+        ${CHIP_TV_COMMON_BASE_DIR}/clusters
+        ${CHIP_ROOT}/src/app/app-platform
     )
 
     target_sources(${target}
@@ -66,25 +68,24 @@ macro(chip_add_tv_app_common target)
         ${CHIP_TV_COMMON_BASE_DIR}/clusters/target-navigator/TargetNavigatorManager.cpp
         ${CHIP_TV_COMMON_BASE_DIR}/clusters/wake-on-lan/WakeOnLanManager.cpp
 
-        ${CHIP_ROOT}/src/app/app-platform/ContentAppClientCommandSender.cpp
         ${CHIP_ROOT}/src/app/app-platform/ContentAppPlatform.cpp
         ${CHIP_ROOT}/src/app/app-platform/ContentApp.cpp
     )
 
-    if (${ARG_SHELL_CMD})
+    if(${ARG_SHELL_CMD})
         target_include_directories(${target}
             ${SCOPE}
-                ${CHIP_TV_COMMON_BASE_DIR}/shell
+            ${CHIP_TV_COMMON_BASE_DIR}/shell
         )
 
         target_sources(${target}
             ${SCOPE}
-                ${CHIP_TV_COMMON_BASE_DIR}/shell/AppTvShellCommands.cpp
+            ${CHIP_TV_COMMON_BASE_DIR}/shell/AppTvShellCommands.cpp
         )
 
         target_compile_definitions(${target}
             ${SCOPE}
-                CHIP_TV_APP_SHELL_CMD_ENABLE
+            CHIP_TV_APP_SHELL_CMD_ENABLE
         )
     endif()
 endmacro()
