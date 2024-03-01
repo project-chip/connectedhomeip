@@ -870,6 +870,16 @@ CHIP_ERROR CastingServer::OnOff_Toggle(TargetEndpointInfo * endpoint, std::funct
 }
 
 /**
+ * @brief Messages cluster
+ */
+CHIP_ERROR CastingServer::Messages_PresentMessagesRequest(TargetEndpointInfo * endpoint, const char * messageText,
+                                                          std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mPresentMessagesRequestCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mPresentMessagesRequestCommand.Invoke(messageText, responseCallback);
+}
+
+/**
  * @brief Media Playback cluster
  */
 CHIP_ERROR CastingServer::MediaPlayback_Play(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
