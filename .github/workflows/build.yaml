@@ -42,6 +42,7 @@ jobs:
         container:
             image: ghcr.io/project-chip/chip-build:35
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -137,6 +138,7 @@ jobs:
         container:
             image: ghcr.io/project-chip/chip-build:35
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -285,6 +287,7 @@ jobs:
         container:
             image: ghcr.io/project-chip/chip-build:35
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -345,6 +348,7 @@ jobs:
         container:
             image: ghcr.io/project-chip/chip-build:35
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -453,6 +457,7 @@ jobs:
         container:
             image: ghcr.io/project-chip/chip-build:35
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"

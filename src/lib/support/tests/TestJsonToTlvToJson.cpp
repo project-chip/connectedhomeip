@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <stdio.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
@@ -322,6 +324,29 @@ void TestConverter_OctetString(nlTestSuite * inSuite, void * inContext)
 
     std::string jsonString = "{\n"
                              "   \"1:BYTES\" : \"AAECAwQ=\"\n"
+                             "}\n";
+
+    ByteSpan tlvSpan(buf, writer.GetLengthWritten());
+    CheckValidConversion(jsonString, tlvSpan, jsonString);
+}
+
+// Octet String, empty
+void TestConverter_OctetString_Empty(nlTestSuite * inSuite, void * inContext)
+{
+    gSuite = inSuite;
+
+    uint8_t buf[256];
+    TLV::TLVWriter writer;
+    TLV::TLVType containerType;
+
+    writer.Init(buf);
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.PutBytes(TLV::ContextTag(1), nullptr, 0));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
+    NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
+
+    std::string jsonString = "{\n"
+                             "   \"1:BYTES\" : \"\"\n"
                              "}\n";
 
     ByteSpan tlvSpan(buf, writer.GetLengthWritten());
@@ -1794,6 +1819,22 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
                                            "   \"1:BYTES\" : \"AAECwQ=\"\n"
                                            "}\n";
 
+    std::string invalidBytesBase64Value4 = "{\n"
+                                           "   \"1:BYTES\" : \"AAECwQ\"\n"
+                                           "}\n";
+
+    std::string invalidBytesBase64Padding1 = "{\n"
+                                             "   \"1:BYTES\" : \"=\"\n"
+                                             "}\n";
+
+    std::string invalidBytesBase64Padding2 = "{\n"
+                                             "   \"1:BYTES\" : \"==\"\n"
+                                             "}\n";
+
+    std::string invalidBytesBase64Padding3 = "{\n"
+                                             "   \"1:BYTES\" : \"===\"\n"
+                                             "}\n";
+
     std::string invalidPositiveInfinityValue = "{\n"
                                                "   \"1:DOUBLE\" : \"+Infinity\"\n"
                                                "}\n";
@@ -1815,7 +1856,11 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
         {  invalidNameWithInvalidTypeField, CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Name With Invalid Type Field"                    },
         {  invalidBytesBase64Value1,        CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid Character"              },
         {  invalidBytesBase64Value2,        CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid Character"              },
-        {  invalidBytesBase64Value3,        CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid length"                 },
+        {  invalidBytesBase64Value3,        CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid padding (missing 1)"    },
+        {  invalidBytesBase64Value4,        CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid padding (missing 2)"    },
+        {  invalidBytesBase64Padding1,      CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid padding (start 1)"      },
+        {  invalidBytesBase64Padding2,      CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid padding (start 2)"      },
+        {  invalidBytesBase64Padding3,      CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Base64 Encoding: Invalid padding (start 3)"      },
         {  invalidPositiveInfinityValue,    CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Double Positive Infinity Encoding"               },
         {  invalidFloatValueAsString,       CHIP_ERROR_INVALID_ARGUMENT,  "Invalid Float Value Encoding as a String"                },
     };
@@ -1827,6 +1872,16 @@ void TestConverter_JsonToTlv_ErrorCases(nlTestSuite * inSuite, void * inContext)
         MutableByteSpan tlvSpan(buf);
         err = JsonToTlv(testCase.mJsonString, tlvSpan);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
+#if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+        if (err != testCase.mExpectedResult)
+        {
+            std::string errStr{ err.Format() };
+            std::string expectedErrStr{ testCase.mExpectedResult.Format() };
+
+            printf("Case: %s, Error: %" CHIP_ERROR_FORMAT ", Expected: %" CHIP_ERROR_FORMAT ", Data: %s\n", testCase.mNameString,
+                   errStr.c_str(), expectedErrStr.c_str(), testCase.mJsonString.c_str());
+        }
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
     }
 }
 
@@ -1887,6 +1942,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("Test Json Tlv Converter - Unsigned Integer 8-Bytes", TestConverter_UnsignedInt_8Bytes),
     NL_TEST_DEF("Test Json Tlv Converter - UTF-8 String Hello!", TestConverter_UTF8String_Hello),
     NL_TEST_DEF("Test Json Tlv Converter - Octet String", TestConverter_OctetString),
+    NL_TEST_DEF("Test Json Tlv Converter - Empty Octet String", TestConverter_OctetString_Empty),
     NL_TEST_DEF("Test Json Tlv Converter - Null", TestConverter_Null),
     NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision 0.0", TestConverter_Float_0),
     NL_TEST_DEF("Test Json Tlv Converter - Floating Point Single Precision 1/3", TestConverter_Float_1third),

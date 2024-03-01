@@ -38,7 +38,7 @@ class PairOnNetworkLongImExtendableInvokeCommand(
 ) :
   PairingCommand(
     controller,
-    "onnetwork-long-im-batch-invoke",
+    "onnetwork-long-im-extendable-invoke",
     credsIssue,
     PairingModeType.ON_NETWORK,
     PairingNetworkType.NONE,

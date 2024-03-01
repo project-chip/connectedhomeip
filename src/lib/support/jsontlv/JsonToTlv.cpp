@@ -15,8 +15,14 @@
  *    limitations under the License.
  */
 
+#include <stdint.h>
+
 #include <algorithm>
-#include <errno.h>
+#include <charconv>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include <json/json.h>
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
@@ -98,69 +104,6 @@ CHIP_ERROR JsonTypeStrToTlvType(const char * elementType, ElementTypeContext & t
     return CHIP_NO_ERROR;
 }
 
-bool IsUnsignedInteger(const std::string & s)
-{
-    size_t len = s.length();
-    if (len == 0)
-    {
-        return false;
-    }
-    for (size_t i = 0; i < len; i++)
-    {
-        if (!isdigit(s[i]))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool IsSignedInteger(const std::string & s)
-{
-    if (s.length() == 0)
-    {
-        return false;
-    }
-    if (s[0] == '-')
-    {
-        return IsUnsignedInteger(s.substr(1));
-    }
-    return IsUnsignedInteger(s);
-}
-
-bool IsValidBase64String(const std::string & s)
-{
-    const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    size_t len                    = s.length();
-
-    // Check if the length is a multiple of 4
-    if (len % 4 != 0)
-    {
-        return false;
-    }
-
-    size_t paddingLen = 0;
-    if (s[len - 1] == '=')
-    {
-        paddingLen++;
-        if (s[len - 2] == '=')
-        {
-            paddingLen++;
-        }
-    }
-
-    // Check for invalid characters
-    for (char c : s.substr(0, len - paddingLen))
-    {
-        if (base64Chars.find(c) == std::string::npos)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 struct ElementContext
 {
     std::string jsonName;
@@ -205,7 +148,17 @@ CHIP_ERROR InternalConvertTlvTag(uint32_t tagNumber, TLV::Tag & tag, const uint3
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, uint32_t implicitProfileId)
+template <typename T>
+CHIP_ERROR ParseNumericalField(const std::string & decimalString, T & outValue)
+{
+    const char * start_ptr       = decimalString.data();
+    const char * end_ptr         = decimalString.data() + decimalString.size();
+    auto [last_converted_ptr, _] = std::from_chars(start_ptr, end_ptr, outValue, 10);
+    VerifyOrReturnError(last_converted_ptr == end_ptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ParseJsonName(const std::string & name, ElementContext & elementCtx, uint32_t implicitProfileId)
 {
     uint32_t tagNumber                  = 0;
     const char * elementType            = nullptr;
@@ -216,28 +169,12 @@ CHIP_ERROR ParseJsonName(const std::string name, ElementContext & elementCtx, ui
 
     if (nameFields.size() == 2)
     {
-        VerifyOrReturnError(IsUnsignedInteger(nameFields[0]), CHIP_ERROR_INVALID_ARGUMENT);
-
-        char * endPtr;
-        errno                = 0;
-        unsigned long result = strtoul(nameFields[0].c_str(), &endPtr, 10);
-        VerifyOrReturnError(nameFields[0].c_str() != endPtr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError((errno != ERANGE && result <= UINT32_MAX), CHIP_ERROR_INVALID_ARGUMENT);
-
-        tagNumber   = static_cast<uint32_t>(result);
+        ReturnErrorOnFailure(ParseNumericalField(nameFields[0], tagNumber));
         elementType = nameFields[1].c_str();
     }
     else if (nameFields.size() == 3)
     {
-        VerifyOrReturnError(IsUnsignedInteger(nameFields[1]), CHIP_ERROR_INVALID_ARGUMENT);
-
-        char * endPtr;
-        errno                = 0;
-        unsigned long result = strtoul(nameFields[1].c_str(), &endPtr, 10);
-        VerifyOrReturnError(nameFields[1].c_str() != endPtr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError((errno != ERANGE && result <= UINT32_MAX), CHIP_ERROR_INVALID_ARGUMENT);
-
-        tagNumber   = static_cast<uint32_t>(result);
+        ReturnErrorOnFailure(ParseNumericalField(nameFields[1], tagNumber));
         elementType = nameFields[2].c_str();
     }
     else
@@ -278,16 +215,14 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
     switch (elementCtx.type.tlvType)
     {
     case TLV::kTLVType_UnsignedInteger: {
-        uint64_t v;
+        uint64_t v = 0;
         if (val.isUInt64())
         {
             v = val.asUInt64();
         }
         else if (val.isString())
         {
-            const std::string valAsString = val.asString();
-            VerifyOrReturnError(IsUnsignedInteger(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
-            v = std::strtoull(valAsString.c_str(), nullptr, 10);
+            ReturnErrorOnFailure(ParseNumericalField(val.asString(), v));
         }
         else
         {
@@ -298,16 +233,14 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
     }
 
     case TLV::kTLVType_SignedInteger: {
-        int64_t v;
+        int64_t v = 0;
         if (val.isInt64())
         {
             v = val.asInt64();
         }
         else if (val.isString())
         {
-            const std::string valAsString = val.asString();
-            VerifyOrReturnError(IsSignedInteger(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
-            v = std::strtoll(valAsString.c_str(), nullptr, 10);
+            ReturnErrorOnFailure(ParseNumericalField(val.asString(), v));
         }
         else
         {
@@ -377,20 +310,23 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         size_t encodedLen             = valAsString.length();
         VerifyOrReturnError(CanCastTo<uint16_t>(encodedLen), CHIP_ERROR_INVALID_ARGUMENT);
 
-        VerifyOrReturnError(IsValidBase64String(valAsString), CHIP_ERROR_INVALID_ARGUMENT);
+        // Check if the length is a multiple of 4 as strict padding is required.
+        VerifyOrReturnError(encodedLen % 4 == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
         Platform::ScopedMemoryBuffer<uint8_t> byteString;
         byteString.Alloc(BASE64_MAX_DECODED_LEN(static_cast<uint16_t>(encodedLen)));
         VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
         auto decodedLen = Base64Decode(valAsString.c_str(), static_cast<uint16_t>(encodedLen), byteString.Get());
+        VerifyOrReturnError(decodedLen < UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(writer.PutBytes(tag, byteString.Get(), decodedLen));
         break;
     }
 
     case TLV::kTLVType_UTF8String: {
         VerifyOrReturnError(val.isString(), CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorOnFailure(writer.PutString(tag, val.asCString()));
+        const std::string valAsString = val.asString();
+        ReturnErrorOnFailure(writer.PutString(tag, valAsString.data(), static_cast<uint32_t>(valAsString.size())));
         break;
     }
 

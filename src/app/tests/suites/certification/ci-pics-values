@@ -1211,6 +1211,7 @@ OO.S.C41.Rsp=1
 OO.S.C42.Rsp=1
 OO.S.F00=1
 OO.S.F01=0
+OO.S.F02=0
 OO.S.A4003=1
 OO.M.ManuallyControlled=1
 

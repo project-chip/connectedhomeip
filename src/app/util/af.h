@@ -194,19 +194,6 @@ uint16_t emberAfFixedEndpointCount(void);
  */
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
 
-/*
- * @brief Function that copies a ZCL string type into a buffer.  The size
- * parameter should indicate the maximum number of characters to copy to the
- * destination buffer not including the length byte.
- */
-void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size);
-/*
- * @brief Function that copies a ZCL long string into a buffer.  The size
- * parameter should indicate the maximum number of characters to copy to the
- * destination buffer not including the length bytes.
- */
-void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
-
 /** @} END Attribute Storage */
 
 /** @name Device Control */

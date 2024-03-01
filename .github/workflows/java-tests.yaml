@@ -133,7 +133,7 @@ jobs:
                      --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
                   '                    
-            - name: Run IM Batch Invoke Test
+            - name: Run IM Extendable Invoke Test
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -141,7 +141,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-batch-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-extendable-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
                   '
             - name: Run IM Read Test

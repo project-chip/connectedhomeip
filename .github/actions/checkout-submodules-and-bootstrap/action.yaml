@@ -15,6 +15,8 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Maximize runner disk
+      uses: ./.github/actions/maximize-runner-disk
     - name: Dump disk info
       uses: ./.github/actions/dump-disk-info
     - name: Set git safe directory for local act runs

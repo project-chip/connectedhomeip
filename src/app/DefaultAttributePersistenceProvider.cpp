@@ -15,6 +15,7 @@
  */
 
 #include <app/DefaultAttributePersistenceProvider.h>
+#include <app/util/ember-strings.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>

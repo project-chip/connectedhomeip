@@ -16,6 +16,7 @@
  */
 
 #import "MTRDeviceControllerLocalTestStorage.h"
+#import "MTRLogging_Internal.h"
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 
@@ -36,12 +37,18 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
 {
     NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
     [defaults setBool:localTestStorageEnabled forKey:kLocalTestUserDefaultEnabledKey];
+    MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage setLocalTestStorageEnabled %d", localTestStorageEnabled);
+    BOOL storedLocalTestStorageEnabled = [defaults boolForKey:kLocalTestUserDefaultEnabledKey];
+    if (storedLocalTestStorageEnabled != localTestStorageEnabled) {
+        MTR_LOG_ERROR("MTRDeviceControllerLocalTestStorage setLocalTestStorageEnabled %d failed", localTestStorageEnabled);
+    }
 }
 
 - (instancetype)initWithPassThroughStorage:(id<MTRDeviceControllerStorageDelegate>)passThroughStorage
 {
     if (self = [super init]) {
         _passThroughStorage = passThroughStorage;
+        MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage initialized with pass-through storage %@", passThroughStorage);
     }
     return self;
 }
@@ -58,7 +65,12 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
         id value = [NSKeyedUnarchiver unarchivedObjectOfClasses:MTRDeviceControllerStorageClasses() fromData:storedData error:&error];
         return value;
     } else {
-        return [_passThroughStorage controller:controller valueForKey:key securityLevel:securityLevel sharingType:sharingType];
+        if (_passThroughStorage) {
+            return [_passThroughStorage controller:controller valueForKey:key securityLevel:securityLevel sharingType:sharingType];
+        } else {
+            MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage valueForKey: shared type but no pass-through storage");
+            return nil;
+        }
     }
 }
 
@@ -75,7 +87,12 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
         [defaults setObject:data forKey:key];
         return YES;
     } else {
-        return [_passThroughStorage controller:controller storeValue:value forKey:key securityLevel:securityLevel sharingType:sharingType];
+        if (_passThroughStorage) {
+            return [_passThroughStorage controller:controller storeValue:value forKey:key securityLevel:securityLevel sharingType:sharingType];
+        } else {
+            MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage storeValue: shared type but no pass-through storage");
+            return NO;
+        }
     }
 }
 
@@ -89,7 +106,12 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
         [defaults removeObjectForKey:key];
         return YES;
     } else {
-        return [_passThroughStorage controller:controller removeValueForKey:key securityLevel:securityLevel sharingType:sharingType];
+        if (_passThroughStorage) {
+            return [_passThroughStorage controller:controller removeValueForKey:key securityLevel:securityLevel sharingType:sharingType];
+        } else {
+            MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage removeValueForKey: shared type but no pass-through storage");
+            return NO;
+        }
     }
 }
 @end

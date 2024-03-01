@@ -34,6 +34,7 @@ import copy
 import ctypes
 import enum
 import json
+import logging
 import threading
 import time
 import typing
@@ -265,9 +266,9 @@ class ChipDeviceControllerBase():
     def _set_dev_ctrl(self, devCtrl):
         def HandleCommissioningComplete(nodeid, err):
             if err.is_success:
-                print("Commissioning complete")
+                logging.info("Commissioning complete")
             else:
-                print("Failed to commission: {}".format(err))
+                logging.warning("Failed to commission: {}".format(err))
 
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
@@ -283,30 +284,30 @@ class ChipDeviceControllerBase():
         def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: str,
                                      setupQRCode: str, err: PyChipError) -> None:
             if err.is_success:
-                print("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
+                logging.info("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
                 self._ChipStack.openCommissioningWindowPincode[nodeid] = CommissioningParameters(
                     setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
-                print("Failed to open commissioning window: {}".format(err))
+                logging.warning("Failed to open commissioning window: {}".format(err))
 
             self._ChipStack.callbackRes = err
             self._ChipStack.completeEvent.set()
 
         def HandleUnpairDeviceComplete(nodeid: int, err: PyChipError):
             if err.is_success:
-                print("Succesfully unpaired device with nodeid {}".format(nodeid))
+                logging.info("Succesfully unpaired device with nodeid {}".format(nodeid))
             else:
-                print("Failed to unpair device: {}".format(err))
+                logging.warning("Failed to unpair device: {}".format(err))
 
             self._ChipStack.callbackRes = err
             self._ChipStack.completeEvent.set()
 
         def HandlePASEEstablishmentComplete(err: PyChipError):
             if not err.is_success:
-                print("Failed to establish secure session to device: {}".format(err))
+                logging.warning("Failed to establish secure session to device: {}".format(err))
                 self._ChipStack.callbackRes = err.to_exception()
             else:
-                print("Established secure session with Device")
+                logging.info("Established secure session with Device")
 
             if self.state != DCState.COMMISSIONING:
                 # During Commissioning, HandlePASEEstablishmentComplete will also be called,
@@ -785,7 +786,7 @@ class ChipDeviceControllerBase():
             res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
-                print('Using PASE connection')
+                logging.info('Using PASE connection')
                 return DeviceProxyWrapper(returnDevice)
 
         class DeviceAvailableClosure():
@@ -1151,7 +1152,7 @@ class ChipDeviceControllerBase():
             # Wildcard
             pass
         elif not isinstance(pathTuple, tuple):
-            print(type(pathTuple))
+            logging.debug(type(pathTuple))
             if isinstance(pathTuple, int):
                 endpoint = pathTuple
             elif issubclass(pathTuple, ClusterObjects.Cluster):
@@ -1426,7 +1427,7 @@ class ChipDeviceControllerBase():
             raise UnknownCommand(cluster, command)
         try:
             res = asyncio.run(self.SendCommand(nodeid, endpoint, req))
-            print(f"CommandResponse {res}")
+            logging.debug(f"CommandResponse {res}")
             return (0, res)
         except InteractionModelError as ex:
             return (int(ex.status), None)

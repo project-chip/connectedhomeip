@@ -5294,6 +5294,9 @@ PICS:
     - label: "Device has Deadfront behaviour"
       id: OO.S.F01
 
+    - label: "Device has OffOnly feature"
+      id: OO.S.F02
+
     #
     # server / manually
     #

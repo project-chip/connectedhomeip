@@ -20,7 +20,10 @@
 
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 #include <map>
-#include <spi_flash_mmap.h>
+
+#if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
+#include <esp_core_dump.h>
+#endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 
 namespace chip {
 namespace app {
@@ -57,20 +60,23 @@ private:
 
     struct CrashLogContext
     {
-        spi_flash_mmap_handle_t mappedHandle = 0;
-        const void * mappedAddress           = nullptr;
-        uint32_t crashSize                   = 0;
-        uint32_t readOffset                  = 0;
-        bool isMapped                        = 0;
+#if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
+        uint32_t crashSize                = 0;
+        uint32_t readOffset               = 0;
+        esp_core_dump_summary_t * summary = nullptr;
 
         void Reset()
         {
-            this->mappedHandle  = 0;
-            this->mappedAddress = nullptr;
-            this->crashSize     = 0;
-            this->readOffset    = 0;
-            this->isMapped      = 0;
+            this->crashSize  = 0;
+            this->readOffset = 0;
+
+            if (this->summary)
+            {
+                Platform::MemoryFree(this->summary);
+                this->summary = nullptr;
+            }
         }
+#endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
     };
 
     static CrashLogContext sCrashLogContext;

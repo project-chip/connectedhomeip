@@ -17,6 +17,7 @@
  */
 package chip.devicecontroller.model;
 
+import java.util.Locale;
 import java.util.logging.Logger;
 
 /** Class for tracking failed invoke response data. */
@@ -30,6 +31,10 @@ public final class NoInvokeResponseData {
 
   public Integer getCommandRef() {
     return commandRef;
+  }
+
+  public String toString() {
+    return String.format(Locale.ENGLISH, "commandRef %s", commandRef.toString());
   }
 
   public static NoInvokeResponseData newInstance(int commandRef) {

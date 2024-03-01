@@ -90,17 +90,9 @@ void PairingSession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<ReliableMessageProtocolConfig> & providedMrpConfig,
+CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
                                                    TLV::TLVWriter & tlvWriter)
 {
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/30456. Based on the spec we need to send values here now,
-    // but it is not entirely clear what we should be sending here when `providedMrpConfig.HasValue() == false`. For now we
-    // are sending the default MRP config values.
-    ReliableMessageProtocolConfig mrpLocalConfig = GetDefaultMRPConfig();
-    if (providedMrpConfig.HasValue())
-    {
-        mrpLocalConfig = providedMrpConfig.Value();
-    }
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
     ReturnErrorOnFailure(

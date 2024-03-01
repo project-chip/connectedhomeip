@@ -35,7 +35,7 @@ template("_chip_build_time_codegen") {
     include_dirs = [ target_gen_dir ]
   }
 
-  pw_python_action("${_name}_codegen") {
+  pw_python_action("${_name}_generate") {
     script = "${chip_root}/scripts/codegen.py"
 
     # TODO: this seems to touch internals. Is this ok? speeds up builds!
@@ -99,7 +99,7 @@ template("_chip_build_time_codegen") {
     if (!defined(deps)) {
       deps = []
     }
-    deps += [ ":${_name}_codegen" ]
+    deps += [ ":${_name}_generate" ]
   }
 }
 
@@ -152,7 +152,7 @@ template("_chip_build_time_zapgen") {
     _output_subdir = "zap-generated"
   }
 
-  pw_python_action("${_name}_zap") {
+  pw_python_action("${_name}_generate") {
     script = "${chip_root}/scripts/tools/zap/generate.py"
 
     # TODO: this seems to touch internals. Is this ok? speeds up builds!
@@ -211,7 +211,7 @@ template("_chip_build_time_zapgen") {
     if (!defined(public_deps)) {
       public_deps = []
     }
-    public_deps += [ ":${_name}_zap" ]
+    public_deps += [ ":${_name}_generate" ]
   }
 }
 

@@ -164,7 +164,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/PendingResponseTrackerImpl.h': {'unordered_set'},
 
     # Not intended for embedded clients
-    'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream'},
+    'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream', 'string', 'vector'},
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
     'src/lib/support/jsontlv/TlvToJson.h': {'string'},
     'src/lib/support/jsontlv/TextFormat.h': {'string'},

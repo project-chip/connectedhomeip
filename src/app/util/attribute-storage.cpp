@@ -22,6 +22,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
@@ -340,16 +341,6 @@ uint16_t emberAfEndpointCount()
 bool emberAfEndpointIndexIsEnabled(uint16_t index)
 {
     return (emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isEnabled));
-}
-
-bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
-{
-    return (attributeType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-}
-
-bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType)
-{
-    return (attributeType == ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)

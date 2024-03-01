@@ -939,6 +939,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             }
         }
     }
+    MTR_LOG_INFO("%@ _getCachedDataVersions dataVersions count: %lu readCache count: %lu", self, dataVersions.count, _readCache.count);
     os_unfair_lock_unlock(&self->_lock);
 
     return dataVersions;
@@ -1748,6 +1749,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [baseDevice openCommissioningWindowWithDiscriminator:discriminator duration:duration queue:queue completion:completion];
 }
 
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    [_deviceController downloadLogFromNodeWithID:_nodeID
+                                            type:type
+                                         timeout:timeout
+                                           queue:queue
+                                      completion:completion];
+}
+
 #pragma mark - Cache management
 
 // assume lock is held
@@ -1983,6 +1996,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
 {
+    MTR_LOG_INFO("%@ setAttributeValues count: %lu reportChanges: %d", self, attributeValues.count, reportChanges);
     os_unfair_lock_lock(&self->_lock);
 
     if (reportChanges) {

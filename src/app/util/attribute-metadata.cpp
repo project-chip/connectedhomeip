@@ -1,6 +1,6 @@
-/**
- *
- *    Copyright (c) 2022 Project CHIP Authors
+/*
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,12 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
+#include <app/util/attribute-metadata.h>
 
-#include <app/util/privilege-constants.h>
-#include <lib/core/DataModelTypes.h>
+#include <app-common/zap-generated/attribute-type.h>
 
-int MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute);
-int MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute);
-int MatterGetAccessPrivilegeForInvokeCommand(chip::ClusterId cluster, chip::CommandId command);
-int MatterGetAccessPrivilegeForReadEvent(chip::ClusterId cluster, chip::EventId event);
+bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
+{
+    return (attributeType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
+bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType)
+{
+    return (attributeType == ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
+}
