@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "WiFiDnssdImpl.h"
+#include "ESP32DnssdImpl.h"
 #include "lib/dnssd/platform/Dnssd.h"
 
 #include <esp_err.h>
@@ -130,7 +130,7 @@ static CHIP_ERROR RemoveMdnsQuery(GenericContext * ctx)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
+CHIP_ERROR EspDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     esp_err_t espError;
@@ -153,7 +153,7 @@ static const char * GetProtocolString(DnssdServiceProtocol protocol)
     return protocol == DnssdServiceProtocol::kDnssdProtocolTcp ? "_tcp" : "_udp";
 }
 
-CHIP_ERROR WiFiDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
+CHIP_ERROR EspDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
     CHIP_ERROR error        = CHIP_NO_ERROR;
     mdns_txt_item_t * items = nullptr;
@@ -203,10 +203,11 @@ exit:
     return error;
 }
 
-CHIP_ERROR WiFiDnssdRemoveServices()
+CHIP_ERROR EspDnssdRemoveServices()
 {
     mdns_service_remove("_matter", "_tcp");
     mdns_service_remove("_matterc", "_udp");
+    mdns_service_remove("_matterd", "_udp");
     return CHIP_NO_ERROR;
 }
 
@@ -332,9 +333,22 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
                 ctx->mService[servicesIndex].mSubTypeSize   = 0;
                 if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
                 {
-                    // If the InterfaceId in the context is Null, we will use the Station netif by default.
-                    ctx->mService[servicesIndex].mInterface =
-                        Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
+                    if (currentResult->esp_netif)
+                    {
+                        ctx->mService[servicesIndex].mInterface =
+                            Inet::InterfaceId(static_cast<struct netif *>(esp_netif_get_netif_impl(currentResult->esp_netif)));
+                    }
+                    else
+                    {
+                        // If the InterfaceId in the context and esp_netif in current result is Null,
+                        // we will use the Station or Ethernet netif by default.
+                        ctx->mService[servicesIndex].mInterface =
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+                            Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
+#elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+                            Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetNetif(DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
+#endif
+                    }
                 }
                 else
                 {
@@ -418,8 +432,22 @@ static CHIP_ERROR ParseSrvResult(ResolveContext * ctx)
         ctx->mService->mSubTypeSize   = 0;
         if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
         {
-            // If the InterfaceId in the context is Null, we will use the Station netif by default.
-            ctx->mService->mInterface = Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
+            if (ctx->mSrvQueryResult->esp_netif)
+            {
+                ctx->mService->mInterface =
+                    Inet::InterfaceId(static_cast<struct netif *>(esp_netif_get_netif_impl(ctx->mSrvQueryResult->esp_netif)));
+            }
+            else
+            {
+                // If the InterfaceId in the context and esp_netif in current result is Null,
+                // we will use the Station or Ethernet netif by default.
+                ctx->mService->mInterface =
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+                    Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
+#elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+                    Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetNetif(DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
+#endif
+            }
         }
         else
         {
@@ -595,7 +623,7 @@ static void MdnsQueryNotifier(mdns_search_once_t * searchHandle)
     chip::DeviceLayer::PlatformMgr().ScheduleWork(MdnsQueryDone, reinterpret_cast<intptr_t>(searchHandle));
 }
 
-CHIP_ERROR WiFiDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+CHIP_ERROR EspDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
                            intptr_t * browseIdentifier)
 {
@@ -623,7 +651,7 @@ CHIP_ERROR WiFiDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     return error;
 }
 
-CHIP_ERROR WiFiDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
+CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                             void * context)
 {
     CHIP_ERROR error              = CHIP_NO_ERROR;
