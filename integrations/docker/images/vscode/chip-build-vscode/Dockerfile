@@ -17,6 +17,7 @@ FROM ghcr.io/project-chip/chip-build-ti:${VERSION} AS ti
 FROM ghcr.io/project-chip/chip-build-openiotsdk:${VERSION} AS openiotsdk
 FROM ghcr.io/project-chip/chip-build-bouffalolab:${VERSION} AS bouffalolab
 FROM ghcr.io/project-chip/chip-build-asr:${VERSION} AS asr
+FROM ghcr.io/project-chip/chip-build-nuttx:${VERSION} AS nuttx
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
@@ -66,6 +67,8 @@ COPY --from=asr /opt/asr /opt/asr
 COPY --from=efr32 /opt/silabs/gecko_sdk /opt/silabs/gecko_sdk
 COPY --from=efr32 /opt/silabs/wiseconnect-wifi-bt-sdk /opt/silabs/wiseconnect-wifi-bt-sdk
 COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
+
+COPY --from=nuttx /opt/nuttx /opt/nuttx
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
