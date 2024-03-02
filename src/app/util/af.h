@@ -196,21 +196,6 @@ bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
 
 /** @} END Attribute Storage */
 
-/** @name Device Control */
-// @{
-
-/**
- * @brief Function that checks if endpoint is identifying
- *
- * This function returns true if device at a given endpoint is
- * identifying.
- *
- * @param endpoint Zigbee endpoint number
- */
-bool emberAfIsDeviceIdentifying(chip::EndpointId endpoint);
-
-/** @} END Device Control */
-
 /** @name Miscellaneous */
 // @{
 
