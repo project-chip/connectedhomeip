@@ -939,7 +939,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             }
         }
     }
-    MTR_LOG_INFO("%@ _getCachedDataVersions dataVersions count: %lu readCache count: %lu", self, dataVersions.count, _readCache.count);
+    MTR_LOG_INFO("%@ _getCachedDataVersions dataVersions count: %lu readCache count: %lu", self, static_cast<unsigned long>(dataVersions.count), static_cast<unsigned long>(_readCache.count));
     os_unfair_lock_unlock(&self->_lock);
 
     return dataVersions;
@@ -1996,7 +1996,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
 {
-    MTR_LOG_INFO("%@ setAttributeValues count: %lu reportChanges: %d", self, attributeValues.count, reportChanges);
+    MTR_LOG_INFO("%@ setAttributeValues count: %lu reportChanges: %d", self, static_cast<unsigned long>(attributeValues.count), reportChanges);
     os_unfair_lock_lock(&self->_lock);
 
     if (reportChanges) {
