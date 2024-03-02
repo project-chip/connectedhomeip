@@ -52,7 +52,6 @@ static bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 #endif
 }
 
-
 /**
  * @brief Checks if group-endpoint association exist for the given fabric
  */
