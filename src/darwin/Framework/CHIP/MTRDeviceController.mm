@@ -887,7 +887,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
         // Load persisted attributes if they exist.
         NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
-        MTR_LOG_INFO("Loaded %lu attributes from storage for %@", attributesFromCache.count, deviceToReturn);
+        MTR_LOG_INFO("Loaded %lu attributes from storage for %@", static_cast<unsigned long>(attributesFromCache.count), deviceToReturn);
         if (attributesFromCache.count) {
             [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
         }

@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <inttypes.h>
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>

@@ -110,8 +110,25 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     ChipLogDetail(Controller, "------Via Shell Enter: controller ux ok|cancel");
 }
 
+/// Callback for getting execution into the main chip thread
+void CallbackOk(System::Layer * aSystemLayer, void * aAppState)
+{
+    ChipLogDetail(AppServer, "UX Ok: now on main thread");
+    CommissionerDiscoveryController * cdc = static_cast<CommissionerDiscoveryController *>(aAppState);
+    cdc->InternalOk();
+}
+
 void CommissionerDiscoveryController::Ok()
 {
+    ChipLogDetail(AppServer, "UX Ok: moving to main thread");
+    // need to ensure callback is on main chip thread
+    assertChipStackLockedByCurrentThread();
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackOk, this);
+}
+
+void CommissionerDiscoveryController::InternalOk()
+{
+    ChipLogDetail(AppServer, "UX InternalOk");
     if (!mPendingConsent)
     {
         ChipLogError(AppServer, "UX Ok: no current instance");
