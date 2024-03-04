@@ -25,8 +25,6 @@
 
 #include <lib/support/CodeUtils.h>
 
-#include <cstdint>
-
 using chip::AttributeId;
 using chip::ClusterId;
 using chip::CommandId;
@@ -38,7 +36,7 @@ namespace {
 namespace GeneratedAccessReadAttribute {
 constexpr ClusterId kCluster[]     = GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER;
 constexpr AttributeId kAttribute[] = GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE;
-constexpr uint8_t kPrivilege[]     = GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE;
+constexpr chip::Access::Privilege kPrivilege[]     = GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE;
 static_assert(ArraySize(kCluster) == ArraySize(kAttribute) && ArraySize(kAttribute) == ArraySize(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessReadAttribute
