@@ -132,7 +132,11 @@ template("chip_data_model") {
       "${_zapgen_gen_dir}/zap-generated/gen_config.h",
     ]
 
-    deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
+    deps = [ 
+      # TODO: still need to depend on util/endpoint-config-defines.h
+      "${chip_root}/src/access",
+      "${chip_root}/src/lib/core:chip_config_header" ,
+    ]
 
     if (chip_code_pre_generated_directory == "") {
       deps += [
@@ -416,6 +420,7 @@ template("chip_data_model") {
     public_deps += [
       ":${_data_model_name}_codegen",
       ":${_data_model_name}_zapgen",
+      "${chip_root}/src/access",
       "${chip_root}/src/app",
       "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",
