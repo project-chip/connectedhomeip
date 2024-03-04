@@ -107,64 +107,50 @@ template("chip_data_model") {
     ]
   }
 
-  # where generated files reside
-  # TODO: where can this reside?
-  if (chip_code_pre_generated_directory == "") {
-    _zapgen_gen_dir = "${target_gen_dir}/zapgen"
-    _codegen_gen_dir = "${target_gen_dir}"
-  } else {
-    # NOTE: if zap and matter file will reside in different locations
-    #       this path will change between zapgen and codegen
-    _pregen_dir =
-        chip_code_pre_generated_directory + "/" +
-        string_replace(rebase_path(invoker.zap_file, chip_root), ".zap", "")
-
-    _zapgen_gen_dir = "${_pregen_dir}/zap/app-templates"
-    _codegen_gen_dir = "${_pregen_dir}/codegen/cpp-app"
-  }
-
   # Fixed source sets for allowing reasonable dependencies on things:
   source_set("${_data_model_name}-endpoint-metadata") {
-    sources = [
-      "${_codegen_gen_dir}/app/PluginApplicationCallbacks.h",
-      "${_zapgen_gen_dir}/zap-generated/access.h",
-      "${_zapgen_gen_dir}/zap-generated/endpoint_config.h",
-      "${_zapgen_gen_dir}/zap-generated/gen_config.h",
+    sources = filter_include(
+            get_target_outputs(":${_data_model_name}_codegen_generate"),
+            [ "*/PluginApplicationCallbacks.h" ])
+    sources += filter_include(
+            get_target_outputs(":${_data_model_name}_zapgen_generate"),
+            [
+              "*/access.h",
+              "*/endpoint_config.h",
+              "*/gen_config.h",
+            ])
+
+    deps = [
+      ":${_data_model_name}_codegen_generate",
+      ":${_data_model_name}_zapgen_generate",
+      "${chip_root}/src/lib/core:chip_config_header",
     ]
-
-    deps = [ "${chip_root}/src/lib/core:chip_config_header" ]
-
-    if (chip_code_pre_generated_directory == "") {
-      deps += [
-        ":${_data_model_name}_codegen_generate",
-        ":${_data_model_name}_zapgen_generate",
-      ]
-    }
   }
 
   source_set("${_data_model_name}-callbacks") {
-    sources = [
-      "${_codegen_gen_dir}/app/callback-stub.cpp",
-      "${_codegen_gen_dir}/app/cluster-init-callback.cpp",
-    ]
+    sources = filter_include(
+            get_target_outputs(":${_data_model_name}_codegen_generate"),
+            [
+              "*/callback-stup.cpp",
+              "*/cluster-init-callback.cpp",
+            ])
 
     deps = [
+      ":${_data_model_name}_codegen_generate",
       "${chip_root}/src/app/common:ids",
       "${chip_root}/src/lib/support:span",
       "${chip_root}/src/protocols/interaction_model",
     ]
-
-    if (chip_code_pre_generated_directory == "") {
-      deps += [ ":${_data_model_name}_codegen_generate" ]
-    }
   }
 
   if (!chip_build_controller_dynamic_server) {
     source_set("${_data_model_name}-command-dispatch") {
-      sources =
-          [ "${_zapgen_gen_dir}/zap-generated/IMClusterCommandHandler.cpp" ]
+      sources = filter_include(
+              get_target_outputs(":${_data_model_name}_zapgen_generate"),
+              [ "*/IMClusterCommandHandler.cpp" ])
 
       deps = [
+        ":${_data_model_name}_zapgen_generate",
         "${chip_root}/src/app",
         "${chip_root}/src/app:interaction-model",
         "${chip_root}/src/app/common:cluster-objects",
@@ -173,10 +159,6 @@ template("chip_data_model") {
         "${chip_root}/src/lib/core",
         "${chip_root}/src/lib/support",
       ]
-
-      if (chip_code_pre_generated_directory == "") {
-        deps += [ ":${_data_model_name}_zapgen_generate" ]
-      }
     }
   }
 
