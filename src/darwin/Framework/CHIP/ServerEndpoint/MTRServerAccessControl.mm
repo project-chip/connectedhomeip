@@ -134,19 +134,19 @@ Global<ControllerAccessControl> gControllerAccessControl;
 
 } // anonymous namespace
 
-int MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
+chip::Access::Privilege MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
 {
     // We don't support any event bits yet.
     return chip::Access::Privilege::kAdminister;
 }
 
-int MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId command)
+chip::Access::Privilege MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId command)
 {
     // For now we only have OTA, which uses Operate.
     return chip::Access::Privilege::kOperate;
 }
 
-int MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attribute)
+chip::Access::Privilege MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attribute)
 {
     NSNumber * _Nullable neededPrivilege = [[MTRDeviceControllerFactory sharedInstance] neededReadPrivilegeForClusterID:@(cluster) attributeID:@(attribute)];
     if (neededPrivilege == nil) {
@@ -177,7 +177,7 @@ int MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attr
     return chip::Access::Privilege::kAdminister;
 }
 
-int MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId attribute)
+chip::Access::Privilege MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId attribute)
 {
     // We don't have any writable attributes yet, but default to Operate.
     return chip::Access::Privilege::kOperate;
