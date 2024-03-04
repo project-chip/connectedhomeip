@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "CommandResponseSender.h"
+#include "CommandResponder.h"
 #include "InteractionModelEngine.h"
 #include "messaging/ExchangeContext.h"
 
@@ -23,7 +23,7 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
-CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
+CHIP_ERROR CommandResponder::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
                                                     const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -38,12 +38,10 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         err = statusError;
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::InvalidAction));
 
-        // If SendCommandResponse() fails, we are responsible for closing the exchange,
-        // as stipulated by the API contract. We fulfill this obligation by not sending
-        // a message expecting a response on the exchange. Since we are in the middle
-        // of processing an incoming message, the exchange will close itself once we are
-        // done processing it, if there is no response to wait for at that point.
         err = SendCommandResponse();
+        // If SendCommandResponse() fails, we must still close the exchange. Since sending an 
+        // InvokeResponseMessage seems problematic, we'll send a StatusResponse with 'Failure'
+        // instead.
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::Failure));
 
         bool moreToSend = !mChunks.IsNull();
@@ -56,7 +54,7 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         return CHIP_NO_ERROR;
     }
 
-    ChipLogDetail(DataManagement, "CommandResponseSender: Unexpected message type %d", aPayloadHeader.GetMessageType());
+    ChipLogDetail(DataManagement, "CommandResponder: Unexpected message type %d", aPayloadHeader.GetMessageType());
     err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     if (mState != State::AllInvokeResponsesSent)
     {
@@ -74,20 +72,36 @@ exit:
     return err;
 }
 
-void CommandResponseSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
+void CommandResponder::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogDetail(DataManagement, "CommandResponseSender: Timed out waiting for response from requester mState=[%10.10s]",
+    ChipLogDetail(DataManagement, "CommandResponder: Timed out waiting for response from requester mState=[%10.10s]",
                   GetStateStr());
+    // We don't need to consider remaining async CommandHandlers here. We become the exchange
+    // delegate only after CommandHandler::OnDone is called.
     Close();
 }
 
-CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
+void CommandResponder::StartSendingCommandResponses()
 {
-    VerifyOrReturnError(mState == State::ReadyForInvokeResponses, CHIP_ERROR_INCORRECT_STATE);
-    // If SendCommandResponse() fails, we are obligated to close the exchange as per the API
-    // contract. However, this method's contract also stipulates that in the event of our
-    // failure, the caller bears the responsibility of closing the exchange.
-    ReturnErrorOnFailure(SendCommandResponse());
+    VerifyOrDie(mState == State::ReadyForInvokeResponses);
+    CHIP_ERROR err = SendCommandResponse();
+    if (err != CHIP_NO_ERROR)
+    {
+        // TODO(#30453): It should be our responsibility to send a Failure StatusResponse to the requestor
+        // if there is a SessionHandle, but legacy unit tests explicitly check the behavior where
+        // we do not send any message. Changing this behavior should be done in a standalone
+        // PR where only that specific change is made. Here is a possible solution that should
+        // be done that fulfills our responsibility to send a Failure StatusResponse, but this causes unit
+        // tests to start failing.
+        //   ```
+        //   if (HasSessionHandle())
+        //   {
+        //       SendStatusResponse(Status::Failure);
+        //   }
+        //   Close();
+        //   return;
+        //   ```
+    }
 
     if (HasMoreToSend())
     {
@@ -98,10 +112,9 @@ CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
     {
         Close();
     }
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandResponseSender::SendCommandResponse()
+CHIP_ERROR CommandResponder::SendCommandResponse()
 {
     VerifyOrReturnError(HasMoreToSend(), CHIP_ERROR_INCORRECT_STATE);
     if (mChunks.IsNull())
@@ -126,7 +139,7 @@ CHIP_ERROR CommandResponseSender::SendCommandResponse()
     return CHIP_NO_ERROR;
 }
 
-const char * CommandResponseSender::GetStateStr() const
+const char * CommandResponder::GetStateStr() const
 {
 #if CHIP_DETAIL_LOGGING
     switch (mState)
@@ -144,7 +157,7 @@ const char * CommandResponseSender::GetStateStr() const
     return "N/A";
 }
 
-void CommandResponseSender::MoveToState(const State aTargetState)
+void CommandResponder::MoveToState(const State aTargetState)
 {
     if (mState == aTargetState)
     {
@@ -154,15 +167,54 @@ void CommandResponseSender::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "Command response sender moving to [%10.10s]", GetStateStr());
 }
 
-void CommandResponseSender::Close()
+void CommandResponder::Close()
 {
     MoveToState(State::AllInvokeResponsesSent);
-    mCloseCalled = true;
-    if (mResponseSenderDoneCallback)
+    mpCallback->OnDone(*this);
+}
+
+void CommandResponder::OnInvokeCommandRequest(Messaging::ExchangeContext * ec,
+                                                   System::PacketBufferHandle && payload, bool isTimedInvoke)
+{
+    VerifyOrDieWithMsg(ec != nullptr, DataManagement, "Incoming exchange context should not be null");
+    VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement, "state should be ReadyForInvokeResponses");
+
+    // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
+    // Exchange Manager for unsolicited InvokeCommand Requests.
+    mExchangeCtx.Grab(ec);
+    mExchangeCtx->WillSendMessage();
+
+    // Grabbing Handle to prevent OnDone from being called before OnInvokeCommandRequest returns.
+    // This allows us to send a StatusResponse error instead of the queued up InvokeResponseMessages.
+    CommandHandler::Handle workHandle(&mCommandHandler);
+    Status status = mCommandHandler.OnInvokeCommandRequest(*this, std::move(payload), isTimedInvoke);
+    if (status != Status::Success)
     {
-        mResponseSenderDoneCallback->mCall(mResponseSenderDoneCallback->mContext);
+        VerifyOrDie(mState == State::ReadyForInvokeResponses);
+        SendStatusResponse(status);
+        // We can't safely call Close() yet, even though we won't be sending more data on this exchange.
+        // It must be deferred until OnDone is called.
+        mDelayCallingCloseUntilOnDone = true;
     }
 }
+
+
+#if CHIP_WITH_NLFAULTINJECTION
+
+void CommandResponder::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
+                                                                    System::PacketBufferHandle && payload, bool isTimedInvoke,
+                                                                    CommandHandler::NlFaultInjectionType faultType)
+{
+    VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
+    VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement, "TH Failure: state should be ReadyForInvokeResponses, issue with TH");
+
+    mExchangeCtx.Grab(ec);
+    mExchangeCtx->WillSendMessage();
+
+    mCommandHandler.TestOnlyInvokeCommandRequestWithFaultsInjected(*this, std::move(payload), isTimedInvoke, faultType);
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
+
 
 } // namespace app
 } // namespace chip

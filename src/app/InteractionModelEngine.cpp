@@ -112,7 +112,7 @@ void InteractionModelEngine::Shutdown()
     // Increase magic number to invalidate all Handle-s.
     mMagic++;
 
-    mCommandHandlerObjs.ReleaseAll();
+    mCommandResponderObjs.ReleaseAll();
 
     mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> Loop {
         mpExchangeMgr->CloseAllContextsForDelegate(obj);
@@ -374,9 +374,14 @@ bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabric
     return false;
 }
 
+void InteractionModelEngine::OnDone(CommandResponder & apResponderObj)
+{
+    mCommandResponderObjs.ReleaseObject(&apResponderObj);
+}
+
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
-    mCommandHandlerObjs.ReleaseObject(&apCommandObj);
+    VerifyOrDie(false);
 }
 
 void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
@@ -412,28 +417,29 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
                                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                                       bool aIsTimedInvoke)
 {
-    CommandHandler * commandHandler = mCommandHandlerObjs.CreateObject(this);
-    if (commandHandler == nullptr)
+    //CommandHandler * commandHandler = mCommandResponderObjs.CreateObject(this);
+    CommandResponder * commandResponder = mCommandResponderObjs.CreateObject(this, this);
+    if (commandResponder == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
         return Status::Busy;
     }
     CHIP_FAULT_INJECT(
         FaultInjection::kFault_IMInvoke_SeparateResponses,
-        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
+        commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(
             apExchangeContext, std::move(aPayload), aIsTimedInvoke, CommandHandler::NlFaultInjectionType::SeparateResponseMessages);
         return Status::Success;);
     CHIP_FAULT_INJECT(FaultInjection::kFault_IMInvoke_SeparateResponsesInvertResponseOrder,
-                      commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(
+                      commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(
                           apExchangeContext, std::move(aPayload), aIsTimedInvoke,
                           CommandHandler::NlFaultInjectionType::SeparateResponseMessagesAndInvertedResponseOrder);
                       return Status::Success;);
     CHIP_FAULT_INJECT(
         FaultInjection::kFault_IMInvoke_SkipSecondResponse,
-        commandHandler->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
+        commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
                                                                        CommandHandler::NlFaultInjectionType::SkipSecondResponse);
         return Status::Success;);
-    commandHandler->OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), aIsTimedInvoke);
+    commandResponder->OnInvokeCommandRequest(apExchangeContext, std::move(aPayload), aIsTimedInvoke);
     return Status::Success;
 }
 

@@ -44,18 +44,28 @@ namespace app {
 using Status = Protocols::InteractionModel::Status;
 
 CommandHandler::CommandHandler(Callback * apCallback) :
-    mpCallback(apCallback), mResponseSenderDone(HandleOnResponseSenderDone, this), mSuppressResponse(false)
+    mpCallback(apCallback), mSuppressResponse(false)
 {}
 
-CommandHandler::CommandHandler(TestOnlyMarker aTestMarker, Callback * apCallback, CommandPathRegistry * apCommandPathRegistry) :
+CommandHandler::CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apCallback) :
     CommandHandler(apCallback)
 {
-    mMaxPathsPerInvoke   = apCommandPathRegistry->MaxSize();
-    mCommandPathRegistry = apCommandPathRegistry;
+    if (aTestOverride.commandPathRegistry)
+    {
+        mMaxPathsPerInvoke   = aTestOverride.commandPathRegistry->MaxSize();
+        mCommandPathRegistry = aTestOverride.commandPathRegistry;
+    }
+    if (aTestOverride.commandResponder)
+    {
+        SetCommandResponder(*aTestOverride.commandResponder);
+    }
 }
 
 CHIP_ERROR CommandHandler::AllocateBuffer()
 {
+    // We should only allocate a buffer if we will be sending out a response.
+    VerifyOrReturnError(ResponsesAccepted(), CHIP_ERROR_INCORRECT_STATE);
+
     if (!mBufferAllocated)
     {
         mCommandMessageWriter.Reset();
@@ -92,40 +102,19 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                            System::PacketBufferHandle && payload, bool isTimedInvoke)
+Status CommandHandler::OnInvokeCommandRequest(CommandResponderInterface & commandResponder,
+                                              System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
-    System::PacketBufferHandle response;
-    Status status = Status::Failure;
-    VerifyOrDieWithMsg(ec != nullptr, DataManagement, "Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "state should be Idle");
 
-    // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
-    // Exchange Manager for unsolicited InvokeCommand Requests.
-    mResponseSender.SetExchangeContext(ec);
+    SetCommandResponder(commandResponder);
 
     // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
-    // TODO: This is broken!  If something under here returns error, we will try
-    // to StartSendingCommandResponses(), and then our caller will try to send a status
-    // response too.  Figure out at what point it's our responsibility to
-    // handler errors vs our caller's.
     Handle workHandle(this);
 
-    // TODO(#30453): It should be possible for SetExchangeContext to internally call WillSendMessage.
-    // Unfortunately, doing so would require us to either:
-    // * Make TestCommandInteraction a friend of CommandResponseSender to allow it to set the exchange
-    //   context without calling WillSendMessage, or
-    // * Understand why unit tests fail when WillSendMessage is called during the execution of
-    //   SetExchangeContext.
-    mResponseSender.WillSendMessage();
-    status = ProcessInvokeRequest(std::move(payload), isTimedInvoke);
-    if (status != Status::Success)
-    {
-        mResponseSender.SendStatusResponse(status);
-        mSentStatusResponse = true;
-    }
-
+    Status status = ProcessInvokeRequest(std::move(payload), isTimedInvoke);
     mGoneAsync = true;
+    return status;
 }
 
 CHIP_ERROR CommandHandler::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage)
@@ -209,7 +198,8 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     invokeRequestMessage.PrettyPrint();
 #endif
-    if (mResponseSender.IsForGroup())
+    VerifyOrDie(mpResponder != nullptr);
+    if (mpResponder->IsForGroup())
     {
         SetGroupRequest(true);
     }
@@ -284,14 +274,6 @@ void CommandHandler::Close()
     }
 }
 
-void CommandHandler::HandleOnResponseSenderDone(void * context)
-{
-    CommandHandler * const _this = static_cast<CommandHandler *>(context);
-    VerifyOrDie(_this != nullptr);
-
-    _this->Close();
-}
-
 void CommandHandler::IncrementHoldOff()
 {
     mPendingWork++;
@@ -307,55 +289,20 @@ void CommandHandler::DecrementHoldOff()
         return;
     }
 
-    if (!mSentStatusResponse)
+    if (mpResponder == nullptr)
     {
-        if (!mResponseSender.HasExchangeContext())
+        ChipLogProgress(DataManagement, "Skipping command response: response sender is null");
+    }
+    else if (!IsGroupRequest())
+    {
+        CHIP_ERROR err = FinalizeLastInvokeResponseMessage();
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(DataManagement, "Skipping command response: exchange context is null");
-        }
-        else if (!IsGroupRequest())
-        {
-            CHIP_ERROR err = StartSendingCommandResponses();
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
-                // TODO(#30453): It should be our responsibility to send a Failure StatusResponse to the requestor
-                // if there is a SessionHandle, but legacy unit tests explicitly check the behavior where
-                // CommandHandler does not send any message. Changing this behavior should be done in a standalone
-                // PR where only that specific change is made. Here is a possible solution that should
-                // be done that fulfills our responsibility to send a Failure StatusResponse, but this causes unit
-                // tests to start failing.
-                //   ```
-                //   if (mResponseSender.HasSessionHandle())
-                //   {
-                //       mResponseSender.SendStatusResponse(Status::Failure);
-                //   }
-                //   Close();
-                //   return;
-                //   ```
-            }
+            ChipLogError(DataManagement, "Failed to finalize command response: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
 
-    if (mResponseSender.AwaitingStatusResponse())
-    {
-        // If we are awaiting a status response, we want to call Close() only once the response sender is done.
-        // Therefore, register to be notified when CommandResponseSender is done.
-        mResponseSender.RegisterOnResponseSenderDoneCallback(&mResponseSenderDone);
-        return;
-    }
     Close();
-}
-
-CHIP_ERROR CommandHandler::StartSendingCommandResponses()
-{
-    VerifyOrReturnError(mPendingWork == 0, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mResponseSender.HasExchangeContext(), CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorOnFailure(FinalizeLastInvokeResponseMessage());
-    ReturnErrorOnFailure(mResponseSender.StartSendingCommandResponses());
-    return CHIP_NO_ERROR;
 }
 
 namespace {
@@ -396,7 +343,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
         }
     }
 
-    VerifyOrExit(mResponseSender.HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrDie(mpResponder != nullptr);
 
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
@@ -485,7 +432,8 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
     err = commandPath.GetGroupCommandPath(&clusterId, &commandId);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
-    groupId = mResponseSender.GetGroupId();
+    VerifyOrDie(mpResponder != nullptr);
+    groupId = mpResponder->GetGroupId();
     fabric  = GetAccessingFabricIndex();
 
     ChipLogDetail(DataManagement, "Received group command for Group=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
@@ -593,14 +541,14 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
 void CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                const char * context)
 {
-    // Return early in case of requests targeted to a group, since they should not add a response.
-    VerifyOrReturn(!IsGroupRequest());
     VerifyOrDie(FallibleAddStatus(aCommandPath, aStatus, context) == CHIP_NO_ERROR);
 }
 
 CHIP_ERROR CommandHandler::FallibleAddStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::Status status,
                                              const char * context)
 {
+    // Return early when response should not be sent out.
+    VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
 
     if (status != Status::Success)
     {
@@ -803,7 +751,8 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
     VerifyOrDie(!mGoneAsync);
-    return mResponseSender.GetAccessingFabricIndex();
+    VerifyOrDie(mpResponder != nullptr);
+    return mpResponder->GetAccessingFabricIndex();
 }
 
 CommandHandler * CommandHandler::Handle::Get()
@@ -850,7 +799,8 @@ CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessageAndPrepareNext()
         // definitively guaranteed.
         // Response dropping is not yet definitive as a subsequent call
         // to AllocateBuffer might succeed.
-        mResponseSender.ResponseDropped();
+        VerifyOrDie(mpResponder != nullptr);
+        mpResponder->ResponseDropped();
     }
     return err;
 }
@@ -870,10 +820,17 @@ CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessage(bool aHasMoreChunks)
     }
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     ReturnErrorOnFailure(mCommandMessageWriter.Finalize(&packet));
-    mResponseSender.AddInvokeResponseToSend(std::move(packet));
+    VerifyOrDie(mpResponder != nullptr);
+    mpResponder->AddInvokeResponseToSend(std::move(packet));
     mBufferAllocated     = false;
     mRollbackBackupValid = false;
     return CHIP_NO_ERROR;
+}
+
+void CommandHandler::SetCommandResponder(CommandResponderInterface & commandResponder)
+{
+    VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "CommandResponder can only be set in idle state");
+    mpResponder = &commandResponder;
 }
 
 const char * CommandHandler::GetStateStr() const
@@ -948,20 +905,18 @@ CHIP_ERROR TestOnlyExtractCommandPathFromNextInvokeRequest(TLV::TLVReader & invo
 // This method intentionally duplicates code from other sections. While code consolidation
 // is generally preferred, here we prioritize generating a clear crash message to aid in
 // troubleshooting test failures.
-void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
+void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandResponderInterface & commandResponder,
                                                                     System::PacketBufferHandle && payload, bool isTimedInvoke,
                                                                     NlFaultInjectionType faultType)
 {
-    VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH Failure: state should be Idle, issue with TH");
+    SetCommandResponder(commandResponder);
 
     ChipLogProgress(DataManagement, "Response to InvokeRequestMessage overridden by fault injection");
     ChipLogProgress(DataManagement, "   Injecting the following response:%s", GetFaultInjectionTypeStr(faultType));
 
-    mResponseSender.SetExchangeContext(ec);
     Handle workHandle(this);
-    mResponseSender.WillSendMessage();
-    VerifyOrDieWithMsg(!mResponseSender.IsForGroup(), DataManagement, "DUT Failure: Unexpected Group Command");
+    VerifyOrDieWithMsg(!commandResponder.IsForGroup(), DataManagement, "DUT Failure: Unexpected Group Command");
 
     System::PacketBufferTLVReader reader;
     InvokeRequestMessage::Parser invokeRequestMessage;

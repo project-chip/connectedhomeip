@@ -31,8 +31,8 @@
 #pragma once
 
 #include "CommandPathRegistry.h"
-#include "CommandResponseSender.h"
 
+#include <app/CommandResponderInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
@@ -177,8 +177,11 @@ public:
         bool mStartOrEndDataStruct = true;
     };
 
-    class TestOnlyMarker
+    class TestOnlyOverrides
     {
+    public:
+        CommandPathRegistry * commandPathRegistry = nullptr;
+        CommandResponderInterface * commandResponder = nullptr;
     };
 
     /*
@@ -189,32 +192,32 @@ public:
     CommandHandler(Callback * apCallback);
 
     /*
-     * Constructor to override number of supported paths per invoke.
+     * Constructor to override number of supported paths per invoke and command responder.
      *
-     * The callback and command path registry passed in has to outlive this CommandHandler object.
+     * The callback and any pointer passed via TestOnlyOverrides outlive this CommandHandler object.
      * For testing purposes.
      */
-    CommandHandler(TestOnlyMarker aTestMarker, Callback * apCallback, CommandPathRegistry * apCommandPathRegistry);
+    CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apCallback);
 
     /*
-     * Main entrypoint for this class to handle an invoke request.
-     *
-     * This function will always call the OnDone function above on the registered callback
-     * before returning.
+     * Main entrypoint for this class to handle an InvokeRequestMessage.
      *
      * isTimedInvoke is true if and only if this is part of a Timed Invoke
      * transaction (i.e. was preceded by a Timed Request).  If we reach here,
      * the timer verification has already been done.
+     * 
+     * commandResponder handles sending InvokeResponses, added by clusters, to the client.
      */
-    void OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                System::PacketBufferHandle && payload, bool isTimedInvoke);
+    Protocols::InteractionModel::Status OnInvokeCommandRequest(
+        CommandResponderInterface & commandResponder, System::PacketBufferHandle && payload,
+        bool isTimedInvoke);
 
     /**
      * Checks that all CommandDataIB within InvokeRequests satisfy the spec's general
      * constraints for CommandDataIB. Additionally checks that InvokeRequestMessage is
      * properly formatted.
      *
-     * This also builds a registry that to ensure that all commands can be responded
+     * This also builds a registry to ensure that all commands can be responded
      * to with the data required as per spec.
      */
     CHIP_ERROR ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage);
@@ -236,8 +239,6 @@ public:
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
-
-    Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
 
     /**
      * This adds a new CommandDataIB element into InvokeResponses for the associated
@@ -300,54 +301,6 @@ public:
     FabricIndex GetAccessingFabricIndex() const;
 
     /**
-     * @brief Best effort to add InvokeResponse to InvokeResponseMessage.
-     *
-     * Tries to add response using lambda. Upon failure to add response, attempts
-     * to rollback the InvokeResponseMessage to a known good state. If failure is due
-     * to insufficient space in the current InvokeResponseMessage:
-     *  - Finalizes the current InvokeResponseMessage.
-     *  - Allocates a new InvokeResponseMessage.
-     *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
-     *
-     * @param [in] addResponseFunction A lambda function responsible for adding the
-     *             response to the current InvokeResponseMessage.
-     */
-    template <typename Function>
-    CHIP_ERROR TryAddingResponse(Function && addResponseFunction)
-    {
-        // Invalidate any existing rollback backups. The addResponseFunction is
-        // expected to create a new backup during either PrepareInvokeResponseCommand
-        // or PrepareStatus execution. Direct invocation of
-        // CreateBackupForResponseRollback is avoided since the buffer used by
-        // InvokeResponseMessage might not be allocated until a Prepare* function
-        // is called.
-        mRollbackBackupValid = false;
-        CHIP_ERROR err       = addResponseFunction();
-        if (err == CHIP_NO_ERROR)
-        {
-            return CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(RollbackResponse());
-        // If we failed to add a command due to lack of space in the
-        // packet, we will make another attempt to add the response using
-        // an additional InvokeResponseMessage.
-        if (mState != State::AddedCommand || err != CHIP_ERROR_NO_MEMORY)
-        {
-            return err;
-        }
-        ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndPrepareNext());
-        err = addResponseFunction();
-        if (err != CHIP_NO_ERROR)
-        {
-            // The return value of RollbackResponse is ignored, as we prioritize
-            // conveying the error generated by addResponseFunction to the
-            // caller.
-            RollbackResponse();
-        }
-        return err;
-    }
-
-    /**
      * API for adding a data response.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
      * object that can be encoded using the DataModel::Encode machinery and
@@ -395,14 +348,18 @@ public:
      * Gets the inner exchange context object, without ownership.
      *
      * WARNING: This is dangerous, since it is directly interacting with the
-     *          exchange being managed automatically by mResponseSender and
+     *          exchange being managed automatically by mpResponder and
      *          if not done carefully, may end up with use-after-free errors.
      *
      * @return The inner exchange context, might be nullptr if no
      *         exchange context has been assigned or the context
      *         has been released.
      */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mResponseSender.GetExchangeContext(); }
+    Messaging::ExchangeContext * GetExchangeContext() const
+    {
+        VerifyOrDie(mpResponder);
+        return mpResponder->GetExchangeContext();
+    }
 
     /**
      * @brief Flush acks right away for a slow command
@@ -415,7 +372,13 @@ public:
      * execution.
      *
      */
-    void FlushAcksRightAwayOnSlowCommand() { mResponseSender.FlushAcksRightNow(); }
+    void FlushAcksRightAwayOnSlowCommand()
+    {
+        if (mpResponder)
+        {
+            mpResponder->FlushAcksRightNow();
+        }
+    }
 
     /**
      * GetSubjectDescriptor() may only be called during synchronous command
@@ -426,7 +389,8 @@ public:
     Access::SubjectDescriptor GetSubjectDescriptor() const
     {
         VerifyOrDie(!mGoneAsync);
-        return mResponseSender.GetSubjectDescriptor();
+        VerifyOrDie(mpResponder);
+        return mpResponder->GetSubjectDescriptor();
     }
 
 #if CHIP_WITH_NLFAULTINJECTION
@@ -454,7 +418,7 @@ public:
      */
     // TODO(#30453): After refactoring CommandHandler for better unit testability, create a
     // unit test specifically for the fault injection behavior.
-    void TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
+    void TestOnlyInvokeCommandRequestWithFaultsInjected(CommandResponderInterface & commandResponder, System::PacketBufferHandle && payload,
                                                         bool isTimedInvoke, NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
 
@@ -472,6 +436,58 @@ private:
         DispatchResponses,   ///< The command response(s) are being dispatched.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
+
+    /**
+     * @brief Best effort to add InvokeResponse to InvokeResponseMessage.
+     *
+     * Tries to add response using lambda. Upon failure to add response, attempts
+     * to rollback the InvokeResponseMessage to a known good state. If failure is due
+     * to insufficient space in the current InvokeResponseMessage:
+     *  - Finalizes the current InvokeResponseMessage.
+     *  - Allocates a new InvokeResponseMessage.
+     *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
+     *
+     * @param [in] addResponseFunction A lambda function responsible for adding the
+     *             response to the current InvokeResponseMessage.
+     */
+    template <typename Function>
+    CHIP_ERROR TryAddingResponse(Function && addResponseFunction)
+    {
+        // Return early when response should not be sent out.
+        VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
+
+        // Invalidate any existing rollback backups. The addResponseFunction is
+        // expected to create a new backup during either PrepareInvokeResponseCommand
+        // or PrepareStatus execution. Direct invocation of
+        // CreateBackupForResponseRollback is avoided since the buffer used by
+        // InvokeResponseMessage might not be allocated until a Prepare* function
+        // is called.
+        mRollbackBackupValid = false;
+        CHIP_ERROR err       = addResponseFunction();
+        if (err == CHIP_NO_ERROR)
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(RollbackResponse());
+        // If we failed to add a command due to lack of space in the
+        // packet, we will make another attempt to add the response using
+        // an additional InvokeResponseMessage.
+        if (mState != State::AddedCommand || err != CHIP_ERROR_NO_MEMORY)
+        {
+            return err;
+        }
+        ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndPrepareNext());
+        err = addResponseFunction();
+        if (err != CHIP_NO_ERROR)
+        {
+            // The return value of RollbackResponse is ignored, as we prioritize
+            // conveying the error generated by addResponseFunction to the
+            // caller.
+            RollbackResponse();
+        }
+        return err;
+    }
+
 
     void MoveToState(const State aTargetState);
     const char * GetStateStr() const;
@@ -549,17 +565,14 @@ private:
 
     CHIP_ERROR FinalizeInvokeResponseMessage(bool aHasMoreChunks);
 
+    Protocols::InteractionModel::Status ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
+
     /**
      * Called internally to signal the completion of all work on this object, gracefully close the
      * exchange (by calling into the base class) and finally, signal to a registerd callback that it's
      * safe to release this object.
      */
     void Close();
-
-    /**
-     * @brief Callback method invoked when CommandResponseSender has finished sending all messages.
-     */
-    static void HandleOnResponseSenderDone(void * context);
 
     /**
      * ProcessCommandDataIB is only called when a unicast invoke command request is received
@@ -572,7 +585,6 @@ private:
      * It doesn't need the endpointId in it's command path since it uses the GroupId in message metadata to find it
      */
     Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
-    CHIP_ERROR StartSendingCommandResponses();
 
     CHIP_ERROR TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
@@ -595,8 +607,8 @@ private:
     CHIP_ERROR TryAddResponseDataPreEncode(const ConcreteCommandPath & aRequestCommandPath,
                                            const ConcreteCommandPath & aResponseCommandPath)
     {
-        // Return early in case of requests targeted to a group, since they should not add a response.
-        VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
+        // Return early when response should not be sent out.
+        VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
 
         InvokeResponseParameters prepareParams(aRequestCommandPath);
         prepareParams.SetStartOrEndDataStruct(false);
@@ -638,10 +650,14 @@ private:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
+    void SetCommandResponder(CommandResponderInterface & commandResponder);
+
     /**
      * Check whether the InvokeRequest we are handling is targeted to a group.
      */
     bool IsGroupRequest() { return mGroupRequest; }
+
+    bool ResponsesAccepted() { return !(mGroupRequest || mpResponder == nullptr); }
 
     /**
      * Sets the state flag to keep the information that request we are handling is targeted to a group.
@@ -666,15 +682,13 @@ private:
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
-    chip::Callback::Callback<OnResponseSenderDone> mResponseSenderDone;
-    CommandResponseSender mResponseSender;
+    CommandResponderInterface * mpResponder = nullptr;
 
     State mState = State::Idle;
     State mBackupState;
     ScopedChangeOnly<bool> mInternalCallToAddResponseData{ false };
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
-    bool mSentStatusResponse               = false;
     bool mGroupRequest                     = false;
     bool mBufferAllocated                  = false;
     bool mReserveSpaceForMoreChunkMessages = false;
