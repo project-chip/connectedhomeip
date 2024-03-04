@@ -49,6 +49,7 @@ static_library("cluster-objects") {
     ":ids",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/MessageDef:events",
     "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

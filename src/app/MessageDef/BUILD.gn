@@ -18,6 +18,11 @@ source_set("events") {
     "EventHeader.h",
     "EventLoggingTypes.h",
   ]
+
+  deps = [
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app:paths",
+  ]
 }
 
 source_set("MessageDef") {

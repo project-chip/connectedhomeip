@@ -97,8 +97,6 @@ jobs:
                      --known-failure app/CommandHandlerInterface.h \
                      --known-failure app/CommandSenderLegacyCallback.h \
                      --known-failure app/data-model/ListLargeSystemExtensions.h \
-                     --known-failure app/EventHeader.h \
-                     --known-failure app/EventLoggingTypes.h \
                      --known-failure app/ReadHandler.h \
                      --known-failure app/ReadPrepareParams.h \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
