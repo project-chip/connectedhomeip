@@ -272,10 +272,10 @@ menu "CHIP Core"
                 the node is not yet commissioned.
 
         config ENABLE_SNTP_TIME_SYNC
-            bool "Enable sntp time synchronization"
+            bool "Enable SNTP time synchronization"
             default n
             help
-                Enable this option to enable sntp time synchronization for example
+                Enable this option to enable SNTP time synchronization
 
     endmenu # "System Options"
 

@@ -26,7 +26,7 @@ static constexpr uint32_t kSecondsInADay        = 24 * 60 * 60;
 
 namespace {
 const uint8_t kMaxNtpServerStringSize = 128;
-char sSntpServerName[kMaxNtpServerStringSize];
+char sSntpServerName[kMaxNtpServerStringSize + 1];
 
 CHIP_ERROR GetLocalTimeString(char * buf, size_t buf_len)
 {
