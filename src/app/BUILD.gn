@@ -191,6 +191,8 @@ static_library("interaction-model") {
     "reporting/reporting.h",
   ]
 
+  deps = [ "${chip_root}/src/app/MessageDef:events" ]
+
   public_deps = [
     ":app_config",
     ":constants",
@@ -248,6 +250,7 @@ static_library("app") {
 
   sources = [
     "AttributeAccessInterface.cpp",
+    "AttributeAccessInterfaceCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePersistenceProvider.h",
