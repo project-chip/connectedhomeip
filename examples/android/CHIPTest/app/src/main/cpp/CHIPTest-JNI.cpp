@@ -263,6 +263,7 @@ extern "C" JNIEXPORT jint Java_com_tcl_chip_chiptest_TestEngine_runTest(JNIEnv *
     nlTestSetLogger(&jni_test_logger);
 
     jint ret = RunRegisteredUnitTests();
+    ret += RUN_ALL_TESTS();
 
     return ret;
 }
