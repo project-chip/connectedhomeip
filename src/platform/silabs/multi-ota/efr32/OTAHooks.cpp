@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
-#include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <include/platform/CHIPDeviceLayer.h>
+#include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#include <platform/silabs/multi-ota/efr32/OTAFirmwareProcessor.h>
 #include <platform/silabs/multi-ota/efr32/OTACustomProcessor.h>
+#include <platform/silabs/multi-ota/efr32/OTAFirmwareProcessor.h>
 
 CHIP_ERROR ProcessDescriptor(void * descriptor)
 {

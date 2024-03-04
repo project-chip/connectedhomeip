@@ -80,11 +80,11 @@ class OTATlvProcessor
 public:
     virtual ~OTATlvProcessor() {}
 
-    virtual CHIP_ERROR Init()        = 0;
-    virtual CHIP_ERROR Clear()       = 0;
-    virtual CHIP_ERROR ApplyAction() = 0;
+    virtual CHIP_ERROR Init()           = 0;
+    virtual CHIP_ERROR Clear()          = 0;
+    virtual CHIP_ERROR ApplyAction()    = 0;
     virtual CHIP_ERROR FinalizeAction() = 0;
-    //virtual CHIP_ERROR AbortAction() = 0;
+    // virtual CHIP_ERROR AbortAction() = 0;
     virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
 
     CHIP_ERROR Process(ByteSpan & block);

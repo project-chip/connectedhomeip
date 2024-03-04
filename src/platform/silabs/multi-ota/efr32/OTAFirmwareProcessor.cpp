@@ -104,7 +104,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
             {
                 ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage() error: %ld", err);
                 // TODO: add this somewhere
-                //imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+                // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                 // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
                 return CHIP_ERROR_CANCELLED;
             }
@@ -130,7 +130,7 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
 {
     uint32_t err = SL_BOOTLOADER_OK;
 
-    #if SL_BTLCTRL_MUX
+#if SL_BTLCTRL_MUX
     err = sl_wfx_host_pre_bootloader_spi_transfer();
     if (err != SL_STATUS_OK)
     {
@@ -181,14 +181,14 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
     }
 #endif // SL_BTLCTRL_MUX
     // This reboots the device
-    //CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
+    // CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAFirmwareProcessor::FinalizeAction()
 {
-    uint32_t err          = SL_BOOTLOADER_OK;
+    uint32_t err = SL_BOOTLOADER_OK;
 
     // Pad the remainder of the write buffer with zeros and write it to bootloader storage
     if (writeBufOffset != 0)
@@ -216,7 +216,6 @@ CHIP_ERROR OTAFirmwareProcessor::FinalizeAction()
             return SL_GENERIC_OTA_ERROR;
         }
 #endif // SL_BTLCTRL_MUX
-
     }
 
     return err ? CHIP_ERROR_WRITE_FAILED : CHIP_NO_ERROR;

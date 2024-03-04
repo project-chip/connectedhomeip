@@ -17,8 +17,8 @@
  */
 
 #include "OTAConfig.h"
-#include <app/server/Server.h>
 #include "silabs_utils.h"
+#include <app/server/Server.h>
 
 #ifndef SIWX_917
 

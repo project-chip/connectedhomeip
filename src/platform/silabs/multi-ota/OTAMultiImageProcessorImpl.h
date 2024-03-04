@@ -18,13 +18,13 @@
 
 #pragma once
 
-#include <lib/core/OTAImageHeader.h>
-#include <map>
-#include <platform/silabs/multi-ota/OTATlvProcessor.h>
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <include/platform/CHIPDeviceLayer.h>
 #include <include/platform/OTAImageProcessor.h>
+#include <lib/core/OTAImageHeader.h>
+#include <map>
+#include <platform/silabs/multi-ota/OTATlvProcessor.h>
 
 /*
  * This hook is called at the end of OTAMultiImageProcessorImpl::Init.

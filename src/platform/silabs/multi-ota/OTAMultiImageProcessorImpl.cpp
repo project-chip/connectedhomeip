@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <lib/support/BufferReader.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <app/clusters/ota-requestor/OTADownloader.h>
-#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
@@ -37,7 +37,6 @@ extern "C" {
 #include "spi_multiplex.h"
 #endif // SL_WIFI
 }
-
 
 namespace chip {
 
@@ -223,9 +222,7 @@ void OTAMultiImageProcessorImpl::HandleAbort(intptr_t context)
         imageProcessor->AbortAllProcessors();
     }
     imageProcessor->Clear();
-
 }
-
 
 void OTAMultiImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
@@ -347,7 +344,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SetBlock(ByteSpan & block)
 void OTAMultiImageProcessorImpl::HandleFinalize(intptr_t context)
 {
     ChipLogError(SoftwareUpdate, "HandleFinalize begin");
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error      = CHIP_NO_ERROR;
     auto * imageProcessor = reinterpret_cast<OTAMultiImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -423,7 +420,6 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
 
-
     // TODO: check where to put this
     // ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
 
@@ -446,7 +442,6 @@ void OTAMultiImageProcessorImpl::FetchNextData(uint32_t context)
 {
     ChipLogError(SoftwareUpdate, "Fetch data 1:");
 
-
     auto * imageProcessor = &OTAMultiImageProcessorImpl::GetDefaultInstance();
     SystemLayer().ScheduleLambda([imageProcessor] {
         if (imageProcessor->mDownloader)
@@ -455,7 +450,6 @@ void OTAMultiImageProcessorImpl::FetchNextData(uint32_t context)
         }
     });
     ChipLogError(SoftwareUpdate, "Fetch data 2:");
-
 }
 
 OTAMultiImageProcessorImpl & OTAMultiImageProcessorImpl::GetDefaultInstance()
