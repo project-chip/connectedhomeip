@@ -446,7 +446,9 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         // We trigger Check-In messages before resuming subscriptions to avoid doing both.
         if (!mFailSafeContext.IsFailSafeArmed())
         {
-            mICDManager.TriggerCheckInMessages();
+            std::function<chip::app::ICDManager::RegistrationVerificationFunction> verifier =
+                std::bind(&Server::CheckInWouldBeSentAtBootVerifier, this, std::placeholders::_1, std::placeholders::_2);
+            mICDManager.TriggerCheckInMessages(verifier);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -518,6 +520,20 @@ void Server::RejoinExistingMulticastGroups()
         }
     }
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+bool Server::CheckInWouldBeSentAtBootVerifier(FabricIndex aFabricIndex, NodeId subjectID)
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    // At least one registration has a persisted entry. Do not send Check-In message.
+    // This is to cover the use-case where the subscription resumption feature is used with the Check-In message.
+    VerifyOrReturnValue(chip::app::InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(aFabricIndex, subjectID),
+                        true);
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    return false;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 void Server::GenerateShutDownEvent()
 {

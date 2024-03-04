@@ -369,6 +369,18 @@ public:
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    /**
+     * @brief Verifier to determine if a Check-In message would be sent at Boot up
+     *
+     * @param aFabricIndex client fabric index
+     * @param subjectID client subject ID
+     * @return true Check-In message would be sent on boot up.
+     * @return false Device has a persisted subscription with the client. See CHIP_CONFIG_PERSIST_SUBSCRIPTIONS.
+     */
+    bool CheckInWouldBeSentAtBootVerifier(FabricIndex aFabricIndex, NodeId subjectID);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**

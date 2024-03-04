@@ -204,8 +204,10 @@ void ICDManager::SendCheckInMsgs()
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
-bool ICDManager::CheckInMessagesWouldBeSent()
+bool ICDManager::CheckInMessagesWouldBeSent(std::function<RegistrationVerificationFunction> RegistrationVerifier)
 {
+    VerifyOrReturnValue(RegistrationVerifier, false);
+
     for (const auto & fabricInfo : *mFabricTable)
     {
         uint16_t supported_clients = ICDConfigurationData::GetInstance().GetClientsSupportedPerFabric();
@@ -234,7 +236,7 @@ bool ICDManager::CheckInMessagesWouldBeSent()
             }
 
             // At least one registration would require a Check-In message
-            VerifyOrReturnValue(mSubInfoProvider->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject), true);
+            VerifyOrReturnValue(RegistrationVerifier(entry.fabricIndex, entry.monitoredSubject), true);
         }
     }
 
@@ -242,7 +244,19 @@ bool ICDManager::CheckInMessagesWouldBeSent()
     return false;
 }
 
-void ICDManager::TriggerCheckInMessages()
+bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex, NodeId subjectID)
+{
+    VerifyOrReturnValue(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID), true);
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    // At least one registration has a persisted entry. Do not send Check-In message.
+    // This is to cover the use-case where the subscription resumption feature is used with the Check-In message.
+    VerifyOrReturnValue(mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID), true);
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    return false;
+}
+
+void ICDManager::TriggerCheckInMessages(const std::function<RegistrationVerificationFunction> & verifier)
 {
     VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
 
@@ -250,9 +264,7 @@ void ICDManager::TriggerCheckInMessages()
     // If we are already in ActiveMode, Check-In messages have already been sent.
     VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
 
-    // If we don't have any Check-In messages to send, do nothing
-    VerifyOrReturn(CheckInMessagesWouldBeSent());
-
+    VerifyOrReturn(CheckInMessagesWouldBeSent(verifier));
     UpdateOperationState(OperationalState::ActiveMode);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
@@ -313,12 +325,16 @@ void ICDManager::UpdateOperationState(OperationalState state)
     {
         mOperationalState = OperationalState::IdleMode;
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        std::function<RegistrationVerificationFunction> verifier =
+            std::bind(&ICDManager::CheckInWouldBeSentAtActiveModeVerifier, this, std::placeholders::_1, std::placeholders::_2);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
         // unless the device would need to send Check-In messages
-        // TODO(#30281) : Verify how persistent subscriptions affects this at ICDManager::Init
         if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-            || CheckInMessagesWouldBeSent()
+            || CheckInMessagesWouldBeSent(verifier)
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
         )
         {

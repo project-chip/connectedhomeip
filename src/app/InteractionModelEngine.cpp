@@ -371,8 +371,25 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricInd
 
 bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID)
 {
-    // TODO(#30281) : Implement persisted sub check and verify how persistent subscriptions affects this at ICDManager::Init
-    return false;
+    bool persistedSubMatches = false;
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+
+    while (iterator->Next(subscriptionInfo))
+    {
+        // TODO(#31873): Persistant subscription only stores the NodeID for now. We cannot check if the CAT matches
+        if (subscriptionInfo.mFabricIndex == aFabricIndex && subscriptionInfo.mNodeId == subjectID)
+        {
+            persistedSubMatches = true;
+            break;
+        }
+    }
+    iterator->Release();
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    return persistedSubMatches;
 }
 
 void InteractionModelEngine::OnDone(CommandResponseSender & apResponderObj)
