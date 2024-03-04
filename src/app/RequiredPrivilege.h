@@ -31,32 +31,26 @@
 
 namespace chip {
 namespace app {
-
-class RequiredPrivilege
+namespace RequiredPrivilege {
+chip::Access::Privilege ForReadAttribute(const ConcreteAttributePath & path)
 {
-    using Privilege = Access::Privilege;
+    return MatterGetAccessPrivilegeForReadAttribute(path.mClusterId, path.mAttributeId);
+}
 
-public:
-    static Privilege ForReadAttribute(const ConcreteAttributePath & path)
-    {
-        return MatterGetAccessPrivilegeForReadAttribute(path.mClusterId, path.mAttributeId);
-    }
+chip::Access::Privilege ForWriteAttribute(const ConcreteAttributePath & path)
+{
+    return MatterGetAccessPrivilegeForWriteAttribute(path.mClusterId, path.mAttributeId);
+}
 
-    static Privilege ForWriteAttribute(const ConcreteAttributePath & path)
-    {
-        return MatterGetAccessPrivilegeForWriteAttribute(path.mClusterId, path.mAttributeId);
-    }
+chip::Access::Privilege ForInvokeCommand(const ConcreteCommandPath & path)
+{
+    return MatterGetAccessPrivilegeForInvokeCommand(path.mClusterId, path.mCommandId);
+}
 
-    static Privilege ForInvokeCommand(const ConcreteCommandPath & path)
-    {
-        return MatterGetAccessPrivilegeForInvokeCommand(path.mClusterId, path.mCommandId);
-    }
-
-    static Privilege ForReadEvent(const ConcreteEventPath & path)
-    {
-        return MatterGetAccessPrivilegeForReadEvent(path.mClusterId, path.mEventId);
-    }
-};
-
+chip::Access::Privilege ForReadEvent(const ConcreteEventPath & path)
+{
+    return MatterGetAccessPrivilegeForReadEvent(path.mClusterId, path.mEventId);
+}
+} // namespace RequiredPrivilege
 } // namespace app
 } // namespace chip

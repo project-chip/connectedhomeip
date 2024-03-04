@@ -34,9 +34,9 @@ namespace {
 
 #ifdef GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER
 namespace GeneratedAccessReadAttribute {
-constexpr ClusterId kCluster[]     = GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER;
-constexpr AttributeId kAttribute[] = GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE;
-constexpr chip::Access::Privilege kPrivilege[]     = GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE;
+constexpr ClusterId kCluster[]                 = GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER;
+constexpr AttributeId kAttribute[]             = GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE;
+constexpr chip::Access::Privilege kPrivilege[] = GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE;
 static_assert(ArraySize(kCluster) == ArraySize(kAttribute) && ArraySize(kAttribute) == ArraySize(kPrivilege),
               "Generated parallel arrays must be same size");
 } // namespace GeneratedAccessReadAttribute
