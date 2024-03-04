@@ -88,7 +88,7 @@ chip::Access::Privilege MatterGetAccessPrivilegeForReadAttribute(ClusterId clust
         }
     }
 #endif
-    return kMatterAccessPrivilegeView;
+    return chip::Access::Privilege::kView;
 }
 
 chip::Access::Privilege MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId attribute)
@@ -103,7 +103,7 @@ chip::Access::Privilege MatterGetAccessPrivilegeForWriteAttribute(ClusterId clus
         }
     }
 #endif
-    return kMatterAccessPrivilegeOperate;
+    return chip::Access::Privilege::kOperate;
 }
 
 chip::Access::Privilege MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId command)
@@ -118,7 +118,7 @@ chip::Access::Privilege MatterGetAccessPrivilegeForInvokeCommand(ClusterId clust
         }
     }
 #endif
-    return kMatterAccessPrivilegeOperate;
+    return chip::Access::Privilege::kOperate;
 }
 
 chip::Access::Privilege MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
@@ -133,5 +133,5 @@ chip::Access::Privilege MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, 
         }
     }
 #endif
-    return kMatterAccessPrivilegeView;
+    return chip::Access::Privilege::kView;
 }
