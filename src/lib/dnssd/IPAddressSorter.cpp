@@ -34,11 +34,11 @@ void Sort(Inet::IPAddress * addresses, size_t count, Inet::InterfaceId interface
 void Sort(const Span<Inet::IPAddress> & addresses, Inet::InterfaceId interfaceId)
 {
     Sorting::InsertionSort(addresses.begin(), addresses.size(),
-                        [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
-                            auto scoreA = to_underlying(ScoreIpAddress(a, interfaceId));
-                            auto scoreB = to_underlying(ScoreIpAddress(b, interfaceId));
-                            return scoreA > scoreB;
-                        });
+                           [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
+                               auto scoreA = to_underlying(ScoreIpAddress(a, interfaceId));
+                               auto scoreB = to_underlying(ScoreIpAddress(b, interfaceId));
+                               return scoreA > scoreB;
+                           });
 }
 
 IpScore ScoreIpAddress(const Inet::IPAddress & ip, Inet::InterfaceId interfaceId)
