@@ -25,5 +25,4 @@ segger_rtt_buffer_size_down = 1024
 
 declare_args() {
   app_data_model = ""
-  chip_enable_multi_ota_requestor = false
 }

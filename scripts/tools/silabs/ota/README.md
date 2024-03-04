@@ -69,20 +69,3 @@ format of the TLV by creating a JSON file based on the `ota_payload.schema`. The
 tool offers support for describing multiple TLV in the same JSON file. Please
 see the `examples/ota_max_entries_example.json` for a multi-app + SSBL example.
 Option `--json` must be used to specify the path to the JSON file.
-
-## Examples
-
-A set of examples can be found in `./examples`. Please run `create_ota_image.sh`
-to generate the examples:
-
--   Application image with default descriptor
--   Application image with specified descriptor
--   Factory data image
--   SSBL image
--   Application + SSBL + factory data image
--   Maximum number of entries image, using `ota_max_entries_example.json`. The
-    examples uses 8 SSBL binaries because they have a small size and fit in
-    external flash.
-
-The binaries from `./examples/binaries` should only be used only as an example.
-The user should provide their own binaries when generating the OTA image.

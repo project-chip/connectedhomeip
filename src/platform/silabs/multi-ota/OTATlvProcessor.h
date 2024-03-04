@@ -42,9 +42,6 @@ namespace chip {
 #define CHIP_OTA_PROCESSOR_EXTERNAL_STORAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
 #define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
 
-// TODO: come up with error codes
-#define SL_GENERIC_OTA_ERROR CHIP_ERROR_TLV_PROCESSOR(0x0F)
-
 // Descriptor constants
 inline constexpr size_t kVersionStringSize = 64;
 inline constexpr size_t kBuildDateSize     = 64;
