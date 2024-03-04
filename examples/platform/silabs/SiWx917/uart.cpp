@@ -128,7 +128,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
  */
 int16_t uartLogWrite(const char * log, uint16_t length)
 {
-    if (log == NULL || length < 1)
+    if (log == NULL || length == 0)
     {
         return UART_CONSOLE_ERR;
     }
