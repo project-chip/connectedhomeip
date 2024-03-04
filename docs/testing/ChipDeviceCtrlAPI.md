@@ -675,9 +675,9 @@ sent.
     AttributeCache.attributeCache (Attribute.py), which is a dict mapping
     endpoints to a list of Cluster (ClusterObjects.py) classes (dict[int,
     List[Cluster]]) Access as
-    returned_object[endpoint_id][<Cluster class>][<Attribute class>] Ex. To
+    returned_object[endpoint_id][<cluster class>][<Attribute class>] Ex. To
     access the OnTime attribute from the OnOff cluster on endpoint 1
-    returned_object[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
+    returned_object[1][clusters.onoff][Clusters.OnOff.Attributes.OnTime]
 
 **Raises**:
 
