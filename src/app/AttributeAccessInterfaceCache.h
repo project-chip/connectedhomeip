@@ -35,7 +35,7 @@ namespace app {
  * This cache records both "used" (i.e. uses AAI) and the single last
  * "unused" (i.e. does NOT use AAI) entries. Combining positive/negative
  * lookup led to factor of ~10 reduction of AAI lookups in total for wildcard
- * reads on chip-all-clusters-app, with a cache size of 1. The size did not
+ * reads on chip-all-clusters-app, with a cache size of 1. Increasing the size did not
  * significantly improve the performance.
  */
 class AttributeAccessInterfaceCache
