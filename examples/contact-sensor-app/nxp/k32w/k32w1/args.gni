@@ -34,3 +34,5 @@ is_debug = false
 chip_crypto = "platform"
 chip_openthread_ftd = false
 chip_with_ot_cli = 0
+
+chip_with_diag_logs_demo = true

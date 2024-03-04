@@ -33,6 +33,7 @@ declare_args() {
   chip_software_version = 0
   # Setup discriminator as argument
   setup_discriminator = 3840
+  chip_with_diag_logs_demo = true
 }
 
 assert(current_os == "freertos")
@@ -76,6 +77,12 @@ k32w1_sdk("sdk") {
   defines += [
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
   ]
+
+  if (chip_with_diag_logs_demo) {
+    defines += [
+      "CONFIG_DIAG_LOGS_DEMO=1",
+    ]
+  }
 }
 
 k32w1_executable("contact_sensor_app") {
@@ -161,6 +168,12 @@ k32w1_executable("contact_sensor_app") {
 
   if (chip_with_factory_data == 1) {
     ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
+  }
+
+  if (chip_with_diag_logs_demo) {
+     deps += [
+       "${chip_root}/src/platform/nxp:nxp_diagnostic_logs",
+     ]
   }
 
   output_dir = root_out_dir
