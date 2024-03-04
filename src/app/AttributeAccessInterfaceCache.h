@@ -44,7 +44,7 @@ namespace app {
 template <size_t N>
 class AttributeAccessInterfaceCache
 {
-  public:
+public:
     AttributeAccessInterfaceCache() { Invalidate(); }
 
     /**
@@ -54,7 +54,7 @@ class AttributeAccessInterfaceCache
     {
         for (auto & entry : mCacheSlots)
         {
-          entry.Invalidate();
+            entry.Invalidate();
         }
         mLastUnusedEntry.Invalidate();
     }
@@ -62,7 +62,7 @@ class AttributeAccessInterfaceCache
     /**
      * @brief Mark that we know a given <`endpointId`, `clusterId`> uses AAI, with instance `attrInterface`
      */
-    void MarkUsed(EndpointId endpointId, ClusterId clusterId, AttributeAccessInterface *attrInterface)
+    void MarkUsed(EndpointId endpointId, ClusterId clusterId, AttributeAccessInterface * attrInterface)
     {
         GetCacheSlot(endpointId, clusterId)->Set(endpointId, clusterId, attrInterface);
     }
@@ -70,11 +70,7 @@ class AttributeAccessInterfaceCache
     /**
      * @brief Mark that we know a given <`endpointId`, `clusterId`> does NOT use AAI.
      */
-    void MarkUnused(EndpointId endpointId, ClusterId clusterId)
-    {
-        mLastUnusedEntry.Set(endpointId, clusterId, nullptr);
-
-    }
+    void MarkUnused(EndpointId endpointId, ClusterId clusterId) { mLastUnusedEntry.Set(endpointId, clusterId, nullptr); }
 
     /**
      * @brief Get the AttributeAccessInterface instance for a given <`endpointId`, `clusterId`>, if present in cache.
@@ -88,7 +84,7 @@ class AttributeAccessInterfaceCache
         AttributeAccessCacheEntry * cacheSlot = GetCacheSlot(endpointId, clusterId);
         if (cacheSlot->Matches(endpointId, clusterId) && (cacheSlot->accessor != nullptr))
         {
-          return cacheSlot->accessor;
+            return cacheSlot->accessor;
         }
 
         return nullptr;
@@ -99,30 +95,27 @@ class AttributeAccessInterfaceCache
      *
      * May return false even though it doesn't use AAI, on cache miss of unused slot.
      */
-    bool IsUnused(EndpointId endpointId, ClusterId clusterId) const
-    {
-        return mLastUnusedEntry.Matches(endpointId, clusterId);
-    }
+    bool IsUnused(EndpointId endpointId, ClusterId clusterId) const { return mLastUnusedEntry.Matches(endpointId, clusterId); }
 
-  private:
+private:
     struct AttributeAccessCacheEntry
     {
-        EndpointId endpointId = kInvalidEndpointId;
-        ClusterId clusterId = kInvalidClusterId;
+        EndpointId endpointId               = kInvalidEndpointId;
+        ClusterId clusterId                 = kInvalidClusterId;
         AttributeAccessInterface * accessor = nullptr;
 
         void Invalidate()
         {
             endpointId = kInvalidEndpointId;
-            clusterId = kInvalidClusterId;
-            accessor = nullptr;
+            clusterId  = kInvalidClusterId;
+            accessor   = nullptr;
         }
 
-        void Set(EndpointId theEndpointId, ClusterId theClusterId, AttributeAccessInterface *theAccessor)
+        void Set(EndpointId theEndpointId, ClusterId theClusterId, AttributeAccessInterface * theAccessor)
         {
             endpointId = theEndpointId;
-            clusterId = theClusterId;
-            accessor = theAccessor;
+            clusterId  = theClusterId;
+            accessor   = theAccessor;
         }
 
         bool Matches(EndpointId theEndpointId, ClusterId theClusterId) const

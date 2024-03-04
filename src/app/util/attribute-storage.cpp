@@ -1393,7 +1393,7 @@ app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId
     // If endpoint/cluster is definitely not for AttributeAccessInterface, immediately skip all searches.
     if (gAttributeAccessInterfaceCache.IsUnused(endpointId, clusterId))
     {
-      return nullptr;
+        return nullptr;
     }
 
     // Find in cache, hope for a match.
