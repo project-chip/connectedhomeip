@@ -91,6 +91,7 @@ limitations under the License.
     <code>0x0035</code>
     <define>THREAD_NETWORK_DIAGNOSTICS_CLUSTER</define>
     <description>The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems</description>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
     <attribute side="server" code="0x00" define="CHANNEL" type="int16u" min="0x00" max="0xFFFF" writable="false" isNullable="true" optional="false">Channel</attribute>
     <attribute side="server" code="0x01" define="ROUTING_ROLE" type="RoutingRoleEnum" writable="false" isNullable="true" optional="false">RoutingRole</attribute>
     <attribute side="server" code="0x02" define="NETWORK_NAME" type="char_string" length="16" writable="false" default="" isNullable="true" optional="false">NetworkName</attribute>
