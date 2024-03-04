@@ -49,6 +49,11 @@ jobs:
             - name: Validate zap-cli is NOT available
               # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
               run: scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
+            - name: Run watchOS Build Debug
+              working-directory: src/darwin/Framework
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk watchos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Run iOS Build Debug
               working-directory: src/darwin/Framework
               # Disable availability annotations, since we are not building a system

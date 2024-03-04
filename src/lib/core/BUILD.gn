@@ -113,9 +113,14 @@ source_set("encoding") {
 source_set("types") {
   sources = [
     "CHIPSafeCasts.h",
+    "CHIPVendorIdentifiers.hpp",
+    "DataModelTypes.h",
     "Global.h",
+    "GroupId.h",
     "InPlace.h",
+    "NodeId.h",
     "Optional.h",
+    "PasscodeId.h",
     "ReferenceCounted.h",
     "Unchecked.h",
   ]
@@ -138,12 +143,8 @@ static_library("core") {
     "CHIPKeyIds.h",
     "CHIPPersistentStorageDelegate.h",
     "ClusterEnums.h",
-    "DataModelTypes.h",
-    "GroupId.h",
-    "NodeId.h",
     "OTAImageHeader.cpp",
     "OTAImageHeader.h",
-    "PasscodeId.h",
     "PeerId.h",
     "ScopedNodeId.h",
     "TLV.h",

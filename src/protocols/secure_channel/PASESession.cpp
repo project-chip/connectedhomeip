@@ -195,7 +195,7 @@ CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Sp
     mIterationCount = pbkdf2IterCount;
     mNextExpectedMsg.SetValue(MsgType::PBKDFParamRequest);
     mPairingComplete = false;
-    mLocalMRPConfig  = mrpLocalConfig;
+    mLocalMRPConfig  = mrpLocalConfig.ValueOr(GetDefaultMRPConfig());
 
     ChipLogDetail(SecureChannel, "Waiting for PBKDF param request");
 
@@ -225,7 +225,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
 
     mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
 
-    mLocalMRPConfig = mrpLocalConfig;
+    mLocalMRPConfig = mrpLocalConfig.ValueOr(GetDefaultMRPConfig());
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
