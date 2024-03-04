@@ -126,7 +126,6 @@ template("chip_data_model") {
       "${chip_root}/src/access",
       "${chip_root}/src/lib/core:chip_config_header",
     ]
-
   }
 
   source_set("${_data_model_name}-callbacks") {
