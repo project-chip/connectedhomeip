@@ -47,6 +47,7 @@ chip_test_suite_using_nltest("tests") {
     "TestScoped.cpp",
     "TestScopedBuffer.cpp",
     "TestSerializableIntegerSet.cpp",
+    "TestSorting.cpp",
     "TestSpan.cpp",
     "TestStateMachine.cpp",
     "TestStaticSupportSmartPtr.cpp",

@@ -24,7 +24,7 @@ namespace IPAddressSorter {
 
 void Sort(Inet::IPAddress * addresses, size_t count, Inet::InterfaceId interfaceId)
 {
-    Sorting::BubbleSort(addresses, count, [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
+    Sorting::InsertionSort(addresses, count, [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
         auto scoreA = to_underlying(ScoreIpAddress(a, interfaceId));
         auto scoreB = to_underlying(ScoreIpAddress(b, interfaceId));
         return scoreA > scoreB;
@@ -33,7 +33,7 @@ void Sort(Inet::IPAddress * addresses, size_t count, Inet::InterfaceId interface
 
 void Sort(const Span<Inet::IPAddress> & addresses, Inet::InterfaceId interfaceId)
 {
-    Sorting::BubbleSort(addresses.begin(), addresses.size(),
+    Sorting::InsertionSort(addresses.begin(), addresses.size(),
                         [interfaceId](const Inet::IPAddress & a, const Inet::IPAddress & b) -> bool {
                             auto scoreA = to_underlying(ScoreIpAddress(a, interfaceId));
                             auto scoreB = to_underlying(ScoreIpAddress(b, interfaceId));
