@@ -67,7 +67,6 @@
 #define CHIP_ADV_DATA_FLAGS 0x06
 #define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
 
-
 using namespace ::chip;
 using namespace ::chip::Ble;
 
@@ -279,15 +278,14 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ChipLogProgress(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
-        BLEMgrImpl().mFlags.Set(Flags::kFastAdvertisingEnabled,0);
-        BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded,1);
+        BLEMgrImpl().mFlags.Set(Flags::kFastAdvertisingEnabled, 0);
+        BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
 
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
         BLEMgrImpl().mFlags.Clear(Flags::kExtAdvertisingEnabled);
         BLEMgrImpl().StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS);
 #endif
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
-
     }
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
     else
@@ -296,7 +294,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
         BLEMgrImpl().mFlags.Set(Flags::kExtAdvertisingEnabled);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
-        BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded,1);
+        BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 #endif
@@ -1615,7 +1613,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     else
     {
-    #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
         if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
         {
             adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
@@ -1626,12 +1624,12 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN;
             adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX;
         }
-    #else
+#else
 
         adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
         adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
 
-    #endif
+#endif
     }
 
     ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable)",
