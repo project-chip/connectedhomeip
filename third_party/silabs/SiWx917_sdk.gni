@@ -165,6 +165,7 @@ template("siwx917_sdk") {
       "RSI_WLAN_API_ENABLE",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
+      "NVM3_LOCK_OVERRIDE=1",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
       "${silabs_mcu}=1",
       "${silabs_board}=1",
