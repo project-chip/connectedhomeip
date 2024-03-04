@@ -20,8 +20,11 @@
 #include <stdlib.h>
 
 #include "openiotsdk_platform.h"
-#include <lib/support/UnitTest.h>
+#include <NlTestLogger.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
+
+constexpr nl_test_output_logger_t NlTestLogger::nl_test_logger;
 
 using namespace ::chip;
 
@@ -33,6 +36,8 @@ int main()
         return EXIT_FAILURE;
     }
 
+    nlTestSetLogger(&NlTestLogger::nl_test_logger);
+
     ChipLogAutomation("Open IoT SDK unit-tests start");
 
     if (openiotsdk_network_init(true))
@@ -42,7 +47,7 @@ int main()
     }
 
     ChipLogAutomation("Open IoT SDK unit-tests run...");
-    int status = chip::test::RunAllTests();
+    int status = RunRegisteredUnitTests();
     ChipLogAutomation("Test status: %d", status);
     ChipLogAutomation("Open IoT SDK unit-tests completed");
 
