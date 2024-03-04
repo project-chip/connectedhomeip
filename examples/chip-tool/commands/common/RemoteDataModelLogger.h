@@ -20,7 +20,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/EventHeader.h>
+#include <app/MessageDef/EventHeader.h>
 #include <app/MessageDef/StatusIB.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/dnssd/Resolver.h>
