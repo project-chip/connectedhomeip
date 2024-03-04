@@ -1200,12 +1200,12 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "Enable BLE Extended Advertisement"
-        config ENABLE_BLE_EXT_ADVERTISING
-            bool "Enable BLE Extended Advertisement"
+    menu "Enable BLE Extended Announcement"
+        config ENABLE_BLE_EXT_ANNOUNCEMENT
+            bool "Enable BLE Extended Announcement"
             default n
             help
-                Enable BLE Extended Advertisement.
+                Enable BLE Extended Announcement.
 
     endmenu
 

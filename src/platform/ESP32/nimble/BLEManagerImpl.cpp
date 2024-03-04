@@ -78,8 +78,6 @@ namespace Internal {
 namespace {
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
-
-
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 static constexpr uint16_t kNewConnectionScanTimeout = 60;
 static constexpr uint16_t kConnectTimeout           = 20;
@@ -225,8 +223,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
-                                    //    pdMS_TO_TICKS(50),
-                                       1,   // == default timer period
+                                       1,                   // == default timer period
                                        false,               // no timer reload (==one-shot)
                                        (void *) this,       // init timer id = ble obj context
                                        BleAdvTimeoutHandler // timer callback handler
