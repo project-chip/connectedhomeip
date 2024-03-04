@@ -113,40 +113,28 @@ class CommandType(Enum):
     UNKNOWN = auto()
 
 
-# workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
-CONC_CLUSTERS = {0x040C: ('Carbon Monoxide Concentration Measurement', 'CMOCONC'),
-                 0x040D: ('Carbon Dioxide Concentration Measurement', 'CDOCONC'),
-                 0x0413: ('Nitrogen Dioxide Concentration Measurement', 'NDOCONC'),
-                 0x0415: ('Ozone Concentration Measurement', 'OZCONC'),
-                 0x042A: ('PM2.5 Concentration Measurement', 'PMICONC'),
-                 0x042B: ('Formaldehyde Concentration Measurement', 'FLDCONC'),
-                 0x042C: ('PM1 Concentration Measurement', 'PMHCONC'),
-                 0x042D: ('PM10 Concentration Measurement', 'PMKCONC'),
-                 0x042E: ('Total Volatile Organic Compounds Concentration Measurement', 'TVOCCONC'),
-                 0x042F: ('Radon Concentration Measurement', 'RNCONC')}
-CONC_BASE_NAME = 'Concentration Measurement Clusters'
-RESOURCE_CLUSTERS = {0x0071: ('HEPA Filter Monitoring', 'HEPAFREMON'),
-                     0x0072: ('Activated Carbon Filter Monitoring', 'ACFREMON')}
-RESOURCE_BASE_NAME = 'Resource Monitoring Clusters'
-WATER_CLUSTER = {0x0405: ('Relative Humidity Measurement', 'RH')}
-WATER_BASE_NAME = 'Water Content Measurement Clusters'
-CLUSTER_ALIASES = {CONC_BASE_NAME: CONC_CLUSTERS, RESOURCE_BASE_NAME: RESOURCE_CLUSTERS, WATER_BASE_NAME: WATER_CLUSTER}
-
-
-def is_alias(id: uint):
-    for base, alias in CLUSTER_ALIASES.items():
-        if id in alias:
-            return True
-    return False
+# workaround for aliased clusters PICS not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/461 is addressed
+ALIAS_PICS = {0x040C: 'CMOCONC',
+              0x040D: 'CDOCONC',
+              0x0413: 'NDOCONC',
+              0x0415: 'OZCONC',
+              0x042A: 'PMICONC',
+              0x042B: 'FLDCONC',
+              0x042C: 'PMHCONC',
+              0x042D: 'PMKCONC',
+              0x042E: 'TVOCCONC',
+              0x042F: 'RNCONC',
+              0x0071: 'HEPAFREMON',
+              0x0072: 'ACFREMON',
+              0x0405: 'RH'}
 
 
 class ClusterParser:
-    def __init__(self, cluster, cluster_id, name, is_alias):
+    def __init__(self, cluster, cluster_id, name):
         self._problems: list[ProblemNotice] = []
         self._cluster = cluster
         self._cluster_id = cluster_id
         self._name = name
-        self._is_alias = is_alias
 
         self._derived = None
         try:
@@ -162,6 +150,9 @@ class ClusterParser:
             self._pics = classification.attrib['picsCode']
         except (KeyError, StopIteration):
             self._pics = None
+
+        if self._cluster_id in ALIAS_PICS.keys():
+            self._pics = ALIAS_PICS[cluster_id]
 
         self.feature_elements = self.get_all_feature_elements()
         self.attribute_elements = self.get_all_attribute_elements()
@@ -282,12 +273,12 @@ class ClusterParser:
             return Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
 
         if access_xml is None:
-            # Derived and alias clusters can inherit their access from the base and that's fine, so don't add an error
+            # Derived clusters can inherit their access from the base and that's fine, so don't add an error
             # Similarly, pure base clusters can have the access defined in the derived clusters. If neither has it defined,
             # we will determine this at the end when we put these together.
             # Things with deprecated conformance don't get an access element, and that is also fine.
             # If a device properly passes the conformance test, such elements are guaranteed not to appear on the device.
-            if self._is_alias or self._derived is not None or is_disallowed(conformance):
+            if self._derived is not None or is_disallowed(conformance):
                 return (None, None, None)
 
             location = self.get_location_from_element(element_xml)
@@ -421,31 +412,32 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[int, XmlC
         xml: XML element read from from the XML cluster file
         clusters: dict of id -> XmlCluster. This function will append new clusters as appropriate to this dict.
         pure_base_clusters: dict of base name -> XmlCluster. This data structure is used to hold pure base clusters that don't have
-                            an ID. This function will append new pure base clusters as approrpriate to this dict.
+                            an ID. This function will append new pure base clusters as appropriate to this dict.
         ids_by_name: dict of cluster name -> ID. This function will append new IDs as appropriate to this dict.
         problems: list of any problems encountered during spec parsing. This function will append problems as appropriate to this list.
     '''
     cluster = xml.iter('cluster')
     for c in cluster:
-        name = c.attrib['name']
-        if not c.attrib['id']:
-            # Fully derived clusters have no id, but also shouldn't appear on a device.
-            # We do need to keep them, though, because we need to update the derived
-            # clusters. We keep them in a special dict by name, so they can be thrown
-            # away later.
-            cluster_id = None
-        else:
-            cluster_id = int(c.attrib['id'], 0)
-            ids_by_name[name] = cluster_id
+        ids = c.iter('clusterId')
+        for id in ids:
+            name = id.get('name')
+            cluster_id = id.get('id')
+            if cluster_id:
+                cluster_id = int(id.get('id'), 0)
+                ids_by_name[name] = cluster_id
 
-        parser = ClusterParser(c, cluster_id, name, is_alias(cluster_id))
-        new = parser.create_cluster()
-        problems = problems + parser.get_problems()
+            parser = ClusterParser(c, cluster_id, name)
+            new = parser.create_cluster()
+            problems = problems + parser.get_problems()
 
-        if cluster_id:
-            clusters[cluster_id] = new
-        else:
-            pure_base_clusters[name] = new
+            if cluster_id:
+                clusters[cluster_id] = new
+            else:
+                # Fully derived clusters have no id, but also shouldn't appear on a device.
+                # We do need to keep them, though, because we need to update the derived
+                # clusters. We keep them in a special dict by name, so they can be thrown
+                # away later.
+                pure_base_clusters[name] = new
 
 
 def check_clusters_for_unknown_commands(clusters: dict[int, XmlCluster], problems: list[ProblemNotice]):
@@ -488,15 +480,6 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
         remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
 
     combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name)
-
-    for alias_base_name, aliased_clusters in CLUSTER_ALIASES.items():
-        for id, (alias_name, pics) in aliased_clusters.items():
-            base = pure_base_clusters[alias_base_name]
-            new = deepcopy(base)
-            new.derived = alias_base_name
-            new.name = alias_name
-            new.pics = pics
-            clusters[id] = new
 
     # TODO: All these fixups should be removed BEFORE SVE if at all possible
     # Workaround for Color Control cluster - the spec uses a non-standard conformance. Set all to optional now, will need
