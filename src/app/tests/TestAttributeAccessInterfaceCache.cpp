@@ -26,8 +26,11 @@ using namespace chip::app;
 
 namespace {
 
+
 void TestBasicLifecycle(nlTestSuite * inSuite, void * inContext)
 {
+    using CacheResult = AttributeAccessInterfaceCache::CacheResult;
+
     int data1 = 1;
     int data2 = 2;
 
@@ -37,42 +40,64 @@ void TestBasicLifecycle(nlTestSuite * inSuite, void * inContext)
     AttributeAccessInterface * accessor1 = reinterpret_cast<AttributeAccessInterface *>(&data1);
     AttributeAccessInterface * accessor2 = reinterpret_cast<AttributeAccessInterface *>(&data2);
 
-    AttributeAccessInterfaceCache<1> cache;
+    AttributeAccessInterfaceCache cache;
 
     // Cache can keep track of at least 1 entry,
-    NL_TEST_ASSERT(inSuite, cache.Get(1, 1) == nullptr);
-    NL_TEST_ASSERT(inSuite, !cache.IsUnused(1, 1));
+    AttributeAccessInterface * entry = nullptr;
+
+    NL_TEST_ASSERT(inSuite, cache.Get(1, 1, &entry) == CacheResult::kCacheMiss);
+    NL_TEST_ASSERT(inSuite, entry == nullptr);
     cache.MarkUsed(1, 1, accessor1);
 
-    NL_TEST_ASSERT(inSuite, cache.Get(1, 1) == accessor1);
-    NL_TEST_ASSERT(inSuite, cache.Get(1, 2) == nullptr);
-    NL_TEST_ASSERT(inSuite, cache.Get(2, 1) == nullptr);
+    NL_TEST_ASSERT(inSuite, cache.Get(1, 1, &entry) == CacheResult::kDefinitelyUsed);
+    NL_TEST_ASSERT(inSuite, entry == accessor1);
+
+    entry = nullptr;
+    NL_TEST_ASSERT(inSuite, cache.Get(1, 2, &entry) == CacheResult::kCacheMiss);
+    NL_TEST_ASSERT(inSuite, entry == nullptr);
+    NL_TEST_ASSERT(inSuite, cache.Get(2, 1, &entry) == CacheResult::kCacheMiss);
+    NL_TEST_ASSERT(inSuite, entry == nullptr);
 
     cache.MarkUsed(1, 2, accessor1);
-    NL_TEST_ASSERT(inSuite, cache.Get(1, 2) == accessor1);
-    NL_TEST_ASSERT(inSuite, cache.Get(2, 1) == nullptr);
+
+    entry = nullptr;
+    NL_TEST_ASSERT(inSuite, cache.Get(1, 2, &entry) == CacheResult::kDefinitelyUsed);
+    NL_TEST_ASSERT(inSuite, entry == accessor1);
+    NL_TEST_ASSERT(inSuite, cache.Get(2, 1, &entry) == CacheResult::kCacheMiss);
 
     cache.MarkUsed(1, 2, accessor2);
-    NL_TEST_ASSERT(inSuite, cache.Get(1, 2) == accessor2);
+
+    entry = nullptr;
+    NL_TEST_ASSERT(inSuite, cache.Get(1, 2, &entry) == CacheResult::kDefinitelyUsed);
+    NL_TEST_ASSERT(inSuite, entry == accessor2);
+    // The following should not crash (e.g. output not used if nullptr).
+    NL_TEST_ASSERT(inSuite, cache.Get(1, 2, nullptr) == CacheResult::kDefinitelyUsed);
+
+    // Setting used to nullptr == does not mark used.
+    cache.MarkUsed(1, 2, nullptr);
+    entry = nullptr;
+    NL_TEST_ASSERT(inSuite, cache.Get(1, 2, &entry) == CacheResult::kCacheMiss);
+    NL_TEST_ASSERT(inSuite, entry == nullptr);
 
     cache.Invalidate();
-    NL_TEST_ASSERT(inSuite, cache.Get(1, 1) == nullptr);
-    NL_TEST_ASSERT(inSuite, cache.Get(1, 2) == nullptr);
-    NL_TEST_ASSERT(inSuite, cache.Get(2, 1) == nullptr);
+    NL_TEST_ASSERT(inSuite, cache.Get(1, 1, &entry) == CacheResult::kCacheMiss);
+    NL_TEST_ASSERT(inSuite, entry == nullptr);
+    NL_TEST_ASSERT(inSuite, cache.Get(1, 2, &entry) == CacheResult::kCacheMiss);
+    NL_TEST_ASSERT(inSuite, cache.Get(2, 1, &entry) == CacheResult::kCacheMiss);
 
     // Marking unused works, keeps single entry, and is invalidated when invalidated fully.
-    NL_TEST_ASSERT(inSuite, !cache.IsUnused(2, 2));
-    NL_TEST_ASSERT(inSuite, !cache.IsUnused(3, 3));
+    NL_TEST_ASSERT(inSuite, cache.Get(2, 2, nullptr) != CacheResult::kDefinitelyUnused);
+    NL_TEST_ASSERT(inSuite, cache.Get(3, 3, nullptr) != CacheResult::kDefinitelyUnused);
     cache.MarkUnused(2, 2);
-    NL_TEST_ASSERT(inSuite, cache.IsUnused(2, 2));
-    NL_TEST_ASSERT(inSuite, !cache.IsUnused(3, 3));
+    NL_TEST_ASSERT(inSuite, cache.Get(2, 2, nullptr) == CacheResult::kDefinitelyUnused);
+    NL_TEST_ASSERT(inSuite, cache.Get(3, 3, nullptr) != CacheResult::kDefinitelyUnused);
 
     cache.MarkUnused(3, 3);
-    NL_TEST_ASSERT(inSuite, !cache.IsUnused(2, 2));
-    NL_TEST_ASSERT(inSuite, cache.IsUnused(3, 3));
+    NL_TEST_ASSERT(inSuite, cache.Get(2, 2, nullptr) != CacheResult::kDefinitelyUnused);
+    NL_TEST_ASSERT(inSuite, cache.Get(3, 3, nullptr) == CacheResult::kDefinitelyUnused);
 
     cache.Invalidate();
-    NL_TEST_ASSERT(inSuite, !cache.IsUnused(3, 3));
+    NL_TEST_ASSERT(inSuite, cache.Get(3, 3, nullptr) != CacheResult::kDefinitelyUnused);
 }
 
 // clang-format off

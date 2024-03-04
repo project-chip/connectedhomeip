@@ -28,8 +28,6 @@ namespace app {
 /**
  * @brief Cache to make look-up of AttributeAccessInterface (AAI) instances faster.
  *
- * @tparam N - The size of the cache (current suggested value == 1)
- *
  * This cache makes use of the fact that looking-up AttributeAccessInterface
  * instances is usually done in loops, during read/subscription wildcard
  * expansion, and there is a significant amount of locality.
@@ -38,13 +36,17 @@ namespace app {
  * "unused" (i.e. does NOT use AAI) entries. Combining positive/negative
  * lookup led to factor of ~10 reduction of AAI lookups in total for wildcard
  * reads on chip-all-clusters-app, with a cache size of 1. The size did not
- * significantly improve the performance, but `N` is left to support better
- * hashing/storage algorithms in the future if needed.
+ * significantly improve the performance.
  */
-template <size_t N>
 class AttributeAccessInterfaceCache
 {
 public:
+    enum class CacheResult {
+      kCacheMiss,
+      kDefinitelyUnused,
+      kDefinitelyUsed
+    };
+
     AttributeAccessInterfaceCache() { Invalidate(); }
 
     /**
@@ -72,30 +74,34 @@ public:
      */
     void MarkUnused(EndpointId endpointId, ClusterId clusterId) { mLastUnusedEntry.Set(endpointId, clusterId, nullptr); }
 
+
     /**
      * @brief Get the AttributeAccessInterface instance for a given <`endpointId`, `clusterId`>, if present in cache.
      *
      * @param endpointId - Endpoint ID to look-up.
      * @param clusterId - Cluster ID to look-up.
-     * @return the instance pointer on cache hit, or nullptr on cache miss.
+     * @param outAttributeAccess - If not null, and Get returns `kDefinitelyUsed`, then this is set to the instance pointer.
+     * @return a for whether the entry is actually used or not.
      */
-    AttributeAccessInterface * Get(EndpointId endpointId, ClusterId clusterId)
+    CacheResult Get(EndpointId endpointId, ClusterId clusterId, AttributeAccessInterface ** outAttributeAccess)
     {
+        if (mLastUnusedEntry.Matches(endpointId, clusterId))
+        {
+            return CacheResult::kDefinitelyUnused;
+        }
+
         AttributeAccessCacheEntry * cacheSlot = GetCacheSlot(endpointId, clusterId);
         if (cacheSlot->Matches(endpointId, clusterId) && (cacheSlot->accessor != nullptr))
         {
-            return cacheSlot->accessor;
+            if (outAttributeAccess != nullptr)
+            {
+                *outAttributeAccess =cacheSlot->accessor;
+            }
+            return CacheResult::kDefinitelyUsed;
         }
 
-        return nullptr;
+        return CacheResult::kCacheMiss;
     }
-
-    /**
-     * @brief returns true if <`endpointId`, `clusterId`> was last marked as NOT to using AAI.
-     *
-     * May return false even though it doesn't use AAI, on cache miss of unused slot.
-     */
-    bool IsUnused(EndpointId endpointId, ClusterId clusterId) const { return mLastUnusedEntry.Matches(endpointId, clusterId); }
 
 private:
     struct AttributeAccessCacheEntry
@@ -126,12 +132,12 @@ private:
 
     AttributeAccessCacheEntry * GetCacheSlot(EndpointId endpointId, ClusterId clusterId)
     {
-        // A future implementation may use a better method.
-        size_t slotId = (clusterId ^ endpointId) & (N - 1);
-        return &mCacheSlots[slotId];
+        (void)endpointId;
+        (void)clusterId;
+        return &mCacheSlots[0];
     }
 
-    AttributeAccessCacheEntry mCacheSlots[N];
+    AttributeAccessCacheEntry mCacheSlots[1];
     AttributeAccessCacheEntry mLastUnusedEntry;
 };
 
