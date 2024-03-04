@@ -27,9 +27,9 @@ from typing import Any, Optional
 
 import chip.clusters.ClusterObjects
 import chip.tlv
-from chip.clusters.Attribute import ValueDecodeFailure, AttributePath, AttributeCache
-from mobly import asserts
 from chip.ChipDeviceCtrl import TLVJsonConverter
+from chip.clusters.Attribute import AttributeCache, AttributePath, ValueDecodeFailure
+from mobly import asserts
 
 
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
