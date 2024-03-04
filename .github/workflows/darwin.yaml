@@ -49,6 +49,11 @@ jobs:
             - name: Validate zap-cli is NOT available
               # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
               run: scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
+            - name: Run watchOS Build Debug
+              working-directory: src/darwin/Framework
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk watchos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Run iOS Build Debug
               working-directory: src/darwin/Framework
               # Disable availability annotations, since we are not building a system
@@ -103,8 +108,7 @@ jobs:
               # target versions instead?
               run: |
                   mkdir -p /tmp/darwin/framework-tests
-                  echo "This is a simple log" > /tmp/darwin/framework-tests/end_user_support_log.txt
-                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --end_user_support_log /tmp/darwin/framework-tests/end_user_support_log.txt > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
+                  ../../../out/debug/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 --dac_provider ../../../credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json --product-id 32768 --discriminator 3839 --secured-device-port 5539 --KVS /tmp/chip-all-clusters-app-kvs2 > >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid-err.log >&2) &
                   # Disable BLE (CHIP_IS_BLE=NO) because the app does not have the permission to use it and that may crash the CI.
 
@@ -120,13 +124,10 @@ jobs:
               run: |
                   xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
               working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
-            - name: Uploading .ips files in Xcode derived data to debug the failure
-              uses: actions/upload-artifact@v4
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: darwin-framework-derived-data
-                  path: ~/Library/Developer/Xcode/DerivedData/**/*.ips
-                  retention-days: 5
+            - name: Collect crash logs
+              run: |
+                  mkdir -p /tmp/darwin/framework-tests
+                  find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}

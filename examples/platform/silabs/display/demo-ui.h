@@ -126,7 +126,7 @@ void demoUIDisplayApp(bool on);
  * @return
  *      void
  *****************************************************************************/
-void demoUIDisplayProtocol(demoUIProtocol protocol, bool isConnected);
+void demoUIDisplayProtocols();
 
 /**************************************************************************/
 /**

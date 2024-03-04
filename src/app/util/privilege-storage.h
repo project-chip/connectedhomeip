@@ -16,13 +16,8 @@
  */
 #pragma once
 
+#include <app/util/privilege-constants.h>
 #include <lib/core/DataModelTypes.h>
-
-inline constexpr int kMatterAccessPrivilegeView       = 0;
-inline constexpr int kMatterAccessPrivilegeOperate    = 1;
-inline constexpr int kMatterAccessPrivilegeManage     = 2;
-inline constexpr int kMatterAccessPrivilegeAdminister = 3;
-inline constexpr int kMatterAccessPrivilegeMaxValue   = kMatterAccessPrivilegeAdminister;
 
 int MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute);
 int MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute);

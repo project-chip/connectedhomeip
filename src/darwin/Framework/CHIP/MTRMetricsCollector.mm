@@ -193,19 +193,19 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     using ValueType = MetricEvent::Value::Type;
     switch (event.ValueType()) {
     case ValueType::kInt32:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %d", event.key(), event.type(), event.ValueInt32());
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %d", event.key(), static_cast<int>(event.type()), event.ValueInt32());
         break;
     case ValueType::kUInt32:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %u", event.key(), event.type(), event.ValueUInt32());
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %u", event.key(), static_cast<int>(event.type()), event.ValueUInt32());
         break;
     case ValueType::kChipErrorCode:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, error value: %u", event.key(), event.type(), event.ValueErrorCode());
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, error value: %u", event.key(), static_cast<int>(event.type()), event.ValueErrorCode());
         break;
     case ValueType::kUndefined:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: nil", event.key(), event.type());
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: nil", event.key(), static_cast<int>(event.type()));
         break;
     default:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, unknown value", event.key(), event.type());
+        MTR_LOG_INFO("Received metric event, key: %s, type: %d, unknown value", event.key(), static_cast<int>(event.type()));
         return;
     }
 
