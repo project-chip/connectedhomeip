@@ -955,7 +955,7 @@ class ChipDeviceControllerBase():
                                 suppressResponse: typing.Optional[bool] = None):
         '''
         Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
-        the responses. If a valid responseType is passed in, that will be used to deserialize the object. If not,
+        the responses. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
         the type will be automatically deduced from the metadata received over the wire.
 
         nodeId: Target's Node ID
@@ -1330,7 +1330,7 @@ class ChipDeviceControllerBase():
                             (dict[int, List[Cluster]])
                             Access as returned_object[endpoint_id][<Cluster class>][<Attribute class>]
                             Ex. To access the OnTime attribute from the OnOff cluster on endpoint 1
-                            ret[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
+                            returned_object[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
 
         Raises:
             - InteractionModelError (chip.interaction_model) on error
@@ -1398,7 +1398,7 @@ class ChipDeviceControllerBase():
                                     Callable[[EventReadResult, SubscriptionTransaction], None]
                                     You can await events using a trigger mechanism in the callback. ex. queue.SimpleQueue
 
-            - read request: AsyncReadTransation.ReadResponse.events.
+            - read request: AsyncReadTransaction.ReadResponse.events.
                             This is a List[ClusterEvent].
 
         Raises:

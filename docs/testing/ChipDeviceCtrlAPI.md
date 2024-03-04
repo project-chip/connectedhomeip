@@ -349,6 +349,10 @@ sent to remote node. suppressTimedRequestMessage: When set to true, we suppress
 sending Timed Request Message. commandRefsOverride: List of commandRefs to use
 for each command with the same index in `commands`.
 
+**Returns**:
+
+-   TestOnlyBatchCommandResponse
+
 <a id="chip.ChipDeviceCtrl.ChipDeviceControllerBase.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke"></a>
 
 #### TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke
@@ -413,7 +417,7 @@ async def SendBatchCommands(
 
 Send a batch of cluster-object encapsulated commands to a node and get returned
 a future that can be awaited upon to receive the responses. If a valid
-responseType is passed in, that will be used to deserialize the object. If not,
+responseType is passed in, that will be used to de-serialize the object. If not,
 the type will be automatically deduced from the metadata received over the wire.
 
 nodeId: Target's Node ID commands: A list of InvokeRequestInfo containing the
@@ -673,7 +677,7 @@ sent.
     List[Cluster]]) Access as
     returned_object[endpoint_id][<Cluster class>][<Attribute class>] Ex. To
     access the OnTime attribute from the OnOff cluster on endpoint 1
-    ret[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
+    returned_object[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
 
 **Raises**:
 
@@ -737,7 +741,7 @@ subscriptions. When not provided, a read request will be sent.
     Callable[[EventReadResult, SubscriptionTransaction], None] You can await
     events using a trigger mechanism in the callback. ex. queue.SimpleQueue
 
--   read request: AsyncReadTransation.ReadResponse.events. This is a
+-   read request: AsyncReadTransaction.ReadResponse.events. This is a
     List[ClusterEvent].
 
 **Raises**:
@@ -1000,9 +1004,11 @@ selected filter.
 #### CommissionWithCode
 
 ```python
-def CommissionWithCode(setupPayload: str,
-                       nodeid: int,
-                       networkOnly: bool = False) -> PyChipError
+def CommissionWithCode(
+        setupPayload: str,
+        nodeid: int,
+        discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL
+) -> PyChipError
 ```
 
 Commission with the given nodeid from the setupPayload. setupPayload may be a QR
