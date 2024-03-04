@@ -32,22 +32,22 @@
 namespace chip {
 namespace app {
 namespace RequiredPrivilege {
-chip::Access::Privilege ForReadAttribute(const ConcreteAttributePath & path)
+inline chip::Access::Privilege ForReadAttribute(const ConcreteAttributePath & path)
 {
     return MatterGetAccessPrivilegeForReadAttribute(path.mClusterId, path.mAttributeId);
 }
 
-chip::Access::Privilege ForWriteAttribute(const ConcreteAttributePath & path)
+inline chip::Access::Privilege ForWriteAttribute(const ConcreteAttributePath & path)
 {
     return MatterGetAccessPrivilegeForWriteAttribute(path.mClusterId, path.mAttributeId);
 }
 
-chip::Access::Privilege ForInvokeCommand(const ConcreteCommandPath & path)
+inline chip::Access::Privilege ForInvokeCommand(const ConcreteCommandPath & path)
 {
     return MatterGetAccessPrivilegeForInvokeCommand(path.mClusterId, path.mCommandId);
 }
 
-chip::Access::Privilege ForReadEvent(const ConcreteEventPath & path)
+inline chip::Access::Privilege ForReadEvent(const ConcreteEventPath & path)
 {
     return MatterGetAccessPrivilegeForReadEvent(path.mClusterId, path.mEventId);
 }
