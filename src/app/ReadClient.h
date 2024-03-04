@@ -27,7 +27,7 @@
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/EventHeader.h>
+#include <app/MessageDef/EventHeader.h>
 #include <app/EventPathParams.h>
 #include <app/MessageDef/ReadRequestMessage.h>
 #include <app/MessageDef/StatusIB.h>

@@ -13,6 +13,13 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
+source_set("events") {
+  sources = [
+    "EventHeader.h",
+    "EventLoggingTypes.h",
+  ]
+}
+
 source_set("MessageDef") {
   sources = [
     "ArrayBuilder.cpp",
@@ -112,6 +119,7 @@ source_set("MessageDef") {
   ]
 
   deps = [
+    ":events",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app:constants",
     "${chip_root}/src/app:paths",
