@@ -38,9 +38,9 @@ struct Datum
     // The associated data is constructed to detect stable sort.
     int associated_data;
 
-    friend bool operator==(const Datum & lhs, const Datum & rhs)
+    bool operator==(const Datum & other)
     {
-        return (lhs.key == rhs.key) && (lhs.associated_data == rhs.associated_data);
+        return (this == &other) || ((this->key == other.key) && (this->associated_data == other.associated_data));
     }
 };
 
