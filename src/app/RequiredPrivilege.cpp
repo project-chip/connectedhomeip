@@ -19,9 +19,5 @@
 #include "RequiredPrivilege.h"
 
 namespace chip {
-namespace app {
-
-constexpr Access::Privilege RequiredPrivilege::kPrivilegeMapper[];
-
-} // namespace app
+namespace app {} // namespace app
 } // namespace chip

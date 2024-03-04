@@ -132,10 +132,10 @@ template("chip_data_model") {
       "${_zapgen_gen_dir}/zap-generated/gen_config.h",
     ]
 
-    deps = [ 
+    deps = [
       # TODO: still need to depend on util/endpoint-config-defines.h
       "${chip_root}/src/access",
-      "${chip_root}/src/lib/core:chip_config_header" ,
+      "${chip_root}/src/lib/core:chip_config_header",
     ]
 
     if (chip_code_pre_generated_directory == "") {
