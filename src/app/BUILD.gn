@@ -192,6 +192,8 @@ static_library("interaction-model") {
     "reporting/reporting.h",
   ]
 
+  deps = [ "${chip_root}/src/app/MessageDef:events" ]
+
   public_deps = [
     ":app_config",
     ":constants",
