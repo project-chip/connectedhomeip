@@ -121,7 +121,6 @@ template("chip_data_model") {
             ])
 
     deps = [
-      # TODO: still need to depend on util/endpoint-config-defines.h
       ":${_data_model_name}_codegen_generate",
       ":${_data_model_name}_zapgen_generate",
       "${chip_root}/src/access",
