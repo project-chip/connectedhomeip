@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Alarm Base" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId name="Alarm Base"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="ALARM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="RESET" name="Reset" summary="Supports the ability to reset alarms">
@@ -91,7 +96,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Reset" response="Y">
+    <command id="0x00" name="Reset" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="RESET"/>
@@ -100,7 +105,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="ModifyEnabledAlarms" response="Y">
+    <command id="0x01" name="ModifyEnabledAlarms" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <optionalConform/>
       <field id="0" name="Mask" type="AlarmBitmap" default="0">

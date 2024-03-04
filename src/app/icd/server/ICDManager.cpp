@@ -120,6 +120,22 @@ bool ICDManager::SupportsFeature(Feature feature)
 #endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
+uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
+{
+    // This should only be called when the device is in ActiveMode
+    VerifyOrReturnValue(mOperationalState == OperationalState::ActiveMode, 0);
+
+    uint32_t promisedActiveDuration =
+        std::min(ICDConfigurationData::GetInstance().GetGuaranteedStayActiveDuration().count(), stayActiveDuration);
+
+    // If the device is already in ActiveMode, we need to extend the active mode duration
+    // for whichever is smallest between 30000 milliseconds and stayActiveDuration, taking in account the remaining active time.
+    ExtendActiveMode(System::Clock::Milliseconds16(promisedActiveDuration));
+    promisedActiveDuration = DeviceLayer::SystemLayer().GetRemainingTime(OnActiveModeDone, this).count();
+
+    return promisedActiveDuration;
+}
+
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 void ICDManager::SendCheckInMsgs()
 {
@@ -366,17 +382,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         else
         {
-            Milliseconds16 activeModeThreshold = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
-            DeviceLayer::SystemLayer().ExtendTimerTo(activeModeThreshold, OnActiveModeDone, this);
-
-            Milliseconds32 activeModeJitterThreshold = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
-            activeModeJitterThreshold =
-                (activeModeThreshold >= activeModeJitterThreshold) ? activeModeThreshold - activeModeJitterThreshold : kZero;
-
-            if (!mTransitionToIdleCalled)
-            {
-                DeviceLayer::SystemLayer().ExtendTimerTo(activeModeJitterThreshold, OnTransitionToIdle, this);
-            }
+            ExtendActiveMode(ICDConfigurationData::GetInstance().GetActiveModeThreshold());
         }
     }
 }
@@ -521,11 +527,6 @@ void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
     case ICDManagementEvents::kTableUpdated:
         this->UpdateICDMode();
         break;
-
-    case ICDManagementEvents::kStayActiveRequestReceived:
-        // TODO : Implement the StayActiveRequest
-        // https://github.com/project-chip/connectedhomeip/issues/24259
-        break;
     default:
         break;
     }
@@ -538,6 +539,19 @@ void ICDManager::OnSubscriptionReport()
     // Doing so will only add an ActiveModeThreshold to the active time which we don't want to do here.
     VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
     this->UpdateOperationState(OperationalState::ActiveMode);
+}
+
+void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
+{
+    DeviceLayer::SystemLayer().ExtendTimerTo(extendDuration, OnActiveModeDone, this);
+
+    Milliseconds32 activeModeJitterThreshold = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
+    activeModeJitterThreshold = (extendDuration >= activeModeJitterThreshold) ? extendDuration - activeModeJitterThreshold : kZero;
+
+    if (!mTransitionToIdleCalled)
+    {
+        DeviceLayer::SystemLayer().ExtendTimerTo(activeModeJitterThreshold, OnTransitionToIdle, this);
+    }
 }
 
 ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)

@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Water Content Measurement Clusters" revision="3">
   <revisionHistory>
@@ -61,6 +63,9 @@ Davis, CA 95616, USA
     <revision revision="2" summary="CCB 2241"/>
     <revision revision="3" summary="New data model format and notation"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0405" name="Relative Humidity Measurement"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="RH" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="uint16">

@@ -21,6 +21,10 @@
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 #include <map>
 
+#if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
+#include <esp_core_dump.h>
+#endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -54,12 +58,62 @@ private:
     LogProvider(const LogProvider &)             = delete;
     LogProvider & operator=(const LogProvider &) = delete;
 
-    // This tracks the ByteSpan for each session
-    std::map<LogSessionHandle, ByteSpan *> mSessionSpanMap;
+    struct CrashLogContext
+    {
+#if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
+        uint32_t crashSize                = 0;
+        uint32_t readOffset               = 0;
+        esp_core_dump_summary_t * summary = nullptr;
+
+        void Reset()
+        {
+            this->crashSize  = 0;
+            this->readOffset = 0;
+
+            if (this->summary)
+            {
+                Platform::MemoryFree(this->summary);
+                this->summary = nullptr;
+            }
+        }
+#endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
+    };
+
+    static CrashLogContext sCrashLogContext;
+
+    struct LogContext
+    {
+        IntentEnum intent;
+        union
+        {
+            struct
+            {
+                ByteSpan span;
+            } EndUserSupport;
+            struct
+            {
+                ByteSpan span;
+            } NetworkDiag;
+            struct
+            {
+                // TODO: This be a ref counted, so that we can serve parallel queries for crash logs
+                CrashLogContext * logContext;
+            } Crash;
+        };
+    };
+
+    // This tracks the ByteSpan for each session, need to change this to void *
+    std::map<LogSessionHandle, LogContext *> mSessionContextMap;
 
     LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
 
-    const uint8_t * GetDataStartForIntent(IntentEnum intent);
+    // Helpers for Retrieving Core Dump from flash
+    size_t GetCrashSize();
+    CHIP_ERROR MapCrashPartition(CrashLogContext * crashLogContext);
+
+    CHIP_ERROR PrepareLogContextForIntent(LogContext * context, IntentEnum intent);
+    void CleanupLogContextForIntent(LogContext * contex);
+    CHIP_ERROR GetDataForIntent(LogContext * context, MutableByteSpan & outBuffer, bool & outIsEndOfLog);
 };
 
 } // namespace DiagnosticLogs

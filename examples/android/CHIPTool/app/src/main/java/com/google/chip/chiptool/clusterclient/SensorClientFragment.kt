@@ -155,7 +155,13 @@ class SensorClientFragment : Fragment() {
       val clusterName = binding.clusterNameSpinner.selectedItem.toString()
       val clusterId = CLUSTERS[clusterName]!!["clusterId"] as Long
       val attributeId = CLUSTERS[clusterName]!!["attributeId"] as Long
-      val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
+      val device =
+        try {
+          ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
+        } catch (e: IllegalStateException) {
+          Log.d(TAG, "getConnectedDevicePointer exception", e)
+          return
+        }
       val callback = makeReadCallback(clusterName, false)
 
       deviceController.readAttributePath(
@@ -177,7 +183,13 @@ class SensorClientFragment : Fragment() {
       val clusterName = binding.clusterNameSpinner.selectedItem.toString()
       val clusterId = CLUSTERS[clusterName]!!["clusterId"] as Long
       val attributeId = CLUSTERS[clusterName]!!["attributeId"] as Long
-      val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
+      val device =
+        try {
+          ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
+        } catch (e: IllegalStateException) {
+          Log.d(TAG, "getConnectedDevicePointer exception", e)
+          return
+        }
       val callback = makeReadCallback(clusterName, true)
 
       deviceController.subscribeToAttributePath(

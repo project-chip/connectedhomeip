@@ -234,8 +234,8 @@ class HostApp(Enum):
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'
         elif self == HostApp.RVC:
-            yield 'rvc-app'
-            yield 'rvc-app.map'
+            yield 'chip-rvc-app'
+            yield 'chip-rvc-app.map'
         elif self == HostApp.AIR_PURIFIER:
             yield 'air-purifier-app'
             yield 'air-purifier-app.map'

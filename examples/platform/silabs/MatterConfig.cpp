@@ -18,6 +18,7 @@
  */
 
 #include "AppConfig.h"
+#include "BaseApplication.h"
 #include "OTAConfig.h"
 #include <MatterConfig.h>
 
@@ -254,6 +255,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+    initParams.appDelegate = &BaseApplication::sAppDelegate;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
 
@@ -303,10 +307,6 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 extern "C" void vApplicationIdleHook(void)
 {
 #if SIWX_917 && CHIP_CONFIG_ENABLE_ICD_SERVER
-    if (ConnectivityMgr().IsWiFiStationConnected())
-    {
-        // Let the M4 sleep once commissioning is done and device is in idle state
-        sl_wfx_host_si91x_sleep_wakeup();
-    }
+    sl_wfx_host_si91x_sleep_wakeup();
 #endif
 }

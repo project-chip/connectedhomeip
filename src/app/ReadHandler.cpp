@@ -134,7 +134,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
 
     MoveToState(HandlerState::CanStartReporting);
 
-    ObjectList<AttributePathParams> * attributePath = mpAttributePathList;
+    SingleLinkedListNode<AttributePathParams> * attributePath = mpAttributePathList;
     while (attributePath)
     {
         mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(attributePath->mValue);

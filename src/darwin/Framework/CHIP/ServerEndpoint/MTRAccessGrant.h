@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
  * An access grant, which can be represented as an entry in the Matter Access
  * Control cluster.
  */
+NS_SWIFT_SENDABLE
 MTR_NEWLY_AVAILABLE
 @interface MTRAccessGrant : NSObject <NSCopying>
 

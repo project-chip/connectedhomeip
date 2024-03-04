@@ -582,6 +582,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 #endif
     }
 
+    // TODO(#32274): Explain why we cannot have interval_min == interval_max.
+    if (interval_min == interval_max)
+    {
+        ++interval_max;
+    }
+    ChipLogProgress(DeviceLayer, "Starting advertising with interval_min=%u, intverval_max=%u (units of 625us)",
+                    static_cast<unsigned>(interval_min), static_cast<unsigned>(interval_max));
     ret = sl_bt_advertiser_set_timing(advertising_set_handle, interval_min, interval_max, 0, 0);
     err = MapBLEError(ret);
     SuccessOrExit(err);
