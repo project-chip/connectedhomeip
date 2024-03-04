@@ -27,31 +27,14 @@
 #include <include/platform/OTAImageProcessor.h>
 
 /*
- * OTA hooks that can be overwritten by application.
- * Default behavior is implemented as WEAK symbols in platform OtaHooks.cpp.
- */
-
-/*
- * This hook is called at the end of OTAImageProcessorImpl::Init.
+ * This hook is called at the end of OTAMultiImageProcessorImpl::Init.
  * It should generally register the OTATlvProcessor instances.
  */
-extern "C" CHIP_ERROR OtaHookInit();
-
-/*
- * This hook is called at the end of OTAImageProcessorImpl::HandleApply.
- * The default implementation saves the internal OTA entry structure and resets the device.
- */
-extern "C" void OtaHookReset();
-
-/*
- * This hook is called at the end of OTAImageProcessorImpl::HandleAbort.
- * For example, it can be used to schedule a retry.
- */
-extern "C" void OtaHookAbort();
+CHIP_ERROR OtaHookInit();
 
 namespace chip {
 
-class OTAImageProcessorImpl : public OTAImageProcessorInterface
+class OTAMultiImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
     using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
@@ -75,10 +58,9 @@ public:
     CHIP_ERROR ProcessFinalize();
     CHIP_ERROR SelectProcessor(ByteSpan & block);
     CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
-    //Optional<ProviderLocation> & GetBackupProvider() { return mBackupProviderLocation; }
 
     static void FetchNextData(uint32_t context);
-    static OTAImageProcessorImpl & GetDefaultInstance();
+    static OTAMultiImageProcessorImpl & GetDefaultInstance();
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -111,7 +93,6 @@ private:
     OTATlvProcessor * mCurrentProcessor = nullptr;
     OTADataAccumulator mAccumulator;
     std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
-    //Optional<ProviderLocation> mBackupProviderLocation;
 };
 
 } // namespace chip

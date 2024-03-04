@@ -23,12 +23,12 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#include <platform/silabs/multi-ota/MultiOTAImageProcessorImpl.h>
+#include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
-static chip::OTAImageProcessorImpl gImageProcessor;
+static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
 extern "C" {
 #include "btl_interface.h"
@@ -41,7 +41,7 @@ extern "C" {
 
 namespace chip {
 
-CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
+CHIP_ERROR OTAMultiImageProcessorImpl::Init(OTADownloader * downloader)
 {
     ReturnErrorCodeIf(downloader == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -52,7 +52,7 @@ CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
     return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::Clear()
+void OTAMultiImageProcessorImpl::Clear()
 {
     mHeaderParser.Clear();
     mAccumulator.Clear();
@@ -63,31 +63,31 @@ void OTAImageProcessorImpl::Clear()
     ReleaseBlock();
 }
 
-CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
+CHIP_ERROR OTAMultiImageProcessorImpl::PrepareDownload()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::Finalize()
+CHIP_ERROR OTAMultiImageProcessorImpl::Finalize()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::Apply()
+CHIP_ERROR OTAMultiImageProcessorImpl::Apply()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::Abort()
+CHIP_ERROR OTAMultiImageProcessorImpl::Abort()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
+CHIP_ERROR OTAMultiImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
     if ((block.data() == nullptr) || block.empty())
     {
@@ -105,9 +105,9 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
+void OTAMultiImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAMultiImageProcessorImpl *>(context);
 
     VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
@@ -119,15 +119,12 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mParams.downloadedBytes = 0;
 
-    // TODO: do we need this line?
-    //GetRequestorInstance()->GetProviderLocation(imageProcessor->mBackupProviderLocation);
-
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mAccumulator.Init(sizeof(OTATlvHeader));
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
-CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
+CHIP_ERROR OTAMultiImageProcessorImpl::ProcessHeader(ByteSpan & block)
 {
     OTAImageHeader header;
     ReturnErrorOnFailure(mHeaderParser.AccumulateAndDecode(block, header));
@@ -139,7 +136,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
+CHIP_ERROR OTAMultiImageProcessorImpl::ProcessPayload(ByteSpan & block)
 {
     CHIP_ERROR status = CHIP_NO_ERROR;
 
@@ -180,7 +177,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
     return status;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::SelectProcessor(ByteSpan & block)
+CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
 {
     OTATlvHeader header;
     Encoding::LittleEndian::Reader reader(block.data(), sizeof(header));
@@ -203,7 +200,7 @@ CHIP_ERROR OTAImageProcessorImpl::SelectProcessor(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcessor * processor)
+CHIP_ERROR OTAMultiImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcessor * processor)
 {
     auto pair = mProcessorMap.find(tag);
     if (pair != mProcessorMap.end())
@@ -217,23 +214,22 @@ CHIP_ERROR OTAImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcesso
     return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::HandleAbort(intptr_t context)
+void OTAMultiImageProcessorImpl::HandleAbort(intptr_t context)
 {
     ChipLogError(SoftwareUpdate, "OTA was aborted");
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAMultiImageProcessorImpl *>(context);
     if (imageProcessor != nullptr)
     {
         imageProcessor->AbortAllProcessors();
     }
     imageProcessor->Clear();
 
-    OtaHookAbort();
 }
 
 
-void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
+void OTAMultiImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAMultiImageProcessorImpl *>(context);
 
     VerifyOrReturn(imageProcessor != nullptr, ChipLogError(SoftwareUpdate, "ImageProcessor context is null"));
 
@@ -255,7 +251,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     imageProcessor->HandleStatus(status);
 }
 
-void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
+void OTAMultiImageProcessorImpl::HandleStatus(CHIP_ERROR status)
 {
     if (status == CHIP_NO_ERROR || status == CHIP_ERROR_BUFFER_TOO_SMALL)
     {
@@ -273,7 +269,7 @@ void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
     }
 }
 
-void OTAImageProcessorImpl::AbortAllProcessors()
+void OTAMultiImageProcessorImpl::AbortAllProcessors()
 {
     ChipLogError(SoftwareUpdate, "All selected processors will call abort action");
 
@@ -281,15 +277,13 @@ void OTAImageProcessorImpl::AbortAllProcessors()
     {
         if (pair.second->WasSelected())
         {
-            // TODO: do we need AbortAction or similar?
-            //pair.second->AbortAction();
             pair.second->Clear();
             pair.second->SetWasSelected(false);
         }
     }
 }
 
-bool OTAImageProcessorImpl::IsFirstImageRun()
+bool OTAMultiImageProcessorImpl::IsFirstImageRun()
 {
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor == nullptr)
@@ -300,7 +294,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
     return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+CHIP_ERROR OTAMultiImageProcessorImpl::ConfirmCurrentImage()
 {
     uint32_t currentVersion;
     uint32_t targetVersion;
@@ -320,7 +314,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
+CHIP_ERROR OTAMultiImageProcessorImpl::SetBlock(ByteSpan & block)
 {
     if (block.empty())
     {
@@ -350,10 +344,11 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
+void OTAMultiImageProcessorImpl::HandleFinalize(intptr_t context)
 {
+    ChipLogError(SoftwareUpdate, "HandleFinalize begin");
     CHIP_ERROR error = CHIP_NO_ERROR;
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAMultiImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         return;
@@ -375,15 +370,19 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
 
-CHIP_ERROR OTAImageProcessorImpl::ProcessFinalize()
+CHIP_ERROR OTAMultiImageProcessorImpl::ProcessFinalize()
 {
-    return mCurrentProcessor->FinalizeAction();
+    for (auto const & pair : this->mProcessorMap)
+    {
+        pair.second->FinalizeAction();
+    }
+    return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::HandleApply(intptr_t context)
+void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 {
     CHIP_ERROR error      = CHIP_NO_ERROR;
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAMultiImageProcessorImpl *>(context);
 
     ChipLogProgress(SoftwareUpdate, "HandleApply: started");
 
@@ -432,7 +431,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 }
 
-CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
+CHIP_ERROR OTAMultiImageProcessorImpl::ReleaseBlock()
 {
     if (mBlock.data() != nullptr)
     {
@@ -443,18 +442,23 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
     return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::FetchNextData(uint32_t context)
+void OTAMultiImageProcessorImpl::FetchNextData(uint32_t context)
 {
-    auto * imageProcessor = &OTAImageProcessorImpl::GetDefaultInstance();
+    ChipLogError(SoftwareUpdate, "Fetch data 1:");
+
+
+    auto * imageProcessor = &OTAMultiImageProcessorImpl::GetDefaultInstance();
     SystemLayer().ScheduleLambda([imageProcessor] {
         if (imageProcessor->mDownloader)
         {
             imageProcessor->mDownloader->FetchNextData();
         }
     });
+    ChipLogError(SoftwareUpdate, "Fetch data 2:");
+
 }
 
-OTAImageProcessorImpl & OTAImageProcessorImpl::GetDefaultInstance()
+OTAMultiImageProcessorImpl & OTAMultiImageProcessorImpl::GetDefaultInstance()
 {
     return gImageProcessor;
 }

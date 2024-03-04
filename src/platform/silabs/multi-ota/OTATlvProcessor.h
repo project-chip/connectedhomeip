@@ -65,14 +65,14 @@ struct OTATlvHeader
 /**
  * This class defines an interface for a Matter TLV processor.
  * Instances of derived classes can be registered as processors
- * in OTAImageProcessorImpl. Based on the TLV type, a certain
+ * in OTAMultiImageProcessorImpl. Based on the TLV type, a certain
  * processor is used to process subsequent blocks until the number
  * of bytes found in the metadata is processed. In case a block contains
  * data from two different TLVs, the processor should ensure the remaining
  * data is returned in the block passed as input.
  * The default processors: application, SSBL and factory data are registered
- * in OTAImageProcessorImpl::Init through OtaHookInit.
- * Applications should use OTAImageProcessorImpl::RegisterProcessor
+ * in OTAMultiImageProcessorImpl::Init through OtaHookInit.
+ * Applications should use OTAMultiImageProcessorImpl::RegisterProcessor
  * to register additional processors.
  */
 class OTATlvProcessor
@@ -85,7 +85,7 @@ public:
     virtual CHIP_ERROR ApplyAction() = 0;
     virtual CHIP_ERROR FinalizeAction() = 0;
     //virtual CHIP_ERROR AbortAction() = 0;
-    //virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
 
     CHIP_ERROR Process(ByteSpan & block);
     void RegisterDescriptorCallback(ProcessDescriptor callback) { mCallbackProcessDescriptor = callback; }
@@ -103,7 +103,7 @@ protected:
      * The method takes subsequent chunks of the Matter OTA image file and processes them.
      * If more image chunks are needed, CHIP_ERROR_BUFFER_TOO_SMALL error is returned.
      * Other error codes indicate that an error occurred during processing. Fetching
-     * next data is scheduled automatically by OTAImageProcessorImpl if the return value
+     * next data is scheduled automatically by OTAMultiImageProcessorImpl if the return value
      * is neither an error code, nor CHIP_OTA_FETCH_ALREADY_SCHEDULED (which implies the
      * scheduling is done inside ProcessInternal or will be done in the future, through a
      * callback).

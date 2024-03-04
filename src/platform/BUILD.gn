@@ -151,10 +151,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     defines += [
       "CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR=${chip_enable_ota_requestor}",
     ]
-    # TODO: add this to silabs platform specific code
-    defines += [
-      "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=${chip_enable_multi_ota_requestor}",
-    ]
 
     if (chip_device_project_config_include != "") {
       defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]

@@ -87,8 +87,6 @@ declare_args() {
 
   # Enable OTA requestor support
   chip_enable_ota_requestor = false
-  # TODO: add this to silabs platform specific code
-  chip_enable_multi_ota_requestor = false
 
   # Select DNS-SD implementation
   if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||

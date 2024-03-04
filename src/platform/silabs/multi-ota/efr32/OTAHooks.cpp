@@ -16,31 +16,13 @@
  *    limitations under the License.
  */
 
-#include <platform/silabs/multi-ota/MultiOTAImageProcessorImpl.h>
+#include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <include/platform/CHIPDeviceLayer.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include <platform/silabs/multi-ota/efr32/OTAFirmwareProcessor.h>
-
-// TODO: Find home for CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
-/** 
- * @def CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
- *
- * Enables default OTA TLV factory data processor.
- * Disabled by default.
- */
-#ifndef CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
-#define CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR 0
-#endif // CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
-
-
-#if CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
-#include <platform/silabs/multi-ota/efr32/FactoryDataProcessor.h>
-#endif // CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
-
-
-extern "C" void ResetMCU(void);
+#include <platform/silabs/multi-ota/efr32/OTACustomProcessor.h>
 
 CHIP_ERROR ProcessDescriptor(void * descriptor)
 {
@@ -59,12 +41,8 @@ CHIP_ERROR OtaHookInit()
 
     sApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
 
-    auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
+    auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(1, &sApplicationProcessor));
-// TODO: add this back once the FactoryDataProcessor Implementation is complete
-//#if CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
-//    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(3, &sFactoryDataProcessor));
-//#endif // CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
 
     return CHIP_NO_ERROR;
 }

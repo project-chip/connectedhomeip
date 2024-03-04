@@ -20,7 +20,7 @@
 #include <lib/support/BufferReader.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/silabs/multi-ota/MultiOTAImageProcessorImpl.h>
+#include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 #if OTA_ENCRYPTION_ENABLE
 #include "OtaUtils.h"
@@ -44,15 +44,14 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
         block = block.SubSpan(bytes);
         if (mProcessedLength == mLength)
         {
-            // TODO: do we need an ExitAction or similar?
-            /*status = ExitAction();
+            status = ExitAction();
             if (!IsError(status))
             {
                 // If current block was processed fully and the block still contains data, it
                 // means that the block contains another TLV's data and the current processor
-                // should be changed by OTAImageProcessorImpl.
+                // should be changed by OTAMultiImageProcessorImpl.
                 return CHIP_OTA_CHANGE_PROCESSOR;
-            }*/
+            }
         }
     }
 
