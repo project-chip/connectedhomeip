@@ -26,7 +26,6 @@ using namespace chip::app;
 
 namespace {
 
-
 void TestBasicLifecycle(nlTestSuite * inSuite, void * inContext)
 {
     using CacheResult = AttributeAccessInterfaceCache::CacheResult;

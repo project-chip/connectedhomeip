@@ -41,10 +41,11 @@ namespace app {
 class AttributeAccessInterfaceCache
 {
 public:
-    enum class CacheResult {
-      kCacheMiss,
-      kDefinitelyUnused,
-      kDefinitelyUsed
+    enum class CacheResult
+    {
+        kCacheMiss,
+        kDefinitelyUnused,
+        kDefinitelyUsed
     };
 
     AttributeAccessInterfaceCache() { Invalidate(); }
@@ -74,7 +75,6 @@ public:
      */
     void MarkUnused(EndpointId endpointId, ClusterId clusterId) { mLastUnusedEntry.Set(endpointId, clusterId, nullptr); }
 
-
     /**
      * @brief Get the AttributeAccessInterface instance for a given <`endpointId`, `clusterId`>, if present in cache.
      *
@@ -95,7 +95,7 @@ public:
         {
             if (outAttributeAccess != nullptr)
             {
-                *outAttributeAccess =cacheSlot->accessor;
+                *outAttributeAccess = cacheSlot->accessor;
             }
             return CacheResult::kDefinitelyUsed;
         }
@@ -132,8 +132,8 @@ private:
 
     AttributeAccessCacheEntry * GetCacheSlot(EndpointId endpointId, ClusterId clusterId)
     {
-        (void)endpointId;
-        (void)clusterId;
+        (void) endpointId;
+        (void) clusterId;
         return &mCacheSlots[0];
     }
 

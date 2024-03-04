@@ -1394,27 +1394,27 @@ app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId
     using CacheResult = AttributeAccessInterfaceCache::CacheResult;
 
     AttributeAccessInterface * cached = nullptr;
-    CacheResult result = gAttributeAccessInterfaceCache.Get(endpointId, clusterId, &cached);
+    CacheResult result                = gAttributeAccessInterfaceCache.Get(endpointId, clusterId, &cached);
     switch (result)
     {
-      case CacheResult::kDefinitelyUnused:
-          return nullptr;
-      case CacheResult::kDefinitelyUsed:
-          return cached;
-      case CacheResult::kCacheMiss:
-      default:
-          // Did not cache yet, search set of AAI registered, and cache if found.
-          for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
-          {
-              if (cur->Matches(endpointId, clusterId))
-              {
-                  gAttributeAccessInterfaceCache.MarkUsed(endpointId, clusterId, cur);
-                  return cur;
-              }
-          }
+    case CacheResult::kDefinitelyUnused:
+        return nullptr;
+    case CacheResult::kDefinitelyUsed:
+        return cached;
+    case CacheResult::kCacheMiss:
+    default:
+        // Did not cache yet, search set of AAI registered, and cache if found.
+        for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+        {
+            if (cur->Matches(endpointId, clusterId))
+            {
+                gAttributeAccessInterfaceCache.MarkUsed(endpointId, clusterId, cur);
+                return cur;
+            }
+        }
 
-          // Did not find AAI registered: mark as definitely not using.
-          gAttributeAccessInterfaceCache.MarkUnused(endpointId, clusterId);
+        // Did not find AAI registered: mark as definitely not using.
+        gAttributeAccessInterfaceCache.MarkUnused(endpointId, clusterId);
     }
 
     return nullptr;
