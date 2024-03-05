@@ -171,6 +171,7 @@ static_library("interaction-model") {
     "PendingResponseTrackerImpl.h",
     "ReadClient.h",  # TODO: cpp is only included conditionally. Needs logic
                      # fixing
+    "ReadPrepareParams.h",
     "RequiredPrivilege.h",
     "StatusResponse.cpp",
     "StatusResponse.h",
