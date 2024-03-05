@@ -18,6 +18,7 @@
 #import "MTRMetricsCollector.h"
 #import "MTRLogging_Internal.h"
 #include "MTRMetrics_Internal.h"
+#include <MTRMetrics.h>
 #import <MTRUnfairLock.h>
 #include <platform/Darwin/Tracing.h>
 #include <system/SystemClock.h>
@@ -26,13 +27,17 @@
 
 using MetricEvent = chip::Tracing::MetricEvent;
 
-static NSString * kMTRMetricDataValueKey = @"value";
-static NSString * kMTRMetricDataTimepointKey = @"time_point";
-static NSString * kMTRMetricDataDurationKey = @"duration_us";
-
-@implementation MTRMetricsData {
+@implementation MTRMetricData {
     chip::System::Clock::Microseconds64 _timePoint;
-    chip::System::Clock::Microseconds64 _duration;
+    MetricEvent::Type _type;
+}
+
+- (instancetype)init
+{
+    // Default is to create data for instant event type.
+    // The key can be anything since it is not really used in this context.
+    MetricEvent event(MetricEvent::Type::kInstantEvent, "");
+    return [self initWithMetricEvent:event];
 }
 
 - (instancetype)initWithMetricEvent:(const MetricEvent &)event
@@ -41,60 +46,50 @@ static NSString * kMTRMetricDataDurationKey = @"duration_us";
         return nil;
     }
 
+    _type = event.type();
+
+    using EventType = MetricEvent::Type;
+    switch (_type) {
+    // Capture timepoint for begin and end to calculate duration
+    case EventType::kBeginEvent:
+    case EventType::kEndEvent:
+        _timePoint = chip::System::SystemClock().GetMonotonicMicroseconds64();
+        break;
+    case EventType::kInstantEvent:
+        _timePoint = chip::System::Clock::Microseconds64(0);
+        break;
+    }
+
     using ValueType = MetricEvent::Value::Type;
     switch (event.ValueType()) {
     case ValueType::kInt32:
         _value = [NSNumber numberWithInteger:event.ValueInt32()];
         break;
     case ValueType::kUInt32:
-        _value = [NSNumber numberWithInteger:event.ValueUInt32()];
+        _value = [NSNumber numberWithUnsignedInteger:event.ValueUInt32()];
         break;
     case ValueType::kChipErrorCode:
-        _value = [NSNumber numberWithInteger:event.ValueErrorCode()];
+        _errorCode = [NSNumber numberWithUnsignedInteger:event.ValueErrorCode()];
         break;
     case ValueType::kUndefined:
-    default:
-        _value = nil;
+        break;
     }
-
-    _timePoint = chip::System::SystemClock().GetMonotonicMicroseconds64();
-    _duration = chip::System::Clock::Microseconds64(0);
     return self;
 }
 
-- (void)setDurationFromMetricData:(MTRMetricsData *)fromData
+- (void)setDurationFromMetricDataAndClearCounters:(MTRMetricData *)fromData
 {
-    _duration = _timePoint - fromData->_timePoint;
-}
+    auto duration = _timePoint - fromData->_timePoint;
+    _durationMicroseconds = [NSNumber numberWithUnsignedLongLong:duration.count()];
 
-- (NSNumber *)timePointMicroseconds
-{
-    return [NSNumber numberWithUnsignedLongLong:_timePoint.count()];
-}
-
-- (NSNumber *)durationMicroseconds
-{
-    return [NSNumber numberWithUnsignedLongLong:_duration.count()];
+    // Clear timepoints to minimize history
+    _timePoint = fromData->_timePoint = chip::System::Clock::Microseconds64(0);
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"MTRMetricsData: Value = %@, TimePoint = %@, Duration = %@ us", self.value, self.timePointMicroseconds, self.durationMicroseconds];
-}
-
-- (NSDictionary *)toDictionary
-{
-    NSMutableDictionary * dictRepresentation = [NSMutableDictionary dictionary];
-    if (self.value) {
-        [dictRepresentation setValue:self.value forKey:kMTRMetricDataValueKey];
-    }
-    if (auto tmPt = self.timePointMicroseconds) {
-        [dictRepresentation setValue:tmPt forKey:kMTRMetricDataTimepointKey];
-    }
-    if (auto duration = self.durationMicroseconds) {
-        [dictRepresentation setValue:duration forKey:kMTRMetricDataDurationKey];
-    }
-    return dictRepresentation;
+    return [NSString stringWithFormat:@"<MTRMetricData>: Type %d, Value = %@, Error Code = %@, Duration = %@ us",
+                     static_cast<int>(_type), self.value, self.errorCode, self.durationMicroseconds];
 }
 
 @end
@@ -123,8 +118,9 @@ void ShutdownMetricsCollection()
 
 @implementation MTRMetricsCollector {
     os_unfair_lock _lock;
-    NSMutableDictionary<NSString *, MTRMetricsData *> * _metricsDataCollection;
+    NSMutableDictionary<NSString *, MTRMetricData *> * _metricsDataCollection;
     chip::Tracing::signposts::DarwinTracingBackend _tracingBackend;
+    BOOL _tracingBackendRegistered;
 }
 
 + (instancetype)sharedInstance
@@ -152,32 +148,43 @@ void ShutdownMetricsCollection()
     }
     _lock = OS_UNFAIR_LOCK_INIT;
     _metricsDataCollection = [NSMutableDictionary dictionary];
+    _tracingBackendRegistered = FALSE;
     return self;
 }
 
 - (void)registerTracingBackend
 {
     std::lock_guard lock(_lock);
-    chip::Tracing::Register(_tracingBackend);
-    MTR_LOG_INFO("Registered tracing backend with the registry");
+
+    // Register only once
+    if (!_tracingBackendRegistered) {
+        chip::Tracing::Register(_tracingBackend);
+        MTR_LOG_INFO("Registered tracing backend with the registry");
+        _tracingBackendRegistered = TRUE;
+    }
 }
 
 - (void)unregisterTracingBackend
 {
     std::lock_guard lock(_lock);
-    chip::Tracing::Unregister(_tracingBackend);
-    MTR_LOG_INFO("Unregistered tracing backend with the registry");
+
+    // Unregister only if registered before
+    if (_tracingBackendRegistered) {
+        chip::Tracing::Unregister(_tracingBackend);
+        MTR_LOG_INFO("Unregistered tracing backend with the registry");
+        _tracingBackendRegistered = FALSE;
+    }
 }
 
 static inline NSString * suffixNameForMetricType(MetricEvent::Type type)
 {
     switch (type) {
     case MetricEvent::Type::kBeginEvent:
-        return @"-begin";
+        return @"_begin";
     case MetricEvent::Type::kEndEvent:
-        return @"-end";
+        return @"_end";
     case MetricEvent::Type::kInstantEvent:
-        return @"-instant";
+        return @"_instant";
     }
 }
 
@@ -211,14 +218,14 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
 
     // Create the new metric key based event type
     auto metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(event)];
-    MTRMetricsData * data = [[MTRMetricsData alloc] initWithMetricEvent:event];
+    MTRMetricData * data = [[MTRMetricData alloc] initWithMetricEvent:event];
 
     // If End event, compute its duration using the Begin event
     if (event.type() == MetricEvent::Type::kEndEvent) {
         auto metricsBeginKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetricType(MetricEvent::Type::kBeginEvent)];
-        MTRMetricsData * beginMetric = _metricsDataCollection[metricsBeginKey];
+        MTRMetricData * beginMetric = _metricsDataCollection[metricsBeginKey];
         if (beginMetric) {
-            [data setDurationFromMetricData:beginMetric];
+            [data setDurationFromMetricDataAndClearCounters:beginMetric];
         } else {
             // Unbalanced end
             MTR_LOG_ERROR("Unable to find Begin event corresponding to Metric Event: %s", event.key());
@@ -230,7 +237,7 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     // If the event is a begin or end event, implicitly emit a corresponding instant event
     if (event.type() == MetricEvent::Type::kBeginEvent || event.type() == MetricEvent::Type::kEndEvent) {
         MetricEvent instantEvent(MetricEvent::Type::kInstantEvent, event.key());
-        data = [[MTRMetricsData alloc] initWithMetricEvent:instantEvent];
+        data = [[MTRMetricData alloc] initWithMetricEvent:instantEvent];
         metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(instantEvent)];
         [_metricsDataCollection setValue:data forKey:metricsKey];
     }
@@ -240,10 +247,9 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
 {
     std::lock_guard lock(_lock);
 
-    // Copy the MTRMetrics as NSDictionary
     MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
     for (NSString * key in _metricsDataCollection) {
-        [metrics setValue:[_metricsDataCollection[key] toDictionary] forKey:key];
+        [metrics setMetricData:_metricsDataCollection[key] forKey:key];
     }
 
     // Clear curent stats, if specified
