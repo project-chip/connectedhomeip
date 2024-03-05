@@ -75,16 +75,20 @@ void SetTestEventTrigger_zzzzzzzzzz()
     ChipLogProgress(Support, "[zzzzzzzzzz-handle] L-%d", __LINE__ );
 }
 
+// TODO: inc. header ...
+extern void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> & nullableForecast);
+
 void SetTestEventTrigger_StartTimeAdjustment()
 {
     ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d", __LINE__ );
 
     DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
 
-    sDeviceEnergyManagementTestEventSaveData.forecast = dg->GetForecast();
-
     //     virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast() override;
     sForecast = dg->GetForecast();
+    // sDeviceEnergyManagementTestEventSaveData.forecast = dg->GetForecast();
+
+#if 0 // TODO:
     if (!sForecast.IsNull())
     {
         ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d sForecast.forecastId = %d", __LINE__,  sForecast.Value().forecastId);
@@ -100,6 +104,8 @@ void SetTestEventTrigger_StartTimeAdjustment()
                                      sForecast.Value().latestEndTime.HasValue()?  sForecast.Value().latestEndTime.Value() : 666666);
 #endif
     }
+#endif
+    ForecastTestSetup_TP3b(sForecast);
 
     Status s = dg->StartTimeAdjustRequest(1, AdjustmentCauseEnum::kLocalOptimization);
     if (s != Status::Success)
@@ -107,8 +113,11 @@ void SetTestEventTrigger_StartTimeAdjustment()
         ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d StartTimeAdjustRequest() Failed", __LINE__ );
     }
 
-    DataModel::Nullable<Structs::ForecastStruct::Type>  newForecast = dg->GetForecast();
-    // TODO: compare new/old forcasts
+    // DataModel::Nullable<Structs::ForecastStruct::Type>  newForecast = dg->GetForecast();
+    // TODO: compare new/old forcasts? No that's done at the python level.
+
+
+
 }
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)

@@ -17,6 +17,7 @@
  */
 
 #include "DeviceEnergyManagementDelegateImpl.h"
+#include "utils.h"
 #include <string>
 
 
@@ -146,6 +147,36 @@ static void FillForecast(DataModel::Nullable<Structs::ForecastStruct::Type> & nu
     slots[1].costs = Optional<CostsList> {CostsList(costs2, costsCount)};
 
     nullableForecast = MakeNullable(forecast);
+}
+
+// Prepare for Test Procedure
+void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> & nullableForecast)
+{
+    if (nullableForecast.IsNull())
+    {
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Null but nullableForecast.HasValue",  __FUNCTION__);
+        return;
+    }
+
+    Structs::ForecastStruct::Type & forecast = nullableForecast.Value();
+    ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d xxForecast.startTime = %d", __LINE__ , forecast.startTime);
+    ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d xxForecast.endTime = %d", __LINE__, forecast.endTime );
+    ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d xxForecast.isPauseable = %s", __LINE__, forecast.isPauseable? "T":"F" );
+
+    uint32_t chipEpoch = 0;
+
+    CHIP_ERROR ce = UtilsGetEpochTS(chipEpoch);
+    ChipLogProgress(Support, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ce=%s  epoch = %d",
+                         (ce != CHIP_NO_ERROR)? "Err":"Good", chipEpoch);
+
+#if 1
+    forecast.startTime         = static_cast<uint32_t>(chipEpoch);       // planned start time, in UTC, for the entire Forecast.
+    // earliest start time, in UTC, that the entire Forecast can be shifted to. null value indicates that it can be started immediately.
+    forecast.earliestStartTime = Optional<DataModel::Nullable<uint32_t>> {DataModel::Nullable<uint32_t>{chipEpoch}}; 
+
+    forecast.endTime           = static_cast<uint32_t>(chipEpoch * 3);   // planned end time, in UTC, for the entire Forecast.
+    forecast.latestEndTime     = Optional<uint32_t> (static_cast<uint32_t>(chipEpoch * 3));  // latest end time, in UTC, for the entire Forecast
+#endif
 }
 
 namespace chip {
