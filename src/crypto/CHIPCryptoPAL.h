@@ -349,6 +349,16 @@ public:
     }
 
     /**
+     * Only exists for compatibility with SensitiveDataBuffer.
+     * Returns an error unless the specified size matches the buffer capacity.
+     */
+    CHIP_ERROR SetLength(size_t length)
+    {
+        VerifyOrReturnError(length == kCapacity, CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      * @brief Returns fixed length of the buffer
      */
     constexpr size_t Length() const { return kCapacity; }
@@ -377,8 +387,8 @@ private:
     uint8_t mBytes[kCapacity];
 };
 
-using P256ECDSASignature    = SensitiveDataBuffer<kMax_ECDSA_Signature_Length>;
-using P256ECDHDerivedSecret = SensitiveDataBuffer<kMax_ECDH_Secret_Length>;
+using P256ECDSASignature    = SensitiveDataFixedBuffer<kP256_ECDSA_Signature_Length_Raw>;
+using P256ECDHDerivedSecret = SensitiveDataFixedBuffer<kP256_FE_Length>;
 
 using IdentityProtectionKey     = SensitiveDataFixedBuffer<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
 using IdentityProtectionKeySpan = FixedByteSpan<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
