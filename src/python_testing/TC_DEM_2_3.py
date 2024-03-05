@@ -114,7 +114,6 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
                     f"       SlotIsPauseable: {slot.slotIsPauseable} MinPauseDuration: {slot.minPauseDuration} MaxPauseDuration: {slot.maxPauseDuration}")
                 logging.info(f"       ManufacturerESAState: {slot.manufacturerESAState}")
                 logging.info(f"       NominalPower: {slot.nominalPower} MinPower: {slot.minPower} MaxPower: {slot.maxPower}")
-                logging.info(f"       NominalEnergy: {slot.nominalEnergy} MinEnergy: {slot.minEnergy} MaxEnergy: {slot.maxEnergy}")
                 logging.info(f"       MinPowerAdjustment: {slot.minPowerAdjustment} MaxPowerAdjustment: {slot.maxPowerAdjustment}")
                 logging.info(
                     f"       MinDurationAdjustment: {slot.minDurationAdjustment} MaxDurationAdjustment: {slot.maxDurationAdjustment}")

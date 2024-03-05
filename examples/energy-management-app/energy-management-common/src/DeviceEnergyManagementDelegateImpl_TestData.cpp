@@ -33,13 +33,17 @@ using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
 #define DELEGATE_TEST_DATA        // TODO: comment out if not needed
 
+static Structs::CostStruct::Type  gCosts [2];
+
+
 #ifdef  DELEGATE_TEST_DATA
-static const Structs::SlotStruct::Type gSlot {
+static Structs::SlotStruct::Type gSlot[2] {
     static_cast<uint32_t>(120),   // minDuration
     static_cast<uint32_t>(230),   // maxDuration
     static_cast<uint32_t>(340),   // defaultDuration
     static_cast<uint32_t>(450),   // elapsedSlotTime
     static_cast<uint32_t>(560),   // remainingSlotTime
+
     Optional<bool>(true),         // slotIsPauseable
     Optional<uint32_t>(static_cast<uint32_t>(670)),   // minPauseDuration
     Optional<uint32_t>(static_cast<uint32_t>(780)),   // maxPauseDuration
@@ -50,7 +54,7 @@ static const Structs::SlotStruct::Type gSlot {
     Optional<int64_t>{4},          // nominalEnergy;
 
     Optional<DataModel::List<const Structs::CostStruct::Type>>{
-        DataModel::List<const Structs::CostStruct::Type>(),
+        DataModel::List<const Structs::CostStruct::Type>(gCosts, 2),
     },
 
     Optional<int64_t> {5},         // minPowerAdjustment;
@@ -58,6 +62,8 @@ static const Structs::SlotStruct::Type gSlot {
     Optional<uint32_t>{7},         // minDurationAdjustment;
     Optional<uint32_t>{8}          // maxDurationAdjustment;
     };
+
+static DataModel::List<const Structs::SlotStruct::Type> gSlotList(gSlot, 2);
 
 // Just for testing. TODO: To be removed ?
 static void FillCostStruct(Structs::CostStruct::Type & cost)
@@ -87,11 +93,11 @@ static void FillForecast(DataModel::Nullable<Structs::ForecastStruct::Type> & nu
     nullableForecast.SetNull();
     if (!nullableForecast.IsNull())
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Null but nullableForecast.HasValue",  __FUNCTION__);
+        ChipLogProgress(Zcl, "DEM: %s Null but nullableForecast.HasValue",  __FUNCTION__);
     }
     else
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Null & nullableForecast.NullValue",  __FUNCTION__);
+        ChipLogProgress(Zcl, "DEM: %s Null & nullableForecast.NullValue",  __FUNCTION__);
     }
 
     Structs::ForecastStruct::Type forecast;
@@ -105,34 +111,27 @@ static void FillForecast(DataModel::Nullable<Structs::ForecastStruct::Type> & nu
     forecast.latestEndTime     = Optional<uint32_t> (static_cast<uint32_t>(67890));
     forecast.isPauseable       = true;
 
-    uint32_t slotCount = 2;
-    Structs::SlotStruct::Type  * slots = new Structs::SlotStruct::Type[slotCount];
-    slots[0] = gSlot;
+    gSlot[1].minDuration       = gSlot[0].minDuration + 1;
+    gSlot[1].maxDuration       = gSlot[0].maxDuration + 1;
+    gSlot[1].defaultDuration   = gSlot[0].defaultDuration + 1;
+    gSlot[1].elapsedSlotTime   = gSlot[0].elapsedSlotTime + 1;
+    gSlot[1].remainingSlotTime = gSlot[0].remainingSlotTime + 1;
+    gSlot[1].slotIsPauseable   = Optional<bool>( !gSlot[0].slotIsPauseable.ValueOr(false));
+    gSlot[1].minPauseDuration  = Optional<uint32_t>(gSlot[0].minPauseDuration.ValueOr(0) + 1);
+    gSlot[1].maxPauseDuration  = Optional<uint32_t>(gSlot[0].maxPauseDuration.ValueOr(0) + 1);
+    gSlot[1].manufacturerESAState = Optional<uint16_t>{90};
+    gSlot[1].nominalPower       = Optional<int64_t>{91};
+    gSlot[1].minPower           = Optional<int64_t>{92};
+    gSlot[1].maxPower           = Optional<int64_t>{93};
+    gSlot[1].nominalEnergy      = Optional<int64_t>{94};
 
-    slots[1].minDuration       = gSlot.minDuration + 1;
-    slots[1].maxDuration       = gSlot.maxDuration + 1;
-    slots[1].defaultDuration   = gSlot.defaultDuration + 1;
-    slots[1].elapsedSlotTime   = gSlot.elapsedSlotTime + 1;
-    slots[1].remainingSlotTime = gSlot.remainingSlotTime + 1;
-    slots[1].slotIsPauseable   = Optional<bool>( !gSlot.slotIsPauseable.ValueOr(false));
-    slots[1].minPauseDuration  = Optional<uint32_t>(gSlot.minPauseDuration.ValueOr(0) + 1);
-    slots[1].maxPauseDuration  = Optional<uint32_t>(gSlot.maxPauseDuration.ValueOr(0) + 1);
-    slots[1].manufacturerESAState = Optional<uint16_t>{90};
-    slots[1].nominalPower       = Optional<int64_t>{91};
-    slots[1].minPower           = Optional<int64_t>{92};
-    slots[1].maxPower           = Optional<int64_t>{93};
-    slots[1].nominalEnergy      = Optional<int64_t>{94};
+    gSlot[1].costs = Optional<DataModel::List<const Structs::CostStruct::Type>>{
+                       DataModel::List<const Structs::CostStruct::Type>()};
 
-    // Optional<DataModel::List<const Structs::CostStruct::Type>> costs;
-    slots[1].costs = Optional<DataModel::List<const Structs::CostStruct::Type>>{
-                     DataModel::List<const Structs::CostStruct::Type>()};
-
-    slots[1].minPowerAdjustment = Optional<int64_t>{95};
-    slots[1].maxPowerAdjustment = Optional<int64_t>{96};
-    slots[1].minDurationAdjustment = Optional<uint32_t>{97};
-    slots[1].maxDurationAdjustment = Optional<uint32_t>{98};
-
-    forecast.slots = DataModel::List<const Structs::SlotStruct::Type>(slots, slotCount);
+    gSlot[1].minPowerAdjustment = Optional<int64_t>{95};
+    gSlot[1].maxPowerAdjustment = Optional<int64_t>{96};
+    gSlot[1].minDurationAdjustment = Optional<uint32_t>{97};
+    gSlot[1].maxDurationAdjustment = Optional<uint32_t>{98};
 
     uint32_t costsCount = 2;
     Structs::CostStruct::Type  * costs1 = new Structs::CostStruct::Type[costsCount];
@@ -143,8 +142,8 @@ static void FillForecast(DataModel::Nullable<Structs::ForecastStruct::Type> & nu
     FillCostStruct(costs2[0]);
     FillCostStruct(costs2[1]);
 
-    slots[0].costs = Optional<CostsList> {CostsList(costs1, costsCount)};
-    slots[1].costs = Optional<CostsList> {CostsList(costs2, costsCount)};
+    gSlot[0].costs = Optional<CostsList> {CostsList(costs1, costsCount)};
+    gSlot[1].costs = Optional<CostsList> {CostsList(costs2, costsCount)};
 
     nullableForecast = MakeNullable(forecast);
 }
@@ -154,7 +153,7 @@ void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> &
 {
     if (nullableForecast.IsNull())
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Null but nullableForecast.HasValue",  __FUNCTION__);
+        ChipLogProgress(Zcl, "DEM: %s Null but nullableForecast.HasValue",  __FUNCTION__);
         return;
     }
 
@@ -166,17 +165,15 @@ void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> &
     uint32_t chipEpoch = 0;
 
     CHIP_ERROR ce = UtilsGetEpochTS(chipEpoch);
-    ChipLogProgress(Support, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ce=%s  epoch = %d",
+    ChipLogProgress(Support, "@@@@@@@@@@@@@@@@@@@@@@@@ ce=%s  epoch = %d",
                          (ce != CHIP_NO_ERROR)? "Err":"Good", chipEpoch);
 
-#if 1
     forecast.startTime         = static_cast<uint32_t>(chipEpoch);       // planned start time, in UTC, for the entire Forecast.
+
     // earliest start time, in UTC, that the entire Forecast can be shifted to. null value indicates that it can be started immediately.
     forecast.earliestStartTime = Optional<DataModel::Nullable<uint32_t>> {DataModel::Nullable<uint32_t>{chipEpoch}}; 
-
     forecast.endTime           = static_cast<uint32_t>(chipEpoch * 3);   // planned end time, in UTC, for the entire Forecast.
     forecast.latestEndTime     = Optional<uint32_t> (static_cast<uint32_t>(chipEpoch * 3));  // latest end time, in UTC, for the entire Forecast
-#endif
 }
 
 namespace chip {
@@ -197,14 +194,15 @@ DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate()
         s = DeviceEnergyManagement::Attributes::ESAState::Set(endpoint, esaStatus);
         if (EMBER_ZCL_STATUS_SUCCESS != s)
         {
-            ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Failed to set() ESAStateEnum::kUserOptOut",  __FUNCTION__);
+            ChipLogProgress(Zcl, "DEM: %s Failed to set() ESAStateEnum::kUserOptOut",  __FUNCTION__);
             goto DEPARTURES;
         }
     }
 #endif
 
     FillForecast(mForecast);
-    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Enabled Feature ForecastAdjustment",  __FUNCTION__);
+    ForecastTestSetup_TP3b(mForecast);
+    ChipLogProgress(Zcl, "DEM: %s Enabled Feature ForecastAdjustment",  __FUNCTION__);
 
     return;
 }
