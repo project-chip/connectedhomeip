@@ -18,7 +18,7 @@
 
 #include <app/util/mock/MockNodeConfig.h>
 
-#include <app/att-storage.h>
+#include <app/util/att-storage.h>
 #include <app/util/af.h>
 #include <lib/support/CodeUtils.h>
 

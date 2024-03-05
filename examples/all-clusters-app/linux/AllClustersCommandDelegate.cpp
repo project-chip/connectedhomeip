@@ -19,7 +19,7 @@
 #include "AllClustersCommandDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/att-storage.h>
+#include <app/util/att-storage.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>

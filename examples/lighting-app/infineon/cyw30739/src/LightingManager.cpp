@@ -19,7 +19,7 @@
 
 #include "LightingManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/att-storage.h>
+#include <app/util/att-storage.h>
 #include <app/util/af.h>
 #include <stdio.h>
 
