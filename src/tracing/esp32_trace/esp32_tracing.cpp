@@ -163,10 +163,6 @@ void ESP32Backend::RegisterMetric(const char * key, ValueType type)
             ESP_LOGE("SYS.MTR", "Type mismatch for metric key %s", key);
             return;
         }
-        else
-        {
-            return;
-        }
     }
 
     switch (type)
