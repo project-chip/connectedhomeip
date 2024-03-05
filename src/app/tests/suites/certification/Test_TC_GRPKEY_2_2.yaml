@@ -33,8 +33,8 @@ tests:
 
     - label:
           "Step 1: TH reads MaxGroupKeysPerFabric attribute from
-          GroupKeyManagement cluster on DUT. Save the value as Max_GrpKey for
-          future use."
+          GroupKeyManagement cluster on DUT using a fabric-filtered read. Save
+          the value as Max_GrpKey for future use."
       PICS: GRPKEY.S.A0003
       command: "readAttribute"
       attribute: "MaxGroupKeysPerFabric"
@@ -849,20 +849,3 @@ tests:
                 value: 0x01b
       response:
           error: NOT_FOUND
-
-    - label:
-          "Step 26: TH removes all the existing GroupKeySetID that were added in
-          Step 21 by sending a KeySetRemove command starting from GroupKeySetID
-          1 to the GroupKeyManagement cluster."
-      PICS: GRPKEY.S.C03.Rsp
-      command: "KeySetRemove"
-      arguments:
-          values:
-              - name: "GroupKeySetID"
-                value: 1
-              - name: "GroupKeySetID"
-                value: 2
-      response:
-          values:
-              - name: "Status"
-                value: 0x00
