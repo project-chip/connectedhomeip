@@ -346,6 +346,19 @@ public:
     //
     void SetForceHandlerQuota(bool forceHandlerQuota) { mForceHandlerQuota = forceHandlerQuota; }
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    //
+    // Override the subscription timeout resumption retry interval seconds. The default retry interval will be
+    // 300s + GetFibonacciForIndex(retry_times) * 300s, which is too long for unit-tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetSubscriptionTimeoutResumptionRetryIntervalSeconds(int32_t seconds)
+    {
+        mSubscriptionResumptionRetrySecondsOverride = seconds;
+    }
+#endif
+
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
     // they don't provide for the ability to shut down those subscriptions after they've been established.
@@ -383,6 +396,8 @@ private:
 
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
+
+    void TryToResumeSubscriptions();
 
     ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
 
@@ -627,7 +642,10 @@ private:
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
     bool mForceHandlerQuota = false;
-#endif
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    int mSubscriptionResumptionRetrySecondsOverride = -1;
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool HasSubscriptionsToResume();
