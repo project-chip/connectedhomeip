@@ -69,6 +69,7 @@ Davis, CA 95616, USA
   <features>
     <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
       <otherwiseConform>
+        <provisionalConform/>
         <mandatoryConform>
           <feature name="LITS"/>
         </mandatoryConform>
@@ -77,9 +78,16 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="1" code="UAT" name="UserActiveModeTrigger" summary="Device supports the user active mode trigger feature.">
       <otherwiseConform>
+        <provisionalConform/>
         <mandatoryConform>
           <feature name="LITS"/>
         </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="2" code="LITS" name="LongIdleTimeSupport" summary="Device supports operating as a Long Idle Time ICD.">
+      <otherwiseConform>
+        <provisionalConform/>
         <optionalConform/>
       </otherwiseConform>
     </feature>
@@ -156,9 +164,12 @@ Davis, CA 95616, USA
     <attribute id="0x0006" name="UserActiveModeTriggerHint" type="UserActiveModeTriggerBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="UAT"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="UAT"/>
+        </mandatoryConform>
+      </otherwiseConform>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0007" name="UserActiveModeTriggerInstruction" type="string" default="&quot;">
@@ -168,9 +179,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="OperatingMode" type="OperatingModeEnum">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="LITS"/>
-      </mandatoryConform>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </attribute>
   </attributes>
   <commands>
