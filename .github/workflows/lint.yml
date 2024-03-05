@@ -116,7 +116,6 @@ jobs:
                      --known-failure app/util/DataModelHandler.h \
                      --known-failure app/util/ember-compatibility-functions.cpp \
                      --known-failure app/util/endpoint-config-api.h \
-                     --known-failure app/util/endpoint-config-defines.h \
                      --known-failure app/util/generic-callbacks.h \
                      --known-failure app/util/generic-callback-stubs.cpp \
                      --known-failure app/util/im-client-callbacks.h \
