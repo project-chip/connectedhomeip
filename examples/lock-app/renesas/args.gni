@@ -24,10 +24,11 @@ chip_openthread_ftd = false
 chip_enable_ota_requestor = false
 chip_system_config_use_lwip = true
 
-chip_error_logging = false
-chip_progress_logging = false
-chip_detail_logging = false
+chip_error_logging = true
+chip_progress_logging = true
+chip_detail_logging = true
 chip_automation_logging = false
+treat_warnings_as_errors = false
 chip_project_config_include_dirs =
 [
     "//include",

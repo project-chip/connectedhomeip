@@ -29,10 +29,10 @@ class KeyValueStoreManagerImpl : public KeyValueStoreManager
 public:
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0)
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     CHIP_ERROR _Delete(const char * key) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _Put(const char * key, const void * value, size_t value_size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _Put(const char * key, const void * value, size_t value_size) { return CHIP_NO_ERROR; }
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; };
 private:

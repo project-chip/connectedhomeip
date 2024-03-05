@@ -28,7 +28,7 @@ chip_external_mbedtls = true
 chip_crypto = "mbedtls"
 
 chip_device_platform = "renesas"
-chip_mdns = "platform"
+chip_mdns = "minimal"
 
 chip_enable_openthread = false
 chip_config_network_layer_ble = false

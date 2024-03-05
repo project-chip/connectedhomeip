@@ -25,7 +25,7 @@
 #pragma once
 
 // -------------------- General Configuration --------------------
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 0x00001300
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 0x00002000
 
 // -------------------- WiFi Station Configuration --------------------
 
@@ -66,3 +66,12 @@
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE 256
 
 // -------------------- Software Update Manager Configuration --------------------
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT 1000
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT "U1BBS0UyUCBLZXkgU2FsdA=="
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT_DEFAULT
+#endif

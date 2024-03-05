@@ -356,7 +356,13 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSerialNumber(const
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    buf[0] = 0x11;
+    buf[1] = 0x22;
+    buf[2] = 0x33;
+    buf[3] = 0x44;
+    buf[4] = 0x55;
+    buf[5] = 0x66;
+    return CHIP_NO_ERROR;
 }
 
 template <class ConfigClass>

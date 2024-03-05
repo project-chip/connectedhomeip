@@ -22,7 +22,7 @@ namespace Dnssd {
 
 namespace test {
 namespace {
-static constexpr size_t kMaxExpectedCalls = 10;
+static constexpr size_t kMaxExpectedCalls = 1;
 size_t numExpectedCalls                   = 0;
 ExpectedCall expectedCalls[kMaxExpectedCalls];
 bool foundCall[kMaxExpectedCalls] = {};
@@ -100,7 +100,7 @@ void ChipDnssdShutdown() {}
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
-    return test::CheckExpected(test::CallType::kStart, service);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()

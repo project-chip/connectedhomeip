@@ -34,7 +34,6 @@ static_library("chip-lock-app")
     "${chip_root}/third_party/jsoncpp",
     "${chip_root}/src/controller",
     "//third_party/connectedhomeip/src/app:app",
-    "${chip_root}/src/platform/logging:stdio",
     "${chip_root}/examples/lock-app/lock-common",
     "//third_party/connectedhomeip/src/credentials:credentials"
   ]
@@ -90,9 +89,6 @@ group("default") {
         "//third_party/connectedhomeip/src/platform:platform",
         "//third_party/connectedhomeip/src/platform:platform_base",
         "//third_party/connectedhomeip/src/platform:syscalls_stub",
-        "//third_party/connectedhomeip/src/platform/logging:force_stdio",
-        "//third_party/connectedhomeip/src/platform/logging:headers",
-        "//third_party/connectedhomeip/src/platform/logging:stdio",
         "//third_party/connectedhomeip/src/platform/renesas:renesas",
         "//third_party/connectedhomeip/src/protocols/secure_channel:secure_channel",
         "//third_party/connectedhomeip/src/setup_payload:additional_data_payload",
