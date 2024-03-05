@@ -44,15 +44,6 @@ namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
-namespace {
-
-enum
-{
-    kChipProduct_Connect = 0x0016
-};
-
-} // unnamed namespace
-
 // TODO: Define a Singleton instance of CHIP Group Key Store here (#1266)
 
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()

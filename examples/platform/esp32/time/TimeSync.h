@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,13 @@
  *    limitations under the License.
  */
 
-#include "RequiredPrivilege.h"
+#pragma once
+#include <esp_sntp.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 
 namespace chip {
-namespace app {
-
-constexpr Access::Privilege RequiredPrivilege::kPrivilegeMapper[];
-
-} // namespace app
+namespace Esp32TimeSync {
+void Init(const char * aSntpServerName, uint16_t aSyncSntpIntervalDay);
+} // namespace Esp32TimeSync
 } // namespace chip

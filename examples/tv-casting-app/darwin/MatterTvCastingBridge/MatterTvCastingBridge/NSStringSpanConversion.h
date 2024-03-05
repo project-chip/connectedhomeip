@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020-2024 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,16 +14,26 @@
  *    limitations under the License.
  */
 
-#import "MCAttribute.h"
+#pragma once
+
 #import <Foundation/Foundation.h>
 
-#ifndef MCAttributeObjects_h
-#define MCAttributeObjects_h
+#include <lib/support/Span.h>
 
-@interface MCApplicationBasicClusterVendorIDAttribute : MCAttribute <NSNumber *>
-@end
+NS_ASSUME_NONNULL_BEGIN
 
-@interface MCMediaPlaybackClusterCurrentStateAttribute : MCAttribute <NSNumber *>
-@end
+/**
+ * Utilities for converting between NSString and chip::CharSpan.
+ */
 
-#endif /* MCAttributeObjects_h */
+inline chip::CharSpan AsCharSpan(NSString * str)
+{
+    return chip::CharSpan([str UTF8String], [str lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+}
+
+inline NSString * AsString(chip::CharSpan span)
+{
+    return [[NSString alloc] initWithBytes:span.data() length:span.size() encoding:NSUTF8StringEncoding];
+}
+
+NS_ASSUME_NONNULL_END
