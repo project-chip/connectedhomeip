@@ -1003,7 +1003,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         return;
     }
 
-    uint8_t rawDaysMask   = daysMask.Raw();
+    uint8_t rawDaysMask = daysMask.Raw();
 
     // Check that bits are within range
     if ((0 == rawDaysMask) || (rawDaysMask & 0x80))
