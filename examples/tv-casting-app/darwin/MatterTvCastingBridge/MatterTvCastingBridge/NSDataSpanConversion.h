@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020-2024 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,16 +14,20 @@
  *    limitations under the License.
  */
 
-#import "MCAttribute.h"
+#pragma once
+
 #import <Foundation/Foundation.h>
 
-#ifndef MCAttributeObjects_h
-#define MCAttributeObjects_h
+#include <lib/support/Span.h>
 
-@interface MCApplicationBasicClusterVendorIDAttribute : MCAttribute <NSNumber *>
-@end
+NS_ASSUME_NONNULL_BEGIN
 
-@interface MCMediaPlaybackClusterCurrentStateAttribute : MCAttribute <NSNumber *>
-@end
+/**
+ * Utilities for converting between NSData and chip::Span.
+ */
 
-#endif /* MCAttributeObjects_h */
+inline chip::ByteSpan AsByteSpan(NSData * data) { return chip::ByteSpan(static_cast<const uint8_t *>(data.bytes), data.length); }
+
+inline NSData * AsData(chip::ByteSpan span) { return [NSData dataWithBytes:span.data() length:span.size()]; }
+
+NS_ASSUME_NONNULL_END

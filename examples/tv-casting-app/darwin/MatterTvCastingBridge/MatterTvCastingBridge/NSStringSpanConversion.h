@@ -1,5 +1,4 @@
 /**
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,28 +14,26 @@
  *    limitations under the License.
  */
 
-#import "MCCluster_Internal.h"
-#import "zap-generated/MCClusterObjects.h"
-
-#import "MCEndpoint_Internal.h"
-
-#import "core/Endpoint.h"
+#pragma once
 
 #import <Foundation/Foundation.h>
 
-@implementation MCCluster
+#include <lib/support/Span.h>
 
-- (instancetype _Nonnull)initWithCppCluster:(matter::casting::memory::Strong<matter::casting::core::BaseCluster>)cppCluster
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ * Utilities for converting between NSString and chip::CharSpan.
+ */
+
+inline chip::CharSpan AsCharSpan(NSString * str)
 {
-    if (self = [super init]) {
-        _cppCluster = cppCluster;
-    }
-    return self;
+    return chip::CharSpan([str UTF8String], [str lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
 
-- (MCEndpoint * _Nonnull)endpoint
+inline NSString * AsString(chip::CharSpan span)
 {
-    return [[MCEndpoint alloc] initWithCppEndpoint:_cppCluster->GetEndpoint().lock()];
+    return [[NSString alloc] initWithBytes:span.data() length:span.size() encoding:NSUTF8StringEncoding];
 }
 
-@end
+NS_ASSUME_NONNULL_END
