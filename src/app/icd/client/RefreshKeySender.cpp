@@ -34,10 +34,7 @@ RefreshKeySender::RefreshKeySender(CheckInDelegate * checkInDelegate, const ICDC
     mpCheckInDelegate(checkInDelegate),
     mICDClientInfo(icdClientInfo), mpICDClientStorage(icdClientStorage), mpImEngine(engine), mNewKey(refreshKeyBuffer),
     mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
-
-{
-    // mNewKey = refreshKeyBuffer;
-}
+{}
 
 CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
