@@ -43,7 +43,6 @@ namespace chip {
 #define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
 #define SL_GENERIC_OTA_ERROR CHIP_ERROR_TLV_PROCESSOR(0x0E)
 
-
 // Descriptor constants
 inline constexpr size_t kVersionStringSize = 64;
 inline constexpr size_t kBuildDateSize     = 64;
@@ -83,7 +82,6 @@ public:
     virtual CHIP_ERROR Clear()          = 0;
     virtual CHIP_ERROR ApplyAction()    = 0;
     virtual CHIP_ERROR FinalizeAction() = 0;
-    // virtual CHIP_ERROR AbortAction() = 0;
     virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
 
     CHIP_ERROR Process(ByteSpan & block);
