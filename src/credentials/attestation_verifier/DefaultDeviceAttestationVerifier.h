@@ -87,6 +87,9 @@ protected:
     CsaCdKeysTrustStore mCdKeysTrustStore;
     const AttestationTrustStore * mAttestationTrustStore;
     const RevocationSet * mRevocationSet;
+
+    AttestationVerificationResult IsCertificateRevoked(bool isPaa, Crypto::AttestationCertVidPid vidPidUnderTest,
+                                                       ByteSpan certificate);
 };
 
 /**
@@ -115,7 +118,8 @@ const AttestationTrustStore * GetTestAttestationTrustStore();
  *          process lifetime.  In particular, after the first call it's not
  *          possible to change which AttestationTrustStore is used by this verifier.
  */
-DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore, const RevocationSet * revocationSet);
+DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore,
+                                                  const RevocationSet * revocationSet = nullptr);
 
 } // namespace Credentials
 } // namespace chip

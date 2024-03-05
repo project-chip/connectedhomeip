@@ -16,13 +16,13 @@
  */
 #include "JSONFileRevocationSet.h"
 
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/ScopedBuffer.h>
 
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
 
 namespace chip {
 namespace Credentials {
@@ -53,17 +53,16 @@ AttestationVerificationResult JSONFileRevocationSet::IsCertificateRevoked(bool i
                                                                           ByteSpan issuer, ByteSpan authorityKeyId,
                                                                           ByteSpan serialNumber) const
 {
-    for (size_t revocation_set_idx = 0; revocation_set_idx < mRevocationSet.size(); ++revocation_set_idx)
+    for (int revocation_set_idx = 0; revocation_set_idx < static_cast<int>(mRevocationSet.size()); ++revocation_set_idx)
     {
-        Json::Value type = mRevocationSet[static_cast<int>(revocation_set_idx)]["type"];
+        Json::Value revocationSetEntry = mRevocationSet[revocation_set_idx];
 
         // 1.
-        if (type.asString().compare("revocation_set") == 0)
+        if (revocationSetEntry["type"].asString().compare("revocation_set") == 0)
         {
-            Json::Value jsonCrlIssuerSubjectKeyId = mRevocationSet[static_cast<int>(revocation_set_idx)]["issuer_subject_key_id"];
-            Json::Value jsonCrlIssuerName         = mRevocationSet[static_cast<int>(revocation_set_idx)]["issuer_name"];
-            Json::Value jsonCrlRevokedSerialNumbers =
-                mRevocationSet[static_cast<int>(revocation_set_idx)]["revoked_serial_numbers"];
+            Json::Value jsonCrlIssuerSubjectKeyId   = revocationSetEntry["issuer_subject_key_id"];
+            Json::Value jsonCrlIssuerName           = revocationSetEntry["issuer_name"];
+            Json::Value jsonCrlRevokedSerialNumbers = revocationSetEntry["revoked_serial_numbers"];
 
             uint8_t crlIssuerSubjectKeyIdBuf[Crypto::kAuthorityKeyIdentifierLength] = { 0 };
             ByteSpan crlIssuerSubjectKeyId(crlIssuerSubjectKeyIdBuf);
@@ -81,61 +80,45 @@ AttestationVerificationResult JSONFileRevocationSet::IsCertificateRevoked(bool i
 
             // 2.
             size_t crlSignerCertificateLength =
-                Base64Decode(jsonCrlIssuerName.asString().c_str(), jsonCrlIssuerName.asString().size(), crlSignerCertificate.Get());
+                Base64Decode(jsonCrlIssuerName.asString().c_str(), static_cast<uint16_t>(jsonCrlIssuerName.asString().size()),
+                             crlSignerCertificate.Get());
             VerifyOrReturnError(crlSignerCertificateLength > 0 && crlSignerCertificateLength != UINT16_MAX,
                                 AttestationVerificationResult::kInternalError);
 
-            // 3.
+            // 3. && 4.
+            Crypto::AttestationCertVidPid vidPid;
+
+            Crypto::ExtractVIDPIDFromAttributeString(
+                Crypto::DNAttrType::kCommonName, ByteSpan(crlSignerCertificate.Get(), crlSignerCertificateLength), vidPid, vidPid);
+
+            if (vidPid.mVendorId.HasValue() && vidPid.mVendorId.Value() != vidPidUnderTest.mVendorId.Value())
+            {
+                // VID does not match. Stop further processing and continue to next entry.
+                continue;
+            }
+
             if (isPaa)
             {
-                Crypto::AttestationCertVidPid vid;
-
-                Crypto::ExtractVIDPIDFromAttributeString(
-                    Crypto::DNAttrType::kCommonName, ByteSpan(crlSignerCertificate.Get(), crlSignerCertificateLength), vid, vid);
-
-                if (vid.mVendorId.HasValue())
-                {
-                    if (vid.mVendorId.Value() != vidPidUnderTest.mVendorId.Value())
-                    {
-                        // VID does not match. Stop further processing and continue to next entry.
-                        continue;
-                    }
-                }
-            }
-            // 4.
-            else
-            {
-                Crypto::AttestationCertVidPid vidPid;
-
-                Crypto::ExtractVIDPIDFromAttributeString(Crypto::DNAttrType::kCommonName,
-                                                         ByteSpan(crlSignerCertificate.Get(), crlSignerCertificateLength), vidPid,
-                                                         vidPid);
-
-                if (vidPid.mVendorId.HasValue() && vidPid.mVendorId.Value() != vidPidUnderTest.mVendorId.Value())
-                {
-                    // VID does not match. Stop further processing and continue to next entry.
-                    continue;
-                }
-
                 if (vidPid.mProductId.HasValue())
                 {
-                    if (vidPid.mProductId.Value() != vidPidUnderTest.mProductId.Value())
-                    {
-                        // PID does not match. Stop further processing and continue to next entry.
-                        continue;
-                    }
+                    // PAA must not contain PID entry. Format wrong. Continuing to next entry.
+                    continue;
+                }
+            }
+            else
+            {
+                if (vidPid.mProductId.HasValue() && vidPid.mProductId.Value() != vidPidUnderTest.mProductId.Value())
+                {
+                    // PID does not match. Stop further processing and continue to next entry.
+                    continue;
                 }
             }
 
-            // 7.a Perform CRLFile validation
+            // 7. Perform CRLFile validation
             if (authorityKeyId.data_equal(crlIssuerSubjectKeyId) == false)
             {
                 continue;
             }
-
-            // TODO: 7.b
-
-            // TODO: 8.
 
             // 9. && 10.
             for (int serial_number_idx = 0; serial_number_idx < static_cast<int>(jsonCrlRevokedSerialNumbers.size());
@@ -151,15 +134,16 @@ AttestationVerificationResult JSONFileRevocationSet::IsCertificateRevoked(bool i
 
                 size_t revokedSerialNumberLength =
                     Base64Decode(jsonCrlRevokedSerialNumbers[serial_number_idx].asString().c_str(),
-                                 jsonCrlRevokedSerialNumbers[serial_number_idx].asString().size(), revokedSerialNumber.Get());
+                                 static_cast<uint16_t>(jsonCrlRevokedSerialNumbers[serial_number_idx].asString().size()),
+                                 revokedSerialNumber.Get());
                 VerifyOrReturnError(revokedSerialNumberLength > 0 && revokedSerialNumberLength != UINT16_MAX,
                                     AttestationVerificationResult::kInternalError);
 
                 uint8_t crlRevokedSerialNumberBuf[Crypto::kMaxCertificateSerialNumberLength] = { 0 };
                 ByteSpan crlSerialNumber(crlRevokedSerialNumberBuf);
 
-                VerifyOrReturnError(Encoding::HexToBytes(reinterpret_cast<char *>(revokedSerialNumber.Get()),
-                                                         revokedSerialNumberLength, crlRevokedSerialNumberBuf,
+                VerifyOrReturnError(Encoding::HexToBytes(Uint8::to_char(revokedSerialNumber.Get()), revokedSerialNumberLength,
+                                                         crlRevokedSerialNumberBuf,
                                                          sizeof(crlRevokedSerialNumberBuf)) == sizeof(crlRevokedSerialNumberBuf),
                                     AttestationVerificationResult::kInvalidArgument);
 
