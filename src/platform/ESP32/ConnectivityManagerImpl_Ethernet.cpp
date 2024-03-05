@@ -90,7 +90,8 @@ void ConnectivityManagerImpl::OnEthernetPlatformEvent(const ChipDeviceEvent * ev
 {
     if (event->Type == DeviceEventType::kESPSystemEvent)
     {
-        if (event->Platform.ESPSystemEvent.Base == IP_EVENT) {
+        if (event->Platform.ESPSystemEvent.Base == IP_EVENT)
+        {
             switch (event->Platform.ESPSystemEvent.Id)
             {
             case IP_EVENT_ETH_GOT_IP:

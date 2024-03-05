@@ -346,7 +346,8 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
                             Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
 #elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-                            Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetNetif(DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
+                            Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetNetif(
+                                DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
 #endif
                     }
                 }
@@ -445,7 +446,8 @@ static CHIP_ERROR ParseSrvResult(ResolveContext * ctx)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
                     Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
 #elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-                    Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetNetif(DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
+                    Inet::InterfaceId(
+                        DeviceLayer::Internal::ESP32Utils::GetNetif(DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
 #endif
             }
         }
@@ -624,8 +626,8 @@ static void MdnsQueryNotifier(mdns_search_once_t * searchHandle)
 }
 
 CHIP_ERROR EspDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
-                           intptr_t * browseIdentifier)
+                          chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                          intptr_t * browseIdentifier)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     mdns_search_once_t * queryHandle =
@@ -651,8 +653,7 @@ CHIP_ERROR EspDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip
     return error;
 }
 
-CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
-                            void * context)
+CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
 {
     CHIP_ERROR error              = CHIP_NO_ERROR;
     mdns_search_once_t * querySrv = mdns_query_async_new(service->mName, service->mType, GetProtocolString(service->mProtocol),
