@@ -51,7 +51,7 @@ from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
 from .clusters import Objects as GeneratedObjects
-from .clusters.Attribute import AttributeCache, AttributePath
+from .clusters.Attribute import AttributeCache, AttributePath, ValueDecodeFailure
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
 from .exceptions import UnknownAttribute, UnknownCommand

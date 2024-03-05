@@ -28,7 +28,7 @@ from typing import Any, Optional
 import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.ChipDeviceCtrl import TLVJsonConverter
-from chip.clusters.Attribute import AttributeCache, AttributePath, ValueDecodeFailure
+from chip.clusters.Attribute import ValueDecodeFailure
 from mobly import asserts
 
 
