@@ -165,7 +165,7 @@ CHIP_ERROR EspDnssdPublishService(const DnssdService * service, DnssdPublishCall
     }
 
     VerifyOrExit(service->mTextEntrySize <= UINT8_MAX, error = CHIP_ERROR_INVALID_ARGUMENT);
-    if (service->mTextEntries)
+    if (service->mTextEntries && service->mTextEntrySize > 0)
     {
         items = static_cast<mdns_txt_item_t *>(chip::Platform::MemoryCalloc(service->mTextEntrySize, sizeof(mdns_txt_item_t)));
         VerifyOrExit(items != nullptr, error = CHIP_ERROR_NO_MEMORY);
