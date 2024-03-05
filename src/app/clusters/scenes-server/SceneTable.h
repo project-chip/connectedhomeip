@@ -37,10 +37,9 @@ inline constexpr GroupId kGlobalGroupSceneId     = 0x0000;
 inline constexpr SceneIndex kUndefinedSceneIndex = 0xffff;
 inline constexpr SceneId kUndefinedSceneId       = 0xff;
 
-static constexpr size_t kIteratorsMax                 = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
-static constexpr size_t kSceneNameMaxLength           = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
-static constexpr size_t kScenesMaxTransitionTimeS     = 6000u;
-static constexpr size_t kScenesMaxTransitionTime100ms = kScenesMaxTransitionTimeS * 10;
+static constexpr size_t kIteratorsMax            = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
+static constexpr size_t kSceneNameMaxLength      = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
+static constexpr size_t kScenesMaxTransitionTime = 60'000'000u;
 
 /// @brief SceneHandlers are meant as interface between various clusters and the Scene table.
 /// When a scene command involving extension field sets is received, the Scene Table will go through
@@ -85,9 +84,10 @@ public:
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster pair is supported by
     /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
-    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
-                                    const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
-                                    MutableByteSpan & serialisedBytes) = 0;
+    virtual CHIP_ERROR
+    SerializeAdd(EndpointId endpoint,
+                 const app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
+                 MutableByteSpan & serialisedBytes) = 0;
 
     /// @brief Called when handling StoreScene, and only if the handler supports the given endpoint and cluster.
     ///
@@ -112,7 +112,7 @@ public:
     /// @note Only gets called for handlers for which SupportsCluster() is true for the given endpoint and cluster.
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
 
-                                   app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
+                                   app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
 
     /// @brief Restore a stored scene for the given cluster instance, over timeMs milliseconds (e.g. when handling RecallScene)
     ///

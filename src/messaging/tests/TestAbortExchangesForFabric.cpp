@@ -21,6 +21,7 @@
  *      one) for a fabric.
  */
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
@@ -33,7 +34,7 @@
 #include <transport/SessionManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDConfigurationData.h> // nogncheck
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
 namespace {
@@ -258,12 +259,16 @@ const nlTest sTests[] = {
     NL_TEST_SENTINEL(),
 };
 
+// clang-format off
 nlTestSuite sSuite = {
     "Test-AbortExchangesForFabric",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
+// clang-format on
 
 } // namespace
 

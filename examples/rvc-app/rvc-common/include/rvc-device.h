@@ -19,10 +19,12 @@ private:
     ModeBase::Instance mCleanModeInstance;
 
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
-    OperationalState::Instance mOperationalStateInstance;
+    RvcOperationalState::Instance mOperationalStateInstance;
 
     bool mDocked   = false;
     bool mCharging = false;
+
+    uint8_t mStateBeforePause = 0;
 
 public:
     /**
@@ -33,7 +35,7 @@ public:
     explicit RvcDevice(EndpointId aRvcClustersEndpoint) :
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
-        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint, RvcOperationalState::Id)
+        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint)
     {
         // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
@@ -46,6 +48,7 @@ public:
         mCleanModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcCleanChangeToMode, this);
         mOperationalStateDelegate.SetPauseCallback(&RvcDevice::HandleOpStatePauseCallback, this);
         mOperationalStateDelegate.SetResumeCallback(&RvcDevice::HandleOpStateResumeCallback, this);
+        mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
     }
 
     /**
@@ -80,6 +83,11 @@ public:
     void HandleOpStateResumeCallback(Clusters::OperationalState::GenericOperationalError & err);
 
     /**
+     * Handles the RvcOperationalState GoHome command.
+     */
+    void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
+
+    /**
      * Updates the state machine when the device becomes fully-charged.
      */
     void HandleChargedMessage();
@@ -103,6 +111,8 @@ public:
     void HandleErrorEvent(const std::string & error);
 
     void HandleClearErrorMessage();
+
+    void HandleResetMessage();
 };
 
 } // namespace Clusters

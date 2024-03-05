@@ -25,29 +25,29 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#if (BLE_ENABLE || RSI_BLE_ENABLE)
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #define BLE_MIN_CONNECTION_INTERVAL_MS 45 // 45 msec
 #define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
 #define BLE_SLAVE_LATENCY_MS 0
 #define BLE_TIMEOUT_MS 400
-#endif // RSI_BLE_ENABLE
+#endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #include "FreeRTOS.h"
 #include "timers.h"
-#if (BLE_ENABLE || RSI_BLE_ENABLE)
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif // __cplusplus
 #include <rsi_ble.h>
 #include <rsi_ble_apis.h>
 #include <rsi_bt_common.h>
 #ifdef __cplusplus
 }
-#endif
+#endif // __cplusplus
 #else
 #include "gatt_db.h"
 #include "sl_bgapi.h"
 #include "sl_bt_api.h"
-#endif // RSI_BLE_ENABLE
+#endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 
 namespace chip {
 namespace DeviceLayer {
@@ -64,7 +64,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 public:
     void HandleBootEvent(void);
 
-#if (BLE_ENABLE || RSI_BLE_ENABLE)
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
     void HandleConnectEvent(void);
     void HandleConnectionCloseEvent(uint16_t reason);
     void HandleWriteEvent(rsi_ble_event_write_t evt);
@@ -86,7 +86,7 @@ public:
     CHIP_ERROR StopAdvertising(void);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-#if (BLE_ENABLE || RSI_BLE_ENABLE)
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
     static void HandleC3ReadRequest(void);
 #else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -143,7 +143,6 @@ private:
     static BLEManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
-
     enum class Flags : uint16_t
     {
         kAdvertisingEnabled     = 0x0001,
@@ -152,18 +151,23 @@ private:
         kRestartAdvertising     = 0x0008,
         kEFRBLEStackInitialized = 0x0010,
         kDeviceNameSet          = 0x0020,
+        kExtAdvertisingEnabled  = 0x0040,
     };
 
     enum
     {
         kMaxConnections      = BLE_LAYER_NUM_BLE_ENDPOINTS,
-        kMaxDeviceNameLength = 16,
+        kMaxDeviceNameLength = 21,
         kUnusedIndex         = 0xFF,
     };
 
+    static constexpr uint8_t kFlagTlvSize       = 3; // 1 byte for length, 1b for type and 1b for the Flag value
+    static constexpr uint8_t kUUIDTlvSize       = 4; // 1 byte for length, 1b for type and 2b for the UUID value
+    static constexpr uint8_t kDeviceNameTlvSize = (2 + kMaxDeviceNameLength); // 1 byte for length, 1b for type and + device name
+
     struct CHIPoBLEConState
     {
-#if !(BLE_ENABLE || RSI_BLE_ENABLE)
+#if !(SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
         bd_addr address;
 #endif
         uint16_t mtu : 10;
@@ -192,7 +196,7 @@ private:
     CHIP_ERROR EncodeAdditionalDataTlv();
 #endif
 
-#if (BLE_ENABLE || RSI_BLE_ENABLE)
+#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
     void HandleRXCharWrite(rsi_ble_event_write_t * evt);
 #else
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);

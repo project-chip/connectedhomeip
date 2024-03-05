@@ -28,5 +28,28 @@ source_set("manager") {
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols",
+  ]
+}
+
+# ICD Handler source-set is broken out of the main source-set to enable unit tests
+# All sources and configurations used by the CheckInHandler need to go in this source-set
+source_set("handler") {
+  sources = [
+    "CheckInDelegate.h",
+    "CheckInHandler.cpp",
+    "CheckInHandler.h",
+    "DefaultCheckInDelegate.cpp",
+    "DefaultCheckInDelegate.h",
+    "RefreshKeySender.cpp",
+    "RefreshKeySender.h",
+  ]
+  public_deps = [
+    ":manager",
+    "${chip_root}/src/app",
+    "${chip_root}/src/controller",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols",
   ]
 }

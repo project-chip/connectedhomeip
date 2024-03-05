@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "DefaultICDClientStorage.h"
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <iterator>
 #include <lib/core/Global.h>
 #include <lib/support/Base64.h>
@@ -258,32 +258,22 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kMonitoredSubject)));
         ReturnErrorOnFailure(reader.Get(clientInfo.monitored_subject));
 
-        // UserActiveModeTriggerHint
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerHint)));
-        ReturnErrorOnFailure(reader.Get(clientInfo.user_active_mode_trigger_hint));
-
-        // UserActiveModeTriggerInstruction
-        ReturnErrorOnFailure(reader.Next());
-        err = reader.Expect(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerInstruction));
-        if (err == CHIP_NO_ERROR)
-        {
-            ReturnErrorOnFailure(
-                reader.GetString(clientInfo.user_active_mode_trigger_instruction, kUserActiveModeTriggerInstructionSize));
-            clientInfo.has_instruction = true;
-            // Shared key
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kSharedKey)));
-        }
-        else if (err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT)
-        {
-            err = reader.Expect(TLV::ContextTag(ClientInfoTag::kSharedKey));
-        }
-        ReturnErrorOnFailure(err);
-
-        ByteSpan buf;
-        ReturnErrorOnFailure(reader.Get(buf));
-        VerifyOrReturnError(buf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
-        memcpy(clientInfo.shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+        // Aes key handle
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kAesKeyHandle)));
+        ByteSpan aesBuf;
+        ReturnErrorOnFailure(reader.Get(aesBuf));
+        VerifyOrReturnError(aesBuf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
+        memcpy(clientInfo.aes_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), aesBuf.data(),
                sizeof(Crypto::Symmetric128BitsKeyByteArray));
+
+        // Hmac key handle
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kHmacKeyHandle)));
+        ByteSpan hmacBuf;
+        ReturnErrorOnFailure(reader.Get(hmacBuf));
+        VerifyOrReturnError(hmacBuf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
+        memcpy(clientInfo.hmac_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), hmacBuf.data(),
+               sizeof(Crypto::Symmetric128BitsKeyByteArray));
+
         ReturnErrorOnFailure(reader.ExitContainer(ICDClientInfoType));
         clientInfoVector.push_back(clientInfo);
     }
@@ -304,12 +294,20 @@ CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const Byt
     Crypto::Symmetric128BitsKeyByteArray keyMaterial;
     memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
-    return mpKeyStore->CreateKey(keyMaterial, clientInfo.shared_key);
+    // TODO : Update key lifetime once creaKey method supports it.
+    ReturnErrorOnFailure(mpKeyStore->CreateKey(keyMaterial, clientInfo.aes_key_handle));
+    CHIP_ERROR err = mpKeyStore->CreateKey(keyMaterial, clientInfo.hmac_key_handle);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpKeyStore->DestroyKey(clientInfo.aes_key_handle);
+    }
+    return err;
 }
 
 void DefaultICDClientStorage::RemoveKey(ICDClientInfo & clientInfo)
 {
-    mpKeyStore->DestroyKey(clientInfo.shared_key);
+    mpKeyStore->DestroyKey(clientInfo.aes_key_handle);
+    mpKeyStore->DestroyKey(clientInfo.hmac_key_handle);
 }
 
 CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector)
@@ -325,17 +323,10 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kStartICDCounter), clientInfo.start_icd_counter));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kOffset), clientInfo.offset));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kMonitoredSubject), clientInfo.monitored_subject));
-        ReturnErrorOnFailure(
-            writer.Put(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerHint), clientInfo.user_active_mode_trigger_hint));
-        if (clientInfo.has_instruction)
-        {
-            ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerInstruction),
-                                                  clientInfo.user_active_mode_trigger_instruction,
-                                                  static_cast<uint32_t>(strlen(clientInfo.user_active_mode_trigger_instruction))));
-        }
-
-        ByteSpan buf(clientInfo.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kSharedKey), buf));
+        ByteSpan aesBuf(clientInfo.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kAesKeyHandle), aesBuf));
+        ByteSpan hmacBuf(clientInfo.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kHmacKeyHandle), hmacBuf));
         ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));
     }
     return writer.EndContainer(arrayType);
@@ -419,23 +410,6 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
                                               backingBuffer.Get(), static_cast<uint16_t>(len));
 }
 
-CHIP_ERROR DefaultICDClientStorage::GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo)
-{
-    size_t clientInfoSize = 0;
-    std::vector<ICDClientInfo> clientInfoVector;
-    ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
-    IgnoreUnusedVariable(clientInfoSize);
-    for (auto & info : clientInfoVector)
-    {
-        if (peerNode.GetNodeId() == info.peer_node.GetNodeId())
-        {
-            clientInfo = info;
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_NOT_FOUND;
-}
-
 CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 {
     size_t clientInfoSize = 0;
@@ -488,10 +462,25 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName());
 }
 
-CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo)
+CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
+                                                          CounterType & counter)
 {
-    // TODO: Need to implement default decription code using CheckinMessage::ParseCheckinMessagePayload
-    return CHIP_NO_ERROR;
+    uint8_t appDataBuffer[kAppDataLength];
+    MutableByteSpan appData(appDataBuffer);
+    auto * iterator = IterateICDClientInfo();
+    VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
+    while (iterator->Next(clientInfo))
+    {
+        CHIP_ERROR err = chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(
+            clientInfo.aes_key_handle, clientInfo.hmac_key_handle, payload, counter, appData);
+        if (CHIP_NO_ERROR == err)
+        {
+            iterator->Release();
+            return CHIP_NO_ERROR;
+        }
+    }
+    iterator->Release();
+    return CHIP_ERROR_NOT_FOUND;
 }
 } // namespace app
 } // namespace chip

@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -65,7 +67,7 @@ tests:
               type: list
               contains: [0, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 5: TH reads EventList attribute from DUT"
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -74,7 +76,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: TH reads AcceptedCommandList attribute from DUT"
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -82,7 +84,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 7: TH reads GeneratedCommandList attribute from DUT"
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

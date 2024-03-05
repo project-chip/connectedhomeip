@@ -54,11 +54,17 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050a" name="Content Launcher" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050A" name="Content Launcher" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Add Seasons, Episode, Any and CurrentContext to search, Added Text/Audio tracks support with PlaybackPreferences field"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x050A" name="Content Launcher"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONTENTLAUNCHER" scope="Endpoint"/>
   <features>
     <feature bit="0" code="CS" name="ContentSearch" summary="Device supports content search (non-app specific)">
@@ -128,7 +134,7 @@ Davis, CA 95616, USA
       <item value="11" name="SportsTeam" summary="SportsTeam represents the categorical information of a professional sports team; for example, &quot;University of Washington Huskies&quot;">
         <mandatoryConform/>
       </item>
-      <item value="12" name="Type" summary="The type of content requested. Supported types are &quot;Movie&quot;, &quot;MovieSeries&quot;, &quot;TVSeries&quot;, &quot;TVSeason&quot;, &quot;TVEpisode&quot;, &quot;SportsEvent&quot;, and &quot;Video&quot;">
+      <item value="12" name="Type" summary="The type of content requested. Supported types are &quot;Movie&quot;, &quot;MovieSeries&quot;, &quot;TVSeries&quot;, &quot;TVSeason&quot;, &quot;TVEpisode&quot;, &quot;Trailer&quot;, &quot;SportsEvent&quot;, &quot;LiveEvent&quot;, and &quot;Video&quot;">
         <mandatoryConform/>
       </item>
       <item value="13" name="Video" summary="Video represents the identifying data for a specific piece of video content; for example, &quot;Manchester by the Sea&quot;.">
@@ -172,9 +178,6 @@ Davis, CA 95616, USA
       <bitfield name="HLS" bit="1" summary="Device supports HTTP Live Streaming (HLS)">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WebRTC" bit="2" summary="Device supports WebRTC via HTML5 (Web Real-Time Communication)">
-        <mandatoryConform/>
-      </bitfield>
     </bitmap>
     <struct name="AdditionalInfoStruct">
       <field id="0" name="Name" type="string">
@@ -188,69 +191,28 @@ Davis, CA 95616, USA
     </struct>
     <struct name="BrandingInformationStruct">
       <field id="0" name="ProviderName" type="string">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="256"/>
       </field>
       <field id="1" name="Background" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="2" name="Logo" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="3" name="ProgressBar" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="4" name="Splash" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="5" name="WaterMark" type="StyleInformationStruct" default="MS">
-        <access read="true" write="true"/>
         <optionalConform/>
-      </field>
-    </struct>
-    <struct name="PlaybackPreferencesStruct">
-      <field id="0" name="PlaybackPosition" type="uint64">
-        <quality nullable="true"/>
-        <mandatoryConform>
-          <feature name="AS"/>
-        </mandatoryConform>
-      </field>
-      <field id="1" name="TextTrack" type="TrackPreferenceStruct">
-        <quality nullable="true"/>
-        <mandatoryConform>
-          <feature name="TT"/>
-        </mandatoryConform>
-      </field>
-      <field id="2" name="AudioTracks" type="list[TrackPreferenceStruct Type]">
-        <quality nullable="true"/>
-        <mandatoryConform>
-          <feature name="AT"/>
-        </mandatoryConform>
-      </field>
-    </struct>
-    <struct name="TrackPreferenceStruct">
-      <field id="0" name="LanguageCode" type="string">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
-      </field>
-      <field id="1" name="Characteristics" type="list[CharacteristicEnum Type]" default="null">
-        <quality nullable="true"/>
-        <optionalConform/>
-      </field>
-      <field id="2" name="AudioOutputIndex" type="uint8">
-        <quality nullable="true"/>
-        <mandatoryConform>
-          <feature name="AT"/>
-        </mandatoryConform>
       </field>
     </struct>
     <struct name="ContentSearchStruct">
-      <field id="0" name="ParameterList" type="list[ParameterStruct Type]" default="0">
+      <field id="0" name="ParameterList" type="list" default="0">
+        <entry type="ParameterStruct"/>
         <mandatoryConform/>
       </field>
     </struct>
@@ -273,8 +235,30 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="maxLength" value="1024"/>
       </field>
-      <field id="2" name="ExternalIDList" type="list[AdditionalInfoStruct Type]" default="empty">
+      <field id="2" name="ExternalIDList" type="list" default="empty">
+        <entry type="AdditionalInfoStruct"/>
         <optionalConform/>
+      </field>
+    </struct>
+    <struct name="PlaybackPreferencesStruct">
+      <field id="0" name="PlaybackPosition" type="uint64">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+      </field>
+      <field id="1" name="TextTrack" type="TrackPreferenceStruct">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="TT"/>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="AudioTracks" type="list">
+        <entry type="TrackPreferenceStruct"/>
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
       </field>
     </struct>
     <struct name="StyleInformationStruct">
@@ -289,6 +273,23 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="Size" type="DimensionStruct" default="MS">
         <optionalConform/>
+      </field>
+    </struct>
+    <struct name="TrackPreferenceStruct">
+      <field id="0" name="LanguageCode" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="32"/>
+      </field>
+      <field id="1" name="Characteristics" type="list" default="null">
+        <entry type="ref_CharacteristicEnum"/>
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="2" name="AudioOutputIndex" type="uint8">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
       </field>
     </struct>
   </dataTypes>
@@ -313,7 +314,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="LaunchContent" response="LauncherResponse">
+    <command id="0x00" name="LaunchContent" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CS"/>
@@ -332,11 +333,12 @@ Davis, CA 95616, USA
       <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
         <optionalConform/>
       </field>
-      <field id="4" name="UseCurrentContext" type="bool" default="true">
+      <field id="4" name="UseCurrentContext" type="bool" default="TRUE">
         <optionalConform/>
+        <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x01" name="LaunchURL" response="LauncherResponse">
+    <command id="0x01" name="LaunchURL" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="UP"/>
@@ -355,7 +357,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x02" name="LauncherResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
           <feature name="CS"/>

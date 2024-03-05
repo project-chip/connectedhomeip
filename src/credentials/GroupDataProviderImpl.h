@@ -201,8 +201,8 @@ protected:
     protected:
         GroupDataProviderImpl & mProvider;
         uint16_t mKeyHash = 0;
-        Crypto::Aes128BitsKeyHandle mEncryptionKey;
-        Crypto::Aes128BitsKeyHandle mPrivacyKey;
+        Crypto::Aes128KeyHandle mEncryptionKey;
+        Crypto::Aes128KeyHandle mPrivacyKey;
     };
 
     class KeySetIteratorImpl : public KeySetIterator

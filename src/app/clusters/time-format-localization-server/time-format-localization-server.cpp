@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums-check.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -37,6 +38,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TimeFormatLocalization;
 using namespace chip::app::Clusters::TimeFormatLocalization::Attributes;
 using namespace chip::DeviceLayer;
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -135,6 +138,17 @@ bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validT
     return false;
 }
 
+template <typename E>
+Optional<E> SafeCast(uint8_t value)
+{
+    E val = static_cast<E>(value);
+    if (EnsureKnownEnumValue(val) == E::kUnknownEnumValue)
+    {
+        return NullOptional;
+    }
+    return MakeOptional(val);
+}
+
 } // anonymous namespace
 
 // =============================================================================
@@ -145,7 +159,7 @@ static Protocols::InteractionModel::Status emberAfPluginTimeFormatLocalizationOn
                                                                                                    CalendarTypeEnum newType)
 {
     Protocols::InteractionModel::Status res;
-    CalendarTypeEnum validType = CalendarTypeEnum::kBuddhist;
+    CalendarTypeEnum validType = CalendarTypeEnum::kUseActiveLocale;
 
     if (IsSupportedCalendarType(newType, validType))
     {
@@ -160,56 +174,48 @@ static Protocols::InteractionModel::Status emberAfPluginTimeFormatLocalizationOn
     return res;
 }
 
-static Protocols::InteractionModel::Status
-emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(EndpointId EndpointId, EmberAfAttributeType attrType,
-                                                              uint16_t attrSize, uint8_t * attrValue)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
 Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
     const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    Protocols::InteractionModel::Status res;
-
     switch (attributePath.mAttributeId)
     {
-    case ActiveCalendarType::Id:
-        if (sizeof(uint8_t) == size)
-        {
-            res = emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId,
-                                                                          static_cast<CalendarTypeEnum>(*value));
-        }
-        else
-        {
-            res = Protocols::InteractionModel::Status::InvalidValue;
-        }
-        break;
+    case ActiveCalendarType::Id: {
+        VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
-    default:
-        res = emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, size, value);
-        break;
+        auto calendarType = SafeCast<CalendarTypeEnum>(*value);
+        VerifyOrReturnValue(calendarType.HasValue(), Protocols::InteractionModel::Status::ConstraintError);
+
+        return emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId, calendarType.Value());
     }
+    case HourFormat::Id: {
+        VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
-    return res;
+        auto hourFormat = SafeCast<HourFormatEnum>(*value);
+        VerifyOrReturnValue(hourFormat.HasValue(), Protocols::InteractionModel::Status::ConstraintError);
+
+        return Protocols::InteractionModel::Status::Success;
+    }
+    default:
+        return Protocols::InteractionModel::Status::Success;
+    }
 }
 
 void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 {
     CalendarTypeEnum calendarType;
     CalendarTypeEnum validType;
-    EmberAfStatus status = ActiveCalendarType::Get(endpoint, &calendarType);
+    Status status = ActiveCalendarType::Get(endpoint, &calendarType);
 
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                   ChipLogError(Zcl, "Failed to read calendar type with error: 0x%02x", status));
+    VerifyOrReturn(Status::Success == status,
+                   ChipLogError(Zcl, "Failed to read calendar type with error: 0x%02x", to_underlying(status)));
 
     // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
     // If initial value is not one of the allowed values, pick one valid value and write it.
     if (!IsSupportedCalendarType(calendarType, validType))
     {
         status = ActiveCalendarType::Set(endpoint, validType);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(Zcl, "Failed to write calendar type with error: 0x%02x", status));
+        VerifyOrReturn(Status::Success == status,
+                       ChipLogError(Zcl, "Failed to write calendar type with error: 0x%02x", to_underlying(status)));
     }
 }
 

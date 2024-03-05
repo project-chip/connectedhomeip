@@ -53,6 +53,12 @@ limitations under the License.
         <!-- RESERVED = 0x03 -->
     </struct>
 
+    <enum name="OperatingModeEnum" type="enum8">
+    <cluster code="0x0046" />
+    <item value="0" name="SIT" />
+    <item value="1" name="LIT" />
+    </enum>
+
     <cluster>
         <domain>General</domain>
         <name>ICD Management</name>
@@ -79,6 +85,7 @@ limitations under the License.
         <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>
         <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" writable="false" optional="true" isNullable="false">UserActiveModeTriggerHint</attribute>
         <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false">UserActiveModeTriggerInstruction</attribute>
+        <attribute side="server" code="0x08" define="OPERATING_MODE" type="OperatingModeEnum" default="0" writable="false" optional="true" isNullable="false">OperatingMode</attribute>
 
         <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
             <description>Register a client to the end device</description>
@@ -104,6 +111,7 @@ limitations under the License.
         <command source="client" code="0x03" name="StayActiveRequest" response="StayActiveResponse" optional="true">
             <description>Request the end device to stay in Active Mode for an additional ActiveModeThreshold</description>
             <access op="invoke" privilege="manage"/>
+            <arg name="StayActiveDuration" type="int32u" isNullable="false"/>
         </command>
 
         <command source="server" code="0x04" name="StayActiveResponse" optional="true" disableDefaultResponse="true">

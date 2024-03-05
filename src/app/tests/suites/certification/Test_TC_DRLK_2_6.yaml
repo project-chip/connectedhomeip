@@ -46,7 +46,10 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Step 2: Create Holiday schedule with 1 index"
+    - label:
+          "Step 2: TH sends Set Holiday Schedule Command to DUT with the
+          following values: a)HolidayIndex as 1  b)LocalStartTime as 20 Seconds
+          c)LocalEndTime as 30 Seconds d)OperatingMode as 0"
       PICS: DRLK.S.F0b && DRLK.S.C11.Rsp
       command: "SetHolidaySchedule"
       arguments:
@@ -60,7 +63,9 @@ tests:
               - name: "OperatingMode"
                 value: 0
 
-    - label: "Step 3a: Get Holiday Schedule with HolidayIndex as 1"
+    - label:
+          "Step 3a: TH sends Get Holiday Schedule Command to DUT with
+          HolidayIndex as 1"
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:
@@ -82,7 +87,10 @@ tests:
               - name: "OperatingMode"
                 value: 0
 
-    - label: "Step 4: Create Holiday schedule with invalid operating mode"
+    - label:
+          "Step 4: TH sends Set Holiday Schedule Command to DUT with the
+          following values: a)HolidayIndex as 1  b)LocalStartTime as
+          20  c)LocalEndTime as 30  d)OperatingMode as 5(Invalid value)"
       PICS: DRLK.S.C11.Rsp
       command: "SetHolidaySchedule"
       arguments:
@@ -98,7 +106,9 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    - label: "Step 5: Get Holiday Schedule with Invalid HolidayIndex 15."
+    - label:
+          "Step 5: TH sends Get Holiday Schedule Command to DUT with Invalid
+          HolidayIndex as 15"
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:
@@ -112,7 +122,10 @@ tests:
               - name: "Status"
                 value: 133
 
-    - label: "Step 6: Get Holiday Schedule with the Non-scheduled HolidayIndex"
+    - label:
+          "Step 6: TH sends Get Holiday Schedule Command to DUT with the
+          HolidayIndex as 10 (value is in the the range of step 1 but Holiday
+          Schedule entry not available)"
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:
@@ -126,7 +139,9 @@ tests:
               - name: "Status"
                 value: 139
 
-    - label: "Step 7: Clear Holiday schedule with 1 index"
+    - label:
+          "Step 7: TH send Clear Holiday Schedule Command to DUT with
+          HolidayIndex as 1"
       PICS: DRLK.S.F0b && DRLK.S.C13.Rsp
       command: "ClearHolidaySchedule"
       arguments:
@@ -134,7 +149,9 @@ tests:
               - name: "HolidayIndex"
                 value: 1
 
-    - label: "Step 8: Make sure that holiday schedule was deleted"
+    - label:
+          "Step 8: TH sends Get Holiday Schedule Command to DUT with
+          HolidayIndex as 1"
       PICS: DRLK.S.F0b && DRLK.S.C12.Rsp && DRLK.S.C12.Tx
       command: "GetHolidaySchedule"
       arguments:

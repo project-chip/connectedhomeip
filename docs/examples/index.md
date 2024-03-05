@@ -19,7 +19,6 @@ air-quality-sensor-app/**/README
 :maxdepth: 1
 
 all-clusters-app/**/README
-all-clusters-app/**/Readme
 ```
 
 ## All clusters minimal example
@@ -29,7 +28,6 @@ all-clusters-app/**/Readme
 :maxdepth: 1
 
 all-clusters-minimal-app/**/README
-all-clusters-minimal-app/**/Readme
 ```
 
 ## Bridge example
@@ -78,6 +76,15 @@ chip-tool/README
 darwin-framework-tool/README
 ```
 
+## Energy Management example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+energy-management-app/**/README
+```
+
 ## Java matter controller example
 
 ```{toctree}
@@ -122,6 +129,7 @@ lighting-app/qpg/APPLICATION
 :maxdepth: 1
 
 light-switch-app/**/README
+light-switch-app/qpg/APPLICATION
 ```
 
 ## Lock example
@@ -168,7 +176,6 @@ ota-provider-app/**/README
 :maxdepth: 1
 
 ota-requestor-app/**/README
-ota-requestor-app/**/Readme
 ```
 
 ## Persistent storage example
@@ -247,6 +254,15 @@ smoke-co-alarm-app/**/README
 dishwasher-app/**/README
 ```
 
+## Microwave oven example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+microwave-oven-app/**/README
+```
+
 ## Temperature measurement example
 
 ```{toctree}
@@ -263,7 +279,7 @@ temperature-measurement-app/**/README
 :maxdepth: 1
 
 thermostat/**/README
-thermostat/**/Readme
+thermostat/qpg/APPLICATION
 ```
 
 ## TV example
@@ -319,4 +335,13 @@ air-purifier-app/**/README
 :maxdepth: 1
 
 network-manager-app/README
+```
+
+## Lit ICD example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+lit-icd-app/**/README
 ```

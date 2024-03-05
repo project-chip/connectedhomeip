@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off" revision="6">
   <revisionHistory>
@@ -64,6 +66,9 @@ Davis, CA 95616, USA
     <revision revision="5" summary="Addition of Dead Front behavior and associated FeatureMap entry"/>
     <revision revision="6" summary="Addition of OffOnly feature and associated FeatureMap entry"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0006" name="On/Off"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="OO" scope="Endpoint"/>
   <features>
     <feature bit="0" code="LT" name="Lighting" summary="Behavior that supports lighting applications.">
@@ -93,26 +98,26 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="DelayedAllOffEffectVariantEnum">
-      <item value="0" name="DelayedOffFastFade" summary="Fade to off in 0.8 seconds">
+      <item value="0x00" name="DelayedOffFastFade" summary="Fade to off in 0.8 seconds">
         <mandatoryConform/>
       </item>
-      <item value="1" name="NoFade" summary="No fade">
+      <item value="0x01" name="NoFade" summary="No fade">
         <mandatoryConform/>
       </item>
-      <item value="2" name="DelayedOffSlowFade" summary="50% dim down in 0.8 seconds then fade to off in 12 seconds">
+      <item value="0x02" name="DelayedOffSlowFade" summary="50% dim down in 0.8 seconds then fade to off in 12 seconds">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="DyingLightEffectVariantEnum">
-      <item value="0" name="DyingLightFadeOff" summary="20% dim up in 0.5s then fade to off in 1 second">
+      <item value="0x00" name="DyingLightFadeOff" summary="20% dim up in 0.5s then fade to off in 1 second">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="EffectIdentifierEnum">
-      <item value="0" name="DelayedAllOff" summary="Delayed All Off">
+      <item value="0x00" name="DelayedAllOff" summary="Delayed All Off">
         <mandatoryConform/>
       </item>
-      <item value="1" name="DyingLight" summary="Dying Light">
+      <item value="0x01" name="DyingLight" summary="Dying Light">
         <mandatoryConform/>
       </item>
     </enum>
@@ -171,11 +176,11 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Off" response="Y">
+    <command id="0x00" name="Off" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x01" name="On" response="Y">
+    <command id="0x01" name="On" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <notTerm>
@@ -183,7 +188,7 @@ Davis, CA 95616, USA
         </notTerm>
       </mandatoryConform>
     </command>
-    <command id="0x02" name="Toggle" response="Y">
+    <command id="0x02" name="Toggle" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <notTerm>
@@ -191,7 +196,7 @@ Davis, CA 95616, USA
         </notTerm>
       </mandatoryConform>
     </command>
-    <command id="0x40" name="OffWithEffect" response="Y">
+    <command id="0x40" name="OffWithEffect" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="LT"/>
@@ -205,13 +210,13 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x41" name="OnWithRecallGlobalScene" response="Y">
+    <command id="0x41" name="OnWithRecallGlobalScene" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </command>
-    <command id="0x42" name="OnWithTimedOff" response="Y">
+    <command id="0x42" name="OnWithTimedOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="LT"/>

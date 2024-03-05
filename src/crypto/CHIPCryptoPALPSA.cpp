@@ -69,7 +69,7 @@ bool isValidTag(const uint8_t * tag, size_t tag_length)
 } // namespace
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const Aes128BitsKeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
     VerifyOrReturnError(isBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
@@ -123,7 +123,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
 }
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext)
 {
     VerifyOrReturnError(isBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
@@ -271,7 +271,7 @@ void Hash_SHA256_stream::Clear()
     psa_hash_abort(toHashOperation(&mContext));
 }
 
-CHIP_ERROR PsaKdf::Init(psa_algorithm_t algorithm, const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info)
+CHIP_ERROR PsaKdf::Init(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info)
 {
     psa_status_t status        = PSA_SUCCESS;
     psa_key_attributes_t attrs = PSA_KEY_ATTRIBUTES_INIT;
@@ -284,7 +284,17 @@ CHIP_ERROR PsaKdf::Init(psa_algorithm_t algorithm, const ByteSpan & secret, cons
     psa_reset_key_attributes(&attrs);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    status = psa_key_derivation_setup(&mOperation, algorithm);
+    return InitOperation(mSecretKeyId, salt, info);
+}
+
+CHIP_ERROR PsaKdf::Init(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info)
+{
+    return InitOperation(hkdfKey.As<psa_key_id_t>(), salt, info);
+}
+
+CHIP_ERROR PsaKdf::InitOperation(psa_key_id_t hkdfKey, const ByteSpan & salt, const ByteSpan & info)
+{
+    psa_status_t status = psa_key_derivation_setup(&mOperation, PSA_ALG_HKDF(PSA_ALG_SHA_256));
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     if (salt.size() > 0)
@@ -293,7 +303,7 @@ CHIP_ERROR PsaKdf::Init(psa_algorithm_t algorithm, const ByteSpan & secret, cons
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
     }
 
-    status = psa_key_derivation_input_key(&mOperation, PSA_KEY_DERIVATION_INPUT_SECRET, mSecretKeyId);
+    status = psa_key_derivation_input_key(&mOperation, PSA_KEY_DERIVATION_INPUT_SECRET, hkdfKey);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_key_derivation_input_bytes(&mOperation, PSA_KEY_DERIVATION_INPUT_INFO, info.data(), info.size());
@@ -328,8 +338,7 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
 
     PsaKdf kdf;
 
-    ReturnErrorOnFailure(kdf.Init(PSA_ALG_HKDF(PSA_ALG_SHA_256), ByteSpan(secret, secret_length), ByteSpan(salt, salt_length),
-                                  ByteSpan(info, info_length)));
+    ReturnErrorOnFailure(kdf.Init(ByteSpan(secret, secret_length), ByteSpan(salt, salt_length), ByteSpan(info, info_length)));
 
     return kdf.DeriveBytes(MutableByteSpan(out_buffer, out_length));
 }
@@ -360,6 +369,21 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
 exit:
     psa_destroy_key(keyId);
     psa_reset_key_attributes(&attrs);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,
+                                 size_t out_length)
+{
+    VerifyOrReturnError(isBufferNonEmpty(message, message_length), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buffer != nullptr && out_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), CHIP_ERROR_INVALID_ARGUMENT);
+
+    const psa_algorithm_t algorithm = PSA_ALG_HMAC(PSA_ALG_SHA_256);
+    psa_status_t status             = PSA_SUCCESS;
+
+    status = psa_mac_compute(key.As<psa_key_id_t>(), algorithm, message, message_length, out_buffer, out_length, &out_length);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }

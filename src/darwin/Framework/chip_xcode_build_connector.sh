@@ -93,7 +93,7 @@ done
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="boringssl"'
-    'chip_build_controller_dynamic_server=true'
+    'chip_build_controller_dynamic_server=false'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_enable_wifi=false'
@@ -132,19 +132,19 @@ esac
     )
 }
 
-[[ $CHIP_IS_ASAN == YES ]] && {
+[[ $CHIP_IS_ASAN == YES || $ENABLE_ADDRESS_SANITIZER == YES ]] && {
     args+=(
         'is_asan=true'
     )
 }
 
-[[ $CHIP_IS_UBSAN == YES ]] && {
+[[ $CHIP_IS_UBSAN == YES || $ENABLE_UNDEFINED_BEHAVIOR_SANITIZER == YES ]] && {
     args+=(
         'is_ubsan=true'
     )
 }
 
-[[ $CHIP_IS_TSAN == YES ]] && {
+[[ $CHIP_IS_TSAN == YES || $ENABLE_THREAD_SANITIZER == YES ]] && {
     args+=(
         'is_tsan=true'
         # The system stats stuff races on the stats in various ways,

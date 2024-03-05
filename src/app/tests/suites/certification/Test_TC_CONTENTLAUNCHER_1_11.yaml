@@ -33,15 +33,15 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: read the global attribute: ClusterRevision"
+    - label: "Step 1: TH reads the ClusterRevision attribute from the DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 1
+          value: 2
           constraints:
               type: int16u
 
-    - label: "Step 2a: Read the global attribute: FeatureMap"
+    - label: "Step 2a: TH reads the FeatureMap attribute from the DUT"
       PICS: ( !CONTENTLAUNCHER.S.F00 && !CONTENTLAUNCHER.S.F01 )
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -72,7 +72,7 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Step 3a: Read the global attribute: AttributeList"
+    - label: "Step 3a: TH reads the AttributeList attribute from the DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -81,7 +81,7 @@ tests:
               type: list
               contains: [65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 3a: Read the global attribute: AttributeList"
+    - label: "Step 3a: TH reads the AttributeList attribute from the DUT"
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -90,7 +90,8 @@ tests:
               type: list
               contains: [65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 3b: Read the optional attribute(AcceptHeader): AttributeList"
+    - label:
+          "Step 3b: TH reads the optional attribute(AcceptHeader): AttributeList"
       PICS: CONTENTLAUNCHER.S.A0000
       command: "readAttribute"
       attribute: "AttributeList"
@@ -100,8 +101,8 @@ tests:
               contains: [0]
 
     - label:
-          "Step 3c: Read the optional attribute(SupportedStreamingProtocols):
-          AttributeList"
+          "Step 3c: TH reads the optional
+          attribute(SupportedStreamingProtocols): AttributeList"
       PICS: CONTENTLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
@@ -111,7 +112,7 @@ tests:
               contains: [1]
 
     - label:
-          "Step 4a: Read the optional command(LaunchContent) in
+          "Step 4a: TH reads the optional command(LaunchContent) in
           AcceptedCommandList attribute"
       PICS: CONTENTLAUNCHER.C.C00.Tx
       command: "readAttribute"
@@ -122,8 +123,8 @@ tests:
               contains: [0]
 
     - label:
-          "Step 4b: Read the optional command(LaunchURL) in AcceptedCommandList
-          attribute"
+          "Step 4b: TH reads the optional command(LaunchURL) in
+          AcceptedCommandList attribute"
       PICS: CONTENTLAUNCHER.C.C01.Tx
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -132,7 +133,7 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Step 5: Read the global attribute: GeneratedCommandList"
+    - label: "Step 5: TH reads the GeneratedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -140,7 +141,7 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Step 6: Read the global attribute: EventList"
+    - label: "Step 6: TH reads the EventList attribute from the DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"

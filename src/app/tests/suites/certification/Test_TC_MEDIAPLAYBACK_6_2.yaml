@@ -23,7 +23,8 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -41,14 +42,14 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1: Reads the CurrentState attribute from the DUT"
+    - label: "Step 1: TH reads the CurrentState attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "Step 2: Sends a Play command to the DUT"
+    - label: "Step 2: TH sends a Play command to the DUT"
       PICS: MEDIAPLAYBACK.S.C00.Rsp
       command: "Play"
       response:
@@ -67,14 +68,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 3: Reads the CurrentState attribute"
+    - label: "Step 3: TH reads the CurrentState attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
-    - label: "Step 4: Sends a StartOver command to the DUT"
+    - label: "Step 4: TH sends a StartOver command to the DUT"
       PICS: MEDIAPLAYBACK.S.C03.Rsp
       command: "StartOver"
       response:
@@ -93,7 +94,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 5: Sends a Next command to the DUT"
+    - label: "Step 5: TH sends a Next command to the DUT"
       PICS: MEDIAPLAYBACK.S.C05.Rsp
       command: "Next"
       response:
@@ -113,7 +114,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 6: Sends a Previous command to the DUT"
+    - label: "Step 6: TH sends a Previous command to the DUT"
       PICS: MEDIAPLAYBACK.S.C04.Rsp
       command: "Previous"
       response:
@@ -134,7 +135,9 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 7: Sends a SkipForward command to the DUT "
+    - label:
+          "Step 7: TH sends a SkipForward command to the DUT with a
+          DeltaPositionMilliseconds value of 10000"
       PICS: MEDIAPLAYBACK.S.C08.Rsp
       command: "SkipForward"
       arguments:
@@ -158,14 +161,16 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 8: Reads the SampledPosition attribute from the DUT"
+    - label: "Step 8: TH reads the SampledPosition attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C08.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
           value: { "Position": 10000 }
 
-    - label: "Step 9: Sends a SkipBackward command to the DUT "
+    - label:
+          "Step 9: TH sends a SkipBackward command to the DUT with a
+          DeltaPositionMilliseconds value of 10000"
       PICS: MEDIAPLAYBACK.S.C09.Rsp
       command: "SkipBackward"
       arguments:
@@ -189,7 +194,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 10: Reads the SampledPosition attribute from the DUT"
+    - label: "Step 10: TH reads the SampledPosition attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C09.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"

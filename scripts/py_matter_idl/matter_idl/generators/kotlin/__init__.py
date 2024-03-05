@@ -65,9 +65,9 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
 
     if isinstance(actual, BasicString):
         if actual.is_binary:
-            return 'OctetString'
+            return 'ByteArray'
         else:
-            return 'CharString'
+            return 'String'
     elif isinstance(actual, BasicInteger):
         if actual.is_signed:
             return "Int{}s".format(actual.power_of_two_bits)
@@ -126,8 +126,6 @@ _KNOWN_DECODABLE_TYPES = {
     # non-named enums
     'enum8': 'uint8_t',
     'enum16': 'uint16_t',
-    'enum32': 'uint32_t',
-    'enum64': 'uint64_t',
 }
 
 
@@ -351,6 +349,11 @@ class EncodableValue:
         self.attrs = attrs
 
     @property
+    def is_basic_type(self):
+        """Returns True if this type is a basic type in Kotlin"""
+        return self.kotlin_type != "Any"
+
+    @property
     def is_nullable(self):
         return EncodableValueAttr.NULLABLE in self.attrs
 
@@ -452,15 +455,23 @@ class EncodableValue:
             else:
                 return "String"
         elif isinstance(t, IdlEnumType):
-            if t.base_type.byte_count >= 3:
-                return "ULong"
-            else:
+            if t.base_type.byte_count <= 1:
+                return "UByte"
+            elif t.base_type.byte_count <= 2:
+                return "UShort"
+            elif t.base_type.byte_count <= 4:
                 return "UInt"
+            else:
+                return "ULong"
         elif isinstance(t, IdlBitmapType):
-            if t.base_type.byte_count >= 3:
-                return "ULong"
-            else:
+            if t.base_type.byte_count <= 1:
+                return "UByte"
+            elif t.base_type.byte_count <= 2:
+                return "UShort"
+            elif t.base_type.byte_count <= 4:
                 return "UInt"
+            else:
+                return "ULong"
         else:
             return "Any"
 
@@ -529,7 +540,7 @@ class EncodableValue:
             else:
                 return "Ljava/lang/Integer;"
         else:
-            return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
+            return "Lchip/controller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
 
 def GlobalEncodableValueFrom(typeName: str, context: TypeLookupContext) -> EncodableValue:
@@ -656,7 +667,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
 
         self.internal_render_one_output(
             template_path="MatterFiles_gni.jinja",
-            output_file_name="java/matter/devicecontroller/cluster/files.gni",
+            output_file_name="java/matter/controller/cluster/files.gni",
             vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
@@ -665,7 +676,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
 
         # Generate a `.kt` file for each cluster.
         for cluster in clientClusters:
-            output_name = f"java/matter/devicecontroller/cluster/clusters/{cluster.name}Cluster.kt"
+            output_name = f"java/matter/controller/cluster/clusters/{cluster.name}Cluster.kt"
             self.internal_render_one_output(
                 template_path="MatterClusters.jinja",
                 output_file_name=output_name,
@@ -682,7 +693,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
                 if struct.tag:
                     continue
 
-                output_name = "java/matter/devicecontroller/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
+                output_name = "java/matter/controller/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
                 self.internal_render_one_output(
                     template_path="MatterStructs.jinja",
                     output_file_name=output_name.format(
@@ -699,7 +710,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
                 if not event.fields:
                     continue
 
-                output_name = "java/matter/devicecontroller/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
+                output_name = "java/matter/controller/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
                 self.internal_render_one_output(
                     template_path="MatterEventStructs.jinja",
                     output_file_name=output_name.format(

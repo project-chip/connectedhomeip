@@ -21,6 +21,9 @@
  */
 
 #include "CHIPCryptoPAL.h"
+
+#include "SessionKeystore.h"
+
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPEncoding.h>
@@ -232,11 +235,6 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
 }
 
 } // namespace
-
-Symmetric128BitsKeyHandle::~Symmetric128BitsKeyHandle()
-{
-    ClearSecretData(mContext.mOpaque);
-}
 
 using HKDF_sha_crypto = HKDF_sha;
 
@@ -503,18 +501,11 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p::GetKeys(uint8_t * out, size_t * out_len)
+CHIP_ERROR Spake2p::GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key) const
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::KC, CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::KC, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(*out_len >= hash_size / 2, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    memcpy(out, Ke, hash_size / 2);
-    error = CHIP_NO_ERROR;
-exit:
-    *out_len = hash_size / 2;
-    return error;
+    return keystore.CreateKey(ByteSpan(Ke, hash_size / 2), key);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl()
@@ -784,7 +775,7 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
+CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                          size_t nonce_length, uint8_t * output)
 {
     // Discard tag portion of CCM to apply only CTR mode encryption/decryption.

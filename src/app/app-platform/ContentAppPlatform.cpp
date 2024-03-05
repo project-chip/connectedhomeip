@@ -32,6 +32,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -41,19 +42,20 @@ using namespace chip::app::Clusters;
 using namespace chip::Access;
 using ApplicationStatusEnum   = app::Clusters::ApplicationBasic::ApplicationStatusEnum;
 using GetSetupPINResponseType = app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
+using chip::Protocols::InteractionModel::Status;
 
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
-EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength)
+Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                            const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                            uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
     ChipLogDetail(DeviceLayer, "emberAfExternalAttributeReadCallback endpoint %d ", endpointIndex);
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
+    Status ret = Status::Failure;
 
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
@@ -68,14 +70,14 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     return ret;
 }
 
-EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Status emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                             const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
     ChipLogDetail(DeviceLayer, "emberAfExternalAttributeWriteCallback endpoint %d ", endpointIndex);
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
+    Status ret = Status::Failure;
 
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
@@ -93,18 +95,18 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 namespace chip {
 namespace AppPlatform {
 
-EmberAfStatus __attribute__((weak)) AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                                             const EmberAfAttributeMetadata * attributeMetadata,
-                                                                             uint8_t * buffer, uint16_t maxReadLength)
+Status __attribute__((weak)) AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                      const EmberAfAttributeMetadata * attributeMetadata,
+                                                                      uint8_t * buffer, uint16_t maxReadLength)
 {
-    return (EMBER_ZCL_STATUS_FAILURE);
+    return (Status::Failure);
 }
 
-EmberAfStatus __attribute__((weak))
+Status __attribute__((weak))
 AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                           const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
-    return (EMBER_ZCL_STATUS_FAILURE);
+    return (Status::Failure);
 }
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
@@ -136,13 +138,13 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             index++;
             continue;
         }
-        EmberAfStatus ret;
+        CHIP_ERROR err;
         EndpointId initEndpointId = mCurrentEndpointId;
 
         do
         {
-            ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
-            if (ret == EMBER_ZCL_STATUS_SUCCESS)
+            err = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
+            if (err == CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
                                 mCurrentEndpointId, index);
@@ -151,9 +153,9 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
                 IncrementCurrentEndpointID();
                 return app->GetEndpointId();
             }
-            else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+            else if (err != CHIP_ERROR_ENDPOINT_EXISTS)
             {
-                ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
+                ChipLogError(DeviceLayer, "Adding ContentApp error=%" CHIP_ERROR_FORMAT, err.Format());
                 return kNoCurrentEndpointId;
             }
             IncrementCurrentEndpointID();
@@ -202,10 +204,10 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             index++;
             continue;
         }
-        EmberAfStatus ret = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
-        if (ret != EMBER_ZCL_STATUS_SUCCESS)
+        CHIP_ERROR err = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "Adding ContentApp error=%d", ret);
+            ChipLogError(DeviceLayer, "Adding ContentApp error : %" CHIP_ERROR_FORMAT, err.Format());
             return kNoCurrentEndpointId;
         }
         ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
@@ -235,13 +237,12 @@ EndpointId ContentAppPlatform::RemoveContentApp(ContentApp * app)
         if (mContentApps[index] == app)
         {
             EndpointId curEndpoint = app->GetEndpointId();
-            EndpointId ep          = emberAfClearDynamicEndpoint(index);
-            mContentApps[index]    = nullptr;
-            ChipLogProgress(DeviceLayer, "Removed device %d from dynamic endpoint %d (index=%d)",
-                            app->GetApplicationBasicDelegate()->HandleGetVendorId(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
-            UNUSED_VAR(ep);
+            /*[[maybe_unused]]*/ EndpointId ep = emberAfClearDynamicEndpoint(index);
+            mContentApps[index]                = nullptr;
+            ChipLogProgress(DeviceLayer, "Removed device %d from dynamic endpoint %d (index=%d)",
+                            app->GetApplicationBasicDelegate()->HandleGetVendorId(), ep, index);
             if (curEndpoint == mCurrentAppEndpointId)
             {
                 mCurrentAppEndpointId = kNoCurrentEndpointId;
@@ -451,7 +452,64 @@ void ContentAppPlatform::UnsetIfCurrentApp(ContentApp * app)
     }
 }
 
-uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId)
+bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId,
+                                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode)
+{
+    // TODO: perform more complex search for matching apps
+    ContentApp * app = LoadContentAppByClient(info.vendorId, info.productId);
+    if (app == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "no app found for vendor id=%d \r\n", info.vendorId);
+        return false;
+    }
+
+    if (app->GetApplicationBasicDelegate() == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "no ApplicationBasic cluster for app with vendor id=%d \r\n", info.vendorId);
+        return false;
+    }
+
+    // first check if the vendor id matches the client
+    bool allow = app->GetApplicationBasicDelegate()->HandleGetVendorId() == vendorId;
+    if (!allow)
+    {
+        // if no match, then check allowed vendor list
+        for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
+        {
+            if (allowedVendor == vendorId)
+            {
+                allow = true;
+                break;
+            }
+        }
+        if (!allow)
+        {
+            ChipLogProgress(
+                DeviceLayer,
+                "no permission given by ApplicationBasic cluster on app with vendor id=%d to client with vendor id=%d\r\n",
+                info.vendorId, vendorId);
+            return false;
+        }
+    }
+
+    if (app->GetAccountLoginDelegate() == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with vendor id=%d \r\n", info.vendorId);
+        return true;
+    }
+
+    static const size_t kSetupPasscodeSize = 12;
+    char mSetupPasscode[kSetupPasscodeSize];
+
+    app->GetAccountLoginDelegate()->GetSetupPin(mSetupPasscode, kSetupPasscodeSize, rotatingId);
+    std::string passcodeString(mSetupPasscode);
+
+    char * eptr;
+    passcode = (uint32_t) strtol(passcodeString.c_str(), &eptr, 10);
+    return true;
+}
+
+uint32_t ContentAppPlatform::GetPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId)
 {
     ContentApp * app = LoadContentAppByClient(vendorId, productId);
     if (app == nullptr)
@@ -466,14 +524,14 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
         return 0;
     }
 
-    static const size_t kSetupPINSize = 12;
-    char mSetupPIN[kSetupPINSize];
+    static const size_t kSetupPasscodeSize = 12;
+    char mSetupPasscode[kSetupPasscodeSize];
 
-    app->GetAccountLoginDelegate()->GetSetupPin(mSetupPIN, kSetupPINSize, rotatingId);
-    std::string pinString(mSetupPIN);
+    app->GetAccountLoginDelegate()->GetSetupPin(mSetupPasscode, kSetupPasscodeSize, rotatingId);
+    std::string passcodeString(mSetupPasscode);
 
     char * eptr;
-    return (uint32_t) strtol(pinString.c_str(), &eptr, 10);
+    return (uint32_t) strtol(passcodeString.c_str(), &eptr, 10);
 }
 
 // Returns ACL entry with match subject or CHIP_ERROR_NOT_FOUND if no match is found
@@ -658,6 +716,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                 continue;
             }
 
+            bool accessAllowed = false;
             for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
             {
                 if (allowedVendor == targetVendorId)
@@ -674,6 +733,12 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                         .fabricIndex = kUndefinedFabricIndex,
                     });
                 }
+                accessAllowed = true;
+            }
+            if (accessAllowed)
+            {
+                // notify content app about this nodeId
+                app->AddClientNode(subjectNodeId);
             }
         }
     }

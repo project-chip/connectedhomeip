@@ -544,7 +544,7 @@ void SetupPretendDevices()
     app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
-    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, 4);
+    app::Clusters::Thermostat::Attributes::SystemMode::Set(1, app::Clusters::Thermostat::SystemModeEnum::kHeat);
     AddAttribute("OccupiedCoolingSetpoint", "19");
     app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(19 * 100));
     AddAttribute("OccupiedHeatingSetpoint", "25");

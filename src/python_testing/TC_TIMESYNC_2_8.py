@@ -29,6 +29,10 @@ from mobly import asserts
 
 
 class TC_TIMESYNC_2_8(MatterBaseTest):
+    @property
+    def default_timeout(self) -> int:
+        # This test has potentially 6 15 s waits, so set timeout to 100
+        return 100
 
     async def read_ts_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.TimeSynchronization
@@ -45,6 +49,9 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
     async def send_set_utc_cmd(self, utc: uint) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetUTCTime(UTCTime=utc, granularity=Clusters.Objects.TimeSynchronization.Enums.GranularityEnum.kMillisecondsGranularity))
+
+    def pics_TC_TIMESYNC_2_8(self) -> list[str]:
+        return ["TIMESYNC.S.F00"]
 
     @async_test_body
     async def test_TC_TIMESYNC_2_8(self):

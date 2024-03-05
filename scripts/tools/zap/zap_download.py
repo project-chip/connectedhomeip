@@ -126,7 +126,10 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
     z = zipfile.ZipFile(io.BytesIO(r.content))
 
     logging.info("Data downloaded, extracting ...")
-    z.extractall(install_directory)
+    # extractall() does not preserve permissions (https://github.com/python/cpython/issues/59999)
+    for entry in z.filelist:
+        path = z.extract(entry, install_directory)
+        os.chmod(path, (entry.external_attr >> 16) & 0o777)
     logging.info("Done extracting.")
 
 

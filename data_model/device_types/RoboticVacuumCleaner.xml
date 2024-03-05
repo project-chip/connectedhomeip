@@ -58,7 +58,7 @@ Davis, CA 95616, USA
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0074" name="Robotic Vacuum Cleaner" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release of this document"/>
-    <revision revision="2" summary="Add cluster usage constraints and informative data"/>
+    <revision revision="2" summary="Add cluster usage constraints and informative data. Remove the element requirements section, after moving all constraints to the respective cluster specifications."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -68,40 +68,12 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0054" name="RVC Run Mode" side="server">
       <mandatoryConform/>
-      <features>
-        <feature code="" name="OnOff">
-          <disallowConform/>
-        </feature>
-      </features>
-      <attributes>
-        <attribute code="" name="StartUpMode">
-          <disallowConform/>
-        </attribute>
-      </attributes>
     </cluster>
     <cluster id="0x0055" name="RVC Clean Mode" side="server">
       <optionalConform/>
-      <features>
-        <feature code="" name="OnOff">
-          <disallowConform/>
-        </feature>
-      </features>
-      <attributes>
-        <attribute code="" name="StartUpMode">
-          <disallowConform/>
-        </attribute>
-      </attributes>
     </cluster>
     <cluster id="0x0061" name="RVC Operational State" side="server">
       <mandatoryConform/>
-      <commands>
-        <command id="" name="Start">
-          <disallowConform/>
-        </command>
-        <command id="" name="Stop">
-          <disallowConform/>
-        </command>
-      </commands>
     </cluster>
   </clusters>
 </deviceType>

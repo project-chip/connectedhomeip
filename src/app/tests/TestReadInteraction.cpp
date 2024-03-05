@@ -29,6 +29,7 @@
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/basic-types.h>
@@ -78,68 +79,69 @@ class TestContext : public chip::Test::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    static int SetUpTestSuite(void * context)
+    CHIP_ERROR SetUpTestSuite() override
     {
+        ReturnErrorOnFailure(chip::Test::AppContext::SetUpTestSuite());
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
-        gReportScheduler = chip::app::reporting::GetDefaultReportScheduler();
 
-        if (AppContext::Initialize(context) != SUCCESS)
-            return FAILURE;
-        return SUCCESS;
+        if (mSyncScheduler)
+        {
+            gReportScheduler = chip::app::reporting::GetSynchronizedReportScheduler();
+            sUsingSubSync    = true;
+        }
+        else
+        {
+            gReportScheduler = chip::app::reporting::GetDefaultReportScheduler();
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    static int nlTestSetUpTestSuite_Sync(void * context)
+    {
+        static_cast<TestContext *>(context)->mSyncScheduler = true;
+        return nlTestSetUpTestSuite(context);
     }
 
     // Performs shared teardown for all tests in the test suite
-    static int TearDownTestSuite(void * context)
+    void TearDownTestSuite() override
     {
         chip::System::Clock::Internal::SetSystemClockForTesting(gRealClock);
-        if (AppContext::Finalize(context) != SUCCESS)
-            return FAILURE;
-        return SUCCESS;
+        chip::Test::AppContext::TearDownTestSuite();
     }
 
     // Performs setup for each individual test in the test suite
-    static int SetUp(void * context)
+    CHIP_ERROR SetUp() override
     {
         const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
-        auto * ctx = static_cast<TestContext *>(context);
-        VerifyOrReturnError(ctx->mEventCounter.Init(0) == CHIP_NO_ERROR, FAILURE);
 
-        // Reinitialize the exchange manager before running each test, so the context
-        // pool will be guaranteed to be empty.
-        ctx->GetExchangeManager().Shutdown();
-        VerifyOrReturnError(ctx->GetExchangeManager().Init(&ctx->GetSecureSessionManager()) == CHIP_NO_ERROR, FAILURE);
+        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
 
-        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
-        return SUCCESS;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        VerifyOrExit((err = mEventCounter.Init(0)) == CHIP_NO_ERROR,
+                     ChipLogError(AppServer, "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format()));
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+
+    exit:
+        return err;
     }
 
     // Performs teardown for each individual test in the test suite
-    static int TearDown(void * context)
+    void TearDown() override
     {
         chip::app::EventManagement::DestroyEventManagement();
-        return SUCCESS;
-    }
-
-    static int SetUpSyncTestSuite(void * context)
-    {
-        gRealClock = &chip::System::SystemClock();
-        chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
-        gReportScheduler = chip::app::reporting::GetSynchronizedReportScheduler();
-        sUsingSubSync    = true;
-
-        if (AppContext::Initialize(context) != SUCCESS)
-            return FAILURE;
-        return SUCCESS;
+        chip::Test::AppContext::TearDown();
     }
 
 private:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
+    bool mSyncScheduler = false;
 };
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
@@ -284,6 +286,10 @@ class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallbac
 public:
     void OnDone(chip::app::ReadHandler & apReadHandlerObj) override {}
     chip::app::ReadHandler::ApplicationCallback * GetAppCallback() override { return nullptr; }
+    chip::app::InteractionModelEngine * GetInteractionModelEngine() override
+    {
+        return chip::app::InteractionModelEngine::GetInstance();
+    }
 };
 
 } // namespace
@@ -5143,26 +5149,23 @@ const nlTest sTests[] = {
     NL_TEST_SENTINEL(),
 };
 
-// clang-format off
 nlTestSuite sSuite = {
     "TestReadInteraction",
     &sTests[0],
-    TestContext::SetUpTestSuite,
-    TestContext::TearDownTestSuite,
-    TestContext::SetUp,
-    TestContext::TearDown,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 
-nlTestSuite sSyncSuite =
-{
+nlTestSuite sSyncSuite = {
     "TestSyncReadInteraction",
     &sTests[0],
-    TestContext::SetUpSyncTestSuite,
-    TestContext::TearDownTestSuite,
-    TestContext::SetUp,
-    TestContext::TearDown,
+    TestContext::nlTestSetUpTestSuite_Sync,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
-// clang-format on
 
 } // namespace
 

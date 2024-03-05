@@ -44,7 +44,7 @@ MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping
 MTR{{cluster}}Cluster{{command}}Params
 {{/unless}}
 {{/inline}}
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
@@ -72,7 +72,7 @@ MTR{{cluster}}Cluster{{command}}Params
     {{/if}}
 
     using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
-    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
@@ -107,7 +107,7 @@ MTR{{cluster}}Cluster{{command}}Params
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
 {{#if (or isWritableAttribute
@@ -126,7 +126,7 @@ MTR{{cluster}}Cluster{{command}}Params
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}
@@ -171,7 +171,10 @@ MTR{{cluster}}Cluster{{command}}Params
     {{/if}}
     ];
 }
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
+{{#unless (isInConfigList
+           (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
+           "LegacyCommandsWithOnlyOptionalArguments")}}
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#unless (and (isStrEqual cluster "GroupKeyManagement")
                (isStrEqual command "KeySetReadAllIndices"))}}
@@ -179,6 +182,7 @@ MTR{{cluster}}Cluster{{command}}Params
 {
   [self {{asLowerCamelCase command}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
 }
+{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/if}}

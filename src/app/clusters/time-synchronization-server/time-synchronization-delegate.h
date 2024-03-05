@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -43,7 +44,7 @@ public:
     inline bool HasFeature(Feature feature)
     {
         uint32_t map;
-        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == EMBER_ZCL_STATUS_SUCCESS);
+        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == Protocols::InteractionModel::Status::Success);
         return success ? (map & to_underlying(feature)) : false;
     }
 
@@ -104,6 +105,11 @@ public:
      */
     virtual CHIP_ERROR UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
                                                   chip::Callback::Callback<OnFallbackNTPCompletion> * callback) = 0;
+
+    /**
+     * @brief Signals application that UTCTime has changed through the timesync cluster.
+     */
+    virtual void UTCTimeAvailabilityChanged(uint64_t time) = 0;
 
     virtual ~Delegate() = default;
 

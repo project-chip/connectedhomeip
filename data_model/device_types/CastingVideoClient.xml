@@ -90,19 +90,19 @@ Davis, CA 95616, USA
     <cluster id="0x0509" name="Keypad Input" side="client">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x050a" name="Content Launcher" side="client">
+    <cluster id="0x050A" name="Content Launcher" side="client">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x050b" name="Audio Output" side="client">
+    <cluster id="0x050B" name="Audio Output" side="client">
       <optionalConform/>
     </cluster>
-    <cluster id="0x050c" name="Application Launcher" side="client">
+    <cluster id="0x050C" name="Application Launcher" side="client">
       <optionalConform/>
     </cluster>
-    <cluster id="0x050d" name="Application Basic" side="client">
+    <cluster id="0x050D" name="Application Basic" side="client">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x050e" name="Account Login" side="client">
+    <cluster id="0x050E" name="Account Login" side="client">
       <optionalConform/>
     </cluster>
   </clusters>

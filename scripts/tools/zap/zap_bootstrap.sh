@@ -16,10 +16,6 @@
 # limitations under the License.
 #
 
-function _get_fullpath() {
-    cd "$(dirname "$1")" && echo "$PWD/$(basename "$1")"
-}
-
 function _usage() {
     cat <<EOF
 Invalid arguments passed.

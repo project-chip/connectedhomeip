@@ -84,7 +84,7 @@ int TestStreamerStdio()
 {
     nlTestSuite theSuite = { "Test Shell: Streamer", &sTests[0], nullptr, nullptr };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

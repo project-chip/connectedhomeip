@@ -32,6 +32,7 @@ import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.NodeState
+import chip.devicecontroller.model.Status
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -113,6 +114,14 @@ class OtaProviderClientFragment : Fragment() {
     val attributeId = ClusterIDMapping.AccessControl.Attribute.Acl.id
 
     val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
     deviceController.readAttributePath(
       object : ReportCallback {
         override fun onError(
@@ -135,7 +144,7 @@ class OtaProviderClientFragment : Fragment() {
           requireActivity().runOnUiThread { showAddAccessControlDialog(tlv) }
         }
       },
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       listOf(attributePath),
       0
     )
@@ -216,6 +225,15 @@ class OtaProviderClientFragment : Fragment() {
     newEntry.toTlv(AnonymousTag, tlvWriter)
     tlvWriter.endArray()
 
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
+
     deviceController.write(
       object : WriteAttributesCallback {
         override fun onError(attributePath: ChipAttributePath?, e: Exception?) {
@@ -223,12 +241,12 @@ class OtaProviderClientFragment : Fragment() {
           showMessage("Error : ${e.toString()}")
         }
 
-        override fun onResponse(attributePath: ChipAttributePath?) {
+        override fun onResponse(attributePath: ChipAttributePath, status: Status) {
           Log.d(TAG, "onResponse")
-          showMessage("write Success")
+          showMessage("$attributePath : Write response: $status")
         }
       },
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       listOf(
         AttributeWriteRequest.newInstance(
           0,
@@ -248,6 +266,14 @@ class OtaProviderClientFragment : Fragment() {
     val clusterId = ClusterIDMapping.OtaSoftwareUpdateRequestor.ID
     val attributeId = attribute.id
     val path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
     deviceController.readAttributePath(
       object : ReportCallback {
         override fun onError(
@@ -278,7 +304,7 @@ class OtaProviderClientFragment : Fragment() {
           showMessage("OtaSoftwareUpdateRequestor ${attribute.name} value: $value")
         }
       },
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       listOf<ChipAttributePath>(path),
       0
     )
@@ -343,6 +369,15 @@ class OtaProviderClientFragment : Fragment() {
 
     val writeRequest = AttributeWriteRequest.newInstance(endpoint, clusterId, attributeId, tlv)
 
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
+
     deviceController.write(
       object : WriteAttributesCallback {
         override fun onError(attributePath: ChipAttributePath?, e: Exception?) {
@@ -350,12 +385,12 @@ class OtaProviderClientFragment : Fragment() {
           showMessage("error : ${e.toString()}")
         }
 
-        override fun onResponse(attributePath: ChipAttributePath?) {
+        override fun onResponse(attributePath: ChipAttributePath, status: Status) {
           Log.d(TAG, "onResponse")
-          showMessage("write success")
+          showMessage("$attributePath : Write response: $status")
         }
       },
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       listOf<AttributeWriteRequest>(writeRequest),
       0,
       0
@@ -460,11 +495,17 @@ class OtaProviderClientFragment : Fragment() {
   private suspend fun sendAnnounceOTAProviderBtnClick() {
     requireActivity().runOnUiThread { updateOTAStatusBtnClick() }
 
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
+
     val otaRequestCluster =
-      ChipClusters.OtaSoftwareUpdateRequestorCluster(
-        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-        OTA_REQUESTER_ENDPOINT_ID
-      )
+      ChipClusters.OtaSoftwareUpdateRequestorCluster(devicePtr, OTA_REQUESTER_ENDPOINT_ID)
     otaRequestCluster.announceOTAProvider(
       object : DefaultClusterCallback {
         override fun onSuccess() {

@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ChipIdLookup
-import chip.devicecontroller.InvokeCallback
+import chip.devicecontroller.ExtendableInvokeCallback
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.ResubscriptionAttemptCallback
 import chip.devicecontroller.SubscriptionEstablishedCallback
@@ -26,7 +26,10 @@ import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.ChipPathId
 import chip.devicecontroller.model.InvokeElement
+import chip.devicecontroller.model.InvokeResponseData
+import chip.devicecontroller.model.NoInvokeResponseData
 import chip.devicecontroller.model.NodeState
+import chip.devicecontroller.model.Status
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.WildcardFragmentBinding
@@ -56,6 +59,8 @@ class WildcardFragment : Fragment() {
 
   private val attributePath = ArrayList<ChipAttributePath>()
   private val eventPath = ArrayList<ChipEventPath>()
+  private val writePath = ArrayList<AttributeWriteRequest>()
+  private val invokePath = ArrayList<InvokeElement>()
   private val subscribeIdList = ArrayList<ULong>()
 
   private val reportCallback =
@@ -88,29 +93,47 @@ class WildcardFragment : Fragment() {
 
   private val writeAttributeCallback =
     object : WriteAttributesCallback {
+      var viewText = ""
+
       override fun onError(attributePath: ChipAttributePath?, ex: Exception?) {
         Log.e(TAG, "Report error for $attributePath: $ex")
+        viewText += "onError : $attributePath - $ex\n"
       }
 
-      override fun onResponse(attributePath: ChipAttributePath?) {
-        val text = "$attributePath : Write Success"
-        requireActivity().runOnUiThread { binding.outputTv.text = text }
+      override fun onResponse(attributePath: ChipAttributePath, status: Status) {
+        viewText += "$attributePath : Write response: $status\n"
       }
 
       override fun onDone() {
-        Log.i(TAG, "write attribute Done")
+        requireActivity().runOnUiThread {
+          binding.outputTv.text = viewText
+          viewText = ""
+        }
       }
     }
 
-  private val invokeCallback =
-    object : InvokeCallback {
+  private val extendableInvokeCallback =
+    object : ExtendableInvokeCallback {
+      var viewText = ""
+
       override fun onError(e: java.lang.Exception?) {
+        viewText += "Invoke onError : $e\n"
         Log.e(TAG, "Report error", e)
       }
 
-      override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
-        val text = "Invoke Response : $invokeElement, $successCode"
-        requireActivity().runOnUiThread { binding.outputTv.text = text }
+      override fun onResponse(invokeResponseData: InvokeResponseData?) {
+        viewText += "Invoke Response : $invokeResponseData\n"
+      }
+
+      override fun onNoResponse(noInvokeResponseData: NoInvokeResponseData?) {
+        viewText += "Invoke onNoResponse : $noInvokeResponseData\n"
+      }
+
+      override fun onDone() {
+        requireActivity().runOnUiThread {
+          binding.outputTv.text = viewText
+          viewText = ""
+        }
       }
     }
 
@@ -122,46 +145,84 @@ class WildcardFragment : Fragment() {
     _binding = WildcardFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
 
-    binding.selectTypeRadioGroup.setOnCheckedChangeListener { _, i ->
-      val readBtnOn = (i == R.id.readRadioBtn)
-      val subscribeBtnOn = (i == R.id.subscribeRadioBtn)
-      val writeBtnOn = (i == R.id.writeRadioBtn)
-      val invokeBtnOn = (i == R.id.invokeRadioBtn)
+    val writeTypeSpinnerAdapter =
+      ArrayAdapter(
+        requireActivity(),
+        android.R.layout.simple_spinner_dropdown_item,
+        TLV_MAP.keys.toList()
+      )
+    binding.writeValueTypeSp.adapter = writeTypeSpinnerAdapter
 
-      binding.addLayout.visibility = getVisibility(readBtnOn || subscribeBtnOn)
-      binding.attributeIdLabel.visibility = getVisibility(readBtnOn || subscribeBtnOn || writeBtnOn)
-      binding.attributeIdEd.visibility = getVisibility(readBtnOn || subscribeBtnOn || writeBtnOn)
-      binding.eventIdLabel.visibility = getVisibility(readBtnOn || subscribeBtnOn)
-      binding.eventIdEd.visibility = getVisibility(readBtnOn || subscribeBtnOn)
-      binding.commandIdLabel.visibility = getVisibility(invokeBtnOn)
-      binding.commandIdEd.visibility = getVisibility(invokeBtnOn)
-      binding.isUrgentLabel.visibility = getVisibility(subscribeBtnOn)
-      binding.isUrgentSp.visibility = getVisibility(subscribeBtnOn)
-      binding.shutdownSubscriptionBtn.visibility = getVisibility(subscribeBtnOn)
+    binding.selectTypeRadioGroup.setOnCheckedChangeListener { _, radioBtnId ->
+      setVisibilityEachView(radioBtnId)
     }
 
-    binding.sendBtn.setOnClickListener {
-      if (binding.readRadioBtn.isChecked) {
-        showReadDialog()
-      } else if (binding.subscribeRadioBtn.isChecked) {
-        showSubscribeDialog()
-      } else if (binding.writeRadioBtn.isChecked) {
-        showWriteDialog()
-      } else if (binding.invokeRadioBtn.isChecked) {
-        showInvokeDialog()
-      }
-    }
+    binding.sendBtn.setOnClickListener { showDialog() }
 
     binding.shutdownSubscriptionBtn.setOnClickListener { showShutdownSubscriptionDialog() }
 
-    binding.addAttributeBtn.setOnClickListener { addPathList(ATTRIBUTE) }
-    binding.addEventBtn.setOnClickListener { addPathList(EVENT) }
+    binding.addAttributeBtn.setOnClickListener { addPathList(SendType.ATTRIBUTE) }
+    binding.addEventBtn.setOnClickListener { addPathList(SendType.EVENT) }
+    binding.addListBtn.setOnClickListener { addRequest() }
     binding.resetBtn.setOnClickListener { resetPath() }
+    binding.writeInvokeresetBtn.setOnClickListener { resetPath() }
 
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
     return binding.root
+  }
+
+  private fun setVisibilityEachView(radioBtnId: Int) {
+    val readBtnOn = (radioBtnId == R.id.readRadioBtn)
+    val subscribeBtnOn = (radioBtnId == R.id.subscribeRadioBtn)
+    val writeBtnOn = (radioBtnId == R.id.writeRadioBtn)
+    val invokeBtnOn = (radioBtnId == R.id.invokeRadioBtn)
+
+    binding.addAttributeBtn.visibility = getVisibility(readBtnOn || subscribeBtnOn)
+    binding.addEventBtn.visibility = getVisibility(readBtnOn || subscribeBtnOn)
+    binding.resetBtn.visibility = getVisibility(readBtnOn || subscribeBtnOn)
+    binding.attributeIdLabel.visibility = getVisibility(readBtnOn || subscribeBtnOn || writeBtnOn)
+    binding.attributeIdEd.visibility = getVisibility(readBtnOn || subscribeBtnOn || writeBtnOn)
+    binding.eventIdLabel.visibility = getVisibility(readBtnOn || subscribeBtnOn)
+    binding.eventIdEd.visibility = getVisibility(readBtnOn || subscribeBtnOn)
+    binding.addListBtn.visibility = getVisibility(writeBtnOn || invokeBtnOn)
+    binding.commandIdLabel.visibility = getVisibility(invokeBtnOn)
+    binding.commandIdEd.visibility = getVisibility(invokeBtnOn)
+    binding.isUrgentLabel.visibility = getVisibility(subscribeBtnOn)
+    binding.isUrgentSp.visibility = getVisibility(subscribeBtnOn)
+    binding.writeValueLabel.visibility = getVisibility(writeBtnOn)
+    binding.writeValueEd.visibility = getVisibility(writeBtnOn)
+    binding.writeValueTypeLabel.visibility = getVisibility(writeBtnOn)
+    binding.writeValueTypeSp.visibility = getVisibility(writeBtnOn)
+    binding.dataVersionLabel.visibility = getVisibility(writeBtnOn)
+    binding.dataVersionEd.visibility = getVisibility(writeBtnOn)
+    binding.invokeValueLabel.visibility = getVisibility(invokeBtnOn)
+    binding.invokeValueEd.visibility = getVisibility(invokeBtnOn)
+    binding.shutdownSubscriptionBtn.visibility = getVisibility(subscribeBtnOn)
+    binding.writeInvokeresetBtn.visibility = getVisibility(writeBtnOn || invokeBtnOn)
+
+    resetPath()
+  }
+
+  private fun showDialog() {
+    if (binding.readRadioBtn.isChecked) {
+      showReadDialog()
+    } else if (binding.subscribeRadioBtn.isChecked) {
+      showSubscribeDialog()
+    } else if (binding.writeRadioBtn.isChecked) {
+      showWriteDialog()
+    } else if (binding.invokeRadioBtn.isChecked) {
+      showInvokeDialog()
+    }
+  }
+
+  private fun addRequest() {
+    if (binding.writeRadioBtn.isChecked) {
+      addWriteRequest()
+    } else {
+      addInvokeRequest()
+    }
   }
 
   private fun getVisibility(isShowing: Boolean): Int {
@@ -172,7 +233,7 @@ class WildcardFragment : Fragment() {
     }
   }
 
-  private fun addPathList(type: Int) {
+  private fun addPathList(type: SendType) {
     val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
     val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
     val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
@@ -182,9 +243,9 @@ class WildcardFragment : Fragment() {
       (binding.subscribeRadioBtn.isChecked) &&
         (binding.isUrgentSp.selectedItem.toString().toBoolean())
 
-    if (type == ATTRIBUTE) {
+    if (type == SendType.ATTRIBUTE) {
       attributePath.add(ChipAttributePath.newInstance(endpointId, clusterId, attributeId))
-    } else if (type == EVENT) {
+    } else if (type == SendType.EVENT) {
       eventPath.add(ChipEventPath.newInstance(endpointId, clusterId, eventId, isUrgent))
     }
     updateAddListView()
@@ -193,6 +254,8 @@ class WildcardFragment : Fragment() {
   private fun resetPath() {
     attributePath.clear()
     eventPath.clear()
+    writePath.clear()
+    invokePath.clear()
     updateAddListView()
   }
 
@@ -203,6 +266,12 @@ class WildcardFragment : Fragment() {
     }
     for (event in eventPath) {
       builder.append("event($event)\n")
+    }
+    for (write in writePath) {
+      builder.append("WritePath($write)\n")
+    }
+    for (invoke in invokePath) {
+      builder.append("InvokePath($invoke)\n")
     }
     binding.sendListView.text = builder.toString()
   }
@@ -269,12 +338,18 @@ class WildcardFragment : Fragment() {
           "ResubscriptionAttempt terminationCause:$terminationCause, nextResubscribeIntervalMsec:$nextResubscribeIntervalMsec"
         )
       }
-
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        return
+      }
     deviceController.subscribeToPath(
       subscriptionEstablishedCallback,
       resubscriptionAttemptCallback,
       reportCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       attributePath.ifEmpty { null },
       eventPath.ifEmpty { null },
       minInterval,
@@ -287,9 +362,16 @@ class WildcardFragment : Fragment() {
   }
 
   private suspend fun read(isFabricFiltered: Boolean, eventMin: Long?) {
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        return
+      }
     deviceController.readPath(
       reportCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       attributePath.ifEmpty { null },
       eventPath.ifEmpty { null },
       isFabricFiltered,
@@ -298,13 +380,11 @@ class WildcardFragment : Fragment() {
     )
   }
 
-  private suspend fun write(
-    writeValueType: String,
-    writeValue: String,
-    dataVersion: Int?,
-    timedRequestTimeoutMs: Int,
-    imTimeoutMs: Int
-  ) {
+  private fun addWriteRequest() {
+    val writeValue = binding.writeValueEd.text.toString()
+    val writeValueType = binding.writeValueTypeSp.selectedItem.toString()
+    val dataVersion = binding.dataVersionEd.text.toString()
+
     val endpointId =
       if (!addressUpdateFragment.isGroupId()) {
         getChipPathIdForText(binding.endpointIdEd.text.toString())
@@ -315,10 +395,10 @@ class WildcardFragment : Fragment() {
     val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
 
     val version =
-      if (dataVersion == null) {
+      if (dataVersion.isEmpty()) {
         Optional.empty()
       } else {
-        Optional.of(dataVersion)
+        Optional.of(dataVersion.toInt())
       }
 
     lateinit var writeRequest: AttributeWriteRequest
@@ -350,20 +430,15 @@ class WildcardFragment : Fragment() {
           version
         )
     }
-
-    deviceController.write(
-      writeAttributeCallback,
-      addressUpdateFragment.getDevicePointer(requireContext()),
-      listOf(writeRequest),
-      timedRequestTimeoutMs,
-      imTimeoutMs
-    )
+    writePath.add(writeRequest)
+    updateAddListView()
   }
 
-  private suspend fun invoke(invokeJson: String, timedRequestTimeoutMs: Int, imTimeoutMs: Int) {
+  private fun addInvokeRequest() {
     val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
     val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
     val commandId = getChipPathIdForText(binding.commandIdEd.text.toString())
+    val invokeJson = binding.invokeValueEd.text.toString()
 
     val jsonString = invokeJson.ifEmpty { "{}" }
     val invokeElement =
@@ -378,10 +453,39 @@ class WildcardFragment : Fragment() {
       } else {
         InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
       }
-    deviceController.invoke(
-      invokeCallback,
-      addressUpdateFragment.getDevicePointer(requireContext()),
-      invokeElement,
+    invokePath.add(invokeElement)
+    updateAddListView()
+  }
+
+  private suspend fun write(timedRequestTimeoutMs: Int, imTimeoutMs: Int) {
+    val devicePtr =
+      try {
+        addressUpdateFragment.getDevicePointer(requireContext())
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getDevicePointer exception", e)
+        return
+      }
+    deviceController.write(
+      writeAttributeCallback,
+      devicePtr,
+      writePath,
+      timedRequestTimeoutMs,
+      imTimeoutMs
+    )
+  }
+
+  private suspend fun invoke(timedRequestTimeoutMs: Int, imTimeoutMs: Int) {
+    val devicePtr =
+      try {
+        addressUpdateFragment.getDevicePointer(requireContext())
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getDevicePointer exception", e)
+        return
+      }
+    deviceController.extendableInvoke(
+      extendableInvokeCallback,
+      devicePtr,
+      invokePath,
       timedRequestTimeoutMs,
       imTimeoutMs
     )
@@ -426,31 +530,14 @@ class WildcardFragment : Fragment() {
   private fun showWriteDialog() {
     binding.outputTv.text = ""
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.write_dialog, null)
-    val writeValueTypeSp = dialogView.findViewById<Spinner>(R.id.writeValueTypeSp)
-    val spinnerAdapter =
-      ArrayAdapter(
-        requireActivity(),
-        android.R.layout.simple_spinner_dropdown_item,
-        TLV_MAP.keys.toList()
-      )
-    writeValueTypeSp.adapter = spinnerAdapter
     val dialog = AlertDialog.Builder(requireContext()).apply { setView(dialogView) }.create()
 
     dialogView.findViewById<Button>(R.id.writeBtn).setOnClickListener {
-      val writeValue = dialogView.findViewById<EditText>(R.id.writeValueEd).text.toString()
-      val dataVersion = dialogView.findViewById<EditText>(R.id.dataVersionEd).text.toString()
       val timedRequestTimeoutMs =
         dialogView.findViewById<EditText>(R.id.timedRequestTimeoutEd).text.toString()
       val imTimeout = dialogView.findViewById<EditText>(R.id.imTimeoutEd).text.toString()
       scope.launch {
         write(
-          writeValueTypeSp.selectedItem.toString(),
-          writeValue,
-          if (dataVersion.isEmpty()) {
-            null
-          } else {
-            dataVersion.toInt()
-          },
           if (timedRequestTimeoutMs.isEmpty()) {
             0
           } else {
@@ -520,17 +607,14 @@ class WildcardFragment : Fragment() {
   private fun showInvokeDialog() {
     binding.outputTv.text = ""
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.invoke_dialog, null)
-    val invokeValueEd = dialogView.findViewById<EditText>(R.id.invokeValueEd)
     val dialog = AlertDialog.Builder(requireContext()).apply { setView(dialogView) }.create()
 
     dialogView.findViewById<Button>(R.id.invokeBtn).setOnClickListener {
-      val invokeValue = invokeValueEd.text.toString()
       val timedRequestTimeoutMs =
         dialogView.findViewById<EditText>(R.id.timedRequestTimeoutEd).text.toString()
       val imTimeout = dialogView.findViewById<EditText>(R.id.imTimeoutEd).text.toString()
       scope.launch {
         invoke(
-          invokeValue,
           if (timedRequestTimeoutMs.isEmpty()) {
             0
           } else {
@@ -554,7 +638,13 @@ class WildcardFragment : Fragment() {
     val clusterId = 62L // OperationalCredentials
     val attributeId = 5L // CurrentFabricIndex
     val deviceId = addressUpdateFragment.deviceId
-    val devicePointer = ChipClient.getConnectedDevicePointer(context, deviceId)
+    val devicePointer =
+      try {
+        ChipClient.getConnectedDevicePointer(context, deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        return 0U
+      }
     return suspendCoroutine { cont ->
       deviceController.readAttributePath(
         object : ReportCallback {
@@ -651,8 +741,11 @@ class WildcardFragment : Fragment() {
 
   companion object {
     private const val TAG = "WildcardFragment"
-    private const val ATTRIBUTE = 1
-    private const val EVENT = 2
+
+    private enum class SendType {
+      ATTRIBUTE,
+      EVENT
+    }
 
     fun newInstance(): WildcardFragment = WildcardFragment()
 

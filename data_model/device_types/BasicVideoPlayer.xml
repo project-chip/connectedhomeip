@@ -91,7 +91,7 @@ Davis, CA 95616, USA
     <cluster id="0x0509" name="Keypad Input" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x050b" name="Audio Output" side="server">
+    <cluster id="0x050B" name="Audio Output" side="server">
       <optionalConform/>
     </cluster>
   </clusters>

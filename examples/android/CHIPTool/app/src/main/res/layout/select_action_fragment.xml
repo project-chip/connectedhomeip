@@ -127,6 +127,14 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/ota_provider_btn_text" />
+
+        <Button
+            android:id="@+id/icdBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/icd_btn_text" />
     </LinearLayout>
 
 </ScrollView>

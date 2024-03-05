@@ -36,7 +36,6 @@
 extern "C" {
 #endif
 #include "cmsis_os2.h"
-#include "sl_board_configuration.h"
 #include "sl_net.h"
 #include "sl_si91x_driver.h"
 #include "sl_si91x_host_interface.h"

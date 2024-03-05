@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0091"/>
+    <field name="ImportedEnergy" mask="0x01"/>
+    <field name="ExportedEnergy" mask="0x02"/>
+    <field name="CumulativeEnergy" mask="0x04"/>
+    <field name="PeriodicEnergy" mask="0x08"/>
+  </bitmap>
+  <cluster apiMaturity="provisional">
+    <name>Electrical Energy Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <code>0x0091</code>
+    <define>ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <description>This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.</description>
+    <!--Attributes-->
+    <attribute code="0x0000" side="server" define="ACCURACY" type="MeasurementAccuracyStruct">Accuracy</attribute>
+    <attribute code="0x0001" side="server" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
+    <!--Conformance feature IMPE & CUME - for now optional-->
+    <attribute code="0x0002" side="server" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">CumulativeEnergyExported</attribute>
+    <!--Conformance feature EXPE & CUME - for now optional-->
+    <attribute code="0x0003" side="server" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyImported</attribute>
+    <!--Conformance feature IMPE & PERE - for now optional-->
+    <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyExported</attribute>
+    <attribute code="0x0005" side="server" define="CUMULATIVE_ENERGY_RESET" type="CumulativeEnergyResetStruct" isNullable="true" optional="true">CumulativeEnergyReset</attribute>
+    <!--Conformance feature EXPE & PERE - for now optional-->
+    <event code="0x00" side="server" name="CumulativeEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
+      <description>CumulativeEnergyMeasured</description>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
+    </event>
+    <event code="0x01" side="server" name="PeriodicEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
+      <description>PeriodicEnergyMeasured</description>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
+    </event>
+  </cluster>
+  <struct name="CumulativeEnergyResetStruct" apiMaturity="provisional">
+    <cluster code="0x0091"/>
+    <item fieldId="0" name="ImportedResetTimestamp" type="epoch_s" isNullable="true" optional="true"/>
+    <item fieldId="1" name="ExportedResetTimestamp" type="epoch_s" isNullable="true" optional="true"/>
+    <item fieldId="2" name="ImportedResetSystime" type="systime_ms" isNullable="true" optional="true"/>
+    <item fieldId="3" name="ExportedResetSystime" type="systime_ms" isNullable="true" optional="true"/>
+  </struct>
+  <struct name="EnergyMeasurementStruct" apiMaturity="provisional">
+    <cluster code="0x0091"/>
+    <item fieldId="0" name="Energy" type="energy_mwh" min="0" max="4611686018427387904"/>
+    <item fieldId="1" name="StartTimestamp" type="epoch_s" optional="true"/>
+    <item fieldId="2" name="EndTimestamp" type="epoch_s" optional="true"/>
+    <item fieldId="3" name="StartSystime" type="systime_ms" optional="true"/>
+    <item fieldId="4" name="EndSystime" type="systime_ms" optional="true"/>
+  </struct>
+</configurator>

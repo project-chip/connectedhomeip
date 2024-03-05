@@ -20,6 +20,10 @@
  *      PSA Crypto API based implementation of CHIP crypto primitives
  *      with Silicon Labs SDK modifications
  */
+// The psa_driver_wrappers.h file that we're including here assumes that it has
+// access to private struct members. Define this here in order to avoid
+// compilation errors.
+#define MBEDTLS_ALLOW_PRIVATE_ACCESS
 
 #include <crypto/CHIPCryptoPAL.h>
 
@@ -158,7 +162,7 @@ static int timeCompare(mbedtls_x509_time * t1, mbedtls_x509_time * t2)
 }
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const Aes128BitsKeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
     CHIP_ERROR error          = CHIP_NO_ERROR;
@@ -215,7 +219,7 @@ exit:
 }
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, const uint8_t * aad, size_t aad_len,
-                           const uint8_t * tag, size_t tag_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext)
 {
     CHIP_ERROR error          = CHIP_NO_ERROR;
@@ -474,6 +478,13 @@ exit:
     psa_mac_abort(&operation);
     psa_reset_key_attributes(&attr);
     return error;
+}
+
+CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,
+                                 size_t out_length)
+{
+    return HMAC_SHA256(key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray), message, message_length,
+                       out_buffer, out_length);
 }
 
 CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,

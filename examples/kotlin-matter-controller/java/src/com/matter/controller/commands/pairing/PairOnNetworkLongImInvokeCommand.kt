@@ -18,17 +18,11 @@
 package com.matter.controller.commands.pairing
 
 import com.matter.controller.commands.common.CredentialsIssuer
-import java.time.Duration
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.runBlocking
-import matter.controller.InvokeRequest
-import matter.controller.InvokeResponse
 import matter.controller.MatterController
-import matter.controller.model.CommandPath
-import matter.tlv.AnonymousTag
-import matter.tlv.ContextSpecificTag
-import matter.tlv.TlvWriter
+import matter.controller.cluster.clusters.IdentifyCluster
 
 class PairOnNetworkLongImInvokeCommand(
   controller: MatterController,
@@ -43,37 +37,15 @@ class PairOnNetworkLongImInvokeCommand(
     DiscoveryFilterType.LONG_DISCRIMINATOR
   ) {
   override fun runCommand() {
-    val IdentifyTime: UShort = 1u
-    val tlvWriter1 = TlvWriter()
-    tlvWriter1.startStructure(AnonymousTag)
-    tlvWriter1.put(ContextSpecificTag(0), IdentifyTime)
-    tlvWriter1.endStructure()
-
-    val element1: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId = 0u, clusterId = CLUSTER_ID_IDENTIFY, commandId = IDENTIFY_COMMAND),
-        tlvPayload = tlvWriter1.getEncoded(),
-        timedRequest = Duration.ZERO
-      )
-
-    currentCommissioner()
-      .pairDevice(
-        getNodeId(),
-        getRemoteAddr().address.hostAddress,
-        MATTER_PORT,
-        getDiscriminator(),
-        getSetupPINCode(),
-      )
-    currentCommissioner().setCompletionListener(this)
-    waitCompleteMs(getTimeoutMillis())
-
     runBlocking {
       try {
-        val response: InvokeResponse = currentCommissioner().invoke(element1)
+        val identifyTime: UShort = 1u
+        val identifyCluster = IdentifyCluster(controller = currentCommissioner(), endpointId = 0u)
+
+        // By running command identify, we are implicitly requesting CASE to be established if it's
+        // not already present.
+        identifyCluster.identify(identifyTime)
         logger.log(Level.INFO, "Invoke command succeeded")
-        if (response.payload.isNotEmpty()) {
-          // TODO:Handle TLV data response
-        }
       } catch (ex: Exception) {
         setFailure("invoke failure: ${ex.message}")
       } finally {
@@ -86,11 +58,6 @@ class PairOnNetworkLongImInvokeCommand(
 
   companion object {
     private val logger = Logger.getLogger(PairOnNetworkLongImInvokeCommand::class.java.name)
-
     private const val MATTER_PORT = 5540
-    private const val CLUSTER_ID_IDENTIFY = 0x0003u
-    private const val IDENTIFY_COMMAND = 0u
-    private const val CLUSTER_ID_TEST = 0xFFF1FC05u
-    private const val TEST_ADD_ARGUMENT_COMMAND = 0X04u
   }
 }

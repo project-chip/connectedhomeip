@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Alarm Base" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId name="Alarm Base"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="ALARM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="RESET" name="Reset" summary="Supports the ability to reset alarms">
@@ -66,44 +71,44 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <number name="AlarmMap" type=""/>
+    <number name="AlarmBitmap" type=""/>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Mask" type="AlarmMap" default="0">
+    <attribute id="0x0000" name="Mask" type="AlarmBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="Latch" type="AlarmMap" default="0">
+    <attribute id="0x0001" name="Latch" type="AlarmBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="RESET"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="State" type="AlarmMap" default="0">
+    <attribute id="0x0002" name="State" type="AlarmBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0003" name="Supported" type="AlarmMap" default="0">
+    <attribute id="0x0003" name="Supported" type="AlarmBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Reset" response="Y">
+    <command id="0x00" name="Reset" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="RESET"/>
       </mandatoryConform>
-      <field id="0" name="Alarms" type="AlarmMap" default="0">
+      <field id="0" name="Alarms" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="ModifyEnabledAlarms" response="Y">
+    <command id="0x01" name="ModifyEnabledAlarms" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <optionalConform/>
-      <field id="0" name="Mask" type="AlarmMap" default="0">
+      <field id="0" name="Mask" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
     </command>
@@ -112,16 +117,16 @@ Davis, CA 95616, USA
     <event id="0x00" name="Notify" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform/>
-      <field id="1" name="Active" type="AlarmMap" default="0">
+      <field id="1" name="Active" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Inactive" type="AlarmMap" default="0">
+      <field id="2" name="Inactive" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="3" name="State" type="AlarmMap" default="0">
+      <field id="3" name="State" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="4" name="Mask" type="AlarmMap" default="0">
+      <field id="4" name="Mask" type="AlarmBitmap" default="0">
         <mandatoryConform/>
       </field>
     </event>

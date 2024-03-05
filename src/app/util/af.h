@@ -22,17 +22,6 @@
 #endif
 #include CONFIGURATION_HEADER
 
-#ifdef EZSP_HOST
-// Includes needed for ember related functions for the EZSP host
-#include "app/util/ezsp/ezsp-protocol.h"
-#include "app/util/ezsp/ezsp-utils.h"
-#include "app/util/ezsp/ezsp.h"
-#include "app/util/ezsp/serial-interface.h"
-#include "stack/include/ember-random-api.h"
-#include "stack/include/ember-types.h"
-#include "stack/include/error.h"
-#endif // EZSP_HOST
-
 #include <app/util/af-types.h>
 
 #include <app/util/endpoint-config-api.h>
@@ -40,6 +29,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
 #include <lib/support/SafeInt.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /** @name Attribute Storage */
 // @{
@@ -101,9 +91,14 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * over the air. Because this function is being called locally
  * it assumes that the device knows what it is doing and has permission
  * to perform the given operation.
+ *
+ * This function also does NOT check that the input dataType matches the expected
+ * data type (as Accessors.h/cpp have this correct by default).
+ * TODO: this not checking seems off - what if this is run without Accessors.h ?
  */
-EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                    uint8_t * dataPtr, EmberAfAttributeType dataType);
+chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                                chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                                EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.
@@ -114,8 +109,9 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
  * dataPtr may be NULL, signifying that we don't need the value, just the status
  * (i.e. whether the attribute can be read).
  */
-EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                   uint8_t * dataPtr, uint16_t readLength);
+chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                               chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                               uint16_t readLength);
 
 /**
  * @brief macro that returns size of attribute in bytes.
@@ -183,7 +179,7 @@ uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId end
  * @param endpoint Endpoint number
  * @param cluster Id the of the Cluster server you are interrested on
  * @param fixedClusterServerEndpointCount The number of fixed endpoints containing this cluster server.  Typically one of the
- EMBER_AF_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
+ MATTER_DM_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
  */
 uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                               uint16_t fixedClusterServerEndpointCount);
@@ -198,35 +194,7 @@ uint16_t emberAfFixedEndpointCount(void);
  */
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
 
-/*
- * @brief Function that copies a ZCL string type into a buffer.  The size
- * parameter should indicate the maximum number of characters to copy to the
- * destination buffer not including the length byte.
- */
-void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size);
-/*
- * @brief Function that copies a ZCL long string into a buffer.  The size
- * parameter should indicate the maximum number of characters to copy to the
- * destination buffer not including the length bytes.
- */
-void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
-
 /** @} END Attribute Storage */
-
-/** @name Device Control */
-// @{
-
-/**
- * @brief Function that checks if endpoint is identifying
- *
- * This function returns true if device at a given endpoint is
- * identifying.
- *
- * @param endpoint Zigbee endpoint number
- */
-bool emberAfIsDeviceIdentifying(chip::EndpointId endpoint);
-
-/** @} END Device Control */
 
 /** @name Miscellaneous */
 // @{
@@ -251,14 +219,6 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
 /** @} END Miscellaneous */
 
 /** @} END addtogroup */
-
-#if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#if defined(EMBER_TEST)
-#define EMBER_TEST_ASSERT(x) assert(x)
-#else
-#define EMBER_TEST_ASSERT(x)
-#endif
-#endif
 
 /**
  * Returns the pointer to the data version storage for the given endpoint and

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 80.5.2. [TC-MOD-3.2] StartUpMode verification with DUT as Server
+name: 80.5.2.  [TC-MOD-3.2] StartUpMode Verification (DUT as Server)
 
 PICS:
     - MOD.S.A0004
@@ -27,7 +27,9 @@ config:
         defaultValue: 7
 
 tests:
-    - label: "Step 0: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:

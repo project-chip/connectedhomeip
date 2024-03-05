@@ -18,6 +18,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
+#include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTAFirmwareProcessor.h>
 
 #include "OtaSupport.h"
@@ -29,6 +30,9 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
 {
     ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
+#if OTA_ENCRYPTION_ENABLE
+    mUnalignmentNum = 0;
+#endif
     ReturnErrorCodeIf(gOtaSuccess_c != OTA_ClientInit(), CHIP_OTA_PROCESSOR_CLIENT_INIT);
 
     auto offset = OTA_GetCurrentEepromAddressOffset();
@@ -48,6 +52,9 @@ CHIP_ERROR OTAFirmwareProcessor::Clear()
     OTATlvProcessor::ClearInternal();
     mAccumulator.Clear();
     mDescriptorProcessed = false;
+#if OTA_ENCRYPTION_ENABLE
+    mUnalignmentNum = 0;
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -57,7 +64,32 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
+#if OTA_ENCRYPTION_ENABLE
+        /* 16 bytes to used to store undecrypted data because of unalignment */
+        mAccumulator.Init(requestedOtaMaxBlockSize + 16);
+#endif
     }
+#if OTA_ENCRYPTION_ENABLE
+    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
+    memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
+
+    if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
+    {
+        uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
+        mAlignmentNum          = mAlignmentNum * 16;
+        mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
+        memcpy(&mBlock[requestedOtaMaxBlockSize], &mBlock[mAlignmentNum], mUnalignmentNum);
+        mBlock.reduce_size(mAlignmentNum);
+    }
+    else
+    {
+        mUnalignmentNum = mUnalignmentNum + block.size() - requestedOtaMaxBlockSize;
+        mBlock.reduce_size(requestedOtaMaxBlockSize);
+    }
+
+    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
+#endif
 
     auto status = OTA_MakeHeadRoomForNextBlock(requestedOtaMaxBlockSize, OTAImageProcessorImpl::FetchNextData, 0);
     if (gOtaSuccess_c != status)
@@ -65,8 +97,11 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Failed to make room for next block. Status: %d", status);
         return CHIP_OTA_PROCESSOR_MAKE_ROOM;
     }
-
+#if OTA_ENCRYPTION_ENABLE
+    status = OTA_PushImageChunk((uint8_t *) mBlock.data(), (uint16_t) mBlock.size(), NULL, NULL);
+#else
     status = OTA_PushImageChunk((uint8_t *) block.data(), (uint16_t) block.size(), NULL, NULL);
+#endif
     if (gOtaSuccess_c != status)
     {
         ChipLogError(SoftwareUpdate, "Failed to write image block. Status: %d", status);

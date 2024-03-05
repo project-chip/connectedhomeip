@@ -69,7 +69,7 @@ namespace app {
 class AttributePathExpandIterator
 {
 public:
-    AttributePathExpandIterator(ObjectList<AttributePathParams> * aAttributePath);
+    AttributePathExpandIterator(SingleLinkedListNode<AttributePathParams> * aAttributePath);
 
     /**
      * Proceed the iterator to the next attribute path in the given cluster info.
@@ -105,7 +105,7 @@ public:
     inline bool Valid() const { return mpAttributePath != nullptr; }
 
 private:
-    ObjectList<AttributePathParams> * mpAttributePath;
+    SingleLinkedListNode<AttributePathParams> * mpAttributePath;
 
     ConcreteAttributePath mOutputPath;
 

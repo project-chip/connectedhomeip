@@ -23,6 +23,10 @@
  *
  */
 
+#include <app/icd/server/ICDServerConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDNotifier.h> // nogncheck
+#endif
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
@@ -34,6 +38,9 @@ using namespace chip::Access;
 namespace chip {
 namespace app {
 namespace reporting {
+
+Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
+
 CHIP_ERROR Engine::Init()
 {
     mNumReportsInFlight = 0;
@@ -51,7 +58,7 @@ void Engine::Shutdown()
     mGlobalDirtySet.ReleaseAll();
 }
 
-bool Engine::IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
+bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
                                        const ConcreteReadAttributePath & aPath)
 {
     bool existPathMatch       = false;
@@ -509,6 +516,12 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     if (apReadHandler->IsType(ReadHandler::InteractionType::Subscribe))
     {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // Notify the ICDManager that we are about to send a subscription report before we prepare the Report payload.
+        // This allows the ICDManager to trigger any necessary updates and have the information in the report about to be sent.
+        app::ICDNotifier::GetInstance().NotifySubscriptionReport();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
         SubscriptionId subscriptionId = 0;
         apReadHandler->GetSubscriptionId(subscriptionId);
         reportDataBuilder.SubscriptionId(subscriptionId);
@@ -606,7 +619,7 @@ CHIP_ERROR Engine::ScheduleRun()
         return CHIP_NO_ERROR;
     }
 
-    Messaging::ExchangeManager * exchangeManager = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    Messaging::ExchangeManager * exchangeManager = mpImEngine->GetExchangeManager();
     if (exchangeManager == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
@@ -630,18 +643,18 @@ void Engine::Run()
 {
     uint32_t numReadHandled = 0;
 
-    InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
-
     // We may be deallocating read handlers as we go.  Track how many we had
     // initially, so we make sure to go through all of them.
-    size_t initialAllocated = imEngine->mReadHandlers.Allocated();
+    size_t initialAllocated = mpImEngine->mReadHandlers.Allocated();
     while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < initialAllocated))
     {
-        ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) imEngine->mReadHandlers.Allocated());
+        ReadHandler * readHandler =
+            mpImEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) mpImEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
-        if (readHandler->ShouldReportUnscheduled() || imEngine->GetReportScheduler()->IsReportableNow(readHandler))
+        if (readHandler->ShouldReportUnscheduled() || mpImEngine->GetReportScheduler()->IsReportableNow(readHandler))
         {
+
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
             mRunningReadHandler = nullptr;
@@ -663,14 +676,14 @@ void Engine::Run()
     // This isn't strictly necessary, but does make it easier to debug issues in this code if they
     // do arise.
     //
-    if (mCurReadHandlerIdx >= imEngine->mReadHandlers.Allocated())
+    if (mCurReadHandlerIdx >= mpImEngine->mReadHandlers.Allocated())
     {
         mCurReadHandlerIdx = 0;
     }
 
     bool allReadClean = true;
 
-    imEngine->mReadHandlers.ForEachActiveObject([&allReadClean](ReadHandler * handler) {
+    mpImEngine->mReadHandlers.ForEachActiveObject([&allReadClean](ReadHandler * handler) {
         if (handler->IsDirty())
         {
             allReadClean = false;
@@ -828,26 +841,25 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
     BumpDirtySetGeneration();
 
     bool intersectsInterestPath = false;
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject(
-        [&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
-            // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
-            // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
-            // waiting for a response to the last message chunk for read interactions.
-            if (handler->CanStartReporting() || handler->IsAwaitingReportResponse())
+    mpImEngine->mReadHandlers.ForEachActiveObject([&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
+        // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
+        // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
+        // waiting for a response to the last message chunk for read interactions.
+        if (handler->CanStartReporting() || handler->IsAwaitingReportResponse())
+        {
+            for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
             {
-                for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
+                if (object->mValue.Intersects(aAttributePath))
                 {
-                    if (object->mValue.Intersects(aAttributePath))
-                    {
-                        handler->AttributePathIsDirty(aAttributePath);
-                        intersectsInterestPath = true;
-                        break;
-                    }
+                    handler->AttributePathIsDirty(aAttributePath);
+                    intersectsInterestPath = true;
+                    break;
                 }
             }
+        }
 
-            return Loop::Continue;
-        });
+        return Loop::Continue;
+    });
 
     if (!intersectsInterestPath)
     {
@@ -888,7 +900,7 @@ void Engine::OnReportConfirm()
 
 void Engine::GetMinEventLogPosition(uint32_t & aMinLogPosition)
 {
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aMinLogPosition](ReadHandler * handler) {
+    mpImEngine->mReadHandlers.ForEachActiveObject([&aMinLogPosition](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
@@ -923,13 +935,13 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
     // we don't need to call schedule run for event.
     // If schedule run is called, actually we would not delivery events as well.
     // Just wanna save one schedule run here
-    if (InteractionModelEngine::GetInstance()->mEventPathPool.Allocated() == 0)
+    if (mpImEngine->mEventPathPool.Allocated() == 0)
     {
         return CHIP_NO_ERROR;
     }
 
     bool isUrgentEvent = false;
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath, &isUrgentEvent](ReadHandler * handler) {
+    mpImEngine->mReadHandlers.ForEachActiveObject([&aPath, &isUrgentEvent](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;
@@ -960,7 +972,7 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
 
 void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
 {
-    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {
+    mpImEngine->mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {
         if (handler->IsType(ReadHandler::InteractionType::Read))
         {
             return Loop::Continue;

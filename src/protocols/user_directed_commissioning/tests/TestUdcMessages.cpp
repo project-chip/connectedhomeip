@@ -369,9 +369,10 @@ void TestUDCIdentificationDeclaration(nlTestSuite * inSuite, void * inContext)
     uint16_t productId        = 2222;
     uint16_t port             = 123;
     const char * deviceName   = "device1";
-    uint16_t vendorIdTemp     = 0;
     uint16_t pairingHint      = 33;
     const char * pairingInst  = "Read 6 digit code from screen";
+
+    TargetAppInfo appInfo;
 
     // Rotating ID is given as up to 50 hex bytes
     char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
@@ -390,9 +391,19 @@ void TestUDCIdentificationDeclaration(nlTestSuite * inSuite, void * inContext)
     id.SetCdPort(port);
 
     id.SetNoPasscode(true);
-    id.AddAppVendorId(1);
-    id.AddAppVendorId(2);
-    id.AddAppVendorId(3);
+
+    appInfo.vendorId  = 1;
+    appInfo.productId = 9;
+    id.AddTargetAppInfo(appInfo);
+
+    appInfo.vendorId  = 2;
+    appInfo.productId = 8;
+    id.AddTargetAppInfo(appInfo);
+
+    appInfo.vendorId  = 3;
+    appInfo.productId = 7;
+    id.AddTargetAppInfo(appInfo);
+
     id.SetCdUponPasscodeDialog(true);
     id.SetCommissionerPasscode(true);
     id.SetCommissionerPasscodeReady(true);
@@ -408,10 +419,10 @@ void TestUDCIdentificationDeclaration(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, pairingHint == id.GetPairingHint());
     NL_TEST_ASSERT(inSuite, strcmp(id.GetPairingInst(), pairingInst) == 0);
 
-    NL_TEST_ASSERT(inSuite, id.GetNumAppVendorIds() == 3);
-    NL_TEST_ASSERT(inSuite, id.GetAppVendorId(0, vendorIdTemp) && vendorIdTemp == 1);
-    NL_TEST_ASSERT(inSuite, id.GetAppVendorId(1, vendorIdTemp) && vendorIdTemp == 2);
-    NL_TEST_ASSERT(inSuite, id.GetAppVendorId(2, vendorIdTemp) && vendorIdTemp == 3);
+    NL_TEST_ASSERT(inSuite, id.GetNumTargetAppInfos() == 3);
+    NL_TEST_ASSERT(inSuite, id.GetTargetAppInfo(0, appInfo) && appInfo.vendorId == 1 && appInfo.productId == 9);
+    NL_TEST_ASSERT(inSuite, id.GetTargetAppInfo(1, appInfo) && appInfo.vendorId == 2 && appInfo.productId == 8);
+    NL_TEST_ASSERT(inSuite, id.GetTargetAppInfo(2, appInfo) && appInfo.vendorId == 3 && appInfo.productId == 7);
     NL_TEST_ASSERT(inSuite, id.GetNoPasscode() == true);
     NL_TEST_ASSERT(inSuite, id.GetCdUponPasscodeDialog() == true);
     NL_TEST_ASSERT(inSuite, id.GetCommissionerPasscode() == true);
@@ -436,10 +447,10 @@ void TestUDCIdentificationDeclaration(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(idOut.GetPairingInst(), pairingInst) == 0);
     NL_TEST_ASSERT(inSuite, pairingHint == idOut.GetPairingHint());
 
-    NL_TEST_ASSERT(inSuite, id.GetNumAppVendorIds() == idOut.GetNumAppVendorIds());
-    NL_TEST_ASSERT(inSuite, idOut.GetAppVendorId(0, vendorIdTemp) && vendorIdTemp == 1);
-    NL_TEST_ASSERT(inSuite, idOut.GetAppVendorId(1, vendorIdTemp) && vendorIdTemp == 2);
-    NL_TEST_ASSERT(inSuite, idOut.GetAppVendorId(2, vendorIdTemp) && vendorIdTemp == 3);
+    NL_TEST_ASSERT(inSuite, id.GetNumTargetAppInfos() == idOut.GetNumTargetAppInfos());
+    NL_TEST_ASSERT(inSuite, idOut.GetTargetAppInfo(0, appInfo) && appInfo.vendorId == 1 && appInfo.productId == 9);
+    NL_TEST_ASSERT(inSuite, idOut.GetTargetAppInfo(1, appInfo) && appInfo.vendorId == 2 && appInfo.productId == 8);
+    NL_TEST_ASSERT(inSuite, idOut.GetTargetAppInfo(2, appInfo) && appInfo.vendorId == 3 && appInfo.productId == 7);
 
     NL_TEST_ASSERT(inSuite, id.GetNoPasscode() == idOut.GetNoPasscode());
     NL_TEST_ASSERT(inSuite, id.GetCdUponPasscodeDialog() == idOut.GetCdUponPasscodeDialog());

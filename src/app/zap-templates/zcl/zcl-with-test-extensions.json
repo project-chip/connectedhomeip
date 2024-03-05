@@ -24,8 +24,8 @@
         "barrier-control-cluster.xml",
         "basic-information-cluster.xml",
         "binding-cluster.xml",
-        "boolean-sensor-configuration-cluster.xml",
         "boolean-state-cluster.xml",
+        "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
         "chip-ota.xml",
@@ -38,6 +38,7 @@
         "content-control-cluster.xml",
         "descriptor-cluster.xml",
         "device-energy-management-cluster.xml",
+        "device-energy-management-mode-cluster.xml",
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
@@ -45,8 +46,12 @@
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
+        "energy-preference-cluster.xml",
+        "electrical-energy-measurement-cluster.xml",
         "electrical-measurement-cluster.xml",
+        "electrical-power-measurement-cluster.xml",
         "energy-evse-cluster.xml",
+        "energy-evse-mode-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
         "fan-control-cluster.xml",
         "fault-injection-cluster.xml",
@@ -67,8 +72,10 @@
         "level-control-cluster.xml",
         "localization-configuration-cluster.xml",
         "low-power-cluster.xml",
+        "measurement-and-sensing.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
+        "messages-cluster.xml",
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "mode-select-extensions.xml",
@@ -81,6 +88,7 @@
         "operational-state-oven-cluster.xml",
         "operational-state-rvc-cluster.xml",
         "oven-mode-cluster.xml",
+        "power-topology-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",
@@ -175,8 +183,50 @@
             "MaxPathsPerInvoke"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
-        "Descriptor": ["ClusterRevision"],
-        "Device Energy Management": ["Forecast"],
+        "Descriptor": ["ClusterRevision", "FeatureMap"],
+        "Device Energy Management": [
+            "ESAType",
+            "ESACanGenerate",
+            "ESAState",
+            "AbsMinPower",
+            "AbsMaxPower",
+            "PowerAdjustmentCapability",
+            "Forecast",
+            "OptOutState",
+            "FeatureMap"
+        ],
+        "Device Energy Management Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
+        "Energy EVSE": [
+            "State",
+            "SupplyState",
+            "FaultState",
+            "ChargingEnabledUntil",
+            "DischargingEnabledUntil",
+            "CircuitCapacity",
+            "MinimumChargeCurrent",
+            "MaximumChargeCurrent",
+            "MaximumDischargeCurrent",
+            "UserMaximumChargeCurrent",
+            "RandomizationDelayWindow",
+            "NextChargeStartTime",
+            "NextChargeTargetTime",
+            "NextChargeRequiredEnergy",
+            "NextChargeTargetSoC",
+            "ApproximateEVEfficiency",
+            "StateOfCharge",
+            "BatteryCapacity",
+            "VehicleID",
+            "SessionID",
+            "SessionDuration",
+            "SessionEnergyCharged",
+            "SessionEnergyDischarged",
+            "FeatureMap"
+        ],
+        "Energy EVSE Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -202,7 +252,9 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReason"
+            "BootReason",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Group Key Management": [
             "ClusterRevision",
@@ -216,9 +268,7 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric",
-            "UserActiveModeTriggerHint",
-            "UserActiveModeTriggerInstruction"
+            "ClientsSupportedPerFabric"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
@@ -343,6 +393,18 @@
             "FeatureMap"
         ],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Microwave Oven Control": [
+            "CookTime",
+            "MaxCookTime",
+            "PowerSetting",
+            "MinPower",
+            "MaxPower",
+            "PowerStep",
+            "SupportedWatts",
+            "SelectedWattIndex",
+            "WattRating",
+            "FeatureMap"
+        ],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -357,18 +419,8 @@
             "OnMode",
             "FeatureMap"
         ],
-        "RVC Clean Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "OnMode",
-            "FeatureMap"
-        ],
-        "RVC Run Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Operational State": [
             "OperationalState",
             "OperationalError",
@@ -545,7 +597,42 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": ["AirQuality", "FeatureMap"]
+        "Air Quality": ["AirQuality", "FeatureMap"],
+        "Thermostat": ["QueuedPreset"],
+        "Electrical Energy Measurement": [
+            "Accuracy",
+            "CumulativeEnergyImported",
+            "CumulativeEnergyExported",
+            "PeriodicEnergyImported",
+            "PeriodicEnergyExported",
+            "CumulativeEnergyReset",
+            "FeatureMap"
+        ],
+        "Electrical Power Measurement": [
+            "PowerMode",
+            "NumberOfMeasurementTypes",
+            "Accuracy",
+            "Ranges",
+            "Voltage",
+            "ActiveCurrent",
+            "ReactiveCurrent",
+            "ApparentCurrent",
+            "ActivePower",
+            "ReactivePower",
+            "ApparentPower",
+            "RMSVoltage",
+            "RMSCurrent",
+            "RMSPower",
+            "Frequency",
+            "HarmonicCurrents",
+            "HarmonicPhases",
+            "PowerFactor",
+            "NeutralCurrent",
+            "FeatureMap"
+        ],
+        "Power Topology": ["FeatureMap"],
+        "Valve Configuration and Control": ["RemainingDuration"],
+        "Boolean State Configuration": ["CurrentSensitivityLevel"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

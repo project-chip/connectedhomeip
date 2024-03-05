@@ -432,8 +432,13 @@ SECTIONS
 
     __StackLimit = _vStackTop - STACK_SIZE;
 
-    __FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
-    __FACTORY_DATA_SIZE = m_factory_data_size;
+    __MATTER_FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
+    __MATTER_FACTORY_DATA_SIZE = m_factory_data_size;
+
+    /* The .ro_version section inside SSBL is set after the .m_interrupts sections,
+     * which is assumed to never change, so the offset remains the same across different
+     * SSBL versions. This symbol is used in Matter Application to retrieve the SSBL version. */
+    __MATTER_SSBL_VERSION_START = 0x00000120;
      
     ASSERT(((m_app_start + m_app_size + m_app_meta_data + m_factory_data_size + m_flash_config_size) <= m_int_flash_size),
             "Internal flash capacity exceeded")

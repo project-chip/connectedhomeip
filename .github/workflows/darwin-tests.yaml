@@ -99,6 +99,8 @@ jobs:
                         --target darwin-x64-tv-app-${BUILD_VARIANT} \
                         --target darwin-x64-bridge-${BUILD_VARIANT} \
                         --target darwin-x64-lit-icd-${BUILD_VARIANT} \
+                        --target darwin-x64-microwave-oven-${BUILD_VARIANT} \
+                        --target darwin-x64-rvc-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -106,6 +108,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
+                     --runner darwin_framework_tool_python \
                      --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
                      --target-skip-glob '{TestAccessControlConstraints}' \
                      run \
@@ -117,6 +120,8 @@ jobs:
                      --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                     --microwave-oven-app ./out/darwin-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
+                     --rvc-app ./out/darwin-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                   "
             - name: Run OTA Test
               run: |
@@ -131,7 +136,7 @@ jobs:
                      --ota-candidate-file /tmp/otaCandidateJSON \
                   "
             - name: Uploading core files
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.build_variant }}
@@ -139,19 +144,19 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.build_variant }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading framework build log
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: framework-build-log-darwin-${BUILD_VARIANT_FRAMEWORK_TOOL}
                   path: out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin_framework_build.log
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.build_variant }}

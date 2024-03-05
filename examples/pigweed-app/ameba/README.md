@@ -31,11 +31,11 @@ following features are available:
 
 -   Pull docker image:
 
-          $ docker pull ghcr.io/project-chip/chip-build-ameba:26
+          $ docker pull ghcr.io/project-chip/chip-build-ameba:35
 
 -   Run docker container:
 
-          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:26
+          $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-ameba:35
 
 -   Setup build environment:
 

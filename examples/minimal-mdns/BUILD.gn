@@ -76,3 +76,12 @@ executable("mdns-advertiser") {
 
   output_dir = root_out_dir
 }
+
+group("default") {
+  deps = [
+    ":mdns-advertiser",
+    ":minimal-mdns-client",
+    ":minimal-mdns-example-common",
+    ":minimal-mdns-server",
+  ]
+}

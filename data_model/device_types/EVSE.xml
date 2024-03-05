@@ -55,48 +55,20 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="" name="EVSE" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050C" name="Energy EVSE" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
   <clusters>
-    <cluster id="" name="Energy EVSE Mode" side="server">
-      <mandatoryConform/>
-    </cluster>
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0011" name="Power Source" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0090" name="Electrical Power Measurement" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0098" name="Device Energy Management" side="server">
-      <mandatoryConform/>
-      <features>
-        <feature code="" name="PA">
-          <mandatoryConform/>
-        </feature>
-        <feature code="" name="PFR">
-          <otherwiseConform>
-            <mandatoryConform>
-              <feature name="PFA"/>
-            </mandatoryConform>
-            <optionalConform/>
-          </otherwiseConform>
-        </feature>
-        <feature code="" name="PFA">
-          <optionalConform/>
-        </feature>
-      </features>
-    </cluster>
     <cluster id="0x0099" name="Energy EVSE" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x009D" name="Energy EVSE Mode" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0402" name="Temperature Measurement" side="server">

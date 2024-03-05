@@ -79,7 +79,7 @@ def scrape_clusters(scraper, spec_root, output_dir, dry_run):
 
     def scrape_cluster(filename: str) -> None:
         xml_path = get_xml_path(filename, clusters_output_dir)
-        cmd = [scraper, 'cluster', filename, xml_path, '-nd']
+        cmd = [scraper, 'cluster', '-i', filename, '-o', xml_path, '-nd', '--define', 'in-progress']
         if dry_run:
             print(cmd)
         else:
@@ -109,7 +109,7 @@ def scrape_device_types(scraper, spec_root, output_dir, dry_run):
 
     def scrape_device_type(filename: str) -> None:
         xml_path = get_xml_path(filename, device_types_output_dir)
-        cmd = [scraper, 'devicetype', '-c', clusters_output_dir, '-nd', filename, xml_path]
+        cmd = [scraper, 'devicetype', '-c', clusters_output_dir, '-nd', '-i', filename, '-o', xml_path]
         if dry_run:
             print(cmd)
         else:

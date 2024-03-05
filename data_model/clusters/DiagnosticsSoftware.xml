@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!--
-link:../matter-defines.adoc[]
-
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
@@ -61,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0034" name="Software Diagnostics"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DGSW" scope="Node"/>
   <features>
     <feature bit="0" code="WTRMRK" name="Watermarks" summary="Node makes available the metrics for high watermark related to memory consumption.">
@@ -72,9 +73,9 @@ Davis, CA 95616, USA
       <field id="0" name="ID" type="uint64">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="empty">
+      <field id="1" name="Name" type="string" default="empty">
         <optionalConform/>
-        <constraint type="max" value="8"/>
+        <constraint type="maxLength" value="8"/>
       </field>
       <field id="2" name="StackFreeCurrent" type="uint32" default="MS">
         <optionalConform/>
@@ -88,10 +89,11 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="ThreadMetrics" type="&lt;&lt;ref_DataTypeList&gt;&gt;[ThreadMetricsStruct]">
+    <attribute id="0x0000" name="ThreadMetrics" type="list">
+      <entry type="ThreadMetricsStruct"/>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="max" value="64"/>
+      <constraint type="maxCount" value="64"/>
     </attribute>
     <attribute id="0x0001" name="CurrentHeapFree" type="uint64">
       <access read="true" readPrivilege="view"/>
@@ -109,7 +111,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ResetWatermarks" response="Y">
+    <command id="0x00" name="ResetWatermarks" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="WTRMRK"/>
@@ -123,13 +125,13 @@ Davis, CA 95616, USA
       <field id="0" name="ID" type="uint64" default="0">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="empty">
+      <field id="1" name="Name" type="string" default="empty">
         <optionalConform/>
-        <constraint type="max" value="8"/>
+        <constraint type="maxLength" value="8"/>
       </field>
-      <field id="2" name="FaultRecording" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;" default="empty">
+      <field id="2" name="FaultRecording" type="octstr" default="empty">
         <optionalConform/>
-        <constraint type="max" value="1024"/>
+        <constraint type="maxLength" value="1024"/>
       </field>
     </event>
   </events>

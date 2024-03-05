@@ -89,7 +89,7 @@ Davis, CA 95616, USA
         </attribute>
       </attributes>
     </cluster>
-    <cluster id="0x005d" name="Dishwasher Alarm" side="server">
+    <cluster id="0x005D" name="Dishwasher Alarm" side="server">
       <optionalConform/>
     </cluster>
     <cluster id="0x0060" name="Operational State" side="server">

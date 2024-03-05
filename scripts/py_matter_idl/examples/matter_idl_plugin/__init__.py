@@ -56,7 +56,7 @@ def toEnumEntryName(enumEntry, enumName):
 def toProtobufType(zapType: str) -> str:
     """ Convert zap type to protobuf type """
     u32Types = [
-        "uint32", "enum8", "enum16", "enum32", "bitmap8",
+        "uint32", "enum8", "enum16", "bitmap8",
         "bitmap16", "bitmap32", "cluster_id", "attrib_id",
         "event_id", "command_id", "endpoint_no", "group_id",
         "devtype_id", "fabric_idx", "vendor_id", "status_code",

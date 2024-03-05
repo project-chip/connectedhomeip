@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,8 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label:
-          "Step 2: Test Harness Client reads Status attribute from Server DUT"
+    - label: "Step 2: Test Harness Client reads Status from server DUT"
       PICS: PS.S.A0000
       command: "readAttribute"
       attribute: "Status"
@@ -42,7 +41,7 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "Step 3: Test Harness Client reads Order attribute from Server DUT"
+    - label: "Step 3: Test Harness Client reads Order from server DUT"
       PICS: PS.S.A0001
       command: "readAttribute"
       attribute: "Order"
@@ -52,9 +51,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label:
-          "Step 4: Test Harness Client reads Description attribute from Server
-          DUT"
+    - label: "Step 4: Test Harness Client reads Order from server DUT"
       PICS: PS.S.A0002
       command: "readAttribute"
       attribute: "Description"
@@ -64,8 +61,8 @@ tests:
               maxLength: 60
 
     - label:
-          "Step 5: Test Harness Client reads WiredAssessedInputVoltage attribue
-          from Server DUT"
+          "Step 5: Test Harness Client reads WiredAssessedInputVoltage from
+          server DUT"
       PICS: PS.S.A0003
       command: "readAttribute"
       attribute: "WiredAssessedInputVoltage"
@@ -76,8 +73,8 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label:
-          "Step 6: Test Harness Client reads WiredAssessedInputFrequency
-          attribute from Server DUT"
+          "Step 6: Test Harness Client reads WiredAssessedInputFrequencyfrom
+          server DUT"
       PICS: PS.S.A0004
       command: "readAttribute"
       attribute: "WiredAssessedInputFrequency"
@@ -88,8 +85,7 @@ tests:
               maxValue: 65535
 
     - label:
-          "Step 7: Test Harness Client reads WiredCurrentType attribute from
-          Server DUT"
+          "Step 7: Test Harness Client reads WiredCurrentType from server DUT"
       PICS: PS.S.A0005
       command: "readAttribute"
       attribute: "WiredCurrentType"
@@ -100,8 +96,8 @@ tests:
               maxValue: 1
 
     - label:
-          "Step 8: Test Harness Client reads WiredAssessedCurrent attribute from
-          Server DUT"
+          "Step 8: Test Harness Client reads WiredAssessedCurrent from server
+          DUT"
       PICS: PS.S.A0006
       command: "readAttribute"
       attribute: "WiredAssessedCurrent"
@@ -112,7 +108,7 @@ tests:
               maxValue: 0xFFFFFFFF
 
     - label:
-          "Step 9: Test Harness Client reads WiredNominalVoltage from Server DUT"
+          "Step 9: Test Harness Client reads WiredNominalVoltage from server DUT"
       PICS: PS.S.A0007
       command: "readAttribute"
       attribute: "WiredNominalVoltage"

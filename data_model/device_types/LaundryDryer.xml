@@ -55,7 +55,7 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x007c" name="Laundry Dryer" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x007C" name="Laundry Dryer" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
@@ -73,10 +73,10 @@ Davis, CA 95616, USA
         </feature>
       </features>
     </cluster>
-    <cluster id="0x004a" name="Laundry Dryer Controls" side="server">
+    <cluster id="0x004A" name="Laundry Dryer Controls" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0051" name="Laundry Mode" side="server">
+    <cluster id="0x0051" name="Laundry Washer Mode" side="server">
       <optionalConform/>
       <features>
         <feature code="" name="OnOff">

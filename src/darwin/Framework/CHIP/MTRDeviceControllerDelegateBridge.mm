@@ -17,8 +17,10 @@
 
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceController.h"
+#import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricsCollector.h"
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
@@ -120,14 +122,25 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
     if (strongDelegate && mQueue && strongController) {
-        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)]) {
+
+        // Always collect the metrics to avoid unbounded growth of the stats in the collector
+        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshot:TRUE];
+
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
+            [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 NSNumber * nodeID = nil;
                 if (error == CHIP_NO_ERROR) {
                     nodeID = @(nodeId);
                 }
-                [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
+
+                // If the client implements the metrics delegate, prefer that over others
+                if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+                    [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
+                } else {
+                    [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
+                }
             });
             return;
         }

@@ -26,10 +26,7 @@ using namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
-//
-// Those types are defined as drafts in
-// src/app/zap-templates/zcl/data-model/draft/types/thermostat-user-interface-configuration.xml
-//
+
 enum class TemperatureDisplayMode : uint8_t
 {
     kCelsius    = 0x0,

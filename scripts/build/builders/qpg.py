@@ -23,6 +23,8 @@ class QpgApp(Enum):
     LOCK = auto()
     SHELL = auto()
     PERSISTENT_STORAGE = auto()
+    LIGHT_SWITCH = auto()
+    THERMOSTAT = auto()
 
     def ExampleName(self):
         if self == QpgApp.LIGHT:
@@ -33,6 +35,10 @@ class QpgApp(Enum):
             return 'shell'
         elif self == QpgApp.PERSISTENT_STORAGE:
             return 'persistent-storage'
+        elif self == QpgApp.LIGHT_SWITCH:
+            return 'light-switch-app'
+        elif self == QpgApp.THERMOSTAT:
+            return 'thermostat'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -45,6 +51,10 @@ class QpgApp(Enum):
             return 'chip-qpg6105-shell-example'
         elif self == QpgApp.PERSISTENT_STORAGE:
             return 'chip-qpg6105-persistent_storage-example'
+        elif self == QpgApp.LIGHT_SWITCH:
+            return 'chip-qpg6105-light-switch-example'
+        elif self == QpgApp.THERMOSTAT:
+            return 'chip-qpg6105-thermostat-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -57,6 +67,10 @@ class QpgApp(Enum):
             return 'shell_app.out.flashbundle.txt'
         elif self == QpgApp.PERSISTENT_STORAGE:
             return 'persistent_storage_app.out.flashbundle.txt'
+        elif self == QpgApp.LIGHT_SWITCH:
+            return 'light_switch_app.out.flashbundle.txt'
+        elif self == QpgApp.THERMOSTAT:
+            return 'thermostat.out.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 

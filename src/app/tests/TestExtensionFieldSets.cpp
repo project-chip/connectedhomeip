@@ -235,7 +235,7 @@ void TestSerializeDerializeExtensionFieldSet(nlTestSuite * aSuite, void * aConte
     // All ExtensionFieldSets serialize / deserialize
     writer.Init(sceneEFSBuffer);
     writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->Serialize(writer, TLV::ContextTag(TagTestEFS::kEFS)));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->Serialize(writer));
     writer.EndContainer(outer);
     sceneEFS_serialized_length = writer.GetLengthWritten();
     NL_TEST_ASSERT(aSuite, sceneEFS_serialized_length <= kPersistentSceneBufferMax);
@@ -243,7 +243,7 @@ void TestSerializeDerializeExtensionFieldSet(nlTestSuite * aSuite, void * aConte
     reader.Init(sceneEFSBuffer);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testSceneEFS.Deserialize(reader, TLV::ContextTag(TagTestEFS::kEFS)));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testSceneEFS.Deserialize(reader));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
     NL_TEST_ASSERT(aSuite, *EFS == testSceneEFS);

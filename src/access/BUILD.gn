@@ -14,16 +14,26 @@
 
 import("//build_overrides/chip.gni")
 
+source_set("types") {
+  sources = [
+    "AuthMode.h",
+    "Privilege.h",
+    "RequestPath.h",
+    "SubjectDescriptor.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
+  ]
+}
+
 static_library("access") {
   output_name = "libaccess"
 
   sources = [
     "AccessControl.cpp",
     "AccessControl.h",
-    "AuthMode.h",
-    "Privilege.h",
-    "RequestPath.h",
-    "SubjectDescriptor.h",
     "examples/ExampleAccessControlDelegate.cpp",
     "examples/ExampleAccessControlDelegate.h",
     "examples/PermissiveAccessControlDelegate.cpp",
@@ -33,7 +43,9 @@ static_library("access") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":types",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
   ]

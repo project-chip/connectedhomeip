@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the mandatory attribute: MinMeasuredValue"
+    - label: "Step 2: TH reads the MinMeasuredValue attribute from the DUT"
       PICS: TMP.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
@@ -42,7 +42,7 @@ tests:
               minValue: -27315
               maxValue: 32766
 
-    - label: "Step 3: Read the mandatory attribute: MaxMeasuredValue"
+    - label: "Step 3: TH reads the MaxMeasuredValue attribute from the DUT"
       PICS: TMP.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
@@ -53,7 +53,7 @@ tests:
               minValue: CurrentMinMeasured
               maxValue: 32767
 
-    - label: "Step 4: Read the mandatory attribute: MeasuredValue"
+    - label: "Step 4: TH reads the MeasuredValue attribute from the DUT"
       PICS: TMP.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -63,7 +63,7 @@ tests:
               minValue: CurrentMinMeasured
               maxValue: CurrentMaxMeasured
 
-    - label: "Step 6: Read the optional attribute: Tolerance"
+    - label: "Step 5: TH reads the Tolerance attribute from the DUT"
       PICS: TMP.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"

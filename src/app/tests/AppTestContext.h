@@ -26,14 +26,15 @@ namespace Test {
  */
 class AppContext : public LoopbackMessagingContext
 {
-    typedef LoopbackMessagingContext Super;
-
 public:
-    /// Initialize the underlying layers.
-    CHIP_ERROR Init() override;
-
-    // Shutdown all layers, finalize operations
-    void Shutdown() override;
+    // Performs shared setup for all tests in the test suite
+    CHIP_ERROR SetUpTestSuite() override;
+    // Performs shared teardown for all tests in the test suite
+    void TearDownTestSuite() override;
+    // Performs setup for each individual test in the test suite
+    CHIP_ERROR SetUp() override;
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override;
 };
 
 } // namespace Test

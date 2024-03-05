@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".matter.casting.DiscoveryExampleFragment">
+
+    <LinearLayout
+        android:id="@+id/castingPlayers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp"
+        android:padding="10sp">
+
+        <Button
+            android:enabled="false"
+            android:id="@+id/startDiscoveryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/matter_start_discovery_button_text" />
+
+        <Button
+            android:enabled="false"
+            android:id="@+id/stopDiscoveryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/matter_stop_discovery_button_text" />
+
+        <Button
+            android:id="@+id/clearDiscoveryResultsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/matter_clear_results_button_text" />
+
+        <TextView
+            android:id="@+id/matterDiscoveryMessageTextView"
+            android:text="string/matter_discovery_message_default_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        <ListView
+            android:id = "@+id/castingPlayerList"
+            android:layout_width = "match_parent"
+            android:layout_height = "wrap_content"
+            android:fadeScrollbars = "false" />
+    </LinearLayout>
+
+
+</FrameLayout>

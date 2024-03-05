@@ -20,19 +20,20 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/DataModelRevision.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
-#include <app/SpecificationVersion.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <cstddef>
 #include <cstring>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,6 +41,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BasicInformation;
 using namespace chip::app::Clusters::BasicInformation::Attributes;
 using namespace chip::DeviceLayer;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -311,7 +313,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
 CHIP_ERROR BasicAttrAccess::ReadDataModelRevision(AttributeValueEncoder & aEncoder)
 {
-    uint16_t revision = CHIP_DEVICE_DATA_MODEL_REVISION;
+    uint16_t revision = Revision::kDataModelRevision;
     return aEncoder.Encode(revision);
 }
 
@@ -396,7 +398,7 @@ CHIP_ERROR BasicAttrAccess::ReadProductAppearance(AttributeValueEncoder & aEncod
 
 CHIP_ERROR BasicAttrAccess::ReadSpecificationVersion(AttributeValueEncoder & aEncoder)
 {
-    uint32_t specification_version = CHIP_DEVICE_SPECIFICATION_VERSION;
+    uint32_t specification_version = Revision::kSpecificationVersion;
     return aEncoder.Encode(specification_version);
 }
 
@@ -410,6 +412,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
     void OnStartUp(uint32_t softwareVersion) override
     {
+        MATTER_TRACE_INSTANT("OnStartUp", "BasicInfo");
         // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
         ChipLogDetail(Zcl, "Emitting StartUp event");
 
@@ -429,6 +432,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 
     void OnShutDown() override
     {
+        MATTER_TRACE_INSTANT("OnShutDown", "BasicInfo");
         // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
         ChipLogDetail(Zcl, "Emitting ShutDown event");
 
@@ -460,9 +464,9 @@ namespace Clusters {
 namespace BasicInformation {
 bool IsLocalConfigDisabled()
 {
-    bool disabled        = false;
-    EmberAfStatus status = LocalConfigDisabled::Get(0, &disabled);
-    return status == EMBER_ZCL_STATUS_SUCCESS && disabled;
+    bool disabled = false;
+    Status status = LocalConfigDisabled::Get(0, &disabled);
+    return status == Status::Success && disabled;
 }
 } // namespace BasicInformation
 } // namespace Clusters

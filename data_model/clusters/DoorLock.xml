@@ -54,10 +54,12 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock" revision="7">
   <revisionHistory>
-    <revision revision="1" summary="mandatory global ClusterRevision attribute added; CCB 1811 1812 1821"/>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1811 1812 1821"/>
     <revision revision="2" summary="CCB 2430"/>
     <revision revision="3" summary="CCB 2629 2630"/>
     <revision revision="4" summary="All Hubs changes and added feature map"/>
@@ -65,15 +67,18 @@ Davis, CA 95616, USA
     <revision revision="6" summary="New data model format and notation. Added User features. General cleanup of functionality"/>
     <revision revision="7" summary="Added support for European door locks (unbolt feature)"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0101" name="Door Lock"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DRLK" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="PIN" name="PIN Credential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
+    <feature bit="0" code="PIN" name="PINCredential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="RID" name="RFID Credential" summary="Lock supports RFID credentials">
+    <feature bit="1" code="RID" name="RFIDCredential" summary="Lock supports RFID credentials">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="FGP" name="Finger Credentials" summary="Lock supports finger related credentials (fingerprint, finger vein)">
+    <feature bit="2" code="FGP" name="FingerCredentials" summary="Lock supports finger related credentials (fingerprint, finger vein)">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
@@ -82,19 +87,19 @@ Davis, CA 95616, USA
     <feature bit="3" code="LOG" name="Logging" summary="Lock supports local/on-lock logging when Events are not supported">
       <optionalConform/>
     </feature>
-    <feature bit="4" code="WDSCH" name="Week Day Access Schedules" summary="Lock supports week day user access schedules">
+    <feature bit="4" code="WDSCH" name="WeekDayAccessSchedules" summary="Lock supports week day user access schedules">
       <optionalConform/>
     </feature>
-    <feature bit="5" code="DPS" name="Door Position Sensor" summary="Lock supports a door position sensor that indicates door's state">
+    <feature bit="5" code="DPS" name="DoorPositionSensor" summary="Lock supports a door position sensor that indicates door's state">
       <optionalConform/>
     </feature>
-    <feature bit="6" code="FACE" name="Face Credentials" summary="Lock supports face related credentials (face, iris, retina)">
+    <feature bit="6" code="FACE" name="FaceCredentials" summary="Lock supports face related credentials (face, iris, retina)">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
       </otherwiseConform>
     </feature>
-    <feature bit="7" code="COTA" name="Credential Over-the-Air Access" summary="PIN codes over-the-air supported for lock/unlock operations">
+    <feature bit="7" code="COTA" name="CredentialOverTheAirAccess" summary="PIN codes over-the-air supported for lock/unlock operations">
       <optionalConform/>
     </feature>
     <feature bit="8" code="USR" name="User" summary="Lock supports the user commands and database">
@@ -110,10 +115,10 @@ Davis, CA 95616, USA
     <feature bit="9" code="NOT" name="Notification" summary="Operation and Programming Notifications">
       <optionalConform/>
     </feature>
-    <feature bit="10" code="YDSCH" name="Year Day Access Schedules" summary="Lock supports year day user access schedules">
+    <feature bit="10" code="YDSCH" name="YearDayAccessSchedules" summary="Lock supports year day user access schedules">
       <optionalConform/>
     </feature>
-    <feature bit="11" code="HDSCH" name="Holiday Schedules" summary="Lock supports holiday schedules">
+    <feature bit="11" code="HDSCH" name="HolidaySchedules" summary="Lock supports holiday schedules">
       <optionalConform/>
     </feature>
     <feature bit="12" code="UBOLT" name="Unbolting" summary="Lock supports unbolting">
@@ -121,7 +126,6 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <number name="PIN/RFID Code Format" type=""/>
     <enum name="AlarmCodeEnum">
       <item value="0" name="LockJammed" summary="Locking Mechanism Jammed">
         <mandatoryConform/>
@@ -214,14 +218,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="DoorLockStatus">
-      <item value="2" summary="Entry would cause a duplicate credential/ID.">
-        <mandatoryConform/>
-      </item>
-      <item value="3" summary="Entry would replace an occupied slot.">
-        <mandatoryConform/>
-      </item>
-    </enum>
     <enum name="DoorStateEnum">
       <item value="0" name="DoorOpen" summary="Door state is open">
         <mandatoryConform>
@@ -252,6 +248,45 @@ Davis, CA 95616, USA
         <optionalConform>
           <feature name="DPS"/>
         </optionalConform>
+      </item>
+    </enum>
+    <enum name="EventSourceEnum">
+      <item value="0" name="Keypad" summary="Event source is keypad">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Remote" summary="Event source is remote">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Manual" summary="Event source is manual">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="RFID" summary="Event source is RFID">
+        <mandatoryConform/>
+      </item>
+      <item value="255" name="Indeterminate" summary="Event source is unknown">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="EventTypeEnum">
+      <item value="0" name="Operation" summary="Event type is operation">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Programming" summary="Event type is programming">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Alarm" summary="Event type is alarm">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="LEDSettingEnum">
+      <item value="0" name="NoLEDSignal" summary="Never use LED for signalization">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="NoLEDSignalAccessAllowed" summary="Use LED signalization except for access allowed events">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="LEDSignalAll" summary="Use LED signalization for all events">
+        <mandatoryConform/>
       </item>
     </enum>
     <enum name="LockDataTypeEnum">
@@ -322,6 +357,58 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="LockStateEnum">
+      <item value="0" name="NotFullyLocked" summary="Lock state is not fully locked">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Locked" summary="Lock state is fully locked">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Unlocked" summary="Lock state is fully unlocked">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Unlatched" summary="Lock state is fully unlocked and the latch is pulled">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="LockTypeEnum">
+      <item value="0" name="DeadBolt" summary="Physical lock type is dead bolt">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Magnetic" summary="Physical lock type is magnetic">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Other" summary="Physical lock type is other">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Mortise" summary="Physical lock type is mortise">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Rim" summary="Physical lock type is rim">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="LatchBolt" summary="Physical lock type is latch bolt">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="CylindricalLock" summary="Physical lock type is cylindrical lock">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="TubularLock" summary="Physical lock type is tubular lock">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="InterconnectedLock" summary="Physical lock type is interconnected lock">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="DeadLatch" summary="Physical lock type is dead latch">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="DoorFurniture" summary="Physical lock type is door furniture">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="Eurocylinder" summary="Physical lock type is euro cylinder">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="OperatingModeEnum">
       <item value="0" name="Normal">
         <mandatoryConform/>
@@ -370,7 +457,7 @@ Davis, CA 95616, USA
       <item value="1" name="Manual" summary="Lock/unlock operation came from manual operation (key, thumbturn, handle, etc).">
         <optionalConform/>
       </item>
-      <item value="2" name="ProprietaryRemote" summary="Lock/unlock operation came from prioretary remote source (e.g. vendor app/cloud)">
+      <item value="2" name="ProprietaryRemote" summary="Lock/unlock operation came from proprietary remote source (e.g. vendor app/cloud)">
         <optionalConform/>
       </item>
       <item value="3" name="Keypad" summary="Lock/unlock operation came from keypad">
@@ -401,49 +488,64 @@ Davis, CA 95616, USA
         </optionalConform>
       </item>
     </enum>
+    <enum name="SoundVolumeEnum">
+      <item value="0" name="Silent" summary="Silent Mode">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Low" summary="Low Volume">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="High" summary="High Volume">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Medium" summary="Medium Volume">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="Status Codes" type="status"/>
     <enum name="UserStatusEnum">
-      <item value="0" name="Available">
+      <item value="0" name="Available" summary="The user ID is available">
         <mandatoryConform/>
       </item>
-      <item value="1" name="OccupiedEnabled">
+      <item value="1" name="OccupiedEnabled" summary="The user ID is occupied and enabled">
         <mandatoryConform/>
       </item>
-      <item value="3" name="OccupiedDisabled">
+      <item value="3" name="OccupiedDisabled" summary="The user ID is occupied and disabled">
         <optionalConform/>
       </item>
     </enum>
     <enum name="UserTypeEnum">
-      <item value="0" name="UnrestrictedUser">
+      <item value="0" name="UnrestrictedUser" summary="The user ID type is unrestricted">
         <mandatoryConform/>
       </item>
-      <item value="1" name="YearDayScheduleUser">
+      <item value="1" name="YearDayScheduleUser" summary="The user ID type is schedule">
         <optionalConform/>
       </item>
-      <item value="2" name="WeekDayScheduleUser">
+      <item value="2" name="WeekDayScheduleUser" summary="The user ID type is schedule">
         <optionalConform/>
       </item>
-      <item value="3" name="ProgrammingUser">
+      <item value="3" name="ProgrammingUser" summary="The user ID type is programming">
         <optionalConform/>
       </item>
-      <item value="4" name="NonAccessUser">
+      <item value="4" name="NonAccessUser" summary="The user ID type is non access">
         <optionalConform/>
       </item>
-      <item value="5" name="ForcedUser">
+      <item value="5" name="ForcedUser" summary="The user ID type is forced">
         <optionalConform>
           <feature name="USR"/>
         </optionalConform>
       </item>
-      <item value="6" name="DisposableUser">
+      <item value="6" name="DisposableUser" summary="The user ID type is disposable">
         <optionalConform>
           <feature name="USR"/>
         </optionalConform>
       </item>
-      <item value="7" name="ExpiringUser">
+      <item value="7" name="ExpiringUser" summary="The user ID type is expiring">
         <optionalConform>
           <feature name="USR"/>
         </optionalConform>
       </item>
-      <item value="8" name="ScheduleRestrictedUser">
+      <item value="8" name="ScheduleRestrictedUser" summary="The user ID type is schedule restricted">
         <mandatoryConform>
           <orTerm>
             <feature name="WDSCH"/>
@@ -451,7 +553,7 @@ Davis, CA 95616, USA
           </orTerm>
         </mandatoryConform>
       </item>
-      <item value="9" name="RemoteOnlyUser">
+      <item value="9" name="RemoteOnlyUser" summary="The user ID type is remote only">
         <mandatoryConform>
           <andTerm>
             <feature name="USR"/>
@@ -461,100 +563,186 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </item>
     </enum>
-    <bitmap name="DaysMaskMap">
-      <bitfield name="Sunday" bit="0">
+    <bitmap name="AlarmMaskBitmap">
+      <bitfield name="LockJammed" bit="0" summary="Locking Mechanism Jammed">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Monday" bit="1">
+      <bitfield name="LockFactoryReset" bit="1" summary="Lock Reset to Factory Defaults">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="N" bit="2" summary="Reserved">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="LockRadioPowerCycled" bit="3" summary="RF Module Power Cycled">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="WrongCodeEntryLimit" bit="4" summary="Tamper Alarm - wrong code entry limit">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="PIN"/>
+            <feature name="RID"/>
+          </orTerm>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="FrontEscutcheonRemoved" bit="5" summary="Tamper Alarm - front escutcheon removed from main">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="DoorForcedOpen" bit="6" summary="Forced Door Open under Door Locked Condition">
+        <optionalConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="ConfigurationRegisterBitmap">
+      <bitfield name="LocalProgramming" bit="0" summary="The state of local programming functionality">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Tuesday" bit="2">
+      <bitfield name="KeypadInterface" bit="1" summary="The state of the keypad interface">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Wednesday" bit="3">
+      <bitfield name="RemoteInterface" bit="2" summary="The state of the remote interface">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Thursday" bit="4">
+      <bitfield name="SoundVolume" bit="5" summary="Sound volume is set to Silent value">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Friday" bit="5">
+      <bitfield name="AutoRelockTime" bit="6" summary="Auto relock time it set to 0">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Saturday" bit="6">
+      <bitfield name="LEDSettings" bit="7" summary="LEDs is disabled">
         <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="CredentialRulesBitmap">
+      <bitfield name="Single" bit="0" summary="Only one credential is required for lock operation">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Dual" bit="1" summary="Any two credentials are required for lock operation">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Tri" bit="2" summary="Any three credentials are required for lock operation">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="DaysMaskBitmap">
+      <bitfield name="Sunday" bit="0" summary="Schedule is applied on Sunday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Monday" bit="1" summary="Schedule is applied on Monday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Tuesday" bit="2" summary="Schedule is applied on Tuesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Wednesday" bit="3" summary="Schedule is applied on Wednesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Thursday" bit="4" summary="Schedule is applied on Thursday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Friday" bit="5" summary="Schedule is applied on Friday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Saturday" bit="6" summary="Schedule is applied on Saturday">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="EventMaskBitmap">
+      <bitfield name="Bit0" bit="0" summary="State of bit 0">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit1" bit="1" summary="State of bit 1">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit2" bit="2" summary="State of bit 2">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit3" bit="3" summary="State of bit 3">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit4" bit="4" summary="State of bit 4">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit5" bit="5" summary="State of bit 5">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit6" bit="6" summary="State of bit 6">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit7" bit="7" summary="State of bit 7">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit8" bit="8" summary="State of bit 8">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit9" bit="9" summary="State of bit 9">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit10" bit="10" summary="State of bit 10">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit11" bit="11" summary="State of bit 11">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit12" bit="12" summary="State of bit 12">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit13" bit="13" summary="State of bit 13">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit14" bit="14" summary="State of bit 14">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Bit15" bit="15" summary="State of bit 15">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="LocalProgrammingFeaturesBitmap">
+      <bitfield name="AddUsersCredentialsSchedules" bit="0" summary="The state of the ability to add users, credentials or schedules on the device">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ModifyUsersCredentialsSchedules" bit="1" summary="The state of the ability to modify users, credentials or schedules on the device">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ClearUsersCredentialsSchedules" bit="2" summary="The state of the ability to clear users, credentials or schedules on the device">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AdjustSettings" bit="3" summary="The state of the ability to adjust settings on the device">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="OperatingModesBitmap">
+      <bitfield name="Normal" bit="0" summary="Normal operation mode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Vacation" bit="1" summary="Vacation operation mode">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="Privacy" bit="2" summary="Privacy operation mode">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="NoRemoteLockUnlock" bit="3" summary="No remote lock and unlock operation mode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Passage" bit="4" summary="Passage operation mode">
+        <optionalConform/>
       </bitfield>
     </bitmap>
     <struct name="CredentialStruct">
       <field id="0" name="CredentialType" type="CredentialTypeEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="CredentialIndex" type="uint16" default="0">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="LockState" type="enum8">
-      <enum>
-        <item value="0" name="Not Fully Locked" summary="Lock state is not fully locked">
-          <mandatoryConform/>
-        </item>
-        <item value="1" name="Locked" summary="Lock state is fully locked">
-          <mandatoryConform/>
-        </item>
-        <item value="2" name="Unlocked" summary="Lock state is fully unlocked">
-          <mandatoryConform/>
-        </item>
-        <item value="3" name="Unlatched" summary="Lock state is fully unlocked and the latch is pulled">
-          <optionalConform/>
-        </item>
-      </enum>
+    <attribute id="0x0000" name="LockState" type="LockStateEnum">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0001" name="LockType" type="enum8">
-      <enum>
-        <item value="0" name="Dead bolt" summary="Physical lock type is dead bolt">
-          <mandatoryConform/>
-        </item>
-        <item value="1" name="Magnetic" summary="Physical lock type is magnetic">
-          <mandatoryConform/>
-        </item>
-        <item value="2" name="Other" summary="Physical lock type is other">
-          <mandatoryConform/>
-        </item>
-        <item value="3" name="Mortise" summary="Physical lock type is mortise">
-          <mandatoryConform/>
-        </item>
-        <item value="4" name="Rim" summary="Physical lock type is rim">
-          <mandatoryConform/>
-        </item>
-        <item value="5" name="Latch Bolt" summary="Physical lock type is latch bolt">
-          <mandatoryConform/>
-        </item>
-        <item value="6" name="Cylindrical Lock" summary="Physical lock type is cylindrical lock">
-          <mandatoryConform/>
-        </item>
-        <item value="7" name="Tubular Lock" summary="Physical lock type is tubular lock">
-          <mandatoryConform/>
-        </item>
-        <item value="8" name="Interconnected Lock" summary="Physical lock type is interconnected lock">
-          <mandatoryConform/>
-        </item>
-        <item value="9" name="Dead Latch" summary="Physical lock type is dead latch">
-          <mandatoryConform/>
-        </item>
-        <item value="10" name="Door Furniture" summary="Physical lock type is door furniture">
-          <mandatoryConform/>
-        </item>
-        <item value="11" name="Eurocylinder" summary="Physical lock type is eurocylinder">
-          <mandatoryConform/>
-        </item>
-      </enum>
+    <attribute id="0x0001" name="LockType" type="LockTypeEnum">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint type="desc"/>
@@ -563,7 +751,7 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0003" name="DoorState" type="enum8">
+    <attribute id="0x0003" name="DoorState" type="DoorStateEnum">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true"/>
       <mandatoryConform>
@@ -659,32 +847,21 @@ Davis, CA 95616, USA
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001a" name="MinRFIDCodeLength" type="uint8" default="MS">
+    <attribute id="0x001A" name="MinRFIDCodeLength" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001b" name="CredentialRulesSupport" type="map8" default="1">
-      <bitmap>
-        <bitfield name="Single" bit="0" summary="Only one credential is required for lock operation">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Dual" bit="1" summary="Any two credentials are required for lock operation">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Tri" bit="2" summary="Any three credentials are required for lock operation">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x001B" name="CredentialRulesSupport" type="CredentialRulesBitmap" default="1">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001c" name="NumberOfCredentialsSupportedPerUser" type="uint8" default="0">
+    <attribute id="0x001C" name="NumberOfCredentialsSupportedPerUser" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
@@ -704,87 +881,33 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint type="maxLength" value="3"/>
     </attribute>
-    <attribute id="0x0022" name="LEDSettings" type="uint8" default="0">
+    <attribute id="0x0022" name="LEDSettings" type="LEDSettingEnum" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
-      <constraint type="desc"/>
     </attribute>
     <attribute id="0x0023" name="AutoRelockTime" type="uint32" default="MS">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0024" name="SoundVolume" type="uint8" default="0">
+    <attribute id="0x0024" name="SoundVolume" type="SoundVolumeEnum" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
-      <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0025" name="OperatingMode" type="enum8" default="0">
+    <attribute id="0x0025" name="OperatingMode" type="OperatingModeEnum" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0026" name="SupportedOperatingModes" type="map16" default="0xFFF6">
-      <bitmap>
-        <bitfield name="Normal" bit="0">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Vacation" bit="1">
-          <optionalConform/>
-        </bitfield>
-        <bitfield name="Privacy" bit="2">
-          <optionalConform/>
-        </bitfield>
-        <bitfield name="NoRemoteLockUnlock" bit="3">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Passage" bit="4">
-          <optionalConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0026" name="SupportedOperatingModes" type="OperatingModesBitmap" default="0xFFF6">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0027" name="DefaultConfigurationRegister" type="map16" default="0">
-      <bitmap>
-        <bitfield name="Local Programming" bit="0" summary="0 - Enable Local Programming Attribute default value is 0 (disabled)
-
-1 - Enable Local Programming Attribute default value is 1 (enabled)">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Keypad Interface" bit="1" summary="0 –Keypad Interface default access is disabled
-
-1 - Keypad Interface default access is enabled">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Remote Interface" bit="2" summary="0 - Remote Interface default access is disabled
-
-1 - Remote Interface default access is enabled">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Sound Volume" bit="5" summary="0 – Sound Volume attribute default value is 0 (Silent Mode)
-
-1 – Sound Volume attribute default value is equal to something other
-than 0">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Auto Relock" bit="6" summary="0 – Auto Relock Time attribute default value = 0
-
-1 – Auto Relock Time attribute default value is equal to something other
-than 0">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="LED Settings" bit="7" summary="0 – LED Settings attribute default value = 0
-
-1 – LED Settings attribute default value is equal to something other
-than 0">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0027" name="DefaultConfigurationRegister" type="ConfigurationRegisterBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
@@ -799,39 +922,17 @@ than 0">
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x002a" name="EnableInsideStatusLED" type="bool" default="0">
+    <attribute id="0x002A" name="EnableInsideStatusLED" type="bool" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x002b" name="EnablePrivacyModeButton" type="bool" default="0">
+    <attribute id="0x002B" name="EnablePrivacyModeButton" type="bool" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x002c" name="LocalProgrammingFeatures" type="map8" default="0">
-      <bitmap>
-        <bitfield name="Add Locally" bit="0" summary="0 - The ability to add Users/credentials/Schedules locally is disabled
-
-1 - The ability to add Users/Credentials/Schedules locally is enabled">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Modify Locally" bit="1" summary="0 - The ability to modify Users/credentials/Schedules locally is disabled
-
-1 - The ability to modify Users/Credentials/Schedules locally is enabled">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Clear Locally" bit="2" summary="0 - The ability to clear Users/credentials/Schedules locally is disabled
-
-1 - The ability to clear Users/Credentials/Schedules locally is enabled">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Adjust Locally" bit="3" summary="0 - The ability to adjust lock settings locally is disabled
-
-1 - The ability to adjust lock settings locally is enabled">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x002C" name="LocalProgrammingFeatures" type="LocalProgrammingFeaturesBitmap" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
@@ -891,66 +992,12 @@ than 0">
       </optionalConform>
       <constraint type="between" from="1" to="2880"/>
     </attribute>
-    <attribute id="0x0040" name="AlarmMask" type="map16" default="0xFFFF">
-      <bitmap>
-        <bitfield name="Alarm Code 0" bit="0" summary="Locking Mechanism Jammed">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Alarm Code 1" bit="1" summary="Lock Reset to Factory Defaults">
-          <optionalConform/>
-        </bitfield>
-        <bitfield name="Alarm Code 2" bit="2" summary="Reserved">
-          <optionalConform/>
-        </bitfield>
-        <bitfield name="Alarm Code 3" bit="3" summary="RF Module Power Cycled">
-          <optionalConform/>
-        </bitfield>
-        <bitfield name="Alarm Code 4" bit="4" summary="Tamper Alarm - wrong code entry limit">
-          <mandatoryConform>
-            <orTerm>
-              <feature name="PIN"/>
-              <feature name="RID"/>
-            </orTerm>
-          </mandatoryConform>
-        </bitfield>
-        <bitfield name="Alarm Code 5" bit="5" summary="Tamper Alarm - front escutcheon removed from main">
-          <optionalConform/>
-        </bitfield>
-        <bitfield name="Alarm Code 6" bit="6" summary="Forced Door Open under Door Locked Condition">
-          <optionalConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0040" name="AlarmMask" type="AlarmMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0041" name="KeypadOperationEventMask" type="map16" default="0xFFFF">
-      <bitmap>
-        <bitfield name="Operation Event Code 0" bit="0" summary="Unknown or manufacturer-specific keypad operation event">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 1" bit="1" summary="Lock, source: keypad">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 2" bit="2" summary="Unlock, source: keypad">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 3" bit="3" summary="Lock, source: keypad, error: invalid PIN">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 4" bit="4" summary="Lock, source: keypad, error: invalid schedule">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 5" bit="5" summary="Unlock, source: keypad, error: invalid code">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 6" bit="6" summary="Unlock, source: keypad, error: invalid schedule">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 15" bit="7" summary="Non-Access User operation event, source keypad.">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0041" name="KeypadOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform>
@@ -960,102 +1007,21 @@ than 0">
         </andTerm>
       </optionalConform>
     </attribute>
-    <attribute id="0x0042" name="RemoteOperationEventMask" type="map16" default="0xFFFF">
-      <bitmap>
-        <bitfield name="Operation Event Code 0" bit="0" summary="Unknown or manufacturer-specific remote operation event">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 1" bit="1" summary="Lock, source: remote">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 2" bit="2" summary="Unlock, source: remote">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 3" bit="3" summary="Lock, source: remote, error: invalid code">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 4" bit="4" summary="Lock, source: remote, error: invalid schedule">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 5" bit="5" summary="Unlock, source: remote, error: invalid code">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 6" bit="6" summary="Unlock, source: remote, error: invalid schedule">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0042" name="RemoteOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform>
         <feature name="NOT"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x0043" name="ManualOperationEventMask" type="map16" default="0xFFFF">
-      <bitmap>
-        <bitfield name="Operation Even Code 0" bit="0" summary="Unknown or manufacturer-specific manual operation event">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 1" bit="1" summary="Thumbturn Lock">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 2" bit="2" summary="Thumbturn Unlock">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 7" bit="3" summary="One touch lock">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 8" bit="4" summary="Key Lock">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 9" bit="5" summary="Key Unlock">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 10" bit="6" summary="Auto lock">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 11" bit="7" summary="Schedule Lock">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 12" bit="8" summary="Schedule Unlock">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 13" bit="9" summary="Manual Lock (Key or Thumbturn)">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Even Code 14" bit="10" summary="Manual Unlock (Key or Thumbturn)">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0043" name="ManualOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform>
         <feature name="NOT"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x0044" name="RFIDOperationEventMask" type="map16" default="0xFFFF">
-      <bitmap>
-        <bitfield name="Operation Event Code 0" bit="0" summary="Unknown or manufacturer-specific keypad operation event">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 1" bit="1" summary="Lock, source: RFID">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 2" bit="2" summary="Unlock, source: RFID">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 3" bit="3" summary="Lock, source: RFID, error: invalid RFID ID">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 4" bit="4" summary="Lock, source: RFID, error: invalid schedule">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 5" bit="5" summary="Unlock, source: RFID, error: invalid RFID ID">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Operation Event Code 6" bit="6" summary="Unlock, source: RFID, error: invalid schedule">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0044" name="RFIDOperationEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform>
@@ -1065,58 +1031,7 @@ than 0">
         </andTerm>
       </optionalConform>
     </attribute>
-    <attribute id="0x0045" name="KeypadProgrammingEventMask" type="map16" default="0xFFFF">
-      <bitmap>
-        <bitfield name="Program Event Code 0" bit="0" summary="Unknown or manufacturer-specific keypad programming event">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 1" bit="1" summary="Programming PIN code changed, source: keypad
-
-User ID: programming user ID.
-
-PIN: default or programming PIN code if codes can be sent over the air per attribute.
-
-User type: default
-
-User Status: default">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 2" bit="2" summary="PIN added, source: keypad
-
-User ID: user ID that was added.
-
-PIN: code that was added (if codes can be sent over the air per attribute.)
-
-User type: default or type added.
-
-User Status: default or status added.">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 3" bit="3" summary="PIN cleared, source: keypad
-
-User ID: user ID that was cleared.
-
-PIN: code that was cleared (if codes can be sent over the air per attribute.)
-
-User type: default or type cleared.
-
-User Status: default or status cleared.">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 4" bit="4" summary="PIN changed
-
-Source: keypad
-
-User ID: user ID that was changed
-
-PIN: code that was changed (if codes can be sent over the air per attribute.)
-
-User type: default or type changed.
-
-User Status: default or status changed.">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0045" name="KeypadProgrammingEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform>
@@ -1126,69 +1041,14 @@ User Status: default or status changed.">
         </andTerm>
       </optionalConform>
     </attribute>
-    <attribute id="0x0046" name="RemoteProgrammingEventMask" type="map16" default="0xFFFF">
-      <bitmap>
-        <bitfield name="Program Event Code 0" bit="0" summary="Unknown or manufacturer-specific remote programming event.">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 2" bit="2" summary="PIN added, source remote
-
-Same as keypad source above">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 3" bit="3" summary="PIN cleared, source remote
-
-Same as keypad source above.">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 4" bit="4" summary="PIN changed
-
-Source remote
-
-Same as keypad source above">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 5" bit="5" summary="RFID code added, Source remote">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 6" bit="6" summary="RFID code cleared, Source remote">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0046" name="RemoteProgrammingEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform>
         <feature name="NOT"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x0047" name="RFIDProgrammingEventMask" type="map16" default="0xFFFF">
-      <bitmap>
-        <bitfield name="Program Event Code 0" bit="0" summary="Unknown or manufacturer-specific keypad programming event">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 5" bit="5" summary="ID Added, Source: RFID
-
-User ID: user ID that was added.
-
-ID: ID that was added (if codes can be sent over the air per attribute.)
-
-User Type: default or type added.
-
-User Status: default or status added.">
-          <mandatoryConform/>
-        </bitfield>
-        <bitfield name="Program Event Code 6" bit="6" summary="ID cleared, Source: RFID
-
-User ID: user ID that was cleared.
-
-ID: ID that was cleared (if codes can be sent over the air per attribute.)
-
-User Type: default or type cleared.
-
-User Status: default or status cleared.">
-          <mandatoryConform/>
-        </bitfield>
-      </bitmap>
+    <attribute id="0x0047" name="RFIDProgrammingEventMask" type="EventMaskBitmap" default="0xFFFF">
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform>
@@ -1200,12 +1060,10 @@ User Status: default or status cleared.">
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Lock Door" response="Y">
+    <command id="0x00" name="LockDoor" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="PINCode
-
-        PIN/RFID Code&amp;#8224;" type="octets">
+      <field id="0" name="PINCode" type="octstr">
         <optionalConform>
           <andTerm>
             <feature name="COTA"/>
@@ -1214,12 +1072,10 @@ User Status: default or status cleared.">
         </optionalConform>
       </field>
     </command>
-    <command id="0x01" name="Unlock Door" response="Y">
+    <command id="0x01" name="UnlockDoor" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="PINCode
-
-        PIN/RFID Code&amp;#8224;" type="octets">
+      <field id="0" name="PINCode" type="octstr">
         <optionalConform>
           <andTerm>
             <feature name="COTA"/>
@@ -1228,19 +1084,17 @@ User Status: default or status cleared.">
         </optionalConform>
       </field>
     </command>
-    <command id="0x02" name="Toggle" response="Y">
+    <command id="0x02" name="Toggle" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <disallowConform/>
     </command>
-    <command id="0x03" name="Unlock with Timeout" response="Y">
+    <command id="0x03" name="UnlockWithTimeout" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <optionalConform/>
       <field id="0" name="Timeout" type="uint16">
         <mandatoryConform/>
       </field>
-      <field id="1" name="PINCode
-
-        PIN/RFID Code&amp;#8224;" type="octets">
+      <field id="1" name="PINCode" type="octstr">
         <optionalConform>
           <andTerm>
             <feature name="COTA"/>
@@ -1249,60 +1103,46 @@ User Status: default or status cleared.">
         </optionalConform>
       </field>
     </command>
-    <command id="0x04" name="Get Log Record" response="Get Log Record Response">
+    <command id="0x04" name="GetLogRecord" direction="commandToServer" response="GetLogRecordResponse">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="LOG"/>
       </mandatoryConform>
-      <field id="0" name="Log Index" type="uint16">
+      <field id="0" name="LogIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x04" name="Get Log Record Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x04" name="GetLogRecordResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="LOG"/>
       </mandatoryConform>
-      <field id="0" name="Log Entry ID" type="uint16">
+      <field id="0" name="LogEntryID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="Timestamp" type="epoch-s">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Event Type" type="enum8">
-        <enum>
-          <item value="0" name="Operation">
-            <mandatoryConform/>
-          </item>
-          <item value="1" name="Programming">
-            <mandatoryConform/>
-          </item>
-          <item value="2" name="Alarm">
-            <mandatoryConform/>
-          </item>
-        </enum>
+      <field id="2" name="EventType" type="EventTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Source" type="EventSourceEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="EventID" type="uint8">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="3" name="Source" type="uint8">
+      <field id="5" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="4" name="Event ID/Alarm Code" type="uint8">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="5" name="User ID" type="uint16">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="6" name="PIN" type="octets">
+      <field id="6" name="PIN" type="octstr">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x05" name="Set PIN Code" response="Y">
+    <command id="0x05" name="SetPINCode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1312,25 +1152,24 @@ User Status: default or status cleared.">
           <feature name="PIN"/>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="User Status" type="uint8" default="OccupiedEnabled">
+      <field id="1" name="UserStatus" type="UserStatusEnum" default="OccupiedEnabled">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="UserStatusEnum"/>
+        <constraint type="desc"/>
       </field>
-      <field id="2" name="User Type" type="enum8" default="UnrestrictedUser">
+      <field id="2" name="UserType" type="UserTypeEnum" default="UnrestrictedUser">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="UserTypeEnum"/>
       </field>
-      <field id="3" name="PIN" type="octets">
+      <field id="3" name="PIN" type="octstr">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x06" name="Get PIN Code" response="Get PIN Code Response">
+    <command id="0x06" name="GetPINCode" direction="commandToServer" response="GetPINCodeResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1340,13 +1179,12 @@ User Status: default or status cleared.">
           <feature name="PIN"/>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x06" name="Get PIN Code Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x06" name="GetPINCodeResponse" direction="responseFromServer">
       <mandatoryConform>
         <andTerm>
           <notTerm>
@@ -1355,26 +1193,26 @@ User Status: default or status cleared.">
           <feature name="PIN"/>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="User Status" type="uint8" default="Available">
+      <field id="1" name="UserStatus" type="UserStatusEnum" default="Available">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="UserStatusEnum"/>
+        <constraint type="desc"/>
       </field>
-      <field id="2" name="User Type" type="enum8">
+      <field id="2" name="UserType" type="UserTypeEnum">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="UserTypeEnum"/>
+        <constraint type="desc"/>
       </field>
-      <field id="3" name="PIN Code" type="octets" default="empty">
+      <field id="3" name="PINCode" type="octstr" default="empty">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x07" name="Clear PIN Code" response="Y">
+    <command id="0x07" name="ClearPINCode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1384,15 +1222,13 @@ User Status: default or status cleared.">
           <feature name="PIN"/>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="PINSlotIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="0" name="PINSlotIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfPINUsersSupported"/>
         <constraint type="allowed" value="0xFFFE"/>
       </field>
     </command>
-    <command id="0x08" name="Clear All PIN Codes" response="Y">
+    <command id="0x08" name="ClearAllPINCodes" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1403,7 +1239,7 @@ User Status: default or status cleared.">
         </andTerm>
       </mandatoryConform>
     </command>
-    <command id="0x09" name="Set User Status" response="Y">
+    <command id="0x09" name="SetUserStatus" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1417,16 +1253,16 @@ User Status: default or status cleared.">
           </orTerm>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="User Status" type="uint8">
+      <field id="1" name="UserStatus" type="UserStatusEnum">
         <mandatoryConform/>
-        <constraint type="allowed" value="UserStatusEnum"/>
+        <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x0a" name="Get User Status" response="Get User Status Response">
+    <command id="0x0A" name="GetUserStatus" direction="commandToServer" response="GetUserStatusResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1440,45 +1276,39 @@ User Status: default or status cleared.">
           </orTerm>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x0a" name="Get User Status Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x0A" name="GetUserStatusResponse" direction="responseFromServer">
       <mandatoryConform>
         <notTerm>
           <feature name="USR"/>
         </notTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="User Status" type="enum8">
+      <field id="1" name="UserStatus" type="UserStatusEnum">
         <mandatoryConform/>
-        <constraint type="allowed" value="UserStatusEnum"/>
       </field>
     </command>
-    <command id="0x0b" name="Set Week Day Schedule" response="Y">
+    <command id="0x0B" name="SetWeekDaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
       </mandatoryConform>
-      <field id="0" name="WeekDayIndex
-
-        Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="WeekDayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfWeekDaySchedulesSupportedPerUser"/>
       </field>
-      <field id="1" name="UserIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
-      <field id="2" name="DaysMask" type="DaysMaskMap">
+      <field id="2" name="DaysMask" type="DaysMaskBitmap">
         <mandatoryConform/>
       </field>
       <field id="3" name="StartHour" type="uint8">
@@ -1498,38 +1328,29 @@ User Status: default or status cleared.">
         <constraint type="between" from="0" to="59"/>
       </field>
     </command>
-    <command id="0x0c" name="Get Week Day Schedule" response="Get Week Day Schedule Response">
+    <command id="0x0C" name="GetWeekDaySchedule" direction="commandToServer" response="GetWeekDayScheduleResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
       </mandatoryConform>
-      <field id="0" name="WeekDayIndex
-
-        Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="WeekDayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfWeekDaySchedulesSupportedPerUser"/>
       </field>
-      <field id="1" name="UserIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x0c" name="Get Week Day Schedule Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x0C" name="GetWeekDayScheduleResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="WDSCH"/>
       </mandatoryConform>
-      <field id="0" name="WeekDayIndex
-
-        Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="WeekDayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfWeekDaySchedulesSupportedPerUser"/>
       </field>
-      <field id="1" name="UserIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
@@ -1537,7 +1358,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="3" name="DaysMask" type="DaysMaskMap">
+      <field id="3" name="DaysMask" type="DaysMaskBitmap">
         <optionalConform/>
       </field>
       <field id="4" name="StartHour" type="uint8">
@@ -1557,39 +1378,31 @@ User Status: default or status cleared.">
         <constraint type="between" from="0" to="59"/>
       </field>
     </command>
-    <command id="0x0d" name="Clear Week Day Schedule" response="Y">
+    <command id="0x0D" name="ClearWeekDaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
       </mandatoryConform>
-      <field id="0" name="WeekDayIndex
-
-        Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="WeekDayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfWeekDaySchedulesSupportedPerUser"/>
         <constraint type="allowed" value="0xFE"/>
       </field>
-      <field id="1" name="UserIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x0e" name="Set Year Day Schedule" response="Y">
+    <command id="0x0E" name="SetYearDaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
       </mandatoryConform>
-      <field id="0" name="YearDayIndex
-
-        Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="YearDayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfYearDaySchedulesSupportedPerUser"/>
       </field>
-      <field id="1" name="UserIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
@@ -1600,38 +1413,29 @@ User Status: default or status cleared.">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0f" name="Get Year Day Schedule" response="Get Year Day Schedule Response">
+    <command id="0x0F" name="GetYearDaySchedule" direction="commandToServer" response="GetYearDayScheduleResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
       </mandatoryConform>
-      <field id="0" name="YearDayIndex
-
-        Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="YearDayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfYearDaySchedulesSupportedPerUser"/>
       </field>
-      <field id="1" name="UserIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x0f" name="Get Year Day Schedule Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x0F" name="GetYearDayScheduleResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="YDSCH"/>
       </mandatoryConform>
-      <field id="0" name="YearDayIndex
-
-        Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="YearDayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfYearDaySchedulesSupportedPerUser"/>
       </field>
-      <field id="1" name="UserIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
@@ -1646,33 +1450,27 @@ User Status: default or status cleared.">
         <optionalConform/>
       </field>
     </command>
-    <command id="0x10" name="Clear Year Day Schedule" response="Y">
+    <command id="0x10" name="ClearYearDaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
       </mandatoryConform>
-      <field id="0" name="YearDayIndex
-
-        Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="YearDayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfYearDaySchedulesSupportedPerUser"/>
         <constraint type="allowed" value="0xFE"/>
       </field>
-      <field id="1" name="UserIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="1" name="UserIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x11" name="Set Holiday Schedule" response="Y">
+    <command id="0x11" name="SetHolidaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="HDSCH"/>
       </mandatoryConform>
-      <field id="0" name="HolidayIndex
-
-        Holiday Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="HolidayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfHolidaySchedulesSupported"/>
       </field>
@@ -1686,26 +1484,21 @@ User Status: default or status cleared.">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x12" name="Get Holiday Schedule" response="Get Holiday Schedule Response">
+    <command id="0x12" name="GetHolidaySchedule" direction="commandToServer" response="GetHolidayScheduleResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="HDSCH"/>
       </mandatoryConform>
-      <field id="0" name="HolidayIndex
-
-        Holiday Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="HolidayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfHolidaySchedulesSupported"/>
       </field>
     </command>
-    <command id="0x12" name="Get Holiday Schedule Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x12" name="GetHolidayScheduleResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="HDSCH"/>
       </mandatoryConform>
-      <field id="0" name="HolidayIndex
-
-        Holiday Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="HolidayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfHolidaySchedulesSupported"/>
       </field>
@@ -1726,20 +1519,18 @@ User Status: default or status cleared.">
         <optionalConform/>
       </field>
     </command>
-    <command id="0x13" name="Clear Holiday Schedule" response="Y">
+    <command id="0x13" name="ClearHolidaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="HDSCH"/>
       </mandatoryConform>
-      <field id="0" name="HolidayIndex
-
-        Holiday Schedule ID&amp;#8224;" type="uint8">
+      <field id="0" name="HolidayIndex" type="uint8">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfHolidaySchedulesSupported"/>
         <constraint type="allowed" value="0xFE"/>
       </field>
     </command>
-    <command id="0x14" name="Set User Type" response="Y">
+    <command id="0x14" name="SetUserType" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1753,16 +1544,15 @@ User Status: default or status cleared.">
           </orTerm>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="User Type" type="enum8">
+      <field id="1" name="UserType" type="UserTypeEnum">
         <mandatoryConform/>
-        <constraint type="allowed" value="UserTypeEnum"/>
       </field>
     </command>
-    <command id="0x15" name="Get User Type" response="Get User Type Response">
+    <command id="0x15" name="GetUserType" direction="commandToServer" response="GetUserTypeResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1776,28 +1566,26 @@ User Status: default or status cleared.">
           </orTerm>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x15" name="Get User Type Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x15" name="GetUserTypeResponse" direction="responseFromServer">
       <mandatoryConform>
         <notTerm>
           <feature name="USR"/>
         </notTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="User Type" type="enum8">
+      <field id="1" name="UserType" type="UserTypeEnum">
         <mandatoryConform/>
-        <constraint type="allowed" value="UserTypeEnum"/>
       </field>
     </command>
-    <command id="0x16" name="Set RFID Code" response="Y">
+    <command id="0x16" name="SetRFIDCode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1807,25 +1595,25 @@ User Status: default or status cleared.">
           <feature name="RID"/>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="User Status" type="uint8" default="OccupiedEnabled">
+      <field id="1" name="UserStatus" type="UserStatusEnum" default="OccupiedEnabled">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="UserStatusEnum"/>
+        <constraint type="desc"/>
       </field>
-      <field id="2" name="User Type" type="enum8" default="UnrestrictedUser">
+      <field id="2" name="UserType" type="UserTypeEnum" default="UnrestrictedUser">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="UserTypeEnum"/>
+        <constraint type="desc"/>
       </field>
-      <field id="3" name="RFID Code" type="octets">
+      <field id="3" name="RFIDCode" type="octstr">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x17" name="Get RFID Code" response="Get RFID Code Response">
+    <command id="0x17" name="GetRFIDCode" direction="commandToServer" response="GetRFIDCodeResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1835,13 +1623,12 @@ User Status: default or status cleared.">
           <feature name="RID"/>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x17" name="Get RFID Code Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x17" name="GetRFIDCodeResponse" direction="responseFromServer">
       <mandatoryConform>
         <andTerm>
           <notTerm>
@@ -1850,26 +1637,26 @@ User Status: default or status cleared.">
           <feature name="RID"/>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="User ID" type="uint16">
+      <field id="0" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="User Status" type="enum8" default="Available">
+      <field id="1" name="UserStatus" type="UserStatusEnum" default="Available">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="UserStatusEnum"/>
+        <constraint type="desc"/>
       </field>
-      <field id="2" name="User Type" type="enum8">
+      <field id="2" name="UserType" type="UserTypeEnum">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="UserTypeEnum"/>
+        <constraint type="desc"/>
       </field>
-      <field id="3" name="RFID Code" type="octets" default="empty">
+      <field id="3" name="RFIDCode" type="octstr" default="empty">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x18" name="Clear RFID Code" response="Y">
+    <command id="0x18" name="ClearRFIDCode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1879,15 +1666,13 @@ User Status: default or status cleared.">
           <feature name="RID"/>
         </andTerm>
       </mandatoryConform>
-      <field id="0" name="RFIDSlotIndex
-
-        User ID&amp;#8224;" type="uint16">
+      <field id="0" name="RFIDSlotIndex" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="NumberOfRFIDUsersSupported"/>
         <constraint type="allowed" value="0xFFFE"/>
       </field>
     </command>
-    <command id="0x19" name="Clear All RFID Codes" response="Y">
+    <command id="0x19" name="ClearAllRFIDCodes" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1898,7 +1683,7 @@ User Status: default or status cleared.">
         </andTerm>
       </mandatoryConform>
     </command>
-    <command id="0x1a" name="Set User" response="Y">
+    <command id="0x1A" name="SetUser" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1943,7 +1728,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x1b" name="Get User" response="Get User Response">
+    <command id="0x1B" name="GetUser" direction="commandToServer" response="GetUserResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1953,8 +1738,7 @@ User Status: default or status cleared.">
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x1c" name="Get User Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x1C" name="GetUserResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
@@ -2004,7 +1788,7 @@ User Status: default or status cleared.">
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x1d" name="Clear User" response="Y">
+    <command id="0x1D" name="ClearUser" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -2015,37 +1799,37 @@ User Status: default or status cleared.">
         <constraint type="allowed" value="0xFFFE"/>
       </field>
     </command>
-    <command id="0x20" name="Operating Event Notification" direction="commandToClient">
+    <command id="0x20" name="OperatingEventNotification" direction="commandToClient">
       <access invokePrivilege="operate"/>
       <optionalConform>
         <feature name="NOT"/>
       </optionalConform>
     </command>
-    <command id="0x21" name="Programming Event Notification" direction="commandToClient">
+    <command id="0x21" name="ProgrammingEventNotification" direction="commandToClient">
       <access invokePrivilege="operate"/>
       <optionalConform>
         <feature name="NOT"/>
       </optionalConform>
-      <field id="0" name="Program Event Source" type="uint8">
+      <field id="0" name="ProgramEventSource" type="EventSourceEnum">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="Program Event Code" type="uint8">
+      <field id="1" name="ProgramEventCode" type="ProgrammingEventCodeEnum">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="2" name="User ID" type="uint16">
+      <field id="2" name="UserID" type="uint16">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="3" name="PIN" type="octets">
+      <field id="3" name="PIN" type="octstr">
         <mandatoryConform/>
       </field>
-      <field id="4" name="User Type" type="enum8">
+      <field id="4" name="UserType" type="UserTypeEnum">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="5" name="User Status" type="enum8">
+      <field id="5" name="UserStatus" type="UserStatusEnum">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -2056,7 +1840,7 @@ User Status: default or status cleared.">
         <optionalConform/>
       </field>
     </command>
-    <command id="0x22" name="Set Credential" response="Set Credential Response">
+    <command id="0x22" name="SetCredential" direction="commandToServer" response="SetCredentialResponse">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -2069,7 +1853,7 @@ User Status: default or status cleared.">
       <field id="1" name="Credential" type="CredentialStruct">
         <mandatoryConform/>
       </field>
-      <field id="2" name="CredentialData" type="octets">
+      <field id="2" name="CredentialData" type="octstr">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -2096,8 +1880,7 @@ User Status: default or status cleared.">
         <constraint type="allowed" value="RemoteOnlyUser"/>
       </field>
     </command>
-    <command id="0x23" name="Set Credential Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x23" name="SetCredentialResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
@@ -2116,7 +1899,7 @@ User Status: default or status cleared.">
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x24" name="Get Credential Status" response="Get Credential Status Response">
+    <command id="0x24" name="GetCredentialStatus" direction="commandToServer" response="GetCredentialStatusResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -2125,8 +1908,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x25" name="Get Credential Status Response" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x25" name="GetCredentialStatusResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
@@ -2152,7 +1934,7 @@ User Status: default or status cleared.">
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x26" name="Clear Credential" response="Y">
+    <command id="0x26" name="ClearCredential" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -2163,12 +1945,12 @@ User Status: default or status cleared.">
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x27" name="Unbolt Door" response="Y">
+    <command id="0x27" name="UnboltDoor" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="UBOLT"/>
       </mandatoryConform>
-      <field id="0" name="PINCode" type="octets">
+      <field id="0" name="PINCode" type="octstr">
         <optionalConform>
           <andTerm>
             <feature name="COTA"/>
@@ -2186,7 +1968,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
       </field>
     </event>
-    <event id="0x01" name="DoorStateChange" priority="desc">
+    <event id="0x01" name="DoorStateChange" priority="critical">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="DPS"/>
@@ -2195,7 +1977,7 @@ User Status: default or status cleared.">
         <mandatoryConform/>
       </field>
     </event>
-    <event id="0x02" name="LockOperation" priority="desc">
+    <event id="0x02" name="LockOperation" priority="critical">
       <access readPrivilege="view"/>
       <mandatoryConform/>
       <field id="0" name="LockOperationType" type="LockOperationTypeEnum">
@@ -2225,7 +2007,7 @@ User Status: default or status cleared.">
         <constraint type="countBetween" from="1" to="NumberOfCredentialsSupportedPerUser"/>
       </field>
     </event>
-    <event id="0x03" name="LockOperationError" priority="desc">
+    <event id="0x03" name="LockOperationError" priority="critical">
       <access readPrivilege="view"/>
       <mandatoryConform/>
       <field id="0" name="LockOperationType" type="LockOperationTypeEnum">

@@ -159,6 +159,9 @@ static bool IsMemoryOnlyGlobalKey(NSString * key)
     // We do not expect to see the "g/ts/tts", "g/ts/dntp", "g/ts/tz",
     // "g/ts/dsto" Time Synchronization keys.
 
+    // We do not expect to see the "g/icd/cic" key; that's only used for an ICD
+    // that sends check-in messages.
+
     return false;
 }
 

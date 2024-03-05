@@ -27,11 +27,8 @@ class OnOffSwitchFragment :
   override fun setupAppbar(): LayoutAppbarBinding = binding.appbar
 
   override fun setupUi() {
-    /** title icon */
-    binding.onOffSwitchTitleLayout.titleIcon.setImageResource(matterSettings.device.deviceIconResId)
-
     /** title text */
-    binding.onOffSwitchTitleLayout.titleText.text = getString(matterSettings.device.deviceNameResId)
+    binding.appbar.toolbarTitle.text = getString(matterSettings.device.deviceNameResId)
 
     /** OnOff layout */
     binding.onOffSwitchOnOffLayout.buttonData =

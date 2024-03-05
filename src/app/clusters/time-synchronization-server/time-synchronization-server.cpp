@@ -18,11 +18,8 @@
 #include "DefaultTimeSyncDelegate.h"
 #include "time-synchronization-delegate.h"
 
-#if TIME_SYNC_ENABLE_TSC_FEATURE
-#include <app/InteractionModelEngine.h>
-#endif
-
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -37,9 +34,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/RuntimeOptionsProvider.h>
 
-#include <app-common/zap-generated/cluster-enums.h>
-
 #include <system/SystemClock.h>
+
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+#include <app/InteractionModelEngine.h>
+#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -122,33 +121,11 @@ Delegate * GetDefaultDelegate()
 } // namespace app
 } // namespace chip
 
-constexpr uint64_t kChipEpochUsSinceUnixEpoch =
-    static_cast<uint64_t>(kChipEpochSecondsSinceUnixEpoch) * chip::kMicrosecondsPerSecond;
-
-static bool ChipEpochToUnixEpochMicro(uint64_t chipEpochTime, uint64_t & unixEpochTime)
-{
-    // in case chipEpochTime is too big and result overflows return false
-    if (chipEpochTime + kChipEpochUsSinceUnixEpoch < kChipEpochUsSinceUnixEpoch)
-    {
-        return false;
-    }
-    unixEpochTime = chipEpochTime + kChipEpochUsSinceUnixEpoch;
-    return true;
-}
-
-static bool UnixEpochToChipEpochMicro(uint64_t unixEpochTime, uint64_t & chipEpochTime)
-{
-    VerifyOrReturnValue(unixEpochTime >= kChipEpochUsSinceUnixEpoch, false);
-    chipEpochTime = unixEpochTime - kChipEpochUsSinceUnixEpoch;
-
-    return true;
-}
-
 static CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs)
 {
     uint64_t UTCTimeInUnixEpochUs;
 
-    VerifyOrReturnError(ChipEpochToUnixEpochMicro(UTCTimeInChipEpochUs, UTCTimeInUnixEpochUs), CHIP_ERROR_INVALID_TIME);
+    VerifyOrReturnError(ChipEpochToUnixEpochMicros(UTCTimeInChipEpochUs, UTCTimeInUnixEpochUs), CHIP_ERROR_INVALID_TIME);
     uint64_t secs = UTCTimeInChipEpochUs / chip::kMicrosecondsPerSecond;
     // https://github.com/project-chip/connectedhomeip/issues/27501
     VerifyOrReturnError(secs <= UINT32_MAX, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
@@ -402,9 +379,9 @@ void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource
         }
         return;
     }
-    mGranularity         = granularity;
-    EmberAfStatus status = TimeSource::Set(kRootEndpointId, timeSource);
-    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
+    mGranularity  = granularity;
+    Status status = TimeSource::Set(kRootEndpointId, timeSource);
+    if (!(status == Status::Success || status == Status::UnsupportedAttribute))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
     }
@@ -416,8 +393,8 @@ void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessfu
     {
         mGranularity = GranularityEnum::kMillisecondsGranularity;
         // Non-matter SNTP because we know it's external and there's only one source
-        EmberAfStatus status = TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
-        if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
+        Status status = TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
+        if (!(status == Status::Success || status == Status::UnsupportedAttribute))
         {
             ChipLogError(Zcl, "Writing TimeSource failed.");
         }
@@ -795,12 +772,13 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
     CHIP_ERROR err = UpdateUTCTime(utcTime);
     if (err != CHIP_NO_ERROR && !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
     {
-        ChipLogError(Zcl, "Error setting UTC time on the device");
+        ChipLogError(Zcl, "Error setting UTC time on the device: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-    mGranularity         = granularity;
-    EmberAfStatus status = TimeSource::Set(ep, source);
-    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
+    GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
+    mGranularity  = granularity;
+    Status status = TimeSource::Set(ep, source);
+    if (!(status == Status::Success || status == Status::UnsupportedAttribute))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
         return CHIP_IM_GLOBAL_STATUS(Failure);
@@ -820,7 +798,7 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
     TimeState newState = UpdateDSTOffsetState();
     VerifyOrReturnError(TimeState::kInvalid != newState, CHIP_ERROR_INVALID_TIME);
     ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
-    VerifyOrReturnError(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
+    VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
     if (TimeState::kChanged == UpdateTimeZoneState())
     {
         emitTimeZoneStatusEvent(ep);
@@ -863,7 +841,7 @@ TimeState TimeSynchronizationServer::UpdateTimeZoneState()
 
     VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, TimeState::kInvalid);
     VerifyOrReturnValue(tzList.size() != 0, TimeState::kInvalid);
-    VerifyOrReturnValue(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), TimeState::kInvalid);
+    VerifyOrReturnValue(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), TimeState::kInvalid);
 
     for (size_t i = 0; i < tzList.size(); i++)
     {
@@ -902,7 +880,7 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
 
     VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, TimeState::kInvalid);
     VerifyOrReturnValue(dstList.size() != 0, TimeState::kInvalid);
-    VerifyOrReturnValue(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), TimeState::kInvalid);
+    VerifyOrReturnValue(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), TimeState::kInvalid);
 
     for (size_t i = 0; i < dstList.size(); i++)
     {
@@ -1066,7 +1044,7 @@ CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath &
             return aEncoder.EncodeNull();
         }
         VerifyOrReturnError(System::SystemClock().GetClock_RealTime(utcTimeUnix) == CHIP_NO_ERROR, aEncoder.EncodeNull());
-        VerifyOrReturnError(UnixEpochToChipEpochMicro(utcTimeUnix.count(), chipEpochTime), aEncoder.EncodeNull());
+        VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime), aEncoder.EncodeNull());
         return aEncoder.Encode(chipEpochTime);
     }
     case Granularity::Id: {
@@ -1285,7 +1263,7 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
             return true;
         }
         bool dnsResolve;
-        if (EMBER_ZCL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
+        if (Status::Success != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
         {
             commandObj->AddStatus(commandPath, Status::Failure);
             return true;

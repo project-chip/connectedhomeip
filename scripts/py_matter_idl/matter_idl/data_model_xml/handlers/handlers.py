@@ -245,7 +245,7 @@ class EnumHandler(BaseHandler):
         if not self._enum.entries:
             return
 
-        # try to find the best enum size that fits out of enum8, enum32 and enum32
+        # try to find the best enum size that fits out of enum8 and enum16
         # TODO: this is a pure heuristic. XML containing this would be better.
         #       https://github.com/csa-data-model/projects/issues/345
         acceptable = {8, 16}
@@ -498,6 +498,39 @@ class CommandsHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
+class RevisionHistoryHandler(BaseHandler):
+    """
+    Parses elements of revision history that look like:
+
+    '''
+       <revisionHistory>
+         <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
+         <revision revision="2" summary="CCB 2808"/>
+         <revision revision="3" summary="All Hubs changes"/>
+         <revision revision="4" summary="New data model format and notation; add IdentifyType"/>
+       </revisionHistory>
+    '''
+    """
+
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "revision":
+            if 'revision' not in attrs:
+                LOGGER.error(
+                    f"Could not find a revision for {attrs}: no revision data")
+                return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+            else:
+                rev = int(attrs['revision'])
+                if self._cluster.revision < rev:
+                    self._cluster.revision = rev
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        else:
+            return BaseHandler(self.context)
+
+
 class DataTypesHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -580,12 +613,7 @@ class ClusterHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "revisionHistory":
-            # Revision history COULD be used to find the latest revision of a cluster
-            # however current IDL files do NOT have a revision info field
-            #
-            # NOTE: we COULD set this as a `default` for attribute clusterRevision, however this will likely
-            #       not match with what matter IDL would parse into.
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+            return RevisionHistoryHandler(self.context, self._cluster)
         elif name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)

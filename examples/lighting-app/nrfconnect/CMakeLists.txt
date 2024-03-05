@@ -218,7 +218,6 @@ target_link_libraries(app PRIVATE
   thread_service.nanopb_rpc
   pw_checksum
   pw_hdlc
-  pw_hdlc.pw_rpc
   pw_log
   pw_rpc.server
   pw_sys_io

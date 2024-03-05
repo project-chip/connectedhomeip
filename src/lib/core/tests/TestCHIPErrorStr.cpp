@@ -134,6 +134,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_INSUFFICIENT_PRIVILEGE,
     CHIP_ERROR_MESSAGE_COUNTER_EXHAUSTED,
     CHIP_ERROR_FABRIC_EXISTS,
+    CHIP_ERROR_ENDPOINT_EXISTS,
     CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER,
     CHIP_ERROR_INVALID_KEY_ID,
     CHIP_ERROR_INVALID_TIME,
@@ -225,14 +226,14 @@ int TestCHIPErrorStr()
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "Core-Error-Strings",
+        "Test CHIP_ERROR string conversions",
         &sTests[0],
         nullptr,
         nullptr
     };
     // clang-format on
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);

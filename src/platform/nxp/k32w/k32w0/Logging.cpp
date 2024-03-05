@@ -45,7 +45,7 @@ void GetMessageString(char * buf, uint8_t bufLen, const char * module, uint8_t c
      */
     assert(bufLen >= (timestamp_max_len_bytes + category_max_len_bytes + (strlen(module) + 2) + 1));
 
-    writtenLen = snprintf(buf, bufLen, "[%" PRIu32, otPlatAlarmMilliGetNow());
+    writtenLen = snprintf(buf, bufLen, "[%ld]", otPlatAlarmMilliGetNow());
     bufLen -= writtenLen;
     buf += writtenLen;
 

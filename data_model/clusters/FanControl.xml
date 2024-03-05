@@ -54,17 +54,22 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: short
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
     <revision revision="2" summary="New data model format and notation; Percent, speed and motion settings; General cleanup"/>
-    <revision revision="3" summary="Addition of Airflow Direction and Step command"/>
+    <revision revision="3" summary="Addition of AirflowDirection and Step command"/>
     <revision revision="4" summary="Change conformance for FanModeSequenceEnum"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0202" name="Fan Control"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="FAN" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="SPD" name="MultiSpeed" summary="1-100 speeds">
+    <feature bit="0" code="SPD" name="MultiSpeed" summary="0-SpeedMax Fan Speeds">
       <optionalConform/>
     </feature>
     <feature bit="1" code="AUT" name="Auto" summary="Automatic mode supported for fan speed">
@@ -79,7 +84,7 @@ Davis, CA 95616, USA
     <feature bit="4" code="STEP" name="Step" summary="Step command supported">
       <optionalConform/>
     </feature>
-    <feature bit="5" code="DIR" name="Airflow Direction" summary="Airflow Direction attribute is supported">
+    <feature bit="5" code="DIR" name="AirflowDirection" summary="Airflow Direction attribute is supported">
       <optionalConform/>
     </feature>
   </features>
@@ -114,36 +119,36 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="FanModeSequenceEnum">
-      <item value="0" name="Off/Low/Med/High" summary="Fan is capable of off, low, medium and high modes">
+      <item value="0" name="Off" summary="Fan is capable of off, low, medium and high modes">
         <optionalConform choice="a">
           <notTerm>
             <feature name="AUT"/>
           </notTerm>
         </optionalConform>
       </item>
-      <item value="1" name="Off/Low/High" summary="Fan is capable of off, low and high modes">
+      <item value="1" name="Off" summary="Fan is capable of off, low and high modes">
         <optionalConform choice="a">
           <notTerm>
             <feature name="AUT"/>
           </notTerm>
         </optionalConform>
       </item>
-      <item value="2" name="Off/Low/Med/High/Auto" summary="Fan is capable of off, low, medium, high and auto modes">
+      <item value="2" name="Off" summary="Fan is capable of off, low, medium, high and auto modes">
         <optionalConform choice="a">
           <feature name="AUT"/>
         </optionalConform>
       </item>
-      <item value="3" name="Off/Low/High/Auto" summary="Fan is capable of off, low, high and auto modes">
+      <item value="3" name="Off" summary="Fan is capable of off, low, high and auto modes">
         <optionalConform choice="a">
           <feature name="AUT"/>
         </optionalConform>
       </item>
-      <item value="4" name="Off/High/Auto" summary="Fan is capable of off, high and auto modes">
+      <item value="4" name="Off" summary="Fan is capable of off, high and auto modes">
         <optionalConform choice="a">
           <feature name="AUT"/>
         </optionalConform>
       </item>
-      <item value="5" name="Off/High" summary="Fan is capable of off and high modes">
+      <item value="5" name="Off" summary="Fan is capable of off and high modes">
         <optionalConform choice="a">
           <notTerm>
             <feature name="AUT"/>
@@ -259,7 +264,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000a" name="WindSetting" type="WindBitmap" default="0">
+    <attribute id="0x000A" name="WindSetting" type="WindBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <mandatoryConform>
@@ -267,7 +272,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000b" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
+    <attribute id="0x000B" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <mandatoryConform>
@@ -277,7 +282,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Step" response="Y">
+    <command id="0x00" name="Step" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="STEP"/>

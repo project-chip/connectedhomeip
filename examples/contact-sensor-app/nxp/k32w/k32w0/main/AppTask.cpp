@@ -45,6 +45,8 @@
 #include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #endif
 
+#include "BLEManagerImpl.h"
+
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
@@ -69,6 +71,9 @@ static LEDWidget sContactSensorLED;
 
 static bool sIsThreadProvisioned = false;
 static bool sHaveBLEConnections  = false;
+#if CHIP_ENABLE_LIT
+static bool sIsDeviceCommissioned = false;
+#endif
 
 static uint32_t eventMask = 0;
 
@@ -83,7 +88,10 @@ using namespace chip::app;
 
 AppTask AppTask::sAppTask;
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-static AppTask::FactoryDataProvider sFactoryDataProvider;
+static chip::DeviceLayer::FactoryDataProviderImpl sFactoryDataProvider;
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+static chip::DeviceLayer::CustomFactoryDataProvider sCustomFactoryDataProvider;
+#endif
 #endif
 
 static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
@@ -121,6 +129,18 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     return err;
+}
+
+static void app_gap_callback(gapGenericEvent_t * event)
+{
+    /* This callback is called in the context of BLE task, so event processing
+     * should be posted to app task. */
+}
+
+static void app_gatt_callback(deviceId_t id, gattServerEvent_t * event)
+{
+    /* This callback is called in the context of BLE task, so event processing
+     * should be posted to app task. */
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -185,6 +205,9 @@ CHIP_ERROR AppTask::Init()
     SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
     SetCommissionableDataProvider(&sFactoryDataProvider);
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+    sCustomFactoryDataProvider.ParseFunctionExample();
+#endif
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
@@ -239,6 +262,17 @@ CHIP_ERROR AppTask::Init()
     err = ConfigurationMgr().GetSoftwareVersion(currentVersion);
 
     K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    /* SSBL will always be seen as booting from address 0, thanks to the remapping mechanism.
+     * This means the SSBL version will always offset from address 0. */
+    extern uint32_t __MATTER_SSBL_VERSION_START[];
+    K32W_LOG("Current SSBL Version: %ld. Found at address 0x%lx", *((uint32_t *) __MATTER_SSBL_VERSION_START),
+             (uint32_t) __MATTER_SSBL_VERSION_START);
+#endif
+
+    auto & bleManager = chip::DeviceLayer::Internal::BLEMgrImpl();
+    bleManager.RegisterAppCallbacks(app_gap_callback, app_gatt_callback);
 
     return err;
 }
@@ -418,6 +452,12 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
             button_event.Handler = ResetActionEventHandler;
         }
 #endif
+#if CHIP_ENABLE_LIT
+        if (button_action == USER_ACTIVE_MODE_TRIGGER_PUSH)
+        {
+            button_event.Handler = UserActiveModeHandler;
+        }
+#endif
     }
 
     sAppTask.PostEvent(&button_event);
@@ -455,6 +495,16 @@ void AppTask::HandleKeyboard(void)
 #if (defined OM15082)
             ButtonEventHandler(RESET_BUTTON, RESET_BUTTON_PUSH);
             break;
+#elif CHIP_ENABLE_LIT
+            if (sIsDeviceCommissioned)
+            {
+                ButtonEventHandler(BLE_BUTTON, USER_ACTIVE_MODE_TRIGGER_PUSH);
+            }
+            else
+            {
+                ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
+            }
+            break;
 #else
             ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
@@ -466,7 +516,15 @@ void AppTask::HandleKeyboard(void)
             ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
             break;
         case gKBD_EventPB4_c:
-            ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
+#if CHIP_ENABLE_LIT
+            if (sIsDeviceCommissioned)
+            {
+                ButtonEventHandler(BLE_BUTTON, USER_ACTIVE_MODE_TRIGGER_PUSH);
+            }
+            else
+#endif
+
+                ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
 #if !(defined OM15082)
         case gKBD_EventLongPB1_c:
@@ -663,6 +721,28 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     }
 }
 
+#if CHIP_ENABLE_LIT
+void AppTask::UserActiveModeHandler(void * aGenericEvent)
+{
+    AppEvent * aEvent = (AppEvent *) aGenericEvent;
+
+    if (aEvent->ButtonEvent.PinNo != BLE_BUTTON)
+        return;
+
+    if (sAppTask.mFunction != Function::kNoneSelected)
+    {
+        K32W_LOG("Another function is scheduled. Could not request ICD Active Mode!");
+        return;
+    }
+    PlatformMgr().ScheduleWork(AppTask::UserActiveModeTrigger, 0);
+}
+
+void AppTask::UserActiveModeTrigger(intptr_t arg)
+{
+    ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+}
+#endif
+
 void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
@@ -676,6 +756,12 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
             sIsThreadProvisioned = FALSE;
         }
     }
+#if CHIP_ENABLE_LIT
+    else if (event->Type == DeviceEventType::kCommissioningComplete)
+    {
+        sIsDeviceCommissioned = TRUE;
+    }
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (event->Type == DeviceEventType::kDnssdInitialized)
@@ -861,10 +947,10 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     uint8_t newValue = ContactSensorMgr().IsContactClosed();
 
     // write the new on/off value
-    EmberAfStatus status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Protocols::InteractionModel::Status status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", status);
+        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
     }
     logBooleanStateEvent(newValue);
 }

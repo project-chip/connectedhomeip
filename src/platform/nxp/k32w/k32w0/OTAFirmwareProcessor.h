@@ -45,6 +45,9 @@ private:
 
     OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
+#if OTA_ENCRYPTION_ENABLE
+    uint32_t mUnalignmentNum;
+#endif
 };
 
 } // namespace chip

@@ -41,3 +41,4 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_POOL_USE_HEAP 1
 
 // ========== Platform-specific Configuration Overrides =========
+#define CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS 5

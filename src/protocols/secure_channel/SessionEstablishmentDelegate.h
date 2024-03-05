@@ -32,6 +32,18 @@
 
 namespace chip {
 
+enum class SessionEstablishmentStage : uint8_t
+{
+    kUnknown          = 0,
+    kNotInKeyExchange = 1,
+    kSentSigma1       = 2,
+    kReceivedSigma1   = 3,
+    kSentSigma2       = 4,
+    kReceivedSigma2   = 5,
+    kSentSigma3       = 6,
+    kReceivedSigma3   = 7,
+};
+
 class DLL_EXPORT SessionEstablishmentDelegate
 {
 public:
@@ -39,8 +51,22 @@ public:
      *   Called when session establishment fails with an error.  This will be
      *   called at most once per session establishment and will not be called if
      *   OnSessionEstablished is called.
+     *
+     *   This overload of OnSessionEstablishmentError is not called directly.
+     *   It's only called from the default implementation of the two-argument
+     *   overload.
      */
     virtual void OnSessionEstablishmentError(CHIP_ERROR error) {}
+
+    /**
+     *   Called when session establishment fails with an error and state at the
+     *   failure. This will be called at most once per session establishment and
+     *   will not be called if OnSessionEstablished is called.
+     */
+    virtual void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage)
+    {
+        OnSessionEstablishmentError(error);
+    }
 
     /**
      *   Called on start of session establishment process

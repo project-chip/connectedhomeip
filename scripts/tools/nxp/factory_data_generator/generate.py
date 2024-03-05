@@ -27,6 +27,14 @@ from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVe
                     SetupPasscode, StrArgument, UniqueId, VendorId, VendorName, Verifier)
 from default import InputArgument
 
+# A magic value used in the factory data integrity check.
+# The value will be checked at runtime, before verifying the
+# factory data integrity. Factory data header has the following format:
+# | hash id (4 bytes) | size (4 bytes) | hash (4 bytes) |
+# If the hash id check fails, it means the factory data is either missing
+# or has become corrupted.
+HASH_ID = "CE47BA5E"
+
 
 def set_logger():
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
@@ -70,7 +78,7 @@ class KlvGenerator:
         self.spake2p = Spake2p()
         if self.args.spake2p_verifier is None:
             self.spake2p.generate(self.args)
-        self.args.dac_key.generate_private_key(self.args.dac_key_password)
+        self.args.dac_key.generate_private_key(self.args.dac_key_password, self.args.dac_key_use_sss_blob)
 
     def _validate_args(self):
         if self.args.dac_key_password is None:
@@ -155,9 +163,9 @@ class KlvGenerator:
                 fullContentCipher = size.to_bytes(4, "little") + fullContentCipher
 
                 # Add hash id
-                hashId = bytearray.fromhex("CE47BA5E")
+                hashId = bytearray.fromhex(HASH_ID)
                 hashId.reverse()
-                fullContentCipher = hashId.reverse() + fullContentCipher
+                fullContentCipher = hashId + fullContentCipher
 
                 size = len(fullContentCipher)
 
@@ -209,6 +217,8 @@ def main():
 
     optional.add_argument("--dac_key_password", type=str,
                           help="[path] Password to decode DAC Key if available")
+    optional.add_argument("--dac_key_use_sss_blob", action='store_true',
+                          help="[bool] If present, DAC private key area is populated by an encrypted blob")
     optional.add_argument("--spake2p_verifier", type=Verifier,
                           help="[base64 str] Already generated spake2p verifier")
     optional.add_argument("--aes128_key",

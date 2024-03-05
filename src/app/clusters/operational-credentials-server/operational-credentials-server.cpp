@@ -641,6 +641,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // missing root. Let's early-bail with InvalidNOC.
     VerifyOrExit(failSafeContext.AddTrustedRootCertHasBeenInvoked(), nocResponse = NodeOperationalCertStatusEnum::kInvalidNOC);
 
+    // Check this explicitly before adding the fabric so we don't need to back out changes if this is an error.
+    VerifyOrExit(IsOperationalNodeId(commandData.caseAdminSubject) || IsCASEAuthTag(commandData.caseAdminSubject),
+                 nocResponse = NodeOperationalCertStatusEnum::kInvalidAdminSubject);
+
     err = fabricTable.AddNewPendingFabricWithOperationalKeystore(NOCValue, ICACValue.ValueOr(ByteSpan{}), adminVendorId,
                                                                  &newFabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));

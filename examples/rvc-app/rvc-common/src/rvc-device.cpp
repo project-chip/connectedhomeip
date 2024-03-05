@@ -41,7 +41,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
             response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle."));
+                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
             return;
         }
 
@@ -58,7 +58,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
             response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle."));
+                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
             return;
         }
 
@@ -72,7 +72,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
 
     // If we fall through at any point, it's because the change is not supported in the current state.
     response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-    response.statusText.SetValue(chip::CharSpan::fromCharString("This change is not allowed at this time."));
+    response.statusText.SetValue(chip::CharSpan::fromCharString("This change is not allowed at this time"));
 }
 
 void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
@@ -81,7 +81,7 @@ void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::
 
     if (rvcRunCurrentMode != RvcRunMode::ModeIdle)
     {
-        response.status = to_underlying(RvcCleanMode::StatusCode::kCleaningInProgress);
+        response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
         response.statusText.SetValue(chip::CharSpan::fromCharString("Change of the cleaning mode is only allowed in Idle."));
         return;
     }
@@ -91,27 +91,70 @@ void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::
 
 void RvcDevice::HandleOpStatePauseCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
+    // This method is only called if the device is in a Pause-compatible state, i.e. `Running` or `SeekingCharger`.
+    mStateBeforePause = mOperationalStateInstance.GetCurrentOperationalState();
     auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
-    if (error == CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    }
-    else
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
-    }
+    err.Set((error == CHIP_NO_ERROR) ? to_underlying(OperationalState::ErrorStateEnum::kNoError)
+                                     : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
 }
 
 void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
-    auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
-    if (error == CHIP_NO_ERROR)
+    uint8_t targetState = to_underlying(OperationalState::OperationalStateEnum::kRunning);
+
+    switch (mOperationalStateInstance.GetCurrentOperationalState())
     {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
+    case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked): {
+        if (mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeCleaning &&
+            mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeMapping)
+        {
+            err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+            return;
+        }
     }
-    else
+    break;
+    case to_underlying(OperationalState::OperationalStateEnum::kPaused): {
+        if (mStateBeforePause == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+        {
+            targetState = to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger);
+        }
+    }
+    break;
+    default:
+        // This method is only called if the device is in a resume-compatible state, i.e. `Charging`, `Docked` or
+        // `Paused`. Therefore, we do not expect to ever enter this branch.
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+
+    auto error = mOperationalStateInstance.SetOperationalState(targetState);
+
+    err.Set((error == CHIP_NO_ERROR) ? to_underlying(OperationalState::ErrorStateEnum::kNoError)
+                                     : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+}
+
+void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err)
+{
+    switch (mOperationalStateInstance.GetCurrentOperationalState())
     {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    case to_underlying(OperationalState::OperationalStateEnum::kStopped): {
+        if (mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeIdle)
+        {
+            err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+            return;
+        }
+
+        auto error = mOperationalStateInstance.SetOperationalState(
+            to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+
+        err.Set((error == CHIP_NO_ERROR) ? to_underlying(OperationalState::ErrorStateEnum::kNoError)
+                                         : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
+    break;
+    default:
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
     }
 }
 
@@ -281,4 +324,11 @@ void RvcDevice::HandleClearErrorMessage()
 
     mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
     SetDeviceToIdleState();
+}
+
+void RvcDevice::HandleResetMessage()
+{
+    mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
+    mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    mCleanModeInstance.UpdateCurrentMode(RvcCleanMode::ModeQuick);
 }

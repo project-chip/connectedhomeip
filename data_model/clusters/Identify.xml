@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0003" name="Identify" revision="4">
   <revisionHistory>
@@ -62,59 +64,57 @@ Davis, CA 95616, USA
     <revision revision="3" summary="All Hubs changes"/>
     <revision revision="4" summary="New data model format and notation; add IdentifyType"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0003" name="Identify"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="I" scope="Endpoint"/>
-  <features>
-    <feature bit="0" code="QRY" name="Query" summary="Multicast query for identification state">
-      <optionalConform/>
-    </feature>
-  </features>
   <dataTypes>
     <enum name="EffectIdentifierEnum">
-      <item value="0" name="Blink" summary="e.g., Light is turned on/off once.">
+      <item value="0x00" name="Blink" summary="e.g., Light is turned on/off once.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Breathe" summary="e.g., Light is turned on/off over 1 second and repeated 15 times.">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Okay" summary="e.g., Colored light turns green for 1 second; non-colored light flashes twice.">
-        <mandatoryConform/>
-      </item>
-      <item value="11" name="ChannelChange" summary="e.g., Colored light turns orange for 8 seconds;
+      <item value="0x0B" name="ChannelChange" summary="e.g., Colored light turns orange for 8 seconds;
                            non-colored light switches to the maximum brightness for 0.5s and then minimum brightness for 7.5s.">
         <mandatoryConform/>
       </item>
-      <item value="254" name="FinishEffect" summary="Complete the current effect sequence before
+      <item value="0x01" name="Breathe" summary="e.g., Light is turned on/off over 1 second and repeated 15 times.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="Okay" summary="e.g., Colored light turns green for 1 second; non-colored light flashes twice.">
+        <mandatoryConform/>
+      </item>
+      <item value="0xFE" name="FinishEffect" summary="Complete the current effect sequence before
                            terminating. e.g., if in the middle of a breathe effect (as above),
                            first complete the current 1s breathe effect and then terminate the
                            effect.">
         <mandatoryConform/>
       </item>
-      <item value="255" name="StopEffect" summary="Terminate the effect as soon as possible.">
+      <item value="0xFF" name="StopEffect" summary="Terminate the effect as soon as possible.">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="EffectVariantEnum">
-      <item value="0" name="Default" summary="Indicates the default effect is used">
+      <item value="0x00" name="Default" summary="Indicates the default effect is used">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="IdentifyTypeEnum">
-      <item value="0" name="None" summary="No presentation.">
+      <item value="0x00" name="None" summary="No presentation.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="LightOutput" summary="Light output of a lighting product.">
+      <item value="0x01" name="LightOutput" summary="Light output of a lighting product.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="VisibleIndicator" summary="Typically a small LED.">
+      <item value="0x02" name="VisibleIndicator" summary="Typically a small LED.">
         <mandatoryConform/>
       </item>
-      <item value="3" name="AudibleBeep">
+      <item value="0x03" name="AudibleBeep">
         <mandatoryConform/>
       </item>
-      <item value="4" name="Display" summary="Presentation will be visible on display screen.">
+      <item value="0x04" name="Display" summary="Presentation will be visible on display screen.">
         <mandatoryConform/>
       </item>
-      <item value="5" name="Actuator" summary="Presentation will be conveyed by actuator functionality
+      <item value="0x05" name="Actuator" summary="Presentation will be conveyed by actuator functionality
                              such as through a window blind operation or in-wall relay.">
         <mandatoryConform/>
       </item>
@@ -132,29 +132,14 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Identify" response="Y">
+    <command id="0x00" name="Identify" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
       <field id="0" name="IdentifyTime" type="uint16">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x00" name="IdentifyQueryResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="QRY"/>
-      </mandatoryConform>
-      <field id="0" name="Timeout" type="uint16">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x01" name="IdentifyQuery" response="IdentifyQueryResponse">
-      <access invokePrivilege="manage"/>
-      <mandatoryConform>
-        <feature name="QRY"/>
-      </mandatoryConform>
-    </command>
-    <command id="0x40" name="TriggerEffect" response="Y">
+    <command id="0x40" name="TriggerEffect" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <optionalConform/>
       <field id="0" name="EffectIdentifier" type="EffectIdentifierEnum">

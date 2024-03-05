@@ -191,7 +191,9 @@ void CastingServer::OnCommissioningSessionEstablishmentStarted()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner)
 {
-    return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
+    // TODO: expose options to the higher layer
+    Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+    return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
 }
 
 chip::Inet::IPAddress * CastingServer::getIpAddressForUDCRequest(chip::Inet::IPAddress ipAddresses[], const size_t numIPs)
@@ -276,7 +278,7 @@ void CastingServer::ReadServerClustersForNode(NodeId nodeId)
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-        if (binding.type == EMBER_UNICAST_BINDING && nodeId == binding.nodeId)
+        if (binding.type == MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
         {
             if (!mActiveTargetVideoPlayerInfo.HasEndpoint(binding.remote))
             {
@@ -548,7 +550,7 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
                     " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                     binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                     binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-                if (binding.type == EMBER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
+                if (binding.type == MATTER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
                 {
                     ChipLogProgress(
                         NotSpecified,
@@ -639,7 +641,7 @@ NodeId CastingServer::GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-        if (binding.type == EMBER_UNICAST_BINDING && fabricIndex == binding.fabricIndex)
+        if (binding.type == MATTER_UNICAST_BINDING && fabricIndex == binding.fabricIndex)
         {
             ChipLogProgress(NotSpecified, "GetVideoPlayerNodeForFabricIndex nodeId=0x" ChipLogFormatX64,
                             ChipLogValueX64(binding.nodeId));
@@ -665,7 +667,7 @@ FabricIndex CastingServer::GetVideoPlayerFabricIndexForNode(NodeId nodeId)
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-        if (binding.type == EMBER_UNICAST_BINDING && nodeId == binding.nodeId)
+        if (binding.type == MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
         {
             ChipLogProgress(NotSpecified, "GetVideoPlayerFabricIndexForNode fabricIndex=%d nodeId=0x" ChipLogFormatX64,
                             binding.fabricIndex, ChipLogValueX64(binding.nodeId));
@@ -693,7 +695,7 @@ void CastingServer::SetDefaultFabricIndex(std::function<void(TargetVideoPlayerIn
             ChipLogError(AppServer, " -- Not initialized");
             continue;
         }
-        NodeId myNodeId = fb.GetNodeId();
+        [[maybe_unused]] NodeId myNodeId = fb.GetNodeId();
         ChipLogProgress(NotSpecified,
                         "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
                         ChipLogValueX64(myNodeId), ChipLogValueX64(fb.GetFabricId()), fabricIndex);
@@ -865,6 +867,16 @@ CHIP_ERROR CastingServer::OnOff_Toggle(TargetEndpointInfo * endpoint, std::funct
 {
     ReturnErrorOnFailure(mToggleCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
     return mToggleCommand.Invoke(responseCallback);
+}
+
+/**
+ * @brief Messages cluster
+ */
+CHIP_ERROR CastingServer::Messages_PresentMessagesRequest(TargetEndpointInfo * endpoint, const char * messageText,
+                                                          std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mPresentMessagesRequestCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mPresentMessagesRequestCommand.Invoke(messageText, responseCallback);
 }
 
 /**

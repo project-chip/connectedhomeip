@@ -12,7 +12,7 @@
     ],
     "resources": {
         "availability-data": "availability.yaml",
-        "config-data": "../../../../app/common/templates/config-data.yaml"
+        "config-data": "config-data.yaml"
     },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [
@@ -119,6 +119,11 @@
             "path": "MTRClusterConstants.zapt",
             "name": "Constants for cluster IDs",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants.h"
+        },
+        {
+            "path": "MTRClusterNames-src.zapt",
+            "name": "Objc Cluster Names API",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterNames.mm"
         },
         {
             "path": "MTRAttributeSpecifiedCheck-src.zapt",

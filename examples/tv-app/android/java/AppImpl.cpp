@@ -230,21 +230,22 @@ constexpr CommandId channelOutgoingCommands[] = {
 };
 // Declare Cluster List for Content App endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(contentAppClusters)
-DECLARE_DYNAMIC_CLUSTER(app::Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationBasic::Id, applicationBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::KeypadInput::Id, keypadInputAttrs, keypadInputIncomingCommands,
+DECLARE_DYNAMIC_CLUSTER(app::Clusters::Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationBasic::Id, applicationBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::KeypadInput::Id, keypadInputAttrs, ZAP_CLUSTER_MASK(SERVER), keypadInputIncomingCommands,
                             keypadInputOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationLauncher::Id, applicationLauncherAttrs, applicationLauncherIncomingCommands,
-                            applicationLauncherOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::AccountLogin::Id, accountLoginAttrs, accountLoginIncomingCommands,
-                            accountLoginOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ContentLauncher::Id, contentLauncherAttrs, contentLauncherIncomingCommands,
-                            contentLauncherOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::MediaPlayback::Id, mediaPlaybackAttrs, mediaPlaybackIncomingCommands,
-                            mediaPlaybackOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::TargetNavigator::Id, targetNavigatorAttrs, targetNavigatorIncomingCommands,
-                            targetNavigatorOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::Channel::Id, channelAttrs, channelIncomingCommands, channelOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationLauncher::Id, applicationLauncherAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            applicationLauncherIncomingCommands, applicationLauncherOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::AccountLogin::Id, accountLoginAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            accountLoginIncomingCommands, accountLoginOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ContentLauncher::Id, contentLauncherAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            contentLauncherIncomingCommands, contentLauncherOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::MediaPlayback::Id, mediaPlaybackAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            mediaPlaybackIncomingCommands, mediaPlaybackOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::TargetNavigator::Id, targetNavigatorAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            targetNavigatorIncomingCommands, targetNavigatorOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::Channel::Id, channelAttrs, ZAP_CLUSTER_MASK(SERVER), channelIncomingCommands,
+                            channelOutgoingCommands),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Content App endpoint
@@ -323,6 +324,7 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
         ChipLogProgress(DeviceLayer, " Looking next=%s ", app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
         if (app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
+            // need to think about loading apk here?
             ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[i]),
                                                             Span<const EmberAfDeviceType>(gContentAppDeviceType));
             return app;
@@ -421,11 +423,16 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
             ChipLogProgress(DeviceLayer,
                             "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint priviledged vendor accessible clusters "
                             "being returned.");
-            return { chip::app::Clusters::Descriptor::Id,         chip::app::Clusters::OnOff::Id,
-                     chip::app::Clusters::WakeOnLan::Id,          chip::app::Clusters::MediaPlayback::Id,
-                     chip::app::Clusters::LowPower::Id,           chip::app::Clusters::KeypadInput::Id,
-                     chip::app::Clusters::ContentLauncher::Id,    chip::app::Clusters::AudioOutput::Id,
-                     chip::app::Clusters::ApplicationLauncher::Id };
+            return { chip::app::Clusters::Descriptor::Id,
+                     chip::app::Clusters::OnOff::Id,
+                     chip::app::Clusters::WakeOnLan::Id,
+                     chip::app::Clusters::MediaPlayback::Id,
+                     chip::app::Clusters::LowPower::Id,
+                     chip::app::Clusters::KeypadInput::Id,
+                     chip::app::Clusters::ContentLauncher::Id,
+                     chip::app::Clusters::AudioOutput::Id,
+                     chip::app::Clusters::ApplicationLauncher::Id,
+                     chip::app::Clusters::Messages::Id };
         }
         ChipLogProgress(
             DeviceLayer,
@@ -433,7 +440,8 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
         return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
                  chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
                  chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
-                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id };
+                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id,
+                 chip::app::Clusters::Messages::Id };
     }
     return {};
 }

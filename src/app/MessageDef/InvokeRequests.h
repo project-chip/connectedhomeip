@@ -43,6 +43,12 @@ class Builder : public ArrayBuilder
 {
 public:
     /**
+     *  @brief Performs underlying StructBuilder::Init, but reserves memory need in
+     *  EndOfInvokeRequests() with underlying TLVWriter.
+     */
+    CHIP_ERROR InitWithEndBufferReserved(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
+
+    /**
      *  @brief Initialize a CommandDataIB::Builder for writing into the TLV stream
      *
      *  @return A reference to CommandDataIB::Builder
@@ -61,8 +67,16 @@ public:
      */
     CHIP_ERROR EndOfInvokeRequests();
 
+    /**
+     *  @brief Get number of bytes required in the buffer by EndOfInvokeRequests()
+     *
+     *  @return Expected number of bytes required in the buffer by EndOfInvokeRequests()
+     */
+    uint32_t GetSizeToEndInvokeRequests();
+
 private:
     CommandDataIB::Builder mCommandData;
+    bool mIsEndBufferReserved = false;
 };
 } // namespace InvokeRequests
 } // namespace app

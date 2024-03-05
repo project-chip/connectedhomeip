@@ -48,7 +48,7 @@ if [ "$#" == "0" ]; then
     $USAGE
 
     <AppRootFolder>
-        Root Location of the app e.g: examples/lighting-app/efr32/
+        Root Location of the app e.g: examples/lighting-app/silabs/
 
     <outputFolder>
         Desired location for the output files
@@ -86,6 +86,10 @@ if [ "$#" == "0" ]; then
         chip_enable_icd_server
             Configure has a Intermitently connected device. (Default false)
             Must also set chip_openthread_ftd=false
+        enable_synchronized_sed
+            Enable Synchronized Sleepy end device. (Default false)
+            Must also set chip_enable_icd_server=true chip_openthread_ftd=false
+            --icd can be used to configure both arguments
         use_rs9116
             Build wifi example with extension board rs9116. (Default false)
         use_SiWx917
@@ -113,6 +117,10 @@ if [ "$#" == "0" ]; then
             Use provided hardware version at build time
         siwx917_commissionable_data
             Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
+        si91x_alarm_based_wakeup
+            Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled (Default false)
+        si91x_alarm_periodic_time
+            Periodic time at which the 917 SoC should wakeup (Default: 30sec)
         Presets
         --icd
             enable ICD features, set thread mtd
@@ -285,10 +293,10 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ] || [ "$SILABS_BOARD" == "BRD4338A" ] || [ "$SILABS_BOARD" == "BRD4325G" ]; then
+    if [ "$SILABS_BOARD" == "BRD4338A" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
-        optArgs+="chip_device_platform =\"SiWx917\" "
+        optArgs+="chip_device_platform =\"SiWx917\" is_debug=false "
     fi
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then

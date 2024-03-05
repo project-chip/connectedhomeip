@@ -13,10 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 263.4.2. [TC-DISHM-3.2] StartUpMode verification with DUT as Server
+name: 263.4.2. [TC-DISHM-3.2] Startup Mode functionality with DUT as Server
 
 PICS:
-    - DISHM.S
+    - DISHM.S.A0002
 
 config:
     nodeId: 0x12344321
@@ -26,7 +26,7 @@ config:
 tests:
     - label: "Preconditions"
       verification: |
-          !DISHM.S.F00(DEPONOFF) | OnOff cluster’s StartUpOnOff attribute is NULL | StartUpOnOff is 0 | OnMode is NULL
+          !DISHM.S.F00 | OnOff cluster’s StartUpOnOff attribute is NULL | StartUpOnOff is 0 | OnMode is NULL
       disabled: true
 
     - label: "Note"

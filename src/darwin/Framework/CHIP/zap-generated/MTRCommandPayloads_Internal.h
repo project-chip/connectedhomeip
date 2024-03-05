@@ -94,120 +94,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRScenesClusterAddSceneParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterAddSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRScenesClusterViewSceneParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterViewSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRScenesClusterRemoveSceneParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterRemoveSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRScenesClusterRemoveAllScenesParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterRemoveAllScenesResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRScenesClusterStoreSceneParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterStoreSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRScenesClusterRecallSceneParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterGetSceneMembershipParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterGetSceneMembershipResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRScenesClusterEnhancedAddSceneParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterEnhancedAddSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRScenesClusterEnhancedViewSceneParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterEnhancedViewSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct;
-
-@end
-
-@interface MTRScenesClusterCopySceneParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRScenesClusterCopySceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType &)decodableStruct;
-
-@end
-
 @interface MTROnOffClusterOffParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -535,6 +421,18 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRGeneralDiagnosticsClusterPayloadTestRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRGeneralDiagnosticsClusterPayloadTestResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -958,18 +856,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRRVCOperationalStateClusterStopParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRRVCOperationalStateClusterStartParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTRRVCOperationalStateClusterResumeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -979,6 +865,102 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRRVCOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRRVCOperationalStateClusterGoHomeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRScenesManagementClusterAddSceneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRScenesManagementClusterAddSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRScenesManagementClusterViewSceneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRScenesManagementClusterViewSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRScenesManagementClusterRemoveSceneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRScenesManagementClusterRemoveSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRScenesManagementClusterRemoveAllScenesParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRScenesManagementClusterRemoveAllScenesResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRScenesManagementClusterStoreSceneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRScenesManagementClusterStoreSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRScenesManagementClusterRecallSceneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRScenesManagementClusterGetSceneMembershipParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRScenesManagementClusterGetSceneMembershipResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRScenesManagementClusterCopySceneParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRScenesManagementClusterCopySceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -994,7 +976,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBooleanSensorConfigurationClusterSuppressRequestParams (InternalMethods)
+@interface MTRBooleanStateConfigurationClusterSuppressAlarmParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRBooleanStateConfigurationClusterEnableDisableAlarmParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1007,12 +995,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRValveConfigurationAndControlClusterCloseParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRValveConfigurationAndControlClusterSetLevelParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1043,6 +1025,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMessagesClusterPresentMessagesRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMessagesClusterCancelMessagesRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1085,6 +1079,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRDeviceEnergyManagementClusterRequestConstraintBasedForecastParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementClusterCancelRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1135,6 +1135,30 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTREnergyEVSEClusterClearTargetsParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEModeClusterChangeToModeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRDeviceEnergyManagementModeClusterChangeToModeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -1288,6 +1312,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRDoorLockClusterSetAliroReaderConfigParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDoorLockClusterClearAliroReaderConfigParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRWindowCoveringClusterUpOrOpenParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1367,6 +1403,48 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRThermostatClusterClearWeeklyScheduleParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterSetActiveScheduleRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterSetActivePresetRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterStartPresetsSchedulesEditRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterCancelPresetsSchedulesEditRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterCancelSetActivePresetRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -2014,6 +2092,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRUnitTestingClusterTestBatchHelperResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRUnitTestingClusterTestListInt8UReverseRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2065,6 +2149,30 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRUnitTestingClusterTestBatchHelperRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRUnitTestingClusterTestSecondBatchHelperRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRUnitTestingClusterTestDifferentVendorMeiRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRUnitTestingClusterTestDifferentVendorMeiResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType &)decodableStruct;
 
 @end
 

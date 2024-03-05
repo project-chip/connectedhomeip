@@ -185,6 +185,7 @@ silabs_executable("thermostat_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",

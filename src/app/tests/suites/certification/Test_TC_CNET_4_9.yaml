@@ -81,7 +81,9 @@ tests:
               - name: "DebugText"
                 value: ""
 
-    - label: "Step 2: TH reads Networks attribute from the DUT "
+    - label:
+          "Step 2: TH reads Networks attribute from the DUT and saves the number
+          of entries as 'NumNetworks' "
       PICS: CNET.S.A0001
       command: "readAttribute"
       attribute: "Networks"
@@ -117,6 +119,11 @@ tests:
           "Step 4: TH sends RemoveNetwork Command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
           set to 1"
+      verification: |
+          Verify that DUT sends NetworkConfigResponse to command with the following fields:
+          NetworkingStatus is success
+
+          NetworkIndex is 'Userwifi_netidx'
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       command: "RemoveNetwork"
       arguments:
@@ -128,6 +135,8 @@ tests:
       response:
           values:
               - name: "NetworkingStatus"
+                value: 0
+              - name: "NetworkIndex"
                 value: 0
 
     - label: "Step 5: TH reads Networks attribute from the DUT"
@@ -201,6 +210,7 @@ tests:
     - label:
           "Step 10: TH reads Breadcrumb attribute from the General Commissioning
           cluster of the DUT"
+      PICS: CNET.S.C04.Rsp
       cluster: "General Commissioning"
       command: "readAttribute"
       attribute: "Breadcrumb"
@@ -263,6 +273,11 @@ tests:
           "Step 14: TH sends RemoveNetwork Command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field
           set to 1"
+      verification: |
+          Verify that DUT sends NetworkConfigResponse to command with the following fields:
+          NetworkingStatus is success
+
+          NetworkIndex is 'Userwifi_netidx'
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       command: "RemoveNetwork"
       arguments:
@@ -275,8 +290,11 @@ tests:
           values:
               - name: "NetworkingStatus"
                 value: 0
+              - name: "NetworkIndex"
+                value: 0
 
     - label: "Step 15: TH sends the CommissioningComplete command to the DUT"
+      PICS: CNET.S.C04.Rsp
       cluster: "General Commissioning"
       command: "CommissioningComplete"
       response:

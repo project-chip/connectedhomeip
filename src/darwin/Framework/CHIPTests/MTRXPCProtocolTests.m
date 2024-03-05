@@ -23,8 +23,6 @@
 
 #import "MTRErrorTestUtils.h"
 
-#import <app/util/af-enums.h>
-
 #import <math.h> // For INFINITY
 
 // system dependencies
@@ -33,48 +31,6 @@
 static const uint16_t kTimeoutInSeconds = 3;
 // Inverted expectation timeout
 static const uint16_t kNegativeTimeoutInSeconds = 1;
-
-@interface MTRAttributePath (Test)
-- (BOOL)isEqual:(id)object;
-@end
-
-@implementation MTRAttributePath (Test)
-- (BOOL)isEqual:(id)object
-{
-    if ([object isKindOfClass:[MTRAttributePath class]]) {
-        MTRAttributePath * other = object;
-        return [self.endpoint isEqualToNumber:other.endpoint] && [self.cluster isEqualToNumber:other.cluster] &&
-            [self.attribute isEqualToNumber:other.attribute];
-    }
-    return NO;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"MTRAttributePath(%@,%@,%@)", self.endpoint, self.cluster, self.attribute];
-}
-@end
-
-@interface MTRCommandPath (Test)
-- (BOOL)isEqual:(id)object;
-@end
-
-@implementation MTRCommandPath (Test)
-- (BOOL)isEqual:(id)object
-{
-    if ([object isKindOfClass:[MTRCommandPath class]]) {
-        MTRCommandPath * other = object;
-        return [self.endpoint isEqualToNumber:other.endpoint] && [self.cluster isEqualToNumber:other.cluster] &&
-            [self.command isEqualToNumber:other.command];
-    }
-    return NO;
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"MTRCommandPath(%@,%@,%@)", self.endpoint, self.cluster, self.command];
-}
-@end
 
 @interface MTRClusterStateCacheContainer (Test)
 // Obsolete method is moved to this test suite to keep tests compatible

@@ -33,6 +33,7 @@ macro(chip_app_component_codegen IDL_NAME)
       OUTPUTS
             "app/PluginApplicationCallbacks.h"
             "app/callback-stub.cpp"
+            "app/cluster-init-callback.cpp"
       OUTPUT_PATH   APP_GEN_DIR
       OUTPUT_FILES  APP_GEN_FILES
     )
@@ -60,7 +61,6 @@ macro(chip_app_component_zapgen ZAP_NAME)
       GENERATOR "app-templates"
       OUTPUTS
             "zap-generated/access.h"
-            "zap-generated/CHIPClusters.h"
             "zap-generated/endpoint_config.h"
             "zap-generated/gen_config.h"
             "zap-generated/IMClusterCommandHandler.cpp"

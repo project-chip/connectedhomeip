@@ -234,12 +234,12 @@ CHIP_ERROR ASN1Writer::PutBitString(uint8_t unusedBitCount, const uint8_t * enco
 
 CHIP_ERROR ASN1Writer::PutBitString(uint8_t unusedBitCount, chip::TLV::TLVReader & tlvReader)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
-
     ByteSpan encodedBits;
     ReturnErrorOnFailure(tlvReader.Get(encodedBits));
 
     VerifyOrReturnError(CanCastTo<int32_t>(encodedBits.size() + 1), ASN1_ERROR_LENGTH_OVERFLOW);
+
+    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(
         EncodeHead(kASN1TagClass_Universal, kASN1UniversalTag_BitString, false, static_cast<int32_t>(encodedBits.size() + 1)));
@@ -335,12 +335,12 @@ CHIP_ERROR ASN1Writer::PutValue(uint8_t cls, uint8_t tag, bool isConstructed, co
 
 CHIP_ERROR ASN1Writer::PutValue(uint8_t cls, uint8_t tag, bool isConstructed, chip::TLV::TLVReader & tlvReader)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
-
     ByteSpan val;
     ReturnErrorOnFailure(tlvReader.Get(val));
 
     VerifyOrReturnError(CanCastTo<int32_t>(val.size()), ASN1_ERROR_LENGTH_OVERFLOW);
+
+    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(EncodeHead(cls, tag, isConstructed, static_cast<int32_t>(val.size())));
 

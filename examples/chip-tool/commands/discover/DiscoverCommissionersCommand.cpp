@@ -29,7 +29,7 @@ CHIP_ERROR DiscoverCommissionersCommand::RunCommand()
 
 void DiscoverCommissionersCommand::Shutdown()
 {
-    int commissionerCount = 0;
+    [[maybe_unused]] int commissionerCount = 0;
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
         const Dnssd::DiscoveredNodeData * commissioner = mCommissionableNodeController.GetDiscoveredCommissioner(i);

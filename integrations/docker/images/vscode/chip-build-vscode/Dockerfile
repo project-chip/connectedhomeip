@@ -11,11 +11,13 @@ FROM ghcr.io/project-chip/chip-build-tizen:${VERSION} AS tizen
 FROM ghcr.io/project-chip/chip-build-crosscompile:${VERSION} AS crosscompile
 FROM ghcr.io/project-chip/chip-build-ameba:${VERSION} AS ameba
 FROM ghcr.io/project-chip/chip-build-k32w:${VERSION} AS k32w
+FROM ghcr.io/project-chip/chip-build-rw61x:${VERSION} AS rw61x
 FROM ghcr.io/project-chip/chip-build-imx:${VERSION} AS imx
 FROM ghcr.io/project-chip/chip-build-ti:${VERSION} AS ti
 FROM ghcr.io/project-chip/chip-build-openiotsdk:${VERSION} AS openiotsdk
 FROM ghcr.io/project-chip/chip-build-bouffalolab:${VERSION} AS bouffalolab
 FROM ghcr.io/project-chip/chip-build-asr:${VERSION} AS asr
+FROM ghcr.io/project-chip/chip-build-nuttx:${VERSION} AS nuttx
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
@@ -50,6 +52,8 @@ COPY --from=ameba /opt/ameba /opt/ameba
 
 COPY --from=k32w /opt/sdk /opt/k32w
 
+COPY --from=rw61x /opt/sdk /opt/nxp-sdk
+
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
 COPY --from=ti /opt/ti/sysconfig_1.16.2 /opt/ti/sysconfig_1.16.2
@@ -63,6 +67,8 @@ COPY --from=asr /opt/asr /opt/asr
 COPY --from=efr32 /opt/silabs/gecko_sdk /opt/silabs/gecko_sdk
 COPY --from=efr32 /opt/silabs/wiseconnect-wifi-bt-sdk /opt/silabs/wiseconnect-wifi-bt-sdk
 COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
+
+COPY --from=nuttx /opt/nuttx /opt/nuttx
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
@@ -113,6 +119,7 @@ ENV JAVA_PATH=/usr/lib/jvm/java-8-openjdk-amd64
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV NXP_K32W0_SDK_ROOT=/opt/k32w/core
 ENV NXP_K32W1_SDK_ROOT=/opt/k32w/k32w1
+ENV NXP_SDK_ROOT=/opt/nxp-sdk/rw61x
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa

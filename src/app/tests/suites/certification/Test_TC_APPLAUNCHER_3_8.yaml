@@ -39,7 +39,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: Stop an app with the provided application ID"
+    - label:
+          "Step 1a: TH sends a StopApp command to DUT to stop a running
+          application"
       PICS: APPLAUNCHER.S.C01.Rsp
       command: "StopApp"
       arguments:
@@ -55,7 +57,7 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 2: Reads the Status attribute"
+    - label: "Step 1b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint
       cluster: "Application Basic"
       command: "readAttribute"

@@ -68,10 +68,21 @@ protected:
     void _OnCHIPoBLEAdvertisingStart();
     void _OnCHIPoBLEAdvertisingStop();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    void _WaitOnSrpClearAllComplete();
+    void _NotifySrpClearAllComplete();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    // ===== Methods that override the GenericThreadStackMa
+
 private:
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
     friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
     static ThreadStackManagerImpl sInstance;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    TaskHandle_t mSrpClearAllRequester = nullptr;
+#endif
+
     ThreadStackManagerImpl() = default;
 };
 

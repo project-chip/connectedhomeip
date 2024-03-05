@@ -17,7 +17,8 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <cluster>
+  <!-- Deprecated because this is a zigbee-only cluster -->
+  <cluster apiMaturity="deprecated">
     <name>Binary Input (Basic)</name>
     <domain>General</domain>
     <description>An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. </description>

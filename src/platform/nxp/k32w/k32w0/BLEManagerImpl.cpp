@@ -51,7 +51,7 @@ BLEManagerCommon * BLEManagerImpl::GetImplInstance()
 {
     return &BLEManagerImpl::sInstance;
 }
-CHIP_ERROR BLEManagerImpl::InitHostController(ble_generic_cb_fp cb_fp)
+CHIP_ERROR BLEManagerImpl::InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

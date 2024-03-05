@@ -73,7 +73,11 @@ static_library("Linux") {
     "SystemTimeSupport.cpp",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload" ]
+  deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/credentials:credentials_header",
+    "${chip_root}/src/setup_payload",
+  ]
 
   if (!chip_use_external_logging) {
     sources += [ "Logging.cpp" ]
@@ -97,6 +101,8 @@ static_library("Linux") {
       "bluez/BluezConnection.h",
       "bluez/BluezEndpoint.cpp",
       "bluez/BluezEndpoint.h",
+      "bluez/BluezObjectIterator.h",
+      "bluez/BluezObjectList.h",
       "bluez/ChipDeviceScanner.cpp",
       "bluez/ChipDeviceScanner.h",
       "bluez/Types.h",

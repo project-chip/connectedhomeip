@@ -55,10 +55,13 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050f" name="Content Control" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050F" name="Content Control" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x050F" name="Content Control"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONCON" scope="Endpoint"/>
   <features>
     <feature bit="0" code="ST" name="ScreenTime" summary="Supports managing screen time limits.">
@@ -76,18 +79,105 @@ Davis, CA 95616, USA
     <feature bit="4" code="SCR" name="ScheduledContentRating" summary="Supports managing content controls based upon rating threshold for scheduled content.">
       <optionalConform/>
     </feature>
+    <feature bit="5" code="BC" name="BlockChannels" summary="Supports managing a set of channels that are prohibited.">
+      <optionalConform/>
+    </feature>
+    <feature bit="6" code="BA" name="BlockApplications" summary="Supports managing a set of applications that are prohibited.">
+      <optionalConform/>
+    </feature>
+    <feature bit="7" code="BTW" name="BlockContentTimeWindow" summary="Supports managing content controls based upon setting time window in which all contents and applications SHALL be blocked.">
+      <optionalConform/>
+    </feature>
   </features>
   <dataTypes>
+    <enum name="Status Codes" type="status"/>
+    <bitmap name="DayOfWeekBitmap type">
+      <bitfield name="Sunday" bit="0" summary="Sunday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Monday" bit="1" summary="Monday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Tuesday" bit="2" summary="Tuesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Wednesday" bit="3" summary="Wednesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Thursday" bit="4" summary="Thursday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Friday" bit="5" summary="Friday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Saturday" bit="6" summary="Saturday">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="AppInfoStruct">
+      <field id="0" name="CatalogVendorID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ApplicationID" type="string">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="BlockChannelStruct">
+      <field id="0" name="BlockChannelIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MajorNumber" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MinorNumber" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Identifier" type="string">
+        <optionalConform/>
+      </field>
+    </struct>
     <struct name="RatingNameStruct">
       <field id="0" name="RatingName" type="string">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="8"/>
       </field>
       <field id="1" name="RatingNameDesc" type="string">
-        <access read="true"/>
         <optionalConform/>
         <constraint type="maxLength" value="64"/>
+      </field>
+    </struct>
+    <struct name="TimePeriodStruct type">
+      <field id="0" name="StartHour" type="uint8">
+        <mandatoryConform/>
+        <constraint type="between" from="0" to="23"/>
+      </field>
+      <field id="1" name="StartMinute" type="uint8">
+        <mandatoryConform/>
+        <constraint type="between" from="0" to="59"/>
+      </field>
+      <field id="2" name="EndHour" type="uint8">
+        <mandatoryConform/>
+        <constraint type="between" from="0" to="23"/>
+      </field>
+      <field id="3" name="EndMinute" type="uint8">
+        <mandatoryConform/>
+        <constraint type="between" from="0" to="59"/>
+      </field>
+    </struct>
+    <struct name="TimeWindowStruct">
+      <field id="0" name="TimeWindowIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DayOfWeek" type="DayOfWeekBitmap type">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="2" name="TimePeriod" type="list">
+        <entry type="TimePeriodStruct type"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
       </field>
     </struct>
   </dataTypes>
@@ -95,14 +185,13 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="Enabled" type="bool">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0001" name="OnDemandRatings" type="list[RatingNameStruct Type]">
+    <attribute id="0x0001" name="OnDemandRatings" type="list">
+      <entry type="RatingNameStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="OCR"/>
       </mandatoryConform>
-      <constraint type="desc"/>
     </attribute>
     <attribute id="0x0002" name="OnDemandRatingThreshold" type="string">
       <access read="true" readPrivilege="view"/>
@@ -111,12 +200,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="maxLength" value="8"/>
     </attribute>
-    <attribute id="0x0003" name="ScheduledContentRatings" type="list[RatingNameStruct Type]">
+    <attribute id="0x0003" name="ScheduledContentRatings" type="list">
+      <entry type="RatingNameStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="SCR"/>
       </mandatoryConform>
-      <constraint type="desc"/>
     </attribute>
     <attribute id="0x0004" name="ScheduledContentRatingThreshold" type="string">
       <access read="true" readPrivilege="view"/>
@@ -144,11 +233,32 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0008" name="BlockChannelList" type="list">
+      <entry type="BlockChannelStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0009" name="BlockApplicationList" type="list">
+      <entry type="AppInfoStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000A" name="BlockContentTimeWindow" type="list">
+      <entry type="TimeWindowStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BTW"/>
+      </mandatoryConform>
+      <constraint type="maxCount" value="7"/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="UpdatePIN" response="Y">
+    <command id="0x00" name="UpdatePIN" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform>
         <feature name="PM"/>
@@ -162,14 +272,13 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="6"/>
       </field>
     </command>
-    <command id="0x01" name="ResetPIN" response="ResetPINResponse">
+    <command id="0x01" name="ResetPIN" direction="commandToServer" response="ResetPINResponse">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="PM"/>
       </mandatoryConform>
     </command>
     <command id="0x02" name="ResetPINResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PM"/>
       </mandatoryConform>
@@ -178,15 +287,15 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="6"/>
       </field>
     </command>
-    <command id="0x03" name="Enable" response="Y">
+    <command id="0x03" name="Enable" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform/>
     </command>
-    <command id="0x04" name="Disable" response="Y">
+    <command id="0x04" name="Disable" direction="commandToServer" response="Y">
       <access invokePrivilege="manage" timed="true"/>
       <mandatoryConform/>
     </command>
-    <command id="0x05" name="AddBonusTime" response="Y">
+    <command id="0x05" name="AddBonusTime" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="ST"/>
@@ -196,31 +305,33 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="6"/>
       </field>
       <field id="1" name="BonusTime" type="elapsed-s" default="300s">
-        <optionalConform/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x06" name="SetScreenDailyTime" response="Y">
+    <command id="0x06" name="SetScreenDailyTime" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="ST"/>
       </mandatoryConform>
       <field id="0" name="ScreenTime" type="elapsed-s">
         <mandatoryConform/>
+        <constraint type="max" value="86400"/>
       </field>
     </command>
-    <command id="0x07" name="BlockUnratedContent" response="Y">
+    <command id="0x07" name="BlockUnratedContent" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>
     </command>
-    <command id="0x08" name="UnblockUnratedContent" response="Y">
+    <command id="0x08" name="UnblockUnratedContent" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="BU"/>
       </mandatoryConform>
     </command>
-    <command id="0x09" name="SetOnDemandRatingThreshold" response="Y">
+    <command id="0x09" name="SetOnDemandRatingThreshold" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="OCR"/>
@@ -230,7 +341,7 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="8"/>
       </field>
     </command>
-    <command id="0x0a" name="SetScheduledContentRatingThreshold" response="Y">
+    <command id="0x0A" name="SetScheduledContentRatingThreshold" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="SCR"/>
@@ -240,12 +351,77 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="8"/>
       </field>
     </command>
+    <command id="0x0B" name="AddBlockChannels" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="BC"/>
+      </mandatoryConform>
+      <field id="0" name="Channels" type="list">
+        <entry type="BlockChannelStruct"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0C" name="RemoveBlockChannels" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="BC"/>
+      </mandatoryConform>
+      <field id="0" name="ChannelIndexes" type="list">
+        <entry type="uint16"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0D" name="AddBlockApplications" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="BA"/>
+      </mandatoryConform>
+      <field id="0" name="Applications" type="list">
+        <entry type="AppInfoStruct"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0E" name="RemoveBlockApplications" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="BA"/>
+      </mandatoryConform>
+      <field id="0" name="Applications" type="list">
+        <entry type="AppInfoStruct"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0F" name="SetBlockContentTimeWindow" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="BTW"/>
+      </mandatoryConform>
+      <field id="0" name="TimeWindow" type="TimeWindowStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x10" name="RemoveBlockContentTimeWindow" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="BTW"/>
+      </mandatoryConform>
+      <field id="0" name="TimeWindowIndexes" type="list">
+        <entry type="uint16"/>
+        <mandatoryConform/>
+      </field>
+    </command>
   </commands>
   <events>
     <event id="0x00" name="RemainingScreenTimeExpired" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="ST"/>
+      </mandatoryConform>
+    </event>
+    <event id="0x01" name="EnteringBlockContentTimeWindow" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BTW"/>
       </mandatoryConform>
     </event>
   </events>

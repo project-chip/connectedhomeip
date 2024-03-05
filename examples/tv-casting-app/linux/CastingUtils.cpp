@@ -105,7 +105,7 @@ void InitCommissioningFlow(intptr_t commandArg)
             commissioner->LogDetail();
             if (associatedConnectableVideoPlayer.HasValue())
             {
-                TargetVideoPlayerInfo * targetVideoPlayerInfo = associatedConnectableVideoPlayer.Value();
+                [[maybe_unused]] TargetVideoPlayerInfo * targetVideoPlayerInfo = associatedConnectableVideoPlayer.Value();
                 ChipLogProgress(AppServer, "Previously connected with nodeId 0x" ChipLogFormatX64 " fabricIndex: %d",
                                 ChipLogValueX64(targetVideoPlayerInfo->GetNodeId()), targetVideoPlayerInfo->GetFabricIndex());
             }
@@ -305,7 +305,7 @@ void PrintFabrics()
             ChipLogError(AppServer, " -- Not initialized");
             continue;
         }
-        NodeId myNodeId = fb.GetNodeId();
+        [[maybe_unused]] NodeId myNodeId = fb.GetNodeId();
         ChipLogProgress(NotSpecified,
                         "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
                         ChipLogValueX64(myNodeId), ChipLogValueX64(fb.GetFabricId()), fabricIndex);

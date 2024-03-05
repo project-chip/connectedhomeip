@@ -18,6 +18,7 @@
 package matter.controller
 
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ICDDeviceInfo
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -48,6 +49,11 @@ class CompletionListenerAdapter(val listener: MatterController.CompletionListene
   ) = listener.onReadCommissioningInfo(vendorId, productId, wifiEndpointId, threadEndpointId)
 
   override fun onOpCSRGenerationComplete(csr: ByteArray) = listener.onOpCSRGenerationComplete(csr)
+
+  override fun onICDRegistrationInfoRequired() = listener.onICDRegistrationInfoRequired()
+
+  override fun onICDRegistrationComplete(errorCode: Int, icdDeviceInfo: ICDDeviceInfo) =
+    listener.onICDRegistrationComplete(errorCode, icdDeviceInfo)
 
   override fun onError(error: Throwable) = listener.onError(error)
 

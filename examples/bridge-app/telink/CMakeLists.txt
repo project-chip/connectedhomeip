@@ -69,11 +69,6 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
 
-add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-    -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=16
-)
-
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/ZclCallbacks.cpp
@@ -90,3 +85,7 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../bridge-common/bridge-app.zap
 )
+
+if(CONFIG_BOOTLOADER_MCUBOOT)
+  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()

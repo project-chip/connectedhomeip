@@ -55,17 +55,21 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002e" name="Power Source Configuration" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002E" name="Power Source Configuration" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="utility" picsCode="PSCFG" scope="Endpoint"/>
+  <clusterIds>
+    <clusterId id="0x002E" name="Power Source Configuration"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="PSCFG" scope="Node"/>
   <attributes>
-    <attribute id="0x0000" name="Sources" type="list[&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt;]">
+    <attribute id="0x0000" name="Sources" type="list">
+      <entry type="endpoint-no"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="max" value="6"/>
+      <constraint type="maxCount" value="6"/>
     </attribute>
   </attributes>
 </cluster>

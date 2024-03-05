@@ -23,8 +23,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
-#include <app/server/Dnssd.h>
-
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>

@@ -54,47 +54,68 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0061" name="RVC Operational State" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Deprecate the Start and Stop commands. Add the GoHome command."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0061" name="RVC Operational State"/>
+  </clusterIds>
   <classification hierarchy="derived" baseCluster="Operational State" role="application" picsCode="RVCOPSTATE" scope="Endpoint"/>
+  <commands>
+    <command id="0x00" name="Pause"/>
+    <command id="0x01" name="Stop">
+      <deprecateConform/>
+    </command>
+    <command id="0x02" name="Start">
+      <deprecateConform/>
+    </command>
+    <command id="0x03" name="Resume"/>
+    <command id="0x04" name="OperationalCommandResponse"/>
+    <command id="0x80" name="GoHome" direction="commandToServer" response="OperationalCommandResponse">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+    </command>
+  </commands>
   <dataTypes>
     <enum name="ErrorStateEnum">
-      <item value="64" name="FailedToFindChargingDock" summary="The device has failed to find or reach the charging dock">
+      <item value="0x40" name="FailedToFindChargingDock" summary="The device has failed to find or reach the charging dock">
         <mandatoryConform/>
       </item>
-      <item value="65" name="Stuck" summary="The device is stuck and requires manual intervention">
+      <item value="0x41" name="Stuck" summary="The device is stuck and requires manual intervention">
         <mandatoryConform/>
       </item>
-      <item value="66" name="DustBinMissing" summary="The device has detected that its dust bin is missing">
+      <item value="0x42" name="DustBinMissing" summary="The device has detected that its dust bin is missing">
         <mandatoryConform/>
       </item>
-      <item value="67" name="DustBinFull" summary="The device has detected that its dust bin is full">
+      <item value="0x43" name="DustBinFull" summary="The device has detected that its dust bin is full">
         <mandatoryConform/>
       </item>
-      <item value="68" name="WaterTankEmpty" summary="The device has detected that its water tank is empty">
+      <item value="0x44" name="WaterTankEmpty" summary="The device has detected that its water tank is empty">
         <mandatoryConform/>
       </item>
-      <item value="69" name="WaterTankMissing" summary="The device has detected that its water tank is missing">
+      <item value="0x45" name="WaterTankMissing" summary="The device has detected that its water tank is missing">
         <mandatoryConform/>
       </item>
-      <item value="70" name="WaterTankLidOpen" summary="The device has detected that its water tank lid is open">
+      <item value="0x46" name="WaterTankLidOpen" summary="The device has detected that its water tank lid is open">
         <mandatoryConform/>
       </item>
-      <item value="71" name="MopCleaningPadMissing" summary="The device has detected that its cleaning pad is missing">
+      <item value="0x47" name="MopCleaningPadMissing" summary="The device has detected that its cleaning pad is missing">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="OperationalStateEnum">
-      <item value="64" name="SeekingCharger" summary="The device is en route to the charging dock">
+      <item value="0x40" name="SeekingCharger" summary="The device is en route to the charging dock">
         <mandatoryConform/>
       </item>
-      <item value="65" name="Charging" summary="The device is charging">
+      <item value="0x41" name="Charging" summary="The device is charging">
         <mandatoryConform/>
       </item>
-      <item value="66" name="Docked" summary="The device is on the dock, not charging">
+      <item value="0x42" name="Docked" summary="The device is on the dock, not charging">
         <mandatoryConform/>
       </item>
     </enum>

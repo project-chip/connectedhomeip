@@ -17,7 +17,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/im-client-callbacks.h>
 #include <controller/CHIPCluster.h>
-#include <lib/support/CHIPListUtils.h>
+#include <app/data-model/ListLargeSystemExtensions.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <type_traits>
@@ -63,7 +63,7 @@ MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping
 MTR{{cluster}}Cluster{{command}}Params
 {{/unless}}
 {{/inline}}
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil completion:completion];
@@ -91,7 +91,7 @@ MTR{{cluster}}Cluster{{command}}Params
     {{/if}}
 
     using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
-    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
@@ -127,7 +127,7 @@ MTR{{cluster}}Cluster{{command}}Params
 (void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:@(self.endpoint)
+    [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
     {{#if_is_fabric_scoped_struct type}}
@@ -176,7 +176,7 @@ MTR{{cluster}}Cluster{{command}}Params
         TypeInfo::Type cppValue;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
 
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpoint);
+        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout);
     });
     std::move(*bridge).DispatchAction(self.device);
@@ -189,7 +189,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
     using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:@(self.endpoint)
+    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
                                                    params:params
@@ -246,7 +246,10 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
     {{/if}}
     ];
 }
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
+{{#unless (isInConfigList
+           (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
+           "LegacyCommandsWithOnlyOptionalArguments")}}
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#unless (and (isStrEqual cluster "GroupKeyManagement")
                (isStrEqual command "KeySetReadAllIndices"))}}
@@ -254,6 +257,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {
   [self {{asLowerCamelCase command}}WithParams:nil completionHandler:completionHandler];
 }
+{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/if}}

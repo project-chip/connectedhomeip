@@ -111,18 +111,22 @@ enum
     kChipEpochSecondsSinceUnixEpoch = kChipEpochDaysSinceUnixEpoch * kSecondsPerDay,
 };
 
-extern bool IsLeapYear(uint16_t year);
-extern uint8_t DaysInMonth(uint16_t year, uint8_t month);
-extern uint8_t FirstWeekdayOfYear(uint16_t year);
-extern void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t & month, uint8_t & dayOfMonth);
-extern void CalendarDateToOrdinalDate(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint16_t & dayOfYear);
-extern bool CalendarDateToDaysSinceUnixEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint32_t & daysSinceEpoch);
-extern bool DaysSinceUnixEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
-extern bool AdjustCalendarDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, int32_t relativeDays);
-extern bool CalendarTimeToSecondsSinceUnixEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute,
-                                                uint8_t second, uint32_t & secondsSinceEpoch);
-extern void SecondsSinceUnixEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
-                                                uint8_t & hour, uint8_t & minute, uint8_t & second);
+// Difference in microseconds between Unix epoch (Jan 1 1970 00:00:00) and CHIP Epoch (Jan 1 2000 00:00:00).
+constexpr uint64_t kChipEpochUsSinceUnixEpoch =
+    static_cast<uint64_t>(kChipEpochSecondsSinceUnixEpoch) * chip::kMicrosecondsPerSecond;
+
+bool IsLeapYear(uint16_t year);
+uint8_t DaysInMonth(uint16_t year, uint8_t month);
+uint8_t FirstWeekdayOfYear(uint16_t year);
+void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t & month, uint8_t & dayOfMonth);
+void CalendarDateToOrdinalDate(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint16_t & dayOfYear);
+bool CalendarDateToDaysSinceUnixEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint32_t & daysSinceEpoch);
+bool DaysSinceUnixEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
+bool AdjustCalendarDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, int32_t relativeDays);
+bool CalendarTimeToSecondsSinceUnixEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute,
+                                         uint8_t second, uint32_t & secondsSinceEpoch);
+void SecondsSinceUnixEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
+                                         uint8_t & hour, uint8_t & minute, uint8_t & second);
 
 /**
  *  @brief Convert a calendar date and time to the number of seconds since CHIP Epoch (2000-01-01 00:00:00 UTC).
@@ -141,8 +145,8 @@ extern void SecondsSinceUnixEpochToCalendarTime(uint32_t secondsSinceEpoch, uint
  *  @return   True if the date/time was converted successfully. False if the given year falls outside the
  *            representable range.
  */
-extern bool CalendarToChipEpochTime(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute, uint8_t second,
-                                    uint32_t & chipEpochTime);
+bool CalendarToChipEpochTime(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute, uint8_t second,
+                             uint32_t & chipEpochTime);
 
 /**
  *  @brief Convert the number of seconds since CHIP Epoch (2000-01-01 00:00:00 UTC) to a calendar date and time.
@@ -158,34 +162,64 @@ extern bool CalendarToChipEpochTime(uint16_t year, uint8_t month, uint8_t dayOfM
  *  @param minute         Minute (0-59).
  *  @param second         Second (0-59).
  */
-extern void ChipEpochToCalendarTime(uint32_t chipEpochTime, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour,
-                                    uint8_t & minute, uint8_t & second);
+void ChipEpochToCalendarTime(uint32_t chipEpochTime, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour,
+                             uint8_t & minute, uint8_t & second);
 
 /**
- *  @brief Convert the number of seconds since Unix Epoch (1970-01-01 00:00:00 UTC) to
+ *  @brief Convert the number of seconds since Unix Epoch (1970-01-01 00:00:00 GMT TAI) to
  *         CHIP Epoch (2000-01-01 00:00:00 UTC).
  *
  *  @details  Input time values are limited to positive values up to 2^32-1. This limits the
  *            representable date range to the year 2135.
  *
- *  @param unixEpochTime  Number of seconds since 1970-01-01 00:00:00 UTC.
- *  @param chipEpochTime  Number of seconds since 2000-01-01 00:00:00 UTC.
+ *  @param[in] unixEpochTimeSeconds  Number of seconds since 1970-01-01 00:00:00 GMT TAI.
+ *  @param[out] outChipEpochTimeSeconds  Number of seconds since 2000-01-01 00:00:00 UTC.
  *
  *  @return   True if the time was converted successfully. False if the given Unix epoch time
  *            falls outside the representable range.
  */
-extern bool UnixEpochToChipEpochTime(uint32_t unixEpochTime, uint32_t & chipEpochTime);
+bool UnixEpochToChipEpochTime(uint32_t unixEpochTimeSeconds, uint32_t & outChipEpochTimeSeconds);
 
 /**
- *  @def secondsToMilliseconds
+ *  @brief Convert the number of microseconds since CHIP Epoch (2000-01-01 00:00:00 UTC) to
+ *         Unix Epoch (1970-01-01 00:00:00 GMT TAI).
+ *
+ *  @param[in] chipEpochTimeMicros  Number of microseconds since 2000-01-01 00:00:00 UTC.
+ *  @param[out] outUnixEpochTimeMicros  Number of microseconds since 1970-01-01 00:00:00 GMT TAI.
+ *
+ *  @return   True if the time was converted successfully. False if the given CHIP epoch time
+ *            falls outside the representable range.
+ */
+bool ChipEpochToUnixEpochMicros(uint64_t chipEpochTimeMicros, uint64_t & outUnixEpochTimeMicros);
+
+/**
+ *  @brief Convert the number of microseconds since Unix Epoch (1970-01-01 00:00:00 GMT TAI) to
+ *         CHIP Epoch (2000-01-01 00:00:00 UTC).
+ *
+ *  @param[in] unixEpochTimeMicros  Number of microseconds since 1970-01-01 00:00:00 GMT TAI.
+ *  @param[out] outChipEpochTimeMicros  Number of microseconds since 2000-01-01 00:00:00 UTC.
+ *
+ *  @return   True if the time was converted successfully. False if the given Unix epoch time
+ *            falls outside the representable range.
+ */
+bool UnixEpochToChipEpochMicros(uint64_t unixEpochTimeMicros, uint64_t & outChipEpochTimeMicros);
+
+/**
+ *  @def SecondsToMilliseconds
  *
  *  @brief
  *    Convert integer seconds to milliseconds.
  *
  */
-inline uint32_t secondsToMilliseconds(uint32_t seconds)
+inline uint64_t SecondsToMilliseconds(uint32_t seconds)
 {
     return (seconds * kMillisecondsPerSecond);
+}
+
+// For backwards-compatibility of public API.
+[[deprecated("Use SecondsToMilliseconds")]] inline uint64_t secondsToMilliseconds(uint32_t seconds)
+{
+    return SecondsToMilliseconds(seconds);
 }
 
 } // namespace chip

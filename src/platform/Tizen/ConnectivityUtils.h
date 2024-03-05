@@ -38,31 +38,22 @@ namespace Internal {
 static constexpr uint16_t kWiFi_BAND_2_4_GHZ = 2400;
 static constexpr uint16_t kWiFi_BAND_5_0_GHZ = 5000;
 
-class ConnectivityUtils
-{
-public:
-    static uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel);
-    static uint8_t MapFrequencyToChannel(const uint16_t frequency);
-    static app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
-    static CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize);
-    static CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
-    static CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
-    static CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
-    static CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
-    static CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi);
-    static CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount);
-    static CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate);
-    static CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
-    static CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
-    static CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex);
+namespace ConnectivityUtils {
 
-private:
-    static uint16_t Map2400MHz(const uint8_t inChannel);
-    static uint16_t Map5000MHz(const uint8_t inChannel);
-    static double ConvertFrequenceToFloat(const iw_freq * in);
-    static CHIP_ERROR GetWiFiParameter(int skfd, const char * ifname, int request, struct iwreq * pwrq);
-    static CHIP_ERROR GetWiFiStats(int skfd, const char * ifname, struct iw_statistics * stats);
-};
+app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
+CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize);
+CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
+CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
+CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
+CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
+CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi);
+CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount);
+CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate);
+CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
+CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
+CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex);
+
+} // namespace ConnectivityUtils
 
 } // namespace Internal
 } // namespace DeviceLayer

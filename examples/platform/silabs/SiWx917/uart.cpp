@@ -26,6 +26,7 @@ extern "C" {
 #endif
 #include "assert.h"
 #include "rsi_board.h"
+#include "rsi_debug.h"
 #include "uart.h"
 #include <stddef.h>
 #include <string.h>
@@ -49,7 +50,7 @@ void callback_event(uint32_t event)
     case SL_USART_EVENT_RECEIVE_COMPLETE:
 #ifdef ENABLE_CHIP_SHELL
         chip::NotifyShellProcessFromISR();
-#endif;
+#endif
     case SL_USART_EVENT_TRANSFER_COMPLETE:
         break;
     }
@@ -72,28 +73,25 @@ void uartConsoleInit(void)
     usart_config.synch_mode    = DISABLE;
     sl_si91x_usart_control_config_t get_config;
 
-    // Initialized board UART
-    DEBUGINIT();
-
     // Initialize the UART
     status = sl_si91x_usart_init((usart_peripheral_t) usart_config.usart_module, &usart_handle);
     if (status != SL_STATUS_OK)
     {
-        DEBUGOUT("sl_si91x_usart_initialize: Error Code : %lu \n", status);
+        SILABS_LOG("sl_si91x_usart_initialize: Error Code : %lu \n", status);
     }
 
     // Configure the USART configurations
     status = sl_si91x_usart_set_configuration(usart_handle, &usart_config);
     if (status != SL_STATUS_OK)
     {
-        DEBUGOUT("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
+        SILABS_LOG("sl_si91x_usart_set_configuration: Error Code : %lu \n", status);
     }
 
     // Register user callback function
     status = sl_si91x_usart_register_event_callback(callback_event);
     if (status != SL_STATUS_OK)
     {
-        DEBUGOUT("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
+        SILABS_LOG("sl_si91x_usart_register_event_callback: Error Code : %lu \n", status);
     }
 
     NVIC_EnableIRQ(USART0_IRQn);
@@ -119,6 +117,30 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
         return status;
     }
     return BufLength;
+}
+
+/**
+ * @brief Write Logs to the Uart. Appends a return character
+ *
+ * @param log pointer to the logs
+ * @param length number of bytes to write
+ * @return int16_t Amount of bytes written or ERROR (-1)
+ */
+int16_t uartLogWrite(const char * log, uint16_t length)
+{
+    if (log == NULL || length == 0)
+    {
+        return UART_CONSOLE_ERR;
+    }
+    for (uint16_t i = 0; i < length; i++)
+    {
+        Board_UARTPutChar(log[i]);
+    }
+    // To print next log in new line with proper formatting
+    Board_UARTPutChar('\r');
+    Board_UARTPutChar('\n');
+
+    return length + 2;
 }
 
 /*

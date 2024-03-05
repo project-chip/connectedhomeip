@@ -54,12 +54,17 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001d" name="Descriptor" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001D" name="Descriptor" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Semantic tag list; TagList feature"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x001D" name="Descriptor"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DESC" scope="Endpoint"/>
   <features>
     <feature bit="0" code="TAGLIST" name="TagList" summary="The TagList attribute is present"/>
@@ -76,11 +81,12 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="DeviceTypeList" type="list[DeviceTypeStruct Type]" default="desc">
+    <attribute id="0x0000" name="DeviceTypeList" type="list" default="desc">
+      <entry type="DeviceTypeStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="min" value="1"/>
+      <constraint type="minCount" value="1"/>
     </attribute>
     <attribute id="0x0001" name="ServerList" type="list" default="empty">
       <entry type="cluster-id"/>
@@ -99,13 +105,14 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0004" name="TagList" type="list[&lt;&lt;ref_SemTag&gt;&gt;]" default="MS">
+    <attribute id="0x0004" name="TagList" type="list" default="MS">
+      <entry type="ref_SemTag"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="TAGLIST"/>
       </mandatoryConform>
-      <constraint type="between" from="1" to="6"/>
+      <constraint type="countBetween" from="1" to="6"/>
     </attribute>
   </attributes>
 </cluster>

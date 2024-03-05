@@ -40,34 +40,9 @@ static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
 static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
-uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __FACTORY_DATA_START;
-uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __FACTORY_DATA_SIZE;
+uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __MATTER_FACTORY_DATA_START;
+uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __MATTER_FACTORY_DATA_SIZE;
 uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
-
-FactoryDataProvider::FactoryDataProvider()
-{
-    maxLengths[FactoryDataId::kVerifierId]           = kSpake2pSerializedVerifier_MaxBase64Len;
-    maxLengths[FactoryDataId::kSaltId]               = kSpake2pSalt_MaxBase64Len;
-    maxLengths[FactoryDataId::kIcId]                 = sizeof(uint32_t);
-    maxLengths[FactoryDataId::kDacPrivateKeyId]      = Crypto::kP256_PrivateKey_Length;
-    maxLengths[FactoryDataId::kDacCertificateId]     = Credentials::kMaxDERCertLength;
-    maxLengths[FactoryDataId::kPaiCertificateId]     = Credentials::kMaxDERCertLength;
-    maxLengths[FactoryDataId::kDiscriminatorId]      = sizeof(uint32_t);
-    maxLengths[FactoryDataId::kSetupPasscodeId]      = sizeof(uint32_t);
-    maxLengths[FactoryDataId::kVidId]                = sizeof(uint16_t);
-    maxLengths[FactoryDataId::kPidId]                = sizeof(uint16_t);
-    maxLengths[FactoryDataId::kCertDeclarationId]    = Credentials::kMaxCMSSignedCDMessage;
-    maxLengths[FactoryDataId::kVendorNameId]         = ConfigurationManager::kMaxVendorNameLength;
-    maxLengths[FactoryDataId::kProductNameId]        = ConfigurationManager::kMaxProductNameLength;
-    maxLengths[FactoryDataId::kSerialNumberId]       = ConfigurationManager::kMaxSerialNumberLength;
-    maxLengths[FactoryDataId::kManufacturingDateId]  = ConfigurationManager::kMaxManufacturingDateLength;
-    maxLengths[FactoryDataId::kHardwareVersionId]    = sizeof(uint16_t);
-    maxLengths[FactoryDataId::kHardwareVersionStrId] = ConfigurationManager::kMaxHardwareVersionStringLength;
-    maxLengths[FactoryDataId::kUniqueId]             = ConfigurationManager::kMaxUniqueIDLength;
-    maxLengths[FactoryDataId::kPartNumber]           = ConfigurationManager::kMaxPartNumberLength;
-    maxLengths[FactoryDataId::kProductURL]           = ConfigurationManager::kMaxProductURLLength;
-    maxLengths[FactoryDataId::kProductLabel]         = ConfigurationManager::kMaxProductLabelLength;
-}
 
 FactoryDataProvider::~FactoryDataProvider() {}
 
@@ -97,12 +72,6 @@ CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf
 
         if (searchedType == type)
         {
-            if ((type >= FactoryDataProvider::kNumberOfIds) || (length > maxLengths[type]))
-            {
-                ChipLogError(DeviceLayer, "Failed validity check for factory data with: id=%d, length=%d", type, length);
-                break;
-            }
-
             ReturnErrorCodeIf(bufLength < length, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(pBuf, (void *) (addr + kValueOffset), length);
 
@@ -123,11 +92,17 @@ CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf
 
 CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
+#if CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+    constexpr uint8_t kCdForAllExamples[] = CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION;
+
+    return CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
+#else
     uint16_t declarationSize = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kCertDeclarationId, outBuffer.data(), outBuffer.size(), declarationSize));
     outBuffer.reduce_size(declarationSize);
 
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
@@ -359,6 +334,30 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 #endif
 
     return err;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    uint8_t productFinish;
+    uint16_t length = 0;
+    auto err        = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
+    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    uint8_t color;
+    uint16_t length = 0;
+    auto err        = SearchForId(FactoryDataId::kProductPrimaryColor, &color, sizeof(color), length);
+    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

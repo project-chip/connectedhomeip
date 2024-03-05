@@ -1,0 +1,528 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 132.3.1. [TC-S-3.1] Functionality with DUT as Client
+
+PICS:
+    - S.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label: "Step 0a: Precondition 1"
+      verification: |
+          - TH as server exposes a Scenes Management server cluster on Endpoint: EndpointID, supporting all possible commands and corresponding attributes.
+          - Commission DUT to TH
+      disabled: true
+
+    - label:
+          "Step 0b: Precondition 2: TH sends KeySetWrite command in the
+          GroupKeyManagement cluster to DUT using a key that is pre-installed on
+          the TH. GroupKeySet fields are as follows: * GroupKeySetID: 0x01a1 *
+          GroupKeySecurityPolicy: TrustFirst (0) * EpochKey0:
+          a0a1a2a3a4a5a6a7a8a9aaabacadaeaf * EpochStartTime0: 1110000 *
+          EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf * EpochStartTime1: 1110001
+          * EpochKey2: c0c1c2c3c4c5c6c7c8c9cacbcccdcecf * EpochStartTime2:
+          1110002"
+      verification: |
+          Please execute the below commands before starting the test case :
+
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a1","groupKeySecurityPolicy": 0, "epochKey0":"a0a1a2a3a4a5a6a7a8a9aaabacadaeaf","epochStartTime0": 1110000,"epochKey1":"b0b1b2b3b4b5b6b7b8b9babbbcbdbebf", "epochStartTime1": 1110001,"epochKey2":"c0c1c2c3c4c5c6c7c8c9cacbcccdcecf", "epochStartTime2": 1110002 }' 1 0
+
+          Verify the KeySetWrite command  On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
+
+          [1706722808.568204][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706722808.568218][5404:5404] CHIP:DMG: {
+          [1706722808.568225][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706722808.568237][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706722808.568247][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706722808.568272][5404:5404] CHIP:DMG:         [
+          [1706722808.568281][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706722808.568290][5404:5404] CHIP:DMG:                 {
+          [1706722808.568298][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706722808.568315][5404:5404] CHIP:DMG:                         {
+          [1706722808.568328][5404:5404] CHIP:DMG:                                 EndpointId = 0x0,
+          [1706722808.568341][5404:5404] CHIP:DMG:                                 ClusterId = 0x3f,
+          [1706722808.568356][5404:5404] CHIP:DMG:                                 CommandId = 0x0,
+          [1706722808.568366][5404:5404] CHIP:DMG:                         },
+          [1706722808.568381][5404:5404] CHIP:DMG:
+          [1706722808.568391][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706722808.568403][5404:5404] CHIP:DMG:                         {
+          [1706722808.568414][5404:5404] CHIP:DMG:                                 0x0 =
+          [1706722808.568426][5404:5404] CHIP:DMG:                                 {
+          [1706722808.568439][5404:5404] CHIP:DMG:                                         0x0 = 417,
+          [1706722808.568453][5404:5404] CHIP:DMG:                                         0x1 = 0,
+          [1706722808.568465][5404:5404] CHIP:DMG:                                         0x2 = [
+          [1706722808.568482][5404:5404] CHIP:DMG:                                                         0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf,
+          [1706722808.568498][5404:5404] CHIP:DMG:                                         ] (16 bytes)
+          [1706722808.568511][5404:5404] CHIP:DMG:                                         0x3 = 1110000,
+          [1706722808.568523][5404:5404] CHIP:DMG:                                         0x4 = [
+          [1706722808.568539][5404:5404] CHIP:DMG:                                                         0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf,
+          [1706722808.568553][5404:5404] CHIP:DMG:                                         ] (16 bytes)
+          [1706722808.568578][5404:5404] CHIP:DMG:                                         0x5 = 1110001,
+          [1706722808.568594][5404:5404] CHIP:DMG:                                         0x6 = [
+          [1706722808.568610][5404:5404] CHIP:DMG:                                                         0xc2, 0xc1, 0xc2, 0xc3, 0cd4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf,
+          [1706722808.568623][5404:5404] CHIP:DMG:                                         ] (16 bytes)
+          [1706722808.568633][5404:5404] CHIP:DMG:                                         0x7 = 1110002,
+          [1706722808.568645][5404:5404] CHIP:DMG:                                 },
+          [1706722808.568661][5404:5404] CHIP:DMG:                         },
+          [1706722808.568671][5404:5404] CHIP:DMG:                 },
+          [1706722808.568695][5404:5404] CHIP:DMG:
+          [1706722808.568704][5404:5404] CHIP:DMG:         ],
+          [1706722808.568729][5404:5404] CHIP:DMG:
+          [1706722808.568739][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706722808.568747][5404:5404] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Step 0c: Precondition 3: TH binds GroupIds 0x0001 and 0x0002 with
+          GroupKeySetID 0x01a1 in the GroupKeyMap attribute list on
+          GroupKeyManagement cluster by writing the GroupKeyMap attribute with
+          two entries as follows: * List item 1: - FabricIndex: 1 - GroupId:
+          0x0001 - GroupKeySetId: 0x01a1"
+      verification: |
+          Please execute the below commands before starting the test case :
+
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": "0x0001", "groupKeySetID": "0x01a1", "fabricIndex": 1} ]' 1 0
+
+          Verify the GroupKeyMap attribute On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
+
+          [1706722844.841613][5404:5404] CHIP:DMG: WriteRequestMessage =
+          [1706722844.841616][5404:5404] CHIP:DMG: {
+          [1706722844.841619][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706722844.841621][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706722844.841625][5404:5404] CHIP:DMG:         AttributeDataIBs =
+          [1706722844.841629][5404:5404] CHIP:DMG:         [
+          [1706722844.841632][5404:5404] CHIP:DMG:                 AttributeDataIB =
+          [1706722844.841636][5404:5404] CHIP:DMG:                 {
+          [1706722844.841639][5404:5404] CHIP:DMG:                         AttributePathIB =
+          [1706722844.841643][5404:5404] CHIP:DMG:                         {
+          [1706722844.841646][5404:5404] CHIP:DMG:                                 Endpoint = 0x0,
+          [1706722844.841649][5404:5404] CHIP:DMG:                                 Cluster = 0x3f,
+          [1706722844.841652][5404:5404] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1706722844.841655][5404:5404] CHIP:DMG:                         }
+          [1706722844.841659][5404:5404] CHIP:DMG:
+          [1706722844.841662][5404:5404] CHIP:DMG:                         Data = [
+          [1706722844.841665][5404:5404] CHIP:DMG:
+          [1706722844.841668][5404:5404] CHIP:DMG:                         ],
+          [1706722844.841670][5404:5404] CHIP:DMG:                 },
+          [1706722844.841677][5404:5404] CHIP:DMG:
+          [1706722844.841680][5404:5404] CHIP:DMG:                 AttributeDataIB =
+          [1706722844.841682][5404:5404] CHIP:DMG:                 {
+          [1706722844.841685][5404:5404] CHIP:DMG:                         AttributePathIB =
+          [1706722844.841687][5404:5404] CHIP:DMG:                         {
+          [1706722844.841690][5404:5404] CHIP:DMG:                                 Endpoint = 0x0,
+          [1706722844.841693][5404:5404] CHIP:DMG:                                 Cluster = 0x3f,
+          [1706722844.841696][5404:5404] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1706722844.841699][5404:5404] CHIP:DMG:                                 ListIndex = Null,
+          [1706722844.841702][5404:5404] CHIP:DMG:                         }
+          [1706722844.841706][5404:5404] CHIP:DMG:
+          [1706722844.841708][5404:5404] CHIP:DMG:                         Data =
+          [1706722844.841711][5404:5404] CHIP:DMG:                         {
+          [1706722844.841715][5404:5404] CHIP:DMG:                                 0x1 = 1,
+          [1706722844.841718][5404:5404] CHIP:DMG:                                 0x2 = 417,
+          [1706722844.841721][5404:5404] CHIP:DMG:                         },
+          [1706722844.841723][5404:5404] CHIP:DMG:                 },
+          [1706722844.841727][5404:5404] CHIP:DMG:
+          [1706722844.841730][5404:5404] CHIP:DMG:         ],
+          [1706722844.841736][5404:5404] CHIP:DMG:
+          [1706722844.841738][5404:5404] CHIP:DMG:         moreChunkedMessages = false,
+          [1706722844.841741][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706722844.841743][5404:5404] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Step 0d: Precondition 4: TH sends a RemoveAllGroups command to DUT."
+      verification: |
+          Please execute the below commands before starting the test case :
+
+          ./chip-tool groups remove-all-groups 1 1
+
+          Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
+
+          [1653485455.344097][11508:11513] CHIP:DMG:                              StatusIB =
+          [1653485455.344141][11508:11513] CHIP:DMG:                              {
+          [1653485455.344190][11508:11513] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1653485455.344236][11508:11513] CHIP:DMG:                              },
+      disabled: true
+
+    - label:
+          "Step 0e: Precondition 5: TH sends a AddGroup command to DUT with the
+          GroupID field set to G1."
+      verification: |
+          Please execute the below commands before starting the test case :
+
+          ./chip-tool groups add-group 0x01 Gp1 1 1
+
+          Verify the AddGroup Command  on TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
+
+          [1706722872.295182][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706722872.295185][5404:5404] CHIP:DMG: {
+          [1706722872.295188][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706722872.295191][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706722872.295194][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706722872.295199][5404:5404] CHIP:DMG:         [
+          [1706722872.295201][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706722872.295205][5404:5404] CHIP:DMG:                 {
+          [1706722872.295207][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706722872.295211][5404:5404] CHIP:DMG:                         {
+          [1706722872.295214][5404:5404] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706722872.295217][5404:5404] CHIP:DMG:                                 ClusterId = 0x4,
+          [1706722872.295220][5404:5404] CHIP:DMG:                                 CommandId = 0x0,
+          [1706722872.295223][5404:5404] CHIP:DMG:                         },
+          [1706722872.295226][5404:5404] CHIP:DMG:
+          [1706722872.295229][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706722872.295233][5404:5404] CHIP:DMG:                         {
+          [1706722872.295236][5404:5404] CHIP:DMG:                                 0x0 = 1,
+          [1706722872.295240][5404:5404] CHIP:DMG:                                 0x1 = "Gp1" (3 chars),
+          [1706722872.295243][5404:5404] CHIP:DMG:                         },
+          [1706722872.295246][5404:5404] CHIP:DMG:                 },
+          [1706722872.295250][5404:5404] CHIP:DMG:
+          [1706722872.295253][5404:5404] CHIP:DMG:         ],
+          [1706722872.295257][5404:5404] CHIP:DMG:
+          [1706722872.295260][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706722872.295262][5404:5404] CHIP:DMG: },
+      disabled: true
+
+    - label: "Step 1: DUT issues a C_ADD_SCENE command to the Test Harness."
+      PICS: S.C.C00.Tx
+      verification: |
+          ./chip-tool scenesmanagement add-scene 0x0001 0x01 20 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4001", "attributeValue": "0x01"}]}]' 1 1
+
+          Verify  TH recieves "AddScene(0x0)" command with following parameters:
+          - ID 0 (GroupID): the type is a group-id.
+          - ID 1 (SceneID): the type is an uint8.
+          - ID 2 (TransitionTime): the type is an uint16; max of 60000.
+          - ID 3 (SceneName): the type is a string; max of 16 bytes
+          - ID 4 (ExtensionFieldSetStructs): the type is a list of ExtensionFieldSetStruct: ClusterID and AttributeValueList. on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1706722915.343620][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706722915.343637][5404:5404] CHIP:DMG: {
+          [1706722915.343649][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706722915.343664][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706722915.343676][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706722915.343714][5404:5404] CHIP:DMG:         [
+          [1706722915.343729][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706722915.343743][5404:5404] CHIP:DMG:                 {
+          [1706722915.343758][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706722915.343776][5404:5404] CHIP:DMG:                         {
+          [1706722915.343794][5404:5404] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706722915.343812][5404:5404] CHIP:DMG:                                 ClusterId = 0x62,
+          [1706722915.343831][5404:5404] CHIP:DMG:                                 CommandId = 0x0,
+          [1706722915.343846][5404:5404] CHIP:DMG:                         },
+          [1706722915.343867][5404:5404] CHIP:DMG:
+          [1706722915.343883][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706722915.343900][5404:5404] CHIP:DMG:                         {
+          [1706722915.343920][5404:5404] CHIP:DMG:                                 0x0 = 1,
+          [1706722915.343939][5404:5404] CHIP:DMG:                                 0x1 = 1,
+          [1706722915.343958][5404:5404] CHIP:DMG:                                 0x2 = 20,
+          [1706722915.343981][5404:5404] CHIP:DMG:                                 0x3 = "scene name" (10 chars),
+          [1706722915.343999][5404:5404] CHIP:DMG:                                 0x4 = [
+          [1706722915.344018][5404:5404] CHIP:DMG:
+          [1706722915.344037][5404:5404] CHIP:DMG:                                         {
+          [1706722915.344073][5404:5404] CHIP:DMG:                                                 0x0 = 768,
+          [1706722915.344094][5404:5404] CHIP:DMG:                                                 0x1 = [
+          [1706722915.344117][5404:5404] CHIP:DMG:
+          [1706722915.344142][5404:5404] CHIP:DMG:                                                         {
+          [1706722915.344174][5404:5404] CHIP:DMG:                                                                 0x0 = 16385,
+          [1706722915.344200][5404:5404] CHIP:DMG:                                                                 0x1 = 1,
+          [1706722915.344226][5404:5404] CHIP:DMG:                                                         },
+          [1706722915.344248][5404:5404] CHIP:DMG:                                                 ],
+          [1706722915.344268][5404:5404] CHIP:DMG:                                         },
+          [1706722915.344286][5404:5404] CHIP:DMG:                                 ],
+          [1706722915.344303][5404:5404] CHIP:DMG:                         },
+          [1706722915.344317][5404:5404] CHIP:DMG:                 },
+          [1706722915.344355][5404:5404] CHIP:DMG:
+          [1706722915.344368][5404:5404] CHIP:DMG:         ],
+          [1706722915.344408][5404:5404] CHIP:DMG:
+          [1706722915.344422][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706722915.344436][5404:5404] CHIP:DMG: },
+
+      disabled: true
+
+    - label: "Step 2: DUT issues a C_VIEW_SCENE command to the Test Harness."
+      PICS: S.C.C01.Tx
+      verification: |
+          ./chip-tool scenesmanagement view-scene 0x0001 0x01 1 1
+
+          Verify  TH recieves "ViewScene(0x1)" command with following parameters:
+          - ID 0 (GroupID): the type is a group-id.
+          - ID 1 (SceneID): the type is an uint8.on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1706722945.925814][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706722945.925826][5404:5404] CHIP:DMG: {
+          [1706722945.925837][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706722945.925850][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706722945.925860][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706722945.925888][5404:5404] CHIP:DMG:         [
+          [1706722945.925903][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706722945.925924][5404:5404] CHIP:DMG:                 {
+          [1706722945.925937][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706722945.925950][5404:5404] CHIP:DMG:                         {
+          [1706722945.925965][5404:5404] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706722945.925980][5404:5404] CHIP:DMG:                                 ClusterId = 0x62,
+          [1706722945.925998][5404:5404] CHIP:DMG:                                 CommandId = 0x1,
+          [1706722945.926014][5404:5404] CHIP:DMG:                         },
+          [1706722945.926035][5404:5404] CHIP:DMG:
+          [1706722945.926051][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706722945.926070][5404:5404] CHIP:DMG:                         {
+          [1706722945.926090][5404:5404] CHIP:DMG:                                 0x0 = 1,
+          [1706722945.926110][5404:5404] CHIP:DMG:                                 0x1 = 1,
+          [1706722945.926126][5404:5404] CHIP:DMG:                         },
+          [1706722945.926141][5404:5404] CHIP:DMG:                 },
+          [1706722945.926165][5404:5404] CHIP:DMG:
+          [1706722945.926176][5404:5404] CHIP:DMG:         ],
+      disabled: true
+
+    - label: "Step 3: DUT issues a C_REMOVE_SCENE command to the Test Harness."
+      PICS: S.C.C02.Tx
+      verification: |
+          ./chip-tool scenesmanagement remove-scene 0x0001 0x01 1 1
+
+          Verify  TH recieves "RemoveScene(0x2)" command with following parameters:
+          - ID 0 (GroupID): the type is a group-id.
+          - ID 1 (SceneID): the type is an uint8.
+          on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1706722967.651552][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706722967.651557][5404:5404] CHIP:DMG: {
+          [1706722967.651561][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706722967.651565][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706722967.651570][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706722967.651577][5404:5404] CHIP:DMG:         [
+          [1706722967.651580][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706722967.651585][5404:5404] CHIP:DMG:                 {
+          [1706722967.651588][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706722967.651593][5404:5404] CHIP:DMG:                         {
+          [1706722967.651598][5404:5404] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706722967.651602][5404:5404] CHIP:DMG:                                 ClusterId = 0x62,
+          [1706722967.651606][5404:5404] CHIP:DMG:                                 CommandId = 0x2,
+          [1706722967.651610][5404:5404] CHIP:DMG:                         },
+          [1706722967.651615][5404:5404] CHIP:DMG:
+          [1706722967.651619][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706722967.651623][5404:5404] CHIP:DMG:                         {
+          [1706722967.651628][5404:5404] CHIP:DMG:                                 0x0 = 1,
+          [1706722967.651633][5404:5404] CHIP:DMG:                                 0x1 = 1,
+          [1706722967.651636][5404:5404] CHIP:DMG:                         },
+          [1706722967.651640][5404:5404] CHIP:DMG:                 },
+          [1706722967.651646][5404:5404] CHIP:DMG:
+          [1706722967.651649][5404:5404] CHIP:DMG:         ],
+          [1706722967.651655][5404:5404] CHIP:DMG:
+          [1706722967.651658][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706722967.651661][5404:5404] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Step 4: DUT issues a C_REMOVE_ALL_SCENES command to the Test Harness."
+      PICS: S.C.C03.Tx
+      verification: |
+          ./chip-tool scenesmanagement remove-all-scenes 0x0001  1 1
+
+          Verify  TH recieves "RemoveAllScenes(0x3)" command with following parameters:
+          - ID 0 (GroupID): the type is a group-id.
+          on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1706722986.792332][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706722986.792353][5404:5404] CHIP:DMG: {
+          [1706722986.792374][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706722986.792388][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706722986.792395][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706722986.792415][5404:5404] CHIP:DMG:         [
+          [1706722986.792425][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706722986.792446][5404:5404] CHIP:DMG:                 {
+          [1706722986.792460][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706722986.792475][5404:5404] CHIP:DMG:                         {
+          [1706722986.792490][5404:5404] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706722986.792508][5404:5404] CHIP:DMG:                                 ClusterId = 0x62,
+          [1706722986.792522][5404:5404] CHIP:DMG:                                 CommandId = 0x3,
+          [1706722986.792535][5404:5404] CHIP:DMG:                         },
+          [1706722986.792553][5404:5404] CHIP:DMG:
+          [1706722986.792568][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706722986.792585][5404:5404] CHIP:DMG:                         {
+          [1706722986.792600][5404:5404] CHIP:DMG:                                 0x0 = 1,
+          [1706722986.792612][5404:5404] CHIP:DMG:                         },
+          [1706722986.792621][5404:5404] CHIP:DMG:                 },
+          [1706722986.792638][5404:5404] CHIP:DMG:
+          [1706722986.792647][5404:5404] CHIP:DMG:         ],
+          [1706722986.792669][5404:5404] CHIP:DMG:
+          [1706722986.792679][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706722986.792689][5404:5404] CHIP:DMG: },
+      disabled: true
+
+    - label: "Step 5: DUT issues a C_STORE_SCENE command to the Test Harness."
+      PICS: S.C.C04.Tx
+      verification: |
+          ./chip-tool scenesmanagement store-scene 0x0001 0x01 1 1
+
+          Verify  TH recieves "StoreScene(0x4)" command with following parameters:
+          - ID 0 (GroupID): the type is a group-id.
+          - ID 1 (SceneID): the type is an uint8.
+          on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1706723006.082174][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706723006.082187][5404:5404] CHIP:DMG: {
+          [1706723006.082196][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706723006.082208][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706723006.082218][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706723006.082237][5404:5404] CHIP:DMG:         [
+          [1706723006.082247][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706723006.082258][5404:5404] CHIP:DMG:                 {
+          [1706723006.082268][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706723006.082280][5404:5404] CHIP:DMG:                         {
+          [1706723006.082292][5404:5404] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706723006.082304][5404:5404] CHIP:DMG:                                 ClusterId = 0x62,
+          [1706723006.082316][5404:5404] CHIP:DMG:                                 CommandId = 0x4,
+          [1706723006.082326][5404:5404] CHIP:DMG:                         },
+          [1706723006.082341][5404:5404] CHIP:DMG:
+          [1706723006.082351][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706723006.082362][5404:5404] CHIP:DMG:                         {
+          [1706723006.082376][5404:5404] CHIP:DMG:                                 0x0 = 1,
+          [1706723006.082388][5404:5404] CHIP:DMG:                                 0x1 = 1,
+          [1706723006.082399][5404:5404] CHIP:DMG:                         },
+          [1706723006.082409][5404:5404] CHIP:DMG:                 },
+          [1706723006.082425][5404:5404] CHIP:DMG:
+          [1706723006.082434][5404:5404] CHIP:DMG:         ],
+          [1706723006.082451][5404:5404] CHIP:DMG:
+          [1706723006.082461][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706723006.082471][5404:5404] CHIP:DMG: },
+      disabled: true
+
+    - label: "Step 6: DUT issues a C_RECALL_SCENE command to the Test Harness."
+      PICS: S.C.C05.Tx
+      verification: |
+          ./chip-tool scenesmanagement recall-scene 0x0001 0x01 1 1 --TransitionTime 10
+
+          Verify  TH recieves "RecallScene(0x5)" command with following parameters:
+          - ID 0 (GroupID): the type is a group-id.
+          - ID 1 (SceneID): the type is an uint8
+          - Optional ID 2 (TransitionTime): the type is an uint32; max of 60000000 on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1706723348.325563][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706723348.325580][5404:5404] CHIP:DMG: {
+          [1706723348.325596][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706723348.325613][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706723348.325628][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706723348.325657][5404:5404] CHIP:DMG:         [
+          [1706723348.325671][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706723348.325689][5404:5404] CHIP:DMG:                 {
+          [1706723348.325703][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706723348.325721][5404:5404] CHIP:DMG:                         {
+          [1706723348.325740][5404:5404] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706723348.325758][5404:5404] CHIP:DMG:                                 ClusterId = 0x62,
+          [1706723348.325776][5404:5404] CHIP:DMG:                                 CommandId = 0x5,
+          [1706723348.325792][5404:5404] CHIP:DMG:                         },
+          [1706723348.325812][5404:5404] CHIP:DMG:
+          [1706723348.325829][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706723348.325846][5404:5404] CHIP:DMG:                         {
+          [1706723348.325865][5404:5404] CHIP:DMG:                                 0x0 = 1,
+          [1706723348.325885][5404:5404] CHIP:DMG:                                 0x1 = 1,
+          [1706723348.325904][5404:5404] CHIP:DMG:                                 0x2 = 10,
+          [1706723348.325924][5404:5404] CHIP:DMG:                         },
+          [1706723348.325938][5404:5404] CHIP:DMG:                 },
+          [1706723348.325965][5404:5404] CHIP:DMG:
+          [1706723348.325979][5404:5404] CHIP:DMG:         ],
+          [1706723348.326007][5404:5404] CHIP:DMG:
+          [1706723348.326022][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706723348.326035][5404:5404] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "Step 7: DUT issues a C_GET_SCENE_MEMBERSHIP command to the Test
+          Harness."
+      PICS: S.C.C06.Tx
+      verification: |
+          ./chip-tool scenesmanagement get-scene-membership 0x00001 1 1
+
+          Verify  TH recieves "GetSceneMembership(0x6)" command with following parameters:
+          - ID 0 (GroupID): the type is a group-id.
+          on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1706723042.993627][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706723042.993631][5404:5404] CHIP:DMG: {
+          [1706723042.993634][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706723042.993639][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706723042.993644][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706723042.993651][5404:5404] CHIP:DMG:         [
+          [1706723042.993655][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706723042.993660][5404:5404] CHIP:DMG:                 {
+          [1706723042.993664][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706723042.993669][5404:5404] CHIP:DMG:                         {
+          [1706723042.993674][5404:5404] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706723042.993685][5404:5404] CHIP:DMG:                                 ClusterId = 0x62,
+          [1706723042.993690][5404:5404] CHIP:DMG:                                 CommandId = 0x6,
+          [1706723042.993694][5404:5404] CHIP:DMG:                         },
+          [1706723042.993699][5404:5404] CHIP:DMG:
+          [1706723042.993703][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706723042.993708][5404:5404] CHIP:DMG:                         {
+          [1706723042.993713][5404:5404] CHIP:DMG:                                 0x0 = 1,
+          [1706723042.993718][5404:5404] CHIP:DMG:                         },
+          [1706723042.993722][5404:5404] CHIP:DMG:                 },
+          [1706723042.993728][5404:5404] CHIP:DMG:
+          [1706723042.993732][5404:5404] CHIP:DMG:         ],
+          [1706723042.993739][5404:5404] CHIP:DMG:
+          [1706723042.993743][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706723042.993746][5404:5404] CHIP:DMG: },
+      disabled: true
+
+    - label: "Step 8: DUT issues a C_COPY_SCENE command to the Test Harness."
+      PICS: S.C.C40.Tx
+      verification: |
+          ./chip-tool scenesmanagement copy-scene 0x00 0x01 0x01 0x01 0x02 1 1
+
+          Verify  TH recieves "CopyScene( 0x40)" command with following parameters:
+          - ID 0 (Mode): the type is a CopyModeBitmap; If this value is set to 1, all scenes are to be copied. Otherwise this bit is set to 0
+          - ID 1 (GroupIdentifierFrom): the type is an group-id.
+          - ID 2 (SceneIdentifierFrom): the type is an uint8.
+          - ID 3 (GroupIdentifierTo): the type is an group-id.
+          - ID 4 (SceneIdentifierTo): the type is an uint8. on TH (all-cluster-app) log and below is the sample log provided for the raspi platform:
+
+          [1706723061.022072][5404:5404] CHIP:DMG: InvokeRequestMessage =
+          [1706723061.022075][5404:5404] CHIP:DMG: {
+          [1706723061.022077][5404:5404] CHIP:DMG:         suppressResponse = false,
+          [1706723061.022081][5404:5404] CHIP:DMG:         timedRequest = false,
+          [1706723061.022084][5404:5404] CHIP:DMG:         InvokeRequests =
+          [1706723061.022089][5404:5404] CHIP:DMG:         [
+          [1706723061.022092][5404:5404] CHIP:DMG:                 CommandDataIB =
+          [1706723061.022095][5404:5404] CHIP:DMG:                 {
+          [1706723061.022098][5404:5404] CHIP:DMG:                         CommandPathIB =
+          [1706723061.022101][5404:5404] CHIP:DMG:                         {
+          [1706723061.022105][5404:5404] CHIP:DMG:                                 EndpointId = 0x1,
+          [1706723061.022108][5404:5404] CHIP:DMG:                                 ClusterId = 0x62,
+          [1706723061.022111][5404:5404] CHIP:DMG:                                 CommandId = 0x40,
+          [1706723061.022114][5404:5404] CHIP:DMG:                         },
+          [1706723061.022117][5404:5404] CHIP:DMG:
+          [1706723061.022120][5404:5404] CHIP:DMG:                         CommandFields =
+          [1706723061.022123][5404:5404] CHIP:DMG:                         {
+          [1706723061.022127][5404:5404] CHIP:DMG:                                 0x0 = 0,
+          [1706723061.022130][5404:5404] CHIP:DMG:                                 0x1 = 1,
+          [1706723061.022133][5404:5404] CHIP:DMG:                                 0x2 = 1,
+          [1706723061.022136][5404:5404] CHIP:DMG:                                 0x3 = 1,
+          [1706723061.022139][5404:5404] CHIP:DMG:                                 0x4 = 2,
+          [1706723061.022142][5404:5404] CHIP:DMG:                         },
+          [1706723061.022145][5404:5404] CHIP:DMG:                 },
+          [1706723061.022150][5404:5404] CHIP:DMG:
+          [1706723061.022152][5404:5404] CHIP:DMG:         ],
+          [1706723061.022157][5404:5404] CHIP:DMG:
+          [1706723061.022160][5404:5404] CHIP:DMG:         InteractionModelRevision = 11
+          [1706723061.022162][5404:5404] CHIP:DMG: },
+      disabled: true

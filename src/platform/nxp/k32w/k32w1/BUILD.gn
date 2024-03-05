@@ -13,12 +13,13 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w1_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${k32w1_sdk_build_root}/k32w1_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
-assert(chip_device_platform == "k32w1")
+assert(chip_device_platform == "nxp")
+assert(nxp_platform == "k32w/k32w1")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
@@ -28,7 +29,7 @@ if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
 
-static_library("k32w1") {
+static_library("nxp_platform") {
   sources = [
     "../../../SingletonConfigurationManager.cpp",
     "../common/BLEManagerCommon.cpp",
@@ -58,6 +59,16 @@ static_library("k32w1") {
     "ram_storage.h",
   ]
 
+  public = [
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+    "${chip_root}/src/credentials/examples/ExamplePAI.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w1/SMU2Manager.h",
+  ]
+
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_with_low_power != 0) {
@@ -65,6 +76,8 @@ static_library("k32w1") {
   }
 
   if (chip_enable_ota_requestor) {
+    public += [ "../common/OTAImageProcessorImpl.h" ]
+
     sources += [
       "../common/OTAImageProcessorImpl.cpp",
       "../common/OTAImageProcessorImpl.h",
@@ -83,10 +96,25 @@ static_library("k32w1") {
       "K32W1PersistentStorageOpKeystore.h",
     ]
 
+    if (chip_with_factory_data == 1) {
+      sources += [
+        "../common/FactoryDataProvider.cpp",
+        "FactoryDataProviderImpl.cpp",
+      ]
+      public += [
+        "${chip_root}/src/credentials/CHIPCert.h",
+        "${chip_root}/src/credentials/CertificationDeclaration.h",
+      ]
+
+      if (chip_convert_dac_private_key == 1) {
+        defines = [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
+      }
+    }
+
     public_deps += [ "${mbedtls_root}:mbedtls" ]
   }
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = []
 
   if (chip_enable_openthread) {
     sources += [
@@ -103,7 +131,17 @@ static_library("k32w1") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+
+    if (use_smu2_dynamic) {
+      sources += [
+        "SMU2Manager.cpp",
+        "SMU2Manager.h",
+      ]
+    }
   }
 
-  public_deps += [ "${chip_root}/src/crypto" ]
+  public_deps += [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 }

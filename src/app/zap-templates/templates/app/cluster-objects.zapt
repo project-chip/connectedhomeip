@@ -8,7 +8,7 @@
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/EventLoggingTypes.h>
+#include <app/MessageDef/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/BitMask.h>
@@ -25,6 +25,7 @@ namespace Clusters {
 namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
+
 {{#zcl_structs}}
 {{#if has_more_than_one_cluster}}
 {{> cluster_objects_struct header=true}}

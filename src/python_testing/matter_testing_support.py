@@ -18,16 +18,19 @@
 import argparse
 import asyncio
 import builtins
+import glob
+import inspect
 import json
 import logging
-import math
 import os
 import pathlib
 import queue
+import random
 import re
 import sys
 import typing
 import uuid
+import xml.etree.ElementTree as ET
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -42,6 +45,7 @@ from chip.tlv import float32, uint
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
+from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
 import chip.clusters as Clusters
@@ -49,15 +53,24 @@ import chip.logging
 import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
+from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.tracing import TracingContext
+from global_attribute_ids import GlobalAttributeIds
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+
+try:
+    from matter_yamltests.hooks import TestRunnerHooks
+except ImportError:
+    class TestRunnerHooks:
+        pass
+
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -129,7 +142,7 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         return pathlib.Path.cwd()
 
 
-def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
+def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
     pics = {}
     for raw in lines:
         line, _, _ = raw.partition("#")
@@ -143,15 +156,34 @@ def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
         if val not in ["1", "0"]:
             raise ValueError('PICS {} must have a value of 0 or 1'.format(key))
 
-        pics[key.strip().upper()] = (val == "1")
+        pics[key.strip()] = (val == "1")
     return pics
 
 
-def read_pics_from_file(filename: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file. """
-    with open(filename, 'r') as f:
-        lines = f.readlines()
-        return parse_pics(lines)
+def parse_pics_xml(contents: str) -> dict[str, bool]:
+    pics = {}
+    mytree = ET.fromstring(contents)
+    for pi in mytree.iter('picsItem'):
+        name = pi.find('itemNumber').text
+        support = pi.find('support').text
+        pics[name] = int(json.loads(support.lower())) == 1
+    return pics
+
+
+def read_pics_from_file(path: str) -> dict[str, bool]:
+    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
+    if os.path.isdir(os.path.abspath(path)):
+        pics_dict = {}
+        for filename in glob.glob(f'{path}/*.xml'):
+            with open(filename, 'r') as f:
+                contents = f.read()
+                pics_dict.update(parse_pics_xml(contents))
+        return pics_dict
+
+    else:
+        with open(path, 'r') as f:
+            lines = f.readlines()
+            return parse_pics(lines)
 
 
 def type_matches(received_value, desired_type):
@@ -175,8 +207,10 @@ def type_matches(received_value, desired_type):
     else:
         return isinstance(received_value, desired_type)
 
+# TODO(#31177): Need to add unit tests for all time conversion methods.
 
-def utc_time_in_matter_epoch(desired_datetime: datetime = None):
+
+def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
     """ Returns the time in matter epoch in us.
 
         If desired_datetime is None, it will return the current time.
@@ -191,19 +225,36 @@ def utc_time_in_matter_epoch(desired_datetime: datetime = None):
     return utc_th_us
 
 
+matter_epoch_us_from_utc_datetime = utc_time_in_matter_epoch
+
+
+def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
+    """Returns the given Matter epoch time as a usable Python datetime in UTC."""
+    delta_from_epoch = timedelta(microseconds=matter_epoch_us)
+    matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+
+    return matter_epoch + delta_from_epoch
+
+
+def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
+    millis = posix_time_ms % 1000
+    seconds = posix_time_ms // 1000
+    return datetime.fromtimestamp(seconds, timezone.utc) + timedelta(milliseconds=millis)
+
+
 def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
     if utc is None:
         utc = utc_time_in_matter_epoch()
 
     # total seconds includes fractional for microseconds
-    expected = utc + offset.total_seconds()*1000000
+    expected = utc + offset.total_seconds() * 1000000
     delta_us = abs(expected - received)
     delta = timedelta(microseconds=delta_us)
     asserts.assert_less_equal(delta, tolerance, "Received time is out of tolerance")
 
 
 def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
-    seconds_passed = math.floor((utc_time_in_matter_epoch() - set_time_matter_us)/1000000)
+    seconds_passed = (utc_time_in_matter_epoch() - set_time_matter_us) // 1000000
     return wait_seconds - seconds_passed
 
 
@@ -224,6 +275,84 @@ class SimpleEventCallback:
         return self._name
 
 
+class EventChangeCallback:
+    def __init__(self, expected_cluster: ClusterObjects):
+        """This class creates a queue to store received event callbacks, that can be checked by the test script
+           expected_cluster: is the cluster from which the events are expected
+        """
+        self._q = queue.Queue()
+        self._expected_cluster = expected_cluster
+
+    async def start(self, dev_ctrl, node_id: int, endpoint: int):
+        """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        self._subscription = await dev_ctrl.ReadEvent(node_id,
+                                                      events=[(endpoint, self._expected_cluster, True)], reportInterval=(1, 5),
+                                                      fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
+        self._subscription.SetEventUpdateCallback(self.__call__)
+
+    def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an event is received.
+           It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
+        if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
+            logging.info(
+                f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
+            self._q.put(res)
+
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout: int = 10):
+        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
+           It returns the event data so that the values can be checked."""
+        try:
+            res = self._q.get(block=True, timeout=timeout)
+        except queue.Empty:
+            asserts.fail("Failed to receive a report for the event {}".format(expected_event))
+
+        asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
+        asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
+        return res.Data
+
+
+class InternalTestRunnerHooks(TestRunnerHooks):
+
+    def start(self, count: int):
+        logging.info(f'Starting test set, running {count} tests')
+
+    def stop(self, duration: int):
+        logging.info(f'Finished test set, ran for {duration}ms')
+
+    def test_start(self, filename: str, name: str, count: int):
+        logging.info(f'Starting test from {filename}: {name} - {count} steps')
+
+    def test_stop(self, exception: Exception, duration: int):
+        logging.info(f'Finished test in {duration}ms')
+
+    def step_skipped(self, name: str, expression: str):
+        # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
+        logging.info(f'\t\t**** Skipping: {name}')
+
+    def step_start(self, name: str):
+        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
+        logging.info(f'\t\t***** Test Step {name}')
+
+    def step_success(self, logger, logs, duration: int, request):
+        pass
+
+    def step_failure(self, logger, logs, duration: int, request, received):
+        # TODO: there's supposed to be some kind of error message here, but I have no idea where it's meant to come from in this API
+        logging.info('\t\t***** Test Failure : ')
+
+    def step_unknown(self):
+        """
+        This method is called when the result of running a step is unknown. For example during a dry-run.
+        """
+        pass
+
+    def show_prompt(self,
+                    msg: str,
+                    placeholder: Optional[str] = None,
+                    default_value: Optional[str] = None) -> None:
+        pass
+
+
 @dataclass
 class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
@@ -237,6 +366,9 @@ class MatterTestConfig:
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
     tests: List[str] = field(default_factory=list)
+    timeout: typing.Union[int, None] = None
+    endpoint: int = 0
+    app_pid: int = 0
 
     commissioning_method: Optional[str] = None
     discriminators: Optional[List[int]] = None
@@ -287,6 +419,9 @@ class ClusterMapper:
             return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
 
     def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
+        global_attrs = [item.value for item in GlobalAttributeIds]
+        if attribute_id in global_attrs:
+            return f"Attribute {GlobalAttributeIds(attribute_id).to_name()} {attribute_id}, 0x{attribute_id:04X}"
         mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
         if not mapping:
             return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
@@ -309,7 +444,16 @@ def cluster_id_str(id):
         s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
     else:
         s = "Unknown cluster"
-    return f'{id_str(id)} {s}'
+    try:
+        return f'{id_str(id)} {s}'
+    except TypeError:
+        return 'HERE IS THE PROBLEM'
+
+
+@dataclass
+class CustomCommissioningParameters:
+    commissioningParameters: CommissioningParameters
+    randomDiscriminator: int
 
 
 @dataclass
@@ -500,12 +644,100 @@ def hex_from_bytes(b: bytes) -> str:
     return hexlify(b).decode("utf-8")
 
 
+@dataclass
+class TestStep:
+    test_plan_number: typing.Union[int, str]
+    description: str
+    is_commissioning: bool = False
+
+
+@dataclass
+class TestInfo:
+    function: str
+    desc: str
+    steps: list[TestStep]
+    pics: list[str]
+
+
 class MatterBaseTest(base_test.BaseTestClass):
     def __init__(self, *args):
         super().__init__(*args)
 
         # List of accumulated problems across all tests
         self.problems = []
+        self.is_commissioning = False
+
+    def get_test_steps(self, test: str) -> list[TestStep]:
+        ''' Retrieves the test step list for the given test
+
+            Test steps are defined in the function called steps_<functionname>.
+            ex for test test_TC_TEST_1_1, the steps are in a function called
+            steps_TC_TEST_1_1.
+
+            Test that implement a steps_ function should call each step
+            in order using self.step(number), where number is the test_plan_number
+            from each TestStep.
+        '''
+        steps = self._get_defined_test_steps(test)
+        return [TestStep(1, "Run entire test")] if steps is None else steps
+
+    def _get_defined_test_steps(self, test: str) -> list[TestStep]:
+        steps_name = 'steps_' + test[5:]
+        try:
+            fn = getattr(self, steps_name)
+            return fn()
+        except AttributeError:
+            return None
+
+    def get_test_pics(self, test: str) -> list[str]:
+        ''' Retrieves a list of top-level PICS that should be checked before running this test
+
+            An empty list means the test will always be run.
+
+            PICS are defined in a function called pics_<functionname>.
+            ex. for test test_TC_TEST_1_1, the pics are in a function called
+            pics_TC_TEST_1_1.
+        '''
+        pics = self._get_defined_pics(test)
+        return [] if pics is None else pics
+
+    def _get_defined_pics(self, test: str) -> list[TestStep]:
+        steps_name = 'pics_' + test[5:]
+        try:
+            fn = getattr(self, steps_name)
+            return fn()
+        except AttributeError:
+            return None
+
+    def get_test_desc(self, test: str) -> str:
+        ''' Returns a description of this test
+
+            Test description is defined in the function called desc_<functionname>.
+            ex for test test_TC_TEST_1_1, the steps are in a function called
+            desc_TC_TEST_1_1.
+
+            Format:
+            <Test plan reference> [<test plan number>] <test plan name>
+
+            ex:
+            133.1.1. [TC-ACL-1.1] Global attributes
+        '''
+        desc_name = 'desc_' + test[5:]
+        try:
+            fn = getattr(self, desc_name)
+            return fn()
+        except AttributeError:
+            return test
+
+    # Override this if the test requires a different default timeout.
+    # This value will be overridden if a timeout is supplied on the command line.
+    @property
+    def default_timeout(self) -> int:
+        return 90
+
+    @property
+    def runner_hook(self) -> TestRunnerHooks:
+        return unstash_globally(self.user_params.get("hooks"))
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
@@ -533,6 +765,26 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Mappings of cluster IDs to names and metadata.
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
         self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
+        self.current_step_index = 0
+        self.step_start_time = datetime.now(timezone.utc)
+        self.step_skipped = False
+
+    def setup_test(self):
+        self.current_step_index = 0
+        self.step_start_time = datetime.now(timezone.utc)
+        self.step_skipped = False
+        if self.runner_hook and not self.is_commissioning:
+            test_name = self.current_test_info.name
+            steps = self._get_defined_test_steps(test_name)
+            num_steps = 1 if steps is None else len(steps)
+            filename = inspect.getfile(self.__class__)
+            desc = self.get_test_desc(test_name)
+            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps)
+            # If we don't have defined steps, we're going to start the one and only step now
+            # if there are steps defined by the test, rely on the test calling the step() function
+            # to indicates how it is proceeding
+            if steps is None:
+                self.step(1)
 
     def teardown_class(self):
         """Final teardown after all tests: log all problems"""
@@ -550,8 +802,19 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def check_pics(self, pics_key: str) -> bool:
         picsd = self.matter_test_config.pics
-        pics_key = pics_key.strip().upper()
+        pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
+
+    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
+        rnd_discriminator = random.randint(0, 4095)
+        try:
+            commissioning_params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
+                                                                    discriminator=rnd_discriminator, option=1)
+            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
+            return params
+
+        except InteractionModelError as e:
+            asserts.fail(e.status, 'Failed to open commissioning window')
 
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
@@ -561,50 +824,112 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
+        if endpoint is None:
+            endpoint = self.matter_test_config.endpoint
 
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
-        err_msg = "Error reading {}:{}".format(str(cluster), str(attribute))
-        asserts.assert_true(attr_ret is not None, err_msg)
-        asserts.assert_false(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
+        read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
-        asserts.assert_true(type_matches(attr_ret, desired_type),
-                            'Returned attribute {} is wrong type expected {}, got {}'.format(attribute, desired_type, type(attr_ret)))
+        type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
+        read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
+        type_ok = type_matches(attr_ret, desired_type)
+        if assert_on_error:
+            asserts.assert_true(read_ok, read_err_msg)
+            asserts.assert_true(type_ok, type_err_msg)
+        else:
+            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+                                             attribute_id=attribute.attribute_id)
+            if not read_ok:
+                self.record_error(test_name=test_name, location=location, problem=read_err_msg)
+                return None
+            elif not type_ok:
+                self.record_error(test_name=test_name, location=location, problem=type_err_msg)
+                return None
         return attr_ret
 
     async def read_single_attribute_expect_error(
             self, cluster: object, attribute: object,
-            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
+            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
+            fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
+        if endpoint is None:
+            endpoint = self.matter_test_config.endpoint
 
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
         err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
-        asserts.assert_true(attr_ret is not None, err_msg)
-        asserts.assert_true(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
-        asserts.assert_true(isinstance(attr_ret.Reason, InteractionModelError), err_msg)
-        asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
+        error_type_ok = attr_ret is not None and isinstance(
+            attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
+        if assert_on_error:
+            asserts.assert_true(error_type_ok, err_msg)
+            asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
+        elif not error_type_ok or attr_ret.Reason.status != error:
+            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+                                             attribute_id=attribute.attribute_id)
+            self.record_error(test_name=test_name, location=location, problem=err_msg)
+            return None
+
         return attr_ret
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0,
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
             timedRequestTimeoutMs: typing.Union[None, int] = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
+        if endpoint is None:
+            endpoint = self.matter_test_config.endpoint
 
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
+
+    async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
+        """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
+
+           The enableKey can be passed into the function, or omitted which will then
+           use the one provided to the script via --hex-arg enableKey:<HEX VALUE>
+           if not it defaults to 0x000102030405060708090a0b0c0d0e0f
+        """
+        # get the test event enable key or assume the default
+        # This can be passed in on command line using
+        #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+        if enableKey is None:
+            if 'enableKey' not in self.matter_test_config.global_test_params:
+                enableKey = bytes([b for b in range(16)])
+            else:
+                enableKey = self.matter_test_config.global_test_params['enableKey']
+
+        try:
+            # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
+            await self.send_single_cmd(endpoint=0,
+                                       cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                                           enableKey,
+                                           eventTrigger)
+                                       )
+
+        except InteractionModelError as e:
+            asserts.fail(
+                f"Sending TestEventTrigger resulted in Unexpected error. Are they enabled in DUT? Command returned - {e.status}")
+
+    async def check_test_event_triggers_enabled(self):
+        """This cluster checks that the General Diagnostics cluster TestEventTriggersEnabled attribute is True.
+           It will assert and fail the test if not True."""
+        full_attr = Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        cluster = Clusters.Objects.GeneralDiagnostics
+        # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
+        test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
+        asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
     def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
         logging.info(f'***** Test Step {stepnum} : {title}')
@@ -617,6 +942,131 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def record_note(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
+
+    def on_fail(self, record):
+        ''' Called by Mobly on test failure
+
+            record is of type TestResultRecord
+        '''
+        if self.runner_hook and not self.is_commissioning:
+            exception = record.termination_signal.exception
+            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            # This isn't QUITE the test duration because the commissioning is handled separately, but it's clsoe enough for now
+            # This is already given in milliseconds
+            test_duration = record.end_time - record.begin_time
+            # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
+            self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
+            self.runner_hook.test_stop(exception=exception, duration=test_duration)
+
+    def on_pass(self, record):
+        ''' Called by Mobly on test pass
+
+            record is of type TestResultRecord
+        '''
+        if self.runner_hook and not self.is_commissioning:
+            # What is request? This seems like an implementation detail for the runner
+            # TODO: As with failure, I have no idea what logger, logs or request are meant to be
+            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = record.end_time - record.begin_time
+            self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
+
+        # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
+        steps = self._get_defined_test_steps(record.test_name)
+        if steps is None:
+            # if we don't have a list of steps, assume they were all run
+            all_steps_run = True
+        else:
+            all_steps_run = len(steps) == self.current_step_index
+
+        if not all_steps_run:
+            # The test is done, but we didn't execute all the steps
+            asserts.fail("Test script error: Not all required steps were run")
+
+        if self.runner_hook and not self.is_commissioning:
+            self.runner_hook.test_stop(exception=None, duration=test_duration)
+
+    def pics_guard(self, pics_condition: bool):
+        """Checks a condition and if False marks the test step as skipped and
+           returns False, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("4")
+              if self.pics_guard(condition_needs_to_be_true_to_execute):
+                  # do the test for step 4
+
+              self.step("5")
+              if self.pics_guard(condition2_needs_to_be_true_to_execute):
+                  # do the test for step 5
+           """
+        if not pics_condition:
+            self.mark_current_step_skipped()
+        return pics_condition
+
+    def mark_current_step_skipped(self):
+        try:
+            steps = self.get_test_steps(self.current_test_info.name)
+            if self.current_step_index == 0:
+                asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
+            num = steps[self.current_step_index-1].test_plan_number
+        except KeyError:
+            num = self.current_step_index
+
+        if self.runner_hook:
+            # TODO: what does name represent here? The wordy test name? The test plan number? The number and name?
+            # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
+            #       as a string? Does it get used by the TH?
+            self.runner_hook.step_skipped(name=str(num), expression="")
+        else:
+            logging.info(f'**** Skipping: {num}')
+        self.step_skipped = True
+
+    def skip_step(self, step):
+        self.step(step)
+        self.mark_current_step_skipped()
+
+    def skip_all_remaining_steps(self, starting_step_number):
+        ''' Skips all remaining test steps starting with provided starting step
+
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally. By providing argument
+                test is more deliberately identifying where test skips are starting from, making
+                it easier to validate against the test plan for correctness.
+        '''
+        steps = self.get_test_steps(self.current_test_info.name)
+        for idx, step in enumerate(steps):
+            if step.test_plan_number == starting_step_number:
+                starting_step_idx = idx
+                break
+        else:
+            asserts.fail("skip_all_remaining_steps was provided with invalid starting_step_num")
+        remaining = steps[starting_step_idx:]
+        for step in remaining:
+            self.skip_step(step.test_plan_number)
+
+    def step(self, step: typing.Union[int, str]):
+        test_name = self.current_test_info.name
+        steps = self.get_test_steps(test_name)
+
+        # TODO: this might be annoying during dev. Remove? Flag?
+        if len(steps) <= self.current_step_index or steps[self.current_step_index].test_plan_number != step:
+            asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
+
+        if self.runner_hook:
+            # If we've reached the next step with no assertion and the step wasn't skipped, it passed
+            if not self.step_skipped and self.current_step_index != 0:
+                # TODO: As with failure, I have no idea what loger, logs or request are meant to be
+                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
+
+            # TODO: it seems like the step start should take a number and a name
+            name = f'{step} : {steps[self.current_step_index].description}'
+            self.runner_hook.step_start(name=name)
+        else:
+            self.print_step(step, steps[self.current_step_index].description)
+
+        self.step_start_time = datetime.now(tz=timezone.utc)
+        self.current_step_index = self.current_step_index + 1
+        self.step_skipped = False
 
     def get_setup_payload_info(self) -> SetupPayloadInfo:
         if self.matter_test_config.qr_code_content is not None:
@@ -646,6 +1096,28 @@ class MatterBaseTest(base_test.BaseTestClass):
             info.filter_value = setup_payload.long_discriminator
 
         return info
+
+    def wait_for_user_input(self,
+                            prompt_msg: str,
+                            input_msg: str = "Press Enter when done.\n",
+                            prompt_msg_placeholder: str = "Submit anything to continue",
+                            default_value: str = "y") -> str:
+        """Ask for user input and wait for it.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt. Indicates what is expected from the user.
+            input_msg (str, optional): Prompt for input function, used when running tests manually. Defaults to "Press Enter when done.\n".
+            prompt_msg_placeholder (str, optional): TH UI prompt input placeholder. Defaults to "Submit anything to continue".
+            default_value (str, optional): TH UI prompt default value. Defaults to "y".
+
+        Returns:
+            str: User input
+        """
+        if self.runner_hook:
+            self.runner_hook.show_prompt(msg=prompt_msg,
+                                         placeholder=prompt_msg_placeholder,
+                                         default_value=default_value)
+        return input(input_msg)
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
@@ -919,6 +1391,9 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = [] if args.tests is None else args.tests
+    config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
+    config.endpoint = 0 if args.endpoint is None else args.endpoint
+    config.app_pid = 0 if args.app_pid is None else args.app_pid
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -966,10 +1441,13 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              metavar='NODE_ID',
                              default=_DEFAULT_CONTROLLER_NODE_ID,
                              help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
-    basic_group.add_argument('-n', '--dut-node-id', type=int_decimal_or_hex,
+    basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
                              metavar='NODE_ID', dest='dut_node_ids', default=[_DEFAULT_DUT_NODE_ID],
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
+    basic_group.add_argument('--endpoint', type=int, default=0, help="Endpoint under test")
+    basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
+    basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
@@ -1062,14 +1540,21 @@ def async_test_body(body):
     synchronously, we need a mechanism to allow an `async def` to be converted to
     a asyncio-run synchronous method. This decorator does the wrapping.
     """
-    def async_runner(*args, **kwargs):
-        return asyncio.run(body(*args, **kwargs))
+
+    def async_runner(self: MatterBaseTest, *args, **kwargs):
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
+        return asyncio.run(runner_with_timeout)
 
     return async_runner
 
 
 class CommissionDeviceTest(MatterBaseTest):
     """Test class auto-injected at the start of test list to commission a device when requested"""
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.is_commissioning = True
 
     def test_run_commissioning(self):
         conf = self.matter_test_config
@@ -1140,6 +1625,7 @@ def default_matter_test_main(argv=None, **kwargs):
     Args:
       argv: A list that is then parsed as command line args. If None, defaults to sys.argv
     """
+
     matter_test_config = parse_matter_test_args(argv)
 
     # Allow override of command line from optional arguments
@@ -1149,6 +1635,38 @@ def default_matter_test_main(argv=None, **kwargs):
     # Find the test class in the test script.
     test_class = _find_test_class()
 
+    # This is required in case we need any testing with maximized certificate chains.
+    # We need *all* issuers from the start, even for default controller, to use
+    # maximized chains, before MatterStackState init, others some stale certs
+    # may not chain properly.
+    if "maximize_cert_chains" in kwargs:
+        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
+
+    hooks = InternalTestRunnerHooks()
+
+    run_tests(test_class, matter_test_config, hooks)
+
+
+def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConfig) -> list[TestInfo]:
+    test_config = generate_mobly_test_config(matter_test_config)
+    base = test_class(test_config)
+
+    if len(matter_test_config.tests) > 0:
+        tests = matter_test_config.tests
+    else:
+        tests = base.get_existing_test_names()
+
+    info = []
+    for t in tests:
+        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
+
+    return info
+
+
+def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks) -> None:
+
+    get_test_info(test_class, matter_test_config)
+
     # Load test config file.
     test_config = generate_mobly_test_config(matter_test_config)
 
@@ -1156,13 +1674,6 @@ def default_matter_test_main(argv=None, **kwargs):
     tests = None
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
-
-    # This is required in case we need any testing with maximized certificate chains.
-    # We need *all* issuers from the start, even for default controller, to use
-    # maximized chains, before MatterStackState init, others some stale certs
-    # may not chain properly.
-    if "maximize_cert_chains" in kwargs:
-        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
 
     stack = MatterStackState(matter_test_config)
 
@@ -1183,6 +1694,10 @@ def default_matter_test_main(argv=None, **kwargs):
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 
         test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
+        test_config.user_params["hooks"] = stash_globally(hooks)
+
+        # Execute the test class with the config
+        ok = True
 
         test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
 
@@ -1200,14 +1715,28 @@ def default_matter_test_main(argv=None, **kwargs):
             if not matter_test_config.commission_only:
                 runner.add_test_class(test_config, test_class, tests)
 
+            if hooks:
+                # Right now, we only support running a single test class at once,
+                # but it's relatively easy to exapand that to make the test process faster
+                # TODO: support a list of tests
+                hooks.start(count=1)
+                # Mobly gives the test run time in seconds, lets be a bit more precise
+                runner_start_time = datetime.now(timezone.utc)
+
             try:
                 runner.run()
                 ok = runner.results.is_all_pass and ok
+            except TimeoutError:
+                ok = False
             except signals.TestAbortAll:
                 ok = False
             except Exception:
                 logging.exception('Exception when executing %s.', test_config.testbed_name)
                 ok = False
+
+    if hooks:
+        duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
+        hooks.stop(duration=duration)
 
     # Shutdown the stack when all done
     stack.Shutdown()

@@ -33,6 +33,8 @@ namespace NetworkCommissioning {
 namespace {
 NetworkCommissioning::WiFiScanResponse * sScanResult;
 GenioScanResponseIterator<NetworkCommissioning::WiFiScanResponse> mScanResponseIter(sScanResult);
+
+using chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
 } // namespace
 
 CHIP_ERROR GenioWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)

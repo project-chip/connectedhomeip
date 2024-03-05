@@ -32,7 +32,7 @@ declare_args() {
   sl_wfx_config_scan = true
 
   # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_transition = false
+  rs91x_wpa3_transition = true
 
   # use commissionable data for SiWx917
   siwx917_commissionable_data = false
@@ -144,10 +144,9 @@ config("siwx917-common-config") {
     defines += [ "QR_CODE_ENABLED" ]
   }
 
-  # TODO: Renable once ota is supported
-  # if (chip_enable_ota_requestor) {
-  #   defines += [ "SILABS_OTA_ENABLED" ]
-  # }
+  if (chip_enable_ota_requestor) {
+    defines += [ "SILABS_OTA_ENABLED" ]
+  }
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
@@ -224,12 +223,12 @@ source_set("siwx917-common") {
     "SiWx917/wfx_rsi_host.c",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell) {
+  if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
     sources += [ "uart.cpp" ]
   }
 
   if (chip_enable_ota_requestor) {
-    # TODO: OTA For CCP Platform
+    sources += [ "${silabs_common_plat_dir}/OTAConfig.cpp" ]
   }
 
   if (!disable_lcd) {

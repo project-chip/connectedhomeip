@@ -34,9 +34,6 @@ public class ClusterIDMapping {
         if (clusterId == Groups.ID) {
             return new Groups();
         }
-        if (clusterId == Scenes.ID) {
-            return new Scenes();
-        }
         if (clusterId == OnOff.ID) {
             return new OnOff();
         }
@@ -211,26 +208,50 @@ public class ClusterIDMapping {
         if (clusterId == RvcOperationalState.ID) {
             return new RvcOperationalState();
         }
+        if (clusterId == ScenesManagement.ID) {
+            return new ScenesManagement();
+        }
         if (clusterId == HepaFilterMonitoring.ID) {
             return new HepaFilterMonitoring();
         }
         if (clusterId == ActivatedCarbonFilterMonitoring.ID) {
             return new ActivatedCarbonFilterMonitoring();
         }
-        if (clusterId == BooleanSensorConfiguration.ID) {
-            return new BooleanSensorConfiguration();
+        if (clusterId == BooleanStateConfiguration.ID) {
+            return new BooleanStateConfiguration();
         }
         if (clusterId == ValveConfigurationAndControl.ID) {
             return new ValveConfigurationAndControl();
         }
+        if (clusterId == ElectricalPowerMeasurement.ID) {
+            return new ElectricalPowerMeasurement();
+        }
+        if (clusterId == ElectricalEnergyMeasurement.ID) {
+            return new ElectricalEnergyMeasurement();
+        }
         if (clusterId == DemandResponseLoadControl.ID) {
             return new DemandResponseLoadControl();
+        }
+        if (clusterId == Messages.ID) {
+            return new Messages();
         }
         if (clusterId == DeviceEnergyManagement.ID) {
             return new DeviceEnergyManagement();
         }
         if (clusterId == EnergyEvse.ID) {
             return new EnergyEvse();
+        }
+        if (clusterId == EnergyPreference.ID) {
+            return new EnergyPreference();
+        }
+        if (clusterId == PowerTopology.ID) {
+            return new PowerTopology();
+        }
+        if (clusterId == EnergyEvseMode.ID) {
+            return new EnergyEvseMode();
+        }
+        if (clusterId == DeviceEnergyManagementMode.ID) {
+            return new DeviceEnergyManagementMode();
         }
         if (clusterId == DoorLock.ID) {
             return new DoorLock();
@@ -656,294 +677,6 @@ public class ClusterIDMapping {
                     }
                     public static AddGroupIfIdentifyingCommandField value(int id) throws NoSuchFieldError {
                         for (AddGroupIfIdentifyingCommandField field : AddGroupIfIdentifyingCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }@Override
-        public String getAttributeName(long id) throws NoSuchFieldError {
-            return Attribute.value(id).toString();
-        }
-
-        @Override
-        public String getEventName(long id) throws NoSuchFieldError {
-            return Event.value(id).toString();
-        }
-
-        @Override
-        public String getCommandName(long id) throws NoSuchFieldError {
-            return Command.value(id).toString();
-        }
-
-        @Override
-        public long getAttributeID(String name) throws IllegalArgumentException {
-            return Attribute.valueOf(name).getID();
-        }
-
-        @Override
-        public long getEventID(String name) throws IllegalArgumentException {
-            return Event.valueOf(name).getID();
-        }
-
-        @Override
-        public long getCommandID(String name) throws IllegalArgumentException {
-            return Command.valueOf(name).getID();
-        }
-    }
-    public static class Scenes implements BaseCluster {
-        public static final long ID = 5L;
-        public long getID() {
-            return ID;
-        }
-
-        public enum Attribute {
-            SceneCount(0L),
-            CurrentScene(1L),
-            CurrentGroup(2L),
-            SceneValid(3L),
-            NameSupport(4L),
-            LastConfiguredBy(5L),
-            SceneTableSize(6L),
-            FabricSceneInfo(7L),
-            GeneratedCommandList(65528L),
-            AcceptedCommandList(65529L),
-            EventList(65530L),
-            AttributeList(65531L),
-            FeatureMap(65532L),
-            ClusterRevision(65533L),;
-            private final long id;
-            Attribute(long id) {
-                this.id = id;
-            }
-
-            public long getID() {
-                return id;
-            }
-
-            public static Attribute value(long id) throws NoSuchFieldError {
-                for (Attribute attribute : Attribute.values()) {
-                    if (attribute.getID() == id) {
-                        return attribute;
-                    }
-                }
-                throw new NoSuchFieldError();
-            }
-        }
-
-        public enum Event {;
-            private final long id;
-            Event(long id) {
-                this.id = id;
-            }
-
-            public long getID() {
-                return id;
-            }
-
-            public static Event value(long id) throws NoSuchFieldError {
-                for (Event event : Event.values()) {
-                    if (event.getID() == id) {
-                        return event;
-                    }
-                }
-                throw new NoSuchFieldError();
-            }
-        }
-
-        public enum Command {
-            AddScene(0L),
-            ViewScene(1L),
-            RemoveScene(2L),
-            RemoveAllScenes(3L),
-            StoreScene(4L),
-            RecallScene(5L),
-            GetSceneMembership(6L),
-            EnhancedAddScene(64L),
-            EnhancedViewScene(65L),
-            CopyScene(66L),;
-            private final long id;
-            Command(long id) {
-                this.id = id;
-            }
-
-            public long getID() {
-                return id;
-            }
-
-            public static Command value(long id) throws NoSuchFieldError {
-                for (Command command : Command.values()) {
-                    if (command.getID() == id) {
-                        return command;
-                    }
-                }
-                throw new NoSuchFieldError();
-            }
-        }public enum AddSceneCommandField {GroupID(0),SceneID(1),TransitionTime(2),SceneName(3),ExtensionFieldSets(4),;
-                    private final int id;
-                    AddSceneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static AddSceneCommandField value(int id) throws NoSuchFieldError {
-                        for (AddSceneCommandField field : AddSceneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ViewSceneCommandField {GroupID(0),SceneID(1),;
-                    private final int id;
-                    ViewSceneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ViewSceneCommandField value(int id) throws NoSuchFieldError {
-                        for (ViewSceneCommandField field : ViewSceneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum RemoveSceneCommandField {GroupID(0),SceneID(1),;
-                    private final int id;
-                    RemoveSceneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static RemoveSceneCommandField value(int id) throws NoSuchFieldError {
-                        for (RemoveSceneCommandField field : RemoveSceneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum RemoveAllScenesCommandField {GroupID(0),;
-                    private final int id;
-                    RemoveAllScenesCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static RemoveAllScenesCommandField value(int id) throws NoSuchFieldError {
-                        for (RemoveAllScenesCommandField field : RemoveAllScenesCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum StoreSceneCommandField {GroupID(0),SceneID(1),;
-                    private final int id;
-                    StoreSceneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static StoreSceneCommandField value(int id) throws NoSuchFieldError {
-                        for (StoreSceneCommandField field : StoreSceneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum RecallSceneCommandField {GroupID(0),SceneID(1),TransitionTime(2),;
-                    private final int id;
-                    RecallSceneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static RecallSceneCommandField value(int id) throws NoSuchFieldError {
-                        for (RecallSceneCommandField field : RecallSceneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum GetSceneMembershipCommandField {GroupID(0),;
-                    private final int id;
-                    GetSceneMembershipCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static GetSceneMembershipCommandField value(int id) throws NoSuchFieldError {
-                        for (GetSceneMembershipCommandField field : GetSceneMembershipCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum EnhancedAddSceneCommandField {GroupID(0),SceneID(1),TransitionTime(2),SceneName(3),ExtensionFieldSets(4),;
-                    private final int id;
-                    EnhancedAddSceneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static EnhancedAddSceneCommandField value(int id) throws NoSuchFieldError {
-                        for (EnhancedAddSceneCommandField field : EnhancedAddSceneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum EnhancedViewSceneCommandField {GroupID(0),SceneID(1),;
-                    private final int id;
-                    EnhancedViewSceneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static EnhancedViewSceneCommandField value(int id) throws NoSuchFieldError {
-                        for (EnhancedViewSceneCommandField field : EnhancedViewSceneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum CopySceneCommandField {Mode(0),GroupIdentifierFrom(1),SceneIdentifierFrom(2),GroupIdentifierTo(3),SceneIdentifierTo(4),;
-                    private final int id;
-                    CopySceneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static CopySceneCommandField value(int id) throws NoSuchFieldError {
-                        for (CopySceneCommandField field : CopySceneCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -3859,7 +3592,8 @@ public class ClusterIDMapping {
 
         public enum Command {
             TestEventTrigger(0L),
-            TimeSnapshot(1L),;
+            TimeSnapshot(1L),
+            PayloadTestRequest(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -3888,6 +3622,23 @@ public class ClusterIDMapping {
                     }
                     public static TestEventTriggerCommandField value(int id) throws NoSuchFieldError {
                         for (TestEventTriggerCommandField field : TestEventTriggerCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum PayloadTestRequestCommandField {EnableKey(0),Value(1),Count(2),;
+                    private final int id;
+                    PayloadTestRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PayloadTestRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (PayloadTestRequestCommandField field : PayloadTestRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -6029,6 +5780,7 @@ public class ClusterIDMapping {
             ClientsSupportedPerFabric(5L),
             UserActiveModeTriggerHint(6L),
             UserActiveModeTriggerInstruction(7L),
+            OperatingMode(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -6123,6 +5875,23 @@ public class ClusterIDMapping {
                     }
                     public static UnregisterClientCommandField value(int id) throws NoSuchFieldError {
                         for (UnregisterClientCommandField field : UnregisterClientCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum StayActiveRequestCommandField {StayActiveDuration(0),;
+                    private final int id;
+                    StayActiveRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static StayActiveRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (StayActiveRequestCommandField field : StayActiveRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -7134,7 +6903,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
-            OnMode(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -7255,7 +7023,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
-            OnMode(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -8193,11 +7960,15 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            CookTime(1L),
+            CookTime(0L),
+            MaxCookTime(1L),
             PowerSetting(2L),
             MinPower(3L),
             MaxPower(4L),
             PowerStep(5L),
+            SupportedWatts(6L),
+            SelectedWattIndex(7L),
+            WattRating(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -8263,7 +8034,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SetCookingParametersCommandField {CookMode(0),CookTime(1),PowerSetting(2),;
+        }public enum SetCookingParametersCommandField {CookMode(0),CookTime(1),PowerSetting(2),WattSettingIndex(3),StartAfterSetting(4),;
                     private final int id;
                     SetCookingParametersCommandField(int id) {
                         this.id = id;
@@ -8501,9 +8272,8 @@ public class ClusterIDMapping {
 
         public enum Command {
             Pause(0L),
-            Stop(1L),
-            Start(2L),
-            Resume(3L),;
+            Resume(3L),
+            GoHome(128L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -8522,6 +8292,253 @@ public class ClusterIDMapping {
                 throw new NoSuchFieldError();
             }
         }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class ScenesManagement implements BaseCluster {
+        public static final long ID = 98L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            LastConfiguredBy(0L),
+            SceneTableSize(1L),
+            FabricSceneInfo(2L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            AddScene(0L),
+            ViewScene(1L),
+            RemoveScene(2L),
+            RemoveAllScenes(3L),
+            StoreScene(4L),
+            RecallScene(5L),
+            GetSceneMembership(6L),
+            CopyScene(64L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum AddSceneCommandField {GroupID(0),SceneID(1),TransitionTime(2),SceneName(3),ExtensionFieldSets(4),;
+                    private final int id;
+                    AddSceneCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AddSceneCommandField value(int id) throws NoSuchFieldError {
+                        for (AddSceneCommandField field : AddSceneCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ViewSceneCommandField {GroupID(0),SceneID(1),;
+                    private final int id;
+                    ViewSceneCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ViewSceneCommandField value(int id) throws NoSuchFieldError {
+                        for (ViewSceneCommandField field : ViewSceneCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveSceneCommandField {GroupID(0),SceneID(1),;
+                    private final int id;
+                    RemoveSceneCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveSceneCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveSceneCommandField field : RemoveSceneCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveAllScenesCommandField {GroupID(0),;
+                    private final int id;
+                    RemoveAllScenesCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveAllScenesCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveAllScenesCommandField field : RemoveAllScenesCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum StoreSceneCommandField {GroupID(0),SceneID(1),;
+                    private final int id;
+                    StoreSceneCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static StoreSceneCommandField value(int id) throws NoSuchFieldError {
+                        for (StoreSceneCommandField field : StoreSceneCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RecallSceneCommandField {GroupID(0),SceneID(1),TransitionTime(2),;
+                    private final int id;
+                    RecallSceneCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RecallSceneCommandField value(int id) throws NoSuchFieldError {
+                        for (RecallSceneCommandField field : RecallSceneCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GetSceneMembershipCommandField {GroupID(0),;
+                    private final int id;
+                    GetSceneMembershipCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GetSceneMembershipCommandField value(int id) throws NoSuchFieldError {
+                        for (GetSceneMembershipCommandField field : GetSceneMembershipCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum CopySceneCommandField {Mode(0),GroupIdentifierFrom(1),SceneIdentifierFrom(2),GroupIdentifierTo(3),SceneIdentifierTo(4),;
+                    private final int id;
+                    CopySceneCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static CopySceneCommandField value(int id) throws NoSuchFieldError {
+                        for (CopySceneCommandField field : CopySceneCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }
@@ -8765,17 +8782,21 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class BooleanSensorConfiguration implements BaseCluster {
+    public static class BooleanStateConfiguration implements BaseCluster {
         public static final long ID = 128L;
         public long getID() {
             return ID;
         }
 
         public enum Attribute {
-            SensitivityLevel(0L),
-            AlarmsActive(1L),
-            AlarmsSuppressed(2L),
-            AlarmsEnabled(3L),
+            CurrentSensitivityLevel(0L),
+            SupportedSensitivityLevels(1L),
+            DefaultSensitivityLevel(2L),
+            AlarmsActive(3L),
+            AlarmsSuppressed(4L),
+            AlarmsEnabled(5L),
+            AlarmsSupported(6L),
+            SensorFault(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -8824,7 +8845,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            SuppressRequest(0L),;
+            SuppressAlarm(0L),
+            EnableDisableAlarm(1L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -8842,17 +8864,34 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SuppressRequestCommandField {AlarmsToSuppress(0),;
+        }public enum SuppressAlarmCommandField {AlarmsToSuppress(0),;
                     private final int id;
-                    SuppressRequestCommandField(int id) {
+                    SuppressAlarmCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static SuppressRequestCommandField value(int id) throws NoSuchFieldError {
-                        for (SuppressRequestCommandField field : SuppressRequestCommandField.values()) {
+                    public static SuppressAlarmCommandField value(int id) throws NoSuchFieldError {
+                        for (SuppressAlarmCommandField field : SuppressAlarmCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum EnableDisableAlarmCommandField {AlarmsToEnableDisable(0),;
+                    private final int id;
+                    EnableDisableAlarmCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static EnableDisableAlarmCommandField value(int id) throws NoSuchFieldError {
+                        for (EnableDisableAlarmCommandField field : EnableDisableAlarmCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -8897,15 +8936,16 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             OpenDuration(0L),
-            AutoCloseTime(1L),
-            RemainingDuration(2L),
-            CurrentState(3L),
-            TargetState(4L),
-            StartUpState(5L),
+            DefaultOpenDuration(1L),
+            AutoCloseTime(2L),
+            RemainingDuration(3L),
+            CurrentState(4L),
+            TargetState(5L),
             CurrentLevel(6L),
             TargetLevel(7L),
-            OpenLevel(8L),
+            DefaultOpenLevel(8L),
             ValveFault(9L),
+            LevelStep(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -8955,8 +8995,7 @@ public class ClusterIDMapping {
 
         public enum Command {
             Open(0L),
-            Close(1L),
-            SetLevel(2L),;
+            Close(1L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -8974,7 +9013,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum OpenCommandField {OpenDuration(0),;
+        }public enum OpenCommandField {OpenDuration(0),TargetLevel(1),;
                     private final int id;
                     OpenCommandField(int id) {
                         this.id = id;
@@ -8991,24 +9030,235 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SetLevelCommandField {Level(0),OpenDuration(1),;
-                    private final int id;
-                    SetLevelCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static SetLevelCommandField value(int id) throws NoSuchFieldError {
-                        for (SetLevelCommandField field : SetLevelCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
                 }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class ElectricalPowerMeasurement implements BaseCluster {
+        public static final long ID = 144L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            PowerMode(0L),
+            NumberOfMeasurementTypes(1L),
+            Accuracy(2L),
+            Ranges(3L),
+            Voltage(4L),
+            ActiveCurrent(5L),
+            ReactiveCurrent(6L),
+            ApparentCurrent(7L),
+            ActivePower(8L),
+            ReactivePower(9L),
+            ApparentPower(10L),
+            RMSVoltage(11L),
+            RMSCurrent(12L),
+            RMSPower(13L),
+            Frequency(14L),
+            HarmonicCurrents(15L),
+            HarmonicPhases(16L),
+            PowerFactor(17L),
+            NeutralCurrent(18L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            MeasurementPeriodRanges(0L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class ElectricalEnergyMeasurement implements BaseCluster {
+        public static final long ID = 145L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            Accuracy(0L),
+            CumulativeEnergyImported(1L),
+            CumulativeEnergyExported(2L),
+            PeriodicEnergyImported(3L),
+            PeriodicEnergyExported(4L),
+            CumulativeEnergyReset(5L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            CumulativeEnergyMeasured(0L),
+            PeriodicEnergyMeasured(1L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }
@@ -9220,6 +9470,147 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
+    public static class Messages implements BaseCluster {
+        public static final long ID = 151L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            Messages(0L),
+            ActiveMessageIDs(1L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            MessageQueued(0L),
+            MessagePresented(1L),
+            MessageComplete(2L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            PresentMessagesRequest(0L),
+            CancelMessagesRequest(1L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),;
+                    private final int id;
+                    PresentMessagesRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PresentMessagesRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (PresentMessagesRequestCommandField field : PresentMessagesRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum CancelMessagesRequestCommandField {MessageIDs(0),;
+                    private final int id;
+                    CancelMessagesRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static CancelMessagesRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (CancelMessagesRequestCommandField field : CancelMessagesRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
     public static class DeviceEnergyManagement implements BaseCluster {
         public static final long ID = 152L;
         public long getID() {
@@ -9234,6 +9625,7 @@ public class ClusterIDMapping {
             AbsMaxPower(4L),
             PowerAdjustmentCapability(5L),
             Forecast(6L),
+            OptOutState(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -9290,7 +9682,8 @@ public class ClusterIDMapping {
             PauseRequest(3L),
             ResumeRequest(4L),
             ModifyForecastRequest(5L),
-            RequestConstraintBasedForecast(6L),;
+            RequestConstraintBasedForecast(6L),
+            CancelRequest(7L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -9308,7 +9701,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum PowerAdjustRequestCommandField {Power(0),Duration(1),;
+        }public enum PowerAdjustRequestCommandField {Power(0),Duration(1),Cause(2),;
                     private final int id;
                     PowerAdjustRequestCommandField(int id) {
                         this.id = id;
@@ -9325,7 +9718,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum StartTimeAdjustRequestCommandField {RequestedStartTime(0),;
+                }public enum StartTimeAdjustRequestCommandField {RequestedStartTime(0),Cause(1),;
                     private final int id;
                     StartTimeAdjustRequestCommandField(int id) {
                         this.id = id;
@@ -9342,7 +9735,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum PauseRequestCommandField {Duration(0),;
+                }public enum PauseRequestCommandField {Duration(0),Cause(1),;
                     private final int id;
                     PauseRequestCommandField(int id) {
                         this.id = id;
@@ -9359,7 +9752,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ModifyForecastRequestCommandField {ForecastId(0),SlotAdjustments(1),;
+                }public enum ModifyForecastRequestCommandField {ForecastId(0),SlotAdjustments(1),Cause(2),;
                     private final int id;
                     ModifyForecastRequestCommandField(int id) {
                         this.id = id;
@@ -9376,7 +9769,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum RequestConstraintBasedForecastCommandField {Constraints(0),;
+                }public enum RequestConstraintBasedForecastCommandField {Constraints(0),Cause(1),;
                     private final int id;
                     RequestConstraintBasedForecastCommandField(int id) {
                         this.id = id;
@@ -9441,8 +9834,6 @@ public class ClusterIDMapping {
             MaximumDischargeCurrent(8L),
             UserMaximumChargeCurrent(9L),
             RandomizationDelayWindow(10L),
-            NumberOfWeeklyTargets(33L),
-            NumberOfDailyTargets(34L),
             NextChargeStartTime(35L),
             NextChargeTargetTime(36L),
             NextChargeRequiredEnergy(37L),
@@ -9565,7 +9956,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SetTargetsCommandField {DayOfWeekforSequence(0),ChargingTargets(1),;
+                }public enum SetTargetsCommandField {ChargingTargetSchedules(0),;
                     private final int id;
                     SetTargetsCommandField(int id) {
                         this.id = id;
@@ -9582,17 +9973,451 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum GetTargetsCommandField {DaysToReturn(0),;
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class EnergyPreference implements BaseCluster {
+        public static final long ID = 155L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            EnergyBalances(0L),
+            CurrentEnergyBalance(1L),
+            EnergyPriorities(2L),
+            LowPowerModeSensitivities(3L),
+            CurrentLowPowerModeSensitivity(4L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class PowerTopology implements BaseCluster {
+        public static final long ID = 156L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            AvailableEndpoints(0L),
+            ActiveEndpoints(1L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class EnergyEvseMode implements BaseCluster {
+        public static final long ID = 157L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            SupportedModes(0L),
+            CurrentMode(1L),
+            StartUpMode(2L),
+            OnMode(3L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            ChangeToMode(0L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum ChangeToModeCommandField {NewMode(0),;
                     private final int id;
-                    GetTargetsCommandField(int id) {
+                    ChangeToModeCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static GetTargetsCommandField value(int id) throws NoSuchFieldError {
-                        for (GetTargetsCommandField field : GetTargetsCommandField.values()) {
+                    public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class DeviceEnergyManagementMode implements BaseCluster {
+        public static final long ID = 159L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            SupportedModes(0L),
+            CurrentMode(1L),
+            StartUpMode(2L),
+            OnMode(3L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            ChangeToMode(0L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum ChangeToModeCommandField {NewMode(0),;
+                    private final int id;
+                    ChangeToModeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -9672,6 +10497,15 @@ public class ClusterIDMapping {
             SendPINOverTheAir(50L),
             RequirePINforRemoteOperation(51L),
             ExpiringUserTimeout(53L),
+            AliroReaderVerificationKey(128L),
+            AliroReaderGroupIdentifier(129L),
+            AliroReaderGroupSubIdentifier(130L),
+            AliroExpeditedTransactionSupportedProtocolVersions(131L),
+            AliroGroupResolvingKey(132L),
+            AliroSupportedBLEUWBProtocolVersions(133L),
+            AliroBLEAdvertisingVersion(134L),
+            NumberOfAliroCredentialIssuerKeysSupported(135L),
+            NumberOfAliroEndpointKeysSupported(136L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -9741,7 +10575,9 @@ public class ClusterIDMapping {
             SetCredential(34L),
             GetCredentialStatus(36L),
             ClearCredential(38L),
-            UnboltDoor(39L),;
+            UnboltDoor(39L),
+            SetAliroReaderConfig(40L),
+            ClearAliroReaderConfig(41L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -10076,6 +10912,23 @@ public class ClusterIDMapping {
                     }
                     public static UnboltDoorCommandField value(int id) throws NoSuchFieldError {
                         for (UnboltDoorCommandField field : UnboltDoorCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetAliroReaderConfigCommandField {SigningKey(0),VerificationKey(1),GroupIdentifier(2),GroupResolvingKey(3),;
+                    private final int id;
+                    SetAliroReaderConfigCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetAliroReaderConfigCommandField value(int id) throws NoSuchFieldError {
+                        for (SetAliroReaderConfigCommandField field : SetAliroReaderConfigCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -10634,6 +11487,20 @@ public class ClusterIDMapping {
             ACLouverPosition(69L),
             ACCoilTemperature(70L),
             ACCapacityformat(71L),
+            PresetTypes(72L),
+            ScheduleTypes(73L),
+            NumberOfPresets(74L),
+            NumberOfSchedules(75L),
+            NumberOfScheduleTransitions(76L),
+            NumberOfScheduleTransitionPerDay(77L),
+            ActivePresetHandle(78L),
+            ActiveScheduleHandle(79L),
+            Presets(80L),
+            Schedules(81L),
+            PresetsSchedulesEditable(82L),
+            TemperatureSetpointHoldPolicy(83L),
+            SetpointHoldExpiryTimestamp(84L),
+            QueuedPreset(85L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -10683,7 +11550,14 @@ public class ClusterIDMapping {
             SetpointRaiseLower(0L),
             SetWeeklySchedule(1L),
             GetWeeklySchedule(2L),
-            ClearWeeklySchedule(3L),;
+            ClearWeeklySchedule(3L),
+            SetActiveScheduleRequest(5L),
+            SetActivePresetRequest(6L),
+            StartPresetsSchedulesEditRequest(7L),
+            CancelPresetsSchedulesEditRequest(8L),
+            CommitPresetsSchedulesRequest(9L),
+            CancelSetActivePresetRequest(10L),
+            SetTemperatureSetpointHoldPolicy(11L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -10746,6 +11620,74 @@ public class ClusterIDMapping {
                     }
                     public static GetWeeklyScheduleCommandField value(int id) throws NoSuchFieldError {
                         for (GetWeeklyScheduleCommandField field : GetWeeklyScheduleCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetActiveScheduleRequestCommandField {ScheduleHandle(0),;
+                    private final int id;
+                    SetActiveScheduleRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetActiveScheduleRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (SetActiveScheduleRequestCommandField field : SetActiveScheduleRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetActivePresetRequestCommandField {PresetHandle(0),DelayMinutes(1),;
+                    private final int id;
+                    SetActivePresetRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetActivePresetRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (SetActivePresetRequestCommandField field : SetActivePresetRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum StartPresetsSchedulesEditRequestCommandField {TimeoutSeconds(0),;
+                    private final int id;
+                    StartPresetsSchedulesEditRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static StartPresetsSchedulesEditRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (StartPresetsSchedulesEditRequestCommandField field : StartPresetsSchedulesEditRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetTemperatureSetpointHoldPolicyCommandField {TemperatureSetpointHoldPolicy(0),;
+                    private final int id;
+                    SetTemperatureSetpointHoldPolicyCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetTemperatureSetpointHoldPolicyCommandField value(int id) throws NoSuchFieldError {
+                        for (SetTemperatureSetpointHoldPolicyCommandField field : SetTemperatureSetpointHoldPolicyCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -15762,6 +16704,7 @@ public class ClusterIDMapping {
             NullableRangeRestrictedInt16u(16424L),
             NullableRangeRestrictedInt16s(16425L),
             WriteOnlyInt8u(16426L),
+            MeiInt8u(4294070017L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -15789,7 +16732,8 @@ public class ClusterIDMapping {
 
         public enum Event {
             TestEvent(1L),
-            TestFabricScopedEvent(2L),;
+            TestFabricScopedEvent(2L),
+            TestDifferentVendorMeiEvent(4294050030L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -15831,7 +16775,10 @@ public class ClusterIDMapping {
             TimedInvokeRequest(18L),
             TestSimpleOptionalArgumentRequest(19L),
             TestEmitTestEventRequest(20L),
-            TestEmitTestFabricScopedEventRequest(21L),;
+            TestEmitTestFabricScopedEventRequest(21L),
+            TestBatchHelperRequest(22L),
+            TestSecondBatchHelperRequest(23L),
+            TestDifferentVendorMeiRequest(4294049962L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -16138,6 +17085,57 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
+                }public enum TestBatchHelperRequestCommandField {SleepBeforeResponseTimeMs(0),SizeOfResponseBuffer(1),FillCharacter(2),;
+                    private final int id;
+                    TestBatchHelperRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static TestBatchHelperRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (TestBatchHelperRequestCommandField field : TestBatchHelperRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum TestSecondBatchHelperRequestCommandField {SleepBeforeResponseTimeMs(0),SizeOfResponseBuffer(1),FillCharacter(2),;
+                    private final int id;
+                    TestSecondBatchHelperRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static TestSecondBatchHelperRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (TestSecondBatchHelperRequestCommandField field : TestSecondBatchHelperRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum TestDifferentVendorMeiRequestCommandField {Arg1(0),;
+                    private final int id;
+                    TestDifferentVendorMeiRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static TestDifferentVendorMeiRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (TestDifferentVendorMeiRequestCommandField field : TestDifferentVendorMeiRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
                 }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
@@ -16337,7 +17335,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            PingCountEvent(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;

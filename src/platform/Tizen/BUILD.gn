@@ -31,6 +31,7 @@ static_library("Tizen") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../GLibTypeDeleter.h",
     "../SingletonConfigurationManager.cpp",
     "AppPreference.cpp",
     "AppPreference.h",
@@ -47,6 +48,8 @@ static_library("Tizen") {
     "DeviceInstanceInfoProviderImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "ErrorUtils.cpp",
+    "ErrorUtils.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",

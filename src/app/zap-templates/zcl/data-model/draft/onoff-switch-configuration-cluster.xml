@@ -17,7 +17,8 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <cluster>
+  <!-- Deprecated because this is a zigbee-only cluster -->
+  <cluster apiMaturity="deprecated">
     <name>On/off Switch Configuration</name>
     <domain>General</domain>
     <description>Attributes and commands for configuring On/Off switching devices.</description>

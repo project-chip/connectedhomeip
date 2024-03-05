@@ -95,7 +95,10 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "Step 2: TH sends Set Credential Command to DUT"
+    - label:
+          "Step 2: TH sends Set Credential Command to DUT with the following
+          fields a)OperationType as 0 b)Credential as 1 1 c)CredentialData as
+          123456 d)UserIndex as 1 e)UserStatus as null f)UserType as null"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -122,7 +125,9 @@ tests:
               - name: "NextCredentialIndex"
                 value: 2
 
-    - label: "Step 3: TH sends Get Credential Status Command"
+    - label:
+          "Step 3: TH sends Get Credential Status Command with a)CredentialType
+          as 1 b)CredentialIndex as 1"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -143,7 +148,11 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "Step 4: TH sends Set Credential Command to DUT"
+    - label:
+          "Step 4: TH sends Set Credential Command to DUT with the following
+          fields a)OperationType as 0 b)Credential as 1 2 C)CredentialData as
+          4321 D)UserIndex as null e)UserStatus as 5(Invalid value) f)UserType
+          as 10(Invalid value)"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -158,7 +167,7 @@ tests:
               - name: "UserIndex"
                 value: null
               - name: "UserStatus"
-                value: 5
+                value: UserStatusEnum.UnknownEnumValue(5)
               - name: "UserType"
                 value: 10
       response:
@@ -168,7 +177,11 @@ tests:
               - name: "UserIndex"
                 value: null
 
-    - label: "Step 5: TH sends Set Credential Command to DUT"
+    - label:
+          "Step 5: TH sends Set Credential Command to DUT with the following
+          fields a)OperationType as 0 b)Credential as 1 2 d)CredentialData as
+          123456 (same as step 2) e)UserIndex as null f)UserStatus as null
+          g)UserType as null"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -194,9 +207,10 @@ tests:
                 value: null
 
     - label:
-          "Step 6a: TH sends Set Credential Command to DUT and Verify that the
-          DUT sends Set Credential Response command with status as DUPLICATE or
-          OCCUPIED"
+          "Step 6a: TH sends Set Credential Command to DUT with the following
+          fields a)OperationType as 0 b)Credential as 1 1 (same as step 2)
+          c)CredentialData as 123456 d)UserIndex as 1 e)UserStatus as null
+          f)UserType as null"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -221,9 +235,10 @@ tests:
                     anyOf: [0x2, 0x3]
 
     - label:
-          "Step 6b: TH sends Set Credential Command to DUT and Verify that the
-          DUT sends Set Credential Response command with status as DUPLICATE or
-          OCCUPIED."
+          "Step 6b: TH sends Set Credential Command to DUT with the following
+          fields: a)OperationType as 0 b)Credential as 1 1 (same as step 2)
+          c)CredentialData as 123457 d)UserIndex as 1 e)UserStatus as null
+          f)UserType as null"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -248,10 +263,9 @@ tests:
                     anyOf: [0x2, 0x3]
 
     - label:
-          "Step 7: TH sends Set Credential Command to DUT and Verify that the
-          DUT sends Set Credential Response command with status
-          INVALID_COMMAND(0x85) if the CredentialIndex is not associated with
-          the UserIndex."
+          "Step 7: TH sends Set Credential Command to DUT with the following
+          fields: a)OperationType as 2 b)Credential as 1 3 c)CredentialData as
+          1234567 d)UserIndex as 1 e)UserStatus as null  f)UserType as null"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -274,7 +288,9 @@ tests:
               - name: "Status"
                 value: 0x85
 
-    - label: "Step 8: TH sends Clear Credential Command to DUT"
+    - label:
+          "Step 8: TH sends Clear Credential Command to DUT with the following
+          fields: a)CredentialType as 1 b)CredentialIndex as 1"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
@@ -283,7 +299,9 @@ tests:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
 
-    - label: "Step 9: TH sends Get Credential Status Command to DUT"
+    - label:
+          "Step 9: TH sends Get Credential command to DUT with the following
+          fields: a)CredentialType as 1 b)CredentialIndex as 1"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -303,7 +321,10 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "Step 10: TH sends Set User Command to DUT"
+    - label:
+          "Step 10: TH sends Set User Command to DUT with the following values:
+          a)OperationType as 0 b)UserIndex as 2 c)UserName as xxx d)UserUniqueID
+          as 6452 e)UserStatus as 1 f)UserType as 0 g)CredentialRule as 0"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
@@ -324,7 +345,10 @@ tests:
               - name: "CredentialRule"
                 value: 0
 
-    - label: "Step 11: TH sends Set Credential Command to DUT"
+    - label:
+          "Step 11: TH sends Set Credential Command to DUT with the following
+          fields: a)OperationType as 0 b)Credential as 1 1 c)CredentialData as
+          123456 d)UserIndex as 2 e)UserStatus as null f)UserType as null"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -349,7 +373,9 @@ tests:
               - name: "UserIndex"
                 value: null
 
-    - label: "Step 12a: TH sends Clear Credential Command to DUT"
+    - label:
+          "Step 12a: TH sends Clear Credential Command to DUT with the following
+          fields: a)CredentialType as 1 b)CredentialIndex as 0xFFFE"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
@@ -358,7 +384,9 @@ tests:
               - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 65534 }
 
-    - label: "Step 12b: TH sends Get Credential Status Command"
+    - label:
+          "Step 12b: TH sends Get Credential command to DUT with the following
+          fields: a)CredentialType as 1 b)CredentialIndex as 0xFFFE"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -378,7 +406,9 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "Step 13: TH sends Get Credential Status Command"
+    - label:
+          "Step 13: TH sends Get Credential Status Command with a)CredentialType
+          as 1 b)CredentialIndex as 1"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
@@ -398,7 +428,9 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
-    - label: "Step 14: TH sends Clear Credential Command to DUT"
+    - label:
+          "Step 14: TH sends Clear Credential Command to DUT with the following
+          fields: a)CredentialType as 8(Invalid value) b)CredentialIndex as 2"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000

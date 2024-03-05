@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!--
-link:../matter-defines.adoc[]
-
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
@@ -56,12 +54,18 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:imagesdir: service_device_management/images
+:xrefstyle: full
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0038" name="Time Synchronization" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Make TrustedTimeSource fabric-aware, add TSC feature, define list max sizes, change writable attributes to commands, remote port, add attribute for DNS support"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0038" name="Time Synchronization"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="TIMESYNC" scope="Node"/>
   <features>
     <feature bit="0" code="TZ" name="TimeZone" summary="Server supports time zone.">
@@ -95,6 +99,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="Status Codes" type="status"/>
     <enum name="TimeZoneDatabaseEnum">
       <item value="0" name="Full" summary="Node has a full list of the available time zones">
         <mandatoryConform/>
@@ -111,19 +116,19 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="ValidStarting" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
+      <field id="1" name="ValidStarting" type="epoch-us">
         <mandatoryConform/>
       </field>
-      <field id="2" name="ValidUntil" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
+      <field id="2" name="ValidUntil" type="epoch-us">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="FabricScopedTrustedTimeSourceStruct">
-      <field id="0" name="NodeID" type="&lt;&lt;ref_DataTypeNodeId&gt;&gt;">
+      <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Endpoint" type="&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt;">
+      <field id="1" name="Endpoint" type="endpoint-no">
         <mandatoryConform/>
       </field>
     </struct>
@@ -132,22 +137,22 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="between" from="-43200" to="50400"/>
       </field>
-      <field id="1" name="ValidAt" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
+      <field id="1" name="ValidAt" type="epoch-us">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="2" name="Name" type="string">
         <optionalConform/>
-        <constraint type="between" from="0" to="64"/>
+        <constraint type="lengthBetween" from="0" to="64"/>
       </field>
     </struct>
     <struct name="TrustedTimeSourceStruct">
-      <field id="0" name="FabricIndex" type="&lt;&lt;ref_FabricIdx&gt;&gt;">
+      <field id="0" name="FabricIndex" type="fabric-idx">
         <mandatoryConform/>
       </field>
-      <field id="1" name="NodeID" type="&lt;&lt;ref_DataTypeNodeId&gt;&gt;">
+      <field id="1" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Endpoint" type="&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt;">
+      <field id="2" name="Endpoint" type="endpoint-no">
         <mandatoryConform/>
       </field>
     </struct>
@@ -177,9 +182,9 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="between" from="-43200" to="50400"/>
       </field>
-      <field id="1" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="1" name="Name" type="string">
         <optionalConform/>
-        <constraint type="between" from="0" to="64"/>
+        <constraint type="lengthBetween" from="0" to="64 bytes"/>
       </field>
     </event>
     <event id="0x03" name="TimeFailure" priority="info">
@@ -191,10 +196,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TSC"/>
       </mandatoryConform>
-      <field id="0" name="TrustedTimeSource" type="FabricScopedTrustedTimeSourceStruct">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
     </event>
   </events>
 </cluster>

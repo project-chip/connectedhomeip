@@ -165,12 +165,10 @@ int main(int argc, char * argv[])
 #endif
 
     CastingPlayerDiscovery::GetInstance()->SetDelegate(DiscoveryDelegateImpl::GetInstance());
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
-                        ChipLogError(AppServer, "CastingPlayerDiscovery::SetDelegate failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     // Discover CastingPlayers
     err = CastingPlayerDiscovery::GetInstance()->StartDiscovery(kTargetPlayerDeviceType);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, -1,
                         ChipLogError(AppServer, "CastingPlayerDiscovery::StartDiscovery failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();

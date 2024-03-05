@@ -55,11 +55,14 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003f" name="GroupKeyManagement" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003F" name="Group Key Management" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Clarify KeySetWrite validation and behavior on invalid epoch key lengths"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x003F" name="GroupKeyManagement"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="GRPKEY" scope="Node"/>
   <features>
     <feature bit="0" code="CS" name="CacheAndSync" summary="The ability to support CacheAndSync security policy and MCSP.">
@@ -86,29 +89,29 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="GroupInfoMapStruct">
-      <field id="1" name="GroupId" type="&lt;&lt;ref_DataTypeGroupId&gt;&gt;">
-        <access read="true"/>
+      <field id="1" name="GroupId" type="group-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Endpoints" type="&lt;&lt;ref_DataTypeList&gt;&gt;[&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt;]">
-        <access read="true"/>
+      <field id="2" name="Endpoints" type="list">
+        <entry type="endpoint-no"/>
         <mandatoryConform/>
-        <constraint type="min" value="1"/>
+        <constraint type="minCount" value="1"/>
       </field>
-      <field id="3" name="GroupName" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
-        <access read="true"/>
+      <field id="3" name="GroupName" type="string">
         <optionalConform/>
-        <constraint type="max" value="16"/>
+        <constraint type="maxLength" value="16"/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
     <struct name="GroupKeyMapStruct">
-      <field id="1" name="GroupId" type="&lt;&lt;ref_DataTypeGroupId&gt;&gt;">
+      <field id="1" name="GroupId" type="group-id">
         <mandatoryConform/>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
         <constraint type="between" from="1" to="65535"/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
     <struct name="GroupKeySetStruct">
       <field id="0" name="GroupKeySetID" type="uint16">
@@ -118,35 +121,35 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="EpochKey0" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="2" name="EpochKey0" type="octstr">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint type="maxLength" value="16"/>
       </field>
-      <field id="3" name="EpochStartTime0" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
-        <access fabricSensitive="true"/>
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="4" name="EpochKey1" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
-        <access fabricSensitive="true"/>
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
-      </field>
-      <field id="5" name="EpochStartTime1" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
+      <field id="3" name="EpochStartTime0" type="epoch-us">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="6" name="EpochKey2" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="4" name="EpochKey1" type="octstr">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint type="maxLength" value="16"/>
       </field>
-      <field id="7" name="EpochStartTime2" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
+      <field id="5" name="EpochStartTime1" type="epoch-us">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="EpochKey2" type="octstr">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="7" name="EpochStartTime2" type="epoch-us">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -161,14 +164,16 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="GroupKeyMap" type="&lt;&lt;ref_DataTypeList&gt;&gt;[GroupKeyMapStruct Type]" default="empty">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+    <attribute id="0x0000" name="GroupKeyMap" type="list" default="empty">
+      <entry type="GroupKeyMapStruct"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage" fabricScoped="true"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0001" name="GroupTable" type="&lt;&lt;ref_DataTypeList&gt;&gt;[GroupInfoMapStruct Type]" default="empty">
-      <access read="true" readPrivilege="view"/>
+    <attribute id="0x0001" name="GroupTable" type="list" default="empty">
+      <entry type="GroupInfoMapStruct"/>
+      <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
@@ -185,14 +190,14 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="KeySetWrite Command" response="Y">
+    <command id="0x00" name="KeySetWrite Command" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupKeySet" type="GroupKeySetStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="KeySetRead Command" response="KeySetReadResponse Command">
+    <command id="0x01" name="KeySetRead Command" direction="commandToServer" response="KeySetReadResponse Command">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupKeySetID" type="uint16">
@@ -200,20 +205,19 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x02" name="KeySetReadResponse Command" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="GroupKeySet" type="GroupKeySetStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x03" name="KeySetRemove Command" response="Y">
+    <command id="0x03" name="KeySetRemove Command" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x04" name="KeySetReadAllIndices Command" response="KeySetReadAllIndicesResponse Command">
+    <command id="0x04" name="KeySetReadAllIndices Command" direction="commandToServer" response="KeySetReadAllIndicesResponse Command">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="reserved">
@@ -221,7 +225,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x05" name="KeySetReadAllIndicesResponse Command" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="GroupKeySetIDs" type="list">
         <entry type="uint16"/>

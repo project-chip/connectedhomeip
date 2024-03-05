@@ -126,8 +126,6 @@ _KNOWN_DECODABLE_TYPES = {
     # non-named enums
     'enum8': 'uint8_t',
     'enum16': 'uint16_t',
-    'enum32': 'uint32_t',
-    'enum64': 'uint64_t',
 }
 
 
@@ -320,8 +318,6 @@ def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
         "int64u",
         "enum8",
         "enum16",
-        "enum32",
-        "enum64",
         "bitmap8",
         "bitmap16",
         "bitmap32",
@@ -765,57 +761,6 @@ class JavaJNIGenerator(__JavaCodeGenerator):
         """
         Renders .CPP files required for JNI support.
         """
-
-        large_targets = [
-            GenerateTarget(template="CHIPCallbackTypes.jinja",
-                           output_name="jni/CHIPCallbackTypes.h"),
-            GenerateTarget(template="CHIPReadCallbacks_h.jinja",
-                           output_name="jni/CHIPReadCallbacks.h"),
-            GenerateTarget(template="CHIPGlobalCallbacks_cpp.jinja",
-                           output_name="jni/CHIPGlobalCallbacks.cpp"),
-        ]
-
-        for target in large_targets:
-            self.internal_render_one_output(
-                template_path=target.template,
-                output_file_name=target.output_name,
-                vars={
-                    'idl': self.idl,
-                    'clientClusters': self.idl.clusters,
-                    'globalTypes': _GLOBAL_TYPES,
-                }
-            )
-
-        cluster_targets = [
-            GenerateTarget(template="ChipClustersRead.jinja",
-                           output_name="jni/{cluster_name}Client-ReadImpl.cpp"),
-            GenerateTarget(template="ChipClustersCpp.jinja",
-                           output_name="jni/{cluster_name}Client-InvokeSubscribeImpl.cpp"),
-        ]
-
-        self.internal_render_one_output(
-            template_path="CHIPCallbackTypes.jinja",
-            output_file_name="jni/CHIPCallbackTypes.h",
-            vars={
-                'idl': self.idl,
-                'clientClusters': self.idl.clusters,
-            }
-        )
-
-        # Every cluster has its own impl, to avoid
-        # very large compilations (running out of RAM)
-        for cluster in self.idl.clusters:
-            for target in cluster_targets:
-                self.internal_render_one_output(
-                    template_path=target.template,
-                    output_file_name=target.output_name.format(
-                        cluster_name=cluster.name),
-                    vars={
-                        'cluster': cluster,
-                        'typeLookup': TypeLookupContext(self.idl, cluster),
-                        'globalTypes': _GLOBAL_TYPES,
-                    }
-                )
 
 
 class JavaClassGenerator(__JavaCodeGenerator):

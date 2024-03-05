@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!--
-link:../matter-defines.adoc[]
-
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
@@ -57,10 +55,13 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0036" name="Wi-Fi Network Diagnostics" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Wi-Fi Network Diagnostics" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0036" name="Wi"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DGWIFI" scope="Node"/>
   <features>
     <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Node makes available the counts for the number of received and transmitted packets on the Wi-Fi interface.">
@@ -138,11 +139,11 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="BSSID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;" default="null">
+    <attribute id="0x0000" name="BSSID" type="octstr" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="allowed" value="6"/>
+      <constraint type="maxLength" value="6"/>
     </attribute>
     <attribute id="0x0001" name="SecurityType" type="SecurityTypeEnum" default="null">
       <access read="true" readPrivilege="view"/>
@@ -200,19 +201,19 @@ Davis, CA 95616, USA
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000a" name="PacketUnicastTxCount" type="uint32" default="0">
+    <attribute id="0x000A" name="PacketUnicastTxCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000b" name="CurrentMaxRate" type="uint64" default="0">
+    <attribute id="0x000B" name="CurrentMaxRate" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x000c" name="OverrunCount" type="uint64" default="0">
+    <attribute id="0x000C" name="OverrunCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -221,7 +222,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="ResetCounts" response="Y">
+    <command id="0x00" name="ResetCounts" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="ERRCNT"/>

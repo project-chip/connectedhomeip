@@ -464,7 +464,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     nullable int64s platformCode = 3;
   }
 
-  attribute ProviderLocation defaultOTAProviders[] = 0;
+  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
@@ -524,11 +524,13 @@ cluster TimeFormatLocalization = 44 {
     kKorean = 9;
     kPersian = 10;
     kTaiwanese = 11;
+    kUseActiveLocale = 255;
   }
 
   enum HourFormatEnum : enum8 {
     k12hr = 0;
     k24hr = 1;
+    kUseActiveLocale = 255;
   }
 
   bitmap Feature : bitmap32 {
@@ -844,7 +846,7 @@ cluster DiagnosticLogs = 50 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
@@ -893,6 +895,10 @@ cluster GeneralDiagnostics = 51 {
     kNFCFault = 4;
     kBLEFault = 5;
     kEthernetFault = 6;
+  }
+
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
   }
 
   struct NetworkInterface {
@@ -947,14 +953,26 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct TimeSnapshotResponse = 2 {
-    systime_us systemTimeUs = 0;
-    nullable epoch_us UTCTimeUs = 1;
+    systime_ms systemTimeMs = 0;
+    nullable posix_ms posixTimeMs = 1;
+  }
+
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
   }
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -996,7 +1014,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -1589,7 +1607,7 @@ cluster BooleanState = 69 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 3;
+  revision 4;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
@@ -1629,7 +1647,7 @@ cluster OccupancySensing = 1030 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 2;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -1655,7 +1673,7 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -1788,8 +1806,8 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -1872,7 +1890,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ResetCounts;
   }
@@ -2005,7 +2023,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -2024,7 +2042,7 @@ endpoint 1 {
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 }
 

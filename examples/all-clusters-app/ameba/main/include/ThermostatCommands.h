@@ -154,7 +154,7 @@ void ProcessThermostatUnicastBindingCommand(BindingCommandData * data, const Emb
     switch (data->commandId)
     {
     case Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
-        setpointRaiseLowerCommand.mode   = static_cast<Clusters::Thermostat::SetpointAdjustMode>(data->args[0]);
+        setpointRaiseLowerCommand.mode   = static_cast<Clusters::Thermostat::SetpointRaiseLowerModeEnum>(data->args[0]);
         setpointRaiseLowerCommand.amount = static_cast<int8_t>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          setpointRaiseLowerCommand, onSuccess, onFailure);
@@ -171,7 +171,7 @@ void ProcessThermostatGroupBindingCommand(BindingCommandData * data, const Ember
     switch (data->commandId)
     {
     case Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
-        setpointRaiseLowerCommand.mode   = static_cast<Clusters::Thermostat::SetpointAdjustMode>(data->args[0]);
+        setpointRaiseLowerCommand.mode   = static_cast<Clusters::Thermostat::SetpointRaiseLowerModeEnum>(data->args[0]);
         setpointRaiseLowerCommand.amount = static_cast<int8_t>(data->args[1]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, setpointRaiseLowerCommand);
         break;

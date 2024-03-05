@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <!--
-link:../matter-defines.adoc[]
-
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
@@ -61,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0032" name="Diagnostic Logs"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DLOG" scope="Node"/>
   <dataTypes>
     <enum name="IntentEnum">
@@ -101,7 +102,7 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <commands>
-    <command id="0x00" name="RetrieveLogsRequest" response="RetrieveLogsResponse">
+    <command id="0x00" name="RetrieveLogsRequest" direction="commandToServer" response="RetrieveLogsResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Intent" type="IntentEnum">
@@ -110,25 +111,24 @@ Davis, CA 95616, USA
       <field id="1" name="RequestedProtocol" type="TransferProtocolEnum">
         <mandatoryConform/>
       </field>
-      <field id="2" name="TransferFileDesignator" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="2" name="TransferFileDesignator" type="string">
         <optionalConform/>
-        <constraint type="max" value="32"/>
+        <constraint type="maxLength" value="32"/>
       </field>
     </command>
     <command id="0x01" name="RetrieveLogsResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="LogContent" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="1" name="LogContent" type="octstr">
         <mandatoryConform/>
-        <constraint type="max" value="1024"/>
+        <constraint type="maxLength" value="1024"/>
       </field>
-      <field id="2" name="UTCTimeStamp" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
+      <field id="2" name="UTCTimeStamp" type="epoch-us">
         <optionalConform/>
       </field>
-      <field id="3" name="TimeSinceBoot" type="&lt;&lt;ref_DataTypeSystemTimeUs&gt;&gt;">
+      <field id="3" name="TimeSinceBoot" type="ref_DataTypeSystemTimeUs">
         <optionalConform/>
       </field>
     </command>

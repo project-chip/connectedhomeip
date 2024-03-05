@@ -51,6 +51,7 @@
 #define WFX_RSI_ST_STA_READY (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE)
 #define WFX_RSI_ST_STARTED (0x200)     /* RSI task started			*/
 #define WFX_RSI_ST_SCANSTARTED (0x400) /* Scan Started				*/
+#define WFX_RSI_ST_SLEEP_READY (0x800) /* Notify the M4 to go to sleep*/
 
 struct wfx_rsi
 {
@@ -91,7 +92,11 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
 #if SL_ICD_ENABLED
+#if SLI_SI917
+int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
+#else
 int32_t wfx_rsi_power_save();
+#endif /* SLI_SI917 */
 #endif /* SL_ICD_ENABLED */
 
 #ifdef __cplusplus

@@ -46,6 +46,7 @@ struct LinuxDeviceOptions
     chip::Optional<std::vector<uint8_t>> spake2pSalt;
     uint32_t spake2pIterations = 0; // When not provided (0), will default elsewhere
     uint32_t mBleDevice        = 0;
+    bool wifiSupports5g        = false;
     bool mWiFi                 = false;
     bool mThread               = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
@@ -70,6 +71,10 @@ struct LinuxDeviceOptions
     bool mSimulateNoInternalTime = false;
 #if defined(PW_RPC_ENABLED)
     uint16_t rpcServerPort = 33000;
+#endif
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    int32_t subscriptionCapacity                   = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
+    int32_t subscriptionResumptionRetryIntervalSec = -1;
 #endif
     static LinuxDeviceOptions & GetInstance();
 };

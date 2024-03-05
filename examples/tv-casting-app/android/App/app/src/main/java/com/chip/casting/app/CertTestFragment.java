@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.R;
 import com.chip.casting.ContentApp;
 import com.chip.casting.ContentLauncherTypes;
 import com.chip.casting.FailureCallback;
@@ -306,6 +307,13 @@ public class CertTestFragment extends Fragment {
         () -> {
           tvCastingApp.applicationBasic_readProductID(
               kContentApp, successCallbackInteger, failureCallback);
+        });
+
+    runAndWait(
+        "messages_presentMessages",
+        successFailureCallback,
+        () -> {
+          tvCastingApp.messages_presentMessages(kTVApp, "CastingAppTestMessage", callback);
         });
 
     runAndWait(

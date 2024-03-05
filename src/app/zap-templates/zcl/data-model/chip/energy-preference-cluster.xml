@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="Energy Management"/>
+  <cluster apiMaturity="provisional">
+    <name>Energy Preference</name>
+    <domain>Energy Management</domain>
+    <code>0x009B</code>
+    <define>ENERGY_PREFERENCE_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides an interface to specify preferences for how devices should consume energy.</description>
+    <!--Attributes-->
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <!--Conformance feature BALA - for now optional-->
+    <attribute code="0x0000" side="server" type="array" entryType="BalanceStruct" define="ENERGY_PREFERENCE_ENERGY_BALANCES" isNullable="false" min="2" max="10" writable="false" optional="true">EnergyBalances</attribute>
+
+    <!--Conformance feature BALA - for now optional-->
+    <attribute code="0x0001" side="server" type="int8u" define="ENERGY_PREFERENCE_CURRENT_ENERGY_BALANCE" isNullable="false" writable="true" optional="true">
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="operate"/>
+      <description>CurrentEnergyBalance</description>
+    </attribute>
+
+    <!--Conformance feature BALA - for now optional-->
+    <attribute code="0x0002" side="server" type="array" entryType="EnergyPriorityEnum" define="ENERGY_PREFERENCE_ENERGY_PRIORITIES" isNullable="false" max="2" writable="false" optional="true">EnergyPriorities</attribute>
+
+    <!--Conformance feature LPMS - for now optional-->
+    <attribute code="0x0003" side="server" type="array" entryType="BalanceStruct" define="ENERGY_PREFERENCE_LOW_POWER_MODE_SENSITIVITIES" isNullable="false" min="2" max="10" writable="false" optional="true">LowPowerModeSensitivities</attribute>
+
+    <!--Conformance feature LPMS - for now optional-->
+    <attribute code="0x0004" side="server" type="int8u" define="ENERGY_PREFERENCE_CURRENT_LOW_POWER_MODE_SENSITIVITY" isNullable="false" writable="true" optional="true">
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="operate"/>
+      <description>CurrentLowPowerModeSensitivity</description>
+    </attribute>
+
+  </cluster>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x009B"/>
+    <field name="EnergyBalance" mask="0x1"/>
+    <field name="LowPowerModeSensitivity" mask="0x2"/>
+  </bitmap>
+
+  <enum name="EnergyPriorityEnum" type="enum8">
+    <cluster code="0x009B"/>
+    <item name="Comfort" value="0x00"/>
+    <item name="Speed" value="0x01"/>
+    <item name="Efficiency" value="0x02"/>
+    <item name="WaterConsumption" value="0x03"/>
+  </enum>
+
+  <struct name="BalanceStruct">
+    <cluster code="0x009B"/>
+    <item name="Step" type="percent"/>
+    <item name="Label" type="char_string" optional="true" length="64"/>
+  </struct>
+
+</configurator>

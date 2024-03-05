@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 99,
+  "featureLevel": 100,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -213,139 +213,6 @@
           ]
         },
         {
-          "name": "Scenes",
-          "code": 5,
-          "mfgCode": null,
-          "define": "SCENES_CLUSTER",
-          "side": "client",
-          "enabled": 1,
-          "apiMaturity": "provisional",
-          "commands": [
-            {
-              "name": "AddScene",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "AddSceneResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "ViewScene",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "ViewSceneResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "RemoveScene",
-              "code": 2,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "RemoveSceneResponse",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "RemoveAllScenes",
-              "code": 3,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "RemoveAllScenesResponse",
-              "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "StoreScene",
-              "code": 4,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "StoreSceneResponse",
-              "code": 4,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "RecallScene",
-              "code": 5,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "GetSceneMembership",
-              "code": 6,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "GetSceneMembershipResponse",
-              "code": 6,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 1,
-              "isEnabled": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "5",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
           "name": "On/Off",
           "code": 6,
           "mfgCode": null,
@@ -428,6 +295,7 @@
           "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -562,6 +430,7 @@
           "define": "BINARY_INPUT_BASIC_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -1248,10 +1117,10 @@
               "side": "client",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1355,7 +1224,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -2163,6 +2032,7 @@
           "define": "LAUNDRY_DRYER_CONTROLS_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -2860,6 +2730,59 @@
           ]
         },
         {
+          "name": "Microwave Oven Control",
+          "code": 95,
+          "mfgCode": null,
+          "define": "MICROWAVE_OVEN_CONTROL_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "SetCookingParameters",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Operational State",
           "code": 96,
           "mfgCode": null,
@@ -2918,22 +2841,6 @@
               "isEnabled": 1
             },
             {
-              "name": "Stop",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "Start",
-              "code": 2,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
               "name": "Resume",
               "code": 3,
               "mfgCode": null,
@@ -2981,6 +2888,139 @@
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Scenes Management",
+          "code": 98,
+          "mfgCode": null,
+          "define": "SCENES_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "AddScene",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddSceneResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "ViewScene",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "ViewSceneResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveScene",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveSceneResponse",
+              "code": 2,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveAllScenes",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveAllScenesResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "StoreScene",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "StoreSceneResponse",
+              "code": 4,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "RecallScene",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetSceneMembership",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetSceneMembershipResponse",
+              "code": 6,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "5",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
               "reportableChange": 0
             }
           ]
@@ -3070,6 +3110,92 @@
           ]
         },
         {
+          "name": "Electrical Power Measurement",
+          "code": 144,
+          "mfgCode": null,
+          "define": "ELECTRICAL_POWER_MEASUREMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Electrical Energy Measurement",
+          "code": 145,
+          "mfgCode": null,
+          "define": "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Device Energy Management",
           "code": 152,
           "mfgCode": null,
@@ -3085,10 +3211,10 @@
               "side": "client",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3146,10 +3272,175 @@
               "side": "client",
               "type": "bitmap32",
               "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Power Topology",
+          "code": 156,
+          "mfgCode": null,
+          "define": "POWER_TOPOLOGY_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Energy EVSE Mode",
+          "code": 157,
+          "mfgCode": null,
+          "define": "ENERGY_EVSE_MODE_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "ChangeToMode",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "ChangeToModeResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Device Energy Management Mode",
+          "code": 159,
+          "mfgCode": null,
+          "define": "DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "ChangeToMode",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "ChangeToModeResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3484,6 +3775,7 @@
           "define": "BARRIER_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "commands": [
             {
               "name": "BarrierControlGoToPercent",
@@ -3637,8 +3929,7 @@
           "mfgCode": null,
           "define": "FAN_CONTROL_CLUSTER",
           "side": "client",
-          "enabled": 1,
-          "apiMaturity": "provisional"
+          "enabled": 1
         },
         {
           "name": "Thermostat User Interface Configuration",
@@ -4037,7 +4328,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -5108,6 +5399,7 @@
           "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -5441,8 +5733,8 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     }
-  ],
-  "log": []
+  ]
 }

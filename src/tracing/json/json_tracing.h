@@ -19,6 +19,7 @@
 
 #include <fstream>
 #include <tracing/backend.h>
+#include <unordered_map>
 
 namespace Json {
 class Value;
@@ -50,16 +51,20 @@ public:
     void TraceBegin(const char * label, const char * group) override;
     void TraceEnd(const char * label, const char * group) override;
     void TraceInstant(const char * label, const char * group) override;
+    void TraceCounter(const char * label) override;
     void LogMessageSend(MessageSendInfo &) override;
     void LogMessageReceived(MessageReceivedInfo &) override;
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
+    void LogMetricEvent(const MetricEvent &) override;
     void Close() override { CloseFile(); }
 
 private:
     /// Does the actual write of the value
     void OutputValue(::Json::Value & value);
+
+    std::unordered_map<std::string, int> mCounters;
 
     // Output file if writing to a file. If closed, writing
     // to ChipLog*

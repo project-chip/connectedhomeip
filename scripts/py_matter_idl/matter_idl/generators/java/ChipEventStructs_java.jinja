@@ -80,7 +80,6 @@ public class ChipEventStructs {
 {%- for cluster in clientClusters | sort(attribute='code') -%}
 {%- set typeLookup = idl | createLookupContext(cluster) %}
 {%- for event in cluster.events %}
-{%- if event.fields %}
 public static class {{cluster.name}}Cluster{{event.name}}Event {
   {%- for field in event.fields %}
   {%- set encodable = field | asEncodable(typeLookup) %}
@@ -133,6 +132,7 @@ public static class {{cluster.name}}Cluster{{event.name}}Event {
 {%- endif -%}
 ;
 {%- endfor %}
+{%- if event.fields %}
     for (StructElement element: ((StructType)tlvValue).value()) {
 {%- for field in event.fields -%}
 {%- set encodable = field | asEncodable(typeLookup) %}
@@ -146,6 +146,7 @@ public static class {{cluster.name}}Cluster{{event.name}}Event {
       }
 {%- endraw %}
     }
+{%- endif %}
     return new {{cluster.name}}Cluster{{event.name}}Event(
   {%- for field in event.fields %}
       {{field.name}}{%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif %}
@@ -177,7 +178,6 @@ public static class {{cluster.name}}Cluster{{event.name}}Event {
     return output.toString();
   }
 }
-{%- endif %}
 {%- endfor %}
 {%- endfor %}
 }

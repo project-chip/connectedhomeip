@@ -186,3 +186,13 @@ tests:
           value: null
           constraints:
               type: int32s
+
+    - label: "Step 14: TH reads the SupportedWiFiBands attribute from the DUT"
+      PICS: CNET.S.A0008
+      command: "readAttribute"
+      attribute: "SupportedWiFiBands"
+      response:
+          constraints:
+              type: list
+              minLength: 1
+              maxLength: 6

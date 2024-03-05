@@ -21,6 +21,7 @@ import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ControllerParams
 import com.matter.controller.commands.common.*
 import com.matter.controller.commands.discover.*
+import com.matter.controller.commands.icd.*
 import com.matter.controller.commands.pairing.*
 
 private fun getDiscoveryCommands(
@@ -66,6 +67,16 @@ private fun getImCommands(
     PairOnNetworkLongImSubscribeCommand(controller, credentialsIssuer),
     PairOnNetworkLongImWriteCommand(controller, credentialsIssuer),
     PairOnNetworkLongImInvokeCommand(controller, credentialsIssuer),
+    PairOnNetworkLongImExtendableInvokeCommand(controller, credentialsIssuer),
+  )
+}
+
+private fun getICDCommands(
+  controller: ChipDeviceController,
+  credentialsIssuer: CredentialsIssuer
+): List<Command> {
+  return listOf(
+    ICDListCommand(controller, credentialsIssuer),
   )
 }
 
@@ -84,6 +95,7 @@ fun main(args: Array<String>) {
   commandManager.register("discover", getDiscoveryCommands(controller, credentialsIssuer))
   commandManager.register("pairing", getPairingCommands(controller, credentialsIssuer))
   commandManager.register("im", getImCommands(controller, credentialsIssuer))
+  commandManager.register("icd", getICDCommands(controller, credentialsIssuer))
 
   try {
     commandManager.run(args)

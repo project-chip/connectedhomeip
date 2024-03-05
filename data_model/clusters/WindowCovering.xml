@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0102" name="Window Covering" revision="5">
   <revisionHistory>
@@ -63,6 +65,9 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes with FeatureMap &amp; OperationalStatus attribute"/>
     <revision revision="5" summary="New data model format and notation. Created plus clarified PositionAware and AbsolutePosition features. General cleanup of functionality."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0102" name="Window Covering"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WNCV" scope="Endpoint"/>
   <features>
     <feature bit="0" code="LF" name="Lift" summary="Lift control and behavior for lifting/sliding window coverings">
@@ -334,13 +339,13 @@ Davis, CA 95616, USA
       </bitfield>
     </bitmap>
     <bitmap name="OperationalStatusBitmap">
-      <bitfield name="Global" summary="Global operational state.">
+      <bitfield name="Global" from="0" to="1" summary="Global operational state.">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Lift" summary="Lift operational state.">
+      <bitfield name="Lift" from="2" to="3" summary="Lift operational state.">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="Tilt" summary="Tilt operational state.">
+      <bitfield name="Tilt" from="4" to="5" summary="Tilt operational state.">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -477,13 +482,13 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint type="between" from="0" to="100"/>
     </attribute>
-    <attribute id="0x000a" name="OperationalStatus" type="OperationalStatusBitmap" default="0">
+    <attribute id="0x000A" name="OperationalStatus" type="OperationalStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <mandatoryConform/>
       <constraint type="allowed" value="0b00xx xxxx"/>
     </attribute>
-    <attribute id="0x000b" name="TargetPositionLiftPercent100ths" type="percent100ths" default="null">
+    <attribute id="0x000B" name="TargetPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true"/>
       <mandatoryConform>
@@ -493,7 +498,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000c" name="TargetPositionTiltPercent100ths" type="percent100ths" default="null">
+    <attribute id="0x000C" name="TargetPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="true" persistence="volatile" reportable="true"/>
       <mandatoryConform>
@@ -503,13 +508,13 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000d" name="EndProductType" type="EndProductTypeEnum" default="0">
+    <attribute id="0x000D" name="EndProductType" type="EndProductTypeEnum" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000e" name="CurrentPositionLiftPercent100ths" type="percent100ths" default="null">
+    <attribute id="0x000E" name="CurrentPositionLiftPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true"/>
       <mandatoryConform>
@@ -520,7 +525,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="between" from="0" to="10000"/>
     </attribute>
-    <attribute id="0x000f" name="CurrentPositionTiltPercent100ths" type="percent100ths" default="null">
+    <attribute id="0x000F" name="CurrentPositionTiltPercent100ths" type="percent100ths" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="true"/>
       <mandatoryConform>
@@ -600,7 +605,7 @@ Davis, CA 95616, USA
     <attribute id="0x0019" name="IntermediateSetpointsTilt">
       <deprecateConform/>
     </attribute>
-    <attribute id="0x001a" name="SafetyStatus" type="SafetyStatusBitmap" default="0">
+    <attribute id="0x001A" name="SafetyStatus" type="SafetyStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <optionalConform/>
@@ -608,19 +613,19 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="UpOrOpen" response="Y">
+    <command id="0x00" name="UpOrOpen" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x01" name="DownOrClose" response="Y">
+    <command id="0x01" name="DownOrClose" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x02" name="StopMotion" response="Y">
+    <command id="0x02" name="StopMotion" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x04" name="GoToLiftValue" response="Y">
+    <command id="0x04" name="GoToLiftValue" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <optionalConform>
         <andTerm>
@@ -633,7 +638,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x05" name="GoToLiftPercentage" response="Y">
+    <command id="0x05" name="GoToLiftPercentage" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <otherwiseConform>
         <mandatoryConform>
@@ -655,7 +660,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x07" name="GoToTiltValue" response="Y">
+    <command id="0x07" name="GoToTiltValue" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <optionalConform>
         <andTerm>
@@ -668,7 +673,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x08" name="GoToTiltPercentage" response="Y">
+    <command id="0x08" name="GoToTiltPercentage" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <otherwiseConform>
         <mandatoryConform>

@@ -23,6 +23,7 @@
 #include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/group/Commands.h"
+#include "commands/icd/ICDCommand.h"
 #include "commands/interactive/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
@@ -40,6 +41,7 @@ int main(int argc, char * argv[])
     Commands commands;
     registerCommandsDelay(commands, &credIssuerCommands);
     registerCommandsDiscover(commands, &credIssuerCommands);
+    registerCommandsICD(commands, &credIssuerCommands);
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPayload(commands);
     registerCommandsPairing(commands, &credIssuerCommands);

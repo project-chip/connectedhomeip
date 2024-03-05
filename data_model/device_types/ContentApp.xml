@@ -61,7 +61,6 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release of this document"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
-  <conditions/>
   <clusters>
     <cluster id="0x0504" name="Channel" side="server">
       <optionalConform/>
@@ -75,21 +74,21 @@ Davis, CA 95616, USA
     <cluster id="0x0509" name="Keypad Input" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x050a" name="Content Launcher" side="server">
+    <cluster id="0x050A" name="Content Launcher" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x050c" name="Application Launcher" side="server">
+    <cluster id="0x050C" name="Application Launcher" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="Application Platform">
+        <feature code="" name="Application">
           <disallowConform/>
         </feature>
       </features>
     </cluster>
-    <cluster id="0x050d" name="Application Basic" side="server">
+    <cluster id="0x050D" name="Application Basic" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x050e" name="Account Login" side="server">
+    <cluster id="0x050E" name="Account Login" side="server">
       <optionalConform/>
     </cluster>
   </clusters>

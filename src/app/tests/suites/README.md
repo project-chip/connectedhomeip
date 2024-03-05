@@ -314,7 +314,6 @@ src/app/tests/suites/examples/gen_readme_example.sh
 | boolean           | 1    | BOOLEAN           | 0x10 | Boolean                  | uint8_t    |
 | bitmap8           | 1    | BITMAP8           | 0x18 | 8-bit bitmap             | uint8_t    |
 | bitmap16          | 2    | BITMAP16          | 0x19 | 16-bit bitmap            | uint16_t   |
-| bitmap24          | 3    | BITMAP24          | 0x1A | 24-bit bitmap            | uint32_t   |
 | bitmap32          | 4    | BITMAP32          | 0x1B | 32-bit bitmap            | uint32_t   |
 | bitmap64          | 8    | BITMAP64          | 0x1F | 64-bit bitmap            | uint8_t \* |
 | int8u             | 1    | INT8U             | 0x20 | Unsigned 8-bit integer   | uint8_t    |

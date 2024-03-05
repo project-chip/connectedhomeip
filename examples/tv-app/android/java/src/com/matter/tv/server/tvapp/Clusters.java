@@ -22,7 +22,7 @@ public class Clusters {
   public static final long ClusterId_DeviceTemperatureConfiguration = 0x00000002;
   public static final long ClusterId_Identify = 0x00000003;
   public static final long ClusterId_Groups = 0x00000004;
-  public static final long ClusterId_Scenes = 0x00000005;
+  public static final long ClusterId_ScenesManagement = 0x00000062;
   public static final long ClusterId_OnOff = 0x00000006;
   public static final long ClusterId_OnOffSwitchConfiguration = 0x00000007;
   public static final long ClusterId_LevelControl = 0x00000008;
@@ -129,7 +129,7 @@ public class Clusters {
   public static final long ClusterId_ApplicationBasic = 0x0000050D;
   public static final long ClusterId_AccountLogin = 0x0000050E;
   public static final long ClusterId_TestCluster = 0xFFF1FC05;
-  public static final long ClusterId_Messaging = 0x00000703;
+  public static final long ClusterId_Messaging = 0x00000097;
   public static final long ClusterId_ApplianceIdentification = 0x00000B00;
   public static final long ClusterId_MeterIdentification = 0x00000B01;
   public static final long ClusterId_ApplianceEventsAndAlert = 0x00000B02;

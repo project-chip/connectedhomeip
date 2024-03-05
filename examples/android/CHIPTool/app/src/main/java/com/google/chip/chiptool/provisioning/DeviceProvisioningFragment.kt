@@ -32,6 +32,8 @@ import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.AttestationInfo
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.DeviceAttestationDelegate
+import chip.devicecontroller.ICDDeviceInfo
+import chip.devicecontroller.ICDRegistrationInfo
 import chip.devicecontroller.NetworkCredentials
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
@@ -158,7 +160,6 @@ class DeviceProvisioningFragment : Fragment() {
 
   private fun pairDeviceWithAddress() {
     // IANA CHIP port
-    val port = 5540
     val id = DeviceIdUtil.getNextAvailableId(requireContext())
 
     DeviceIdUtil.setNextAvailableId(requireContext(), id + 1)
@@ -169,7 +170,7 @@ class DeviceProvisioningFragment : Fragment() {
     deviceController.pairDeviceWithAddress(
       id,
       deviceInfo.ipAddress,
-      port,
+      deviceInfo.port,
       deviceInfo.discriminator,
       deviceInfo.setupPinCode,
       null
@@ -284,7 +285,35 @@ class DeviceProvisioningFragment : Fragment() {
     override fun onError(error: Throwable?) {
       Log.d(TAG, "onError: $error")
     }
+
+    override fun onICDRegistrationInfoRequired() {
+      Log.d(TAG, "onICDRegistrationInfoRequired")
+      deviceController.updateCommissioningICDRegistrationInfo(
+        ICDRegistrationInfo.newBuilder().build()
+      )
+    }
+
+    override fun onICDRegistrationComplete(errorCode: Int, icdDeviceInfo: ICDDeviceInfo) {
+      Log.d(
+        TAG,
+        "onICDRegistrationComplete - errorCode: $errorCode, symmetricKey : ${icdDeviceInfo.symmetricKey.toHex()}, icdDeviceInfo : $icdDeviceInfo"
+      )
+      requireActivity().runOnUiThread {
+        Toast.makeText(
+            requireActivity(),
+            getString(
+              R.string.icd_registration_completed,
+              icdDeviceInfo.userActiveModeTriggerHint.toString()
+            ),
+            Toast.LENGTH_LONG
+          )
+          .show()
+      }
+    }
   }
+
+  private fun ByteArray.toHex(): String =
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
   /** Callback from [DeviceProvisioningFragment] notifying any registered listeners. */
   interface Callback {

@@ -31,6 +31,8 @@ using ChannelInfoType           = chip::app::Clusters::Channel::Structs::Channel
 using AdditionalInfoType        = chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type;
 using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
 using PageTokenType             = chip::app::Clusters::Channel::Structs::PageTokenStruct::Type;
+using ProgramType               = chip::app::Clusters::Channel::Structs::ProgramStruct::Type;
+using ChannelPagingType         = chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type;
 
 class ChannelManager : public ChannelDelegate
 {
@@ -61,13 +63,16 @@ public:
                                    const chip::ByteSpan & data) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
     uint16_t mCurrentChannelIndex;
     ChannelInfoType mCurrentChannel;
     std::vector<ChannelInfoType> mChannels;
+    std::vector<ProgramType> mPrograms;
 
 private:
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
+    static constexpr uint32_t kEndpointFeatureMap = 3;
+    static constexpr uint16_t kClusterRevision    = 2;
 };

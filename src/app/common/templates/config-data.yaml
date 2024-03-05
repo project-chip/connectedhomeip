@@ -1,10 +1,3 @@
-DarwinForceWritable:
-    # Work-around for not allowing changes from writable to read-only
-    # happened in https://github.com/project-chip/connectedhomeip/pull/30134
-    - ApplicationLauncher::CurrentApp
-    - ContentLauncher::SupportedStreamingProtocols
-    - FanControl::FanModeSequence
-
 EnumsNotUsedAsTypeInXML:
     # List of enums that are not used as a type in XML. By adding an enum
     # to this list you prevent incorrectly assuming from code that you are
@@ -19,23 +12,34 @@ EnumsNotUsedAsTypeInXML:
     - "RvcCleanMode::StatusCode"
     - "RvcOperationalState::OperationalStateEnum"
     - "RvcOperationalState::ErrorStateEnum"
+    - "EnergyEvseMode::ModeTag"
+    - "DeviceEnergyManagementMode::ModeTag"
 
 CommandHandlerInterfaceOnlyClusters:
     # List of clusters that are implemented entirely with
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
     - Network Commissioning
-    - Scenes
+    - Scenes Management
     - RVC Run Mode
     - RVC Clean Mode
     - Dishwasher Mode
     - Laundry Washer Mode
+    - Oven Mode
+    - Oven Cavity Operational State
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Operational State
     - Activated Carbon Filter Monitoring
     - HEPA Filter Monitoring
     - RVC Operational State
     - Sample MEI
+    - Microwave Oven Control
+    - Energy EVSE
+    - Energy EVSE Mode
+    - Device Energy Management
+    - Device Energy Management Mode
+    - Electrical Power Measurement
+    - Electrical Energy Measurement
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -52,7 +56,7 @@ ClustersWithInitFunctions:
     - Thermostat
     - Mode Select
     - Sample MEI
-    - Scenes
+    - Scenes Management
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -69,7 +73,7 @@ ClustersWithShutdownFunctions:
     - Level Control
     - Color Control
     - Sample MEI
-    - Scenes
+    - Scenes Management
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
@@ -80,4 +84,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Mode Select
     - Fan Control
     - Thermostat
+    - Energy Preference
     - Laundry Washer Controls
+    - Laundry Dryer Controls

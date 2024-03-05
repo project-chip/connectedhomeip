@@ -29,25 +29,26 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <nlunit-test.h>
+
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 
-static void Abort()
-{
-    abort();
-}
-
-void TestAssert(bool assert, const char * msg)
-{
-    if (!assert)
-    {
-        printf("%s\n", msg);
-        Abort();
-    }
-}
+#define TestAssert(cond, message)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(cond))                                                                                                               \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s", (message));                                                                           \
+        }                                                                                                                          \
+        NL_TEST_ASSERT(inSuite, (cond));                                                                                           \
+                                                                                                                                   \
+        if (!(cond))                                                                                                               \
+            return;                                                                                                                \
+    } while (0)
 
 struct OrdinalDateTestValue
 {
@@ -799,7 +800,7 @@ OrdinalDateTestValue LeapYearOrdinalDates[] =
 };
 // clang-format on
 
-void TestOrdinalDateConversion()
+void TestOrdinalDateConversion(nlTestSuite * inSuite, void * inContext)
 {
     for (uint16_t year = 0; year <= 10000; year++)
     {
@@ -822,7 +823,7 @@ void TestOrdinalDateConversion()
     }
 }
 
-void TestDaysSinceEpochConversion()
+void TestDaysSinceEpochConversion(nlTestSuite * inSuite, void * inContext)
 {
     uint32_t daysSinceEpoch = 0;
 
@@ -869,7 +870,7 @@ void TestDaysSinceEpochConversion()
     }
 }
 
-void TestSecondsSinceEpochConversion()
+void TestSecondsSinceEpochConversion(nlTestSuite * inSuite, void * inContext)
 {
     uint32_t daysSinceEpoch = 0;
     uint32_t timeOfDay      = 0; // in seconds
@@ -948,7 +949,7 @@ void TestSecondsSinceEpochConversion()
     }
 }
 
-void TestChipEpochTimeConversion()
+void TestChipEpochTimeConversion(nlTestSuite * inSuite, void * inContext)
 {
     uint32_t daysSinceEpoch = 0;
     uint32_t timeOfDay      = 0; // in seconds
@@ -1021,16 +1022,54 @@ void TestChipEpochTimeConversion()
     }
 }
 
+void TestChipEpochTimeEdgeConditions(nlTestSuite * inSuite, void * inContext)
+{
+    uint32_t chip_epoch_time_sec = 0;
+
+    NL_TEST_ASSERT(inSuite, UnixEpochToChipEpochTime(INT32_MAX, chip_epoch_time_sec));
+    NL_TEST_ASSERT(inSuite, chip_epoch_time_sec < INT32_MAX);
+
+    // TODO(#30990): Bring back tests when implementation fixed.
+#if 0
+    constexpr uint32_t kUnix2000Jan1 = 946702800; // Start of CHIP epoch.
+
+    chip_epoch_time_sec = INT32_MAX;
+    NL_TEST_ASSERT(inSuite, UnixEpochToChipEpochTime(kUnix2000Jan1, chip_epoch_time_sec) == true);
+    NL_TEST_ASSERT(inSuite, chip_epoch_time_sec == 0);
+
+    chip_epoch_time_sec = 0;
+    NL_TEST_ASSERT(inSuite, UnixEpochToChipEpochTime(kUnix2000Jan1 - 1, chip_epoch_time_sec) == false);
+#endif
+}
+
+// clang-format off
+static const nlTest g_all_tests[] =
+{
+    NL_TEST_DEF("Test Ordinal Date conversion", TestOrdinalDateConversion),
+    NL_TEST_DEF("Test DaysSinceEpoch conversion", TestDaysSinceEpochConversion),
+    NL_TEST_DEF("Test SecondsSinceEpoch conversion", TestSecondsSinceEpochConversion),
+    NL_TEST_DEF("Test ChipEpochTime conversion", TestChipEpochTimeConversion),
+    NL_TEST_DEF("Test edge conditions of time conversions", TestChipEpochTimeEdgeConditions),
+
+    NL_TEST_SENTINEL()
+};
+// clang-format on
+
 int TestTimeUtils()
 {
-    TestOrdinalDateConversion();
-    TestDaysSinceEpochConversion();
-    TestSecondsSinceEpochConversion();
-    TestChipEpochTimeConversion();
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "Test common time utilities",
+        &g_all_tests[0],
+        nullptr,
+        nullptr
+    };
+    // clang-format on
 
-    printf("All tests passed\n");
+    nlTestRunner(&theSuite, nullptr);
 
-    return (0);
+    return nlTestRunnerStats(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestTimeUtils);

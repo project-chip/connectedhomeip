@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import os
 import time
 import typing
 from datetime import datetime, timedelta, timezone
@@ -23,10 +24,11 @@ import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint
 from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
-                                    get_wait_seconds_from_set_time, parse_pics, type_matches, utc_time_in_matter_epoch)
+                                    get_wait_seconds_from_set_time, parse_pics, parse_pics_xml, type_matches,
+                                    utc_time_in_matter_epoch)
 from mobly import asserts, signals
 from taglist_and_topology_test_support import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
-                                               find_tag_list_problems, find_tree_roots, get_all_children,
+                                               find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 
 
@@ -136,7 +138,7 @@ class TestMatterTestingSupport(MatterBaseTest):
     async def test_pics_support(self):
         pics_list = ['TEST.S.A0000=1',
                      'TEST.S.A0001=0',
-                     'lower.s.a0000=1',
+                     'TEST.S.A000a=1'
                      '',
                      ' ',
                      '# comment',
@@ -148,10 +150,9 @@ class TestMatterTestingSupport(MatterBaseTest):
 
         asserts.assert_true(self.check_pics("TEST.S.A0000"), "PICS parsed incorrectly for TEST.S.A0000")
         asserts.assert_false(self.check_pics("TEST.S.A0001"), "PICS parsed incorrectly for TEST.S.A0001")
-        asserts.assert_true(self.check_pics("LOWER.S.A0000"), "PICS pased incorrectly for LOWER.S.A0000")
+        asserts.assert_true(self.check_pics("TEST.S.A000a"), "PICS parsed incorrectly for TEST.S.A000a")
         asserts.assert_true(self.check_pics("SPACE.S.A0000"), "PICS parsed incorrectly for SPACE.S.A0000")
         asserts.assert_false(self.check_pics("NOT.S.A0000"), "PICS parsed incorrectly for NOT.S.A0000")
-        asserts.assert_true(self.check_pics(" test.s.a0000"), "PICS checker lowercase handled incorrectly")
 
         # invalid pics file should throw a value error
         pics_list.append("BAD.S.A000=5")
@@ -302,6 +303,14 @@ class TestMatterTestingSupport(MatterBaseTest):
         endpoints[9][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(2)
         cycles = parts_list_cycles(tree, endpoints)
         asserts.assert_equal(cycles, [2, 3, 4, 5, 9, 10, 13, 14, 16])
+
+    def test_flat_list(self):
+        endpoints = self.create_example_topology()
+        # check the aggregator endpoint to ensure it's ok - aggregator is on 11
+        asserts.assert_true(flat_list_ok(11, endpoints), "Incorrect failure on flat list")
+        # Remove one of the sub-children endpoints from the parts list - it should fail
+        endpoints[11][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].remove(14)
+        asserts.assert_false(flat_list_ok(11, endpoints), "Incorrect pass on flat list missing a part list entry")
 
     def test_get_all_children(self):
         endpoints = self.create_example_topology()
@@ -584,6 +593,41 @@ class TestMatterTestingSupport(MatterBaseTest):
             endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.FeatureMap] = 1
         problems = find_tag_list_problems(roots=[0], device_types={0: device_type_list}, endpoint_dict=endpoints)
         asserts.assert_equal(len(problems.keys()), 0, 'Unexpected problems found in root endpoint')
+
+    def pics_assert(self, pics: str, support: bool):
+        asserts.assert_equal(self.check_pics(pics), support,
+                             f'Unexpected PICS value for {pics} - expected {support}, got {self.check_pics(pics)}')
+
+    def test_xml_pics(self):
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        with open(f'{script_dir}/test_testing/example_pics_xml_basic_info.xml') as f:
+            pics = parse_pics_xml(f.read())
+        print(pics)
+        # force the parsed pics here to be in the config so we can check the check_pics function
+        self.matter_test_config.pics = pics
+        self.pics_assert('BINFO.S', True)
+        self.pics_assert('BINFO.S.A0000', True)
+        self.pics_assert('BINFO.S.A0001', True)
+        self.pics_assert('BINFO.S.A0002', True)
+        self.pics_assert('BINFO.S.A0003', True)
+        self.pics_assert('BINFO.S.A0004', True)
+        self.pics_assert('BINFO.S.A0005', True)
+        self.pics_assert('BINFO.S.A0006', True)
+        self.pics_assert('BINFO.S.A0007', True)
+        self.pics_assert('BINFO.S.A0008', True)
+        self.pics_assert('BINFO.S.A0009', True)
+        self.pics_assert('BINFO.S.A000a', True)
+        self.pics_assert('BINFO.S.A000b', True)
+        self.pics_assert('BINFO.S.A000c', True)
+        self.pics_assert('BINFO.S.A000d', True)
+        self.pics_assert('BINFO.S.A000e', True)
+        self.pics_assert('BINFO.S.A000f', True)
+        self.pics_assert('BINFO.S.A0010', True)
+        self.pics_assert('BINFO.S.A0011', False)
+        self.pics_assert('BINFO.S.A0012', True)
+        self.pics_assert('BINFO.S.A0013', True)
+        self.pics_assert('BINFO.S.A0014', False)
+        self.pics_assert('PICSDOESNOTEXIST', False)
 
 
 if __name__ == "__main__":

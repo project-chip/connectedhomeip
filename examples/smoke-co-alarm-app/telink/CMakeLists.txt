@@ -68,10 +68,6 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include)
 
-add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-)
-
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/SmokeCoAlarmManager.cpp
@@ -87,3 +83,7 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../smoke-co-alarm-common/smoke-co-alarm-app.zap
 )
+
+if(CONFIG_BOOTLOADER_MCUBOOT)
+  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()

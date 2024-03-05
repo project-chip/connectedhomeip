@@ -264,8 +264,10 @@ nlTestSuite sSuite =
 {
     "TestTimedHandler",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
 

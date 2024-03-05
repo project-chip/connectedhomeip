@@ -15,6 +15,9 @@
  */
 
 #include "MTRDeviceControllerDataStore.h"
+
+// Importing MTRBaseDevice.h for the MTRAttributePath class. Needs to change when https://github.com/project-chip/connectedhomeip/issues/31247 is fixed.
+#import "MTRBaseDevice.h"
 #import "MTRLogging_Internal.h"
 
 #include <lib/core/CASEAuthTag.h>
@@ -273,6 +276,437 @@ static bool IsValidCATNumber(id _Nullable value)
     return resumptionInfo;
 }
 
+#pragma - Attribute Cache utility
+
+/** MTRDevice cache storage
+ *
+ *  Per controller:
+ *    NodeID index
+ *        key: "attrCacheNodeIndex"
+ *        value: list of nodeIDs
+ *    EndpointID index
+ *        key: "attrCacheEndpointIndex:<nodeID>:endpointID"
+ *        value: list of endpoint IDs
+ *    ClusterID index
+ *        key: "<nodeID+endpointID> clusters"
+ *        value: list of cluster IDs
+ *    AttributeID index
+ *        key: "<nodeID+endpointID+clusterID> attributes"
+ *        value: list of attribute IDs
+ *    Attribute data entry:
+ *        key: "<nodeID+endpointID+clusterID+attributeID> attribute data"
+ *        value: serialized dictionary of attribute data
+ *
+ *    Attribute data dictionary
+ *        Additional value "serial number"
+ */
+
+- (id)_fetchAttributeCacheValueForKey:(NSString *)key expectedClass:(Class)expectedClass;
+{
+    id data;
+    data = [_storageDelegate controller:_controller
+                            valueForKey:key
+                          securityLevel:MTRStorageSecurityLevelSecure
+                            sharingType:MTRStorageSharingTypeNotShared];
+
+    if (data == nil) {
+        return nil;
+    }
+
+    if (![data isKindOfClass:expectedClass]) {
+        return nil;
+    }
+
+    return data;
+}
+
+- (BOOL)_storeAttributeCacheValue:(id)value forKey:(NSString *)key
+{
+    return [_storageDelegate controller:_controller
+                             storeValue:value
+                                 forKey:key
+                          securityLevel:MTRStorageSecurityLevelSecure
+                            sharingType:MTRStorageSharingTypeNotShared];
+}
+
+- (void)_removeAttributeCacheValueForKey:(NSString *)key
+{
+    [_storageDelegate controller:_controller
+               removeValueForKey:key
+                   securityLevel:MTRStorageSecurityLevelSecure
+                     sharingType:MTRStorageSharingTypeNotShared];
+}
+
+static NSString * sAttributeCacheNodeIndexKey = @"attrCacheNodeIndex";
+
+- (nullable NSArray<NSNumber *> *)_fetchNodeIndex
+{
+    return [self _fetchAttributeCacheValueForKey:sAttributeCacheNodeIndexKey expectedClass:[NSArray class]];
+}
+
+- (BOOL)_storeNodeIndex:(NSArray<NSNumber *> *)nodeIndex
+{
+    return [self _storeAttributeCacheValue:nodeIndex forKey:sAttributeCacheNodeIndexKey];
+}
+
+- (void)_deleteNodeIndex
+{
+    [self _removeAttributeCacheValueForKey:sAttributeCacheNodeIndexKey];
+}
+
+static NSString * sAttributeCacheEndpointIndexKeyPrefix = @"attrCacheEndpointIndex";
+
+- (NSString *)_endpointIndexKeyForNodeID:(NSNumber *)nodeID
+{
+    return [sAttributeCacheEndpointIndexKeyPrefix stringByAppendingFormat:@":0x%016llX", nodeID.unsignedLongLongValue];
+}
+
+- (nullable NSArray<NSNumber *> *)_fetchEndpointIndexForNodeID:(NSNumber *)nodeID
+{
+    return [self _fetchAttributeCacheValueForKey:[self _endpointIndexKeyForNodeID:nodeID] expectedClass:[NSArray class]];
+}
+
+- (BOOL)_storeEndpointIndex:(NSArray<NSNumber *> *)endpointIndex forNodeID:(NSNumber *)nodeID
+{
+    return [self _storeAttributeCacheValue:endpointIndex forKey:[self _endpointIndexKeyForNodeID:nodeID]];
+}
+
+- (void)_deleteEndpointIndexForNodeID:(NSNumber *)nodeID
+{
+    [self _removeAttributeCacheValueForKey:[self _endpointIndexKeyForNodeID:nodeID]];
+}
+
+static NSString * sAttributeCacheClusterIndexKeyPrefix = @"attrCacheClusterIndex";
+
+- (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
+{
+    return [sAttributeCacheClusterIndexKeyPrefix stringByAppendingFormat:@":0x%016llX:%0x04X", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue];
+}
+
+- (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
+{
+    return [self _fetchAttributeCacheValueForKey:[self _clusterIndexKeyForNodeID:nodeID endpointID:endpointID] expectedClass:[NSArray class]];
+}
+
+- (BOOL)_storeClusterIndex:(NSArray<NSNumber *> *)clusterIndex forNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
+{
+    return [self _storeAttributeCacheValue:clusterIndex forKey:[self _clusterIndexKeyForNodeID:nodeID endpointID:endpointID]];
+}
+
+- (void)_deleteClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
+{
+    [self _removeAttributeCacheValueForKey:[self _clusterIndexKeyForNodeID:nodeID endpointID:endpointID]];
+}
+
+static NSString * sAttributeCacheAttributeIndexKeyPrefix = @"attrCacheAttributeIndex";
+
+- (NSString *)_attributeIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
+{
+    return [sAttributeCacheAttributeIndexKeyPrefix stringByAppendingFormat:@":0x%016llX:0x%04X:0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue];
+}
+
+- (nullable NSArray<NSNumber *> *)_fetchAttributeIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
+{
+    return [self _fetchAttributeCacheValueForKey:[self _attributeIndexKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID] expectedClass:[NSArray class]];
+}
+
+- (BOOL)_storeAttributeIndex:(NSArray<NSNumber *> *)attributeIndex forNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
+{
+    return [self _storeAttributeCacheValue:attributeIndex forKey:[self _attributeIndexKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID]];
+}
+
+- (void)_deleteAttributeIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
+{
+    [self _removeAttributeCacheValueForKey:[self _attributeIndexKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID]];
+}
+
+static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeValue";
+
+- (NSString *)_attributeValueKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
+{
+    return [sAttributeCacheAttributeValueKeyPrefix stringByAppendingFormat:@":0x%016llX:0x%04X:0x%08lX:0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue, attributeID.unsignedLongValue];
+}
+
+- (nullable NSDictionary *)_fetchAttributeValueForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
+{
+    return [self _fetchAttributeCacheValueForKey:[self _attributeValueKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID attributeID:attributeID] expectedClass:[NSDictionary class]];
+}
+
+- (BOOL)_storeAttributeValue:(NSDictionary *)value forNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
+{
+    return [self _storeAttributeCacheValue:value forKey:[self _attributeValueKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID attributeID:attributeID]];
+}
+
+- (void)_deleteAttributeValueForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
+{
+    [self _removeAttributeCacheValueForKey:[self _attributeValueKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID attributeID:attributeID]];
+}
+
+#pragma - Attribute Cache management
+
+- (nullable NSArray<NSDictionary *> *)getStoredAttributesForNodeID:(NSNumber *)nodeID
+{
+    __block NSMutableArray * attributesToReturn = nil;
+    dispatch_sync(_storageDelegateQueue, ^{
+        // Fetch node index
+        NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
+
+        if (![nodeIndex containsObject:nodeID]) {
+            // Sanity check and delete if nodeID exists in index
+            NSArray<NSNumber *> * endpointIndex = [self _fetchEndpointIndexForNodeID:nodeID];
+            if (endpointIndex) {
+                MTR_LOG_ERROR("Persistent attribute cache contains orphaned entry for nodeID %@ - deleting", nodeID);
+                [self clearStoredAttributesForNodeID:nodeID];
+            }
+            attributesToReturn = nil;
+            return;
+        }
+
+        // Fetch endpoint index
+        NSArray<NSNumber *> * endpointIndex = [self _fetchEndpointIndexForNodeID:nodeID];
+
+        for (NSNumber * endpointID in endpointIndex) {
+            // Fetch endpoint index
+            NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
+
+            for (NSNumber * clusterID in clusterIndex) {
+                // Fetch endpoint index
+                NSArray<NSNumber *> * attributeIndex = [self _fetchAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
+
+                for (NSNumber * attributeID in attributeIndex) {
+                    NSDictionary * value = [self _fetchAttributeValueForNodeID:nodeID endpointID:endpointID clusterID:clusterID attributeID:attributeID];
+
+                    if (value) {
+                        if (!attributesToReturn) {
+                            attributesToReturn = [NSMutableArray array];
+                        }
+
+                        // Construct data-value dictionary and add to array
+                        MTRAttributePath * path = [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+                        [attributesToReturn addObject:@ { MTRAttributePathKey : path, MTRDataKey : value }];
+                    }
+                }
+
+                // TODO: Add per-cluster integrity check verification
+            }
+        }
+    });
+
+    return attributesToReturn;
+}
+
+- (void)_pruneEmptyStoredAttributesBranches
+{
+    dispatch_assert_queue(_storageDelegateQueue);
+
+    // Fetch node index
+    NSMutableArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex].mutableCopy;
+    NSUInteger nodeIndexCount = nodeIndex.count;
+
+    NSUInteger storeFailures = 0;
+    for (NSNumber * nodeID in nodeIndex) {
+        // Fetch endpoint index
+        NSMutableArray<NSNumber *> * endpointIndex = [self _fetchEndpointIndexForNodeID:nodeID].mutableCopy;
+        NSUInteger endpointIndexCount = endpointIndex.count;
+
+        for (NSNumber * endpointID in endpointIndex) {
+            // Fetch endpoint index
+            NSMutableArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID].mutableCopy;
+            NSUInteger clusterIndexCount = clusterIndex.count;
+
+            for (NSNumber * clusterID in clusterIndex) {
+                // Fetch endpoint index
+                NSMutableArray<NSNumber *> * attributeIndex = [self _fetchAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID].mutableCopy;
+                NSUInteger attributeIndexCount = attributeIndex.count;
+
+                for (NSNumber * attributeID in attributeIndex) {
+                    NSDictionary * value = [self _fetchAttributeValueForNodeID:nodeID endpointID:endpointID clusterID:clusterID attributeID:attributeID];
+
+                    if (!value) {
+                        [attributeIndex removeObject:attributeID];
+                    }
+                }
+
+                if (!attributeIndex.count) {
+                    [clusterIndex removeObject:clusterID];
+                } else if (attributeIndex.count != attributeIndexCount) {
+                    BOOL success = [self _storeAttributeIndex:attributeIndex forNodeID:nodeID endpointID:endpointID clusterID:clusterID];
+                    if (!success) {
+                        storeFailures++;
+                        MTR_LOG_INFO("Store failed for attributeIndex");
+                    }
+                }
+            }
+
+            if (!clusterIndex.count) {
+                [endpointIndex removeObject:endpointID];
+            } else if (clusterIndex.count != clusterIndexCount) {
+                BOOL success = [self _storeClusterIndex:clusterIndex forNodeID:nodeID endpointID:endpointID];
+                if (!success) {
+                    storeFailures++;
+                    MTR_LOG_INFO("Store failed for clusterIndex");
+                }
+            }
+        }
+
+        if (!endpointIndex.count) {
+            [nodeIndex removeObject:nodeID];
+        } else if (endpointIndex.count != endpointIndexCount) {
+            BOOL success = [self _storeEndpointIndex:endpointIndex forNodeID:nodeID];
+            if (!success) {
+                storeFailures++;
+                MTR_LOG_INFO("Store failed for endpointIndex");
+            }
+        }
+    }
+
+    if (!nodeIndex.count) {
+        [self _deleteNodeIndex];
+    } else if (nodeIndex.count != nodeIndexCount) {
+        BOOL success = [self _storeNodeIndex:nodeIndex];
+        if (!success) {
+            storeFailures++;
+            MTR_LOG_INFO("Store failed for nodeIndex");
+        }
+    }
+
+    if (storeFailures) {
+        MTR_LOG_ERROR("Store failed in _pruneEmptyStoredAttributesBranches: %lu", (unsigned long) storeFailures);
+    }
+}
+
+- (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID
+{
+    dispatch_async(_storageDelegateQueue, ^{
+        NSUInteger storeFailures = 0;
+
+        for (NSDictionary * dataValue in dataValues) {
+            MTRAttributePath * path = dataValue[MTRAttributePathKey];
+            NSDictionary * value = dataValue[MTRDataKey];
+
+            BOOL storeFailed = NO;
+            // Ensure node index exists
+            NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
+            if (!nodeIndex) {
+                nodeIndex = [NSArray arrayWithObject:nodeID];
+                storeFailed = ![self _storeNodeIndex:nodeIndex];
+            } else if (![nodeIndex containsObject:nodeID]) {
+                storeFailed = ![self _storeNodeIndex:[nodeIndex arrayByAddingObject:nodeID]];
+            }
+            if (storeFailed) {
+                storeFailures++;
+                MTR_LOG_INFO("Store failed for nodeIndex");
+                continue;
+            }
+
+            // Ensure endpoint index exists
+            NSArray<NSNumber *> * endpointIndex = [self _fetchEndpointIndexForNodeID:nodeID];
+            if (!endpointIndex) {
+                endpointIndex = [NSArray arrayWithObject:path.endpoint];
+                storeFailed = ![self _storeEndpointIndex:endpointIndex forNodeID:nodeID];
+            } else if (![endpointIndex containsObject:path.endpoint]) {
+                storeFailed = ![self _storeEndpointIndex:[endpointIndex arrayByAddingObject:path.endpoint] forNodeID:nodeID];
+            }
+            if (storeFailed) {
+                storeFailures++;
+                MTR_LOG_INFO("Store failed for endpointIndex");
+                continue;
+            }
+
+            // Ensure cluster index exists
+            NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:path.endpoint];
+            if (!clusterIndex) {
+                clusterIndex = [NSArray arrayWithObject:path.cluster];
+                storeFailed = ![self _storeClusterIndex:clusterIndex forNodeID:nodeID endpointID:path.endpoint];
+            } else if (![clusterIndex containsObject:path.cluster]) {
+                storeFailed = ![self _storeClusterIndex:[clusterIndex arrayByAddingObject:path.cluster] forNodeID:nodeID endpointID:path.endpoint];
+            }
+            if (storeFailed) {
+                storeFailures++;
+                MTR_LOG_INFO("Store failed for clusterIndex");
+                continue;
+            }
+
+            // TODO: Add per-cluster integrity check calculation and store with cluster
+            // TODO: Think about adding more integrity check for endpoint and node levels as well
+
+            // Ensure attribute index exists
+            NSArray<NSNumber *> * attributeIndex = [self _fetchAttributeIndexForNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
+            if (!attributeIndex) {
+                attributeIndex = [NSArray arrayWithObject:path.attribute];
+                storeFailed = ![self _storeAttributeIndex:attributeIndex forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
+            } else if (![attributeIndex containsObject:path.attribute]) {
+                storeFailed = ![self _storeAttributeIndex:[attributeIndex arrayByAddingObject:path.attribute] forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
+            }
+            if (storeFailed) {
+                storeFailures++;
+                MTR_LOG_INFO("Store failed for attributeIndex");
+                continue;
+            }
+
+            // Store value
+            storeFailed = [self _storeAttributeValue:value forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute];
+            if (storeFailed) {
+                storeFailures++;
+                MTR_LOG_INFO("Store failed for attribute value");
+            }
+        }
+
+        // In the rare event that store fails, allow all attribute store attempts to go through and prune empty branches at the end altogether.
+        if (storeFailures) {
+            [self _pruneEmptyStoredAttributesBranches];
+            MTR_LOG_ERROR("Store failed in -storeAttributeValues:forNodeID: %lu", (unsigned long) storeFailures);
+        }
+    });
+}
+
+- (void)_clearStoredAttributesForNodeID:(NSNumber *)nodeID
+{
+    // Fetch endpoint index
+    NSArray<NSNumber *> * endpointIndex = [self _fetchEndpointIndexForNodeID:nodeID];
+
+    for (NSNumber * endpointID in endpointIndex) {
+        // Fetch cluster index
+        NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
+
+        for (NSNumber * clusterID in clusterIndex) {
+            // Fetch attribute index
+            NSArray<NSNumber *> * attributeIndex = [self _fetchAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
+
+            for (NSNumber * attributeID in attributeIndex) {
+                [self _deleteAttributeValueForNodeID:nodeID endpointID:endpointID clusterID:clusterID attributeID:attributeID];
+            }
+
+            [self _deleteAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
+        }
+
+        [self _deleteClusterIndexForNodeID:nodeID endpointID:endpointID];
+    }
+
+    [self _deleteEndpointIndexForNodeID:nodeID];
+}
+
+- (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID
+{
+    dispatch_async(_storageDelegateQueue, ^{
+        [self _clearStoredAttributesForNodeID:nodeID];
+    });
+}
+
+- (void)clearAllStoredAttributes
+{
+    dispatch_async(_storageDelegateQueue, ^{
+        // Fetch node index
+        NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
+
+        for (NSNumber * nodeID in nodeIndex) {
+            [self _clearStoredAttributesForNodeID:nodeID];
+        }
+
+        [self _deleteNodeIndex];
+    });
+}
+
 @end
 
 @implementation MTRCASESessionResumptionInfo
@@ -356,6 +790,9 @@ NSSet<Class> * MTRDeviceControllerStorageClasses()
         [NSData class],
         [NSArray class],
         [MTRCASESessionResumptionInfo class],
+        [NSDictionary class],
+        [NSString class],
+        [MTRAttributePath class],
     ]];
     return sStorageClasses;
 }

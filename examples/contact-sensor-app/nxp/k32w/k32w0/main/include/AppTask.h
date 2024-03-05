@@ -50,15 +50,6 @@
 class AppTask
 {
 public:
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
-    using FactoryDataProvider = chip::DeviceLayer::CustomFactoryDataProvider;
-#else
-    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProviderImpl;
-#endif
-#endif
-
-public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
@@ -94,6 +85,10 @@ private:
     static void ContactActionEventHandler(void * aGenericEvent);
     static void ResetActionEventHandler(void * aGenericEvent);
     static void InstallEventHandler(void * aGenericEvent);
+#if CHIP_ENABLE_LIT
+    static void UserActiveModeHandler(void * aGenericEvent);
+    static void UserActiveModeTrigger(intptr_t arg);
+#endif
 
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);

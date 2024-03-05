@@ -39,6 +39,7 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/CHIPDevicePlatformEvent.h",
     "${silabs_platform_dir}/CHIPMem-Platform.cpp",
     "${silabs_platform_dir}/CHIPPlatformConfig.h",
+    "${silabs_platform_dir}/ConfigurationManagerImpl.cpp",
     "${silabs_platform_dir}/ConfigurationManagerImpl.h",
     "${silabs_platform_dir}/ConnectivityManagerImpl.h",
     "${silabs_platform_dir}/DiagnosticDataProviderImpl.cpp",
@@ -62,15 +63,13 @@ static_library("SiWx917") {
     "../rs911x/rsi_ble_config.h",
     "../rs911x/wfx_sl_ble_init.c",
     "../rs911x/wfx_sl_ble_init.h",
-    "ConfigurationManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
   ]
 
-  # TODO: OTA on CCP platform
   if (chip_enable_ota_requestor) {
     sources += [
-      #"OTAImageProcessorImpl.cpp",
-      #"${silabs_platform_dir}/OTAImageProcessorImpl.h",
+      "${silabs_platform_dir}/OTAImageProcessorImpl.h",
+      "OTAImageProcessorImpl.cpp",
     ]
   }
 

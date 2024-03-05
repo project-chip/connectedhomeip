@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 19.4.3. [TC-APPLAUNCHER-3.7] Launch Application Verification
+name:
+    19.4.3. [TC-APPLAUNCHER-3.7] Launch Application Verification (DUT as Client)
 
 PICS:
     - APPLAUNCHER.S
@@ -37,7 +38,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: Launch an app with the provided a application ID"
+    - label:
+          "Step 1: TH sends a LaunchApp command to DUT to launch and bring an
+          application to the foreground"
       PICS: APPLAUNCHER.S.C00.Rsp
       command: "LaunchApp"
       arguments:

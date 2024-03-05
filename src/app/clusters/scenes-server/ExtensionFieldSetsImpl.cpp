@@ -20,12 +20,8 @@
 namespace chip {
 namespace scenes {
 
-// ExtensionFieldSetsImpl::ExtensionFieldSetsImpl() : ExtensionFieldSets() {}
-
-CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer, TLV::Tag structTag) const
+CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer) const
 {
-    TLV::TLVType structureContainer;
-    ReturnErrorOnFailure(writer.StartContainer(structTag, TLV::kTLVType_Structure, structureContainer));
     TLV::TLVType arrayContainer;
     ReturnErrorOnFailure(
         writer.StartContainer(TLV::ContextTag(TagEFS::kFieldSetArrayContainer), TLV::kTLVType_Array, arrayContainer));
@@ -34,16 +30,11 @@ CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer, TLV::Tag s
         ReturnErrorOnFailure(mFieldSets[i].Serialize(writer));
     }
 
-    ReturnErrorOnFailure(writer.EndContainer(arrayContainer));
-    return writer.EndContainer(structureContainer);
+    return writer.EndContainer(arrayContainer);
 }
 
-CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader, TLV::Tag structTag)
+CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader)
 {
-    TLV::TLVType structureContainer;
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, structTag));
-    ReturnErrorOnFailure(reader.EnterContainer(structureContainer));
-
     TLV::TLVType arrayContainer;
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagEFS::kFieldSetArrayContainer)));
     ReturnErrorOnFailure(reader.EnterContainer(arrayContainer));
@@ -69,8 +60,7 @@ CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader, TLV::Tag
         return err;
     }
 
-    ReturnErrorOnFailure(reader.ExitContainer(arrayContainer));
-    return reader.ExitContainer(structureContainer);
+    return reader.ExitContainer(arrayContainer);
 }
 
 void ExtensionFieldSetsImpl::Clear()

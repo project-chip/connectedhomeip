@@ -38,6 +38,9 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     ReturnErrorOnFailure(PlatformMemoryUser::Init());
 
+    // Make sure the storage is clean, so we will not reuse any stale data.
+    mStorage.ClearStorage();
+
     ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
     ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
 
@@ -76,6 +79,7 @@ void MessagingContext::Shutdown()
     VerifyOrDie(mInitialized);
     mInitialized = false;
 
+    mMessageCounterManager.Shutdown();
     mExchangeManager.Shutdown();
     mSessionManager.Shutdown();
     mFabricTable.Shutdown();

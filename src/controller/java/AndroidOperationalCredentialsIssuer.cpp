@@ -127,14 +127,16 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
                                                                  const ByteSpan & PAI,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    JniLocalReferenceScope scope(env);
+
     if (mUseJavaCallbackForNOCRequest)
     {
         return CallbackGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
     }
-    else
-    {
-        return LocalGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
-    }
+
+    return LocalGenerateNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC, PAI, onCompletion);
 }
 
 CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
@@ -168,13 +170,13 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     env->ExceptionClear();
 
     jbyteArray javaCsrElements;
-    JniReferences::GetInstance().N2J_ByteArray(env, csrElements.data(), static_cast<uint32_t>(csrElements.size()), javaCsrElements);
+    JniReferences::GetInstance().N2J_ByteArray(env, csrElements.data(), static_cast<jint>(csrElements.size()), javaCsrElements);
 
     jbyteArray javaCsrNonce;
-    JniReferences::GetInstance().N2J_ByteArray(env, csrNonce.data(), static_cast<uint32_t>(csrNonce.size()), javaCsrNonce);
+    JniReferences::GetInstance().N2J_ByteArray(env, csrNonce.data(), static_cast<jint>(csrNonce.size()), javaCsrNonce);
 
     jbyteArray javaCsrElementsSignature;
-    JniReferences::GetInstance().N2J_ByteArray(env, csrElementsSignature.data(), static_cast<uint32_t>(csrElementsSignature.size()),
+    JniReferences::GetInstance().N2J_ByteArray(env, csrElementsSignature.data(), static_cast<jint>(csrElementsSignature.size()),
                                                javaCsrElementsSignature);
 
     ChipLogProgress(Controller, "Parsing Certificate Signing Request");
@@ -198,7 +200,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     VerifyOrReturnError(CanCastTo<uint32_t>(csr.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
     jbyteArray javaCsr;
-    JniReferences::GetInstance().N2J_ByteArray(env, csr.data(), static_cast<uint32_t>(csr.size()), javaCsr);
+    JniReferences::GetInstance().N2J_ByteArray(env, csr.data(), static_cast<jint>(csr.size()), javaCsr);
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
@@ -213,21 +215,21 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
     }
 
     jbyteArray javaAttestationChallenge;
-    JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), static_cast<uint32_t>(attestationChallenge.size()),
+    JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(), static_cast<jint>(attestationChallenge.size()),
                                                javaAttestationChallenge);
 
     const ByteSpan & attestationElements = mAutoCommissioner->GetAttestationElements();
     VerifyOrReturnError(CanCastTo<uint32_t>(attestationElements.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
     jbyteArray javaAttestationElements;
-    JniReferences::GetInstance().N2J_ByteArray(env, attestationElements.data(), static_cast<uint32_t>(attestationElements.size()),
+    JniReferences::GetInstance().N2J_ByteArray(env, attestationElements.data(), static_cast<jint>(attestationElements.size()),
                                                javaAttestationElements);
 
     const ByteSpan & attestationNonce = mAutoCommissioner->GetAttestationNonce();
     VerifyOrReturnError(CanCastTo<uint32_t>(attestationNonce.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
     jbyteArray javaAttestationNonce;
-    JniReferences::GetInstance().N2J_ByteArray(env, attestationNonce.data(), static_cast<uint32_t>(attestationNonce.size()),
+    JniReferences::GetInstance().N2J_ByteArray(env, attestationNonce.data(), static_cast<jint>(attestationNonce.size()),
                                                javaAttestationNonce);
 
     const ByteSpan & attestationElementsSignature = mAutoCommissioner->GetAttestationSignature();
@@ -235,14 +237,14 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
 
     jbyteArray javaAttestationElementsSignature;
     JniReferences::GetInstance().N2J_ByteArray(env, attestationElementsSignature.data(),
-                                               static_cast<uint32_t>(attestationElementsSignature.size()),
+                                               static_cast<jint>(attestationElementsSignature.size()),
                                                javaAttestationElementsSignature);
 
     jbyteArray javaDAC;
-    JniReferences::GetInstance().N2J_ByteArray(env, DAC.data(), static_cast<uint32_t>(DAC.size()), javaDAC);
+    JniReferences::GetInstance().N2J_ByteArray(env, DAC.data(), static_cast<jint>(DAC.size()), javaDAC);
 
     jbyteArray javaPAI;
-    JniReferences::GetInstance().N2J_ByteArray(env, PAI.data(), static_cast<uint32_t>(PAI.size()), javaPAI);
+    JniReferences::GetInstance().N2J_ByteArray(env, PAI.data(), static_cast<jint>(PAI.size()), javaPAI);
 
     ByteSpan certificationDeclarationSpan;
     ByteSpan attestationNonceSpan;
@@ -263,10 +265,10 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
 
     jbyteArray javaCD;
     JniReferences::GetInstance().N2J_ByteArray(env, certificationDeclarationSpan.data(),
-                                               static_cast<uint32_t>(certificationDeclarationSpan.size()), javaCD);
+                                               static_cast<jint>(certificationDeclarationSpan.size()), javaCD);
 
     jbyteArray javaFirmwareInfo;
-    JniReferences::GetInstance().N2J_ByteArray(env, firmwareInfoSpan.data(), static_cast<uint32_t>(firmwareInfoSpan.size()),
+    JniReferences::GetInstance().N2J_ByteArray(env, firmwareInfoSpan.data(), static_cast<jint>(firmwareInfoSpan.size()),
                                                javaFirmwareInfo);
 
     jobject attestationInfo;
@@ -383,7 +385,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
     jbyteArray javaCsr;
     JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrElements.data(),
-                                               static_cast<uint32_t>(csrElements.size()), javaCsr);
+                                               static_cast<jint>(csrElements.size()), javaCsr);
     JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr);
     return CHIP_NO_ERROR;
 }
@@ -464,8 +466,7 @@ CHIP_ERROR N2J_CSRInfo(JNIEnv * env, jbyteArray nonce, jbyteArray elements, jbyt
     jmethodID constructor;
     jclass infoClass;
 
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/CSRInfo", infoClass);
-    JniClass attestationInfoClass(infoClass);
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/CSRInfo", infoClass);
     SuccessOrExit(err);
 
     env->ExceptionClear();
@@ -487,8 +488,7 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray no
     jmethodID constructor;
     jclass infoClass;
 
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/AttestationInfo", infoClass);
-    JniClass attestationInfoClass(infoClass);
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/AttestationInfo", infoClass);
     SuccessOrExit(err);
 
     env->ExceptionClear();

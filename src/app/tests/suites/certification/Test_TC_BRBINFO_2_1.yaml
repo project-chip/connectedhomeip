@@ -59,7 +59,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "Step 6: TH writes VendorName from the DUT."
+    - label: "Step 6: TH writes VendorName as 'sample'"
       PICS: BRBINFO.S.A0001
       command: "writeAttribute"
       attribute: "VendorName"
@@ -98,7 +98,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 9: TH writes VendorID from the DUT."
+    - label: "Step 9: TH writes VendorID as '0x0011'"
       PICS: BRBINFO.S.A0002
       command: "writeAttribute"
       attribute: "VendorID"
@@ -124,7 +124,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "Step 12: TH writes ProductName from the DUT."
+    - label: "Step 12: TH writes ProductName as 'newproduct'"
       PICS: BRBINFO.S.A0003
       command: "writeAttribute"
       attribute: "ProductName"
@@ -243,7 +243,7 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "Step 22: TH writes HardwareVersion from the DUT."
+    - label: "Step 22: TH writes HardwareVersion as '0x4531'"
       PICS: BRBINFO.S.A0007
       command: "writeAttribute"
       attribute: "HardwareVersion"
@@ -270,7 +270,7 @@ tests:
               minLength: 1
               maxLength: 64
 
-    - label: "Step 25: TH writes HardwareVersionString from the DUT."
+    - label: "Step 25: TH writes HardwareVersionString as 'newhardwareversion'"
       PICS: BRBINFO.S.A0008
       command: "writeAttribute"
       attribute: "HardwareVersionString"
@@ -296,7 +296,7 @@ tests:
               minValue: 0
               maxValue: 4294967294
 
-    - label: "Step 28: TH writes SoftwareVersion from the DUT."
+    - label: "Step 28: TH writes SoftwareVersion as '0x8213'"
       PICS: BRBINFO.S.A0009
       command: "writeAttribute"
       attribute: "SoftwareVersion"
@@ -322,7 +322,7 @@ tests:
               minLength: 1
               maxLength: 64
 
-    - label: "Step 31: TH writes SoftwareVersionString from the DUT."
+    - label: "Step 31: TH writes SoftwareVersionString as '1.0'"
       PICS: BRBINFO.S.A000a
       command: "writeAttribute"
       attribute: "SoftwareVersionString"
@@ -362,7 +362,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 34: TH writes ManufacturingDate from the DUT."
+    - label: "Step 34: TH writes ManufacturingDate as '20210814789452IN'"
       PICS: BRBINFO.S.A000b
       command: "writeAttribute"
       attribute: "ManufacturingDate"
@@ -388,7 +388,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "Step 37: TH writes PartNumber from the DUT."
+    - label: "Step 37: TH writes PartNumber as 'newpart'"
       PICS: BRBINFO.S.A000c
       command: "writeAttribute"
       attribute: "PartNumber"
@@ -427,7 +427,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 40: TH writes ProductURL from the DUT."
+    - label: "Step 40: TH writes ProductURL as 'https://www.example.com'"
       PICS: BRBINFO.S.A000d
       command: "writeAttribute"
       attribute: "ProductURL"
@@ -466,7 +466,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 43: TH writes ProductLabel from the DUT."
+    - label: "Step 43: TH writes ProductLabel as 'newproductlabel'"
       PICS: BRBINFO.S.A000e
       command: "writeAttribute"
       attribute: "ProductLabel"
@@ -492,7 +492,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "Step 46: TH writes SerialNumber from the DUT."
+    - label: "Step 46: TH writes SerialNumber_test as 'newserialnumber'"
       PICS: BRBINFO.S.A000f
       command: "writeAttribute"
       attribute: "SerialNumber"
@@ -535,7 +535,7 @@ tests:
 
     - label:
           "Step 52: TH sends Write request message to DUT to change value of
-          Reachable to false"
+          Reachable to 'false'"
       PICS: BRBINFO.S.A0011
       command: "writeAttribute"
       attribute: "Reachable"
@@ -563,7 +563,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "Step 54: TH writes UniqueID from the DUT."
+    - label: "Step 54: TH writes UniqueID as 'newid'"
       PICS: BRBINFO.S.A0012
       command: "writeAttribute"
       attribute: "UniqueID"
@@ -619,3 +619,35 @@ tests:
       attribute: "ProductAppearance"
       response:
           value: ProductAppearancevalue
+
+    - label:
+          "Step 62: TH reads attribute ID 0x0015 from the DUT (matches in ID to
+          CapabilityMinima in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0015
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label:
+          "Step 63: TH reads attribute ID 0x0016 from the DUT (matches in ID to
+          CapabilityMinima in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0016
+      response:
+          error: UNSUPPORTED_ATTRIBUTE

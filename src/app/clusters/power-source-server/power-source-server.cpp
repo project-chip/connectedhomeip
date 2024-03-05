@@ -25,9 +25,9 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <zap-generated/gen_config.h>
 
 using namespace chip;
 using namespace app;
@@ -72,9 +72,9 @@ PowerSourceServer gPowerSourceServer;
 PowerSourceAttrAccess gAttrAccess;
 
 #ifdef ZCL_USING_POWER_SOURCE_CLUSTER_SERVER
-static constexpr uint16_t kNumStaticEndpoints = EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT;
+static constexpr uint16_t kNumStaticEndpoints = MATTER_DM_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT;
 #define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS                                                                                       \
-    (EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    (MATTER_DM_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
 #else
 static constexpr uint16_t kNumStaticEndpoints    = 0;
 #define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT

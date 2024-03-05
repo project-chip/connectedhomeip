@@ -19,9 +19,6 @@
 #include "DeviceControllerDelegateBridge.h"
 #import <Matter/Matter.h>
 
-@interface CHIPToolDeviceControllerDelegate ()
-@end
-
 @implementation CHIPToolDeviceControllerDelegate
 - (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
@@ -64,6 +61,13 @@
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
 {
     _commandBridge->SetCommandExitStatus(error, "Pairing Commissioning Complete");
+}
+
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error nodeID:(NSNumber *)nodeID metrics:(MTRMetrics *)metrics
+{
+    (void) nodeID;
+    NSString * message = [NSString stringWithFormat:@"Pairing Commissioning Complete with metrics %@", metrics];
+    _commandBridge->SetCommandExitStatus(error, [message UTF8String]);
 }
 
 @end

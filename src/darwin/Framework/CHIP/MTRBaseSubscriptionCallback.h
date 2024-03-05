@@ -22,7 +22,7 @@
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/EventHeader.h>
+#include <app/MessageDef/EventHeader.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/ReadClient.h>
 #include <app/ReadPrepareParams.h>
@@ -99,6 +99,9 @@ public:
     {
         mClusterStateCache = std::move(aClusterStateCache);
     }
+
+    // Used to reset Resubscription backoff on events that indicate likely availability of device to come back online
+    void ResetResubscriptionBackoff() { mResubscriptionNumRetries = 0; }
 
 protected:
     // Report an error, which may be due to issues in our own internal state or
@@ -178,6 +181,10 @@ private:
     bool mHaveQueuedDeletion = false;
     OnDoneHandler _Nullable mOnDoneHandler = nil;
     dispatch_block_t mInterimReportBlock = nil;
+
+    // Copied from ReadClient and customized for
+    uint32_t ComputeTimeTillNextSubscription();
+    uint32_t mResubscriptionNumRetries = 0;
 };
 
 NS_ASSUME_NONNULL_END

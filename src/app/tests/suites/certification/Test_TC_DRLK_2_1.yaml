@@ -160,8 +160,10 @@ tests:
       response:
           value: LockStateValue
 
-    - label: "Step 1d: TH sends a Lock Door command to the DUT."
-      PICS: DRLK.S.C00.Rsp && DRLK.S.F00 && DRLK.S.F07
+    - label:
+          "Step 1d: TH sends a Lock Door command to the DUT. If DRLK.S.F00(PIN)
+          & DRLK.S.F07(COTA), include a Valid PINCode in the Lock Door command."
+      PICS: DRLK.S.C00.Rsp && DRLK.S.F00 && DRLK.S.F07 && DRLK.S.A0000
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -170,7 +172,7 @@ tests:
                 value: "123456"
 
     - label: "Step 1d: TH sends a Lock Door command to the DUT."
-      PICS: DRLK.S.C00.Rsp && !DRLK.S.F00 && !DRLK.S.F07
+      PICS: DRLK.S.C00.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
 
@@ -190,13 +192,16 @@ tests:
       response:
           value: 1
 
-    - label: "Step 1e: TH sends a Unlock Door command to the DUT."
-      PICS: DRLK.S.C01.Rsp && !DRLK.S.F00 && !DRLK.S.F07
+    - label:
+          "Step 1e: TH sends a Unlock Door command to the DUT. If
+          DRLK.S.F00(PIN) & DRLK.S.F07(COTA), include a Valid PINCode in the
+          Unlock Door command"
+      PICS: DRLK.S.C01.Rsp && !DRLK.S.F00 && !DRLK.S.F07 && DRLK.S.A0000
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
 
     - label: "Step 1e: TH sends a Unlock Door command to the DUT."
-      PICS: DRLK.S.C01.Rsp && DRLK.S.F00 && DRLK.S.F07
+      PICS: DRLK.S.C01.Rsp && DRLK.S.F00 && DRLK.S.F07 && DRLK.S.A0000
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -1325,8 +1330,8 @@ tests:
 
     - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
       PICS:
-          ( DRLK.S.F00 || DRLK.S.F01 ) &&
-          DRLK.S.M.WrongCodeEntryLimitAttributeWritable
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
+          DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
@@ -1334,7 +1339,7 @@ tests:
 
     - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
       PICS:
-          " ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
           !DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
@@ -1345,8 +1350,8 @@ tests:
 
     - label: "Step 31c: TH reads WrongCode EntryLimit attribute"
       PICS:
-          ( DRLK.S.F00 || DRLK.S.F01 ) &&
-          DRLK.S.M.WrongCodeEntryLimitAttributeWritable
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
+          DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "readAttribute"
       attribute: "WrongCodeEntryLimit"
       response:
@@ -1354,7 +1359,7 @@ tests:
 
     - label: "Step 31c: TH reads WrongCode EntryLimit attribute"
       PICS:
-          " ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030 &&
           !DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "readAttribute"
       attribute: "WrongCodeEntryLimit"
@@ -1376,8 +1381,8 @@ tests:
 
     - label: "Step 32b: TH writes UserCodeTemporaryDisableTime attribute as 120"
       PICS:
-          ( DRLK.S.F00 || DRLK.S.F01 ) &&
-          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
+          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       arguments:
@@ -1385,7 +1390,7 @@ tests:
 
     - label: "Step 32b: TH writes UserCodeTemporaryDisableTime attribute as 120"
       PICS:
-          " ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
           !DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
@@ -1396,8 +1401,8 @@ tests:
 
     - label: "Step 32c: TH reads UserCodeTemporary DisableTime attribute"
       PICS:
-          ( DRLK.S.F00 || DRLK.S.F01 ) &&
-          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
+          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       response:
@@ -1405,7 +1410,7 @@ tests:
 
     - label: "Step 32c: TH reads UserCodeTemporary DisableTime attribute"
       PICS:
-          " ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          " ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031 &&
           !DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"

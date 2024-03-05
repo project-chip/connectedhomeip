@@ -28,7 +28,7 @@ Two types of switch devices are supported: latching switch (e.g. rocker switch) 
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade.</description>
 
     <globalAttribute side="server" code="0xFFFC" value="0" />
-    <globalAttribute side="server" code="0xFFFD" value="1" />
+    <globalAttribute side="either" code="0xFFFD" value="1" />
 
     <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="int8u" writable="false" optional="false" default="2" min="2">NumberOfPositions</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="int8u" writable="false" reportable="true" optional="false">CurrentPosition</attribute>

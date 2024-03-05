@@ -28,9 +28,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/SessionParameters.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
-#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <transport/CryptoContext.h>
 #include <transport/SecureSession.h>
@@ -104,7 +104,7 @@ public:
     /**
      * Encode the Session Parameters using the provided TLV tag.
      */
-    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const Optional<ReliableMessageProtocolConfig> & mrpLocalConfig,
+    static CHIP_ERROR EncodeSessionParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
                                               TLV::TLVWriter & tlvWriter);
 
 protected:
@@ -218,10 +218,14 @@ protected:
     void Clear();
 
     /**
-     * Notify our delegate about a session establishment error, if we have not
-     * notified it of an error or success before.
+     * Notify our delegate about a session establishment error and the stage when the error occurs
+     * if we have not already notified it of an error or success before.
+     *
+     * @param error The error code to report.
+     * @param stage The stage of the session when the error occurs, defaults to kNotInKeyExchange.
      */
-    void NotifySessionEstablishmentError(CHIP_ERROR error);
+    void NotifySessionEstablishmentError(CHIP_ERROR error,
+                                         SessionEstablishmentStage stage = SessionEstablishmentStage::kNotInKeyExchange);
 
 protected:
     CryptoContext::SessionRole mRole;
@@ -234,7 +238,7 @@ protected:
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
     // mRemoteSessionParams is received from other end and set to our session.
-    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
+    ReliableMessageProtocolConfig mLocalMRPConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
     SessionParameters mRemoteSessionParams;
 
 private:

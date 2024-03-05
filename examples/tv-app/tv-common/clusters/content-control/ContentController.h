@@ -25,10 +25,10 @@
 using ContentControlDelegate = chip::app::Clusters::ContentControl::Delegate;
 using ResetPINResponseType   = chip::app::Clusters::ContentControl::Commands::ResetPINResponse::Type;
 
-class ContentController : public ContentControlDelegate
+class ContentControlManager : public ContentControlDelegate
 {
 public:
-    ContentController();
+    ContentControlManager();
 
     // Attribute Delegates
     bool HandleGetEnabled() override;
@@ -57,5 +57,5 @@ public:
 protected:
 private:
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
+    static constexpr uint32_t kEndpointFeatureMap = 3;
 };

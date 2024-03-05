@@ -55,7 +55,10 @@ tests:
           saveAs: CurrentFabricIndexValue
 
     - label:
-          "Step 2:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
+          "Step 2:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 1 element
+          1.Struct :  a)Privilege field: Manage (4) b)AuthMode field: CASE (2)
+          c)Subjects field: [N1] d)Targets field: null"
       PICS: ACL.S.A0000
       command: "writeAttribute"
       attribute: "ACL"
@@ -63,8 +66,8 @@ tests:
           value:
               [
                   {
-                      Privilege: "4",
-                      AuthMode: "2",
+                      Privilege: AccessControlEntryPrivilegeEnum.Manage,
+                      AuthMode: AccessControlEntryAuthModeEnum.CASE,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
                       FabricIndex: CurrentFabricIndexValue,
@@ -80,7 +83,10 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          "Step 4:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
+          "Step 4:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 1 element
+          1.Struct : a)Privilege field: Administer (5) b)AuthMode field: CASE
+          (2) c)Subjects field: [N1] d)argets field: null"
       PICS: ACL.S.A0000
       command: "writeAttribute"
       attribute: "ACL"
@@ -88,8 +94,8 @@ tests:
           value:
               [
                   {
-                      Privilege: "5",
-                      AuthMode: "2",
+                      Privilege: AccessControlEntryPrivilegeEnum.Administer,
+                      AuthMode: AccessControlEntryAuthModeEnum.CASE,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
                       FabricIndex: CurrentFabricIndexValue,
@@ -109,7 +115,7 @@ tests:
 
     - label:
           "Step 6:TH1 writes DUT Endpoint 0 AccessControl cluster Extension
-          attribute"
+          attribute, value is an empty list"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
