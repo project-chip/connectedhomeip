@@ -35,12 +35,14 @@ extern "C" {
 //    size - output buffer size
 // Returns:
 //    Number of TLV bytes encoded. If this fails, 0 will be returned.
-size_t pychip_JsonToTlv(const char* json, uint8_t* buf, size_t size) {
+size_t pychip_JsonToTlv(const char * json, uint8_t * buf, size_t size)
+{
     MutableByteSpan tlvSpan(buf, size);
     CHIP_ERROR err = JsonToTlv(json, tlvSpan);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         return 0;
     }
     return tlvSpan.size();
 }
-}  // extern "C"
+} // extern "C"
