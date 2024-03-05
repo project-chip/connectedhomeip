@@ -80,7 +80,7 @@ using MetricEvent = chip::Tracing::MetricEvent;
 - (void)setDurationFromMetricDataAndClearCounters:(MTRMetricData *)fromData
 {
     auto duration = _timePoint - fromData->_timePoint;
-    _durationMicroseconds = [NSNumber numberWithUnsignedLongLong:duration.count()];
+    _duration = [NSNumber numberWithDouble:double(duration.count()) / USEC_PER_SEC];
 
     // Clear timepoints to minimize history
     _timePoint = fromData->_timePoint = chip::System::Clock::Microseconds64(0);
@@ -88,8 +88,8 @@ using MetricEvent = chip::Tracing::MetricEvent;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRMetricData>: Type %d, Value = %@, Error Code = %@, Duration = %@ us",
-                     static_cast<int>(_type), self.value, self.errorCode, self.durationMicroseconds];
+    return [NSString stringWithFormat:@"<MTRMetricData: Type %d, Value = %@, Error Code = %@, Duration = %@ us>",
+                     static_cast<int>(_type), self.value, self.errorCode, self.duration];
 }
 
 @end
