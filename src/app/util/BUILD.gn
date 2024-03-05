@@ -22,6 +22,7 @@ source_set("types") {
     "basic-types.h",
     "ember-strings.cpp",
     "ember-strings.h",
+    "endpoint-config-defines.h",
     "types_stub.h",
   ]
 
