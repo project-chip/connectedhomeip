@@ -192,7 +192,7 @@ static_library("interaction-model") {
     "reporting/reporting.h",
   ]
 
-  deps = [ "${chip_root}/src/app/MessageDef:events" ]
+  deps = [ "${chip_root}/src/app:events" ]
 
   public_deps = [
     ":app_config",
@@ -242,6 +242,18 @@ static_library("interaction-model") {
 
     public_configs += [ ":config-controller-dynamic-server" ]
   }
+}
+
+source_set("events") {
+  sources = [
+    "EventHeader.h",
+    "EventLoggingTypes.h",
+  ]
+
+  deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+  ]
 }
 
 # Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.

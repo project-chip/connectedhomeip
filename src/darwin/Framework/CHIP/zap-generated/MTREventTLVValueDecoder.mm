@@ -25,8 +25,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Events.h>
-#include <app/MessageDef/EventHeader.h>
-#include <app/MessageDef/EventLoggingTypes.h>
+#include <app/EventHeader.h>
+#include <app/EventLoggingTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <lib/support/TypeTraits.h>
