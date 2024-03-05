@@ -207,7 +207,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
     wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
 
-    CommissioningParameters params = wrapper->mAutoCommissioner.GetCommissioningParameters();
+    CommissioningParameters params = wrapper->GetCommissioningParameters();
     params.SetFailsafeTimerSeconds(failsafeTimerSeconds);
     params.SetAttemptWiFiNetworkScan(attemptNetworkScanWiFi);
     params.SetAttemptThreadNetworkScan(attemptNetworkScanThread);
@@ -526,6 +526,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateCommissioningParameters(const c
 {
     // this will wipe out any custom attestationNonce and csrNonce that was being used.
     // however, Android APIs don't allow these to be set to custom values today.
+    mCommissioningParameter = params;
     return mAutoCommissioner.SetCommissioningParameters(params);
 }
 

@@ -123,10 +123,7 @@ public:
 
     chip::Credentials::PartialDACVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
 
-    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
-    {
-        return mAutoCommissioner.GetCommissioningParameters();
-    }
+    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const { return mCommissioningParameter; }
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
@@ -261,6 +258,8 @@ private:
     char mUserActiveModeTriggerInstructionBuffer[kUserActiveModeTriggerInstructionBufferLen];
     chip::MutableCharSpan mUserActiveModeTriggerInstruction = chip::MutableCharSpan(mUserActiveModeTriggerInstructionBuffer);
     chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerHint;
+
+    chip::Controller::CommissioningParameters mCommissioningParameter;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST

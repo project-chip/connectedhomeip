@@ -884,10 +884,10 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
-    err = wrapper->UpdateCommissioningParameters(commissioningParams);
+    err = wrapper->GetAutoCommissioner()->SetCommissioningParameters(commissioningParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "SetCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
@@ -919,10 +919,10 @@ JNI_METHOD(void, updateCommissioningICDRegistrationInfo)
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
-    err = wrapper->UpdateCommissioningParameters(commissioningParams);
+    err = wrapper->GetAutoCommissioner()->SetCommissioningParameters(commissioningParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "SetCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }

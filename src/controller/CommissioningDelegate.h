@@ -370,9 +370,12 @@ public:
         mAttestationNonce.SetValue(attestationNonce);
         return *this;
     }
+
+    // If a WiFiCredentials is provided, then the WiFiNetworkScan will not be attempted
     CommissioningParameters & SetWiFiCredentials(WiFiCredentials wifiCreds)
     {
         mWiFiCreds.SetValue(wifiCreds);
+        mAttemptWiFiNetworkScan.SetValue(false);
         return *this;
     }
 
