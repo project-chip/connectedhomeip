@@ -223,7 +223,7 @@ source_set("siwx917-common") {
     "SiWx917/wfx_rsi_host.c",
   ]
 
-  if (chip_enable_pw_rpc || chip_build_libshell) {
+  if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
     sources += [ "uart.cpp" ]
   }
 

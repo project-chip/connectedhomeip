@@ -223,6 +223,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
                   mv scripts/codegen.py scripts/codegen.py.renamed
+                  mv scripts/tools/zap/generate.py scripts/tools/zap/generate.py.renamed
             - name: Clean output
               run: rm -rf ./out
             - name: Build using build_examples.py (pregen)
@@ -234,18 +235,11 @@ jobs:
                        --pregen-dir ./zzz_pregenerated \
                        build \
                     "
-            - name: Check no code generation in output
-              run: |
-                  CNT=$(find out -name "CHIPClusters.h" | wc -l)
-                  if [ "${CNT}" != "0" ]; then
-                     echo "ERROR: found unexpected generated files:"
-                     find out -name "CHIPClusters.h"
-                     exit 1
-                  fi
             - name: Undo code pre-generation changes (make compile time codegen work again)
               run: |
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
+                  mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py 
             - name: Run fake linux tests with build_examples
               run: |
                   ./scripts/run_in_build_env.sh \

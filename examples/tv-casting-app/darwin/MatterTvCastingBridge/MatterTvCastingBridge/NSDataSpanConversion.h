@@ -1,7 +1,5 @@
-/*
- *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+/**
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,12 +14,20 @@
  *    limitations under the License.
  */
 
-#include "RequiredPrivilege.h"
+#pragma once
 
-namespace chip {
-namespace app {
+#import <Foundation/Foundation.h>
 
-constexpr Access::Privilege RequiredPrivilege::kPrivilegeMapper[];
+#include <lib/support/Span.h>
 
-} // namespace app
-} // namespace chip
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ * Utilities for converting between NSData and chip::Span.
+ */
+
+inline chip::ByteSpan AsByteSpan(NSData * data) { return chip::ByteSpan(static_cast<const uint8_t *>(data.bytes), data.length); }
+
+inline NSData * AsData(chip::ByteSpan span) { return [NSData dataWithBytes:span.data() length:span.size()]; }
+
+NS_ASSUME_NONNULL_END

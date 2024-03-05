@@ -37,6 +37,7 @@
 #include <openthread/dns_client.h>
 #endif
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/NetworkCommissioning.h>

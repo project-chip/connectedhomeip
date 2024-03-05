@@ -1,5 +1,4 @@
 /**
- *
  *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +13,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-inline constexpr int kMatterAccessPrivilegeView       = 0;
-inline constexpr int kMatterAccessPrivilegeOperate    = 1;
-inline constexpr int kMatterAccessPrivilegeManage     = 2;
-inline constexpr int kMatterAccessPrivilegeAdminister = 3;
-inline constexpr int kMatterAccessPrivilegeMaxValue   = kMatterAccessPrivilegeAdminister;
+#import <Foundation/Foundation.h>
+
+#include <lib/support/Span.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+/**
+ * Utilities for converting between NSString and chip::CharSpan.
+ */
+
+inline chip::CharSpan AsCharSpan(NSString * str)
+{
+    return chip::CharSpan([str UTF8String], [str lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+}
+
+inline NSString * AsString(chip::CharSpan span)
+{
+    return [[NSString alloc] initWithBytes:span.data() length:span.size() encoding:NSUTF8StringEncoding];
+}
+
+NS_ASSUME_NONNULL_END

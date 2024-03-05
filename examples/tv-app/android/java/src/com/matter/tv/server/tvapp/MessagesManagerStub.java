@@ -31,13 +31,6 @@ public class MessagesManagerStub implements MessagesManager {
   public MessagesManagerStub(int endpoint) {
     this.endpoint = endpoint;
     Log.d(TAG, "MessagesManagerStub: at " + this.endpoint);
-
-    HashMap<Long, String> responseOptions = new HashMap<Long, String>();
-    responseOptions.put(new Long(1), "Yes");
-    responseOptions.put(new Long(2), "No");
-    presentMessages(
-        "31323334353637383930313233343536", 1, 1, 30, 60000, "TestMessage", responseOptions);
-    Log.d(TAG, "MessagesManagerStub: added dummy message");
   }
 
   @Override

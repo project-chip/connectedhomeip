@@ -17,6 +17,7 @@
 
 #include <app/util/attribute-storage.h>
 
+#include <app/AttributeAccessInterfaceCache.h>
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
@@ -136,6 +137,7 @@ constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVI
 DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 
 AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
+AttributeAccessInterfaceCache gAttributeAccessInterfaceCache;
 
 // shouldUnregister returns true if the given AttributeAccessInterface should be
 // unregistered.
@@ -1364,6 +1366,7 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * 
 
 bool registerAttributeAccessOverride(AttributeAccessInterface * attrOverride)
 {
+    gAttributeAccessInterfaceCache.Invalidate();
     for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
     {
         if (cur->Matches(*attrOverride))
@@ -1379,19 +1382,39 @@ bool registerAttributeAccessOverride(AttributeAccessInterface * attrOverride)
 
 void unregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
 {
+    gAttributeAccessInterfaceCache.Invalidate();
     UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; });
 }
 
 namespace chip {
 namespace app {
+
 app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
 {
-    for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+    using CacheResult = AttributeAccessInterfaceCache::CacheResult;
+
+    AttributeAccessInterface * cached = nullptr;
+    CacheResult result                = gAttributeAccessInterfaceCache.Get(endpointId, clusterId, &cached);
+    switch (result)
     {
-        if (cur->Matches(endpointId, clusterId))
+    case CacheResult::kDefinitelyUnused:
+        return nullptr;
+    case CacheResult::kDefinitelyUsed:
+        return cached;
+    case CacheResult::kCacheMiss:
+    default:
+        // Did not cache yet, search set of AAI registered, and cache if found.
+        for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
         {
-            return cur;
+            if (cur->Matches(endpointId, clusterId))
+            {
+                gAttributeAccessInterfaceCache.MarkUsed(endpointId, clusterId, cur);
+                return cur;
+            }
         }
+
+        // Did not find AAI registered: mark as definitely not using.
+        gAttributeAccessInterfaceCache.MarkUnused(endpointId, clusterId);
     }
 
     return nullptr;
