@@ -440,8 +440,6 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ReleaseBlock()
 
 void OTAMultiImageProcessorImpl::FetchNextData(uint32_t context)
 {
-    ChipLogError(SoftwareUpdate, "Fetch data 1:");
-
     auto * imageProcessor = &OTAMultiImageProcessorImpl::GetDefaultInstance();
     SystemLayer().ScheduleLambda([imageProcessor] {
         if (imageProcessor->mDownloader)
@@ -449,7 +447,6 @@ void OTAMultiImageProcessorImpl::FetchNextData(uint32_t context)
             imageProcessor->mDownloader->FetchNextData();
         }
     });
-    ChipLogError(SoftwareUpdate, "Fetch data 2:");
 }
 
 OTAMultiImageProcessorImpl & OTAMultiImageProcessorImpl::GetDefaultInstance()

@@ -30,7 +30,6 @@
  * This hook is called at the end of OTAMultiImageProcessorImpl::Init.
  * It should generally register the OTATlvProcessor instances.
  */
-CHIP_ERROR OtaHookInit();
 
 namespace chip {
 
@@ -40,6 +39,8 @@ public:
     using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
 
     CHIP_ERROR Init(OTADownloader * downloader);
+    CHIP_ERROR OtaHookInit();
+    static CHIP_ERROR ProcessDescriptor(void * descriptor);
     void Clear();
 
     //////////// OTAImageProcessorInterface Implementation ///////////////

@@ -21,10 +21,9 @@
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#include <platform/silabs/multi-ota/efr32/OTACustomProcessor.h>
 #include <platform/silabs/multi-ota/efr32/OTAFirmwareProcessor.h>
 
-CHIP_ERROR ProcessDescriptor(void * descriptor)
+CHIP_ERROR chip::OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor)
 {
     auto desc = static_cast<chip::OTAFirmwareProcessor::Descriptor *>(descriptor);
     ChipLogDetail(SoftwareUpdate, "Descriptor: %ld, %s, %s", desc->version, desc->versionString, desc->buildDate);
@@ -32,12 +31,9 @@ CHIP_ERROR ProcessDescriptor(void * descriptor)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OtaHookInit()
+CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
 {
     static chip::OTAFirmwareProcessor sApplicationProcessor;
-#if CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
-    static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
-#endif // CONFIG_CHIP_SILABS_OTA_FACTORY_DATA_PROCESSOR
 
     sApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
 

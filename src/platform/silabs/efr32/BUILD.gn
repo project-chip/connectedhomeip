@@ -91,7 +91,7 @@ static_library("efr32") {
   } else if (chip_enable_ota_requestor) {
     sources += [
       "${silabs_platform_dir}/OTAImageProcessorImpl.h",
-      "${silabs_platform_dir}/efr32/OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.cpp",
     ]
   }
 
