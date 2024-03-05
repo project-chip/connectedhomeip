@@ -17,9 +17,9 @@ import("${chip_root}/src/app/common_flags.gni")
 
 source_set("types") {
   sources = [
+    "att-storage.h",
     "attribute-metadata.cpp",
     "attribute-metadata.h",
-    "att-storage.h",
     "basic-types.h",
     "ember-strings.cpp",
     "ember-strings.h",
