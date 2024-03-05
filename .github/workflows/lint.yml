@@ -92,7 +92,6 @@ jobs:
                      --known-failure controller/ExamplePersistentStorage.h \
                      --known-failure app/AttributeAccessInterface.h \
                      --known-failure app/AttributeAccessToken.h \
-                     --known-failure app/att-storage.h \
                      --known-failure app/CommandHandler.h \
                      --known-failure app/CommandHandlerInterface.h \
                      --known-failure app/CommandSenderLegacyCallback.h \
