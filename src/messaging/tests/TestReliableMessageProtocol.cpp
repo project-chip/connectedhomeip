@@ -2197,7 +2197,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("Test MRP backoff algorithm", TestReliableMessageProtocol::CheckGetBackoff),
     // TODO: Re-enable this test, after changing test to use Mock clock / DriveIO rather than DriveIOUntil.
     // Issue: https://github.com/project-chip/connectedhomeip/issues/32440
-    //NL_TEST_DEF("Test an application response that comes after MRP retransmits run out",
+    // NL_TEST_DEF("Test an application response that comes after MRP retransmits run out",
     //            TestReliableMessageProtocol::CheckApplicationResponseDelayed),
     NL_TEST_DEF("Test an application response that never comes, so MRP retransmits run out and then exchange times out",
                 TestReliableMessageProtocol::CheckApplicationResponseNeverComes),
