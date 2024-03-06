@@ -374,7 +374,9 @@ class MatterTestConfig:
     discriminators: Optional[List[int]] = None
     setup_passcodes: Optional[List[int]] = None
     commissionee_ip_address_just_for_testing: Optional[str] = None
-    maximize_cert_chains: bool = False
+    # By default, we start with maximized cert chains, as required for RR-1.1.
+    # This allows cert tests to be run without re-commissioning for RR-1.1.
+    maximize_cert_chains: bool = True
 
     qr_code_content: Optional[str] = None
     manual_code: Optional[str] = None
@@ -390,7 +392,10 @@ class MatterTestConfig:
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
-    controller_cat_tags: List[int] = field(default_factory=list)
+    # By default, we commission with CAT tags specified for RR-1.1
+    # so the cert tests can be run without re-commissioning the device
+    # for this one test. This can be overwritten from the command line
+    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
 
     # Fabric ID which to use
     fabric_id: int = 1
@@ -1415,7 +1420,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     return config
 
 
-def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
+def parse_matter_test_args() -> MatterTestConfig:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -1527,9 +1532,7 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
     args_group.add_argument('--hex-arg', nargs='*', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
-    if not argv:
-        argv = sys.argv[1:]
-
+    argv = sys.argv[1:]
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
 
 
@@ -1612,7 +1615,7 @@ class CommissionDeviceTest(MatterBaseTest):
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
 
-def default_matter_test_main(argv=None, **kwargs):
+def default_matter_test_main():
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
     In this case, only one test class in a test script is allowed.
@@ -1622,25 +1625,12 @@ def default_matter_test_main(argv=None, **kwargs):
       ...
       if __name__ == '__main__':
         default_matter_test_main.main()
-    Args:
-      argv: A list that is then parsed as command line args. If None, defaults to sys.argv
     """
 
-    matter_test_config = parse_matter_test_args(argv)
-
-    # Allow override of command line from optional arguments
-    if not matter_test_config.controller_cat_tags and "controller_cat_tags" in kwargs:
-        matter_test_config.controller_cat_tags = kwargs["controller_cat_tags"]
+    matter_test_config = parse_matter_test_args()
 
     # Find the test class in the test script.
     test_class = _find_test_class()
-
-    # This is required in case we need any testing with maximized certificate chains.
-    # We need *all* issuers from the start, even for default controller, to use
-    # maximized chains, before MatterStackState init, others some stale certs
-    # may not chain properly.
-    if "maximize_cert_chains" in kwargs:
-        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
 
     hooks = InternalTestRunnerHooks()
 
