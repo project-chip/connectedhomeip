@@ -25,8 +25,8 @@
 
 #include "MockEvents.h"
 #include "common.h"
+#include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
-#include <app/MessageDef/EventLoggingTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
