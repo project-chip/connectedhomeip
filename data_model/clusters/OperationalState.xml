@@ -65,6 +65,17 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="OPSTATE" scope="Endpoint"/>
   <dataTypes>
+    <enum name="ErrorStateEnum">
+      <item from="0x00" to="0x3F" name="GeneralErrors" summary="Generally applicable values for error, defined herein">
+        <mandatoryConform/>
+      </item>
+      <item from="0x40" to="0x7F" name="DerivedClusterErrors" summary="Derived Cluster defined errors">
+        <mandatoryConform/>
+      </item>
+      <item from="0x80" to="0xBF" name="ManufacturerError" summary="Vendor specific errors">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="OperationalStateEnum">
       <item from="0x00" to="0x3F" name="GeneralStates" summary="Generally applicable values for state, defined herein">
         <mandatoryConform/>
@@ -77,18 +88,7 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="ErrorStateStruct">
-      <field id="0" name="ErrorStateID" type="enum8" default="0">
-        <enum>
-          <item from="0x00" to="0x3F" name="GeneralErrors" summary="Generally applicable values for error, defined herein">
-            <mandatoryConform/>
-          </item>
-          <item from="0x40" to="0x7F" name="DerivedClusterErrors" summary="Derived Cluster defined errors">
-            <mandatoryConform/>
-          </item>
-          <item from="0x80" to="0xBF" name="ManufacturerError" summary="Vendor specific errors">
-            <mandatoryConform/>
-          </item>
-        </enum>
+      <field id="0" name="ErrorStateID" type="ErrorStateEnum" default="0">
         <mandatoryConform/>
       </field>
       <field id="1" name="ErrorStateLabel" type="string" default="empty">

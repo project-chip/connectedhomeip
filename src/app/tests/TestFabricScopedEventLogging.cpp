@@ -24,9 +24,9 @@
 
 #include <access/SubjectDescriptor.h>
 #include <app/EventLoggingDelegate.h>
+#include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/EventLoggingTypes.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>

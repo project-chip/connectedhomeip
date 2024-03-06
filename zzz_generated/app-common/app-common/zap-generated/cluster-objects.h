@@ -24,7 +24,7 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app-common/zap-generated/ids/Events.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/MessageDef/EventLoggingTypes.h>
+#include <app/EventLoggingTypes.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>

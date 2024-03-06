@@ -257,10 +257,6 @@
 		75B0D01E2B71B47F002074DD /* MTRDeviceTestDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 75B0D01D2B71B47F002074DD /* MTRDeviceTestDelegate.m */; };
 		75B765C12A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h in Headers */ = {isa = PBXBuildFile; fileRef = 75B765C02A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h */; };
 		75B765C32A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm in Sources */ = {isa = PBXBuildFile; fileRef = 75B765C22A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm */; };
-		75D532752B91194D009C64E4 /* ember-strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75D532742B91194D009C64E4 /* ember-strings.cpp */; };
-		75D532762B91194D009C64E4 /* ember-strings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75D532742B91194D009C64E4 /* ember-strings.cpp */; };
-		75D532782B91195B009C64E4 /* attribute-metadata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75D532772B91195B009C64E4 /* attribute-metadata.cpp */; };
-		75D532792B91195B009C64E4 /* attribute-metadata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75D532772B91195B009C64E4 /* attribute-metadata.cpp */; };
 		8874C1322B69C7060084BEFD /* MTRMetricsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8874C1312B69C7060084BEFD /* MTRMetricsTests.m */; };
 		88E6C9462B6334ED001A1FE0 /* MTRMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 88E6C9432B6334ED001A1FE0 /* MTRMetrics.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88E6C9472B6334ED001A1FE0 /* MTRMetrics_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 88E6C9442B6334ED001A1FE0 /* MTRMetrics_Internal.h */; };
@@ -661,8 +657,6 @@
 		75B765BF2A1D70F80014719B /* MTRAttributeSpecifiedCheck-src.zapt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MTRAttributeSpecifiedCheck-src.zapt"; sourceTree = "<group>"; };
 		75B765C02A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRAttributeSpecifiedCheck.h; sourceTree = "<group>"; };
 		75B765C22A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRAttributeSpecifiedCheck.mm; sourceTree = "<group>"; };
-		75D532742B91194D009C64E4 /* ember-strings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-strings.cpp"; path = "util/ember-strings.cpp"; sourceTree = "<group>"; };
-		75D532772B91195B009C64E4 /* attribute-metadata.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-metadata.cpp"; path = "util/attribute-metadata.cpp"; sourceTree = "<group>"; };
 		8874C1312B69C7060084BEFD /* MTRMetricsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRMetricsTests.m; sourceTree = "<group>"; };
 		88E6C9432B6334ED001A1FE0 /* MTRMetrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRMetrics.h; sourceTree = "<group>"; };
 		88E6C9442B6334ED001A1FE0 /* MTRMetrics_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRMetrics_Internal.h; sourceTree = "<group>"; };
@@ -1000,8 +994,6 @@
 		1E857311265519DE0050A4D9 /* app */ = {
 			isa = PBXGroup;
 			children = (
-				75D532772B91195B009C64E4 /* attribute-metadata.cpp */,
-				75D532742B91194D009C64E4 /* ember-strings.cpp */,
 				5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */,
 				514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */,
 				514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */,
@@ -1768,7 +1760,6 @@
 				B45373BD2A9FEA9100807602 /* service.c in Sources */,
 				0395469E2991DFC5006D42A8 /* json_writer.cpp in Sources */,
 				03FB93E02A46200A0048CB35 /* DiscoverCommissionablesCommand.mm in Sources */,
-				75D532762B91194D009C64E4 /* ember-strings.cpp in Sources */,
 				B45373EF2A9FEBFE00807602 /* ops-raw-skt.c in Sources */,
 				516411332B6BF77700E67C05 /* MTRServerAccessControl.mm in Sources */,
 				037C3DD52991C2E200B7EEE2 /* CHIPCommandBridge.mm in Sources */,
@@ -1783,7 +1774,6 @@
 				B45373AA2A9FE73400807602 /* WebSocketServer.cpp in Sources */,
 				B45373E62A9FEBA400807602 /* header.c in Sources */,
 				B45374002A9FEC4F00807602 /* unix-init.c in Sources */,
-				75D532792B91195B009C64E4 /* attribute-metadata.cpp in Sources */,
 				B45373DF2A9FEB6F00807602 /* system.c in Sources */,
 				B45373FC2A9FEC4F00807602 /* unix-caps.c in Sources */,
 				B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */,
@@ -1848,7 +1838,6 @@
 				516416012B6B483C00D5CE11 /* MTRIMDispatch.mm in Sources */,
 				51D0B1412B61B3A4006E3511 /* MTRServerCluster.mm in Sources */,
 				514C79FC2B62F94C00DD6D7B /* ota-provider.cpp in Sources */,
-				75D532752B91194D009C64E4 /* ember-strings.cpp in Sources */,
 				5136661428067D550025EDAE /* MTRDeviceControllerFactory.mm in Sources */,
 				51D0B1392B618CC6006E3511 /* MTRServerAttribute.mm in Sources */,
 				51B22C2A2740CB47008D5055 /* MTRCommandPayloadsObjc.mm in Sources */,
@@ -1885,7 +1874,6 @@
 				5A6FEC9627B5983000F25F42 /* MTRDeviceControllerXPCConnection.mm in Sources */,
 				511913FB28C100EF009235E9 /* MTRBaseSubscriptionCallback.mm in Sources */,
 				510470FB2A2F7DF60053EA7E /* MTRBackwardsCompatShims.mm in Sources */,
-				75D532782B91195B009C64E4 /* attribute-metadata.cpp in Sources */,
 				5173A47629C0E2ED00F67F48 /* MTRFabricInfo.mm in Sources */,
 				5ACDDD7D27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm in Sources */,
 				513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */,

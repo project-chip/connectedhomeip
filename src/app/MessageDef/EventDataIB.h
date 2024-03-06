@@ -27,8 +27,8 @@
 #include "StructBuilder.h"
 #include "StructParser.h"
 #include <app/AppConfig.h>
-#include <app/MessageDef/EventHeader.h>
-#include <app/MessageDef/EventLoggingTypes.h>
+#include <app/EventHeader.h>
+#include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
