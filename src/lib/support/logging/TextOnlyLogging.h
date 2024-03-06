@@ -276,8 +276,14 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
  */
 #define ChipLogFormatExchangeId "%u%c"
 #define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
-#define ChipLogFormatExchange ChipLogFormatExchangeId
-#define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
+#define ChipLogFormateExchangeNode "[%u:" ChipLogFormatX64 "]"
+#define ChipLogValueExchangeNode(fabric, id) fabric, ChipLogValueX64(id)
+#define ChipLogFormatExchange ChipLogFormatExchangeId " to: " ChipLogFormateExchangeNode
+#define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator()),                               \
+    ChipLogValueExchangeNode(                                                                                                      \
+        ((ec)->HasSessionHandle() ? (ec)->GetSessionHandle()->GetSubjectDescriptor().fabricIndex : kUndefinedFabricIndex),         \
+        ((ec)->HasSessionHandle() ? (ec)->GetSessionHandle()->GetSubjectDescriptor().subject : kUndefinedNodeId))   
+
 #define ChipLogValueExchangeIdFromSentHeader(payloadHeader)                                                                        \
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), (payloadHeader).IsInitiator())
 // A received header's initiator boolean is the inverse of the exchange's.
