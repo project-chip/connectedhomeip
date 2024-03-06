@@ -274,6 +274,18 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         memcpy(clientInfo.hmac_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), hmacBuf.data(),
                sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
+        // Idle Mode Duration
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kIdleModeDuration)));
+        ReturnErrorOnFailure(reader.Get(clientInfo.idle_mode_duration));
+
+        // Active Mode Duration
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kActiveModeDuration)));
+        ReturnErrorOnFailure(reader.Get(clientInfo.active_mode_duration));
+
+        // Active Mode Threshold
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kActiveModeThreshold)));
+        ReturnErrorOnFailure(reader.Get(clientInfo.active_mode_threshold));
+
         ReturnErrorOnFailure(reader.ExitContainer(ICDClientInfoType));
         clientInfoVector.push_back(clientInfo);
     }
@@ -327,6 +339,9 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kAesKeyHandle), aesBuf));
         ByteSpan hmacBuf(clientInfo.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kHmacKeyHandle), hmacBuf));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kIdleModeDuration), clientInfo.idle_mode_duration));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kActiveModeDuration), clientInfo.active_mode_duration));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kActiveModeThreshold), clientInfo.active_mode_threshold));
         ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));
     }
     return writer.EndContainer(arrayType);

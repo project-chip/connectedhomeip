@@ -122,13 +122,16 @@ public:
 protected:
     enum class ClientInfoTag : uint8_t
     {
-        kPeerNodeId       = 1,
-        kFabricIndex      = 2,
-        kStartICDCounter  = 3,
-        kOffset           = 4,
-        kMonitoredSubject = 5,
-        kAesKeyHandle     = 6,
-        kHmacKeyHandle    = 7,
+        kPeerNodeId          = 1,
+        kFabricIndex         = 2,
+        kStartICDCounter     = 3,
+        kOffset              = 4,
+        kMonitoredSubject    = 5,
+        kAesKeyHandle        = 6,
+        kHmacKeyHandle       = 7,
+        kIdleModeDuration    = 8,
+        kActiveModeDuration  = 9,
+        kActiveModeThreshold = 10
     };
 
     enum class CounterTag : uint8_t
@@ -155,8 +158,11 @@ protected:
     static constexpr size_t MaxICDClientInfoSize()
     {
         // All the fields added together
-        return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
-                                           sizeof(uint64_t), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        return TLV::EstimateStructOverhead(
+            sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t) /*start_icd_counter*/, sizeof(uint32_t) /*offset*/,
+            sizeof(uint64_t) /*monitored_subject*/, sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
+            sizeof(Crypto::Symmetric128BitsKeyByteArray) /*hmac_key_handle*/, sizeof(uint32_t) /*idle_mode_duration*/,
+            sizeof(uint32_t) /*active_mode_duration*/, sizeof(uint16_t) /*active_mode_threshold*/);
     }
 
     static constexpr size_t MaxICDCounterSize()

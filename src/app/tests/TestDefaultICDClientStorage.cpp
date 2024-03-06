@@ -217,9 +217,14 @@ void TestProcessCheckInPayload(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Populate clientInfo
     ICDClientInfo clientInfo;
-    clientInfo.peer_node = ScopedNodeId(nodeId, fabricId);
-
-    err = manager.SetKey(clientInfo, ByteSpan(kKeyBuffer1));
+    clientInfo.peer_node             = ScopedNodeId(nodeId, fabricId);
+    clientInfo.start_icd_counter     = 1;
+    clientInfo.offset                = 2;
+    clientInfo.monitored_subject     = 3;
+    clientInfo.idle_mode_duration    = 4;
+    clientInfo.active_mode_duration  = 5;
+    clientInfo.active_mode_threshold = 6;
+    err                              = manager.SetKey(clientInfo, ByteSpan(kKeyBuffer1));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = manager.StoreEntry(clientInfo);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -237,6 +242,12 @@ void TestProcessCheckInPayload(nlTestSuite * apSuite, void * apContext)
     ByteSpan payload{ buffer->Start(), buffer->DataLength() };
     err = manager.ProcessCheckInPayload(payload, decodeClientInfo, checkInCounter);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, decodeClientInfo.start_icd_counter == 1);
+    NL_TEST_ASSERT(apSuite, decodeClientInfo.offset == 2);
+    NL_TEST_ASSERT(apSuite, decodeClientInfo.monitored_subject == 3);
+    NL_TEST_ASSERT(apSuite, decodeClientInfo.idle_mode_duration == 4);
+    NL_TEST_ASSERT(apSuite, decodeClientInfo.active_mode_duration == 5);
+    NL_TEST_ASSERT(apSuite, decodeClientInfo.active_mode_threshold == 6);
 
     // 2. Use a key not available in the storage for encoding
     err = manager.SetKey(clientInfo, ByteSpan(kKeyBuffer2));

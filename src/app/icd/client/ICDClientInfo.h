@@ -35,7 +35,9 @@ struct ICDClientInfo
     uint64_t monitored_subject               = static_cast<uint64_t>(0);
     Crypto::Aes128KeyHandle aes_key_handle   = Crypto::Aes128KeyHandle();
     Crypto::Hmac128KeyHandle hmac_key_handle = Crypto::Hmac128KeyHandle();
-
+    uint32_t idle_mode_duration              = 0;
+    uint32_t active_mode_duration            = 0;
+    uint16_t active_mode_threshold           = 0;
     ICDClientInfo() {}
     ICDClientInfo(const ICDClientInfo & other) { *this = other; }
 
@@ -51,6 +53,9 @@ struct ICDClientInfo
         ByteSpan hmac_buf(other.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
         memcpy(hmac_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), hmac_buf.data(),
                sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        idle_mode_duration    = other.idle_mode_duration;
+        active_mode_duration  = other.active_mode_duration;
+        active_mode_threshold = other.active_mode_threshold;
         return *this;
     }
 };
