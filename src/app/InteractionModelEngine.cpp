@@ -417,7 +417,6 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
                                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                                       bool aIsTimedInvoke)
 {
-    // CommandHandler * commandHandler = mCommandResponderObjs.CreateObject(this);
     CommandResponder * commandResponder = mCommandResponderObjs.CreateObject(this, this);
     if (commandResponder == nullptr)
     {

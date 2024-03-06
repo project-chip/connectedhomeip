@@ -94,7 +94,7 @@ void CommandResponder::StartSendingCommandResponses()
         // be done that fulfills our responsibility to send a Failure StatusResponse, but this causes unit
         // tests to start failing.
         //   ```
-        //   if (HasSessionHandle())
+        //   if (mExchangeCtx && mExchangeCtx->HasSessionHandle())
         //   {
         //       SendStatusResponse(Status::Failure);
         //   }

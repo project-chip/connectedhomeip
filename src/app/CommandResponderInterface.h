@@ -24,10 +24,12 @@ namespace chip {
 namespace app {
 
 /**
- * Command responder interface for managing exchange context and sending InvokeResponseMessage(s)
+ * Interface for sending InvokeResponseMessage(s).
  *
- * Interface created to improve unit testability and allow for specific applications
- * to stub out CommandResponder.
+ * Provides information about the associated exchange context.
+ *
+ * Design Rationale: This interface enhances unit testability and allows applications to
+ * customize CommandResponder behavior with stubs.
  */
 class CommandResponderInterface
 {

@@ -27,7 +27,7 @@ namespace chip {
 namespace app {
 
 /**
- * Manages the process of sending InvokeResponseMessage(s) to the original requester.
+ * Manages the process of sending InvokeResponseMessage(s) to the requester.
  *
  * Implements the CommandResponderInterface. Uses a CommandHandler member to process
  * InvokeRequestCommand. The CommandHandler is provided a reference to this

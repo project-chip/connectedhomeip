@@ -54,7 +54,7 @@ CommandHandler::CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apC
     }
     if (aTestOverride.commandResponder)
     {
-        SetCommandResponder(*aTestOverride.commandResponder);
+        SetCommandResponder(aTestOverride.commandResponder);
     }
 }
 
@@ -104,9 +104,10 @@ Status CommandHandler::OnInvokeCommandRequest(CommandResponderInterface & comman
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "state should be Idle");
 
-    SetCommandResponder(commandResponder);
+    SetCommandResponder(&commandResponder);
 
-    // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
+    // Using RAII here: if this is the only handle remaining, DecrementHoldOff will
+    // call the CommandHandler::OnDone callback when this function returns.
     Handle workHandle(this);
 
     Status status = ProcessInvokeRequest(std::move(payload), isTimedInvoke);
@@ -195,7 +196,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     invokeRequestMessage.PrettyPrint();
 #endif
-    VerifyOrDie(mpResponder != nullptr);
+    VerifyOrDie(mpResponder);
     if (mpResponder->IsForGroup())
     {
         SetGroupRequest(true);
@@ -340,8 +341,6 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
         }
     }
 
-    VerifyOrDie(mpResponder != nullptr);
-
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
@@ -429,7 +428,7 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
     err = commandPath.GetGroupCommandPath(&clusterId, &commandId);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
-    VerifyOrDie(mpResponder != nullptr);
+    VerifyOrDie(mpResponder);
     groupId = mpResponder->GetGroupId();
     fabric  = GetAccessingFabricIndex();
 
@@ -521,6 +520,9 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
 
 CHIP_ERROR CommandHandler::TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus)
 {
+    // Return early when response should not be sent out.
+    VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
+
     ReturnErrorOnFailure(PrepareStatus(aCommandPath));
     CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
     StatusIB::Builder & statusIBBuilder      = commandStatus.CreateErrorStatus();
@@ -544,9 +546,6 @@ void CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const P
 CHIP_ERROR CommandHandler::FallibleAddStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::Status status,
                                              const char * context)
 {
-    // Return early when response should not be sent out.
-    VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
-
     if (status != Status::Success)
     {
         if (context == nullptr)
@@ -748,7 +747,7 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
     VerifyOrDie(!mGoneAsync);
-    VerifyOrDie(mpResponder != nullptr);
+    VerifyOrDie(mpResponder);
     return mpResponder->GetAccessingFabricIndex();
 }
 
@@ -796,7 +795,7 @@ CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessageAndPrepareNext()
         // definitively guaranteed.
         // Response dropping is not yet definitive as a subsequent call
         // to AllocateBuffer might succeed.
-        VerifyOrDie(mpResponder != nullptr);
+        VerifyOrDie(mpResponder);
         mpResponder->ResponseDropped();
     }
     return err;
@@ -817,17 +816,17 @@ CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessage(bool aHasMoreChunks)
     }
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     ReturnErrorOnFailure(mCommandMessageWriter.Finalize(&packet));
-    VerifyOrDie(mpResponder != nullptr);
+    VerifyOrDie(mpResponder);
     mpResponder->AddInvokeResponseToSend(std::move(packet));
     mBufferAllocated     = false;
     mRollbackBackupValid = false;
     return CHIP_NO_ERROR;
 }
 
-void CommandHandler::SetCommandResponder(CommandResponderInterface & commandResponder)
+void CommandHandler::SetCommandResponder(CommandResponderInterface * commandResponder)
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "CommandResponder can only be set in idle state");
-    mpResponder = &commandResponder;
+    mpResponder = commandResponder;
 }
 
 const char * CommandHandler::GetStateStr() const
@@ -907,7 +906,7 @@ void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandRespo
                                                                     NlFaultInjectionType faultType)
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH Failure: state should be Idle, issue with TH");
-    SetCommandResponder(commandResponder);
+    SetCommandResponder(&commandResponder);
 
     ChipLogProgress(DataManagement, "Response to InvokeRequestMessage overridden by fault injection");
     ChipLogProgress(DataManagement, "   Injecting the following response:%s", GetFaultInjectionTypeStr(faultType));

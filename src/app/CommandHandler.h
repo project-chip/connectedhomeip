@@ -192,15 +192,21 @@ public:
     CommandHandler(Callback * apCallback);
 
     /*
-     * Constructor to override number of supported paths per invoke and command responder.
+     * Constructor to override the number of supported paths per invoke and command responder.
      *
-     * The callback and any pointer passed via TestOnlyOverrides outlive this CommandHandler object.
+     * The callback and any pointers passed via TestOnlyOverrides must outlive this
+     * CommandHandler object.
+     *
      * For testing purposes.
      */
     CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apCallback);
 
     /*
      * Main entrypoint for this class to handle an InvokeRequestMessage.
+     *
+     * This function MAY call the registered OnDone callback before returning.
+     * To prevent immediate OnDone invocation, callers can wrap their CommandHandler instance
+     * within a CommandHandler::Handle.
      *
      * isTimedInvoke is true if and only if this is part of a Timed Invoke
      * transaction (i.e. was preceded by a Timed Request).  If we reach here,
@@ -410,7 +416,7 @@ public:
      * This function strictly validates the DUT's InvokeRequestMessage against the test plan.
      * If deviations occur, the TH terminates with a detailed error message.
      *
-     * @param ec Exchange context for sending InvokeResponseMessages to the client.
+     * @param commandResponder commandResponder that will send the InvokeResponseMessages to the client.
      * @param payload Payload of the incoming InvokeRequestMessage from the client.
      * @param isTimedInvoke Indicates whether the interaction is timed.
      * @param faultType The specific type of fault to inject into the response.
@@ -453,9 +459,6 @@ private:
     template <typename Function>
     CHIP_ERROR TryAddingResponse(Function && addResponseFunction)
     {
-        // Return early when response should not be sent out.
-        VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
-
         // Invalidate any existing rollback backups. The addResponseFunction is
         // expected to create a new backup during either PrepareInvokeResponseCommand
         // or PrepareStatus execution. Direct invocation of
@@ -649,7 +652,7 @@ private:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
-    void SetCommandResponder(CommandResponderInterface & commandResponder);
+    void SetCommandResponder(CommandResponderInterface * commandResponder);
 
     /**
      * Check whether the InvokeRequest we are handling is targeted to a group.
