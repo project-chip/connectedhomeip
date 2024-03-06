@@ -28,8 +28,8 @@
 
 #include "EventLoggingDelegate.h"
 #include <access/SubjectDescriptor.h>
+#include <app/EventLoggingTypes.h>
 #include <app/MessageDef/EventDataIB.h>
-#include <app/MessageDef/EventLoggingTypes.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/util/basic-types.h>
 #include <lib/core/TLVCircularBuffer.h>

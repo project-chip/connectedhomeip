@@ -21,7 +21,7 @@
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 #include <controller/java/CHIPEventTLVValueDecoder.h>
 #endif
-#include <app/MessageDef/EventLoggingTypes.h>
+#include <app/EventLoggingTypes.h>
 #include <jni.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPJNIError.h>

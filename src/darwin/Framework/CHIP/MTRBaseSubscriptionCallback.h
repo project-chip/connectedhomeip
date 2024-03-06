@@ -22,7 +22,7 @@
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/MessageDef/EventHeader.h>
+#include <app/EventHeader.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/ReadClient.h>
 #include <app/ReadPrepareParams.h>
