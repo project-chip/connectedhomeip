@@ -42,7 +42,7 @@ config("includes") {
   # TODO: generated file dependency should be a lib NOT an include
   include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
 
-  defines = [ "CHIP_HAVE_CONFIG_H=1", "FSL_RTOS_FREE_RTOS=1" ] #<< We need to add FSL_RTOS_FREE_RTOS to build using freertos using FSL.
+  defines = [ "CHIP_HAVE_CONFIG_H=1", "FSL_RTOS_FREE_RTOS=1", "MBEDTLS_CONFIG_FILE=\"mbedtls/rm_psa_crypto_cfg.h\"" ] #<< We need to add FSL_RTOS_FREE_RTOS to build using freertos using FSL.
 
   # Make __FILE__ and related macros relative to chip_root
   cflags = [ "-fmacro-prefix-map=${build_relative_chip_root}/=" ]

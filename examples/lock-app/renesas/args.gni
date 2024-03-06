@@ -48,6 +48,7 @@ chip_project_config_include_dirs =
     "//../../../../../../application_ICS2000/ra_gen/",
     "//../../../../../../common/common_ra_cfg/fsp_cfg/bsp/",
     "//../../../../../../common/common_ra_cfg/fsp_cfg/",
+    "//../../../../../../common/common_ra_cfg/arm/",
     "//../../../../../../common/common_peripherals/include/",
     "//../../../../../../common/lwip-port/",
     "//../../../../../../common/generic/",
