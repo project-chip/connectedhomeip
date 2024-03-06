@@ -48,12 +48,21 @@ tests:
           TH_LOG_OK_FULL_LENGTH)"
       PICS: MCORE.BDX.Initiator
       verification: |
-          "Repeating steps from 2 to 4 by setting Intent field to CrashLogs
+          diagnosticlogs retrieve-logs-request 0 1 1 0 --TransferFileDesignator Length_123456789123456789123.txt
 
-          diagnosticlogs retrieve-logs-request 2 1 1 0 --TransferFileDesignator Length_123456789123456789123.txt
+          On TH(chip-tool), Verify that the DUT sends SendInit message with TransferFileDesignator field set to Length_1234567891234567891
 
-          Note: crash_log  < 1024 Bytes  and DUT does not inittiate the BDX transfer
-          SendInitMsgfromDUT = false"
+          1707966626.594544][10635:10638] CHIP:ATM: SendInit
+          [1707966626.594550][10635:10638] CHIP:ATM:   Proposed Transfer Control: 0x10
+          [1707966626.594558][10635:10638] CHIP:ATM:   Range Control: 0x0
+          [1707966626.594563][10635:10638] CHIP:ATM:   Proposed Max Block Size: 1024
+          [1707966626.594569][10635:10638] CHIP:ATM:   Start Offset: 0x0000000000000000
+          [1707966626.594577][10635:10638] CHIP:ATM:   Proposed Max Length: 0x0000000000000000
+          [1707966626.594584][10635:10638] CHIP:ATM:   File Designator Length: 32
+          [1707966626.594588][10635:10638] CHIP:ATM:   File Designator: Length_123456789123456789123.txt
+
+          Note: end_user_support_log > 1024 bytes so that BDX inititation happens from DUT
+          SendInitMsgfromDUT = true
       disabled: true
 
     - label:
@@ -61,7 +70,26 @@ tests:
           message to DUT"
       PICS: MCORE.BDX.Initiator
       verification: |
-          "SendInitMsgfromDUT = false  this step is not applicable"
+          On chip-tool TH will send the SendAccept Message to the DUT
+
+          [1707894873.734698][34353:34356] CHIP:ATM: Sending BDX Message
+          [1707894873.734710][34353:34356] CHIP:ATM: SendAccept
+          [1707894873.734715][34353:34356] CHIP:ATM:   Transfer Control: 0x10
+          [1707894873.734720][34353:34356] CHIP:ATM:   Max Block Size: 1024
+          [1707894874.235405][34353:34356] CHIP:BDX: Got an event MsgToSend
+
+
+          On TH(chip-tool), verify that the DUT responds by sending RetrieveLogsResponse Command with Success(0) status code to TH after receiving the SendAccept Message 
+          1707894874.239127][34353:34356] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Command 0x0000_0001
+          [1707894874.239189][34353:34356] CHIP:TOO:   RetrieveLogsResponse: {
+          [1707894874.239208][34353:34356] CHIP:TOO:     status: 0
+          [1707894874.239219][34353:34356] CHIP:TOO:     logContent: 
+          [1707894874.239227][34353:34356] CHIP:TOO:    }
+
+          Check for the size of the file that was specified in the File Deginator field of the RetrieveLogsRequest Command sent to DUT and verify that the size is greater than 1024 bytes.
+          The file: Length_123456789123456789123.txt (as mentioned in the file designator field) is  transferred to  /tmp  folder on the build system and the size is  > 1024 bytes
+
+          Note: The file can be stored in any location on the build system. The current SDK imlemnetstion stores the log file transferred using BDX protocol in /tmp folder.
       disabled: true
 
     - label:
@@ -69,14 +97,7 @@ tests:
           SendAccept message to DUT"
       PICS: MCORE.BDX.Initiator
       verification: |
-          "On TH(chip-tool), verify that the DUT responds by sending RetrieveLogsResponse Command with Exhausted(1) status code to TH and LogContent field of RetrieveLogsResponse contains at most 1024 bytes
-
-          1707894938.009997][34371:34374] CHIP:TOO:   RetrieveLogsResponse: {
-          [1707894938.010025][34371:34374] CHIP:TOO:     status: 1
-          [1707894938.010057][34371:34374] CHIP:TOO:     logContent:  RetrieveLogsResponse: {
-          [1707967525.484222][10866:10869] CHIP:TOO:     status: 1
-          [1707967525.484229][10866:10869] CHIP:TOO:     logContent: 353535350A
-          [1707967525.484233][10866:10869] CHIP:TOO:    }"
+          As SendInitMsgfromDUT = true this step is not applicable
       disabled: true
 
     - label:
@@ -84,6 +105,80 @@ tests:
           NetworkDiag  and CrashLogs"
       verification: |
 
+      disabled: true
+
+    - label:
+          "Step 2a: TH sends RetrieveLogsRequest Command to DUT with
+          RequestedProtocol argument as BDX : RetrieveLogsRequest (Intent =
+          EndUserSupport, RequestedProtocol= BDX, TransferFileDesignator =
+          TH_LOG_OK_FULL_LENGTH)"
+      PICS: MCORE.BDX.Initiator
+      verification: |
+          Repeating steps from 2 to 4 by setting Intent field to NetworkDiag
+
+          diagnosticlogs retrieve-logs-request 1 1 1 0 --TransferFileDesignator Length_123456789123456789123.txt
+
+          Note: nw_log  does not exist and DUT does not initiate the BDX transfer
+          SendInitMsgfromDUT = false
+      disabled: true
+
+    - label:
+          "Step 3a: if (SendInitMsgfromDUT = true) TH Sends BDX SendAccept
+          message to DUT"
+      PICS: MCORE.BDX.Initiator
+      verification: |
+          SendInitMsgfromDUT = false  this step is not applicable
+      disabled: true
+
+    - label:
+          "Step 4a: if (SendInitMsgfromDUT = false) TH does not send BDX
+          SendAccept message to DUT"
+      PICS: MCORE.BDX.Initiator
+      verification: |
+          On TH(chip-tool), verify that the DUT responds by sending RetrieveLogsResponse Command with NoLogs(2) status code to TH and LogContent field is empty
+
+          [1707967219.637228][10723:10726] CHIP:TOO:   RetrieveLogsResponse: {
+          [1707967219.637242][10723:10726] CHIP:TOO:     status: 2
+          [1707967219.637248][10723:10726] CHIP:TOO:     logContent:
+          [1707967219.637253][10723:10726] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 2b: TH sends RetrieveLogsRequest Command to DUT with
+          RequestedProtocol argument as BDX : RetrieveLogsRequest (Intent =
+          EndUserSupport, RequestedProtocol= BDX, TransferFileDesignator =
+          TH_LOG_OK_FULL_LENGTH)"
+      PICS: MCORE.BDX.Initiator
+      verification: |
+          Repeating steps from 2 to 4 by setting Intent field to CrashLogs
+
+          diagnosticlogs retrieve-logs-request 2 1 1 0 --TransferFileDesignator Length_123456789123456789123.txt
+
+          Note: crash_log  < 1024 Bytes  and DUT does not inittiate the BDX transfer
+          SendInitMsgfromDUT = false
+      disabled: true
+
+    - label:
+          "Step 3b: if (SendInitMsgfromDUT = true) TH Sends BDX SendAccept
+          message to DUT"
+      PICS: MCORE.BDX.Initiator
+      verification: |
+          SendInitMsgfromDUT = false  this step is not applicable
+      disabled: true
+
+    - label:
+          "Step 4b: if (SendInitMsgfromDUT = false) TH does not send BDX
+          SendAccept message to DUT"
+      PICS: MCORE.BDX.Initiator
+      verification: |
+          On TH(chip-tool), verify that the DUT responds by sending RetrieveLogsResponse Command with Exhausted(1) status code to TH and LogContent field of RetrieveLogsResponse contains at most 1024 bytes
+
+          1707894938.009997][34371:34374] CHIP:TOO:   RetrieveLogsResponse: {
+          [1707894938.010025][34371:34374] CHIP:TOO:     status: 1
+          [1707894938.010057][34371:34374] CHIP:TOO:     logContent:  RetrieveLogsResponse: {
+          [1707967525.484222][10866:10869] CHIP:TOO:     status: 1
+          [1707967525.484229][10866:10869] CHIP:TOO:     logContent: 353535350A
+          [1707967525.484233][10866:10869] CHIP:TOO:    }
       disabled: true
 
     - label:
