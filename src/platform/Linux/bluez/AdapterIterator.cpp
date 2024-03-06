@@ -37,12 +37,6 @@ AdapterIterator::~AdapterIterator()
     {
         g_list_free_full(mObjectList, g_object_unref);
     }
-
-    if (mCurrent.adapter != nullptr)
-    {
-        g_object_unref(mCurrent.adapter);
-        mCurrent.adapter = nullptr;
-    }
 }
 
 CHIP_ERROR AdapterIterator::Initialize(AdapterIterator * self)
@@ -57,7 +51,7 @@ CHIP_ERROR AdapterIterator::Initialize(AdapterIterator * self)
     self->mManager = g_dbus_object_manager_client_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
         bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-        nullptr /*destroy notify */, nullptr /* cancellable */, &MakeUniquePointerReceiver(error).Get());
+        nullptr /* destroy notify */, nullptr /* cancellable */, &error.GetReceiver());
 
     VerifyOrExit(self->mManager != nullptr, ChipLogError(DeviceLayer, "Failed to get DBUS object manager for listing adapters.");
                  err = CHIP_ERROR_INTERNAL);
@@ -90,30 +84,7 @@ bool AdapterIterator::Advance()
             continue;
         }
 
-        // PATH is of the for  BLUEZ_PATH / hci<nr>, i.e. like
-        // '/org/bluez/hci0'
-        // Index represents the number after hci
-        const char * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter));
-        unsigned index    = 0;
-
-        if (sscanf(path, BLUEZ_PATH "/hci%u", &index) != 1)
-        {
-            ChipLogError(DeviceLayer, "Failed to extract HCI index from '%s'", StringOrNullMarker(path));
-            index = 0;
-        }
-
-        if (mCurrent.adapter != nullptr)
-        {
-            g_object_unref(mCurrent.adapter);
-            mCurrent.adapter = nullptr;
-        }
-
-        mCurrent.index   = index;
-        mCurrent.address = bluez_adapter1_get_address(adapter);
-        mCurrent.alias   = bluez_adapter1_get_alias(adapter);
-        mCurrent.name    = bluez_adapter1_get_name(adapter);
-        mCurrent.powered = bluez_adapter1_get_powered(adapter);
-        mCurrent.adapter = adapter;
+        mCurrentAdapter.reset(adapter);
 
         mCurrentListItem = mCurrentListItem->next;
 
@@ -121,6 +92,22 @@ bool AdapterIterator::Advance()
     }
 
     return false;
+}
+
+uint32_t AdapterIterator::GetIndex() const
+{
+    // PATH is of the for  BLUEZ_PATH / hci<nr>, i.e. like '/org/bluez/hci0'
+    // Index represents the number after hci
+    const char * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(mCurrentAdapter.get()));
+    unsigned index    = 0;
+
+    if (sscanf(path, BLUEZ_PATH "/hci%u", &index) != 1)
+    {
+        ChipLogError(DeviceLayer, "Failed to extract HCI index from '%s'", StringOrNullMarker(path));
+        index = 0;
+    }
+
+    return index;
 }
 
 bool AdapterIterator::Next()

@@ -92,9 +92,10 @@ public:
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
 
-    static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate);
-    static void NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate);
-    static void NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate);
+    static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess);
+    static void NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess);
+    static void NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess);
+    static void NotifyBLEPeripheralAdvReleased();
 
 private:
     // ===== Members that implement the BLEManager internal interface.

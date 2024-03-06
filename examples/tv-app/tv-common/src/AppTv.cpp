@@ -549,11 +549,16 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
             ChipLogProgress(DeviceLayer,
                             "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint priviledged vendor accessible clusters "
                             "being returned.");
-            return { chip::app::Clusters::Descriptor::Id,         chip::app::Clusters::OnOff::Id,
-                     chip::app::Clusters::WakeOnLan::Id,          chip::app::Clusters::MediaPlayback::Id,
-                     chip::app::Clusters::LowPower::Id,           chip::app::Clusters::KeypadInput::Id,
-                     chip::app::Clusters::ContentLauncher::Id,    chip::app::Clusters::AudioOutput::Id,
-                     chip::app::Clusters::ApplicationLauncher::Id };
+            return { chip::app::Clusters::Descriptor::Id,
+                     chip::app::Clusters::OnOff::Id,
+                     chip::app::Clusters::WakeOnLan::Id,
+                     chip::app::Clusters::MediaPlayback::Id,
+                     chip::app::Clusters::LowPower::Id,
+                     chip::app::Clusters::KeypadInput::Id,
+                     chip::app::Clusters::ContentLauncher::Id,
+                     chip::app::Clusters::AudioOutput::Id,
+                     chip::app::Clusters::ApplicationLauncher::Id,
+                     chip::app::Clusters::Messages::Id }; // TODO: messages?
         }
         ChipLogProgress(
             DeviceLayer,
@@ -561,7 +566,8 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
         return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
                  chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
                  chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
-                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id };
+                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id,
+                 chip::app::Clusters::Messages::Id };
     }
     return {};
 }

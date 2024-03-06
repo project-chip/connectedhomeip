@@ -34,7 +34,7 @@ namespace chip {
 namespace app {
 
 class CheckInDelegate;
-
+class InteractionModelEngine;
 /**
  * @brief RefreshKeySender contains all the data and methods needed for key refresh and re-registration of an ICD client.
  */
@@ -44,7 +44,7 @@ public:
     typedef Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> RefreshKeyBuffer;
 
     RefreshKeySender(CheckInDelegate * checkInDelegate, const ICDClientInfo & icdClientInfo, ICDClientStorage * icdClientStorage,
-                     const RefreshKeyBuffer & refreshKeyBuffer);
+                     InteractionModelEngine * engine, const RefreshKeyBuffer & refreshKeyBuffer);
 
     /**
      * @brief Sets up a CASE session to the peer for re-registering a client with the peer when a key refresh is required to avoid
@@ -82,9 +82,10 @@ private:
      */
     CHIP_ERROR RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
+    CheckInDelegate * mpCheckInDelegate = nullptr;
     ICDClientInfo mICDClientInfo;
     ICDClientStorage * mpICDClientStorage = nullptr;
-    CheckInDelegate * mpCheckInDelegate   = nullptr;
+    InteractionModelEngine * mpImEngine   = nullptr;
     RefreshKeyBuffer mNewKey;
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

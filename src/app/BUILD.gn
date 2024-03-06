@@ -43,6 +43,15 @@ declare_args() {
 
   enable_eventlist_attribute = false
 
+  # Allow building ota-requestor-app with a non-spec-compliant floor
+  # (i.e. smaller than 2 minutes) for action delays.
+  non_spec_compliant_ota_action_delay_floor = -1
+
+  # enable time sync client for use in `time-synchronization-server` (if linked)
+  # TODO: this should probably be migrated to be time-synchronization-server specific
+  #       if the cluster build targets are decoupled as stand-alone units.
+  time_sync_enable_tsc_feature = 1
+
   # Systems that can spare a bit of RAM for InteractionModelEngine/delegate
   # pointers should do so (allows InteractionModelEngine decoupling and less usage
   # of global pointers)
@@ -65,6 +74,8 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
     "CHIP_CONFIG_STATIC_GLOBAL_INTERACTION_MODEL_ENGINE=${chip_im_static_global_interaction_model_engine}",
+    "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}",
+    "NON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}",
   ]
 
   visibility = [ ":app_config" ]
@@ -74,14 +85,6 @@ source_set("app_config") {
   sources = [ "AppConfig.h" ]
 
   deps = [ ":app_buildconfig" ]
-}
-
-source_set("revision_info") {
-  sources = [
-    "DataModelRevision.h",
-    "InteractionModelRevision.h",
-    "SpecificationVersion.h",
-  ]
 }
 
 source_set("paths") {
@@ -130,6 +133,17 @@ config("config-controller-dynamic-server") {
   ]
 }
 
+source_set("constants") {
+  sources = [
+    "InteractionModelTimeout.h",
+    "SpecificationDefinedRevisions.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/system",
+  ]
+}
+
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
 # which in tern depens on the interaction-model.
 # Using source_set prevents the unit test to build correctly.
@@ -140,23 +154,34 @@ static_library("interaction-model") {
     "CASEClientPool.h",
     "CASESessionManager.cpp",
     "CASESessionManager.h",
+    "CommandSender.cpp",
+    "CommandSender.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "InteractionModelDelegatePointers.cpp",
     "InteractionModelDelegatePointers.h",
     "InteractionModelEngine.cpp",
     "InteractionModelEngine.h",
-    "InteractionModelTimeout.h",
+    "InteractionModelHelper.h",
     "OperationalSessionSetup.cpp",
     "OperationalSessionSetup.h",
     "OperationalSessionSetupPool.h",
-    "RequiredPrivilege.cpp",
+    "PendingResponseTracker.h",
+    "PendingResponseTrackerImpl.cpp",
+    "PendingResponseTrackerImpl.h",
+    "ReadClient.h",  # TODO: cpp is only included conditionally. Needs logic
+                     # fixing
+    "ReadPrepareParams.h",
     "RequiredPrivilege.h",
     "StatusResponse.cpp",
     "StatusResponse.h",
     "SubscriptionResumptionStorage.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
+    "TimedRequest.cpp",
+    "TimedRequest.h",
+    "WriteClient.cpp",
+    "WriteClient.h",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
     "reporting/ReportScheduler.h",
@@ -167,8 +192,11 @@ static_library("interaction-model") {
     "reporting/reporting.h",
   ]
 
+  deps = [ "${chip_root}/src/app:events" ]
+
   public_deps = [
     ":app_config",
+    ":constants",
     ":paths",
     ":subscription-manager",
     "${chip_root}/src/app/MessageDef",
@@ -183,6 +211,10 @@ static_library("interaction-model") {
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
+
+  if (chip_enable_read_client) {
+    sources += [ "ReadClient.cpp" ]
+  }
 
   if (chip_persist_subscriptions) {
     sources += [
@@ -212,6 +244,18 @@ static_library("interaction-model") {
   }
 }
 
+source_set("events") {
+  sources = [
+    "EventHeader.h",
+    "EventLoggingTypes.h",
+  ]
+
+  deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+  ]
+}
+
 # Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
 # This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
 static_library("app") {
@@ -219,6 +263,7 @@ static_library("app") {
 
   sources = [
     "AttributeAccessInterface.cpp",
+    "AttributeAccessInterfaceCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePersistenceProvider.h",
@@ -228,36 +273,28 @@ static_library("app") {
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
     "CommandResponseSender.h",
-    "CommandSender.cpp",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.h",
+    "EventLogging.h",
+    "EventLoggingDelegate.h",
     "EventManagement.cpp",
     "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "OTAUserConsentCommon.h",
-    "PendingResponseTracker.h",
-    "PendingResponseTrackerImpl.cpp",
-    "PendingResponseTrackerImpl.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
-    "TimedRequest.cpp",
-    "TimedRequest.h",
     "TimerDelegates.cpp",
     "TimerDelegates.h",
-    "WriteClient.cpp",
     "WriteHandler.cpp",
 
     # TODO: the following items cannot be included due to interaction-model circularity
     #       (app depending on im and im including these headers):
     #       Name with _ so that linter does not recognize it
     # "CommandHandler._h"
-    # "CommandSender._h",
-    # "ReadClient._h",
     # "ReadHandler._h",
-    # "WriteClient._h",
     # "WriteHandler._h"
 
     # TODO: the following items cannot be included due to platform includes not being
@@ -268,9 +305,9 @@ static_library("app") {
 
   public_deps = [
     ":app_config",
+    ":constants",
     ":global-attributes",
     ":interaction-model",
-    ":revision_info",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/lib/address_resolve",
@@ -286,10 +323,6 @@ static_library("app") {
       "BufferedReadCallback.h",
       "ClusterStateCache.cpp",
       "ClusterStateCache.h",
-      "ReadClient.cpp",
-
-      # TODO: cannot include "ReadClient._h" because interaction-model backreference
-      #       Name with _ so that linter does not recognize it
     ]
   }
 

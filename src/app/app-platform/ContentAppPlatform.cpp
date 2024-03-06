@@ -237,13 +237,12 @@ EndpointId ContentAppPlatform::RemoveContentApp(ContentApp * app)
         if (mContentApps[index] == app)
         {
             EndpointId curEndpoint = app->GetEndpointId();
-            EndpointId ep          = emberAfClearDynamicEndpoint(index);
-            mContentApps[index]    = nullptr;
-            ChipLogProgress(DeviceLayer, "Removed device %d from dynamic endpoint %d (index=%d)",
-                            app->GetApplicationBasicDelegate()->HandleGetVendorId(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
-            UNUSED_VAR(ep);
+            /*[[maybe_unused]]*/ EndpointId ep = emberAfClearDynamicEndpoint(index);
+            mContentApps[index]                = nullptr;
+            ChipLogProgress(DeviceLayer, "Removed device %d from dynamic endpoint %d (index=%d)",
+                            app->GetApplicationBasicDelegate()->HandleGetVendorId(), ep, index);
             if (curEndpoint == mCurrentAppEndpointId)
             {
                 mCurrentAppEndpointId = kNoCurrentEndpointId;
@@ -717,6 +716,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                 continue;
             }
 
+            bool accessAllowed = false;
             for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
             {
                 if (allowedVendor == targetVendorId)
@@ -733,6 +733,12 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                         .fabricIndex = kUndefinedFabricIndex,
                     });
                 }
+                accessAllowed = true;
+            }
+            if (accessAllowed)
+            {
+                // notify content app about this nodeId
+                app->AddClientNode(subjectNodeId);
             }
         }
     }

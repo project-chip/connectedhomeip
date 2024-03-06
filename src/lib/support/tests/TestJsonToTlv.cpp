@@ -151,6 +151,12 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                  "}\n";
     ConvertJsonToTlvAndValidate(byteSpan, jsonString);
 
+    // Empty bytes.
+    jsonString = "{\n"
+                 "   \"1:BYTES\" : \"\"\n"
+                 "}\n";
+    ConvertJsonToTlvAndValidate(ByteSpan{}, jsonString);
+
     DataModel::Nullable<uint8_t> nullValue;
     jsonString = "{\n"
                  "   \"1:NULL\" : null\n"
@@ -300,7 +306,7 @@ void Test32BitConvert(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
         NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(kImplicitProfileId, 0xFEDCBA98u)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag((4275878552 >> 16) & 0xFFFF, 0, 4275878552 & 0xFFFF)) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
         NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, value == 321);
@@ -310,6 +316,76 @@ void Test32BitConvert(nlTestSuite * inSuite, void * inContext)
     }
 
     // FIXME: implement
+}
+
+void TestMEIConvert(nlTestSuite * inSuite, void * inContext)
+{
+    TLV::TLVReader reader;
+    TLV::TLVType tlvType;
+    int32_t value = 0;
+
+    // Vendor ID = 1, Tag ID = 0
+    {
+        SetupWriters();
+        JsonToTlv("{\"65536:INT\": 321}", gWriter1);
+        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+
+        reader.Init(gBuf1, gWriter1.GetLengthWritten());
+        reader.ImplicitProfileId = kImplicitProfileId;
+
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
+        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(1, 0, 0)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
+        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, value == 321);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+    }
+
+    // Vendor ID = 0xFFFF, Tag ID = 0
+    {
+        SetupWriters();
+        JsonToTlv("{\"4294901760:INT\": 123}", gWriter1);
+        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+
+        reader.Init(gBuf1, gWriter1.GetLengthWritten());
+        reader.ImplicitProfileId = kImplicitProfileId;
+
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
+        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(0xFFFF, 0, 0)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
+        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, value == 123);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+    }
+
+    // Vendor ID = 0xFFFF, Tag ID = 0xFFFF
+    {
+        SetupWriters();
+        JsonToTlv("{\"4294967295:INT\": 123}", gWriter1);
+        NL_TEST_ASSERT(inSuite, gWriter1.Finalize() == CHIP_NO_ERROR);
+
+        reader.Init(gBuf1, gWriter1.GetLengthWritten());
+        reader.ImplicitProfileId = kImplicitProfileId;
+
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::AnonymousTag()) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_Structure);
+        NL_TEST_ASSERT(inSuite, reader.EnterContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next(TLV::ProfileTag(0xFFFF, 0, 0xFFFF)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.GetType() == TLV::kTLVType_SignedInteger);
+        NL_TEST_ASSERT(inSuite, reader.Get(value) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, value == 123);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+        NL_TEST_ASSERT(inSuite, reader.ExitContainer(tlvType) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_END_OF_TLV);
+    }
 }
 
 int Initialize(void * apSuite)
@@ -329,6 +405,7 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("TestConverter", TestConverter),
     NL_TEST_DEF("Test32BitConvert", Test32BitConvert),
+    NL_TEST_DEF("TestMEIConvert", TestMEIConvert),
     NL_TEST_SENTINEL()
 };
 // clang-format on

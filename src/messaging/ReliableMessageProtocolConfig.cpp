@@ -21,13 +21,12 @@
  *      for the CHIP Reliable Messaging Protocol.
  *
  */
-
 #include <messaging/ReliableMessageMgr.h>
 
+#include <app/icd/server/ICDServerConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
-
-#include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDConfigurationData.h> // nogncheck

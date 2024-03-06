@@ -132,19 +132,19 @@ esac
     )
 }
 
-[[ $CHIP_IS_ASAN == YES ]] && {
+[[ $CHIP_IS_ASAN == YES || $ENABLE_ADDRESS_SANITIZER == YES ]] && {
     args+=(
         'is_asan=true'
     )
 }
 
-[[ $CHIP_IS_UBSAN == YES ]] && {
+[[ $CHIP_IS_UBSAN == YES || $ENABLE_UNDEFINED_BEHAVIOR_SANITIZER == YES ]] && {
     args+=(
         'is_ubsan=true'
     )
 }
 
-[[ $CHIP_IS_TSAN == YES ]] && {
+[[ $CHIP_IS_TSAN == YES || $ENABLE_THREAD_SANITIZER == YES ]] && {
     args+=(
         'is_tsan=true'
         # The system stats stuff races on the stats in various ways,

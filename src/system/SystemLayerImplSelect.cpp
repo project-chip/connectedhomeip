@@ -255,6 +255,11 @@ bool LayerImplSelect::IsTimerActive(TimerCompleteCallback onComplete, void * app
     return timerIsActive;
 }
 
+Clock::Timeout LayerImplSelect::GetRemainingTime(TimerCompleteCallback onComplete, void * appState)
+{
+    return mTimerList.GetRemainingTime(onComplete, appState);
+}
+
 void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();

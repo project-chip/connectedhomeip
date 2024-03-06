@@ -34,9 +34,6 @@ config("config") {
 chip_data_model("tv-casting-common") {
   zap_file = "tv-casting-app.zap"
 
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/tv-casting-app/zap-generated"
-
   sources = [
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
     "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",
@@ -71,6 +68,7 @@ chip_data_model("tv-casting-common") {
     "include/MediaPlayback.h",
     "include/MediaReadBase.h",
     "include/MediaSubscriptionBase.h",
+    "include/Messages.h",
     "include/OnOff.h",
     "include/PersistenceManager.h",
     "include/TargetEndpointInfo.h",
@@ -86,6 +84,7 @@ chip_data_model("tv-casting-common") {
     "src/KeypadInput.cpp",
     "src/LevelControl.cpp",
     "src/MediaPlayback.cpp",
+    "src/Messages.cpp",
     "src/OnOff.cpp",
     "src/PersistenceManager.cpp",
     "src/TargetEndpointInfo.cpp",

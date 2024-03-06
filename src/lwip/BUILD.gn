@@ -226,7 +226,6 @@ if (current_os == "zephyr" || current_os == "mbed") {
 
       sources += [
         "${lwip_platform}/lwipopts-rs911x.h",
-        "${lwip_platform}/lwipopts-thread.h",
         "${lwip_platform}/lwipopts-wf200.h",
       ]
     } else if (lwip_platform == "standalone") {

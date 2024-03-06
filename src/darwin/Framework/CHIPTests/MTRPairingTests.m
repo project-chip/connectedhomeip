@@ -32,7 +32,7 @@
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
-static uint64_t sDeviceId = 0x12344321;
+static uint64_t sDeviceId = 100000000;
 static NSString * kOnboardingPayload = @"MT:Y.K90SO527JA0648G00";
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
@@ -82,6 +82,7 @@ static MTRTestKeys * sTestKeys = nil;
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @property (nonatomic, nullable) id<MTRDeviceAttestationDelegate> attestationDelegate;
 @property (nonatomic, nullable) NSNumber * failSafeExtension;
+@property (nullable) NSError * commissioningCompleteError;
 @end
 
 @implementation MTRPairingTestControllerDelegate
@@ -100,22 +101,22 @@ static MTRTestKeys * sTestKeys = nil;
 
 - (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
-    XCTAssertEqual(error.code, 0);
+    XCTAssertNil(error);
 
     __auto_type * params = [[MTRCommissioningParameters alloc] init];
     params.deviceAttestationDelegate = self.attestationDelegate;
     params.failSafeTimeout = self.failSafeExtension;
 
     NSError * commissionError = nil;
-    [controller commissionNodeWithID:@(sDeviceId) commissioningParams:params error:&commissionError];
-    XCTAssertNil(commissionError);
+    XCTAssertTrue([controller commissionNodeWithID:@(sDeviceId) commissioningParams:params error:&commissionError],
+        @"Failed to start commissioning for node ID %" PRIu64 ": %@", sDeviceId, commissionError);
 
     // Keep waiting for onCommissioningComplete
 }
 
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
 {
-    XCTAssertEqual(error.code, 0);
+    self.commissioningCompleteError = error;
     [_expectation fulfill];
     _expectation = nil;
 }
@@ -123,6 +124,7 @@ static MTRTestKeys * sTestKeys = nil;
 @end
 
 @interface MTRPairingTests : XCTestCase
+@property (nullable) MTRPairingTestControllerDelegate * controllerDelegate;
 @end
 
 @implementation MTRPairingTests
@@ -148,11 +150,9 @@ static MTRTestKeys * sTestKeys = nil;
 
 + (void)tearDown
 {
-    MTRDeviceController * controller = sController;
-    XCTAssertNotNil(controller);
-
-    [controller shutdown];
-    XCTAssertFalse([controller isRunning]);
+    [sController shutdown];
+    XCTAssertFalse([sController isRunning]);
+    sController = nil;
 
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
@@ -161,6 +161,12 @@ static MTRTestKeys * sTestKeys = nil;
 {
     [super setUp];
     [self setContinueAfterFailure:NO];
+}
+
+- (void)tearDown
+{
+    [sController setDeviceControllerDelegate:(id _Nonnull) nil queue:dispatch_get_main_queue()]; // TODO: do we need a clearDeviceControllerDelegate API?
+    self.controllerDelegate = nil;
 }
 
 // attestationDelegate and failSafeExtension can both be nil
@@ -176,6 +182,7 @@ static MTRTestKeys * sTestKeys = nil;
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 
     [sController setDeviceControllerDelegate:controllerDelegate queue:callbackQueue];
+    self.controllerDelegate = controllerDelegate;
 
     NSError * error;
     __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
@@ -186,6 +193,7 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertNil(error);
 
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNil(controllerDelegate.commissioningCompleteError);
 
     ResetCommissionee([MTRBaseDevice deviceWithNodeID:@(sDeviceId) controller:sController], dispatch_get_main_queue(), self,
         kTimeoutInSeconds);
@@ -230,6 +238,64 @@ static MTRTestKeys * sTestKeys = nil;
                              failSafeExtension:@(90)];
 
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)doPairingAndWaitForProgress:(NSString *)trigger
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Trigger message seen"];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if ([message containsString:trigger]) {
+            [expectation fulfill];
+        }
+    });
+
+    __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:nil
+                                                                                 attestationDelegate:nil
+                                                                                   failSafeExtension:nil];
+    [sController setDeviceControllerDelegate:controllerDelegate queue:dispatch_get_main_queue()];
+    self.controllerDelegate = controllerDelegate;
+
+    __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:NULL];
+    XCTAssertNotNil(payload);
+    NSError * error;
+    XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@(++sDeviceId) error:&error]);
+    XCTAssertNil(error);
+
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+    MTRSetLogCallback(0, nil);
+}
+
+- (void)doPairingTestAfterCancellationAtProgress:(NSString *)trigger
+{
+    // Run pairing up and wait for the trigger
+    [self doPairingAndWaitForProgress:trigger];
+
+    // Call StopPairing and wait for the commissioningComplete callback
+    XCTestExpectation * expectation = [self expectationWithDescription:@"commissioningComplete delegate method called"];
+    self.controllerDelegate.expectation = expectation;
+
+    NSError * error;
+    XCTAssertTrue([sController stopDevicePairing:sDeviceId error:&error], @"stopDevicePairing failed: %@", error);
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+
+    // Validate that the completion correctly indicated cancellation
+    error = self.controllerDelegate.commissioningCompleteError;
+    XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+    XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+
+    // Now pair again. If the previous attempt was cancelled correctly this should work fine.
+    [self doPairingTestWithAttestationDelegate:nil failSafeExtension:nil];
+}
+
+- (void)test005_pairingAfterCancellation_ReadCommissioningInfo
+{
+    // @"Sending read request for commissioning information"
+    [self doPairingTestAfterCancellationAtProgress:@"Performing next commissioning step 'ReadCommissioningInfo'"];
+}
+
+- (void)test006_pairingAfterCancellation_ConfigRegulatoryCommand
+{
+    [self doPairingTestAfterCancellationAtProgress:@"Performing next commissioning step 'ConfigRegulatory'"];
 }
 
 @end

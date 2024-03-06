@@ -186,15 +186,11 @@ Davis, CA 95616, USA
     </bitmap>
     <struct name="MessageResponseOptionStruct">
       <field id="0" name="MessageResponseID" type="uint32">
-        <mandatoryConform>
-          <feature name="RESP"/>
-        </mandatoryConform>
+        <mandatoryConform/>
         <constraint type="min" value="1"/>
       </field>
       <field id="1" name="Label" type="string">
-        <mandatoryConform>
-          <feature name="RPLY"/>
-        </mandatoryConform>
+        <mandatoryConform/>
         <constraint type="maxLength" value="32"/>
       </field>
     </struct>
@@ -216,7 +212,7 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="4" name="Duration" type="uint16" default="0">
+      <field id="4" name="Duration" type="uint64" default="0">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -268,18 +264,20 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="4" name="Duration" type="uint16" default="0">
+      <field id="4" name="Duration" type="uint64" default="0">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="5" name="MessageText" type="string">
         <mandatoryConform/>
+        <constraint type="maxLength" value="256"/>
       </field>
       <field id="6" name="Responses" type="list" default="empty">
         <entry type="MessageResponseOptionStruct"/>
         <mandatoryConform>
           <feature name="RESP"/>
         </mandatoryConform>
+        <constraint type="maxCount" value="4"/>
       </field>
     </command>
     <command id="0x01" name="CancelMessagesRequest" direction="commandToServer" response="Y">
@@ -288,6 +286,7 @@ Davis, CA 95616, USA
       <field id="0" name="MessageIDs" type="list">
         <entry type="MessageID"/>
         <mandatoryConform/>
+        <constraint type="maxCount" value="8"/>
       </field>
     </command>
   </commands>

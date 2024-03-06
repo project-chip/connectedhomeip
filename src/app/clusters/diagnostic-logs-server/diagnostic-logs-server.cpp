@@ -132,8 +132,6 @@ void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, c
     // INVALID_COMMAND.
     VerifyOrReturn(transferFileDesignator.HasValue(), commandObj->AddStatus(path, Status::InvalidCommand));
 
-    VerifyOrReturn(transferFileDesignator.Value().size() > 0, commandObj->AddStatus(path, Status::ConstraintError));
-
     VerifyOrReturn(transferFileDesignator.Value().size() <= kMaxFileDesignatorLen,
                    commandObj->AddStatus(path, Status::ConstraintError));
 

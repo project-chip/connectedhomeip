@@ -71,8 +71,9 @@ int main(void)
 
 void application_start(void * unused)
 {
-    if (SilabsMatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
-        appError(CHIP_ERROR_INTERNAL);
+    CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
+    if (err != CHIP_NO_ERROR)
+        appError(err);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -83,8 +84,9 @@ void application_start(void * unused)
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     SILABS_LOG("Starting App Task");
-    if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR)
-        appError(CHIP_ERROR_INTERNAL);
+    err = AppTask::GetAppTask().StartAppTask();
+    if (err != CHIP_NO_ERROR)
+        appError(err);
 
     vTaskDelete(main_Task);
 }
