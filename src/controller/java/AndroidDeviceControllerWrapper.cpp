@@ -216,7 +216,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     if (countryCode != nullptr)
     {
         JniUtfString countryCodeJniString(env, countryCode);
-        if(countryCodeJniString.size() != kCountryCodeBufferLen)
+        if (countryCodeJniString.size() != kCountryCodeBufferLen)
         {
             *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
             return nullptr;
