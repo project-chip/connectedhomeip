@@ -50,6 +50,8 @@
 
 constexpr uint8_t kUserActiveModeTriggerInstructionBufferLen =
     128 + 1; // 128bytes is max UserActiveModeTriggerInstruction size and 1 byte is for escape sequence.
+
+constexpr uint8_t kCountryCodeBufferLen = 2;
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
  * to handle all controller-related processing.
@@ -181,7 +183,7 @@ public:
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
                 jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure);
+                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, jstring countryCode, CHIP_ERROR * errInfoOnFailure);
 
     void Shutdown();
 
@@ -242,6 +244,8 @@ private:
     std::vector<uint8_t> mNocCertificate;
     std::vector<uint8_t> mIcacCertificate;
     std::vector<uint8_t> mRcacCertificate;
+
+    char mCountryCode[kCountryCodeBufferLen];
 
     chip::Controller::AutoCommissioner mAutoCommissioner;
 
