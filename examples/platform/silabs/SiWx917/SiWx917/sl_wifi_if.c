@@ -827,9 +827,11 @@ void wfx_rsi_task(void * arg)
 #ifdef SL_WFX_CONFIG_SOFTAP
         /* TODO */
         if (flags & WFX_EVT_AP_START)
-        {}
+        {
+        }
         if (flags & WFX_EVT_AP_STOP)
-        {}
+        {
+        }
 #endif /* SL_WFX_CONFIG_SOFTAP */
     }
 }
