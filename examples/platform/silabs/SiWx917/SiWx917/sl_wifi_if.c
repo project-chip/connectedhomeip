@@ -41,7 +41,7 @@
 
 #include "ble_config.h"
 
-#if SL_ICD_ENABLED && SIWX_917
+#if SL_ICD_ENABLED
 #include "rsi_rom_power_save.h"
 #include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_driver.h"
@@ -50,7 +50,7 @@
 // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
 #define BUTTON_PRESSED 1
 bool btn0_pressed = false;
-#endif // SL_ICD_ENABLED && SIWX_917
+#endif // SL_ICD_ENABLED
 
 #include "dhcp_client.h"
 #include "sl_wifi.h"
@@ -63,10 +63,8 @@ bool btn0_pressed = false;
 #define ADV_MULTIPROBE 1
 #define ADV_SCAN_PERIODICITY 10
 
-#ifdef SIWX_917
 #include "sl_si91x_trng.h"
 #define TRNGKEY_SIZE 4
-#endif // SIWX_917
 
 struct wfx_rsi wfx_rsi;
 
@@ -215,7 +213,6 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 
 #if SL_ICD_ENABLED
 
-#if SIWX_917
 /******************************************************************
  * @fn   sl_wfx_host_si91x_sleep_wakeup()
  * @brief
@@ -250,7 +247,6 @@ void sl_wfx_host_si91x_sleep_wakeup()
         }
     }
 }
-#endif /* SIWX_917 */
 
 /******************************************************************
  * @fn   wfx_rsi_power_save()
@@ -373,7 +369,7 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("sl_wifi_get_mac_address failed: %x", status);
         return status;
     }
-#ifdef SIWX_917
+
     const uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
 
     // To check the Entropy of TRNG and verify TRNG functioning.
@@ -391,7 +387,7 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("TRNG Key Programming Failed");
         return status;
     }
-#endif // SIWX_917
+
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
@@ -831,11 +827,9 @@ void wfx_rsi_task(void * arg)
 #ifdef SL_WFX_CONFIG_SOFTAP
         /* TODO */
         if (flags & WFX_EVT_AP_START)
-        {
-        }
+        {}
         if (flags & WFX_EVT_AP_STOP)
-        {
-        }
+        {}
 #endif /* SL_WFX_CONFIG_SOFTAP */
     }
 }
