@@ -69,7 +69,10 @@ object ChipClient {
           AndroidBleManager(context),
           PreferencesKeyValueStoreManager(context),
           PreferencesConfigurationManager(context),
-          NsdManagerServiceResolver(context),
+          NsdManagerServiceResolver(
+            context,
+            NsdManagerServiceResolver.NsdManagerResolverAvailState()
+          ),
           NsdManagerServiceBrowser(context),
           ChipMdnsCallbackImpl(),
           DiagnosticDataProviderImpl(context)

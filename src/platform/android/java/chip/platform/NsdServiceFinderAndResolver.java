@@ -101,13 +101,6 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
 
       if (stopDiscoveryRunnable.cancel(false)) {
         nsdManager.stopServiceDiscovery(this);
-        if (multicastLock.isHeld()) {
-          multicastLock.release();
-        }
-      }
-
-      if (nsdManagerResolverAvailState != null) {
-        nsdManagerResolverAvailState.acquireResolver();
       }
 
       resolveService(service, callbackHandle, contextHandle, chipMdnsCallback, timeoutRunnable);

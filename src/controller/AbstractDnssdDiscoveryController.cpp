@@ -35,7 +35,8 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
             continue;
         }
         if (strcmp(discoveredNode.resolutionData.hostName, nodeData.resolutionData.hostName) == 0 &&
-            discoveredNode.resolutionData.port == nodeData.resolutionData.port)
+            discoveredNode.resolutionData.port == nodeData.resolutionData.port &&
+            discoveredNode.resolutionData.ipAddress == nodeData.resolutionData.ipAddress)
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)

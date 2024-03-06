@@ -82,6 +82,10 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             + serviceType
             + "'");
 
+    if (nsdManagerResolverAvailState != null) {
+      nsdManagerResolverAvailState.acquireResolver();
+    }
+
     Runnable timeoutRunnable =
         new Runnable() {
           @Override
