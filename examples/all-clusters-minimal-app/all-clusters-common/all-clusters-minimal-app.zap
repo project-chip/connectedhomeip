@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 99,
+  "featureLevel": 100,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -7997,7 +7997,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -11823,7 +11823,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -12347,28 +12347,32 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     },
     {
       "endpointTypeName": "MA-onofflight",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     },
     {
       "endpointTypeName": "MA-onofflight",
       "endpointTypeIndex": 2,
       "profileId": 259,
       "endpointId": 2,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 3,
       "profileId": 259,
       "endpointId": 65534,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     }
   ]
 }

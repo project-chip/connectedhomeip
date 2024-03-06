@@ -21,7 +21,7 @@
 #include <Matter/MTRMetrics.h>
 
 @implementation MTRMetrics {
-    NSMutableDictionary<NSString *, id> * _metricsData;
+    NSMutableDictionary<NSString *, MTRMetricData *> * _metricsData;
 }
 
 - (instancetype)init
@@ -42,8 +42,7 @@
 {
     return [_metricsData allKeys];
 }
-
-- (nullable id)valueForKey:(NSString *)key
+- (nullable MTRMetricData *)metricDataForKey:(NSString *)key
 {
     if (!key) {
         MTR_LOG_ERROR("Cannot get metrics value for nil key");
@@ -53,7 +52,7 @@
     return _metricsData[key];
 }
 
-- (void)setValue:(id _Nullable)value forKey:(NSString *)key
+- (void)setMetricData:(MTRMetricData * _Nullable)value forKey:(NSString *)key
 {
     if (!key) {
         MTR_LOG_ERROR("Cannot set metrics value for nil key");
@@ -63,7 +62,7 @@
     [_metricsData setValue:value forKey:key];
 }
 
-- (void)removeValueForKey:(NSString *)key
+- (void)removeMetricDataForKey:(NSString *)key
 {
     if (!key) {
         MTR_LOG_ERROR("Cannot remove metrics value for nil key");

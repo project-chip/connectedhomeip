@@ -32,25 +32,9 @@
 // TODO: figure out a clear path for compile-time codegen
 #include <app/PluginApplicationCallbacks.h>
 
-#ifdef MATTER_DM_PLUGIN_GROUPS_SERVER
-#include <app/clusters/groups-server/groups-server.h>
-#endif // MATTER_DM_PLUGIN_GROUPS_SERVER
-
 using namespace chip;
 
 using chip::Protocols::InteractionModel::Status;
-
-// Is the device identifying?
-bool emberAfIsDeviceIdentifying(EndpointId endpoint)
-{
-#ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
-    uint16_t identifyTime;
-    Status status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
-    return (status == Status::Success && 0 < identifyTime);
-#else
-    return false;
-#endif
-}
 
 // Calculates difference. See EmberAfDifferenceType for the maximum data size
 // that this function will support.

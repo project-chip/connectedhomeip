@@ -33,8 +33,8 @@
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/att-storage.h>
 #include <app/util/af.h>
+#include <app/util/att-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
 

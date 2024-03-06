@@ -86,7 +86,7 @@ static_library("chip-tool-utils") {
     "commands/storage/StorageManagementCommand.cpp",
   ]
 
-  deps = [ "${chip_root}/src/app/MessageDef:events" ]
+  deps = [ "${chip_root}/src/app:events" ]
 
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.cpp" ]
