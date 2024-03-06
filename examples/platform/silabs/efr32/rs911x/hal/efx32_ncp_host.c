@@ -36,12 +36,14 @@
 #include "sl_power_manager.h"
 #endif
 
-#define USART_INITSYNC_BAUDRATE 12500000
+#include "sl_board_control.h"
+#include "sl_si91x_ncp_utility.h"
+#include "spi_multiplex.h"
 
 static bool dma_callback(unsigned int channel, unsigned int sequenceNo, void * userParam);
 
-unsigned int rx_ldma_channel;
-unsigned int tx_ldma_channel;
+uint32_t rx_ldma_channel;
+uint32_t tx_ldma_channel;
 osMutexId_t ncp_transfer_mutex = 0;
 
 static uint32_t dummy_buffer;
@@ -81,7 +83,7 @@ static void efx32_spi_init(void)
     USART_InitSync_TypeDef init = USART_INITSYNC_DEFAULT;
 
     init.msbf         = true; // MSB first transmission for SPI compatibility
-    init.autoCsEnable = true; // Allow the USART to assert CS
+    init.autoCsEnable = false;
     init.baudrate     = USART_INITSYNC_BAUDRATE;
 
     // Configure SPI bus pins
@@ -109,7 +111,7 @@ static void efx32_spi_init(void)
     // Enable USART interface pins
     GPIO->USARTROUTE[SPI_USART_ROUTE_INDEX].ROUTEEN = GPIO_USART_ROUTEEN_RXPEN | // MISO
         GPIO_USART_ROUTEEN_TXPEN |                                               // MOSI
-        GPIO_USART_ROUTEEN_CLKPEN | GPIO_USART_ROUTEEN_CSPEN;
+        GPIO_USART_ROUTEEN_CLKPEN;
 
     // Set slew rate for alternate usage pins
     GPIO_SlewrateSet(SPI_CLOCK_PIN.port, 7, 7);
@@ -117,7 +119,7 @@ static void efx32_spi_init(void)
     // Configure and enable USART
     USART_InitSync(SPI_USART, &init);
 
-    SPI_USART->TIMING |= /*USART_TIMING_TXDELAY_ONE | USART_TIMING_CSSETUP_ONE |*/ USART_TIMING_CSHOLD_ONE;
+    SPI_USART->TIMING |= USART_TIMING_TXDELAY_ONE | USART_TIMING_CSSETUP_ONE | USART_TIMING_CSHOLD_ONE;
 
     // SPI_USART->CTRL_SET |= USART_CTRL_SMSDELAY;
 
@@ -145,6 +147,14 @@ uint32_t sl_si91x_host_get_wake_indicator(void)
 
 sl_status_t sl_si91x_host_init(sl_si91x_host_init_configuration * config)
 {
+#if SL_SPICTRL_MUX
+    sl_status_t status = sl_board_disable_display();
+    if (SL_STATUS_OK != status)
+    {
+        SILABS_LOG("sl_board_disable_display failed with error: %x", status);
+        return status;
+    }
+#endif // SL_SPICTRL_MUX
     init_config.rx_irq  = config->rx_irq;
     init_config.rx_done = config->rx_done;
 
@@ -175,8 +185,8 @@ sl_status_t sl_si91x_host_init(sl_si91x_host_init_configuration * config)
     GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, 0);
 
     DMADRV_Init();
-    DMADRV_AllocateChannel(&rx_ldma_channel, NULL);
-    DMADRV_AllocateChannel(&tx_ldma_channel, NULL);
+    DMADRV_AllocateChannel((unsigned int *) &rx_ldma_channel, NULL);
+    DMADRV_AllocateChannel((unsigned int *) &tx_ldma_channel, NULL);
 
     return SL_STATUS_OK;
 }

@@ -16,14 +16,17 @@ types in the SDK.
     -   XML
     -   Describes the structures, enums, attributes, commands, events etc.
     -   Direct translation of the spec into code
-    -   src/app/zap-templates/zcl/data-model/chip/
+    -   [src/app/zap-templates/zcl/data-model/chip/](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/data-model/chip)
 -   Cluster Implementation
 
     -   Client side - codegen, you write the glue
     -   Server side - cpp implementation through Ember and / or
-        AttributeAccessInterface & CommandHandlerInterface
+        [AttributeAccessInterface](https://github.com/project-chip/connectedhomeip/blob/master/src/app/AttributeAccessInterface.h)
+        and
+        [CommandHandlerInterface](https://github.com/project-chip/connectedhomeip/blob/master/src/app/CommandHandlerInterface.h)
         -   src/app/clusters/<your_cluster_name>
-        -   build file: src/app/chip_data_model.gni
+        -   build file:
+            [src/app/chip_data_model.gni](https://github.com/project-chip/connectedhomeip/blob/master/src/app/chip_data_model.gni)
         -   build file uses data from the codegen to auto-populate the cluster
             list.
         -   Follow examples in there to get your code building into the image
@@ -31,7 +34,7 @@ types in the SDK.
 
 -   Device Type Definitions
     -   XML defines conformance
-    -   src/app/zap-templates/zcl/data-model/chip/matter-devices.xml
+    -   [src/app/zap-templates/zcl/data-model/chip/matter-devices.xml](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap-templates/zcl/data-model/chip/matter-devices.xml)
 
 The following wiki page has a detailed description of how and where to add
 cluster and device type definitions so they are picked up properly by ZAP/ember
@@ -208,7 +211,7 @@ be used across examples
 
 ##### Command Handler Code
 
--   CommandHandlerInterface
+-   [CommandHandlerInterface](https://github.com/project-chip/connectedhomeip/blob/master/src/app/CommandHandlerInterface.h)
     -   Can use HandleCommand function for convenience (sets handled)
     -   If not, need to set whether the command was handled
         -   if no, falls through to ember by default
@@ -238,7 +241,9 @@ pure CommandHandlerInterface implementations.
         -   **MatterReportingAttributeChangeCallback**
 -   **Events**
     -   No direct ember support
-    -   Call LogEvent function in EventLogging.h
+    -   Call LogEvent function in EventLogging.h. Caller has to either lock the
+        Matter stack lock or queue the event to the Matter event queue when
+        using LogEvent.
 
 #### A note on Dynamic Endpoints
 

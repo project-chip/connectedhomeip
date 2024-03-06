@@ -18,8 +18,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("temperature-measurement-common") {
   zap_file = "temperature-measurement.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/temperature-measurement/zap-generated"
   is_server = true
 }
