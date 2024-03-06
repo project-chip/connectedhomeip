@@ -62,27 +62,27 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                              "Accuracy measurementType must be ElectricalEnergy")
 
         self.step("3")
-        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.A0001")):
+        if self.pics_guard(self.check_pics("EEM.S.A0001")):
             cumulativeEnergyImported = await self.read_eem_attribute_expect_success("CumulativeEnergyImported")
             logger.info(f"Rx'd CumulativeEnergyImported: {cumulativeEnergyImported}")
 
         self.step("4")
-        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.A0002")):
+        if self.pics_guard(self.check_pics("EEM.S.A0002")):
             cumulativeEnergyExported = await self.read_eem_attribute_expect_success("CumulativeEnergyExported")
             logger.info(f"Rx'd CumulativeEnergyExported: {cumulativeEnergyExported}")
 
         self.step("5")
-        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.A0003")):
+        if self.pics_guard(self.check_pics("EEM.S.A0003")):
             periodicEnergyImported = await self.read_eem_attribute_expect_success("PeriodicEnergyImported")
             logger.info(f"Rx'd PeriodicEnergyImported: {periodicEnergyImported}")
 
         self.step("6")
-        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.A0004")):
+        if self.pics_guard(self.check_pics("EEM.S.A0004")):
             periodicEnergyExported = await self.read_eem_attribute_expect_success("PeriodicEnergyExported")
             logger.info(f"Rx'd PeriodicEnergyExported: {periodicEnergyExported}")
 
         self.step("7")
-        if self.pics_guard(self.check_pics(f"{self.test_info.pics_code}.S.A0005")):
+        if self.pics_guard(self.check_pics("EEM.S.A0005")):
             cumulativeEnergyReset = await self.read_eem_attribute_expect_success("CumulativeEnergyReset")
             logger.info(f"Rx'd CumulativeEnergyReset: {cumulativeEnergyReset}")
 
