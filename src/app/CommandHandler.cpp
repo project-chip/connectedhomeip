@@ -43,12 +43,9 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
-CommandHandler::CommandHandler(Callback * apCallback) :
-    mpCallback(apCallback), mSuppressResponse(false)
-{}
+CommandHandler::CommandHandler(Callback * apCallback) : mpCallback(apCallback), mSuppressResponse(false) {}
 
-CommandHandler::CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apCallback) :
-    CommandHandler(apCallback)
+CommandHandler::CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apCallback) : CommandHandler(apCallback)
 {
     if (aTestOverride.commandPathRegistry)
     {
@@ -102,8 +99,8 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-Status CommandHandler::OnInvokeCommandRequest(CommandResponderInterface & commandResponder,
-                                              System::PacketBufferHandle && payload, bool isTimedInvoke)
+Status CommandHandler::OnInvokeCommandRequest(CommandResponderInterface & commandResponder, System::PacketBufferHandle && payload,
+                                              bool isTimedInvoke)
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "state should be Idle");
 
@@ -113,7 +110,7 @@ Status CommandHandler::OnInvokeCommandRequest(CommandResponderInterface & comman
     Handle workHandle(this);
 
     Status status = ProcessInvokeRequest(std::move(payload), isTimedInvoke);
-    mGoneAsync = true;
+    mGoneAsync    = true;
     return status;
 }
 

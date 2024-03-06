@@ -23,8 +23,8 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
-CHIP_ERROR CommandResponder::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
-                                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR CommandResponder::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                               System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Status> failureStatusToSend;
@@ -39,7 +39,7 @@ CHIP_ERROR CommandResponder::OnMessageReceived(Messaging::ExchangeContext * apEx
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::InvalidAction));
 
         err = SendCommandResponse();
-        // If SendCommandResponse() fails, we must still close the exchange. Since sending an 
+        // If SendCommandResponse() fails, we must still close the exchange. Since sending an
         // InvokeResponseMessage seems problematic, we'll send a StatusResponse with 'Failure'
         // instead.
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::Failure));
@@ -173,8 +173,8 @@ void CommandResponder::Close()
     mpCallback->OnDone(*this);
 }
 
-void CommandResponder::OnInvokeCommandRequest(Messaging::ExchangeContext * ec,
-                                                   System::PacketBufferHandle && payload, bool isTimedInvoke)
+void CommandResponder::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
+                                              bool isTimedInvoke)
 {
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement, "state should be ReadyForInvokeResponses");
@@ -198,15 +198,15 @@ void CommandResponder::OnInvokeCommandRequest(Messaging::ExchangeContext * ec,
     }
 }
 
-
 #if CHIP_WITH_NLFAULTINJECTION
 
 void CommandResponder::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
-                                                                    System::PacketBufferHandle && payload, bool isTimedInvoke,
-                                                                    CommandHandler::NlFaultInjectionType faultType)
+                                                                      System::PacketBufferHandle && payload, bool isTimedInvoke,
+                                                                      CommandHandler::NlFaultInjectionType faultType)
 {
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
-    VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement, "TH Failure: state should be ReadyForInvokeResponses, issue with TH");
+    VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement,
+                       "TH Failure: state should be ReadyForInvokeResponses, issue with TH");
 
     mExchangeCtx.Grab(ec);
     mExchangeCtx->WillSendMessage();
@@ -214,7 +214,6 @@ void CommandResponder::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging:
     mCommandHandler.TestOnlyInvokeCommandRequestWithFaultsInjected(*this, std::move(payload), isTimedInvoke, faultType);
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
-
 
 } // namespace app
 } // namespace chip

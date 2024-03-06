@@ -33,9 +33,7 @@ namespace app {
  * InvokeRequestCommand. The CommandHandler is provided a reference to this
  * CommandResponderInterface implementation to enable sending InvokeResponseMessage(s).
  */
-class CommandResponder : public Messaging::ExchangeDelegate,
-                         public CommandHandler::Callback,
-                         public CommandResponderInterface
+class CommandResponder : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public CommandResponderInterface
 {
 public:
     class Callback
@@ -49,7 +47,9 @@ public:
         virtual void OnDone(CommandResponder & apResponderObj) = 0;
     };
 
-    CommandResponder(Callback * apCallback, CommandHandler::Callback * apDispatchCallback) : mpCallback(apCallback), mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this) {}
+    CommandResponder(Callback * apCallback, CommandHandler::Callback * apDispatchCallback) :
+        mpCallback(apCallback), mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this)
+    {}
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
@@ -61,7 +61,7 @@ public:
         if (mDelayCallingCloseUntilOnDone)
         {
             // We have already sent a message to the client indicating that we are not expecting
-            //a response.
+            // a response.
             Close();
             return;
         }
@@ -153,8 +153,7 @@ public:
      * transaction (i.e. was preceded by a Timed Request).  If we reach here,
      * the timer verification has already been done.
      */
-    void OnInvokeCommandRequest(Messaging::ExchangeContext * ec,
-                                System::PacketBufferHandle && payload, bool isTimedInvoke);
+    void OnInvokeCommandRequest(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload, bool isTimedInvoke);
 
 #if CHIP_WITH_NLFAULTINJECTION
     /**

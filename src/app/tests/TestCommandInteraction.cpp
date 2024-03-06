@@ -85,7 +85,7 @@ constexpr CommandId kTestCommandIdCommandSpecificResponse = 6;
 constexpr CommandId kTestCommandIdFillResponseMessage     = 7;
 constexpr CommandId kTestNonExistCommandId                = 0;
 
-//const app::CommandHandler::TestOnlyMarker kCommandHandlerTestOnlyMarker;
+// const app::CommandHandler::TestOnlyMarker kCommandHandlerTestOnlyMarker;
 const app::CommandSender::TestOnlyMarker kCommandSenderTestOnlyMarker;
 } // namespace
 
@@ -295,10 +295,7 @@ public:
     bool IsForGroup() const override { return false; }
     GroupId GetGroupId() const override { return kUndefinedGroupId; }
 
-    void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket) override
-    {
-        mChunks.AddToEnd(std::move(aPacket));
-    }
+    void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket) override { mChunks.AddToEnd(std::move(aPacket)); }
     void ResponseDropped() override { mResponseDropped = true; }
 
     System::PacketBufferHandle mChunks;
@@ -318,10 +315,7 @@ public:
         return ServerClusterCommandExists(aCommandPath);
     }
 
-    void Reset()
-    {
-        onFinalCalledTimes = 0;
-    }
+    void ResetCount() { onFinalCalledTimes = 0; }
 
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;
@@ -401,6 +395,7 @@ private:
             GetCommandPathRegistry().Add(aRequestCommandPath, aRef);
             SetCommandResponder(mMockCommandResponder);
         }
+
     private:
         MockCommandResponder mMockCommandResponder;
     };
@@ -634,7 +629,7 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSui
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides {&basicCommandPathRegistry, &mockCommandResponder};
+    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
     CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
@@ -842,7 +837,7 @@ void TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMs
 void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(nlTestSuite * apSuite, void * apContext,
                                                                                bool aNeedStatusCode)
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
     CommandHandlerWithOutstandingCommand commandHandler(&mockCommandHandlerDelegate, requestCommandPath,
                                                         /* aRef = */ NullOptional);
@@ -1285,7 +1280,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistComman
     CommandHandler commandHandler(&mockCommandHandlerDelegate);
     chip::isCommandDispatched = false;
 
-    mockCommandHandlerDelegate.Reset();
+    mockCommandHandlerDelegate.ResetCount();
     MockCommandResponder mockCommandResponder;
     InteractionModel::Status status = commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), false);
 
@@ -1301,14 +1296,15 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
     {
         for (auto transactionIsTimed : allBooleans)
         {
-            mockCommandHandlerDelegate.Reset();
+            mockCommandHandlerDelegate.ResetCount();
             CommandHandler commandHandler(&mockCommandHandlerDelegate);
             System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, messageIsTimed, kTestCommandIdNoData);
             MockCommandResponder mockCommandResponder;
-            Protocols::InteractionModel::Status status = commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), transactionIsTimed);
+            Protocols::InteractionModel::Status status =
+                commandHandler.OnInvokeCommandRequest(mockCommandResponder, std::move(commandDatabuf), transactionIsTimed);
 
             if (messageIsTimed != transactionIsTimed)
             {
@@ -1733,7 +1729,7 @@ void TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenti
 
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides {&basicCommandPathRegistry, &mockCommandResponder};
+    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
     CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
@@ -1741,7 +1737,7 @@ void TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenti
     err = commandSender.Finalize(commandDatabuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    mockCommandHandlerDelegate.Reset();
+    mockCommandHandlerDelegate.ResetCount();
     commandDispatchedCount = 0;
 
     InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
@@ -1796,7 +1792,7 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandler
     err = commandSender.Finalize(commandDatabuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    mockCommandHandlerDelegate.Reset();
+    mockCommandHandlerDelegate.ResetCount();
     sendResponse           = true;
     commandDispatchedCount = 0;
 
@@ -1851,7 +1847,7 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
 
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides {&basicCommandPathRegistry, &mockCommandResponder};
+    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
     CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
@@ -1860,7 +1856,7 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     sendResponse = true;
-    mockCommandHandlerDelegate.Reset();
+    mockCommandHandlerDelegate.ResetCount();
     commandDispatchedCount = 0;
 
     InteractionModel::Status status = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
@@ -1874,7 +1870,7 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides {&basicCommandPathRegistry, &mockCommandResponder};
+    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
     CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
 
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
@@ -1903,7 +1899,7 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides {&basicCommandPathRegistry, &mockCommandResponder};
+    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
     CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
 
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
@@ -1932,7 +1928,7 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
 {
     BasicCommandPathRegistry<4> basicCommandPathRegistry;
     MockCommandResponder mockCommandResponder;
-    CommandHandler::TestOnlyOverrides testOnlyOverrides {&basicCommandPathRegistry, &mockCommandResponder};
+    CommandHandler::TestOnlyOverrides testOnlyOverrides{ &basicCommandPathRegistry, &mockCommandResponder };
     CommandHandler commandHandler(testOnlyOverrides, &mockCommandHandlerDelegate);
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };

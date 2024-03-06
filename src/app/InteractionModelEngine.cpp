@@ -417,7 +417,7 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
                                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                                       bool aIsTimedInvoke)
 {
-    //CommandHandler * commandHandler = mCommandResponderObjs.CreateObject(this);
+    // CommandHandler * commandHandler = mCommandResponderObjs.CreateObject(this);
     CommandResponder * commandResponder = mCommandResponderObjs.CreateObject(this, this);
     if (commandResponder == nullptr)
     {
@@ -437,7 +437,7 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
     CHIP_FAULT_INJECT(
         FaultInjection::kFault_IMInvoke_SkipSecondResponse,
         commandResponder->TestOnlyInvokeCommandRequestWithFaultsInjected(apExchangeContext, std::move(aPayload), aIsTimedInvoke,
-                                                                       CommandHandler::NlFaultInjectionType::SkipSecondResponse);
+                                                                         CommandHandler::NlFaultInjectionType::SkipSecondResponse);
         return Status::Success;);
     commandResponder->OnInvokeCommandRequest(apExchangeContext, std::move(aPayload), aIsTimedInvoke);
     return Status::Success;

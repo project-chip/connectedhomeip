@@ -180,7 +180,7 @@ public:
     class TestOnlyOverrides
     {
     public:
-        CommandPathRegistry * commandPathRegistry = nullptr;
+        CommandPathRegistry * commandPathRegistry    = nullptr;
         CommandResponderInterface * commandResponder = nullptr;
     };
 
@@ -205,12 +205,11 @@ public:
      * isTimedInvoke is true if and only if this is part of a Timed Invoke
      * transaction (i.e. was preceded by a Timed Request).  If we reach here,
      * the timer verification has already been done.
-     * 
+     *
      * commandResponder handles sending InvokeResponses, added by clusters, to the client.
      */
-    Protocols::InteractionModel::Status OnInvokeCommandRequest(
-        CommandResponderInterface & commandResponder, System::PacketBufferHandle && payload,
-        bool isTimedInvoke);
+    Protocols::InteractionModel::Status OnInvokeCommandRequest(CommandResponderInterface & commandResponder,
+                                                               System::PacketBufferHandle && payload, bool isTimedInvoke);
 
     /**
      * Checks that all CommandDataIB within InvokeRequests satisfy the spec's general
@@ -418,8 +417,9 @@ public:
      */
     // TODO(#30453): After refactoring CommandHandler for better unit testability, create a
     // unit test specifically for the fault injection behavior.
-    void TestOnlyInvokeCommandRequestWithFaultsInjected(CommandResponderInterface & commandResponder, System::PacketBufferHandle && payload,
-                                                        bool isTimedInvoke, NlFaultInjectionType faultType);
+    void TestOnlyInvokeCommandRequestWithFaultsInjected(CommandResponderInterface & commandResponder,
+                                                        System::PacketBufferHandle && payload, bool isTimedInvoke,
+                                                        NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
 
 private:
@@ -487,7 +487,6 @@ private:
         }
         return err;
     }
-
 
     void MoveToState(const State aTargetState);
     const char * GetStateStr() const;

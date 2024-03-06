@@ -36,17 +36,17 @@ public:
 
     /* ExchangeContext related getter methods */
     virtual Messaging::ExchangeContext * GetExchangeContext() const = 0;
-    virtual Access::SubjectDescriptor GetSubjectDescriptor() const = 0;
-    virtual FabricIndex GetAccessingFabricIndex() const = 0;
-    virtual bool IsForGroup() const = 0;
-    virtual GroupId GetGroupId() const = 0;
+    virtual Access::SubjectDescriptor GetSubjectDescriptor() const  = 0;
+    virtual FabricIndex GetAccessingFabricIndex() const             = 0;
+    virtual bool IsForGroup() const                                 = 0;
+    virtual GroupId GetGroupId() const                              = 0;
 
     /* Exchange methods that CommandHandler's may need to perform while processing request */
     virtual void FlushAcksRightNow() = 0;
 
     /* CommandResponder core methods */
     virtual void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket) = 0;
-    virtual void ResponseDropped() = 0;
+    virtual void ResponseDropped()                                              = 0;
 };
 
 } // namespace app
