@@ -37,7 +37,7 @@ static_library("chip-lock-app")
     "${chip_root}/examples/lock-app/lock-common",
     "//third_party/connectedhomeip/src/credentials:credentials"
   ]
-  libs = ["lib", "access", "credentials"]
+  libs = ["lib", "access", "credentials", "lock-common"]
 }
 
 group("renesas") {
