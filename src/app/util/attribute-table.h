@@ -64,4 +64,4 @@ chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(chip::Endpo
 chip::Protocols::InteractionModel::Status
 emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
                    EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType,
-                   chip::app::MarkAttributeDirty markDirty = chip::app::MarkAttributeDirty::IfChanged);
+                   chip::app::MarkAttributeDirty markDirty = chip::app::MarkAttributeDirty::kIfChanged);

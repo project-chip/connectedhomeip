@@ -17,11 +17,6 @@
 namespace chip {
 namespace app {
 
-enum class MarkAttributeDirty {
-    IfChanged,
-    No,
-};
-
 namespace Clusters {
 
 {{#zcl_clusters}}

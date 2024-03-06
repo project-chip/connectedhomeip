@@ -102,6 +102,55 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
     return false;
 }
 
+namespace {
+/**
+ * Helper function to determine whether the attribute value for the given
+ * attribute is changing.  On success, the isChanging outparam will be set to
+ * whether the value is changing.
+ */
+Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * newValueData,
+                                EmberAfAttributeType dataType, bool * isChanging)
+{
+    size_t valueSize = AttributeTypeSize(dataType);
+
+    constexpr size_t maxValueSize = 16; // ipv6adr
+    if (valueSize > maxValueSize)
+    {
+        // Very much unexpected
+        ChipLogError(Zcl, "Attribute type %d has too-large size %u", dataType, static_cast<unsigned>(valueSize));
+        return Status::ConstraintError;
+    }
+
+    // valueSize will be 0 when we have no size information for dataType.
+    // In that case, we can't usefully read the current value, since we
+    // don't know how big it is.
+    if (valueSize == 0)
+    {
+        // To be safe, claim changing.
+        *isChanging = true;
+        return Status::Success;
+    }
+
+    uint8_t oldValueBuffer[maxValueSize];
+    // Cast to uint16_t is safe, because we checked valueSize <= maxValueSize above.
+    if (emberAfReadAttribute(endpoint, cluster, attributeID, oldValueBuffer, static_cast<uint16_t>(valueSize)) == Status::Success)
+    {
+        if (memcmp(newValueData, oldValueBuffer, valueSize) == 0)
+        {
+            // Value has not changed.
+            *isChanging = false;
+            return Status::Success;
+        }
+    }
+
+    // We failed to read the old value, or the value is changing.  Either way,
+    // flag the value as changing to be safe.
+    *isChanging = true;
+    return Status::Success;
+}
+
+} // anonymous namespace
+
 Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
                           EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty)
 {
@@ -182,40 +231,24 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
     }
 
     // Check whether anything is actually changing, before we do any work here.
-    size_t valueSize = AttributeTypeSize(dataType);
-
-    constexpr size_t maxValueSize = 16; // ipv6adr
-    if (valueSize > maxValueSize)
+    bool valueChanging;
+    Status imStatus = AttributeValueIsChanging(endpoint, cluster, attributeID, data, dataType, &valueChanging);
+    if (imStatus != Status::Success)
     {
-        // Very much unexpected
-        ChipLogError(Zcl, "Attribute type %d has too-large size %u", dataType, static_cast<unsigned>(valueSize));
-        return Status::ConstraintError;
+        return imStatus;
     }
 
-    // valueSize will be 0 when we have no size information for dataType.
-    // In that case, we can't usefully read the current value, since we
-    // don't know how big it is.
-    if (valueSize != 0)
+    if (!valueChanging)
     {
-        uint8_t oldValueBuffer[maxValueSize];
-        // Cast to uint16_t is safe, because we checked valueSize <= maxValueSize above.
-        if (emberAfReadAttribute(endpoint, cluster, attributeID, oldValueBuffer, static_cast<uint16_t>(valueSize)) ==
-            Status::Success)
-        {
-            if (memcmp(data, oldValueBuffer, valueSize) == 0)
-            {
-                // Value has not changed.  Just do nothing.
-                return Status::Success;
-            }
-        }
+        // Just do nothing.
+        return Status::Success;
     }
 
     const app::ConcreteAttributePath attributePath(endpoint, cluster, attributeID);
 
     // Pre write attribute callback for all attribute changes,
     // regardless of cluster.
-    Protocols::InteractionModel::Status imStatus =
-        MatterPreAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+    imStatus = MatterPreAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
     if (imStatus != Protocols::InteractionModel::Status::Success)
     {
         return imStatus;
@@ -252,7 +285,7 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
     // The callee will weed out attributes that do not need to be stored.
     emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
 
-    if (markDirty != MarkAttributeDirty::No)
+    if (markDirty != MarkAttributeDirty::kNo)
     {
         MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
     }

@@ -117,7 +117,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEn
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 {{#if isNullable}}
@@ -137,7 +137,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
@@ -151,7 +151,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEn
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 {{/if}}
 

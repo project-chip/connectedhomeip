@@ -34,12 +34,6 @@
 namespace chip {
 namespace app {
 
-enum class MarkAttributeDirty
-{
-    IfChanged,
-    No,
-};
-
 namespace Clusters {
 
 namespace Identify {

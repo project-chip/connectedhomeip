@@ -71,7 +71,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace IdentifyTime
@@ -109,7 +109,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace IdentifyType
@@ -146,7 +146,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -183,7 +183,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -229,7 +229,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Groups::NameSu
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NameSupport
@@ -266,7 +266,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -303,7 +303,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -346,7 +346,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnOff
@@ -383,7 +383,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace GlobalSceneControl
@@ -420,7 +420,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnTime
@@ -457,7 +457,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OffWaitTime
@@ -499,7 +499,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::OnOff::StartUpOnOffEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -513,7 +513,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -531,7 +531,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StartUpOnOff
@@ -568,7 +568,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -605,7 +605,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -650,7 +650,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SwitchType
@@ -689,7 +689,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SwitchActions
@@ -728,7 +728,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -767,7 +767,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -814,7 +814,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -828,7 +828,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -844,7 +844,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentLevel
@@ -882,7 +882,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RemainingTime
@@ -920,7 +920,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinLevel
@@ -958,7 +958,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxLevel
@@ -996,7 +996,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentFrequency
@@ -1034,7 +1034,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinFrequency
@@ -1072,7 +1072,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxFrequency
@@ -1113,7 +1113,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::LevelControl::
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Options
@@ -1151,7 +1151,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnOffTransitionTime
@@ -1192,7 +1192,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1206,7 +1206,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -1222,7 +1222,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnLevel
@@ -1263,7 +1263,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1277,7 +1277,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -1293,7 +1293,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnTransitionTime
@@ -1334,7 +1334,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1348,7 +1348,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -1364,7 +1364,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OffTransitionTime
@@ -1405,7 +1405,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1419,7 +1419,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -1435,7 +1435,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DefaultMoveRate
@@ -1476,7 +1476,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1490,7 +1490,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -1506,7 +1506,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StartUpCurrentLevel
@@ -1544,7 +1544,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -1582,7 +1582,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -1627,7 +1627,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActiveText
@@ -1666,7 +1666,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Description
@@ -1705,7 +1705,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InactiveText
@@ -1743,7 +1743,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OutOfService
@@ -1781,7 +1781,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Polarity
@@ -1819,7 +1819,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PresentValue
@@ -1857,7 +1857,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Reliability
@@ -1895,7 +1895,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StatusFlags
@@ -1933,7 +1933,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ApplicationType
@@ -1971,7 +1971,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -2009,7 +2009,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -2054,7 +2054,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -2092,7 +2092,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -2139,7 +2139,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -2176,7 +2176,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -2220,7 +2220,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -2264,7 +2264,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SetupURL
@@ -2301,7 +2301,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -2338,7 +2338,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -2383,7 +2383,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NodeLabel
@@ -2421,7 +2421,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LocalConfigDisabled
@@ -2459,7 +2459,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Reachable
@@ -2497,7 +2497,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -2535,7 +2535,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -2580,7 +2580,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -2619,7 +2619,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -2664,7 +2664,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UpdatePossible
@@ -2706,7 +2706,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UpdateState
@@ -2748,7 +2748,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -2763,7 +2763,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -2779,7 +2779,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UpdateStateProgress
@@ -2818,7 +2818,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -2857,7 +2857,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -2902,7 +2902,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActiveLocale
@@ -2941,7 +2941,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -2980,7 +2980,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -3027,7 +3027,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::Hour
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::TimeFormatLocalization::HourFormatEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace HourFormat
@@ -3068,7 +3068,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::Cale
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActiveCalendarType
@@ -3107,7 +3107,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -3146,7 +3146,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -3191,7 +3191,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::UnitLocalization::TempUnitEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TemperatureUnit
@@ -3229,7 +3229,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -3267,7 +3267,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -3312,7 +3312,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -3351,7 +3351,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -3396,7 +3396,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Status
@@ -3434,7 +3434,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Order
@@ -3472,7 +3472,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Description
@@ -3513,7 +3513,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3527,7 +3527,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -3543,7 +3543,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WiredAssessedInputVoltage
@@ -3584,7 +3584,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3598,7 +3598,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -3614,7 +3614,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WiredAssessedInputFrequency
@@ -3653,7 +3653,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WiredCurrentType
@@ -3694,7 +3694,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3708,7 +3708,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -3724,7 +3724,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WiredAssessedCurrent
@@ -3762,7 +3762,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WiredNominalVoltage
@@ -3800,7 +3800,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WiredMaximumCurrent
@@ -3838,7 +3838,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WiredPresent
@@ -3879,7 +3879,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3893,7 +3893,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -3909,7 +3909,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatVoltage
@@ -3950,7 +3950,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3964,7 +3964,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -3980,7 +3980,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatPercentRemaining
@@ -4021,7 +4021,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -4035,7 +4035,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -4051,7 +4051,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatTimeRemaining
@@ -4090,7 +4090,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatChargeLevel
@@ -4128,7 +4128,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatReplacementNeeded
@@ -4167,7 +4167,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatReplaceability
@@ -4205,7 +4205,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatPresent
@@ -4243,7 +4243,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatReplacementDescription
@@ -4283,7 +4283,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatCommonDesignation
@@ -4321,7 +4321,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatANSIDesignation
@@ -4359,7 +4359,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatIECDesignation
@@ -4399,7 +4399,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatApprovedChemistry
@@ -4437,7 +4437,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatCapacity
@@ -4475,7 +4475,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatQuantity
@@ -4514,7 +4514,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatChargeState
@@ -4555,7 +4555,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -4569,7 +4569,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -4585,7 +4585,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatTimeToFullCharge
@@ -4623,7 +4623,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatFunctionalWhileCharging
@@ -4664,7 +4664,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -4678,7 +4678,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -4694,7 +4694,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatChargingCurrent
@@ -4732,7 +4732,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -4770,7 +4770,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -4814,7 +4814,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Breadcrumb
@@ -4853,7 +4853,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -4891,7 +4891,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -4935,7 +4935,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxNetworks
@@ -4973,7 +4973,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ScanMaxTimeSeconds
@@ -5011,7 +5011,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ConnectMaxTimeSeconds
@@ -5049,7 +5049,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InterfaceEnabled
@@ -5095,7 +5095,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -5109,7 +5109,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -5129,7 +5129,7 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LastNetworkingStatus
@@ -5170,7 +5170,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -5182,7 +5182,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -5198,7 +5198,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LastNetworkID
@@ -5239,7 +5239,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -5253,7 +5253,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value,
@@ -5269,7 +5269,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LastConnectErrorValue
@@ -5312,7 +5312,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SupportedThreadFeatures
@@ -5350,7 +5350,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ThreadVersion
@@ -5389,7 +5389,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -5427,7 +5427,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -5471,7 +5471,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -5509,7 +5509,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -5553,7 +5553,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TestEventTriggersEnabled
@@ -5597,7 +5597,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -5642,7 +5642,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -5681,7 +5681,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -5726,7 +5726,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -5765,7 +5765,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -5810,7 +5810,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -5849,7 +5849,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -5894,7 +5894,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TimeSource
@@ -5935,7 +5935,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeZon
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TimeZoneDatabase
@@ -5973,7 +5973,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NTPServerAvailable
@@ -6011,7 +6011,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SupportsDNSResolve
@@ -6049,7 +6049,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -6087,7 +6087,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -6132,7 +6132,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace VendorName
@@ -6171,7 +6171,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorI
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorId value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace VendorID
@@ -6210,7 +6210,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ProductName
@@ -6249,7 +6249,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NodeLabel
@@ -6288,7 +6288,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace HardwareVersion
@@ -6327,7 +6327,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace HardwareVersionString
@@ -6366,7 +6366,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SoftwareVersion
@@ -6405,7 +6405,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SoftwareVersionString
@@ -6444,7 +6444,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ManufacturingDate
@@ -6483,7 +6483,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PartNumber
@@ -6522,7 +6522,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ProductURL
@@ -6561,7 +6561,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ProductLabel
@@ -6600,7 +6600,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SerialNumber
@@ -6639,7 +6639,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Reachable
@@ -6678,7 +6678,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UniqueID
@@ -6717,7 +6717,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -6756,7 +6756,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -6799,7 +6799,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfPositions
@@ -6836,7 +6836,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentPosition
@@ -6873,7 +6873,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MultiPressMax
@@ -6910,7 +6910,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -6947,7 +6947,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -6992,7 +6992,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -7031,7 +7031,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -7076,7 +7076,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -7115,7 +7115,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -7163,7 +7163,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -7201,7 +7201,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -7245,7 +7245,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -7283,7 +7283,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -7327,7 +7327,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -7365,7 +7365,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -7409,7 +7409,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -7447,7 +7447,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -7491,7 +7491,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -7529,7 +7529,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -7573,7 +7573,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StateValue
@@ -7611,7 +7611,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -7649,7 +7649,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -7697,7 +7697,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UserActiveModeTriggerHint
@@ -7735,7 +7735,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UserActiveModeTriggerInstruction
@@ -7774,7 +7774,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OperatingMode
@@ -7812,7 +7812,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -7850,7 +7850,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -7893,7 +7893,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SetTime
@@ -7930,7 +7930,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TimeRemaining
@@ -7968,7 +7968,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Timer::TimerStatusEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TimerState
@@ -8005,7 +8005,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -8042,7 +8042,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -8087,7 +8087,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -8126,7 +8126,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -8169,7 +8169,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentMode
@@ -8209,7 +8209,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8223,7 +8223,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -8239,7 +8239,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StartUpMode
@@ -8279,7 +8279,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8293,7 +8293,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -8309,7 +8309,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnMode
@@ -8346,7 +8346,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -8383,7 +8383,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -8433,7 +8433,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryDryerControls::Drynes
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8447,7 +8447,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -8467,7 +8467,7 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SelectedDrynessLevel
@@ -8506,7 +8506,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -8544,7 +8544,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -8588,7 +8588,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Description
@@ -8629,7 +8629,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8643,7 +8643,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -8659,7 +8659,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StandardNamespace
@@ -8697,7 +8697,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentMode
@@ -8738,7 +8738,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8752,7 +8752,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -8768,7 +8768,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StartUpMode
@@ -8809,7 +8809,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8823,7 +8823,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -8839,7 +8839,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnMode
@@ -8877,7 +8877,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -8915,7 +8915,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -8959,7 +8959,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -9004,7 +9004,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -9051,7 +9051,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -9065,7 +9065,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -9081,7 +9081,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SpinSpeedCurrent
@@ -9122,7 +9122,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryWasherControls::Numbe
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfRinses
@@ -9161,7 +9161,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -9199,7 +9199,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -9243,7 +9243,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -9287,7 +9287,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -9332,7 +9332,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TemperatureSetpoint
@@ -9371,7 +9371,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinTemperature
@@ -9410,7 +9410,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxTemperature
@@ -9449,7 +9449,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Step
@@ -9487,7 +9487,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SelectedTemperatureLevel
@@ -9525,7 +9525,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -9563,7 +9563,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -9611,7 +9611,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Mask
@@ -9653,7 +9653,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace State
@@ -9695,7 +9695,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Supported
@@ -9733,7 +9733,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -9771,7 +9771,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -9815,7 +9815,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -9859,7 +9859,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -9904,7 +9904,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ExpressedState
@@ -9943,7 +9943,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SmokeState
@@ -9982,7 +9982,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace COState
@@ -10021,7 +10021,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BatteryAlert
@@ -10060,7 +10060,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DeviceMuted
@@ -10098,7 +10098,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TestInProgress
@@ -10136,7 +10136,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace HardwareFaultAlert
@@ -10175,7 +10175,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EndOfServiceAlert
@@ -10214,7 +10214,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InterconnectSmokeAlarm
@@ -10253,7 +10253,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InterconnectCOAlarm
@@ -10293,7 +10293,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ContaminationState
@@ -10332,7 +10332,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SmokeSensitivityLevel
@@ -10370,7 +10370,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ExpiryDate
@@ -10408,7 +10408,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -10446,7 +10446,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -10493,7 +10493,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Mask
@@ -10534,7 +10534,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Latch
@@ -10575,7 +10575,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace State
@@ -10616,7 +10616,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Supported
@@ -10654,7 +10654,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -10692,7 +10692,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -10736,7 +10736,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -10780,7 +10780,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -10824,7 +10824,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -10862,7 +10862,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -10906,7 +10906,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -10944,7 +10944,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -10991,7 +10991,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::NodeId 
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::NodeId value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11005,7 +11005,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::NodeId> & value,
@@ -11021,7 +11021,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::NodeId> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LastConfiguredBy
@@ -11059,7 +11059,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SceneTableSize
@@ -11097,7 +11097,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -11135,7 +11135,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -11179,7 +11179,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -11224,7 +11224,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -11269,7 +11269,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SupportedSensitivityLevels
@@ -11308,7 +11308,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DefaultSensitivityLevel
@@ -11351,7 +11351,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AlarmsActive
@@ -11394,7 +11394,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AlarmsSuppressed
@@ -11437,7 +11437,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AlarmsEnabled
@@ -11480,7 +11480,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AlarmsSupported
@@ -11523,7 +11523,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SensorFault
@@ -11562,7 +11562,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -11601,7 +11601,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -11649,7 +11649,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11664,7 +11664,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -11680,7 +11680,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OpenDuration
@@ -11722,7 +11722,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11737,7 +11737,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -11753,7 +11753,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DefaultOpenDuration
@@ -11795,7 +11795,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11810,7 +11810,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -11826,7 +11826,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AutoCloseTime
@@ -11872,7 +11872,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11887,7 +11887,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -11907,7 +11907,7 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentState
@@ -11953,7 +11953,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11968,7 +11968,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -11988,7 +11988,7 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TargetState
@@ -12030,7 +12030,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -12045,7 +12045,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -12061,7 +12061,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentLevel
@@ -12103,7 +12103,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -12118,7 +12118,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -12134,7 +12134,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TargetLevel
@@ -12173,7 +12173,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DefaultOpenLevel
@@ -12216,7 +12216,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ValveFault
@@ -12255,7 +12255,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LevelStep
@@ -12294,7 +12294,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -12333,7 +12333,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -12378,7 +12378,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -12423,7 +12423,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -12468,7 +12468,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfLoadControlPrograms
@@ -12507,7 +12507,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfEventsPerProgram
@@ -12546,7 +12546,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfTransitions
@@ -12585,7 +12585,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DefaultRandomStart
@@ -12624,7 +12624,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DefaultRandomDuration
@@ -12663,7 +12663,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -12702,7 +12702,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -12745,7 +12745,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -12782,7 +12782,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -12827,7 +12827,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -12871,7 +12871,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -12915,7 +12915,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentEnergyBalance
@@ -12953,7 +12953,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentLowPowerModeSensitivity
@@ -12991,7 +12991,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -13029,7 +13029,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -13073,7 +13073,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -13120,7 +13120,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13134,7 +13134,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -13150,7 +13150,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StartUpMode
@@ -13191,7 +13191,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13205,7 +13205,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -13221,7 +13221,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnMode
@@ -13259,7 +13259,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -13307,7 +13307,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13322,7 +13322,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -13338,7 +13338,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StartUpMode
@@ -13380,7 +13380,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13395,7 +13395,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -13411,7 +13411,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnMode
@@ -13450,7 +13450,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -13498,7 +13498,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockState value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13512,7 +13512,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -13530,7 +13530,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LockState
@@ -13568,7 +13568,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LockType
@@ -13605,7 +13605,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActuatorEnabled
@@ -13647,7 +13647,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DoorStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13661,7 +13661,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -13679,7 +13679,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DoorState
@@ -13716,7 +13716,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DoorOpenEvents
@@ -13753,7 +13753,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DoorClosedEvents
@@ -13790,7 +13790,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OpenPeriod
@@ -13827,7 +13827,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfTotalUsersSupported
@@ -13864,7 +13864,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfPINUsersSupported
@@ -13901,7 +13901,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfRFIDUsersSupported
@@ -13938,7 +13938,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfWeekDaySchedulesSupportedPerUser
@@ -13975,7 +13975,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfYearDaySchedulesSupportedPerUser
@@ -14012,7 +14012,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfHolidaySchedulesSupported
@@ -14049,7 +14049,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxPINCodeLength
@@ -14086,7 +14086,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinPINCodeLength
@@ -14123,7 +14123,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxRFIDCodeLength
@@ -14160,7 +14160,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinRFIDCodeLength
@@ -14201,7 +14201,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CredentialRulesSupport
@@ -14238,7 +14238,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfCredentialsSupportedPerUser
@@ -14276,7 +14276,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Language
@@ -14313,7 +14313,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LEDSettings
@@ -14350,7 +14350,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AutoRelockTime
@@ -14387,7 +14387,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SoundVolume
@@ -14425,7 +14425,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OperatingMode
@@ -14466,7 +14466,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SupportedOperatingModes
@@ -14507,7 +14507,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DefaultConfigurationRegister
@@ -14544,7 +14544,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EnableLocalProgramming
@@ -14581,7 +14581,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EnableOneTouchLocking
@@ -14618,7 +14618,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EnableInsideStatusLED
@@ -14655,7 +14655,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EnablePrivacyModeButton
@@ -14696,7 +14696,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LocalProgrammingFeatures
@@ -14733,7 +14733,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WrongCodeEntryLimit
@@ -14770,7 +14770,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UserCodeTemporaryDisableTime
@@ -14807,7 +14807,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SendPINOverTheAir
@@ -14844,7 +14844,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RequirePINforRemoteOperation
@@ -14881,7 +14881,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ExpiringUserTimeout
@@ -14921,7 +14921,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -14932,7 +14932,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -14948,7 +14948,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AliroReaderVerificationKey
@@ -14988,7 +14988,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -14999,7 +14999,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -15015,7 +15015,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AliroReaderGroupIdentifier
@@ -15053,7 +15053,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AliroReaderGroupSubIdentifier
@@ -15093,7 +15093,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15104,7 +15104,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -15120,7 +15120,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AliroGroupResolvingKey
@@ -15157,7 +15157,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AliroBLEAdvertisingVersion
@@ -15194,7 +15194,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfAliroCredentialIssuerKeysSupported
@@ -15231,7 +15231,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfAliroEndpointKeysSupported
@@ -15268,7 +15268,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -15305,7 +15305,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -15350,7 +15350,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::Type value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Type
@@ -15388,7 +15388,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PhysicalClosedLimitLift
@@ -15426,7 +15426,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PhysicalClosedLimitTilt
@@ -15467,7 +15467,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15481,7 +15481,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -15497,7 +15497,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentPositionLift
@@ -15538,7 +15538,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15552,7 +15552,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -15568,7 +15568,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentPositionTilt
@@ -15606,7 +15606,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfActuationsLift
@@ -15644,7 +15644,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfActuationsTilt
@@ -15685,7 +15685,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ConfigStatus
@@ -15726,7 +15726,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15740,7 +15740,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -15756,7 +15756,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentPositionLiftPercentage
@@ -15797,7 +15797,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15811,7 +15811,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -15827,7 +15827,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentPositionTiltPercentage
@@ -15869,7 +15869,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OperationalStatus
@@ -15910,7 +15910,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15924,7 +15924,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -15941,7 +15941,7 @@ Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percen
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TargetPositionLiftPercent100ths
@@ -15982,7 +15982,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15996,7 +15996,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -16013,7 +16013,7 @@ Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percen
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TargetPositionTiltPercent100ths
@@ -16052,7 +16052,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::EndProductType value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EndProductType
@@ -16093,7 +16093,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -16107,7 +16107,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -16124,7 +16124,7 @@ Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percen
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentPositionLiftPercent100ths
@@ -16165,7 +16165,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -16179,7 +16179,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -16196,7 +16196,7 @@ Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percen
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentPositionTiltPercent100ths
@@ -16234,7 +16234,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InstalledOpenLimitLift
@@ -16272,7 +16272,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InstalledClosedLimitLift
@@ -16310,7 +16310,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InstalledOpenLimitTilt
@@ -16348,7 +16348,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InstalledClosedLimitTilt
@@ -16387,7 +16387,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Mode
@@ -16428,7 +16428,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SafetyStatus
@@ -16466,7 +16466,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -16504,7 +16504,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -16548,7 +16548,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierMovingState
@@ -16586,7 +16586,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierSafetyStatus
@@ -16624,7 +16624,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierCapabilities
@@ -16662,7 +16662,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierOpenEvents
@@ -16700,7 +16700,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierCloseEvents
@@ -16738,7 +16738,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierCommandOpenEvents
@@ -16776,7 +16776,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierCommandCloseEvents
@@ -16814,7 +16814,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierOpenPeriod
@@ -16852,7 +16852,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierClosePeriod
@@ -16890,7 +16890,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BarrierPosition
@@ -16928,7 +16928,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -16966,7 +16966,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -17014,7 +17014,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17029,7 +17029,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17045,7 +17045,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxPressure
@@ -17087,7 +17087,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17102,7 +17102,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17118,7 +17118,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxSpeed
@@ -17160,7 +17160,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17175,7 +17175,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17191,7 +17191,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxFlow
@@ -17233,7 +17233,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17248,7 +17248,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17264,7 +17264,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinConstPressure
@@ -17306,7 +17306,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17321,7 +17321,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17337,7 +17337,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxConstPressure
@@ -17379,7 +17379,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17394,7 +17394,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17410,7 +17410,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinCompPressure
@@ -17452,7 +17452,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17467,7 +17467,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17483,7 +17483,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxCompPressure
@@ -17525,7 +17525,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17540,7 +17540,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17556,7 +17556,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinConstSpeed
@@ -17598,7 +17598,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17613,7 +17613,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17629,7 +17629,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxConstSpeed
@@ -17671,7 +17671,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17686,7 +17686,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17702,7 +17702,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinConstFlow
@@ -17744,7 +17744,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17759,7 +17759,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17775,7 +17775,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxConstFlow
@@ -17817,7 +17817,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17832,7 +17832,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17848,7 +17848,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinConstTemp
@@ -17890,7 +17890,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17905,7 +17905,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17921,7 +17921,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxConstTemp
@@ -17964,7 +17964,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PumpStatus
@@ -18007,7 +18007,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EffectiveOperationMode
@@ -18050,7 +18050,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EffectiveControlMode
@@ -18092,7 +18092,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18107,7 +18107,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -18123,7 +18123,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Capacity
@@ -18165,7 +18165,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18180,7 +18180,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -18196,7 +18196,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Speed
@@ -18238,7 +18238,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18253,7 +18253,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -18269,7 +18269,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LifetimeRunningHours
@@ -18311,7 +18311,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18326,7 +18326,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -18342,7 +18342,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Power
@@ -18384,7 +18384,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18399,7 +18399,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -18415,7 +18415,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LifetimeEnergyConsumed
@@ -18458,7 +18458,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OperationMode
@@ -18501,7 +18501,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ControlMode
@@ -18540,7 +18540,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -18579,7 +18579,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -18626,7 +18626,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18640,7 +18640,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -18656,7 +18656,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LocalTemperature
@@ -18697,7 +18697,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18711,7 +18711,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -18727,7 +18727,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OutdoorTemperature
@@ -18765,7 +18765,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Occupancy
@@ -18803,7 +18803,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AbsMinHeatSetpointLimit
@@ -18841,7 +18841,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AbsMaxHeatSetpointLimit
@@ -18879,7 +18879,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AbsMinCoolSetpointLimit
@@ -18917,7 +18917,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AbsMaxCoolSetpointLimit
@@ -18955,7 +18955,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PICoolingDemand
@@ -18993,7 +18993,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PIHeatingDemand
@@ -19031,7 +19031,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace HVACSystemTypeConfiguration
@@ -19069,7 +19069,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LocalTemperatureCalibration
@@ -19107,7 +19107,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OccupiedCoolingSetpoint
@@ -19145,7 +19145,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OccupiedHeatingSetpoint
@@ -19183,7 +19183,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UnoccupiedCoolingSetpoint
@@ -19221,7 +19221,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UnoccupiedHeatingSetpoint
@@ -19259,7 +19259,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinHeatSetpointLimit
@@ -19297,7 +19297,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxHeatSetpointLimit
@@ -19335,7 +19335,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinCoolSetpointLimit
@@ -19373,7 +19373,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxCoolSetpointLimit
@@ -19411,7 +19411,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinSetpointDeadBand
@@ -19453,7 +19453,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RemoteSensing
@@ -19494,7 +19494,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceO
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ControlSequenceOfOperation
@@ -19533,7 +19533,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SystemMode
@@ -19573,7 +19573,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ThermostatRunningMode
@@ -19612,7 +19612,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::StartOfWeekEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StartOfWeek
@@ -19650,7 +19650,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfWeeklyTransitions
@@ -19688,7 +19688,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfDailyTransitions
@@ -19729,7 +19729,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::TemperatureSetpo
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TemperatureSetpointHold
@@ -19770,7 +19770,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -19784,7 +19784,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -19800,7 +19800,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TemperatureSetpointHoldDuration
@@ -19842,7 +19842,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ThermostatProgrammingOperationMode
@@ -19883,7 +19883,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::Re
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ThermostatRunningState
@@ -19923,7 +19923,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::SetpointChangeSourceEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SetpointChangeSource
@@ -19964,7 +19964,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -19978,7 +19978,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -19994,7 +19994,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SetpointChangeAmount
@@ -20032,7 +20032,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SetpointChangeSourceTimestamp
@@ -20073,7 +20073,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20087,7 +20087,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20103,7 +20103,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OccupiedSetback
@@ -20144,7 +20144,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20158,7 +20158,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20174,7 +20174,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OccupiedSetbackMin
@@ -20215,7 +20215,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20229,7 +20229,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20245,7 +20245,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OccupiedSetbackMax
@@ -20286,7 +20286,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20300,7 +20300,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20316,7 +20316,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UnoccupiedSetback
@@ -20357,7 +20357,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20371,7 +20371,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20387,7 +20387,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UnoccupiedSetbackMin
@@ -20428,7 +20428,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20442,7 +20442,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20458,7 +20458,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UnoccupiedSetbackMax
@@ -20496,7 +20496,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EmergencyHeatDelta
@@ -20535,7 +20535,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ACType
@@ -20573,7 +20573,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ACCapacity
@@ -20612,7 +20612,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ACRefrigerantType
@@ -20651,7 +20651,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCompressorTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ACCompressorType
@@ -20693,7 +20693,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ACErrorCode
@@ -20732,7 +20732,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACLouverPositionEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ACLouverPosition
@@ -20773,7 +20773,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20787,7 +20787,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -20803,7 +20803,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ACCoilTemperature
@@ -20842,7 +20842,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ACCapacityformat
@@ -20880,7 +20880,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfPresets
@@ -20918,7 +20918,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfSchedules
@@ -20956,7 +20956,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfScheduleTransitions
@@ -20997,7 +20997,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21011,7 +21011,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -21027,7 +21027,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfScheduleTransitionPerDay
@@ -21067,7 +21067,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21078,7 +21078,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -21094,7 +21094,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePresetHandle
@@ -21134,7 +21134,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21145,7 +21145,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -21161,7 +21161,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActiveScheduleHandle
@@ -21199,7 +21199,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PresetsSchedulesEditable
@@ -21241,7 +21241,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TemperatureSetpointHoldPolicy
@@ -21282,7 +21282,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21296,7 +21296,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -21312,7 +21312,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SetpointHoldExpiryTimestamp
@@ -21350,7 +21350,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -21388,7 +21388,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -21433,7 +21433,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FanMode
@@ -21472,7 +21472,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FanModeSequence
@@ -21513,7 +21513,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21527,7 +21527,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -21543,7 +21543,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PercentSetting
@@ -21581,7 +21581,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PercentCurrent
@@ -21619,7 +21619,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SpeedMax
@@ -21660,7 +21660,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21674,7 +21674,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -21690,7 +21690,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SpeedSetting
@@ -21728,7 +21728,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SpeedCurrent
@@ -21768,7 +21768,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RockSupport
@@ -21808,7 +21808,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RockSetting
@@ -21848,7 +21848,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WindSupport
@@ -21888,7 +21888,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WindSetting
@@ -21927,7 +21927,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::AirflowDirectionEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AirflowDirection
@@ -21965,7 +21965,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -22003,7 +22003,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -22052,7 +22052,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TemperatureDisplayMode
@@ -22095,7 +22095,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace KeypadLockout
@@ -22140,7 +22140,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfi
 Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ScheduleProgrammingVisibility
@@ -22179,7 +22179,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -22218,7 +22218,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -22262,7 +22262,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentHue
@@ -22300,7 +22300,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentSaturation
@@ -22338,7 +22338,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RemainingTime
@@ -22376,7 +22376,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentX
@@ -22414,7 +22414,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentY
@@ -22452,7 +22452,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DriftCompensation
@@ -22490,7 +22490,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CompensationText
@@ -22528,7 +22528,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorTemperatureMireds
@@ -22566,7 +22566,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorMode
@@ -22604,7 +22604,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Options
@@ -22645,7 +22645,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -22659,7 +22659,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -22675,7 +22675,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NumberOfPrimaries
@@ -22713,7 +22713,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary1X
@@ -22751,7 +22751,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary1Y
@@ -22792,7 +22792,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -22806,7 +22806,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -22822,7 +22822,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary1Intensity
@@ -22860,7 +22860,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary2X
@@ -22898,7 +22898,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary2Y
@@ -22939,7 +22939,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -22953,7 +22953,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -22969,7 +22969,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary2Intensity
@@ -23007,7 +23007,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary3X
@@ -23045,7 +23045,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary3Y
@@ -23086,7 +23086,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23100,7 +23100,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23116,7 +23116,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary3Intensity
@@ -23154,7 +23154,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary4X
@@ -23192,7 +23192,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary4Y
@@ -23233,7 +23233,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23247,7 +23247,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23263,7 +23263,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary4Intensity
@@ -23301,7 +23301,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary5X
@@ -23339,7 +23339,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary5Y
@@ -23380,7 +23380,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23394,7 +23394,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23410,7 +23410,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary5Intensity
@@ -23448,7 +23448,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary6X
@@ -23486,7 +23486,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary6Y
@@ -23527,7 +23527,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23541,7 +23541,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23557,7 +23557,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Primary6Intensity
@@ -23595,7 +23595,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WhitePointX
@@ -23633,7 +23633,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WhitePointY
@@ -23671,7 +23671,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorPointRX
@@ -23709,7 +23709,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorPointRY
@@ -23750,7 +23750,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23764,7 +23764,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23780,7 +23780,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorPointRIntensity
@@ -23818,7 +23818,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorPointGX
@@ -23856,7 +23856,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorPointGY
@@ -23897,7 +23897,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23911,7 +23911,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23927,7 +23927,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorPointGIntensity
@@ -23965,7 +23965,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorPointBX
@@ -24003,7 +24003,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorPointBY
@@ -24044,7 +24044,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -24058,7 +24058,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -24074,7 +24074,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorPointBIntensity
@@ -24112,7 +24112,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EnhancedCurrentHue
@@ -24150,7 +24150,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EnhancedColorMode
@@ -24188,7 +24188,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorLoopActive
@@ -24226,7 +24226,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorLoopDirection
@@ -24264,7 +24264,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorLoopTime
@@ -24302,7 +24302,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorLoopStartEnhancedHue
@@ -24340,7 +24340,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorLoopStoredEnhancedHue
@@ -24378,7 +24378,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorCapabilities
@@ -24416,7 +24416,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorTempPhysicalMinMireds
@@ -24454,7 +24454,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ColorTempPhysicalMaxMireds
@@ -24492,7 +24492,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CoupleColorTempToLevelMinMireds
@@ -24533,7 +24533,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -24547,7 +24547,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -24563,7 +24563,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StartUpColorTemperatureMireds
@@ -24601,7 +24601,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -24639,7 +24639,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -24683,7 +24683,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PhysicalMinLevel
@@ -24721,7 +24721,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PhysicalMaxLevel
@@ -24763,7 +24763,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BallastStatus
@@ -24801,7 +24801,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinLevel
@@ -24839,7 +24839,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxLevel
@@ -24880,7 +24880,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -24894,7 +24894,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -24910,7 +24910,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace IntrinsicBallastFactor
@@ -24951,7 +24951,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -24965,7 +24965,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -24981,7 +24981,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BallastFactorAdjustment
@@ -25019,7 +25019,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LampQuantity
@@ -25058,7 +25058,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LampType
@@ -25097,7 +25097,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LampManufacturer
@@ -25138,7 +25138,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25152,7 +25152,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -25168,7 +25168,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LampRatedHours
@@ -25209,7 +25209,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25223,7 +25223,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -25239,7 +25239,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LampBurnHours
@@ -25281,7 +25281,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LampAlarmMode
@@ -25322,7 +25322,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25336,7 +25336,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -25352,7 +25352,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LampBurnHoursTripPoint
@@ -25391,7 +25391,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -25429,7 +25429,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -25477,7 +25477,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25492,7 +25492,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -25508,7 +25508,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredValue
@@ -25550,7 +25550,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25565,7 +25565,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -25581,7 +25581,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinMeasuredValue
@@ -25623,7 +25623,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25638,7 +25638,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -25654,7 +25654,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxMeasuredValue
@@ -25693,7 +25693,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Tolerance
@@ -25737,7 +25737,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::IlluminanceMeasurement::Ligh
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25751,7 +25751,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -25771,7 +25771,7 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LightSensorType
@@ -25810,7 +25810,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -25849,7 +25849,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -25897,7 +25897,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25912,7 +25912,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -25928,7 +25928,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredValue
@@ -25970,7 +25970,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25985,7 +25985,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26001,7 +26001,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinMeasuredValue
@@ -26043,7 +26043,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26058,7 +26058,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26074,7 +26074,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxMeasuredValue
@@ -26113,7 +26113,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Tolerance
@@ -26152,7 +26152,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -26191,7 +26191,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -26238,7 +26238,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26252,7 +26252,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26268,7 +26268,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredValue
@@ -26309,7 +26309,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26323,7 +26323,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26339,7 +26339,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinMeasuredValue
@@ -26380,7 +26380,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26394,7 +26394,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26410,7 +26410,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxMeasuredValue
@@ -26448,7 +26448,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Tolerance
@@ -26489,7 +26489,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26503,7 +26503,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26519,7 +26519,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ScaledValue
@@ -26560,7 +26560,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26574,7 +26574,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26590,7 +26590,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinScaledValue
@@ -26631,7 +26631,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26645,7 +26645,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26661,7 +26661,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxScaledValue
@@ -26699,7 +26699,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ScaledTolerance
@@ -26737,7 +26737,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Scale
@@ -26775,7 +26775,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -26813,7 +26813,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -26860,7 +26860,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26874,7 +26874,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -26890,7 +26890,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredValue
@@ -26931,7 +26931,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26945,7 +26945,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -26961,7 +26961,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinMeasuredValue
@@ -27002,7 +27002,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -27016,7 +27016,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -27032,7 +27032,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxMeasuredValue
@@ -27070,7 +27070,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Tolerance
@@ -27108,7 +27108,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -27146,7 +27146,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -27194,7 +27194,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -27209,7 +27209,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -27225,7 +27225,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredValue
@@ -27267,7 +27267,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -27282,7 +27282,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -27298,7 +27298,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MinMeasuredValue
@@ -27340,7 +27340,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -27355,7 +27355,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -27371,7 +27371,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MaxMeasuredValue
@@ -27410,7 +27410,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Tolerance
@@ -27449,7 +27449,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -27488,7 +27488,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -27536,7 +27536,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Occupancy
@@ -27577,7 +27577,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::OccupancySensing::OccupancyS
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OccupancySensorType
@@ -27619,7 +27619,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OccupancySensorTypeBitmap
@@ -27657,7 +27657,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PIROccupiedToUnoccupiedDelay
@@ -27695,7 +27695,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PIRUnoccupiedToOccupiedDelay
@@ -27733,7 +27733,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PIRUnoccupiedToOccupiedThreshold
@@ -27771,7 +27771,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UltrasonicOccupiedToUnoccupiedDelay
@@ -27809,7 +27809,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UltrasonicUnoccupiedToOccupiedDelay
@@ -27847,7 +27847,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace UltrasonicUnoccupiedToOccupiedThreshold
@@ -27885,7 +27885,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PhysicalContactOccupiedToUnoccupiedDelay
@@ -27923,7 +27923,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PhysicalContactUnoccupiedToOccupiedDelay
@@ -27961,7 +27961,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
@@ -27999,7 +27999,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -28037,7 +28037,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28082,7 +28082,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28127,7 +28127,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28172,7 +28172,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28217,7 +28217,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28262,7 +28262,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28307,7 +28307,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28352,7 +28352,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28397,7 +28397,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28442,7 +28442,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28487,7 +28487,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28531,7 +28531,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MACAddress
@@ -28569,7 +28569,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LinkLocalAddress
@@ -28607,7 +28607,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -28645,7 +28645,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28688,7 +28688,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -28725,7 +28725,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28769,7 +28769,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentTarget
@@ -28807,7 +28807,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -28845,7 +28845,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -28890,7 +28890,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentState
@@ -28931,7 +28931,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -28945,7 +28945,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -28961,7 +28961,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace StartTime
@@ -29002,7 +29002,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -29016,7 +29016,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -29032,7 +29032,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Duration
@@ -29070,7 +29070,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value, 
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PlaybackSpeed
@@ -29111,7 +29111,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -29125,7 +29125,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -29141,7 +29141,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SeekRangeEnd
@@ -29182,7 +29182,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -29196,7 +29196,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -29212,7 +29212,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SeekRangeStart
@@ -29250,7 +29250,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -29288,7 +29288,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -29332,7 +29332,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentInput
@@ -29370,7 +29370,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -29408,7 +29408,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -29451,7 +29451,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -29488,7 +29488,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -29532,7 +29532,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -29570,7 +29570,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -29618,7 +29618,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace SupportedStreamingProtocols
@@ -29656,7 +29656,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -29694,7 +29694,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -29738,7 +29738,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentOutput
@@ -29776,7 +29776,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -29814,7 +29814,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -29858,7 +29858,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -29896,7 +29896,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -29941,7 +29941,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace VendorName
@@ -29979,7 +29979,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorI
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorId value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace VendorID
@@ -30018,7 +30018,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ApplicationName
@@ -30056,7 +30056,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ProductID
@@ -30097,7 +30097,7 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBasic::Applicatio
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Status
@@ -30136,7 +30136,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ApplicationVersion
@@ -30174,7 +30174,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -30212,7 +30212,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -30256,7 +30256,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -30294,7 +30294,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -30338,7 +30338,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Enabled
@@ -30376,7 +30376,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OnDemandRatingThreshold
@@ -30414,7 +30414,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ScheduledContentRatingThreshold
@@ -30452,7 +30452,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ScreenDailyTime
@@ -30490,7 +30490,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RemainingScreenTime
@@ -30528,7 +30528,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace BlockUnrated
@@ -30566,7 +30566,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -30604,7 +30604,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -30648,7 +30648,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -30686,7 +30686,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -30731,7 +30731,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasurementType
@@ -30769,7 +30769,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcVoltage
@@ -30807,7 +30807,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcVoltageMin
@@ -30845,7 +30845,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcVoltageMax
@@ -30883,7 +30883,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcCurrent
@@ -30921,7 +30921,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcCurrentMin
@@ -30959,7 +30959,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcCurrentMax
@@ -30997,7 +30997,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcPower
@@ -31035,7 +31035,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcPowerMin
@@ -31073,7 +31073,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcPowerMax
@@ -31111,7 +31111,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcVoltageMultiplier
@@ -31149,7 +31149,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcVoltageDivisor
@@ -31187,7 +31187,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcCurrentMultiplier
@@ -31225,7 +31225,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcCurrentDivisor
@@ -31263,7 +31263,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcPowerMultiplier
@@ -31301,7 +31301,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace DcPowerDivisor
@@ -31339,7 +31339,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcFrequency
@@ -31377,7 +31377,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcFrequencyMin
@@ -31415,7 +31415,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcFrequencyMax
@@ -31453,7 +31453,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NeutralCurrent
@@ -31491,7 +31491,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TotalActivePower
@@ -31529,7 +31529,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TotalReactivePower
@@ -31567,7 +31567,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TotalApparentPower
@@ -31605,7 +31605,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Measured1stHarmonicCurrent
@@ -31643,7 +31643,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Measured3rdHarmonicCurrent
@@ -31681,7 +31681,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Measured5thHarmonicCurrent
@@ -31719,7 +31719,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Measured7thHarmonicCurrent
@@ -31757,7 +31757,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Measured9thHarmonicCurrent
@@ -31795,7 +31795,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Measured11thHarmonicCurrent
@@ -31833,7 +31833,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredPhase1stHarmonicCurrent
@@ -31871,7 +31871,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredPhase3rdHarmonicCurrent
@@ -31909,7 +31909,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredPhase5thHarmonicCurrent
@@ -31947,7 +31947,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredPhase7thHarmonicCurrent
@@ -31985,7 +31985,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredPhase9thHarmonicCurrent
@@ -32023,7 +32023,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeasuredPhase11thHarmonicCurrent
@@ -32061,7 +32061,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcFrequencyMultiplier
@@ -32099,7 +32099,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcFrequencyDivisor
@@ -32137,7 +32137,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PowerMultiplier
@@ -32175,7 +32175,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PowerDivisor
@@ -32213,7 +32213,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace HarmonicCurrentMultiplier
@@ -32251,7 +32251,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PhaseHarmonicCurrentMultiplier
@@ -32289,7 +32289,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InstantaneousVoltage
@@ -32327,7 +32327,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InstantaneousLineCurrent
@@ -32365,7 +32365,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InstantaneousActiveCurrent
@@ -32403,7 +32403,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InstantaneousReactiveCurrent
@@ -32441,7 +32441,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace InstantaneousPower
@@ -32479,7 +32479,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltage
@@ -32517,7 +32517,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageMin
@@ -32555,7 +32555,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageMax
@@ -32593,7 +32593,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsCurrent
@@ -32631,7 +32631,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsCurrentMin
@@ -32669,7 +32669,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsCurrentMax
@@ -32707,7 +32707,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePower
@@ -32745,7 +32745,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePowerMin
@@ -32783,7 +32783,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePowerMax
@@ -32821,7 +32821,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ReactivePower
@@ -32859,7 +32859,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ApparentPower
@@ -32897,7 +32897,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PowerFactor
@@ -32935,7 +32935,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsVoltageMeasurementPeriod
@@ -32973,7 +32973,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsUnderVoltageCounter
@@ -33011,7 +33011,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsExtremeOverVoltagePeriod
@@ -33049,7 +33049,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsExtremeUnderVoltagePeriod
@@ -33087,7 +33087,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageSagPeriod
@@ -33125,7 +33125,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageSwellPeriod
@@ -33163,7 +33163,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcVoltageMultiplier
@@ -33201,7 +33201,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcVoltageDivisor
@@ -33239,7 +33239,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcCurrentMultiplier
@@ -33277,7 +33277,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcCurrentDivisor
@@ -33315,7 +33315,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcPowerMultiplier
@@ -33353,7 +33353,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcPowerDivisor
@@ -33392,7 +33392,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OverloadAlarmsMask
@@ -33430,7 +33430,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace VoltageOverload
@@ -33468,7 +33468,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CurrentOverload
@@ -33507,7 +33507,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcOverloadAlarmsMask
@@ -33545,7 +33545,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcVoltageOverload
@@ -33583,7 +33583,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcCurrentOverload
@@ -33621,7 +33621,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcActivePowerOverload
@@ -33659,7 +33659,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AcReactivePowerOverload
@@ -33697,7 +33697,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsOverVoltage
@@ -33735,7 +33735,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsUnderVoltage
@@ -33773,7 +33773,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsExtremeOverVoltage
@@ -33811,7 +33811,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsExtremeUnderVoltage
@@ -33849,7 +33849,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageSag
@@ -33887,7 +33887,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageSwell
@@ -33925,7 +33925,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LineCurrentPhaseB
@@ -33963,7 +33963,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActiveCurrentPhaseB
@@ -34001,7 +34001,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ReactiveCurrentPhaseB
@@ -34039,7 +34039,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltagePhaseB
@@ -34077,7 +34077,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageMinPhaseB
@@ -34115,7 +34115,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageMaxPhaseB
@@ -34153,7 +34153,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsCurrentPhaseB
@@ -34191,7 +34191,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsCurrentMinPhaseB
@@ -34229,7 +34229,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsCurrentMaxPhaseB
@@ -34267,7 +34267,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePowerPhaseB
@@ -34305,7 +34305,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePowerMinPhaseB
@@ -34343,7 +34343,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePowerMaxPhaseB
@@ -34381,7 +34381,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ReactivePowerPhaseB
@@ -34419,7 +34419,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ApparentPowerPhaseB
@@ -34457,7 +34457,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PowerFactorPhaseB
@@ -34495,7 +34495,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsVoltageMeasurementPeriodPhaseB
@@ -34533,7 +34533,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsOverVoltageCounterPhaseB
@@ -34571,7 +34571,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsUnderVoltageCounterPhaseB
@@ -34609,7 +34609,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsExtremeOverVoltagePeriodPhaseB
@@ -34647,7 +34647,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsExtremeUnderVoltagePeriodPhaseB
@@ -34685,7 +34685,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageSagPeriodPhaseB
@@ -34723,7 +34723,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageSwellPeriodPhaseB
@@ -34761,7 +34761,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LineCurrentPhaseC
@@ -34799,7 +34799,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActiveCurrentPhaseC
@@ -34837,7 +34837,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ReactiveCurrentPhaseC
@@ -34875,7 +34875,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltagePhaseC
@@ -34913,7 +34913,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageMinPhaseC
@@ -34951,7 +34951,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageMaxPhaseC
@@ -34989,7 +34989,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsCurrentPhaseC
@@ -35027,7 +35027,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsCurrentMinPhaseC
@@ -35065,7 +35065,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsCurrentMaxPhaseC
@@ -35103,7 +35103,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePowerPhaseC
@@ -35141,7 +35141,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePowerMinPhaseC
@@ -35179,7 +35179,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ActivePowerMaxPhaseC
@@ -35217,7 +35217,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ReactivePowerPhaseC
@@ -35255,7 +35255,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ApparentPowerPhaseC
@@ -35293,7 +35293,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace PowerFactorPhaseC
@@ -35331,7 +35331,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsVoltageMeasurementPeriodPhaseC
@@ -35369,7 +35369,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsOverVoltageCounterPhaseC
@@ -35407,7 +35407,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace AverageRmsUnderVoltageCounterPhaseC
@@ -35445,7 +35445,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsExtremeOverVoltagePeriodPhaseC
@@ -35483,7 +35483,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsExtremeUnderVoltagePeriodPhaseC
@@ -35521,7 +35521,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageSagPeriodPhaseC
@@ -35559,7 +35559,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RmsVoltageSwellPeriodPhaseC
@@ -35598,7 +35598,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -35636,7 +35636,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -35680,7 +35680,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Boolean
@@ -35721,7 +35721,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Bitmap8
@@ -35762,7 +35762,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Bitmap16
@@ -35803,7 +35803,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Bitmap32
@@ -35844,7 +35844,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Bitmap64
@@ -35882,7 +35882,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int8u
@@ -35920,7 +35920,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int16u
@@ -35958,7 +35958,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int24u
@@ -35996,7 +35996,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int32u
@@ -36034,7 +36034,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int40u
@@ -36072,7 +36072,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int48u
@@ -36110,7 +36110,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int56u
@@ -36148,7 +36148,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int64u
@@ -36186,7 +36186,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int8s
@@ -36224,7 +36224,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int16s
@@ -36262,7 +36262,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int24s
@@ -36300,7 +36300,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int32s
@@ -36338,7 +36338,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int40s
@@ -36376,7 +36376,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int48s
@@ -36414,7 +36414,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int56s
@@ -36452,7 +36452,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Int64s
@@ -36490,7 +36490,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Enum8
@@ -36528,7 +36528,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Enum16
@@ -36566,7 +36566,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value, 
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FloatSingle
@@ -36604,7 +36604,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FloatDouble
@@ -36642,7 +36642,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace OctetString
@@ -36681,7 +36681,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LongOctetString
@@ -36719,7 +36719,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace CharString
@@ -36758,7 +36758,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace LongCharString
@@ -36796,7 +36796,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EpochUs
@@ -36834,7 +36834,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EpochS
@@ -36872,7 +36872,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorI
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorId value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace VendorId
@@ -36911,7 +36911,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace EnumAttr
@@ -36949,7 +36949,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RangeRestrictedInt8u
@@ -36987,7 +36987,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RangeRestrictedInt8s
@@ -37025,7 +37025,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RangeRestrictedInt16u
@@ -37063,7 +37063,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace RangeRestrictedInt16s
@@ -37101,7 +37101,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace TimedWriteBoolean
@@ -37139,7 +37139,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace Unsupported
@@ -37180,7 +37180,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37194,7 +37194,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<bool> & value,
@@ -37210,7 +37210,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<bool> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableBoolean
@@ -37254,7 +37254,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37268,7 +37268,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -37288,7 +37288,7 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableBitmap8
@@ -37332,7 +37332,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37346,7 +37346,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -37366,7 +37366,7 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableBitmap16
@@ -37410,7 +37410,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37424,7 +37424,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -37444,7 +37444,7 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableBitmap32
@@ -37488,7 +37488,7 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37502,7 +37502,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status
@@ -37522,7 +37522,7 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableBitmap64
@@ -37563,7 +37563,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37577,7 +37577,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -37593,7 +37593,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt8u
@@ -37634,7 +37634,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37648,7 +37648,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -37664,7 +37664,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt16u
@@ -37705,7 +37705,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37719,7 +37719,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -37735,7 +37735,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt24u
@@ -37776,7 +37776,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37790,7 +37790,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -37806,7 +37806,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt32u
@@ -37847,7 +37847,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37861,7 +37861,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -37877,7 +37877,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt40u
@@ -37918,7 +37918,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37932,7 +37932,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -37948,7 +37948,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt48u
@@ -37989,7 +37989,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38003,7 +38003,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -38019,7 +38019,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt56u
@@ -38060,7 +38060,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38074,7 +38074,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -38090,7 +38090,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt64u
@@ -38131,7 +38131,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38145,7 +38145,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value,
@@ -38161,7 +38161,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt8s
@@ -38202,7 +38202,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38216,7 +38216,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -38232,7 +38232,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt16s
@@ -38273,7 +38273,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38287,7 +38287,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value,
@@ -38303,7 +38303,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt24s
@@ -38344,7 +38344,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38358,7 +38358,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value,
@@ -38374,7 +38374,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt32s
@@ -38415,7 +38415,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38429,7 +38429,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value,
@@ -38445,7 +38445,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt40s
@@ -38486,7 +38486,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38500,7 +38500,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value,
@@ -38516,7 +38516,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt48s
@@ -38557,7 +38557,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38571,7 +38571,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value,
@@ -38587,7 +38587,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt56s
@@ -38628,7 +38628,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38642,7 +38642,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value,
@@ -38658,7 +38658,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableInt64s
@@ -38699,7 +38699,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38713,7 +38713,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -38729,7 +38729,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableEnum8
@@ -38770,7 +38770,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38784,7 +38784,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -38800,7 +38800,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableEnum16
@@ -38841,7 +38841,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value, 
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38855,7 +38855,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value,
@@ -38871,7 +38871,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableFloatSingle
@@ -38912,7 +38912,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38926,7 +38926,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<double> & value,
@@ -38942,7 +38942,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<double> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableFloatDouble
@@ -38982,7 +38982,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38993,7 +38993,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -39009,7 +39009,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableOctetString
@@ -39049,7 +39049,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39060,7 +39060,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value,
@@ -39076,7 +39076,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableCharString
@@ -39119,7 +39119,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39133,7 +39133,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -39151,7 +39151,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableEnumAttr
@@ -39192,7 +39192,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39206,7 +39206,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -39222,7 +39222,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableRangeRestrictedInt8u
@@ -39263,7 +39263,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39277,7 +39277,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value,
@@ -39293,7 +39293,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableRangeRestrictedInt8s
@@ -39334,7 +39334,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39348,7 +39348,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -39364,7 +39364,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableRangeRestrictedInt16u
@@ -39405,7 +39405,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39419,7 +39419,7 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::IfChanged);
+    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -39435,7 +39435,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace NullableRangeRestrictedInt16s
@@ -39473,7 +39473,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace WriteOnlyInt8u
@@ -39511,7 +39511,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -39549,7 +39549,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -39587,7 +39587,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace MeiInt8u
@@ -39631,7 +39631,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -39669,7 +39669,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision
@@ -39713,7 +39713,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FlipFlop
@@ -39751,7 +39751,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace FeatureMap
@@ -39789,7 +39789,7 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::IfChanged);
+    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
 }
 
 } // namespace ClusterRevision

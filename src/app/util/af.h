@@ -24,7 +24,6 @@
 
 #include <app/util/af-types.h>
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/endpoint-config-api.h>
 
 #include <lib/core/DataModelTypes.h>
@@ -100,7 +99,7 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
 chip::Protocols::InteractionModel::Status
 emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * dataPtr,
                       EmberAfAttributeType dataType,
-                      chip::app::MarkAttributeDirty markDirty = chip::app::MarkAttributeDirty::IfChanged);
+                      chip::app::MarkAttributeDirty markDirty = chip::app::MarkAttributeDirty::kIfChanged);
 
 /**
  * @brief Read the attribute value, performing all the checks.
