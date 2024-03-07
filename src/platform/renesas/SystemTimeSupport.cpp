@@ -27,6 +27,7 @@
 
 #include <lib/support/TimeUtils.h>
 #include <time.h>
+#include "time_zone.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -132,16 +133,6 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
     aCurTime = Clock::Microseconds64(sBootTimeUS + GetClock_Monotonic());
     return CHIP_NO_ERROR;
 #endif
-}
-
-typedef long m_time_t;
-struct m_timeval {
-    m_time_t  tv_sec;   /* Seconds */
-    long    tv_usec;  /* Microseconds */
-};
-extern "C"
-{
-    int clock_gettime(struct m_timeval * tp);
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)

@@ -50,6 +50,7 @@ chip_project_config_include_dirs =
     "//../../../../../../common/common_ra_cfg/fsp_cfg/",
     "//../../../../../../common/common_ra_cfg/arm/",
     "//../../../../../../common/common_peripherals/include/",
+    "//../../../../../../common/common_threads/ntp/",
     "//../../../../../../common/lwip-port/",
     "//../../../../../../common/generic/",
     "//../../../../../ARM-software/CMSIS_5/CMSIS/Core/Include/",
