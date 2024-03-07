@@ -318,6 +318,8 @@ template("siwx917_sdk") {
 
   if (chip_crypto == "psa") {
     _mbedtls_root = "${efr32_sdk_root}/util/third_party/mbedtls"
+    sl_si91x_psa_crypto_path =
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/"
 
     config("sl_si91x_psa_crypto_config") {
       defines = [
@@ -336,14 +338,15 @@ template("siwx917_sdk") {
 
       include_dirs = [
         # WISECONNECT 3 SDK
-        "${wifi_sdk_root}/components/si91x/crypto/inc",
-        "${wifi_sdk_root}/components/si91x/crypto/aes/inc",
-        "${wifi_sdk_root}/components/si91x/crypto/aead/inc",
-        "${wifi_sdk_root}/components/si91x/crypto/hmac/inc",
-        "${wifi_sdk_root}/components/si91x/crypto/sha/inc",
-        "${wifi_sdk_root}/components/si91x/crypto/wrap/inc",
-        "${wifi_sdk_root}/components/si91x/crypto/trng/inc",
-        "${wifi_sdk_root}/components/si91x/crypto/ecdh/inc",
+        "${sl_si91x_psa_crypto_path}/inc",
+        "${sl_si91x_psa_crypto_path}/aes/inc",
+        "${sl_si91x_psa_crypto_path}/aead/inc",
+        "${sl_si91x_psa_crypto_path}/ccm/inc",
+        "${sl_si91x_psa_crypto_path}/hmac/inc",
+        "${sl_si91x_psa_crypto_path}/sha/inc",
+        "${sl_si91x_psa_crypto_path}/wrap/inc",
+        "${sl_si91x_psa_crypto_path}/trng/inc",
+        "${sl_si91x_psa_crypto_path}/ecdh/inc",
 
         # mbedTLS
         "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config",
@@ -360,8 +363,6 @@ template("siwx917_sdk") {
       # acts as the mbedTLS target for SiWx917 builds. We need this for the build
       # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
       # edited.
-      sl_si91x_psa_crypto_path =
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/"
       sources = [
         "${_mbedtls_root}/include/mbedtls/platform.h",
         "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
@@ -373,6 +374,7 @@ template("siwx917_sdk") {
         "${_mbedtls_root}/library/asn1write.c",
         "${_mbedtls_root}/library/base64.c",
         "${_mbedtls_root}/library/bignum.c",
+        "${_mbedtls_root}/library/bignum_core.c",
         "${_mbedtls_root}/library/ccm.c",
         "${_mbedtls_root}/library/cipher.c",
         "${_mbedtls_root}/library/cipher_wrap.c",
@@ -402,7 +404,7 @@ template("siwx917_sdk") {
         "${_mbedtls_root}/library/psa_crypto_aead.c",
         "${_mbedtls_root}/library/psa_crypto_cipher.c",
         "${_mbedtls_root}/library/psa_crypto_client.c",
-        "${_mbedtls_root}/library/psa_crypto_driver_wrappers.c",
+        "${_mbedtls_root}/library/psa_crypto_driver_wrappers_no_static.c",
         "${_mbedtls_root}/library/psa_crypto_ecp.c",
         "${_mbedtls_root}/library/psa_crypto_hash.c",
         "${_mbedtls_root}/library/psa_crypto_mac.c",
@@ -440,13 +442,13 @@ template("siwx917_sdk") {
         "${sl_si91x_psa_crypto_path}/aes/src/sl_si91x_aes.c",
         "${sl_si91x_psa_crypto_path}/aes/src/sl_si91x_psa_aes.c",
         "${sl_si91x_psa_crypto_path}/ecdh/src/sl_si91x_ecdh.c",
+        "${sl_si91x_psa_crypto_path}/ecdh/src/sl_si91x_psa_ecdh.c",
         "${sl_si91x_psa_crypto_path}/hmac/src/sl_si91x_hmac.c",
         "${sl_si91x_psa_crypto_path}/hmac/src/sl_si91x_psa_hmac.c",
         "${sl_si91x_psa_crypto_path}/sha/src/sl_si91x_psa_sha.c",
         "${sl_si91x_psa_crypto_path}/sha/src/sl_si91x_sha.c",
         "${sl_si91x_psa_crypto_path}/src/sli_si91x_crypto_driver_functions.c",
         "${sl_si91x_psa_crypto_path}/trng/src/sl_si91x_psa_trng.c",
-        "${sl_si91x_psa_crypto_path}/trng/src/sl_si91x_trng.c",
         "${sl_si91x_psa_crypto_path}/wrap/src/sl_si91x_psa_wrap.c",
         "${sl_si91x_psa_crypto_path}/wrap/src/sl_si91x_wrap.c",
       ]
