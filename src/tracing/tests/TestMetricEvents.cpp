@@ -65,7 +65,7 @@ class MetricEventBackend : public Backend
 {
 public:
     MetricEventBackend() {}
-    const std::vector<MetricEvent> & metricEvents() const { return mMetricEvents; }
+    const std::vector<MetricEvent> & GetMetricEvents() const { return mMetricEvents; }
 
     // Implementation
     virtual void LogMetricEvent(const MetricEvent & event) { mMetricEvents.push_back(event); }
@@ -141,9 +141,9 @@ void TestInstantMetricEvent(nlTestSuite * inSuite, void * inContext)
         MetricEvent(MetricEvent::Type::kInstantEvent, "event3"),
     };
 
-    NL_TEST_ASSERT(inSuite, backend.metricEvents().size() == expected.size());
+    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
     NL_TEST_ASSERT(inSuite,
-                   std::equal(backend.metricEvents().begin(), backend.metricEvents().end(), expected.begin(), expected.end()));
+                   std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 void TestBeginEndMetricEvent(nlTestSuite * inSuite, void * inContext)
@@ -168,10 +168,10 @@ void TestBeginEndMetricEvent(nlTestSuite * inSuite, void * inContext)
             MetricEvent(MetricEvent::Type::kEndEvent, "event1"),
         };
 
-        NL_TEST_ASSERT(inSuite, backend1.metricEvents().size() == expected1.size());
+        NL_TEST_ASSERT(inSuite, backend1.GetMetricEvents().size() == expected1.size());
         NL_TEST_ASSERT(
             inSuite,
-            std::equal(backend1.metricEvents().begin(), backend1.metricEvents().end(), expected1.begin(), expected1.end()));
+            std::equal(backend1.GetMetricEvents().begin(), backend1.GetMetricEvents().end(), expected1.begin(), expected1.end()));
 
         {
             ScopedRegistration scope2(backend2);
@@ -197,10 +197,10 @@ void TestBeginEndMetricEvent(nlTestSuite * inSuite, void * inContext)
             MetricEvent(MetricEvent::Type::kEndEvent, "event4"),
         };
 
-        NL_TEST_ASSERT(inSuite, backend2.metricEvents().size() == expected2.size());
+        NL_TEST_ASSERT(inSuite, backend2.GetMetricEvents().size() == expected2.size());
         NL_TEST_ASSERT(
             inSuite,
-            std::equal(backend2.metricEvents().begin(), backend2.metricEvents().end(), expected2.begin(), expected2.end()));
+            std::equal(backend2.GetMetricEvents().begin(), backend2.GetMetricEvents().end(), expected2.begin(), expected2.end()));
     }
 }
 
@@ -247,10 +247,10 @@ void TestScopedMetricEvent(nlTestSuite * inSuite, void * inContext)
             MetricEvent(MetricEvent::Type::kEndEvent, "event1", CHIP_ERROR_BUSY),
         };
 
-        NL_TEST_ASSERT(inSuite, backend1.metricEvents().size() == expected1.size());
+        NL_TEST_ASSERT(inSuite, backend1.GetMetricEvents().size() == expected1.size());
         NL_TEST_ASSERT(
             inSuite,
-            std::equal(backend1.metricEvents().begin(), backend1.metricEvents().end(), expected1.begin(), expected1.end()));
+            std::equal(backend1.GetMetricEvents().begin(), backend1.GetMetricEvents().end(), expected1.begin(), expected1.end()));
 
         std::vector<MetricEvent> expected2 = {
             MetricEvent(MetricEvent::Type::kBeginEvent, "event2"),
@@ -261,20 +261,20 @@ void TestScopedMetricEvent(nlTestSuite * inSuite, void * inContext)
             MetricEvent(MetricEvent::Type::kEndEvent, "event2", CHIP_ERROR_BAD_REQUEST),
         };
 
-        NL_TEST_ASSERT(inSuite, backend2.metricEvents().size() == expected2.size());
+        NL_TEST_ASSERT(inSuite, backend2.GetMetricEvents().size() == expected2.size());
         NL_TEST_ASSERT(
             inSuite,
-            std::equal(backend2.metricEvents().begin(), backend2.metricEvents().end(), expected2.begin(), expected2.end()));
+            std::equal(backend2.GetMetricEvents().begin(), backend2.GetMetricEvents().end(), expected2.begin(), expected2.end()));
 
         std::vector<MetricEvent> expected3 = {
             MetricEvent(MetricEvent::Type::kBeginEvent, "event3"),
             MetricEvent(MetricEvent::Type::kEndEvent, "event3", CHIP_ERROR_EVENT_ID_FOUND),
         };
 
-        NL_TEST_ASSERT(inSuite, backend3.metricEvents().size() == expected3.size());
+        NL_TEST_ASSERT(inSuite, backend3.GetMetricEvents().size() == expected3.size());
         NL_TEST_ASSERT(
             inSuite,
-            std::equal(backend3.metricEvents().begin(), backend3.metricEvents().end(), expected3.begin(), expected3.end()));
+            std::equal(backend3.GetMetricEvents().begin(), backend3.GetMetricEvents().end(), expected3.begin(), expected3.end()));
     }
 }
 
@@ -298,9 +298,9 @@ exit:
     };
 
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
-    NL_TEST_ASSERT(inSuite, backend.metricEvents().size() == expected.size());
+    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
     NL_TEST_ASSERT(inSuite,
-                   std::equal(backend.metricEvents().begin(), backend.metricEvents().end(), expected.begin(), expected.end()));
+                   std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 void TestSuccessOrExitWithMetric(nlTestSuite * inSuite, void * inContext)
@@ -319,9 +319,9 @@ exit:
     };
 
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUSY);
-    NL_TEST_ASSERT(inSuite, backend.metricEvents().size() == expected.size());
+    NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
     NL_TEST_ASSERT(inSuite,
-                   std::equal(backend.metricEvents().begin(), backend.metricEvents().end(), expected.begin(), expected.end()));
+                   std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 static const nlTest sMetricTests[] = {
