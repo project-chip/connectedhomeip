@@ -1324,10 +1324,10 @@ void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingDirectPrep
     chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
     CommandHandler commandHandler(&mockCommandHandlerDelegate);
 
-    // We intentionally prevent successful calls to PrepareInvokeResponseCommand and FinishCommand when no 
+    // We intentionally prevent successful calls to PrepareInvokeResponseCommand and FinishCommand when no
     // responder is present. This aligns with the design decision to promote AddStatus and AddResponseData
     // usage in such scenarios. See GitHub issue #32486 for discussions on phasing out external use of
-    // these primitives. 
+    // these primitives.
     const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
     ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
     CHIP_ERROR err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
