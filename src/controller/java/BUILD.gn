@@ -396,7 +396,6 @@ kotlin_library("kotlin_matter_controller") {
 
   if (matter_enable_java_compilation) {
     deps += [
-      "${chip_root}/third_party/java_deps:json",
       "${chip_root}/third_party/java_deps:kotlin-stdlib",
       "${chip_root}/third_party/java_deps:kotlinx-coroutines-core-jvm",
       "${chip_root}/third_party/java_deps/stub_src",
