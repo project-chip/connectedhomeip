@@ -543,7 +543,9 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onResubscriptionSucceededCb = callback
 
-    def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
+    def SetAttributeUpdateCallback(
+        self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], Union[None, Awaitable[None]]]
+    ):
         '''
         Sets the callback function for the attribute value change event,
         accepts a Callable accepts an attribute path and the cached data.
@@ -564,7 +566,7 @@ class SubscriptionTransaction:
             self._onErrorCb = callback
 
     @property
-    def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
+    def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], Union[None, Awaitable[None]]]:
         return self._onAttributeChangeCb
 
     @property
@@ -776,8 +778,11 @@ class AsyncReadTransaction:
                     # path could not be resolved into a TypedAttributePath
                     logging.getLogger(__name__).exception(err)
                     continue
-                self._subscription_handler.OnAttributeChangeCb(
-                    attribute_path, self._subscription_handler)
+                callback = self._subscription_handler.OnAttributeChangeCb
+                if inspect.iscoroutinefunction(callback):
+                    asyncio.run_coroutine_threadsafe(callback(attribute_path, self._subscription_handler), self._event_loop)
+                else:
+                    callback(attribute_path, self._subscription_handler)
 
             # Clear it out once we've notified of all changes in this transaction.
         self._changedPathSet = set()
@@ -813,7 +818,9 @@ class AsyncReadTransaction:
         pass
 
     def handleReportEnd(self):
-        # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
+        # We can't post this on the self._event_loop using call_soon_threadsafe() since
+        # the event loop might no longer be open (typically when ZCLSubscribeAttribute
+        # is used).
         self._handleReportEnd()
 
 
