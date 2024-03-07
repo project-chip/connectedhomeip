@@ -50,66 +50,18 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
     return LockManager::Instance().Unlock(endpointId, fabricIdx, nodeId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
-//UnlockWithTimeout
-
-// =============================================================================
-// Users and credentials access callbacks
-// =============================================================================
-
-// SetWeekDaySchedule
-DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
-                                          uint8_t endHour, uint8_t endMinute)
+bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                              OperationErrorEnum & err)
 {
-    return LockManager::Instance().SetSchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute,
-                                               endHour, endMinute);
+    return LockManager::Instance().Unbolt(endpointId, fabricIdx, nodeId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
-// GetWeekDaySchedule
-DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
-                                          EmberAfPluginDoorLockWeekDaySchedule & schedule)
+bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
-    return LockManager::Instance().GetSchedule(endpointId, weekdayIndex, userIndex, schedule);
+    return LockManager::Instance().GetUser(endpointId, userIndex, user);
 }
 
-// emberAfDoorLockClusterClearWeekDayScheduleCallback was handled in src/app/clusters/door-lock-server/door-lock-server.cpp
-// And finally call into emberAfPluginDoorLockSetSchedule
-
-// SetYearDaySchedule
-DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-                                          DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
-{
-    return LockManager::Instance().SetSchedule(endpointId, yearDayIndex, userIndex, status, localStartTime, localEndTime);
-}
-
-// GetYearDaySchedule
-DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
-                                          EmberAfPluginDoorLockYearDaySchedule & schedule)
-{
-    return LockManager::Instance().GetSchedule(endpointId, yearDayIndex, userIndex, schedule);
-}
-
-// emberAfDoorLockClusterClearYearDayScheduleCallback was handled in src/app/clusters/door-lock-server/door-lock-server.cpp
-// And finally call into emberAfPluginDoorLockSetSchedule
-
-// SetHolidaySchedule
-DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
-                                          uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
-{
-    return LockManager::Instance().SetSchedule(endpointId, holidayIndex, status, localStartTime, localEndTime, operatingMode);
-}
-
-// GetHolidaySchedule
-DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
-                                          EmberAfPluginDoorLockHolidaySchedule & schedule)
-{
-    return LockManager::Instance().GetSchedule(endpointId, holidayIndex, schedule);
-}
-
-// emberAfDoorLockClusterClearHolidayScheduleCallback was handled in src/app/clusters/door-lock-server/door-lock-server.cpp
-// And finally call into emberAfPluginDoorLockSetSchedule
-
-// SetUser
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
                                   chip::FabricIndex modifier, const chip::CharSpan & userName, uint32_t uniqueId,
                                   UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
@@ -120,16 +72,12 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
                                            credentialRule, credentials, totalCredentials);
 }
 
-// GetUser
-bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
+                                        EmberAfPluginDoorLockCredentialInfo & credential)
 {
-    return LockManager::Instance().GetUser(endpointId, userIndex, user);
+    return LockManager::Instance().GetCredential(endpointId, credentialIndex, credentialType, credential);
 }
 
-// emberAfDoorLockClusterClearUserCallback was handled in src/app/clusters/door-lock-server/door-lock-server.cpp
-// And finally call into emberAfPluginDoorLockSetCredential and emberAfPluginDoorLockSetUser
-
-// SetCredential
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
                                         chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
                                         CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData)
@@ -138,22 +86,42 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
                                                  credentialData);
 }
 
-// GetCredential
-bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
-                                        EmberAfPluginDoorLockCredentialInfo & credential)
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
+                                          EmberAfPluginDoorLockWeekDaySchedule & schedule)
 {
-    return LockManager::Instance().GetCredential(endpointId, credentialIndex, credentialType, credential);
+    return LockManager::Instance().GetSchedule(endpointId, weekdayIndex, userIndex, schedule);
 }
 
-// emberAfDoorLockClusterClearCredentialCallback was handled in src/app/clusters/door-lock-server/door-lock-server.cpp
-// And finally call into emberAfPluginDoorLockSetCredential and emberAfPluginDoorLockSetUser
-
-// UnboltDoor
-bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
-                                              const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
-                                              OperationErrorEnum & err)
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
+                                          EmberAfPluginDoorLockHolidaySchedule & schedule)
 {
-    return LockManager::Instance().Unbolt(endpointId, fabricIdx, nodeId, pinCode, err, OperationSourceEnum::kRemote);
+    return LockManager::Instance().GetSchedule(endpointId, holidayIndex, schedule);
+}
+
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
+                                          DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                          uint8_t endHour, uint8_t endMinute)
+{
+    return LockManager::Instance().SetSchedule(endpointId, weekdayIndex, userIndex, status, daysMask, startHour, startMinute,
+                                               endHour, endMinute);
+}
+
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                                          DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime)
+{
+    return LockManager::Instance().SetSchedule(endpointId, yearDayIndex, userIndex, status, localStartTime, localEndTime);
+}
+
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
+                                          EmberAfPluginDoorLockYearDaySchedule & schedule)
+{
+    return LockManager::Instance().GetSchedule(endpointId, yearDayIndex, userIndex, schedule);
+}
+
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
+                                          uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
+{
+    return LockManager::Instance().SetSchedule(endpointId, holidayIndex, status, localStartTime, localEndTime, operatingMode);
 }
 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
