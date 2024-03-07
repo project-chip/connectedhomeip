@@ -88,16 +88,9 @@ private:
 class WiFiManager
 {
 public:
-    enum WiFiRequestStatus : int
-    {
-        SUCCESS    = 0,
-        FAILURE    = 1,
-        TERMINATED = 2
-    };
-
     using ScanResultCallback = void (*)(const NetworkCommissioning::WiFiScanResponse &);
-    using ScanDoneCallback   = void (*)(WiFiRequestStatus);
-    using ConnectionCallback = void (*)();
+    using ScanDoneCallback   = void (*)(const wifi_status &);
+    using ConnectionCallback = void (*)(int);
 
     enum class StationStatus : uint8_t
     {
@@ -120,8 +113,7 @@ public:
 
     struct ConnectionHandling
     {
-        ConnectionCallback mOnConnectionSuccess{};
-        ConnectionCallback mOnConnectionFailed{};
+        ConnectionCallback mOnConnectionDone{};
         System::Clock::Seconds32 mConnectionTimeout{};
     };
 
