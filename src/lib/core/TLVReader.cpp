@@ -122,6 +122,9 @@ TLVType TLVReader::GetType() const
         return kTLVType_FloatingPointNumber;
     if (elemType == TLVElementType::NotSpecified || elemType >= TLVElementType::Null)
         return static_cast<TLVType>(elemType);
+
+    // TODO: fix lint: https://github.com/project-chip/connectedhomeip/issues/32249
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     return static_cast<TLVType>(static_cast<uint8_t>(elemType) & ~kTLVTypeSizeMask);
 }
 
@@ -1030,6 +1033,9 @@ TLVElementType TLVReader::ElementType() const
 {
     if (mControlByte == static_cast<uint16_t>(kTLVControlByte_NotSpecified))
         return TLVElementType::NotSpecified;
+
+    // TODO: fix lint: https://github.com/project-chip/connectedhomeip/issues/32249
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     return static_cast<TLVElementType>(mControlByte & kTLVTypeMask);
 }
 

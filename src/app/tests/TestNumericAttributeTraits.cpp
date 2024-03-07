@@ -151,7 +151,10 @@ void Test_SimpleEnum(nlTestSuite * apSuite, void * apContext)
     WorkingType wValue;
     StorageType sNullValue;
     WorkingType wNullValue;
-    const StorageType storageTestData              = SimpleEnum::kOne;
+    const StorageType storageTestData = SimpleEnum::kOne;
+
+    // Intentionally set a "NULL" value
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     const WorkingType workingTestUnsignedNullValue = static_cast<SimpleEnum>(0xFF);
 
     // 1) Verify the size of the types

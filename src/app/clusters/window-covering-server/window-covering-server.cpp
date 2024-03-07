@@ -287,10 +287,14 @@ void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & newMode)
     }
 
     if (oldMode != newMode)
+    {
         Attributes::Mode::Set(endpoint, newMode);
+    }
 
     if (oldStatus != newStatus)
+    {
         ConfigStatusSet(endpoint, newStatus);
+    }
 }
 
 chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)

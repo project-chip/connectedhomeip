@@ -241,6 +241,8 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
 
         t.a = 20;
         t.b = true;
+        // Intentionally out of range to get kUnknownEnumValue
+        // NOLINTNEXTLINE(*.EnumCastOutOfRange)
         t.c = static_cast<Clusters::UnitTesting::SimpleEnum>(10);
         t.d = buf;
 

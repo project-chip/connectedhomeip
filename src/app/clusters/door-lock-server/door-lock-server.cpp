@@ -2590,8 +2590,15 @@ bool DoorLockServer::weekDayIndexValid(chip::EndpointId endpointId, uint8_t week
 
 DlStatus DoorLockServer::clearWeekDaySchedule(chip::EndpointId endpointId, uint16_t userIndex, uint8_t weekDayIndex)
 {
+    // TODO: DaysMaskMap 0 is not an actual ENUM value. However code is too coupled to easily
+    //       convert to BitFlags<DaysMaskMap> as part of CLANG-upgrade.
+    // See https://github.com/project-chip/connectedhomeip/issues/32249
+    //
+    // NOLINTBEGIN(*.EnumCastOutOfRange)
     auto status = emberAfPluginDoorLockSetSchedule(endpointId, weekDayIndex, userIndex, DlScheduleStatus::kAvailable,
                                                    DaysMaskMap(0), 0, 0, 0, 0);
+    // NOLINTEND(*.EnumCastOutOfRange)
+
     if (DlStatus::kSuccess != status && DlStatus::kNotFound != status)
     {
         ChipLogError(Zcl,

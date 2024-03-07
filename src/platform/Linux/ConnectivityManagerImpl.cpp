@@ -510,6 +510,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
 
+        // NOLINTBEGIN(*.EnumCastOutOfRange)
         g_signal_connect(
             mWpaSupplicant.iface, "properties-changed",
             G_CALLBACK(+[](WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * properties, ConnectivityManagerImpl * self) {
@@ -521,6 +522,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
                              return self->_OnWpaInterfaceScanDone(proxy, success);
                          }),
                          this);
+        // NOLINTEND(*.EnumCastOutOfRange)
     }
     else
     {
@@ -750,6 +752,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * sourceObject, GAsyncRes
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant proxy");
 
+        // NOLINTBEGIN(*.EnumCastOutOfRange)
         g_signal_connect(
             mWpaSupplicant.proxy, "interface-added",
             G_CALLBACK(+[](WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties,
@@ -760,6 +763,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * sourceObject, GAsyncRes
             G_CALLBACK(+[](WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties,
                            ConnectivityManagerImpl * self) { return self->_OnWpaInterfaceRemoved(proxy, path, properties); }),
             this);
+        // NOLINTEND(*.EnumCastOutOfRange)
 
         wpa_fi_w1_wpa_supplicant1_call_get_interface(
             mWpaSupplicant.proxy, sWiFiIfName, nullptr,
@@ -1676,9 +1680,13 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         return false;
     }
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     WpaFiW1Wpa_supplicant1BSSProxy * bssProxy = WPA_FI_W1_WPA_SUPPLICANT1_BSS_PROXY(bss.get());
 
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     GAutoPtr<GVariant> ssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "SSID"));
+
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     GAutoPtr<GVariant> bssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "BSSID"));
 
     // Network scan is performed in the background, so the BSS
@@ -1789,7 +1797,10 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         return res;
     };
     auto GetNetworkSecurityType = [IsNetworkWPAPSK, IsNetworkWPA2PSK](WpaFiW1Wpa_supplicant1BSSProxy * proxy) -> uint8_t {
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
         GAutoPtr<GVariant> wpa(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "WPA"));
+
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
         GAutoPtr<GVariant> rsn(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "RSN"));
 
         uint8_t res = IsNetworkWPAPSK(wpa.get()) | IsNetworkWPA2PSK(rsn.get());

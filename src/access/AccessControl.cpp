@@ -554,7 +554,7 @@ bool AccessControl::IsValid(const Entry & entry)
 
     AuthMode authMode       = AuthMode::kNone;
     FabricIndex fabricIndex = kUndefinedFabricIndex;
-    Privilege privilege     = static_cast<Privilege>(0);
+    Privilege privilege     = Privilege::kView;
     size_t subjectCount     = 0;
     size_t targetCount      = 0;
 

@@ -90,6 +90,7 @@ CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackM
         self->mProxy != nullptr, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error"));
 
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     g_signal_connect(self->mProxy.get(), "g-properties-changed", G_CALLBACK(OnDbusPropertiesChanged), self);
 
     return CHIP_NO_ERROR;
@@ -270,6 +271,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
 
     {
         GAutoPtr<GError> err;
+
+        // NOLINTNEXTLINE(bugprone-casting-through-void)
         GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                                            g_variant_new("(ss)", "io.openthread.BorderRouter", "ActiveDatasetTlvs"),
                                                            G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
@@ -326,6 +329,8 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
     VerifyOrReturnError(mProxy, false);
 
     GAutoPtr<GError> err;
+
+    // NOLINTNEXTLINE(bugprone-casting-through-void)
     GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                                        g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"),
                                                        G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));

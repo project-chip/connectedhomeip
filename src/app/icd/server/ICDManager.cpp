@@ -391,6 +391,8 @@ void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
 {
     assertChipStackLockedByCurrentThread();
 
+    // TODO: fix lint: https://github.com/project-chip/connectedhomeip/issues/32249
+    // NOLINTNEXTLINE(*.EnumCastOutOfRange)
     mKeepActiveFlags.Set(flag, state);
     if (mOperationalState == OperationalState::IdleMode && mKeepActiveFlags.HasAny())
     {
@@ -511,6 +513,9 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
     {
         // Only 1 request per type (kCommissioningWindowOpen, kFailSafeArmed)
         // remove requirement directly
+
+        // TODO: fix lint: https://github.com/project-chip/connectedhomeip/issues/32249
+        // NOLINTNEXTLINE(*.EnumCastOutOfRange)
         this->SetKeepActiveModeRequirements(request, false /* state */);
     }
 }
