@@ -50,7 +50,7 @@ public enum PairingHintBitmap {
     public int getBitIndex() {
         return bitIndex;
     }
-    
+
     public boolean getRequirePairingInstruction() {
         return isRequirePairingInstruction;
     }
