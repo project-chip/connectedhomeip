@@ -33,6 +33,7 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #include "lib/core/CHIPError.h"
@@ -52,34 +53,78 @@ NSString * const MTRDataVersionKey = @"dataVersion";
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
-// This class is for storing weak references in a container
-@interface MTRWeakReference<ObjectType> : NSObject
-+ (instancetype)weakReferenceWithObject:(ObjectType)object;
-- (instancetype)initWithObject:(ObjectType)object;
-- (ObjectType)strongObject; // returns strong object or NULL
-@end
 
-@interface MTRWeakReference () {
+// Holder of weak reference of MTRDevice delegate along with its queue
+@interface MTRDeviceDelegateWeakReference : NSObject {
 @private
-    __weak id _object;
+    __weak id _delegate;
+    __weak dispatch_queue_t _queue;
 }
+// TODO: have init method that takes array of attribute / event paths for filtering reports
++ (instancetype)weakReferenceWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue;
+
+// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
+- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
+
+#ifdef DEBUG
+// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
+- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
+#endif
+
+- (BOOL)isNull;
+- (BOOL)containsDelegate:(id<MTRDeviceDelegate>)otherDelegate;
 @end
 
-@implementation MTRWeakReference
-- (instancetype)initWithObject:(id)object
+@implementation MTRDeviceDelegateWeakReference
++ (instancetype)weakReferenceWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    return [[self alloc] initWithDelegate:delegate queue:queue];
+}
+
+- (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     if (self = [super init]) {
-        _object = object;
+        _delegate = delegate;
+        _queue = queue;
     }
     return self;
 }
-+ (instancetype)weakReferenceWithObject:(id)object
+
+- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
 {
-    return [[self alloc] initWithObject:object];
+    if (self.isNull) {
+        return NO;
+    }
+
+    id<MTRDeviceDelegate> strongDelegate = _delegate;
+    dispatch_async(_queue, ^{
+        block(strongDelegate);
+    });
+    return YES;
 }
-- (id)strongObject
+
+#ifdef DEBUG
+- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block
 {
-    return _object;
+    if (self.isNull) {
+        return NO;
+    }
+
+    block(_delegate);
+
+    return YES;
+}
+#endif
+
+- (BOOL)isNull
+{
+    return (!_delegate || !_queue);
+}
+
+- (BOOL)containsDelegate:(id<MTRDeviceDelegate>)otherDelegate
+{
+    return (_delegate == otherDelegate);
 }
 @end
 
@@ -143,14 +188,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTRDeviceWorkItemDuplicateReadTypeID = 1,
 };
 
-@interface MTRDevice ()
+@interface MTRDevice () {
+    NSMutableSet<MTRDeviceDelegateWeakReference *> * _delegates;
+}
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
 // and protects device calls to setUTCTime and setDSTOffset
 @property (nonatomic, readonly) os_unfair_lock timeSyncLock;
 @property (nonatomic) chip::FabricIndex fabricIndex;
-@property (nonatomic) MTRWeakReference<id<MTRDeviceDelegate>> * weakDelegate;
-@property (nonatomic) dispatch_queue_t delegateQueue;
 @property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 @property (nonatomic) BOOL receivingReport;
 @property (nonatomic) BOOL receivingPrimingReport;
@@ -242,6 +287,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
         _state = MTRDeviceStateUnknown;
+        _delegates = [NSMutableSet set];
         MTR_LOG_INFO("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
     return self;
@@ -309,12 +355,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_scheduleNextUpdate:(UInt64)nextUpdateInSeconds
 {
-    MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
+    mtr_weakify(self);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (nextUpdateInSeconds * NSEC_PER_SEC)), self.queue, ^{
         MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
-        MTRDevice * strongSelf = weakSelf.strongObject;
-        if (strongSelf) {
-            [strongSelf _performScheduledTimeUpdate];
+        mtr_strongify(self);
+        if (self) {
+            [self _performScheduledTimeUpdate];
         } else {
             MTR_LOG_DEBUG("%@ MTRDevice no longer valid. No Timer Scheduled will be scheduled for a Device Time Update.", self);
             return;
@@ -341,22 +387,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_performScheduledTimeUpdate
 {
-    os_unfair_lock_lock(&self->_timeSyncLock);
+    std::lock_guard lock(self->_timeSyncLock);
     // Device needs to still be reachable
     if (self.state != MTRDeviceStateReachable) {
         MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", self);
-        os_unfair_lock_unlock(&self->_timeSyncLock);
         return;
     }
     // Device must not be invalidated
     if (!self.timeUpdateScheduled) {
         MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
-        os_unfair_lock_unlock(&self->_timeSyncLock);
         return;
     }
     self.timeUpdateScheduled = NO;
     [self _updateDeviceTimeAndScheduleNextUpdate];
-    os_unfair_lock_unlock(&self->_timeSyncLock);
 }
 
 - (NSArray<NSNumber *> *)_endpointsWithTimeSyncClusterServer
@@ -498,10 +541,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 #endif
 
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
-    _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
-    _delegateQueue = queue;
+    NSMutableSet * weakReferencesToRemove = [NSMutableSet set];
+    for (MTRDeviceDelegateWeakReference * weakReference in _delegates) {
+        if (weakReference.isNull || [weakReference containsDelegate:delegate]) {
+            [weakReferencesToRemove addObject:weakReference];
+        }
+    }
+    if (weakReferencesToRemove.count) {
+        [_delegates minusSet:weakReferencesToRemove];
+        MTR_LOG_INFO("%@ setDelegate: removed %lu", self, (unsigned long) weakReferencesToRemove.count);
+    }
+    [_delegates addObject:[MTRDeviceDelegateWeakReference weakReferenceWithDelegate:delegate queue:queue]];
 
     // If Check if cache is already primed and client hasn't been informed yet, call the -deviceCachePrimed: callback
     if (!_delegateDeviceCachePrimedCalled && [self _isCachePrimedWithInitialConfigurationData]) {
@@ -511,8 +563,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (setUpSubscription) {
         [self _setupSubscription];
     }
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)invalidate
@@ -529,7 +579,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     _state = MTRDeviceStateUnknown;
 
-    _weakDelegate = nil;
+    [_delegates removeAllObjects];
 
     // Make sure we don't try to resubscribe if we have a pending resubscribe
     // attempt, since we now have no delegate.
@@ -573,25 +623,65 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Return YES if there's a valid delegate AND subscription is expected to report value
 - (BOOL)_subscriptionAbleToReport
 {
-    os_unfair_lock_lock(&self->_lock);
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    auto state = _state;
-    os_unfair_lock_unlock(&self->_lock);
-    return (delegate != nil) && (state == MTRDeviceStateReachable);
+    std::lock_guard lock(self->_lock);
+    return [self _delegateExists] && (_state == MTRDeviceStateReachable);
+}
+
+- (BOOL)_delegateExists
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    for (MTRDeviceDelegateWeakReference * weakReference in _delegates) {
+        if (!weakReference.isNull) {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 - (BOOL)_callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            block(delegate);
-        });
-        return YES;
+
+    // Opportunistically remove defunct delegate references
+    NSMutableSet * weakReferencesToRemove = [NSMutableSet set];
+    NSUInteger delegatesCalled = 0;
+    for (MTRDeviceDelegateWeakReference * weakReference in _delegates) {
+        if ([weakReference callDelegateWithBlock:block]) {
+            delegatesCalled++;
+        } else {
+            [weakReferencesToRemove addObject:weakReference];
+        }
     }
-    return NO;
+
+    if (weakReferencesToRemove.count) {
+        [_delegates minusSet:weakReferencesToRemove];
+        MTR_LOG_DEFAULT("%@ _callDelegateWithBlock: removed %lu called %lu", self, (unsigned long) weakReferencesToRemove.count, (unsigned long) delegatesCalled);
+    }
+
+    if (!_delegates.count && !weakReferencesToRemove.count) {
+        // "Remove until 0 remain" case is already logged above
+        MTR_LOG_DEFAULT("%@ _callDelegateWithBlock: no delegates to call", self);
+    }
+
+    return (delegatesCalled > 0);
 }
+
+#ifdef DEBUG
+// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
+- (void)_callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    NSUInteger delegatesCalled = 0;
+    for (MTRDeviceDelegateWeakReference * weakReference in _delegates) {
+        if ([weakReference callDelegateSynchronouslyWithBlock:block]) {
+            delegatesCalled++;
+        }
+    }
+
+    MTR_LOG_INFO("%@ _callDelegateSynchronouslyWithBlock: called %lu", self, (unsigned long) delegatesCalled);
+}
+#endif
 
 - (void)_callDelegateDeviceCachePrimed
 {
@@ -619,12 +709,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             MTR_LOG_INFO(
                 "%@ reachability state change %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
         }
-        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-        if (delegate) {
-            dispatch_async(_delegateQueue, ^{
-                [delegate device:self stateChanged:state];
-            });
-        }
+        [self _callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            [delegate device:self stateChanged:state];
+        }];
     } else {
         MTR_LOG_INFO(
             "%@ Not reporting reachability state change, since no change in state %lu => %lu", self, static_cast<unsigned long>(lastState), static_cast<unsigned long>(state));
@@ -660,41 +747,34 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleSubscriptionError:(NSError *)error
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
     _subscriptionActive = NO;
     _unreportedEvents = nil;
 
     [self _changeState:MTRDeviceStateUnreachable];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_handleResubscriptionNeeded
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
     [self _changeState:MTRDeviceStateUnknown];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_handleSubscriptionReset
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
     // if there is no delegate then also do not retry
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (!delegate) {
+    if (![self _delegateExists]) {
         // NOTE: Do not log anythig here: we have been invalidated, and the
         // Matter stack might already be torn down.
-        os_unfair_lock_unlock(&self->_lock);
         return;
     }
 
     // don't schedule multiple retries
     if (self.reattemptingSubscription) {
         MTR_LOG_DEFAULT("%@ already reattempting subscription", self);
-        os_unfair_lock_unlock(&self->_lock);
         return;
     }
 
@@ -711,12 +791,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     MTR_LOG_DEFAULT("%@ scheduling to reattempt subscription in %u seconds", self, _lastSubscriptionAttemptWait);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
-        os_unfair_lock_lock(&self->_lock);
+        std::lock_guard lock(self->_lock);
         [self _reattemptSubscriptionNowIfNeeded];
-        os_unfair_lock_unlock(&self->_lock);
     });
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_reattemptSubscriptionNowIfNeeded
@@ -733,18 +810,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleUnsolicitedMessageFromPublisher
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
     [self _changeState:MTRDeviceStateReachable];
 
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
-                [delegate deviceBecameActive:self];
-            }
-        });
-    }
+    [self _callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
+            [delegate deviceBecameActive:self];
+        }
+    }];
 
     // in case this is called during exponential back off of subscription
     // reestablishment, this starts the attempt right away
@@ -752,13 +826,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // ReadClient how did we get this notification and if we _do_ have an active
     // ReadClient, this call or _setupSubscription would be no-ops.
     [self _reattemptSubscriptionNowIfNeeded];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_handleReportBegin
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
+
     _receivingReport = YES;
     if (_state != MTRDeviceStateReachable) {
         _receivingPrimingReport = YES;
@@ -766,28 +839,24 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     } else {
         _receivingPrimingReport = NO;
     }
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_handleReportEnd
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
+
     _receivingReport = NO;
     _receivingPrimingReport = NO;
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
 
 // For unit testing only
 #ifdef DEBUG
-    id delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            if ([delegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
-                [delegate unitTestReportEndForDevice:self];
-            }
-        });
-    }
+    [self _callDelegateWithBlock:^(id delegate) {
+        if ([delegate respondsToSelector:@selector(unitTestReportEndForDevice:)]) {
+            [delegate unitTestReportEndForDevice:self];
+        }
+    }];
 #endif
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 // assume lock is held
@@ -795,23 +864,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
     if (attributes.count) {
-        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-        if (delegate) {
-            dispatch_async(_delegateQueue, ^{
-                [delegate device:self receivedAttributeReport:attributes];
-            });
-        }
+        [self _callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            [delegate device:self receivedAttributeReport:attributes];
+        }];
     }
 }
 
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
     [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 #ifdef DEBUG
@@ -825,7 +889,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
     NSDate * oldEstimatedStartTime = _estimatedStartTime;
     // Combine with previous unreported events, if they exist
@@ -909,24 +973,22 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         MTR_LOG_DEFAULT("%@ updated estimated start time to %@", self, _estimatedStartTime);
     }
 
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate) {
+    BOOL delegatesCalled = [self _callDelegateWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        [delegate device:self receivedEventReport:reportToReturn];
+    }];
+    if (delegatesCalled) {
         _unreportedEvents = nil;
-        dispatch_async(_delegateQueue, ^{
-            [delegate device:self receivedEventReport:reportToReturn];
-        });
     } else {
         // save unreported events
         _unreportedEvents = reportToReturn;
     }
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (NSDictionary<MTRClusterPath *, NSNumber *> *)_getCachedDataVersions
 {
     NSMutableDictionary<MTRClusterPath *, NSNumber *> * dataVersions = [NSMutableDictionary dictionary];
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
+
     for (MTRAttributePath * path in _readCache) {
         NSDictionary * dataValue = _readCache[path];
         NSNumber * dataVersionNumber = dataValue[MTRDataVersionKey];
@@ -940,7 +1002,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }
     MTR_LOG_INFO("%@ _getCachedDataVersions dataVersions count: %lu readCache count: %lu", self, static_cast<unsigned long>(dataVersions.count), static_cast<unsigned long>(_readCache.count));
-    os_unfair_lock_unlock(&self->_lock);
 
     return dataVersions;
 }
@@ -979,13 +1040,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&self->_lock);
 
 #ifdef DEBUG
-    id delegate = _weakDelegate.strongObject;
+    __block NSNumber * delegateMin = nil;
     Optional<System::Clock::Seconds32> maxIntervalOverride;
-    if (delegate) {
+    [self _callDelegateSynchronouslyWithBlock:^(id delegate) {
         if ([delegate respondsToSelector:@selector(unitTestMaxIntervalOverrideForSubscription:)]) {
-            NSNumber * delegateMin = [delegate unitTestMaxIntervalOverrideForSubscription:self];
-            maxIntervalOverride.Emplace(delegateMin.unsignedIntValue);
+            delegateMin = [delegate unitTestMaxIntervalOverrideForSubscription:self];
         }
+    }];
+    if (delegateMin) {
+        maxIntervalOverride.Emplace(delegateMin.unsignedIntValue);
     }
 #endif
 
@@ -1191,6 +1254,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     NSUInteger attributesReportedSinceLastCheck = _unitTestAttributesReportedSinceLastCheck;
     _unitTestAttributesReportedSinceLastCheck = 0;
     return attributesReportedSinceLastCheck;
+}
+
+- (NSUInteger)unitTestNonnullDelegateCount
+{
+    std::lock_guard lock(self->_lock);
+
+    NSUInteger nonnullDelegateCount = 0;
+    for (MTRDeviceDelegateWeakReference * weakReference in _delegates) {
+        if (!weakReference.isNull) {
+            nonnullDelegateCount++;
+        }
+    }
+
+    return nonnullDelegateCount;
 }
 #endif
 
@@ -1475,14 +1552,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
                                                                          attributeID:attributeID];
 
-    BOOL useValueAsExpectedValue = YES;
+    __block BOOL useValueAsExpectedValue = YES;
 #ifdef DEBUG
     os_unfair_lock_lock(&self->_lock);
-    id delegate = _weakDelegate.strongObject;
+    [self _callDelegateSynchronouslyWithBlock:^(id delegate) {
+        if ([delegate respondsToSelector:@selector(unitTestShouldSkipExpectedValuesForWrite:)]) {
+            useValueAsExpectedValue = ![delegate unitTestShouldSkipExpectedValuesForWrite:self];
+        }
+    }];
     os_unfair_lock_unlock(&self->_lock);
-    if ([delegate respondsToSelector:@selector(unitTestShouldSkipExpectedValuesForWrite:)]) {
-        useValueAsExpectedValue = ![delegate unitTestShouldSkipExpectedValuesForWrite:self];
-    }
 #endif
 
     uint64_t expectedValueID = 0;
@@ -1818,28 +1896,26 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         if (waitTime < MTR_DEVICE_EXPIRATION_CHECK_TIMER_MINIMUM_WAIT_TIME) {
             waitTime = MTR_DEVICE_EXPIRATION_CHECK_TIMER_MINIMUM_WAIT_TIME;
         }
-        MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
+        mtr_weakify(self);
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (waitTime * NSEC_PER_SEC)), self.queue, ^{
-            MTRDevice * strongSelf = weakSelf.strongObject;
-            [strongSelf _performScheduledExpirationCheck];
+            mtr_strongify(self);
+            [self _performScheduledExpirationCheck];
         });
     }
 }
 
 - (void)_performScheduledExpirationCheck
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
     self.expirationCheckScheduled = NO;
     [self _checkExpiredExpectedValues];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 // Get attribute value dictionary for an attribute path from the right cache
 - (NSDictionary<NSString *, id> *)_attributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
     // First check expected value cache
     NSArray * expectedValue = _expectedValueCache[attributePath];
@@ -1849,8 +1925,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // expired - purge and fall through
             _expectedValueCache[attributePath] = nil;
         } else {
-            os_unfair_lock_unlock(&self->_lock);
-
             // not yet expired - return result
             return expectedValue[MTRDeviceExpectedValueFieldValueIndex];
         }
@@ -1859,16 +1933,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // Then check read cache
     NSDictionary<NSString *, id> * cachedAttributeValue = _readCache[attributePath];
     if (cachedAttributeValue) {
-        os_unfair_lock_unlock(&self->_lock);
-
         return cachedAttributeValue;
     } else {
         // TODO: when not found in cache, generated default values should be used
         MTR_LOG_INFO("%@ _attributeValueDictionaryForAttributePath: could not find cached attribute values for attribute %@", self,
             attributePath);
     }
-
-    os_unfair_lock_unlock(&self->_lock);
 
     return nil;
 }
@@ -1997,7 +2067,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
 {
     MTR_LOG_INFO("%@ setAttributeValues count: %lu reportChanges: %d", self, static_cast<unsigned long>(attributeValues.count), reportChanges);
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
     if (reportChanges) {
         [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeValues]];
@@ -2013,8 +2083,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     if ([self _isCachePrimedWithInitialConfigurationData]) {
         _delegateDeviceCachePrimedCalled = YES;
     }
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 // If value is non-nil, associate with expectedValueID
@@ -2133,7 +2201,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     MTR_LOG_INFO(
         "%@ Setting expected values %@ with expiration time %f seconds from now", self, values, [expirationTime timeIntervalSinceNow]);
 
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
 
     // _getAttributesToReportWithNewExpectedValues will log attribute paths reported
     NSArray * attributesToReport = [self _getAttributesToReportWithNewExpectedValues:values
@@ -2142,24 +2210,23 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self _reportAttributes:attributesToReport];
 
     [self _checkExpiredExpectedValues];
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)removeExpectedValuesForAttributePaths:(NSArray<MTRAttributePath *> *)attributePaths
                               expectedValueID:(uint64_t)expectedValueID
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
+
     for (MTRAttributePath * attributePath in attributePaths) {
         [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
     }
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)removeExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(self->_lock);
+
     [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_removeExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID

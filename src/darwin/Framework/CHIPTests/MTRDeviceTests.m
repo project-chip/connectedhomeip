@@ -2908,6 +2908,53 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 }
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
+- (void)test032_MTRDeviceMultipleDelegates
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // First start with clean slate by removing the MTRDevice and clearing the persisted cache
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    [sController removeDevice:device];
+    [sController.controllerDataStore clearAllStoredAttributes];
+    NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedAttributesAfterClear.count, 0);
+
+    // Now recreate device and get subscription primed
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    XCTestExpectation * gotReportsExpectation1 = [self expectationWithDescription:@"Attribute and Event reports have been received for delegate 1"];
+    __auto_type * delegate1 = [[MTRDeviceTestDelegate alloc] init];
+    __weak __auto_type weakDelegate1 = delegate1;
+    delegate1.onReportEnd = ^{
+        [gotReportsExpectation1 fulfill];
+        __strong __auto_type strongDelegate = weakDelegate1;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    [device setDelegate:delegate1 queue:queue];
+
+    // Test that a second delegate can also receive attribute reports
+    XCTestExpectation * gotAReport2 = [self expectationWithDescription:@"One attribute report received for delegate 2"];
+    @autoreleasepool {
+        __auto_type * delegate2 = [[MTRDeviceTestDelegate alloc] init];
+        __weak __auto_type weakDelegate2 = delegate2;
+        delegate2.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+            [gotAReport2 fulfill];
+            __strong __auto_type strongDelegate = weakDelegate2;
+            strongDelegate.onAttributeDataReceived = nil;
+        };
+
+        [device setDelegate:delegate2 queue:queue];
+
+        XCTAssertEqual([device unitTestNonnullDelegateCount], 2);
+
+        // Wait for the first report on delegate 2, then exit autoreleasepool scope to dealloc delegate2
+        [self waitForExpectations:@[ gotAReport2 ] timeout:60];
+    }
+
+    [self waitForExpectations:@[ gotReportsExpectation1 ] timeout:60];
+
+    XCTAssertEqual([device unitTestNonnullDelegateCount], 1);
+}
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
