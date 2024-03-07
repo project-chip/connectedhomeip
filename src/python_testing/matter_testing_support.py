@@ -1420,7 +1420,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     return config
 
 
-def parse_matter_test_args() -> MatterTestConfig:
+def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -1532,7 +1532,9 @@ def parse_matter_test_args() -> MatterTestConfig:
     args_group.add_argument('--hex-arg', nargs='*', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
 
-    argv = sys.argv[1:]
+    if not argv:
+        argv = sys.argv[1:]
+
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
 
 
