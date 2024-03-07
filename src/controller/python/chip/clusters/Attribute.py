@@ -557,9 +557,9 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onEventChangeCb = callback
 
-    def SetErrorCallback(self, callback: Callable[[int, SubscriptionTransaction], None]):
+    def SetErrorCallback(self, callback: Callable[[int, SubscriptionTransaction], Union[None, Awaitable[None]]]):
         '''
-        Sets the callback function in case a subscription error occured,
+        Sets the callback function in case a subscription error occurred,
         accepts a Callable accepts an error code and the cached data.
         '''
         if callback is not None:
@@ -574,7 +574,7 @@ class SubscriptionTransaction:
         return self._onEventChangeCb
 
     @property
-    def OnErrorCb(self) -> Callable[[int, SubscriptionTransaction], None]:
+    def OnErrorCb(self) -> Callable[[int, SubscriptionTransaction], Union[None, Awaitable[None]]]:
         return self._onErrorCb
 
     @property
@@ -787,7 +787,7 @@ class AsyncReadTransaction:
             # Clear it out once we've notified of all changes in this transaction.
         self._changedPathSet = set()
 
-    def _handleDone(self):
+    async def _handleDone(self):
         #
         # We only set the exception/result on the future in this _handleDone call (if it hasn't
         # already been set yet, which can be in the case of subscriptions) since doing so earlier
@@ -797,7 +797,10 @@ class AsyncReadTransaction:
         if not self._future.done():
             if self._resultError:
                 if self._subscription_handler:
-                    self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
+                    if inspect.iscoroutinefunction(self._subscription_handler.OnErrorCb):
+                        await self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
+                    else:
+                        self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
                 else:
                     self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
             else:
@@ -812,7 +815,7 @@ class AsyncReadTransaction:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
-        self._event_loop.call_soon_threadsafe(self._handleDone)
+        asyncio.run_coroutine_threadsafe(self._handleDone(), self._event_loop)
 
     def handleReportBegin(self):
         pass
