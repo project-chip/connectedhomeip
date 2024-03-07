@@ -1310,8 +1310,8 @@ void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingAddRespons
     chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
     CommandHandler commandHandler(&mockCommandHandlerDelegate);
 
-    uint32_t sizeToFill = 50;  // This is an arbitrary number, we need to select a non-zero value.
-    CHIP_ERROR err = commandHandler.AddResponseData(requestCommandPath, ForcedSizeBuffer(sizeToFill));
+    uint32_t sizeToFill = 50; // This is an arbitrary number, we need to select a non-zero value.
+    CHIP_ERROR err      = commandHandler.AddResponseData(requestCommandPath, ForcedSizeBuffer(sizeToFill));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Since calling AddResponseData is supposed to be a no-operation when there is no responder, it is
@@ -1319,7 +1319,8 @@ void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingAddRespons
     NL_TEST_ASSERT(apSuite, commandHandler.TestOnlyIsInIdleState());
 }
 
-void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingDirectPrepareFinishCommandApis(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingDirectPrepareFinishCommandApis(nlTestSuite * apSuite,
+                                                                                                     void * apContext)
 {
     chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
     CommandHandler commandHandler(&mockCommandHandlerDelegate);
@@ -1330,7 +1331,7 @@ void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingDirectPrep
     // these primitives.
     const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
     ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
-    CHIP_ERROR err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
+    CHIP_ERROR err                          = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     NL_TEST_ASSERT(apSuite, commandHandler.GetCommandDataIBTLVWriter() == nullptr);
