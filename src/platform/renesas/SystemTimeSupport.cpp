@@ -26,6 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/support/TimeUtils.h>
+#include <time.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -133,13 +134,21 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 #endif
 }
 
+typedef long m_time_t;
+struct m_timeval {
+    m_time_t  tv_sec;   /* Seconds */
+    long    tv_usec;  /* Microseconds */
+};
+extern "C"
+{
+    int clock_gettime(struct m_timeval * tp);
+}
+
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
-    if (sBootTimeUS == 0)
-    {
-        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
-    }
-    aCurTime = Clock::Milliseconds64((sBootTimeUS + GetClock_Monotonic()) / 1000);
+    struct m_timeval tv;
+    clock_gettime(&tv);
+    aCurTime = std::chrono::seconds(tv.tv_sec) + std::chrono::milliseconds(tv.tv_usec/1000);
     return CHIP_NO_ERROR;
 }
 
