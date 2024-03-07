@@ -424,6 +424,7 @@ def getSpecificTemplatesTargets():
         'src/controller/python/templates/templates.json': None,
         'src/darwin/Framework/CHIP/templates/templates.json': None,
         'src/controller/java/templates/templates.json': None,
+        'examples/tv-casting-app/darwin/MatterTvCastingBridge/MatterTvCastingBridge/templates/templates.json': None,
     }
 
     targets = []

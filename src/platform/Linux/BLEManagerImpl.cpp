@@ -289,8 +289,13 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStartComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
         sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
-        // Start a timer to make sure that the fast advertising is stopped after specified timeout.
-        SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this));
+        // Do not restart the timer if it is still active. This is to avoid the timer from being restarted
+        // if the advertising is stopped due to a premature release.
+        if (!DeviceLayer::SystemLayer().IsTimerActive(HandleAdvertisingTimer, this))
+        {
+            // Start a timer to make sure that the fast advertising is stopped after specified timeout.
+            SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this));
+        }
         sInstance.mFlags.Set(Flags::kAdvertising);
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete:
@@ -304,6 +309,11 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             sInstance.mFlags.Clear(Flags::kAdvertising);
             ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
         }
+        break;
+    case DeviceEventType::kPlatformLinuxBLEPeripheralAdvReleased:
+        // If the advertising was stopped due to a premature release, check if it needs to be restarted.
+        sInstance.mFlags.Clear(Flags::kAdvertising);
+        DriveBLEState();
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralRegisterAppComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
@@ -780,30 +790,34 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
     return CHIP_NO_ERROR;
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess)
 {
     ChipDeviceEvent event;
     event.Type                                                 = DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete;
     event.Platform.BLEPeripheralRegisterAppComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralRegisterAppComplete.mpAppstate = apAppstate;
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess)
 {
     ChipDeviceEvent event;
     event.Type                                              = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete;
     event.Platform.BLEPeripheralAdvStartComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvStartComplete.mpAppstate = apAppstate;
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate)
+void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess)
 {
     ChipDeviceEvent event;
     event.Type                                             = DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete;
     event.Platform.BLEPeripheralAdvStopComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvStopComplete.mpAppstate = apAppstate;
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyBLEPeripheralAdvReleased()
+{
+    ChipDeviceEvent event;
+    event.Type = DeviceEventType::kPlatformLinuxBLEPeripheralAdvReleased;
     PlatformMgr().PostEventOrDie(&event);
 }
 

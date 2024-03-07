@@ -18,9 +18,7 @@
 
 #include <protocols/secure_channel/PairingSession.h>
 
-#include <app/DataModelRevision.h>
-#include <app/InteractionModelRevision.h>
-#include <app/SpecificationVersion.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
@@ -92,17 +90,9 @@ void PairingSession::DiscardExchange()
     }
 }
 
-CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<ReliableMessageProtocolConfig> & providedMrpConfig,
+CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpLocalConfig,
                                                    TLV::TLVWriter & tlvWriter)
 {
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/30456. Based on the spec we need to send values here now,
-    // but it is not entirely clear what we should be sending here when `providedMrpConfig.HasValue() == false`. For now we
-    // are sending the default MRP config values.
-    ReliableMessageProtocolConfig mrpLocalConfig = GetDefaultMRPConfig();
-    if (providedMrpConfig.HasValue())
-    {
-        mrpLocalConfig = providedMrpConfig.Value();
-    }
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
     ReturnErrorOnFailure(
@@ -112,13 +102,13 @@ CHIP_ERROR PairingSession::EncodeSessionParameters(TLV::Tag tag, const Optional<
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSessionActiveThreshold),
                                        mrpLocalConfig.mActiveThresholdTime.count()));
 
-    uint16_t dataModel = CHIP_DEVICE_DATA_MODEL_REVISION;
+    uint16_t dataModel = Revision::kDataModelRevision;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kDataModelRevision), dataModel));
 
-    uint16_t interactionModel = CHIP_DEVICE_INTERACTION_MODEL_REVISION;
+    uint16_t interactionModel = Revision::kInteractionModelRevision;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kInteractionModelRevision), interactionModel));
 
-    uint32_t specVersion = CHIP_DEVICE_SPECIFICATION_VERSION;
+    uint32_t specVersion = Revision::kSpecificationVersion;
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(SessionParameters::Tag::kSpecificationVersion), specVersion));
 
     uint16_t maxPathsPerInvoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;

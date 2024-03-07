@@ -193,6 +193,11 @@ static CHIP_ERROR PrintAllCommands()
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     streamer_printf(sout, "  add <vid> [<pid>]              Add app with given vendor ID [1, 2, 9050]. Usage: app add 9050\r\n");
     streamer_printf(sout, "  remove <endpoint>              Remove app at given endpoint [6, 7, etc]. Usage: app remove 6\r\n");
+    streamer_printf(sout,
+                    "  appobserver <appendpoint> <clientnodeindex> <data> <hint>    Send app observer command to client node of "
+                    "the given app endpoint. Usage: appobserver 4 0 data hint\r\n");
+    streamer_printf(
+        sout, "  printclients <appendpoint>  Print list of client nodes for the given app endpoint. Usage: printclients 4\r\n");
     streamer_printf(
         sout, "  setpin <endpoint> <pincode>    Set pincode for app with given endpoint ID. Usage: app setpin 6 34567890\r\n");
     streamer_printf(sout,
@@ -277,6 +282,63 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 
         return CHIP_NO_ERROR;
     }
+    else if (strcmp(argv[0], "printclients") == 0)
+    {
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+
+        uint16_t endpoint = (uint16_t) strtol(argv[1], &eptr, 10);
+        ContentApp * app  = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+        if (app == nullptr)
+        {
+            ChipLogProgress(DeviceLayer, "app not found");
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+        uint8_t count = app->GetClientNodeCount();
+        ChipLogProgress(DeviceLayer, "     node count: %d", count);
+        for (uint8_t i = 0; i < count; i++)
+        {
+            NodeId node = app->GetClientNode(i);
+            ChipLogProgress(DeviceLayer, "     node[%d] " ChipLogFormatX64, i, ChipLogValueX64(node));
+        }
+    }
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    else if (strcmp(argv[0], "appobserver") == 0)
+    {
+        if (argc < 5)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+
+        uint16_t endpoint = (uint16_t) strtol(argv[1], &eptr, 10);
+        ContentApp * app  = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
+        if (app == nullptr)
+        {
+            ChipLogProgress(DeviceLayer, "app not found");
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+        uint8_t clientNodeIndex = (uint8_t) strtol(argv[2], &eptr, 10);
+        if (clientNodeIndex >= app->GetClientNodeCount())
+        {
+            ChipLogProgress(DeviceLayer, "illegal client node index");
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+        NodeId clientNode = app->GetClientNode(clientNodeIndex);
+
+        char * data         = argv[3];
+        char * encodingHint = argv[4];
+
+        app->SendAppObserverCommand(GetDeviceCommissioner(), clientNode, data, encodingHint);
+
+        ChipLogProgress(DeviceLayer, "sent appobserver command");
+
+        return CHIP_NO_ERROR;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else if (strcmp(argv[0], "setpin") == 0)
     {
         if (argc < 3)

@@ -302,15 +302,15 @@
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x7 }, /* ControlMode */                                                  \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Thermostat (server) */                                                                        \
-            { (uint16_t) 0xA28, (uint16_t) - 0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedCoolingSetpoint */                            \
-            { (uint16_t) 0x7D0, (uint16_t) - 0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedHeatingSetpoint */                            \
-            { (uint16_t) 0x2BC, (uint16_t) - 0x6AB3, (uint16_t) 0x7FFF }, /* MinHeatSetpointLimit */                               \
-            { (uint16_t) 0xBB8, (uint16_t) - 0x6AB3, (uint16_t) 0x7FFF }, /* MaxHeatSetpointLimit */                               \
-            { (uint16_t) 0x640, (uint16_t) - 0x6AB3, (uint16_t) 0x7FFF }, /* MinCoolSetpointLimit */                               \
-            { (uint16_t) 0xC80, (uint16_t) - 0x6AB3, (uint16_t) 0x7FFF }, /* MaxCoolSetpointLimit */                               \
-            { (uint16_t) 0x19, (uint16_t) 0x0, (uint16_t) 0x19 },         /* MinSetpointDeadBand */                                \
-            { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 },           /* ControlSequenceOfOperation */                         \
-            { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x9 },           /* SystemMode */                                         \
+            { (uint16_t) 0xA28, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedCoolingSetpoint */                             \
+            { (uint16_t) 0x7D0, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedHeatingSetpoint */                             \
+            { (uint16_t) 0x2BC, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MinHeatSetpointLimit */                                \
+            { (uint16_t) 0xBB8, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxHeatSetpointLimit */                                \
+            { (uint16_t) 0x640, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MinCoolSetpointLimit */                                \
+            { (uint16_t) 0xC80, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxCoolSetpointLimit */                                \
+            { (uint16_t) 0x19, (uint16_t) 0x0, (uint16_t) 0x19 },        /* MinSetpointDeadBand */                                 \
+            { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 },          /* ControlSequenceOfOperation */                          \
+            { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x9 },          /* SystemMode */                                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Fan Control (server) */                                                                       \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x6 },  /* FanMode */                                                     \
@@ -334,14 +334,14 @@
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* StartUpColorTemperatureMireds */                             \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Unit Testing (server) */                                                                      \
-            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },     /* range_restricted_int8u */                                \
-            { (uint16_t) - 0x14, (uint16_t) - 0x28, (uint16_t) 0x32 }, /* range_restricted_int8s */                                \
-            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },    /* range_restricted_int16u */                               \
-            { (uint16_t) - 0x64, (uint16_t) - 0x96, (uint16_t) 0xC8 }, /* range_restricted_int16s */                               \
-            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },     /* nullable_range_restricted_int8u */                       \
-            { (uint16_t) - 0x14, (uint16_t) - 0x28, (uint16_t) 0x32 }, /* nullable_range_restricted_int8s */                       \
-            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },    /* nullable_range_restricted_int16u */                      \
-            { (uint16_t) - 0x64, (uint16_t) - 0x96, (uint16_t) 0xC8 }, /* nullable_range_restricted_int16s */                      \
+            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* range_restricted_int8u */                                  \
+            { (uint16_t) -0x14, (uint16_t) -0x28, (uint16_t) 0x32 }, /* range_restricted_int8s */                                  \
+            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* range_restricted_int16u */                                 \
+            { (uint16_t) -0x64, (uint16_t) -0x96, (uint16_t) 0xC8 }, /* range_restricted_int16s */                                 \
+            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* nullable_range_restricted_int8u */                         \
+            { (uint16_t) -0x14, (uint16_t) -0x28, (uint16_t) 0x32 }, /* nullable_range_restricted_int8s */                         \
+            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* nullable_range_restricted_int16u */                        \
+            { (uint16_t) -0x64, (uint16_t) -0x96, (uint16_t) 0xC8 }, /* nullable_range_restricted_int16s */                        \
                                                                                                                                    \
         /* Endpoint: 2, Cluster: On/Off (server) */                                                                                \
         {                                                                                                                          \
@@ -635,7 +635,7 @@
             { ZAP_EMPTY_DEFAULT(), 0x0000003E, 0, ZAP_TYPE(ARRAY),                                                                 \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) },                             /* ActiveNetworkFaultsList */                    \
             { ZAP_SIMPLE_DEFAULT(0x000F), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                 \
-            { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },        /* ClusterRevision */                            \
+            { ZAP_SIMPLE_DEFAULT(2), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },        /* ClusterRevision */                            \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                          \
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 7, ZAP_TYPE(OCTET_STRING),                                                          \
@@ -1169,7 +1169,7 @@
             { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(ENUM8), 0 },      /* OccupancySensorType */                             \
             { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(BITMAP8), 0 },    /* OccupancySensorTypeBitmap */                       \
             { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                      \
-            { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
+            { ZAP_SIMPLE_DEFAULT(4), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Wake on LAN (server) */                                                                       \
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 13, ZAP_TYPE(CHAR_STRING), 0 }, /* MACAddress */                                    \
@@ -1447,7 +1447,7 @@
             { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(ENUM8), 0 },      /* OccupancySensorType */                             \
             { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(BITMAP8), 0 },    /* OccupancySensorTypeBitmap */                       \
             { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                      \
-            { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
+            { ZAP_SIMPLE_DEFAULT(4), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
                                                                                                                                    \
             /* Endpoint: 65534, Cluster: Descriptor (server) */                                                                    \
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) },    /* DeviceTypeList */ \

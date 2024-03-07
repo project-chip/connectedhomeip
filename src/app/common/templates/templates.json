@@ -46,11 +46,6 @@
             "output": "callback.h"
         },
         {
-            "path": "../../zap-templates/templates/app/print-cluster.zapt",
-            "name": "ZCL print-cluster header",
-            "output": "print-cluster.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/attributes/Accessors.zapt",
             "name": "Attributes Accessors header",
             "output": "attributes/Accessors.h"

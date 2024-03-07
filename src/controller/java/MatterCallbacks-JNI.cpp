@@ -69,3 +69,14 @@ JNI_METHOD(void, InvokeCallbackJni, deleteCallback)(JNIEnv * env, jobject self, 
 {
     deleteInvokeCallback(env, self, callbackHandle);
 }
+
+JNI_METHOD(jlong, ExtendableInvokeCallbackJni, newCallback)
+(JNIEnv * env, jobject self)
+{
+    return newExtendableInvokeCallback(env, self);
+}
+
+JNI_METHOD(void, ExtendableInvokeCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
+{
+    deleteExtendableInvokeCallback(env, self, callbackHandle);
+}
