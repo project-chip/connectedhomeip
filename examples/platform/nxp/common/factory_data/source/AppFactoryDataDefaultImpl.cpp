@@ -64,7 +64,7 @@ CHIP_ERROR chip::NXP::App::AppFactoryData_PostMatterStackInit(void)
     FactoryDataPrvdImpl().SetAes128Key(&aes128TestKey[0]);
 #endif /* CONFIG_CHIP_ENCRYPTED_FACTORY_DATA */
 
-    ReturnErrorOnFailure(FactoryDataPrvdImpl().Init());
+    ReturnErrorOnFailure(FactoryDataPrvd().Init());
 
     SetDeviceInstanceInfoProvider(&FactoryDataPrvd());
     SetDeviceAttestationCredentialsProvider(&FactoryDataPrvd());
