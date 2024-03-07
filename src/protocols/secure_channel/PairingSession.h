@@ -26,6 +26,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/SessionParameters.h>
@@ -129,7 +130,11 @@ protected:
 
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     virtual void OnSuccessStatusReport() {}
-    virtual CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
+
+    // Handle a failure StatusReport message from the server.  protocolData will
+    // depend on exactly what the generalCode/protocolCode are.
+    virtual CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
+                                             Optional<uintptr_t> protocolData)
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -174,6 +179,7 @@ protected:
             return CHIP_NO_ERROR;
         }
 
+        Optional<uintptr_t> protocolData;
         if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
             report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
         {
@@ -189,15 +195,15 @@ protected:
                 }
                 else
                 {
-                    // TODO: CASE: Notify minimum wait time to clients on receiving busy status report #28290
                     ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms", minimumWaitTime);
+                    protocolData.Emplace(minimumWaitTime);
                 }
             }
         }
 
         // It's very important that we propagate the return value from
         // OnFailureStatusReport out to the caller.  Make sure we return it directly.
-        return OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode());
+        return OnFailureStatusReport(report.GetGeneralCode(), report.GetProtocolCode(), protocolData);
     }
 
     /**
