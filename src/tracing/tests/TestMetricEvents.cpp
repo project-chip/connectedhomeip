@@ -28,19 +28,15 @@ using namespace chip::Tracing;
 
 namespace chip {
 namespace Tracing {
-inline std::string str(MetricKey key)
-{
-    return std::string(key);
-}
 
-inline bool operator==(const chip::Tracing::MetricEvent & lhs, const chip::Tracing::MetricEvent & rhs)
+static bool operator==(const MetricEvent & lhs, const MetricEvent & rhs)
 {
     if (&lhs == &rhs)
     {
         return true;
     }
 
-    if (lhs.type() == rhs.type() && str(lhs.key()) == str(rhs.key()) && lhs.ValueType() == rhs.ValueType())
+    if (lhs.type() == rhs.type() && std::string(lhs.key()) == std::string(rhs.key()) && lhs.ValueType() == rhs.ValueType())
     {
         switch (lhs.ValueType())
         {
@@ -64,8 +60,6 @@ inline bool operator==(const chip::Tracing::MetricEvent & lhs, const chip::Traci
 
 namespace {
 
-using chip::Tracing::str;
-
 // This keeps a log of all received trace items
 class MetricEventBackend : public Backend
 {
@@ -86,28 +80,28 @@ void TestBasicMetricEvent(nlTestSuite * inSuite, void * inContext)
     {
         MetricEvent event(MetricEvent::Type::kInstantEvent, "instant_event");
         NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kInstantEvent);
-        NL_TEST_ASSERT(inSuite, str(event.key()) == str("instant_event"));
+        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("instant_event"));
         NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kUndefined);
     }
 
     {
         MetricEvent event(MetricEvent::Type::kBeginEvent, "begin_event");
         NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kBeginEvent);
-        NL_TEST_ASSERT(inSuite, str(event.key()) == str("begin_event"));
+        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("begin_event"));
         NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kUndefined);
     }
 
     {
         MetricEvent event(MetricEvent::Type::kEndEvent, "end_event");
         NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kEndEvent);
-        NL_TEST_ASSERT(inSuite, str(event.key()) == str("end_event"));
+        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("end_event"));
         NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kUndefined);
     }
 
     {
         MetricEvent event(MetricEvent::Type::kEndEvent, "end_event_with_int32_value", int32_t(42));
         NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kEndEvent);
-        NL_TEST_ASSERT(inSuite, str(event.key()) == str("end_event_with_int32_value"));
+        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("end_event_with_int32_value"));
         NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kInt32);
         NL_TEST_ASSERT(inSuite, event.ValueInt32() == 42);
     }
@@ -115,7 +109,7 @@ void TestBasicMetricEvent(nlTestSuite * inSuite, void * inContext)
     {
         MetricEvent event(MetricEvent::Type::kEndEvent, "end_event_with_uint32_value", uint32_t(42));
         NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kEndEvent);
-        NL_TEST_ASSERT(inSuite, str(event.key()) == str("end_event_with_uint32_value"));
+        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("end_event_with_uint32_value"));
         NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kUInt32);
         NL_TEST_ASSERT(inSuite, event.ValueUInt32() == 42u);
     }
@@ -123,7 +117,7 @@ void TestBasicMetricEvent(nlTestSuite * inSuite, void * inContext)
     {
         MetricEvent event(MetricEvent::Type::kEndEvent, "end_event_with_error_value", CHIP_ERROR_BUSY);
         NL_TEST_ASSERT(inSuite, event.type() == MetricEvent::Type::kEndEvent);
-        NL_TEST_ASSERT(inSuite, str(event.key()) == str("end_event_with_error_value"));
+        NL_TEST_ASSERT(inSuite, std::string(event.key()) == std::string("end_event_with_error_value"));
         NL_TEST_ASSERT(inSuite, event.ValueType() == MetricEvent::Value::Type::kChipErrorCode);
         NL_TEST_ASSERT(inSuite, chip::ChipError(event.ValueErrorCode()) == CHIP_ERROR_BUSY);
     }
