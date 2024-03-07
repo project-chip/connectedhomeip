@@ -47,6 +47,7 @@ private:
     struct gpio_callback mStalling_cb_data;
 
     bool mState;
+    bool isMotorStopped = true;
     k_timer mMotorTimer;
     k_timer mSkipDetectStallTimer;
 
