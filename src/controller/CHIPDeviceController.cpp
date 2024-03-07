@@ -2308,6 +2308,7 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         info.icd.isLIT                  = !!(featureMap & to_underlying(IcdManagement::Feature::kLongIdleTimeSupport));
         info.icd.checkInProtocolSupport = !!(featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport));
         hasUserActiveModeTrigger        = !!(featureMap & to_underlying(IcdManagement::Feature::kUserActiveModeTrigger));
+        info.icd.isICD                  = true;
     }
     else if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
@@ -2334,6 +2335,10 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
     }
 
     ReturnErrorOnFailure(err);
+    if (!(info.icd.isICD))
+    {
+        return CHIP_NO_ERROR;
+    }
 
     info.icd.userActiveModeTriggerHint.ClearAll();
     info.icd.userActiveModeTriggerInstruction = CharSpan();
@@ -2370,6 +2375,28 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
                 return err;
             }
         }
+    }
+
+    err = mAttributeCache->Get<IcdManagement::Attributes::IdleModeDuration::TypeInfo>(kRootEndpointId, info.icd.idleModeDuration);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "IcdManagement.IdleModeDuration expected, but failed to read.");
+        return err;
+    }
+
+    err =
+        mAttributeCache->Get<IcdManagement::Attributes::ActiveModeDuration::TypeInfo>(kRootEndpointId, info.icd.activeModeDuration);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "IcdManagement.ActiveModeDuration expected, but failed to read.");
+        return err;
+    }
+
+    err = mAttributeCache->Get<IcdManagement::Attributes::ActiveModeThreshold::TypeInfo>(kRootEndpointId,
+                                                                                         info.icd.activeModeThreshold);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "IcdManagement.ActiveModeThreshold expected, but failed to read.");
     }
 
     return err;
@@ -2677,16 +2704,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                 app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
         }
 
-        if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
-        {
-            readPaths[numberOfAttributes++] =
-                app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
-        }
-        // Always read the active mode trigger hint attributes to notify users about it.
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerHint::Id);
-        readPaths[numberOfAttributes++] =
-            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id);
+        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id);
 
         SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
     }
