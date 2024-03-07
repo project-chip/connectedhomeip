@@ -82,6 +82,12 @@ config CONSOLE_HANDLER
 config BOOT_BANNER
     default n
 
+config NCS_BOOT_BANNER
+    default n
+
+config MCUBOOT_BOOT_BANNER
+    default n
+
 config TIMESLICING
     default n
 

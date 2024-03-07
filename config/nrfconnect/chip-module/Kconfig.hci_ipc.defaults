@@ -55,9 +55,6 @@ config BT_CTLR_DATA_LENGTH_MAX
 config BT_CTLR_ASSERT_HANDLER
     default y
 
-config BT_HCI_RAW_RESERVE
-    default 1
-
 # Disable 2M PHY due to interoperability issues.
 config BT_CTLR_PHY_2M
     default n

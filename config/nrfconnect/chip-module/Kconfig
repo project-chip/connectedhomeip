@@ -306,4 +306,9 @@ config CHIP_PERSISTENT_SUBSCRIPTIONS
 	# selecting experimental for this feature since there is an issue with multiple controllers.
 	select EXPERIMENTAL
 
+config CHIP_ENABLE_BDX_LOG_TRANSFER
+	bool "Enable BDX transfer for diagnostic logs"
+	help
+	  Enables the BDX protocol for diagnostics log transfer purposes.
+
 endif # CHIP
