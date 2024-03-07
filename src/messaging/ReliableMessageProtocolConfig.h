@@ -221,6 +221,10 @@ struct ReliableMessageProtocolConfig
      * compiled-in settings, but can still be overridden by ICD configuration
      * and other things that would override the compiled-in settings.
      *
+     * Changing the value via this function does not affect any existing
+     * sessions or exchanges, but does affect the values we communicate to our
+     * peer during future session establishments.
+     *
      * @return whether the local MRP configuration actually changed as a result
      *         of this call.  If it did, callers may need to reset DNS-SD
      *         advertising to advertise the updated values.
