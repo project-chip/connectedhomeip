@@ -265,6 +265,10 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         // The values must be valid now.
         memcpy(mICDSymmetricKey, params.GetICDSymmetricKey().Value().data(), params.GetICDSymmetricKey().Value().size());
         mParams.SetICDSymmetricKey(ByteSpan(mICDSymmetricKey));
+        if (params.GetICDStayActiveDurationMsec().HasValue())
+        {
+            mParams.SetICDStayActiveDurationMsec(params.GetICDStayActiveDurationMsec().Value());
+        }
         mParams.SetICDCheckInNodeId(params.GetICDCheckInNodeId().Value());
         mParams.SetICDMonitoredSubject(params.GetICDMonitoredSubject().Value());
     }
@@ -416,13 +420,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             }
             return CommissioningStage::kICDGetRegistrationInfo;
         }
-        return GetNextCommissioningStageInternal(CommissioningStage::kICDSendStayActive, lastErr);
+        return GetNextCommissioningStageInternal(CommissioningStage::kICDRegistration, lastErr);
     case CommissioningStage::kICDGetRegistrationInfo:
         return CommissioningStage::kICDRegistration;
     case CommissioningStage::kICDRegistration:
-        // TODO(#24259): StayActiveRequest is not supported by server. We may want to SendStayActive after OpDiscovery.
-        return CommissioningStage::kICDSendStayActive;
-    case CommissioningStage::kICDSendStayActive:
         // TODO(cecille): device attestation casues operational cert provisioning to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
@@ -821,9 +822,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             break;
         case CommissioningStage::kICDRegistration:
             // Noting to do. DevicePairingDelegate will handle this.
-            break;
-        case CommissioningStage::kICDSendStayActive:
-            // Nothing to do.
             break;
         case CommissioningStage::kFindOperational:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;

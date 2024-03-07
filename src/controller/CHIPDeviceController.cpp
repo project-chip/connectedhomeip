@@ -1223,6 +1223,24 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
+void DeviceCommissioner::OnICDManagementStayActiveResponse(
+    void * context, const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Command response callback with null context. Ignoring"));
+
+    if (commissioner->mDeviceBeingCommissioned == nullptr)
+    {
+        return;
+    }
+
+    if (commissioner->mPairingDelegate != nullptr)
+    {
+        commissioner->mPairingDelegate->OnICDStayActiveComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
+                                                                data.promisedActiveDuration);
+    }
+}
+
 bool DeviceCommissioner::ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                                    Optional<System::Clock::Timeout> commandTimeout,
                                                    OnExtendFailsafeSuccess onSuccess, OnExtendFailsafeFailure onFailure,
@@ -3180,11 +3198,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-    case CommissioningStage::kICDSendStayActive: {
-        // TODO(#24259): Send StayActiveRequest once server supports this.
-        CommissioningStageComplete(CHIP_NO_ERROR);
-    }
-    break;
     case CommissioningStage::kFindOperational: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
@@ -3207,6 +3220,23 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendComplete: {
+        if (params.GetICDStayActiveDurationMsec().HasValue())
+        {
+            IcdManagement::Commands::StayActiveRequest::Type request;
+
+            request.stayActiveDuration = params.GetICDStayActiveDurationMsec().Value();
+            ChipLogError(Controller, "Send ICD StayActive with Duration %u", request.stayActiveDuration);
+            CHIP_ERROR err =
+                SendCommissioningCommand(proxy, request, OnICDManagementStayActiveResponse, OnBasicFailure, endpoint, timeout);
+            if (err != CHIP_NO_ERROR)
+            {
+                // We won't get any async callbacks here, so just complete our stage.
+                ChipLogError(Controller, "Failed to send IcdManagement.StayActive command: %" CHIP_ERROR_FORMAT, err.Format());
+                CommissioningStageComplete(err);
+                return;
+            }
+        }
+
         GeneralCommissioning::Commands::CommissioningComplete::Type request;
         CHIP_ERROR err =
             SendCommissioningCommand(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint, timeout);

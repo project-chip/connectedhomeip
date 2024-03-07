@@ -72,7 +72,8 @@ public:
         AddArgument("icd-monitored-subject", 0, UINT64_MAX, &mICDMonitoredSubject,
                     "The monitored subject of the ICD, default: The node id used for icd-check-in-nodeid.");
         AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
-
+        AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
+                    "The active duration after LIT ICD is commissioned");
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -197,6 +198,7 @@ public:
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
     void OnICDRegistrationComplete(NodeId deviceId, uint32_t icdCounter) override;
+    void OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedActiveDuration) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
@@ -235,6 +237,7 @@ private:
     chip::Optional<NodeId> mICDCheckInNodeId;
     chip::Optional<chip::ByteSpan> mICDSymmetricKey;
     chip::Optional<uint64_t> mICDMonitoredSubject;
+    chip::Optional<uint32_t> mICDStayActiveDurationMsec;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
         mComplex_TimeZones;

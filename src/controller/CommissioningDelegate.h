@@ -54,7 +54,6 @@ enum CommissioningStage : uint8_t
     kConfigureTrustedTimeSource, ///< Configure a trusted time source if one is required and available (must be done after SendNOC)
     kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registraion informations.
     kICDRegistration,            ///< Register for ICD management
-    kICDSendStayActive,          ///< Send Keep Alive to ICD
     kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
     kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
     kFailsafeBeforeWiFiEnable,   ///< Extend the fail-safe before doing kWiFiNetworkEnable
@@ -544,6 +543,13 @@ public:
         return *this;
     }
 
+    Optional<uint32_t> GetICDStayActiveDurationMsec() const { return mICDStayActiveDurationMsec; }
+    CommissioningParameters & SetICDStayActiveDurationMsec(uint32_t stayActiveDurationMsec)
+    {
+        mICDStayActiveDurationMsec = MakeOptional(stayActiveDurationMsec);
+        return *this;
+    }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -610,7 +616,7 @@ private:
     Optional<NodeId> mICDCheckInNodeId;
     Optional<uint64_t> mICDMonitoredSubject;
     Optional<ByteSpan> mICDSymmetricKey;
-
+    Optional<uint32_t> mICDStayActiveDurationMsec;
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
 };

@@ -117,10 +117,6 @@ const char * StageToString(CommissioningStage stage)
         return "ICDRegistration";
         break;
 
-    case kICDSendStayActive:
-        return "ICDSendStayActive";
-        break;
-
     case kWiFiNetworkSetup:
         return "WiFiNetworkSetup";
         break;
