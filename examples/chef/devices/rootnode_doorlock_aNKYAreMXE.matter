@@ -2374,9 +2374,13 @@ endpoint 1 {
     ram      attribute status default = 1;
     ram      attribute order default = 1;
     ram      attribute description default = "Battery";
+    ram      attribute batVoltage;
+    ram      attribute batPercentRemaining;
+    ram      attribute batTimeRemaining;
     ram      attribute batChargeLevel;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
+    ram      attribute batPresent;
     ram      attribute batReplacementDescription;
     ram      attribute batQuantity default = 1;
     callback attribute endpointList;
@@ -2397,7 +2401,9 @@ endpoint 1 {
     ram      attribute lockState default = 1;
     ram      attribute lockType default = 0;
     ram      attribute actuatorEnabled default = 0;
-    ram      attribute doorState;
+    ram      attribute doorState default = 1;
+    ram      attribute doorOpenEvents;
+    ram      attribute doorClosedEvents;
     ram      attribute numberOfTotalUsersSupported default = 10;
     ram      attribute numberOfPINUsersSupported default = 10;
     ram      attribute numberOfRFIDUsersSupported default = 10;
@@ -2411,7 +2417,7 @@ endpoint 1 {
     ram      attribute credentialRulesSupport default = 1;
     ram      attribute numberOfCredentialsSupportedPerUser default = 5;
     ram      attribute language default = "en";
-    ram      attribute autoRelockTime default = 60;
+    ram      attribute autoRelockTime default = 5;
     ram      attribute soundVolume default = 0;
     ram      attribute operatingMode default = 0;
     ram      attribute supportedOperatingModes default = 0xFFF6;
