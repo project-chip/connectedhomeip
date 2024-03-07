@@ -1911,7 +1911,6 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     jmethodID setCommissioningModeID = env->GetMethodID(discoveredDeviceCls, "setCommissioningMode", "(I)V");
     jmethodID setPairingHintID       = env->GetMethodID(discoveredDeviceCls, "setPairingHint", "(I)V");
 
-
     jobject discoveredObj = env->NewObject(discoveredDeviceCls, constructor);
 
     env->SetLongField(discoveredObj, discrminatorID, data->commissionData.longDiscriminator);
@@ -1927,7 +1926,8 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     env->SetIntField(discoveredObj, productIdID, static_cast<jint>(data->commissionData.productId));
 
     jbyteArray jRotatingId;
-    CHIP_ERROR err = JniReferences::GetInstance().N2J_ByteArray(env, data->commissionData.rotatingId, static_cast<jsize>(data->commissionData.rotatingIdLen), jRotatingId);
+    CHIP_ERROR err = JniReferences::GetInstance().N2J_ByteArray(
+        env, data->commissionData.rotatingId, static_cast<jsize>(data->commissionData.rotatingIdLen), jRotatingId);
 
     if (err != CHIP_NO_ERROR)
     {
