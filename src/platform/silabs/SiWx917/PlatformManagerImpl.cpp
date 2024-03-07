@@ -62,11 +62,6 @@ int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
 
     return res;
 }
-#endif // TINYCRYPT_PRIMITIVES
-
-#if CHIP_CRYPTO_PSA
-psa_crypto_init();
-#endif // CHIP_CRYPTO_PSA
 
 static void app_get_random(uint8_t * aOutput, size_t aLen)
 {
@@ -85,6 +80,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
     return 0;
 }
+#endif // TINYCRYPT_PRIMITIVES
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
@@ -101,16 +97,20 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
+#if defined(TINYCRYPT_PRIMITIVES)
     // 16 : Threshold value
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 
-#if defined(TINYCRYPT_PRIMITIVES)
     /* Set RNG function for tinycrypt operations. */
     err_t ret;
     ret = sys_mutex_new(&rngMutexHandle);
     VerifyOrExit((ERR_OK == ret), err = CHIP_ERROR_NO_MEMORY);
     uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
 #endif // TINYCRYPT_PRIMITIVES
+
+#if CHIP_CRYPTO_PSA
+    psa_crypto_init();
+#endif // CHIP_CRYPTO_PSA
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
