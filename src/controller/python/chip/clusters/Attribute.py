@@ -18,6 +18,7 @@
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
 
+import asyncio
 import builtins
 import ctypes
 import inspect
@@ -27,7 +28,7 @@ from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple, Union
 
 import chip
 import chip.exceptions
@@ -473,8 +474,6 @@ class SubscriptionTransaction:
         self._devCtrl = devCtrl
         self._isDone = False
         self._onResubscriptionSucceededCb = None
-        self._onResubscriptionSucceededCb_isAsync = False
-        self._onResubscriptionAttemptedCb_isAsync = False
 
     def GetAttributes(self):
         ''' Returns the attribute value cache tracking the latest state on the publisher.
@@ -520,7 +519,9 @@ class SubscriptionTransaction:
 
         return minIntervalSec.value, maxIntervalSec.value
 
-    def SetResubscriptionAttemptedCallback(self, callback: Callable[[SubscriptionTransaction, int, int], None], isAsync=False):
+    def SetResubscriptionAttemptedCallback(
+        self, callback: Callable[[SubscriptionTransaction, int, int], Union[None, Awaitable[None]]]
+    ):
         '''
         Sets the callback function that gets invoked anytime a re-subscription is attempted. The callback is expected
         to have the following signature:
@@ -530,9 +531,8 @@ class SubscriptionTransaction:
         '''
         if callback is not None:
             self._onResubscriptionAttemptedCb = callback
-            self._onResubscriptionAttemptedCb_isAsync = isAsync
 
-    def SetResubscriptionSucceededCallback(self, callback: Callable[[SubscriptionTransaction], None], isAsync=False):
+    def SetResubscriptionSucceededCallback(self, callback: Callable[[SubscriptionTransaction], Union[None, Awaitable[None]]]):
         '''
         Sets the callback function that gets invoked when a re-subscription attempt succeeds. The callback
         is expected to have the following signature:
@@ -542,7 +542,6 @@ class SubscriptionTransaction:
         '''
         if callback is not None:
             self._onResubscriptionSucceededCb = callback
-            self._onResubscriptionSucceededCb_isAsync = isAsync
 
     def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
         '''
@@ -741,11 +740,11 @@ class AsyncReadTransaction:
         else:
             logging.info("Re-subscription succeeded!")
             if self._subscription_handler._onResubscriptionSucceededCb is not None:
-                if (self._subscription_handler._onResubscriptionSucceededCb_isAsync):
-                    self._event_loop.create_task(
-                        self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler))
+                callback = self._subscription_handler._onResubscriptionSucceededCb
+                if inspect.iscoroutinefunction(callback):
+                    self._event_loop.create_task(callback(self._subscription_handler))
                 else:
-                    self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler)
+                    callback(self._subscription_handler)
 
     def handleSubscriptionEstablished(self, subscriptionId):
         self._event_loop.call_soon_threadsafe(
@@ -754,13 +753,14 @@ class AsyncReadTransaction:
     def handleResubscriptionAttempted(self, terminationCause: PyChipError, nextResubscribeIntervalMsec: int):
         if not self._subscription_handler:
             return
-        if (self._subscription_handler._onResubscriptionAttemptedCb_isAsync):
-            self._event_loop.create_task(self._subscription_handler._onResubscriptionAttemptedCb(
-                self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec))
+
+        callback = self._subscription_handler._onResubscriptionAttemptedCb
+        if inspect.iscoroutinefunction(callback):
+            asyncio.run_coroutine_threadsafe(callback(
+                self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec), self._event_loop)
         else:
-            self._event_loop.call_soon_threadsafe(
-                self._subscription_handler._onResubscriptionAttemptedCb,
-                self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
+            self._event_loop.call_soon_threadsafe(callback,
+                                                  self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
         pass

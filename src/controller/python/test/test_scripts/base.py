@@ -1057,8 +1057,8 @@ class BaseTestHelper:
         #
         # Register async callbacks that will fire when a re-sub is attempted or succeeds.
         #
-        subscription.SetResubscriptionAttemptedCallback(OnResubscriptionAttempted, True)
-        subscription.SetResubscriptionSucceededCallback(OnResubscriptionSucceeded, True)
+        subscription.SetResubscriptionAttemptedCallback(OnResubscriptionAttempted)
+        subscription.SetResubscriptionSucceededCallback(OnResubscriptionSucceeded)
 
         #
         # Over-ride the default liveness timeout (which is set quite high to accomodate for
