@@ -38,12 +38,6 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
     friend PlatformManager;
 
 private:
-    CHIP_ERROR _AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
-    void _HandleServerStarted() {}
-    void _HandleServerShuttingDown() {}
-    CHIP_ERROR _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
     friend PlatformManager & PlatformMgr();
     friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
