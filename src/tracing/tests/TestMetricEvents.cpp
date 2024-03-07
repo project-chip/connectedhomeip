@@ -142,8 +142,8 @@ void TestInstantMetricEvent(nlTestSuite * inSuite, void * inContext)
     };
 
     NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(inSuite,
-                   std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    NL_TEST_ASSERT(
+        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 void TestBeginEndMetricEvent(nlTestSuite * inSuite, void * inContext)
@@ -299,8 +299,8 @@ exit:
 
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(inSuite,
-                   std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    NL_TEST_ASSERT(
+        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 void TestSuccessOrExitWithMetric(nlTestSuite * inSuite, void * inContext)
@@ -320,8 +320,8 @@ exit:
 
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUSY);
     NL_TEST_ASSERT(inSuite, backend.GetMetricEvents().size() == expected.size());
-    NL_TEST_ASSERT(inSuite,
-                   std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
+    NL_TEST_ASSERT(
+        inSuite, std::equal(backend.GetMetricEvents().begin(), backend.GetMetricEvents().end(), expected.begin(), expected.end()));
 }
 
 static const nlTest sMetricTests[] = {
