@@ -18,40 +18,40 @@
 package chip.devicecontroller;
 
 public enum PairingHintBitmap {
-    PowerCycle(0, false),
-    DeviceManufacturerURL(1, false),
-    Administrator(2, false),
-    SettingsMenuOnTheNode(3, false),
-    CustomInstruction(4, true),
-    DeviceManual(5, false),
-    PressResetButton(6, false),
-    PressResetButtonWithApplicationOfPower(7, false),
-    PressResetButtonForNseconds(8, true),
-    PressResetButtonUntilLightBlinks(9, true),
-    PressResetButtonForNsecondsWithApplicationOfPower(10, true),
-    PressResetButtonUntilLightBlinksWithApplicationOfPower(11, true),
-    PressResetButtonNTimes(12, true),
-    PressSetupButton(13, false),
-    PressSetupButtonWithApplicationOfPower(14, false),
-    PressSetupButtonForNseconds(15, true),
-    PressSetupButtonUntilLightBlinks(16, true),
-    PressSetupButtonForNsecondsWithApplicationOfPower(17, true),
-    PressSetupButtonUntilLightBlinksWithApplicationOfPower(18, true),
-    PressSetupButtonNtimes(19, true);
+  PowerCycle(0, false),
+  DeviceManufacturerURL(1, false),
+  Administrator(2, false),
+  SettingsMenuOnTheNode(3, false),
+  CustomInstruction(4, true),
+  DeviceManual(5, false),
+  PressResetButton(6, false),
+  PressResetButtonWithApplicationOfPower(7, false),
+  PressResetButtonForNseconds(8, true),
+  PressResetButtonUntilLightBlinks(9, true),
+  PressResetButtonForNsecondsWithApplicationOfPower(10, true),
+  PressResetButtonUntilLightBlinksWithApplicationOfPower(11, true),
+  PressResetButtonNTimes(12, true),
+  PressSetupButton(13, false),
+  PressSetupButtonWithApplicationOfPower(14, false),
+  PressSetupButtonForNseconds(15, true),
+  PressSetupButtonUntilLightBlinks(16, true),
+  PressSetupButtonForNsecondsWithApplicationOfPower(17, true),
+  PressSetupButtonUntilLightBlinksWithApplicationOfPower(18, true),
+  PressSetupButtonNtimes(19, true);
 
-    private final int bitIndex;
-    private final boolean isRequirePairingInstruction;
+  private final int bitIndex;
+  private final boolean isRequirePairingInstruction;
 
-    PairingHintBitmap(int bitIndex, boolean isRequirePairingInstruction) {
-        this.bitIndex = bitIndex;
-        this.isRequirePairingInstruction = isRequirePairingInstruction;
-    }
+  PairingHintBitmap(int bitIndex, boolean isRequirePairingInstruction) {
+    this.bitIndex = bitIndex;
+    this.isRequirePairingInstruction = isRequirePairingInstruction;
+  }
 
-    public int getBitIndex() {
-        return bitIndex;
-    }
+  public int getBitIndex() {
+    return bitIndex;
+  }
 
-    public boolean getRequirePairingInstruction() {
-        return isRequirePairingInstruction;
-    }
+  public boolean getRequirePairingInstruction() {
+    return isRequirePairingInstruction;
+  }
 }

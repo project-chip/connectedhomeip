@@ -37,7 +37,7 @@ public class DiscoveredDevice {
 
   // For use in JNI.
   private void setCommissioningMode(int value) {
-      this.commissioningMode = CommissioningWindowStatus.value(value);
+    this.commissioningMode = CommissioningWindowStatus.value(value);
   }
 
   private void setPairingHint(int value) {

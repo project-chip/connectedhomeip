@@ -18,19 +18,22 @@
 package chip.devicecontroller;
 
 public enum CommissioningWindowStatus {
-    WindowNotOpen(0), EnhancedWindowOpen(1), BasicWindowOpen(2);
+  WindowNotOpen(0),
+  EnhancedWindowOpen(1),
+  BasicWindowOpen(2);
 
-    private final int value;
-    CommissioningWindowStatus(int value) {
-        this.value = value;
-    }
+  private final int value;
 
-    public static CommissioningWindowStatus value(int value) {
-        for (CommissioningWindowStatus status : CommissioningWindowStatus.values()) {
-            if (status.value == value) {
-                return status;
-            }
-        }
-        throw new IllegalArgumentException("Invalid value: " + value);
+  CommissioningWindowStatus(int value) {
+    this.value = value;
+  }
+
+  public static CommissioningWindowStatus value(int value) {
+    for (CommissioningWindowStatus status : CommissioningWindowStatus.values()) {
+      if (status.value == value) {
+        return status;
+      }
     }
+    throw new IllegalArgumentException("Invalid value: " + value);
+  }
 }
