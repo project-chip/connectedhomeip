@@ -24,8 +24,8 @@ if (matter_enable_tracing_support && matter_trace_config == "multiplexed") {
     output_name = "libTracingTests"
 
     test_sources = [
-      "TestTracing.cpp",
       "TestMetricEvents.cpp",
+      "TestTracing.cpp",
     ]
 
     public_deps = [
