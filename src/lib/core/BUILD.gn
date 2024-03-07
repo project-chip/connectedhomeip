@@ -187,3 +187,24 @@ static_library("core") {
     "${chip_root}/src/system",
   ]
 }
+
+static_library("vectortlv") {
+  output_name = "libVectorTlv"
+
+  sources = [
+    "TLVVectorWriter.cpp",
+    "TLVVectorWriter.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":core",
+    ":error",
+    "${chip_root}/src/app/common:enums",
+    "${chip_root}/src/ble",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+  ]
+}
