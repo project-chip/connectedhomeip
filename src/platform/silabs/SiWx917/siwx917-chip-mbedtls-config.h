@@ -26,6 +26,7 @@
 #define MBEDTLS_PLATFORM_MEMORY
 #define MBEDTLS_PKCS5_C
 #define MBEDTLS_HKDF_C
+#define MBEDTLS_BIGNUM_C
 
 // SLC GENERATED
 #include "sl_mbedtls_config.h"

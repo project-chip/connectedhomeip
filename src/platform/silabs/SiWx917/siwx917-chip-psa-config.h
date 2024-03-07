@@ -20,4 +20,4 @@
 
 // SLC GENERATED
 #include "psa_crypto_config.h"
-#include "sli_psa_builtin_config.h"
+#include "sli_psa_builtin_config_autogen.h"
