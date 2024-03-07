@@ -553,7 +553,7 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onAttributeChangeCb = callback
 
-    def SetEventUpdateCallback(self, callback: Callable[[EventReadResult, SubscriptionTransaction], None]):
+    def SetEventUpdateCallback(self, callback: Callable[[EventReadResult, SubscriptionTransaction], Union[None, Awaitable[None]]]):
         if callback is not None:
             self._onEventChangeCb = callback
 
@@ -570,7 +570,7 @@ class SubscriptionTransaction:
         return self._onAttributeChangeCb
 
     @property
-    def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], None]:
+    def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], Union[None, Awaitable[None]]]:
         return self._onEventChangeCb
 
     @property
@@ -724,9 +724,12 @@ class AsyncReadTransaction:
                 Header=header, Data=eventValue, Status=chip.interaction_model.Status(status))
             self._events.append(eventResult)
 
-            if (self._subscription_handler is not None):
-                self._subscription_handler.OnEventChangeCb(
-                    eventResult, self._subscription_handler)
+            if self._subscription_handler is not None:
+                callback = self._subscription_handler.OnEventChangeCb
+                if inspect.iscoroutinefunction(callback):
+                    asyncio.run_coroutine_threadsafe(callback(), self._event_loop)
+                else:
+                    callback(eventResult, self._subscription_handler)
 
         except Exception as ex:
             logging.exception(ex)
