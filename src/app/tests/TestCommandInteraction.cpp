@@ -341,7 +341,9 @@ public:
     static void TestCommandHandlerInvalidMessageSync(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerCommandEncodeExternalFailure(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerEncodeSimpleStatusCode(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerWithoutResponderCallingAddStatus(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerWithoutResponderCallingAddResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerWithoutResponderCallingDirectPrepareFinishCommandApis(nlTestSuite * apSuite, void * apContext);
 
     static void TestCommandHandlerWithOnInvokeReceivedEmptyDataMsg(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerRejectMultipleIdenticalCommands(nlTestSuite * apSuite, void * apContext);
@@ -1291,6 +1293,54 @@ void TestCommandInteraction::TestCommandHandlerEncodeSimpleStatusCode(nlTestSuit
     ValidateCommandHandlerEncodeInvokeResponseMessage(apSuite, apContext, true /*aNeedStatusCode=true*/);
 }
 
+void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingAddStatus(nlTestSuite * apSuite, void * apContext)
+{
+    chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
+    CommandHandler commandHandler(&mockCommandHandlerDelegate);
+
+    commandHandler.AddStatus(requestCommandPath, Protocols::InteractionModel::Status::Failure);
+
+    // Since calling AddStatus is supposed to be a no-operation when there is no responder, it is
+    // hard to validate. Best way is to check that we are still in an Idle state afterwards
+    NL_TEST_ASSERT(apSuite, commandHandler.TestOnlyIsInIdleState());
+}
+
+void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingAddResponse(nlTestSuite * apSuite, void * apContext)
+{
+    chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
+    CommandHandler commandHandler(&mockCommandHandlerDelegate);
+
+    uint32_t sizeToFill = 50;  // This is an arbitrary number, we need to select a non-zero value.
+    CHIP_ERROR err = commandHandler.AddResponseData(requestCommandPath, ForcedSizeBuffer(sizeToFill));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // Since calling AddResponseData is supposed to be a no-operation when there is no responder, it is
+    // hard to validate. Best way is to check that we are still in an Idle state afterwards
+    NL_TEST_ASSERT(apSuite, commandHandler.TestOnlyIsInIdleState());
+}
+
+void TestCommandInteraction::TestCommandHandlerWithoutResponderCallingDirectPrepareFinishCommandApis(nlTestSuite * apSuite, void * apContext)
+{
+    chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
+    CommandHandler commandHandler(&mockCommandHandlerDelegate);
+
+    // We intentionally prevent successful calls to PrepareInvokeResponseCommand and FinishCommand when no 
+    // responder is present. This aligns with the design decision to promote AddStatus and AddResponseData
+    // usage in such scenarios. See GitHub issue #32486 for discussions on phasing out external use of
+    // these primitives. 
+    const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
+    ConcreteCommandPath responseCommandPath = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
+    CHIP_ERROR err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+    NL_TEST_ASSERT(apSuite, commandHandler.GetCommandDataIBTLVWriter() == nullptr);
+
+    err = commandHandler.FinishCommand();
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+    NL_TEST_ASSERT(apSuite, commandHandler.TestOnlyIsInIdleState());
+}
+
 void TestCommandInteraction::TestCommandHandlerWithOnInvokeReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext)
 {
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -2029,6 +2079,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerCommandEncodeFailure", chip::app::TestCommandInteraction::TestCommandHandlerCommandEncodeFailure),
     NL_TEST_DEF("TestCommandHandlerCommandEncodeExternalFailure", chip::app::TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure),
     NL_TEST_DEF("TestCommandHandlerEncodeSimpleStatusCode", chip::app::TestCommandInteraction::TestCommandHandlerEncodeSimpleStatusCode),
+    NL_TEST_DEF("TestCommandHandlerWithoutResponderCallingAddStatus", chip::app::TestCommandInteraction::TestCommandHandlerWithoutResponderCallingAddStatus),
+    NL_TEST_DEF("TestCommandHandlerWithoutResponderCallingAddResponse", chip::app::TestCommandInteraction::TestCommandHandlerWithoutResponderCallingAddResponse),
+    NL_TEST_DEF("TestCommandHandlerWithoutResponderCallingDirectPrepareFinishCommandApis", chip::app::TestCommandInteraction::TestCommandHandlerWithoutResponderCallingDirectPrepareFinishCommandApis),
     NL_TEST_DEF("TestCommandHandlerWithOnInvokeReceivedNotExistCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithOnInvokeReceivedNotExistCommand),
     NL_TEST_DEF("TestCommandHandlerWithOnInvokeReceivedEmptyDataMsg", chip::app::TestCommandInteraction::TestCommandHandlerWithOnInvokeReceivedEmptyDataMsg),
     NL_TEST_DEF("TestCommandHandlerRejectMultipleIdenticalCommands", chip::app::TestCommandInteraction::TestCommandHandlerRejectMultipleIdenticalCommands),

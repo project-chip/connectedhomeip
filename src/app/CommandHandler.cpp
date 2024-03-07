@@ -604,6 +604,9 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aResponseC
 CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
                                                         const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)
 {
+    // Intentionally omitting the ResponsesAccepted early exit. Direct use of PrepareInvokeResponseCommand
+    // is discouraged, as it often indicates incorrect usage patterns (see GitHub issue #32486).
+    // If you're encountering CHIP_ERROR_INCORRECT_STATE, refactoring to use AddResponse is recommended.
     ReturnErrorOnFailure(AllocateBuffer());
 
     if (!mInternalCallToAddResponseData && mState == State::AddedCommand)
@@ -648,6 +651,9 @@ CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const CommandPathRegistr
 
 CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
 {
+    // Intentionally omitting the ResponsesAccepted early exit. Direct use of FinishCommand
+    // is discouraged, as it often indicates incorrect usage patterns (see GitHub issue #32486).
+    // If you're encountering CHIP_ERROR_INCORRECT_STATE, refactoring to use AddResponse is recommended.
     VerifyOrReturnError(mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
     CommandDataIB::Builder & commandData = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand();
     if (aStartDataStruct)

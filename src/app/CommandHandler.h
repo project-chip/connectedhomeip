@@ -318,6 +318,9 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
+        // Return early when response should not be sent out.
+        VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
+
         return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aData); });
     }
 
@@ -609,9 +612,6 @@ private:
     CHIP_ERROR TryAddResponseDataPreEncode(const ConcreteCommandPath & aRequestCommandPath,
                                            const ConcreteCommandPath & aResponseCommandPath)
     {
-        // Return early when response should not be sent out.
-        VerifyOrReturnValue(ResponsesAccepted(), CHIP_NO_ERROR);
-
         InvokeResponseParameters prepareParams(aRequestCommandPath);
         prepareParams.SetStartOrEndDataStruct(false);
 
@@ -670,6 +670,8 @@ private:
 
     size_t MaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
 
+    bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
+
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
@@ -694,7 +696,7 @@ private:
     bool mGroupRequest                     = false;
     bool mBufferAllocated                  = false;
     bool mReserveSpaceForMoreChunkMessages = false;
-    // TODO(#30453): We should introduce breaking change where calls to add CommandData
+    // TODO(#32486): We should introduce breaking change where calls to add CommandData
     // need to use AddResponse, and not CommandHandler primitives directly using
     // GetCommandDataIBTLVWriter.
     bool mRollbackBackupValid = false;
