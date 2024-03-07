@@ -17,9 +17,10 @@
 
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceController.h"
+#import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
-#import "MTRMetrics_Internal.h"
+#import "MTRMetricsCollector.h"
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
@@ -121,6 +122,10 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
     if (strongDelegate && mQueue && strongController) {
+
+        // Always collect the metrics to avoid unbounded growth of the stats in the collector
+        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshot:TRUE];
+
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
             [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
             dispatch_async(mQueue, ^{
@@ -130,15 +135,8 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
                     nodeID = @(nodeId);
                 }
 
+                // If the client implements the metrics delegate, prefer that over others
                 if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
-                    MTRMetrics * metrics = [MTRMetrics new];
-
-                    if (nsError) {
-                        [metrics setValue:nsError forKey:MTRMetricCommissioningStatusKey];
-                    } else {
-                        auto * error = [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil];
-                        [metrics setValue:error forKey:MTRMetricCommissioningStatusKey];
-                    }
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
                 } else {
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];

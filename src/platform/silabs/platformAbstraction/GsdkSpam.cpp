@@ -49,7 +49,7 @@ extern "C" {
 #include "uart.h"
 #endif
 
-#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
+#ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
 #include "SEGGER_SYSVIEW.h"
 #endif
 }
@@ -78,7 +78,7 @@ CHIP_ERROR SilabsPlatform::Init(void)
     sl_ot_sys_init();
 #endif
 
-#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
+#ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_Start();
 #endif

@@ -96,6 +96,11 @@ bool LayerImplFreeRTOS::IsTimerActive(TimerCompleteCallback onComplete, void * a
     return (mTimerList.GetRemainingTime(onComplete, appState) > Clock::kZero);
 }
 
+Clock::Timeout LayerImplFreeRTOS::GetRemainingTime(TimerCompleteCallback onComplete, void * appState)
+{
+    return mTimerList.GetRemainingTime(onComplete, appState);
+}
+
 void LayerImplFreeRTOS::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
