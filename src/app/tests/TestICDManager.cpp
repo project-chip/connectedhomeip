@@ -540,6 +540,83 @@ public:
         // After the init we should be in Idle mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
     }
+
+    /* Test that verifies the logic of the ICDManager when it receives a StayActiveRequest*/
+    static void TestICDMStayActive(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx                    = static_cast<TestContext *>(aContext);
+        ICDNotifier notifier                 = ICDNotifier::GetInstance();
+        ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
+
+        // Verify That ICDManager starts in Idle
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Trigger a subscription report. Put the ICD manager into active mode.
+        notifier.NotifySubscriptionReport();
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Advance time by the ActiveModeDuration - 1
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms32);
+        // Confirm ICD manager is in active mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        uint32_t stayActiveRequestedMs = 20000;
+        // Send a stay active request for 20 seconds
+        uint32_t stayActivePromisedMs = ctx->mICDManager.StayActiveRequest(stayActiveRequestedMs);
+        // confirm the promised time is the same as the requested time
+        NL_TEST_ASSERT(aSuite, stayActivePromisedMs == stayActiveRequestedMs);
+
+        // Advance time by the duration of the stay stayActiveRequestedMs - 1 ms
+        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(stayActiveRequestedMs) - 1_ms32);
+        // Confirm ICD manager is in active mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Advance time by 1ms and Confirm ICD manager is in idle mode
+        AdvanceClockAndRunEventLoop(ctx, 1_ms32);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Trigger a subscription report Put the ICD manager into active mode
+        notifier.NotifySubscriptionReport();
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Advance time by the duration of the stay active request - 1 ms
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms32);
+        stayActiveRequestedMs = 35000;
+        // Send a stay active request for 35 seconds, which is higher than the maximum stay active duration (30 seconds)
+        stayActivePromisedMs = ctx->mICDManager.StayActiveRequest(stayActiveRequestedMs);
+        // confirm the promised time is the maximum stay active duration (30 seconds)
+        NL_TEST_ASSERT(aSuite, stayActivePromisedMs == 30000);
+
+        // Advance time by the duration of the max stay active duration - 1 ms
+        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(30000) - 1_ms32);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Advance time by 1ms and Confirm ICD manager is in idle mode
+        AdvanceClockAndRunEventLoop(ctx, 1_ms32);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Trigger a subscription report Put the ICD manager into active mode
+        notifier.NotifySubscriptionReport();
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Advance time by the duration of the stay active request - 1 ms
+        AdvanceClockAndRunEventLoop(ctx, icdConfigData.GetActiveModeDuration() - 1_ms32);
+        stayActiveRequestedMs = 30000;
+        // Send a stay active request for 30 seconds
+        stayActivePromisedMs = ctx->mICDManager.StayActiveRequest(stayActiveRequestedMs);
+        // confirm the promised time is the same as the requested time
+        NL_TEST_ASSERT(aSuite, stayActivePromisedMs == 30000);
+
+        // Advance time by the duration of the stay active request - 20000 ms
+        AdvanceClockAndRunEventLoop(ctx, System::Clock::Milliseconds32(stayActiveRequestedMs) - 20000_ms32);
+        // Confirm ICD manager is in active mode, we should have 20000 seconds left at that point
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        stayActiveRequestedMs = 10000;
+        stayActivePromisedMs  = ctx->mICDManager.StayActiveRequest(stayActiveRequestedMs);
+        // confirm the promised time is 20000 since the device is already planing to stay active longer than the requested time
+        NL_TEST_ASSERT(aSuite, stayActivePromisedMs == 20000);
+    }
 };
 
 } // namespace app
@@ -556,6 +633,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
     NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
     NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
+    NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
     NL_TEST_SENTINEL(),
 };
 

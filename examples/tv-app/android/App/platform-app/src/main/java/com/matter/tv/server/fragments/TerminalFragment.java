@@ -24,6 +24,8 @@ public class TerminalFragment extends Fragment {
   private static String TERMINAL_INSTRUCTIONS =
       "add <vid> [<pid>]    Add app with given vendor ID [1, 2, 9050]. Usage: add 9050\r\n"
           + "remove <endpoint>    Remove app at given endpoint [6, 7, etc]. Usage: remove 6\r\n"
+          + "appobserver <appendpoint> <clientnodeindex> <data> <hint>    Send app observer command to client node of the given app endpoint. Usage: appobserver 4 0 data hint\r\n"
+          + "printclients <appendpoint>  Print list of client nodes for the given app endpoint. Usage: printclients 4\r\n"
           + "setpin <endpoint> <pincode>  Set pincode for app with given endpoint ID. Usage: setpin 6 34567890\r\n"
           + "commission <udc-entry>     Commission given udc-entry using given pincode from corresponding app. Usage:"
           + "commission 0\r\n"

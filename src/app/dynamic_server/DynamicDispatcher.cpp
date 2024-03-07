@@ -30,8 +30,8 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
-#include <app/att-storage.h>
 #include <app/data-model/Decode.h>
+#include <app/util/att-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>

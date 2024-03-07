@@ -716,6 +716,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                 continue;
             }
 
+            bool accessAllowed = false;
             for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
             {
                 if (allowedVendor == targetVendorId)
@@ -732,6 +733,12 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                         .fabricIndex = kUndefinedFabricIndex,
                     });
                 }
+                accessAllowed = true;
+            }
+            if (accessAllowed)
+            {
+                // notify content app about this nodeId
+                app->AddClientNode(subjectNodeId);
             }
         }
     }

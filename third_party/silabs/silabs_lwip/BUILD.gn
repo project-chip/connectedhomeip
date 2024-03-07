@@ -36,7 +36,6 @@ lwip_target("silabs_lwip") {
   sources = [
     "${chip_root}/src/lwip/freertos/sys_arch.c",
     "${chip_root}/src/lwip/silabs/lwipopts-rs911x.h",
-    "${chip_root}/src/lwip/silabs/lwipopts-thread.h",
     "${chip_root}/src/lwip/silabs/lwipopts-wf200.h",
   ]
 

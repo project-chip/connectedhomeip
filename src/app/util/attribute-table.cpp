@@ -14,13 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-// this file contains all the common includes for clusters in the zcl-util
+#include <app/util/attribute-table.h>
 
 #include <app/util/attribute-storage.h>
-
-// for pulling in defines dealing with EITHER server or client
-#include "app/util/common.h"
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
 #include <app/util/odd-sized-integers.h>

@@ -152,6 +152,7 @@ RUN set -x \
     portpicker \
     pygit \
     PyGithub \
+    ruff \
     tabulate \
     && : # last line
 

@@ -273,6 +273,7 @@ public:
      * indicated in the UserPrompter's PromptForCommissionOKPermission callback
      */
     void Ok();
+    void InternalOk();
 
     /**
      * This method should be called after the user has declined to give consent for commissioning of the client

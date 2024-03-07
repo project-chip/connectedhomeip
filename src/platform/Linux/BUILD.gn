@@ -74,6 +74,7 @@ static_library("Linux") {
   ]
 
   deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
   ]

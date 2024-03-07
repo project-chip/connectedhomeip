@@ -18,11 +18,8 @@
 #include "DefaultTimeSyncDelegate.h"
 #include "time-synchronization-delegate.h"
 
-#if TIME_SYNC_ENABLE_TSC_FEATURE
-#include <app/InteractionModelEngine.h>
-#endif
-
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -32,14 +29,15 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SortUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/RuntimeOptionsProvider.h>
 
-#include <app-common/zap-generated/cluster-enums.h>
-
 #include <system/SystemClock.h>
+
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+#include <app/InteractionModelEngine.h>
+#endif
 
 using namespace chip;
 using namespace chip::app;
