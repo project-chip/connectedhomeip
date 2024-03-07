@@ -268,7 +268,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 
     UpdateStatusLED();
 #endif
-
     InitButtons();
 
     // Initialize function button timer
@@ -464,6 +463,8 @@ void AppTaskCommon::UpdateStatusLED()
     {
         if(sIsBLEAdvertising)
             sStatusLED.Blink(200, 200);
+        else
+            sStatusLED.Set(false);
     }
 }
 
@@ -585,7 +586,6 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
 void AppTaskCommon::FactoryResetButtonEventHandler(void)
 {
     AppEvent event;
-
     event.Type               = AppEvent::kEventType_Button;
     event.ButtonEvent.Action = kButtonPushEvent;
     if(GetAppTask().UserFactoryResetHandler)
@@ -708,7 +708,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
-        sIsBLEAdvertising   = ConnectivityMgr().IsBLEAdvertisingEnabled();
+        sIsBLEAdvertising   = ConnectivityMgr().IsBLEAdvertising();
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
 #endif

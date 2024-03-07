@@ -155,6 +155,15 @@ void AppTask::buttonReleaseCheckEventHandler(AppEvent * aEvent)
                 }
                 UpdateClusterStateInternal(NULL);
             }
+            else if(buttonPressCounter < 500)
+            {
+                UpdateStatusLEDExt(false, false);
+            }
+            else
+            {
+                LOG_INF("Do factory reset");
+                FactoryReset();
+            }
             buttonPressCounter = 0;
         }
         else
@@ -168,8 +177,7 @@ void AppTask::buttonReleaseCheckEventHandler(AppEvent * aEvent)
             }
             if(buttonPressCounter == 500)
             {
-                LOG_INF("Do factory reset");
-                FactoryReset();
+                LOG_INF("Release to do factory reset");
                 UpdateStatusLEDExt(false, false);
             }
         }
