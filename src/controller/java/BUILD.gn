@@ -365,11 +365,7 @@ kotlin_library("kotlin_matter_controller") {
 
   output_name = "KotlinMatterController.jar"
 
-  deps = [
-    ":java",
-    ":tlv",
-    "${chip_root}/third_party/java_deps:annotation",
-  ]
+  deps = [ ":java" ]
 
   sources = [
     "src/matter/controller/CompletionListenerAdapter.kt",
