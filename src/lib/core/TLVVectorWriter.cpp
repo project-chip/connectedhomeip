@@ -37,7 +37,7 @@ TlvVectorWriter::TlvVectorWriter(std::vector<uint8_t> * buffer) : buffer_(buffer
     Init(buffer_);
 }
 
-TlvVectorWriter::~TlvVectorWriter() {}
+TlvVectorWriter::~TlvVectorWriter() = default;
 
 TlvVectorWriter::TlvVectorBuffer::TlvVectorBuffer(std::vector<uint8_t> * buffer) : final_buffer_(*buffer) {}
 
