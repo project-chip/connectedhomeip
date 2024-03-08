@@ -238,25 +238,22 @@ exit:
 
 CHIP_ERROR BluezAdvertisement::StartImpl()
 {
-    GDBusObject * adapterObject;
-    GAutoPtr<BluezLEAdvertisingManager1> advMgr;
-    GVariantBuilder optionsBuilder;
-    GVariant * options;
-
     VerifyOrReturnError(mAdapter, CHIP_ERROR_UNINITIALIZED);
 
-    adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
+    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
     VerifyOrReturnError(adapterObject != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    advMgr.reset(bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
+    GAutoPtr<BluezLEAdvertisingManager1> advMgr(
+        bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
     // If the adapter configured in the Init() was unplugged, the LE advertising manager will not
     // be available. In such case, instead of reporting internal error, we should report adapter
     // unavailable, so the application can handle the situation properly.
     VerifyOrReturnError(advMgr, BLE_ERROR_ADAPTER_UNAVAILABLE);
 
+    GVariantBuilder optionsBuilder;
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
-    options = g_variant_builder_end(&optionsBuilder);
+    GVariant * options = g_variant_builder_end(&optionsBuilder);
 
     bluez_leadvertising_manager1_call_register_advertisement(
         advMgr.get(), mAdvPath, options, nullptr,
@@ -295,16 +292,14 @@ exit:
 
 CHIP_ERROR BluezAdvertisement::StopImpl()
 {
-    GDBusObject * adapterObject;
-    GAutoPtr<BluezLEAdvertisingManager1> advMgr;
-
     VerifyOrReturnError(mAdapter, CHIP_ERROR_UNINITIALIZED);
 
-    adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
+    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
     VerifyOrReturnError(adapterObject != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    advMgr.reset(bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
+    GAutoPtr<BluezLEAdvertisingManager1> advMgr(
+        bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
     // If the adapter configured in the Init() was unplugged, the LE advertising manager will not
     // be available. In such case, instead of reporting internal error, we should report adapter
     // unavailable, so the application can handle the situation properly.
