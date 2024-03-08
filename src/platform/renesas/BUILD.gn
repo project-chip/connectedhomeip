@@ -32,10 +32,8 @@ static_library("renesas") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "DnssdImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
@@ -47,7 +45,6 @@ static_library("renesas") {
 
   deps = [ "${chip_root}/src/crypto" ]
 
-  public_deps = [ "${chip_root}/src/lib/dnssd:platform_header",
-                  "${chip_root}/src/platform:platform_base" ]
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
 }
