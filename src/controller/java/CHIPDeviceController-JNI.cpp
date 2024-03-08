@@ -1897,9 +1897,19 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     jclass discoveredDeviceCls = env->FindClass("chip/devicecontroller/DiscoveredDevice");
     jmethodID constructor      = env->GetMethodID(discoveredDeviceCls, "<init>", "()V");
 
-    jfieldID discrminatorID = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");
-    jfieldID ipAddressID    = env->GetFieldID(discoveredDeviceCls, "ipAddress", "Ljava/lang/String;");
-    jfieldID portID         = env->GetFieldID(discoveredDeviceCls, "port", "I");
+    jfieldID discrminatorID       = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");
+    jfieldID ipAddressID          = env->GetFieldID(discoveredDeviceCls, "ipAddress", "Ljava/lang/String;");
+    jfieldID portID               = env->GetFieldID(discoveredDeviceCls, "port", "I");
+    jfieldID deviceTypeID         = env->GetFieldID(discoveredDeviceCls, "deviceType", "J");
+    jfieldID vendorIdID           = env->GetFieldID(discoveredDeviceCls, "vendorId", "I");
+    jfieldID productIdID          = env->GetFieldID(discoveredDeviceCls, "productId", "I");
+    jfieldID rotatingIdID         = env->GetFieldID(discoveredDeviceCls, "rotatingId", "[B");
+    jfieldID instanceNameID       = env->GetFieldID(discoveredDeviceCls, "instanceName", "Ljava/lang/String;");
+    jfieldID deviceNameID         = env->GetFieldID(discoveredDeviceCls, "deviceName", "Ljava/lang/String;");
+    jfieldID pairingInstructionID = env->GetFieldID(discoveredDeviceCls, "pairingInstruction", "Ljava/lang/String;");
+
+    jmethodID setCommissioningModeID = env->GetMethodID(discoveredDeviceCls, "setCommissioningMode", "(I)V");
+    jmethodID setPairingHintID       = env->GetMethodID(discoveredDeviceCls, "setPairingHint", "(I)V");
 
     jobject discoveredObj = env->NewObject(discoveredDeviceCls, constructor);
 
@@ -1911,6 +1921,26 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
 
     env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
     env->SetIntField(discoveredObj, portID, static_cast<jint>(data->resolutionData.port));
+    env->SetLongField(discoveredObj, deviceTypeID, static_cast<jlong>(data->commissionData.deviceType));
+    env->SetIntField(discoveredObj, vendorIdID, static_cast<jint>(data->commissionData.vendorId));
+    env->SetIntField(discoveredObj, productIdID, static_cast<jint>(data->commissionData.productId));
+
+    jbyteArray jRotatingId;
+    CHIP_ERROR err = JniReferences::GetInstance().N2J_ByteArray(
+        env, data->commissionData.rotatingId, static_cast<jsize>(data->commissionData.rotatingIdLen), jRotatingId);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "jRotatingId N2J_ByteArray error : %" CHIP_ERROR_FORMAT, err.Format());
+        return nullptr;
+    }
+    env->SetObjectField(discoveredObj, rotatingIdID, static_cast<jobject>(jRotatingId));
+    env->SetObjectField(discoveredObj, instanceNameID, env->NewStringUTF(data->commissionData.instanceName));
+    env->SetObjectField(discoveredObj, deviceNameID, env->NewStringUTF(data->commissionData.deviceName));
+    env->SetObjectField(discoveredObj, pairingInstructionID, env->NewStringUTF(data->commissionData.pairingInstruction));
+
+    env->CallVoidMethod(discoveredObj, setCommissioningModeID, static_cast<jint>(data->commissionData.commissioningMode));
+    env->CallVoidMethod(discoveredObj, setPairingHintID, static_cast<jint>(data->commissionData.pairingHint));
 
     return discoveredObj;
 }
