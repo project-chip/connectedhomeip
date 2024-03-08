@@ -519,7 +519,7 @@ void ResolveContext::DispatchSuccess()
     bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
 
 #if TARGET_OS_TV
-    // On tvOS, priotize results from en0, en1, ir0 in that order, if those
+    // On tvOS, prioritize results from en0, en1, ir0 in that order, if those
     // interfaces are present, since those will generally have more up-to-date
     // information.
     static const unsigned int priorityInterfaceIndices[] = {
@@ -527,6 +527,12 @@ void ResolveContext::DispatchSuccess()
         if_nametoindex("en1"),
         if_nametoindex("ir0"),
     };
+#else
+    // Elsewhere prioritize "lo0" over other interfaces.
+    static const unsigned int priorityInterfaceIndices[] = {
+        if_nametoindex("lo0"),
+    };
+#endif // TARGET_OS_TV
 
     for (auto interfaceIndex : priorityInterfaceIndices)
     {
@@ -539,7 +545,6 @@ void ResolveContext::DispatchSuccess()
             return;
         }
     }
-#endif // TARGET_OS_TV
 
     for (auto & interface : interfaces)
     {
