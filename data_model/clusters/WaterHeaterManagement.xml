@@ -134,7 +134,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x01" name="Boost" direction="commandToServer" response="Y">
+    <command id="0x00" name="Boost" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
       <field id="0" name="Duration" type="elapsed-s">

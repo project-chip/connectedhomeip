@@ -62,4 +62,30 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Duplicate condition replaces Multiple condition"/>
   </revisionHistory>
   <conditions/>
+  <clusters>
+    <cluster id="0x001D" name="Descriptor" side="server">
+      <mandatoryConform/>
+      <features>
+        <feature code="" name="TAGLIST">
+          <mandatoryConform>
+            <attribute name="Duplicate"/>
+          </mandatoryConform>
+        </feature>
+      </features>
+    </cluster>
+    <cluster id="0x001E" name="Binding" side="server">
+      <mandatoryConform>
+        <andTerm>
+          <condition name="Simple"/>
+          <condition name="Client"/>
+        </andTerm>
+      </mandatoryConform>
+    </cluster>
+    <cluster id="0x0040" name="Fixed Label" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0041" name="User Label" side="server">
+      <optionalConform/>
+    </cluster>
+  </clusters>
 </deviceType>
