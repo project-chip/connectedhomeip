@@ -279,14 +279,15 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 {
     VerifyOrReturnError(mAdapter, CHIP_ERROR_UNINITIALIZED);
 
-    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
-    VerifyOrReturnError(adapterObject != nullptr, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
+    // If the adapter configured in the Init() was unplugged, the g_dbus_interface_get_object()
+    // or bluez_object_get_gatt_manager1() might return nullptr (depending on the timing, since
+    // the D-Bus communication is handled on a separate thread). In such case, we should not
+    // report internal error, but adapter unavailable, so the application can handle the situation
+    // properly.
 
+    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
+    VerifyOrReturnError(adapterObject != nullptr, BLE_ERROR_ADAPTER_UNAVAILABLE);
     GAutoPtr<BluezGattManager1> gattMgr(bluez_object_get_gatt_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
-    // If the adapter configured in the Init() was unplugged, the GATT manager will not
-    // be available. In such case, instead of reporting internal error, we should report
-    // adapter unavailable, so the application can handle the situation properly.
     VerifyOrReturnError(gattMgr, BLE_ERROR_ADAPTER_UNAVAILABLE);
 
     GVariantBuilder optionsBuilder;

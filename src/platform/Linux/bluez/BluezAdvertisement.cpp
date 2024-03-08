@@ -240,15 +240,16 @@ CHIP_ERROR BluezAdvertisement::StartImpl()
 {
     VerifyOrReturnError(mAdapter, CHIP_ERROR_UNINITIALIZED);
 
-    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
-    VerifyOrReturnError(adapterObject != nullptr, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
+    // If the adapter configured in the Init() was unplugged, the g_dbus_interface_get_object()
+    // or bluez_object_get_leadvertising_manager1() might return nullptr (depending on the timing,
+    // since the D-Bus communication is handled on a separate thread). In such case, we should not
+    // report internal error, but adapter unavailable, so the application can handle the situation
+    // properly.
 
+    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
+    VerifyOrReturnError(adapterObject != nullptr, BLE_ERROR_ADAPTER_UNAVAILABLE);
     GAutoPtr<BluezLEAdvertisingManager1> advMgr(
         bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
-    // If the adapter configured in the Init() was unplugged, the LE advertising manager will not
-    // be available. In such case, instead of reporting internal error, we should report adapter
-    // unavailable, so the application can handle the situation properly.
     VerifyOrReturnError(advMgr, BLE_ERROR_ADAPTER_UNAVAILABLE);
 
     GVariantBuilder optionsBuilder;
@@ -294,15 +295,16 @@ CHIP_ERROR BluezAdvertisement::StopImpl()
 {
     VerifyOrReturnError(mAdapter, CHIP_ERROR_UNINITIALIZED);
 
-    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
-    VerifyOrReturnError(adapterObject != nullptr, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
+    // If the adapter configured in the Init() was unplugged, the g_dbus_interface_get_object()
+    // or bluez_object_get_leadvertising_manager1() might return nullptr (depending on the timing,
+    // since the D-Bus communication is handled on a separate thread). In such case, we should not
+    // report internal error, but adapter unavailable, so the application can handle the situation
+    // properly.
 
+    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
+    VerifyOrReturnError(adapterObject != nullptr, BLE_ERROR_ADAPTER_UNAVAILABLE);
     GAutoPtr<BluezLEAdvertisingManager1> advMgr(
         bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
-    // If the adapter configured in the Init() was unplugged, the LE advertising manager will not
-    // be available. In such case, instead of reporting internal error, we should report adapter
-    // unavailable, so the application can handle the situation properly.
     VerifyOrReturnError(advMgr, BLE_ERROR_ADAPTER_UNAVAILABLE);
 
     bluez_leadvertising_manager1_call_unregister_advertisement(
