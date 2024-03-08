@@ -40,25 +40,48 @@ def generated_cmd_pics(pics_base: str, id: int) -> str:
 def feature_pics(pics_base: str, bit: int) -> str:
     return f'{pics_base}.S.F{bit:02x}'
 
+# Use bool-arg check_base_pics_files=True to check the base PICS xml against all known elements
+
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
-        await self.setup_class_helper(False)
+        if not self.user_params.get("check_base_pics_files", False):
+            await self.setup_class_helper(False)
         # build_xml_cluster returns a list of issues found when paring the XML
         # Problems in the XML shouldn't cause test failure, but we want them recorded
         # so they are added to the list of problems that get output when the test set completes.
         self.xml_clusters, self.problems = build_xml_clusters()
 
     def _check_and_record_errors(self, location, required, pics):
-        if required and not self.check_pics(pics):
+        if self.user_params.get("check_base_pics_files", False):
+            # We just want to know that the pics appears in the xml file (aka in the dictionary), don't care about the value
+            have_pics = pics in self.matter_test_config.pics
+        else:
+            have_pics = self.check_pics(pics)
+
+        if required and not have_pics:
             self.record_error("PICS check", location=location,
                               problem=f"An element found on the device, but the corresponding PICS {pics} was not found in pics list")
             self.success = False
         elif not required and self.check_pics(pics):
             self.record_error("PICS check", location=location, problem=f"PICS {pics} found in PICS list, but not on device")
             self.success = False
+
+    def _check_pics_required(self, attribute_id_of_element_list: int, cluster_id: int, element_id: int):
+        if self.user_params.get("check_base_pics_files", False):
+            return True
+
+        if cluster_id not in self.endpoint.keys():
+            # This cluster is not on this endpoint
+            required = False
+        elif element_id in self.endpoint[cluster_id][attribute_id_of_element_list]:
+            # Cluster and element are on the endpoint
+            required = True
+        else:
+            # Cluster is on the endpoint but the element is not in the list
+            required = False
 
     def _add_pics_for_lists(self, cluster_id: int, attribute_id_of_element_list: GlobalAttributeIds) -> None:
         try:
@@ -84,15 +107,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                 continue
             pics = pics_mapper(self.xml_clusters[cluster_id].pics, element_id)
 
-            if cluster_id not in self.endpoint.keys():
-                # This cluster is not on this endpoint
-                required = False
-            elif element_id in self.endpoint[cluster_id][attribute_id_of_element_list]:
-                # Cluster and element are on the endpoint
-                required = True
-            else:
-                # Cluster is on the endpoint but the element is not in the list
-                required = False
+            required = self._check_pics_required(attribute_id_of_element_list, cluster_id, element_id)
 
             if attribute_id_of_element_list == GlobalAttributeIds.ATTRIBUTE_LIST_ID:
                 location = AttributePathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id, attribute_id=element_id)
@@ -113,7 +128,8 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
         # wildcard read is done in setup_class
         self.step(1)
         self.endpoint_id = self.matter_test_config.endpoint
-        self.endpoint = self.endpoints_tlv[self.endpoint_id]
+        if not self.user_params.get("check_base_pics_files", False):
+            self.endpoint = self.endpoints_tlv[self.endpoint_id]
         self.success = True
 
         # Data model XML is used to get the PICS code for this cluster. If we don't know the PICS
@@ -127,7 +143,12 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
             # Ensure the PICS.S code is correctly marked
             pics_cluster = f'{self.xml_clusters[cluster_id].pics}.S'
             location = ClusterPathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id)
-            self._check_and_record_errors(location, cluster_id in self.endpoint, pics_cluster)
+            if not self.user_params.get("check_base_pics_files", False):
+                cluster_pics_required = cluster_id in self.endpoint
+            else:
+                cluster_pics_required = True
+
+            self._check_and_record_errors(location, cluster_pics_required, pics_cluster)
 
         self.step(3)
         for cluster_id, cluster in checkable_clusters.items():
@@ -150,10 +171,18 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                 continue
 
             pics_base = self.xml_clusters[cluster_id].pics
-            try:
-                feature_map = self.endpoint[cluster_id][GlobalAttributeIds.FEATURE_MAP_ID]
-            except KeyError:
-                feature_map = 0
+            if self.user_params.get("check_base_pics_files", False):
+                try:
+                    feature_map = 0
+                    for f in Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature:
+                        feature_map &= f
+                except KeyError:
+                    feature_map = 0
+            else:
+                try:
+                    feature_map = self.endpoint[cluster_id][GlobalAttributeIds.FEATURE_MAP_ID]
+                except KeyError:
+                    feature_map = 0
 
             for feature_mask in cluster_features:
                 # Codegen in python uses feature masks (0x01, 0x02, 0x04 etc.)
