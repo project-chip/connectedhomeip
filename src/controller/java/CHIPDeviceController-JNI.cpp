@@ -371,6 +371,10 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
         jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
 
+        jobject countryCode;
+        err = chip::JniReferences::GetInstance().GetOptionalValue(countryCodeOptional, countryCode);
+        SuccessOrExit(err);
+
 #ifdef JAVA_MATTER_CONTROLLER_TEST
         std::unique_ptr<chip::Controller::ExampleOperationalCredentialsIssuer> opCredsIssuer(
             new chip::Controller::ExampleOperationalCredentialsIssuer());
@@ -383,7 +387,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
             rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
             failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete,
-            skipAttestationCertificateValidation, &err);
+            skipAttestationCertificateValidation, static_cast<jstring>(countryCode), &err);
         SuccessOrExit(err);
 
         if (caseFailsafeTimerSeconds > 0)
@@ -403,29 +407,6 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             // if there is a valid adminSubject in the ControllerParams, then remember it
             CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
             commissioningParams.SetAdminSubject(adminSubject);
-            err = wrapper->UpdateCommissioningParameters(commissioningParams);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
-                SuccessOrExit(err);
-            }
-        }
-
-        jobject countryCode;
-        err = chip::JniReferences::GetInstance().GetOptionalValue(countryCodeOptional, countryCode);
-        SuccessOrExit(err);
-
-        if (countryCode != nullptr)
-        {
-            jstring countryCodeStr = static_cast<jstring>(countryCode);
-            JniUtfString countryCodeJniString(env, countryCodeStr);
-
-            VerifyOrExit(countryCodeJniString.size() == 2, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-            chip::Controller::CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
-            commissioningParams.SetCountryCode(countryCodeJniString.charSpan());
-
-            // The wrapper internally has reserved storage for the country code and will copy the value.
             err = wrapper->UpdateCommissioningParameters(commissioningParams);
             if (err != CHIP_NO_ERROR)
             {
@@ -876,7 +857,7 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+    CommissioningParameters commissioningParams = wrapper->GetAutoCommissioner()->GetCommissioningParameters();
     CHIP_ERROR err                              = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
     if (err != CHIP_NO_ERROR)
     {
@@ -884,10 +865,10 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
-    err = wrapper->UpdateCommissioningParameters(commissioningParams);
+    err = wrapper->GetAutoCommissioner()->SetCommissioningParameters(commissioningParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "SetCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
@@ -911,7 +892,7 @@ JNI_METHOD(void, updateCommissioningICDRegistrationInfo)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+    CommissioningParameters commissioningParams = wrapper->GetAutoCommissioner()->GetCommissioningParameters();
     CHIP_ERROR err                              = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
     if (err != CHIP_NO_ERROR)
     {
@@ -919,10 +900,10 @@ JNI_METHOD(void, updateCommissioningICDRegistrationInfo)
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
-    err = wrapper->UpdateCommissioningParameters(commissioningParams);
+    err = wrapper->GetAutoCommissioner()->SetCommissioningParameters(commissioningParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "SetCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
