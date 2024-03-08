@@ -25,7 +25,6 @@
 #include <cstring>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <lib/support/UnitTest.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <mbedtls/platform.h>
 #include <nl_test_service/nl_test.rpc.pb.h>
@@ -57,7 +56,6 @@ public:
         nlTestSetLogger(&nl_test_logger);
 
         RunRegisteredUnitTests();
-        chip::test::RunAllTests();
 
         stream_writer = nullptr;
         writer.Finish();
