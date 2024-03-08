@@ -351,7 +351,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     SuccessOrExit(err);
 
     jmethodID getEnableServerInteractions;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getEnableServerInteractions", "()Z", &getEnableServerInteractions);
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getEnableServerInteractions", "()Z",
+                                                        &getEnableServerInteractions);
     SuccessOrExit(err);
 
     {
@@ -374,7 +375,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         uint64_t adminSubject              = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getAdminSubject));
         jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
         jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
-        bool enableServerInteractions  = env->CallBooleanMethod(controllerParams, getEnableServerInteractions) == JNI_TRUE;
+        bool enableServerInteractions      = env->CallBooleanMethod(controllerParams, getEnableServerInteractions) == JNI_TRUE;
 
         jobject countryCode;
         err = chip::JniReferences::GetInstance().GetOptionalValue(countryCodeOptional, countryCode);

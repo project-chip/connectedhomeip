@@ -172,19 +172,21 @@ public:
      * @param[in] skipCommissioningComplete whether to skip the CASE commissioningComplete command during commissioning
      * @param[out] errInfoOnFailure a pointer to a CHIP_ERROR that will be populated if this method returns nullptr
      */
-    static AndroidDeviceControllerWrapper * AllocateNew(
-        JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
-        chip::System::Layer * systemLayer, chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
-        chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
+    static AndroidDeviceControllerWrapper *
+    AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::FabricId fabricId,
+                const chip::CATValues & cats, chip::System::Layer * systemLayer,
+                chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
+                chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
 #ifdef JAVA_MATTER_CONTROLLER_TEST
-        ExampleOperationalCredentialsIssuerPtr opCredsIssuer,
+                ExampleOperationalCredentialsIssuerPtr opCredsIssuer,
 #else
-        AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
+                 AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
 #endif
-        jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
-        jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
-        uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
-        bool skipAttestationCertificateValidation, jstring countryCode, bool enableServerInteractions, CHIP_ERROR * errInfoOnFailure);
+                jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
+                jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
+                uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
+                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, jstring countryCode,
+                bool enableServerInteractions, CHIP_ERROR * errInfoOnFailure);
 
     void Shutdown();
 

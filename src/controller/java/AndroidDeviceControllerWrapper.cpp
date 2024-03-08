@@ -351,7 +351,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.controllerNOC  = nocSpan;
     }
 
-    initParams.enableServerInteractions = enableServerInteractions;
+    initParams.enableServerInteractions  = enableServerInteractions;
     setupParams.enableServerInteractions = enableServerInteractions;
 
     *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
@@ -396,10 +396,10 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     wrapper->getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
 
-    auto engine = chip::app::InteractionModelEngine::GetInstance();
+    auto engine       = chip::app::InteractionModelEngine::GetInstance();
     *errInfoOnFailure = wrapper->mCheckInDelegate.Init(&wrapper->mICDClientStorage, engine);
     *errInfoOnFailure = wrapper->mCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
-                                                 &wrapper->mICDClientStorage, &wrapper->mCheckInDelegate, engine);
+                                                      &wrapper->mICDClientStorage, &wrapper->mCheckInDelegate, engine);
 
     memset(ipkBuffer.data(), 0, ipkBuffer.size());
 
