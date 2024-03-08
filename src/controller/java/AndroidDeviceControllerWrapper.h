@@ -50,6 +50,8 @@
 
 constexpr uint8_t kUserActiveModeTriggerInstructionBufferLen =
     128 + 1; // 128bytes is max UserActiveModeTriggerInstruction size and 1 byte is for escape sequence.
+
+constexpr uint8_t kCountryCodeBufferLen = 2;
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
  * to handle all controller-related processing.
@@ -123,10 +125,7 @@ public:
 
     chip::Credentials::PartialDACVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
 
-    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
-    {
-        return mAutoCommissioner.GetCommissioningParameters();
-    }
+    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const { return mCommissioningParameter; }
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
@@ -171,20 +170,19 @@ public:
      * @param[in] skipCommissioningComplete whether to skip the CASE commissioningComplete command during commissioning
      * @param[out] errInfoOnFailure a pointer to a CHIP_ERROR that will be populated if this method returns nullptr
      */
-    static AndroidDeviceControllerWrapper *
-    AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::FabricId fabricId,
-                const chip::CATValues & cats, chip::System::Layer * systemLayer,
-                chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
-                chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
+    static AndroidDeviceControllerWrapper * AllocateNew(
+        JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
+        chip::System::Layer * systemLayer, chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
+        chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
 #ifdef JAVA_MATTER_CONTROLLER_TEST
-                ExampleOperationalCredentialsIssuerPtr opCredsIssuer,
+        ExampleOperationalCredentialsIssuerPtr opCredsIssuer,
 #else
-                AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
+        AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
 #endif
-                jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
-                jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
-                uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure);
+        jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
+        jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
+        uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
+        bool skipAttestationCertificateValidation, jstring countryCode, CHIP_ERROR * errInfoOnFailure);
 
     void Shutdown();
 
@@ -246,6 +244,8 @@ private:
     std::vector<uint8_t> mIcacCertificate;
     std::vector<uint8_t> mRcacCertificate;
 
+    char mCountryCode[kCountryCodeBufferLen];
+
     chip::Controller::AutoCommissioner mAutoCommissioner;
 
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
@@ -261,6 +261,8 @@ private:
     char mUserActiveModeTriggerInstructionBuffer[kUserActiveModeTriggerInstructionBufferLen];
     chip::MutableCharSpan mUserActiveModeTriggerInstruction = chip::MutableCharSpan(mUserActiveModeTriggerInstructionBuffer);
     chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerHint;
+
+    chip::Controller::CommissioningParameters mCommissioningParameter;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST

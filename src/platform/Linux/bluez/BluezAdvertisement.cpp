@@ -224,7 +224,7 @@ void BluezAdvertisement::Shutdown()
 
 void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
 {
-    BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
+    auto * advMgr = reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject);
     GAutoPtr<GError> error;
     gboolean success = FALSE;
 
@@ -252,7 +252,7 @@ CHIP_ERROR BluezAdvertisement::StartImpl()
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    advMgr.reset(bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapterObject)));
+    advMgr.reset(bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
     VerifyOrExit(advMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
@@ -282,7 +282,7 @@ CHIP_ERROR BluezAdvertisement::Start()
 
 void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
 {
-    BluezLEAdvertisingManager1 * advMgr = BLUEZ_LEADVERTISING_MANAGER1(aObject);
+    auto * advMgr = reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject);
     GAutoPtr<GError> error;
     gboolean success = FALSE;
 
@@ -308,7 +308,7 @@ CHIP_ERROR BluezAdvertisement::StopImpl()
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    advMgr.reset(bluez_object_get_leadvertising_manager1(BLUEZ_OBJECT(adapterObject)));
+    advMgr.reset(bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
     VerifyOrExit(advMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
     bluez_leadvertising_manager1_call_unregister_advertisement(

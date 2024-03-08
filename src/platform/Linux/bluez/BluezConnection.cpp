@@ -34,6 +34,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "BluezEndpoint.h"
+#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -95,10 +96,6 @@ BluezConnection::ConnectionDataBundle::ConnectionDataBundle(const BluezConnectio
 
 CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 {
-    // populate the service and the characteristics
-    GList * objects = nullptr;
-    GList * l;
-
     if (!aEndpoint.mIsCentral)
     {
         mpService = reinterpret_cast<BluezGattService1 *>(g_object_ref(aEndpoint.mpService));
@@ -107,11 +104,9 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
     }
     else
     {
-        objects = g_dbus_object_manager_get_objects(aEndpoint.mpObjMgr);
-
-        for (l = objects; l != nullptr; l = l->next)
+        for (BluezObject & object : BluezObjectList(aEndpoint.mpObjMgr))
         {
-            BluezGattService1 * service = bluez_object_get_gatt_service1(BLUEZ_OBJECT(l->data));
+            BluezGattService1 * service = bluez_object_get_gatt_service1(&object);
             if (service != nullptr)
             {
                 if ((BluezIsServiceOnDevice(service, mpDevice)) == TRUE &&
@@ -126,9 +121,9 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         VerifyOrExit(mpService != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL service in %s", __func__));
 
-        for (l = objects; l != nullptr; l = l->next)
+        for (BluezObject & object : BluezObjectList(aEndpoint.mpObjMgr))
         {
-            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(BLUEZ_OBJECT(l->data));
+            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(&object);
             if (char1 != nullptr)
             {
                 if ((BluezIsCharOnService(char1, mpService) == TRUE) &&
@@ -164,8 +159,6 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
     }
 
 exit:
-    if (objects != nullptr)
-        g_list_free_full(objects, g_object_unref);
     return CHIP_NO_ERROR;
 }
 
@@ -305,9 +298,10 @@ CHIP_ERROR BluezConnection::SendIndication(chip::System::PacketBufferHandle apBu
 
 void BluezConnection::SendWriteRequestDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
-    BluezGattCharacteristic1 * c1 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
+    auto * pC1 = reinterpret_cast<BluezGattCharacteristic1 *>(aObject);
+
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &error.GetReceiver());
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(pC1, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: SendWriteRequest : %s", error->message));
     BLEManagerImpl::HandleWriteComplete(static_cast<BluezConnection *>(apConnection));
@@ -354,9 +348,10 @@ void BluezConnection::OnCharacteristicChanged(GDBusProxy * aInterface, GVariant 
 
 void BluezConnection::SubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
-    BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
+    auto * pC2 = reinterpret_cast<BluezGattCharacteristic1 *>(aObject);
+
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error.GetReceiver());
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(pC2, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: SubscribeCharacteristic : %s", error->message));
 
@@ -365,13 +360,12 @@ void BluezConnection::SubscribeCharacteristicDone(GObject * aObject, GAsyncResul
 
 CHIP_ERROR BluezConnection::SubscribeCharacteristicImpl(BluezConnection * connection)
 {
-    BluezGattCharacteristic1 * c2 = nullptr;
-    VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
-    c2 = BLUEZ_GATT_CHARACTERISTIC1(connection->mpC2);
+    BluezGattCharacteristic1 * pC2 = connection->mpC2;
+    VerifyOrExit(pC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
 
     // Get notifications on the TX characteristic change (e.g. indication is received)
-    g_signal_connect(c2, "g-properties-changed", G_CALLBACK(OnCharacteristicChanged), connection);
-    bluez_gatt_characteristic1_call_start_notify(connection->mpC2, nullptr, SubscribeCharacteristicDone, connection);
+    g_signal_connect(pC2, "g-properties-changed", G_CALLBACK(OnCharacteristicChanged), connection);
+    bluez_gatt_characteristic1_call_start_notify(pC2, nullptr, SubscribeCharacteristicDone, connection);
 
 exit:
     return CHIP_NO_ERROR;
@@ -386,22 +380,24 @@ CHIP_ERROR BluezConnection::SubscribeCharacteristic()
 
 void BluezConnection::UnsubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
-    BluezGattCharacteristic1 * c2 = BLUEZ_GATT_CHARACTERISTIC1(aObject);
+    auto * pC2 = reinterpret_cast<BluezGattCharacteristic1 *>(aObject);
+
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &error.GetReceiver());
+    gboolean success = bluez_gatt_characteristic1_call_write_value_finish(pC2, aResult, &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: UnsubscribeCharacteristic : %s", error->message));
 
     // Stop listening to the TX characteristic changes
-    g_signal_handlers_disconnect_by_data(c2, apConnection);
+    g_signal_handlers_disconnect_by_data(pC2, apConnection);
     BLEManagerImpl::HandleSubscribeOpComplete(static_cast<BluezConnection *>(apConnection), false);
 }
 
 CHIP_ERROR BluezConnection::UnsubscribeCharacteristicImpl(BluezConnection * connection)
 {
-    VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
+    BluezGattCharacteristic1 * pC2 = connection->mpC2;
+    VerifyOrExit(pC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
 
-    bluez_gatt_characteristic1_call_stop_notify(connection->mpC2, nullptr, UnsubscribeCharacteristicDone, connection);
+    bluez_gatt_characteristic1_call_stop_notify(pC2, nullptr, UnsubscribeCharacteristicDone, connection);
 
 exit:
     return CHIP_NO_ERROR;
