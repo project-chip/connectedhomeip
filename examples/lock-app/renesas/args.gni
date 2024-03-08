@@ -29,6 +29,7 @@ chip_progress_logging = true
 chip_detail_logging = true
 chip_automation_logging = false
 treat_warnings_as_errors = false
+use_exceptions = false
 chip_project_config_include_dirs =
 [
     "//include",
