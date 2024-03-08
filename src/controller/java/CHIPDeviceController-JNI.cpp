@@ -371,6 +371,10 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
         jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
 
+        jobject countryCode;
+        err = chip::JniReferences::GetInstance().GetOptionalValue(countryCodeOptional, countryCode);
+        SuccessOrExit(err);
+
 #ifdef JAVA_MATTER_CONTROLLER_TEST
         std::unique_ptr<chip::Controller::ExampleOperationalCredentialsIssuer> opCredsIssuer(
             new chip::Controller::ExampleOperationalCredentialsIssuer());
@@ -383,7 +387,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
             rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
             failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete,
-            skipAttestationCertificateValidation, &err);
+            skipAttestationCertificateValidation, static_cast<jstring>(countryCode), &err);
         SuccessOrExit(err);
 
         if (caseFailsafeTimerSeconds > 0)
@@ -403,29 +407,6 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             // if there is a valid adminSubject in the ControllerParams, then remember it
             CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
             commissioningParams.SetAdminSubject(adminSubject);
-            err = wrapper->UpdateCommissioningParameters(commissioningParams);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
-                SuccessOrExit(err);
-            }
-        }
-
-        jobject countryCode;
-        err = chip::JniReferences::GetInstance().GetOptionalValue(countryCodeOptional, countryCode);
-        SuccessOrExit(err);
-
-        if (countryCode != nullptr)
-        {
-            jstring countryCodeStr = static_cast<jstring>(countryCode);
-            JniUtfString countryCodeJniString(env, countryCodeStr);
-
-            VerifyOrExit(countryCodeJniString.size() == 2, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-            chip::Controller::CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
-            commissioningParams.SetCountryCode(countryCodeJniString.charSpan());
-
-            // The wrapper internally has reserved storage for the country code and will copy the value.
             err = wrapper->UpdateCommissioningParameters(commissioningParams);
             if (err != CHIP_NO_ERROR)
             {
@@ -876,7 +857,7 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+    CommissioningParameters commissioningParams = wrapper->GetAutoCommissioner()->GetCommissioningParameters();
     CHIP_ERROR err                              = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
     if (err != CHIP_NO_ERROR)
     {
@@ -884,10 +865,10 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
-    err = wrapper->UpdateCommissioningParameters(commissioningParams);
+    err = wrapper->GetAutoCommissioner()->SetCommissioningParameters(commissioningParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "SetCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
@@ -911,7 +892,7 @@ JNI_METHOD(void, updateCommissioningICDRegistrationInfo)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+    CommissioningParameters commissioningParams = wrapper->GetAutoCommissioner()->GetCommissioningParameters();
     CHIP_ERROR err                              = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
     if (err != CHIP_NO_ERROR)
     {
@@ -919,10 +900,10 @@ JNI_METHOD(void, updateCommissioningICDRegistrationInfo)
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
-    err = wrapper->UpdateCommissioningParameters(commissioningParams);
+    err = wrapper->GetAutoCommissioner()->SetCommissioningParameters(commissioningParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "SetCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         return;
     }
@@ -1897,9 +1878,19 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     jclass discoveredDeviceCls = env->FindClass("chip/devicecontroller/DiscoveredDevice");
     jmethodID constructor      = env->GetMethodID(discoveredDeviceCls, "<init>", "()V");
 
-    jfieldID discrminatorID = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");
-    jfieldID ipAddressID    = env->GetFieldID(discoveredDeviceCls, "ipAddress", "Ljava/lang/String;");
-    jfieldID portID         = env->GetFieldID(discoveredDeviceCls, "port", "I");
+    jfieldID discrminatorID       = env->GetFieldID(discoveredDeviceCls, "discriminator", "J");
+    jfieldID ipAddressID          = env->GetFieldID(discoveredDeviceCls, "ipAddress", "Ljava/lang/String;");
+    jfieldID portID               = env->GetFieldID(discoveredDeviceCls, "port", "I");
+    jfieldID deviceTypeID         = env->GetFieldID(discoveredDeviceCls, "deviceType", "J");
+    jfieldID vendorIdID           = env->GetFieldID(discoveredDeviceCls, "vendorId", "I");
+    jfieldID productIdID          = env->GetFieldID(discoveredDeviceCls, "productId", "I");
+    jfieldID rotatingIdID         = env->GetFieldID(discoveredDeviceCls, "rotatingId", "[B");
+    jfieldID instanceNameID       = env->GetFieldID(discoveredDeviceCls, "instanceName", "Ljava/lang/String;");
+    jfieldID deviceNameID         = env->GetFieldID(discoveredDeviceCls, "deviceName", "Ljava/lang/String;");
+    jfieldID pairingInstructionID = env->GetFieldID(discoveredDeviceCls, "pairingInstruction", "Ljava/lang/String;");
+
+    jmethodID setCommissioningModeID = env->GetMethodID(discoveredDeviceCls, "setCommissioningMode", "(I)V");
+    jmethodID setPairingHintID       = env->GetMethodID(discoveredDeviceCls, "setPairingHint", "(I)V");
 
     jobject discoveredObj = env->NewObject(discoveredDeviceCls, constructor);
 
@@ -1911,6 +1902,26 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
 
     env->SetObjectField(discoveredObj, ipAddressID, jniipAdress);
     env->SetIntField(discoveredObj, portID, static_cast<jint>(data->resolutionData.port));
+    env->SetLongField(discoveredObj, deviceTypeID, static_cast<jlong>(data->commissionData.deviceType));
+    env->SetIntField(discoveredObj, vendorIdID, static_cast<jint>(data->commissionData.vendorId));
+    env->SetIntField(discoveredObj, productIdID, static_cast<jint>(data->commissionData.productId));
+
+    jbyteArray jRotatingId;
+    CHIP_ERROR err = JniReferences::GetInstance().N2J_ByteArray(
+        env, data->commissionData.rotatingId, static_cast<jsize>(data->commissionData.rotatingIdLen), jRotatingId);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "jRotatingId N2J_ByteArray error : %" CHIP_ERROR_FORMAT, err.Format());
+        return nullptr;
+    }
+    env->SetObjectField(discoveredObj, rotatingIdID, static_cast<jobject>(jRotatingId));
+    env->SetObjectField(discoveredObj, instanceNameID, env->NewStringUTF(data->commissionData.instanceName));
+    env->SetObjectField(discoveredObj, deviceNameID, env->NewStringUTF(data->commissionData.deviceName));
+    env->SetObjectField(discoveredObj, pairingInstructionID, env->NewStringUTF(data->commissionData.pairingInstruction));
+
+    env->CallVoidMethod(discoveredObj, setCommissioningModeID, static_cast<jint>(data->commissionData.commissioningMode));
+    env->CallVoidMethod(discoveredObj, setPairingHintID, static_cast<jint>(data->commissionData.pairingHint));
 
     return discoveredObj;
 }
