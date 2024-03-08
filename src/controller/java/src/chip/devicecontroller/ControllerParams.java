@@ -3,7 +3,10 @@ package chip.devicecontroller;
 import java.util.Optional;
 import javax.annotation.Nullable;
 
-/** Parameters representing initialization arguments for {@link ChipDeviceController}. */
+/**
+ * Parameters representing initialization arguments for
+ * {@link ChipDeviceController}.
+ */
 public final class ControllerParams {
 
   private final long fabricId;
@@ -17,15 +20,22 @@ public final class ControllerParams {
   private final boolean skipAttestationCertificateValidation;
   private final Optional<String> countryCode;
   private final Optional<Integer> regulatoryLocationType;
-  @Nullable private final KeypairDelegate keypairDelegate;
-  @Nullable private final byte[] rootCertificate;
-  @Nullable private final byte[] intermediateCertificate;
-  @Nullable private final byte[] operationalCertificate;
-  @Nullable private final byte[] ipk;
+  @Nullable
+  private final KeypairDelegate keypairDelegate;
+  @Nullable
+  private final byte[] rootCertificate;
+  @Nullable
+  private final byte[] intermediateCertificate;
+  @Nullable
+  private final byte[] operationalCertificate;
+  @Nullable
+  private final byte[] ipk;
   private final long adminSubject;
   private final boolean enableServerInteractions;
 
-  /** @param udpListenPort the UDP listening port, or 0 to pick any available port. */
+  /**
+   * @param udpListenPort the UDP listening port, or 0 to pick any available port.
+   */
   private ControllerParams(Builder builder) {
     this.fabricId = builder.fabricId;
     this.udpListenPort = builder.udpListenPort;
@@ -126,7 +136,8 @@ public final class ControllerParams {
   }
 
   /**
-   * Returns parameters which uses the provided {@code operationalKeyConfig} as its operating
+   * Returns parameters which uses the provided {@code operationalKeyConfig} as
+   * its operating
    * credentials. You must set a vendor ID, 0xFFF4 is a test vendor ID
    * ControllerParams.newBuilder().setControllerVendorId(0xFFF4).build()
    */
@@ -152,15 +163,21 @@ public final class ControllerParams {
     private boolean skipAttestationCertificateValidation = false;
     private Optional<String> countryCode = Optional.empty();
     private Optional<Integer> regulatoryLocationType = Optional.empty();
-    @Nullable private KeypairDelegate keypairDelegate = null;
-    @Nullable private byte[] rootCertificate = null;
-    @Nullable private byte[] intermediateCertificate = null;
-    @Nullable private byte[] operationalCertificate = null;
-    @Nullable private byte[] ipk = null;
+    @Nullable
+    private KeypairDelegate keypairDelegate = null;
+    @Nullable
+    private byte[] rootCertificate = null;
+    @Nullable
+    private byte[] intermediateCertificate = null;
+    @Nullable
+    private byte[] operationalCertificate = null;
+    @Nullable
+    private byte[] ipk = null;
     private long adminSubject = 0;
     private boolean enableServerInteractions = false;
 
-    private Builder() {}
+    private Builder() {
+    }
 
     public Builder setFabricId(long fabricId) {
       this.fabricId = fabricId;
@@ -181,11 +198,15 @@ public final class ControllerParams {
     }
 
     /**
-     * Sets the FailsafeTimer duration passed to ChipDeviceCommissioner's CommissioningParameters.
-     * Increasing this value from its default will allow more time for network scans, cloud op cert
+     * Sets the FailsafeTimer duration passed to ChipDeviceCommissioner's
+     * CommissioningParameters.
+     * Increasing this value from its default will allow more time for network
+     * scans, cloud op cert
      * signing calls, and user interaction.
      *
-     * <p>Note: It is also possible for internal logic (within Autocommissioner, etc) to re-call
+     * <p>
+     * Note: It is also possible for internal logic (within Autocommissioner, etc)
+     * to re-call
      * ArmFailSafe to account for network config delays.
      *
      * @param failsafeTimerSeconds
@@ -200,11 +221,15 @@ public final class ControllerParams {
     }
 
     /**
-     * Sets the CASEFailsafeExpirySeconds duration passed to ChipDeviceCommissioner's
-     * CommissioningParameters. After PASE session has finished, the failsafe is rearmed with the
+     * Sets the CASEFailsafeExpirySeconds duration passed to
+     * ChipDeviceCommissioner's
+     * CommissioningParameters. After PASE session has finished, the failsafe is
+     * rearmed with the
      * specified expiry before continuing commissioning.
      *
-     * <p>Note: If CASEFailsafeExpirySeconds is not set (or is 0), the failsafe will not be rearmed.
+     * <p>
+     * Note: If CASEFailsafeExpirySeconds is not set (or is 0), the failsafe will
+     * not be rearmed.
      *
      * @param caseFailsafeExpirySeconds
      * @return
@@ -221,10 +246,14 @@ public final class ControllerParams {
      * Enable/disable wifi network scan during commissioning in the the default
      * CommissioningDelegate used by the ChipDeviceCommissioner.
      *
-     * <p>Specifically, this sets AttemptWiFiNetworkScan in the CommissioningParameters passed to
+     * <p>
+     * Specifically, this sets AttemptWiFiNetworkScan in the CommissioningParameters
+     * passed to
      * the CommissioningDelegate.
      *
-     * <p>When a WiFi scan is attempted, the result will be propagated to the ScanNetworksListener
+     * <p>
+     * When a WiFi scan is attempted, the result will be propagated to the
+     * ScanNetworksListener
      * assigned to the ChipDeviceController.
      *
      * @param attemptNetworkScanWiFi
@@ -239,10 +268,14 @@ public final class ControllerParams {
      * Enable/disable Thread network scan during commissioning in the the default
      * CommissioningDelegate used by the ChipDeviceCommissioner.
      *
-     * <p>Specifically, this sets AttemptThreadNetworkScan in the CommissioningParameters passed to
+     * <p>
+     * Specifically, this sets AttemptThreadNetworkScan in the
+     * CommissioningParameters passed to
      * the CommissioningDelegate.
      *
-     * <p>When a Thread scan is attempted, the result will be propagated to the ScanNetworksListener
+     * <p>
+     * When a Thread scan is attempted, the result will be propagated to the
+     * ScanNetworksListener
      * assigned to the ChipDeviceController.
      *
      * @param attemptNetworkScanWiFi
@@ -254,13 +287,18 @@ public final class ControllerParams {
     }
 
     /**
-     * Disable the CASE phase of commissioning when the CommissioningComplete command is sent by
+     * Disable the CASE phase of commissioning when the CommissioningComplete
+     * command is sent by
      * this ChipDeviceCommissioner.
      *
-     * <p>Specifically, this sets SkipCommissioningComplete in the CommissioningParameters passed to
+     * <p>
+     * Specifically, this sets SkipCommissioningComplete in the
+     * CommissioningParameters passed to
      * the CommissioningDelegate.
      *
-     * <p>A controller will set this to true when the CASE phase of commissioning is done by a
+     * <p>
+     * A controller will set this to true when the CASE phase of commissioning is
+     * done by a
      * separate process, for example, by a Hub on the network.
      *
      * @param skipCommissioningComplete
@@ -274,7 +312,8 @@ public final class ControllerParams {
     /**
      * Used when the Commissioner disables Attestation Certificate Validation.
      *
-     * <p>Specifically, this sets SkipAttestationCertificateValidation in the
+     * <p>
+     * Specifically, this sets SkipAttestationCertificateValidation in the
      * CommissioningParameters passed to the CommissioningDelegate.
      *
      * @param skipAttestationCertificateValidation
@@ -290,11 +329,14 @@ public final class ControllerParams {
      * Sets the Regulatory Location country code passed to ChipDeviceCommissioner's
      * CommissioningParameters.
      *
-     * <p>Setting the country code will set the CountryCode when the SetRegulatoryConfig command is
+     * <p>
+     * Setting the country code will set the CountryCode when the
+     * SetRegulatoryConfig command is
      * sent by this ChipDeviceCommissioner.
      *
-     * @param countryCode an ISO 3166-1 alpha-2 code to represent the country, dependent territory,
-     *     or special area of geographic interest
+     * @param countryCode an ISO 3166-1 alpha-2 code to represent the country,
+     *                    dependent territory,
+     *                    or special area of geographic interest
      * @return
      */
     public Builder setCountryCode(final String countryCode) {
@@ -309,11 +351,14 @@ public final class ControllerParams {
      * Sets the Regulatory Location capability passed to ChipDeviceCommissioner's
      * CommissioningParameters.
      *
-     * <p>Setting the regulatory location type will set the NewRegulatoryConfig when the
+     * <p>
+     * Setting the regulatory location type will set the NewRegulatoryConfig when
+     * the
      * SetRegulatoryConfig command is sent by this ChipDeviceCommissioner.
      *
-     * @param regulatoryLocation an app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum
-     *     enum value
+     * @param regulatoryLocation an
+     *                           app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum
+     *                           enum value
      * @return
      */
     public Builder setRegulatoryLocation(int regulatoryLocation) {
@@ -352,8 +397,10 @@ public final class ControllerParams {
     }
 
     /**
-     * Sets the AdminSubject value passed to ChipDeviceCommissioner's CommissioningParameters. This
-     * value is passed in the AddNoc command sent to the commissionee and represents the subject of
+     * Sets the AdminSubject value passed to ChipDeviceCommissioner's
+     * CommissioningParameters. This
+     * value is passed in the AddNoc command sent to the commissionee and represents
+     * the subject of
      * the default ACL created by that call.
      *
      * @param adminSubject
@@ -364,6 +411,13 @@ public final class ControllerParams {
       return this;
     }
 
+    /**
+     * Controls enabling server interactions on a controller.
+     * For ICD check-in message, this feature has to enable.
+     * 
+     * @param enableServerInteractions
+     * @return
+     */
     public Builder setEnableServerInteractions(boolean enableServerInteractions) {
       this.enableServerInteractions = enableServerInteractions;
       return this;
