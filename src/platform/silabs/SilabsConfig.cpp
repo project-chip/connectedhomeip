@@ -33,7 +33,7 @@
 #include <nvm3_hal_flash.h>
 #include <nvm3_lock.h>
 
-#ifndef SIWX_917 // 917soc/wifi-sdk implements the same nvm3 lock/unlock mechanism and it currently can't be overide.
+#ifndef SLI_917_SOC // 917soc/wifi-sdk implements the same nvm3 lock/unlock mechanism and it currently can't be overide.
 #include <FreeRTOS.h>
 #include <semphr.h>
 // Substitute the GSDK weak nvm3_lockBegin and nvm3_lockEnd
@@ -58,7 +58,7 @@ void nvm3_lockEnd(void)
     VerifyOrDie(nvm3_Sem != NULL);
     xSemaphoreGive(nvm3_Sem);
 }
-#endif // !SIWX_917
+#endif // !SLI_917_SOC
 
 namespace chip {
 namespace DeviceLayer {
@@ -78,9 +78,9 @@ CHIP_ERROR SilabsConfig::Init()
 
 void SilabsConfig::DeInit()
 {
-#ifndef SIWX_917
+#ifndef SLI_917_SOC
     vSemaphoreDelete(nvm3_Sem);
-#endif // !SIWX_917
+#endif // !SLI_917_SOC
     nvm3_close(nvm3_defaultHandle);
 }
 
