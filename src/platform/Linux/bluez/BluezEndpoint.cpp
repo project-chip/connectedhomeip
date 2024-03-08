@@ -57,6 +57,7 @@
 #include <glib-object.h>
 #include <glib.h>
 
+#include <ble/BleError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -268,7 +269,16 @@ void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult 
 
     VerifyOrReturn(success == TRUE, {
         ChipLogError(DeviceLayer, "FAIL: RegisterGattApplication: %s", error->message);
-        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR_INTERNAL);
+        switch (error->code)
+        {
+        case G_DBUS_ERROR_NO_REPLY:        // BlueZ crashed or the D-Bus connection is broken
+        case G_DBUS_ERROR_SERVICE_UNKNOWN: // BlueZ service is not available on the bus
+        case G_DBUS_ERROR_UNKNOWN_OBJECT:  // Requested BLE adapter is not available
+            BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(BLE_ERROR_ADAPTER_UNAVAILABLE);
+            break;
+        default:
+            BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR_INTERNAL);
+        }
     });
 
     ChipLogDetail(DeviceLayer, "GATT application registered successfully");
