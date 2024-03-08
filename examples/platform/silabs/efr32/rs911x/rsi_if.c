@@ -163,7 +163,7 @@ int32_t wfx_rsi_reset_count()
     }
     else
     {
-        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
+        rsi_wlan_ext_stats_t * test  = (rsi_wlan_ext_stats_t *) buff;
         temp_reset.beacon_lost_count = test->beacon_lost_count;
         temp_reset.beacon_rx_count   = test->beacon_rx_count;
         temp_reset.mcast_rx_count    = test->mcast_rx_count;
