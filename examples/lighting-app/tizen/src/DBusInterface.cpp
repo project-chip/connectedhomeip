@@ -26,6 +26,7 @@
 #include <app/clusters/color-control-server/color-control-server.h>
 #include <app/clusters/level-control/level-control.h>
 #include <app/clusters/on-off-server/on-off-server.h>
+#include <app/InteractionModelEngine.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -44,6 +45,7 @@ public:
     void OnDone(CommandHandler & apCommandObj) {}
     void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
     Status CommandExists(const ConcreteCommandPath & aCommandPath) { return Status::Success; }
+    uint32_t GetInteractionModelEngineGeneration() const { return InteractionModelEngine::GetInstance()->GetInteractionModelEngineGeneration(); }
 };
 
 DBusInterface::DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpointId)

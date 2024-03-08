@@ -179,9 +179,10 @@ public:
     WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
 
     /**
-     * The Magic number of this InteractionModelEngine, the magic number is set during Init()
+     * The generation number of this InteractionModelEngine, the number is updated during Init() and Shundown().
+     * An CommandHandler::Handle is valid iff. its number equals to this one.
      */
-    uint32_t GetMagicNumber() const { return mMagic; }
+    uint32_t GetInteractionModelEngineGeneration() const override { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
