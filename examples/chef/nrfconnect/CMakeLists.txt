@@ -84,6 +84,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
     ${CHEF}/common/chef-fan-control-manager.cpp
+    ${CHEF}/common/chef-operational-state-delegate-impl.cpp
     ${CHEF}/common/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp

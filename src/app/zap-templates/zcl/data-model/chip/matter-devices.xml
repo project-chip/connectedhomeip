@@ -74,10 +74,10 @@ limitations under the License.
                 <requireAttribute>ACTIVE_LOCALE</requireAttribute>
                 <requireAttribute>SUPPORTED_LOCALES</requireAttribute>
             </include>
-            <include cluster="Time Format Localization" client="false" server="true" clientLocked="true" serverLocked="false">
+            <include cluster="Time Format Localization" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>HOUR_FORMAT</requireAttribute>
             </include>
-            <include cluster="Unit Localization" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Unit Localization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>UP_TIME</requireAttribute>
             </include>
@@ -1417,7 +1417,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
                 <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1475,7 +1474,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
                 <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>

@@ -396,7 +396,6 @@ kotlin_library("kotlin_matter_controller") {
 
   if (matter_enable_java_compilation) {
     deps += [
-      "${chip_root}/third_party/java_deps:json",
       "${chip_root}/third_party/java_deps:kotlin-stdlib",
       "${chip_root}/third_party/java_deps:kotlinx-coroutines-core-jvm",
       "${chip_root}/third_party/java_deps/stub_src",
@@ -451,6 +450,7 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/CommissioningWindowStatus.java",
     "src/chip/devicecontroller/ConnectionFailureException.java",
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
@@ -470,6 +470,7 @@ android_library("java") {
     "src/chip/devicecontroller/OTAProviderDelegate.java",
     "src/chip/devicecontroller/OpenCommissioningCallback.java",
     "src/chip/devicecontroller/OperationalKeyConfig.java",
+    "src/chip/devicecontroller/PairingHintBitmap.java",
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "src/chip/devicecontroller/ReportCallback.java",
     "src/chip/devicecontroller/ReportCallbackJni.java",
