@@ -221,19 +221,19 @@ void BluezAdvertisement::Shutdown()
 
 void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
 {
-    auto * advMgr = reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject);
     GAutoPtr<GError> error;
-    gboolean success = FALSE;
+    gboolean success = bluez_leadvertising_manager1_call_register_advertisement_finish(
+        reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject), aResult, &error.GetReceiver());
 
-    success = bluez_leadvertising_manager1_call_register_advertisement_finish(advMgr, aResult, &error.GetReceiver());
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: RegisterAdvertisement : %s", error->message));
+    VerifyOrReturn(success == TRUE, {
+        ChipLogError(DeviceLayer, "FAIL: RegisterAdvertisement: %s", error->message);
+        BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR_INTERNAL);
+    });
 
     mIsAdvertising = true;
 
-    ChipLogDetail(DeviceLayer, "RegisterAdvertisement complete");
-
-exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(success == TRUE);
+    ChipLogDetail(DeviceLayer, "BLE advertisement started successfully");
+    BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR BluezAdvertisement::StartImpl()
@@ -276,19 +276,19 @@ CHIP_ERROR BluezAdvertisement::Start()
 
 void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
 {
-    auto * advMgr = reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject);
     GAutoPtr<GError> error;
-    gboolean success = FALSE;
+    gboolean success = bluez_leadvertising_manager1_call_unregister_advertisement_finish(
+        reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject), aResult, &error.GetReceiver());
 
-    success = bluez_leadvertising_manager1_call_unregister_advertisement_finish(advMgr, aResult, &error.GetReceiver());
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: UnregisterAdvertisement: %s", error->message));
+    VerifyOrReturn(success == TRUE, {
+        ChipLogError(DeviceLayer, "FAIL: UnregisterAdvertisement: %s", error->message);
+        BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR_INTERNAL);
+    });
 
     mIsAdvertising = false;
 
-    ChipLogDetail(DeviceLayer, "UnregisterAdvertisement complete");
-
-exit:
-    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(success == TRUE);
+    ChipLogDetail(DeviceLayer, "BLE advertisement stopped successfully");
+    BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR BluezAdvertisement::StopImpl()

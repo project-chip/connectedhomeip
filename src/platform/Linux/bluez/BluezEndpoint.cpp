@@ -267,12 +267,12 @@ void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult 
                                                                             &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, {
-        ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message);
-        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false);
+        ChipLogError(DeviceLayer, "FAIL: RegisterGattApplication: %s", error->message);
+        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR_INTERNAL);
     });
 
-    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(true);
-    ChipLogDetail(DeviceLayer, "BluezPeripheralRegisterAppDone done");
+    ChipLogDetail(DeviceLayer, "GATT application registered successfully");
+    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
