@@ -124,7 +124,8 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
 
         # TODO: consider what we want to do with the OTA clusters. They do not currently have PICS codes.
         ota_ids = [Clusters.OtaSoftwareUpdateProvider.id, Clusters.OtaSoftwareUpdateRequestor.id]
-        checkable_clusters = {cluster_id: cluster for cluster_id, cluster in checkable_clusters.items() if cluster_id not in ota_ids}
+        checkable_clusters = {cluster_id: cluster for cluster_id,
+                              cluster in checkable_clusters.items() if cluster_id not in ota_ids}
 
         self.step(2)
         for cluster_id, cluster in checkable_clusters.items():
