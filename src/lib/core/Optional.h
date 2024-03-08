@@ -24,6 +24,7 @@
 #pragma once
 
 #include <new>
+#include <optional>
 #include <type_traits>
 #include <utility>
 
@@ -47,93 +48,40 @@ template <class T>
 class Optional
 {
 public:
-    constexpr Optional() : mHasValue(false) {}
-    constexpr Optional(NullOptionalType) : mHasValue(false) {}
+    constexpr Optional() {}
+    constexpr Optional(NullOptionalType) {}
 
-    ~Optional()
-    {
-        // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Branch): mData is set when mHasValue
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-    }
-
-    explicit Optional(const T & value) : mHasValue(true) { new (&mValue.mData) T(value); }
+    explicit Optional(const T & value) : mValue(value) {}
 
     template <class... Args>
-    constexpr explicit Optional(InPlaceType, Args &&... args) : mHasValue(true)
-    {
-        new (&mValue.mData) T(std::forward<Args>(args)...);
-    }
+    constexpr explicit Optional(InPlaceType, Args &&... args) : mValue(std::in_place, std::forward<Args>(args)...)
+    {}
 
-    constexpr Optional(const Optional & other) : mHasValue(other.mHasValue)
-    {
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(other.mValue.mData);
-        }
-    }
+    constexpr Optional(const Optional & other) : mValue(other.mValue) {}
 
     // Converts an Optional of an implicitly convertible type
     template <class U, std::enable_if_t<!std::is_same_v<T, U> && std::is_convertible_v<const U, T>, bool> = true>
-    constexpr Optional(const Optional<U> & other) : mHasValue(other.HasValue())
-    {
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(other.Value());
-        }
-    }
+    constexpr Optional(const Optional<U> & other) : mValue(other.Value())
+    {}
 
     // Converts an Optional of a type that requires explicit conversion
     template <class U,
               std::enable_if_t<!std::is_same_v<T, U> && !std::is_convertible_v<const U, T> && std::is_constructible_v<T, const U &>,
                                bool> = true>
-    constexpr explicit Optional(const Optional<U> & other) : mHasValue(other.HasValue())
-    {
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(other.Value());
-        }
-    }
+    constexpr explicit Optional(const Optional<U> & other) : mValue(other.Value())
+    {}
 
-    constexpr Optional(Optional && other) : mHasValue(other.mHasValue)
-    {
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(std::move(other.mValue.mData));
-            other.mValue.mData.~T();
-            other.mHasValue = false;
-        }
-    }
+    constexpr Optional(Optional && other) : mValue(std::move(other.mValue)) {}
 
     constexpr Optional & operator=(const Optional & other)
     {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = other.mHasValue;
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(other.mValue.mData);
-        }
+        mValue = other.mValue;
         return *this;
     }
 
     constexpr Optional & operator=(Optional && other)
     {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = other.mHasValue;
-        if (mHasValue)
-        {
-            new (&mValue.mData) T(std::move(other.mValue.mData));
-            other.mValue.mData.~T();
-            other.mHasValue = false;
-        }
+        mValue = std::move(other.mValue);
         return *this;
     }
 
@@ -141,59 +89,31 @@ public:
     template <class... Args>
     constexpr T & Emplace(Args &&... args)
     {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = true;
-        new (&mValue.mData) T(std::forward<Args>(args)...);
-        return mValue.mData;
+        mValue.emplace(std::forward<Args>(args)...);
+        return *mValue;
     }
 
     /** Make the optional contain a specific value */
-    constexpr void SetValue(const T & value)
-    {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = true;
-        new (&mValue.mData) T(value);
-    }
+    constexpr void SetValue(const T & value) { mValue = value; }
 
     /** Make the optional contain a specific value */
-    constexpr void SetValue(T && value)
-    {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = true;
-        new (&mValue.mData) T(std::move(value));
-    }
+    constexpr void SetValue(T && value) { mValue = std::move(value); }
 
     /** Invalidate the value inside the optional. Optional now has no value */
-    constexpr void ClearValue()
-    {
-        if (mHasValue)
-        {
-            mValue.mData.~T();
-        }
-        mHasValue = false;
-    }
+    constexpr void ClearValue() { mValue = std::nullopt; }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     T & Value() &
     {
         VerifyOrDie(HasValue());
-        return mValue.mData;
+        return *mValue;
     }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     const T & Value() const &
     {
         VerifyOrDie(HasValue());
-        return mValue.mData;
+        return *mValue;
     }
 
     /** Gets the current value of the optional if the optional has a value;
@@ -201,12 +121,9 @@ public:
     const T & ValueOr(const T & defaultValue) const { return HasValue() ? Value() : defaultValue; }
 
     /** Checks if the optional contains a value or not */
-    constexpr bool HasValue() const { return mHasValue; }
+    constexpr bool HasValue() const { return mValue.has_value(); }
 
-    bool operator==(const Optional & other) const
-    {
-        return (mHasValue == other.mHasValue) && (!other.mHasValue || (mValue.mData == other.mValue.mData));
-    }
+    bool operator==(const Optional & other) const { return mValue == other.mValue; }
     bool operator!=(const Optional & other) const { return !(*this == other); }
     bool operator==(const T & other) const { return HasValue() && Value() == other; }
     bool operator!=(const T & other) const { return !(*this == other); }
@@ -222,13 +139,7 @@ public:
     }
 
 private:
-    bool mHasValue;
-    union Value
-    {
-        Value() {}
-        ~Value() {}
-        T mData;
-    } mValue;
+    std::optional<T> mValue;
 };
 
 template <class T>

@@ -37,12 +37,11 @@ SessionHolder::SessionHolder(const SessionHolder & that) : IntrusiveListNodeBase
 
 SessionHolder::SessionHolder(SessionHolder && that) : IntrusiveListNodeBase()
 {
-    mSession = that.mSession;
+    mSession = std::move(that.mSession);
     if (mSession.HasValue())
     {
         mSession.Value()->AddHolder(*this);
     }
-
     that.Release();
 }
 

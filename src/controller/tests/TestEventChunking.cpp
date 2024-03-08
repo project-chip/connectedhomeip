@@ -207,7 +207,6 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
     {
         app::DataModel::DecodableList<ByteSpan> v;
         NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
-        auto it          = v.begin();
         size_t arraySize = 0;
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, arraySize == 4);

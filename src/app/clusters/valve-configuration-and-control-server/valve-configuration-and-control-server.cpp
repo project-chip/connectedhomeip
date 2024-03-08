@@ -276,8 +276,7 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
 
 CHIP_ERROR CloseValve(EndpointId ep)
 {
-    Delegate * delegate = GetDelegate(ep);
-    DataModel::Nullable<uint32_t> rDuration;
+    Delegate * delegate        = GetDelegate(ep);
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     VerifyOrReturnError(Status::Success == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
@@ -308,9 +307,7 @@ CHIP_ERROR CloseValve(EndpointId ep)
 
 CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration)
 {
-    Delegate * delegate     = GetDelegate(ep);
-    Optional<Status> status = Optional<Status>::Missing();
-    DataModel::Nullable<Percent> openLevel;
+    Delegate * delegate = GetDelegate(ep);
     DataModel::Nullable<uint64_t> autoCloseTime;
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
