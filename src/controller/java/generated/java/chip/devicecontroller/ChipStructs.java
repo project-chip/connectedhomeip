@@ -8752,7 +8752,7 @@ public static class ThermostatClusterScheduleStruct {
   public Optional<String> name;
   public Optional<byte[]> presetHandle;
   public ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions;
-  public @Nullable Optional<Boolean> builtIn;
+  public @Nullable Boolean builtIn;
   private static final long SCHEDULE_HANDLE_ID = 0L;
   private static final long SYSTEM_MODE_ID = 1L;
   private static final long NAME_ID = 2L;
@@ -8766,7 +8766,7 @@ public static class ThermostatClusterScheduleStruct {
     Optional<String> name,
     Optional<byte[]> presetHandle,
     ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions,
-    @Nullable Optional<Boolean> builtIn
+    @Nullable Boolean builtIn
   ) {
     this.scheduleHandle = scheduleHandle;
     this.systemMode = systemMode;
@@ -8783,7 +8783,7 @@ public static class ThermostatClusterScheduleStruct {
     values.add(new StructElement(NAME_ID, name.<BaseTLVType>map((nonOptionalname) -> new StringType(nonOptionalname)).orElse(new EmptyType())));
     values.add(new StructElement(PRESET_HANDLE_ID, presetHandle.<BaseTLVType>map((nonOptionalpresetHandle) -> new ByteArrayType(nonOptionalpresetHandle)).orElse(new EmptyType())));
     values.add(new StructElement(TRANSITIONS_ID, ArrayType.generateArrayType(transitions, (elementtransitions) -> elementtransitions.encodeTlv())));
-    values.add(new StructElement(BUILT_IN_ID, builtIn != null ? builtIn.<BaseTLVType>map((nonOptionalbuiltIn) -> new BooleanType(nonOptionalbuiltIn)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(BUILT_IN_ID, builtIn != null ? new BooleanType(builtIn) : new NullType()));
 
     return new StructType(values);
   }
@@ -8797,7 +8797,7 @@ public static class ThermostatClusterScheduleStruct {
     Optional<String> name = Optional.empty();
     Optional<byte[]> presetHandle = Optional.empty();
     ArrayList<ChipStructs.ThermostatClusterScheduleTransitionStruct> transitions = null;
-    @Nullable Optional<Boolean> builtIn = null;
+    @Nullable Boolean builtIn = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SCHEDULE_HANDLE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -8827,7 +8827,7 @@ public static class ThermostatClusterScheduleStruct {
       } else if (element.contextTagNum() == BUILT_IN_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          builtIn = Optional.of(castingValue.value(Boolean.class));
+          builtIn = castingValue.value(Boolean.class);
         }
       }
     }
