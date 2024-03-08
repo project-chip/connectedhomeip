@@ -180,7 +180,7 @@ public:
 #ifdef JAVA_MATTER_CONTROLLER_TEST
                 ExampleOperationalCredentialsIssuerPtr opCredsIssuer,
 #else
-                 AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
+                AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
 #endif
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
                 jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
