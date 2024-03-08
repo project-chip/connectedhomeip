@@ -1124,7 +1124,6 @@ exit:
 template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock(void)
 {
-    VerifyOrReturnValue(mOTInst, false);
     otDeviceRole curRole = otThreadGetDeviceRole(mOTInst);
     return (curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED);
 }
@@ -1132,7 +1131,6 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock
 template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock(void)
 {
-    VerifyOrReturnValue(mOTInst, false);
     return otIp6IsEnabled(mOTInst);
 }
 
@@ -1473,7 +1471,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
                                                                                const Span<const Dnssd::TextEntry> & aTxtEntries,
                                                                                uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval)
 {
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
     size_t entryId                           = 0;
@@ -1576,7 +1573,6 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpService(const char * aInstanceName, const char * aName)
 {
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
 
@@ -1627,7 +1623,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_InvalidateAllSr
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSrpServices()
 {
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
@@ -1683,7 +1678,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ClearAllSrpHost
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(const char * aHostName)
 {
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
