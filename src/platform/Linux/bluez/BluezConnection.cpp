@@ -34,6 +34,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "BluezEndpoint.h"
+#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -95,10 +96,6 @@ BluezConnection::ConnectionDataBundle::ConnectionDataBundle(const BluezConnectio
 
 CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 {
-    // populate the service and the characteristics
-    GList * objects = nullptr;
-    GList * l;
-
     if (!aEndpoint.mIsCentral)
     {
         mpService = reinterpret_cast<BluezGattService1 *>(g_object_ref(aEndpoint.mpService));
@@ -107,11 +104,9 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
     }
     else
     {
-        objects = g_dbus_object_manager_get_objects(aEndpoint.mpObjMgr);
-
-        for (l = objects; l != nullptr; l = l->next)
+        for (BluezObject & object : BluezObjectList(aEndpoint.mpObjMgr))
         {
-            BluezGattService1 * service = bluez_object_get_gatt_service1(BLUEZ_OBJECT(l->data));
+            BluezGattService1 * service = bluez_object_get_gatt_service1(&object);
             if (service != nullptr)
             {
                 if ((BluezIsServiceOnDevice(service, mpDevice)) == TRUE &&
@@ -126,9 +121,9 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         VerifyOrExit(mpService != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL service in %s", __func__));
 
-        for (l = objects; l != nullptr; l = l->next)
+        for (BluezObject & object : BluezObjectList(aEndpoint.mpObjMgr))
         {
-            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(BLUEZ_OBJECT(l->data));
+            BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(&object);
             if (char1 != nullptr)
             {
                 if ((BluezIsCharOnService(char1, mpService) == TRUE) &&
@@ -164,8 +159,6 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
     }
 
 exit:
-    if (objects != nullptr)
-        g_list_free_full(objects, g_object_unref);
     return CHIP_NO_ERROR;
 }
 

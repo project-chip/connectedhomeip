@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <iterator>
+
 #include <glib.h>
 
 #include <platform/CHIPDeviceConfig.h>

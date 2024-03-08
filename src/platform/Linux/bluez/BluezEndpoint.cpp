@@ -72,6 +72,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "BluezConnection.h"
+#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -420,15 +421,14 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
     return service;
 }
 
-void BluezEndpoint::SetupAdapter()
+CHIP_ERROR BluezEndpoint::SetupAdapter()
 {
     char expectedPath[32];
     snprintf(expectedPath, sizeof(expectedPath), BLUEZ_PATH "/hci%u", mAdapterId);
 
-    GList * objects = g_dbus_object_manager_get_objects(mpObjMgr);
-    for (auto l = objects; l != nullptr && mAdapter.get() == nullptr; l = l->next)
+    for (BluezObject & object : BluezObjectList(mpObjMgr))
     {
-        GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(BLUEZ_OBJECT(l->data)));
+        GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(&object));
         if (adapter.get() != nullptr)
         {
             if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
@@ -450,7 +450,7 @@ void BluezEndpoint::SetupAdapter()
         }
     }
 
-    VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
+    VerifyOrReturnError(mAdapter, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
     bluez_adapter1_set_powered(mAdapter.get(), TRUE);
 
@@ -459,8 +459,7 @@ void BluezEndpoint::SetupAdapter()
     // and the flag is necessary to force using LE transport.
     bluez_adapter1_set_discoverable(mAdapter.get(), FALSE);
 
-exit:
-    g_list_free_full(objects, g_object_unref);
+    return CHIP_NO_ERROR;
 }
 
 BluezConnection * BluezEndpoint::GetBluezConnection(const char * aPath)
