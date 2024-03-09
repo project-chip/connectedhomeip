@@ -720,7 +720,7 @@ class BaseTestHelper:
         # was received.
         #
         await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
-        time.sleep(2)
+        await asyncio.sleep(2)
 
         sub.Shutdown()
 
@@ -752,7 +752,7 @@ class BaseTestHelper:
         # was received.  Use a different value from before, so there is an actual change.
         #
         await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(5))])
-        time.sleep(2)
+        await asyncio.sleep(2)
 
         sub.Shutdown()
 
@@ -775,7 +775,7 @@ class BaseTestHelper:
             await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(6))])
-        time.sleep(2)
+        await asyncio.sleep(2)
 
         sub.Shutdown()
 
