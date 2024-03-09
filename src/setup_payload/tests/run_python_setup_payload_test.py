@@ -21,7 +21,7 @@ import sys
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('src', 'setup_payload', 'tests'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
-from generate_setup_payload import CommissioningFlow, SetupPayload  # noqa: E402
+from SetupPayload import CommissioningFlow, SetupPayload  # noqa: E402
 
 
 def payload_param_dict():
@@ -43,7 +43,7 @@ def remove_escape_sequence(data):
     return result
 
 
-def parse_setup_payload(chip_tool, payload):
+def chip_tool_parse_setup_payload(chip_tool, payload):
     cmd_args = [chip_tool, 'payload', 'parse-setup-payload', payload]
     data = subprocess.check_output(cmd_args).decode('utf-8')
     data = remove_escape_sequence(data)
@@ -62,6 +62,27 @@ def parse_setup_payload(chip_tool, payload):
     return parsed_params
 
 
+def chip_tool_generate_code(chip_tool, payload_data, cmd, key, is_qrcode):
+    cmd_args = [chip_tool, 'payload', cmd]
+    cmd_args += ['--setup-pin-code', str(payload_data.pincode)]
+    cmd_args += ['--vendor-id', str(payload_data.vid)] if payload_data.vid else []
+    cmd_args += ['--product-id', str(payload_data.pid)] if payload_data.pid else []
+    cmd_args += ['--commissioning-mode', str(int(payload_data.flow))]
+
+    if is_qrcode:
+        cmd_args += ['--discriminator', str(payload_data.long_discriminator)]
+        cmd_args += ['--rendezvous', str(payload_data.discovery)]
+    else:
+        # generate-manualcode always takes in the long discriminator, but the python parsed data only has the short one
+        cmd_args += ['--discriminator', str(payload_data.short_discriminator << 8)]
+
+    data = subprocess.check_output(cmd_args).decode('utf-8')
+    data = remove_escape_sequence(data)
+    st = data.find(key) + len(key)
+    end = data.find('\n', st)
+    return data[st:end].strip()
+
+
 def generate_payloads(in_params):
     payloads = SetupPayload(in_params['Long discriminator'], in_params['Passcode'],
                             in_params['Discovery Bitmask'], CommissioningFlow(in_params['Custom flow']),
@@ -71,7 +92,7 @@ def generate_payloads(in_params):
     return manualcode, qrcode
 
 
-def verify_payloads(in_params, manualcode_params, qrcode_params):
+def verify_generated_payloads(in_params, manualcode_params, qrcode_params):
     assert in_params['Version'] == int(manualcode_params['Version'], 0)
     assert in_params['Passcode'] == int(manualcode_params['Passcode'], 0)
     assert in_params['Short discriminator'] == int(manualcode_params['Short discriminator'], 0)
@@ -101,7 +122,7 @@ def get_payload_params(discriminator, passcode, discovery=4, flow=0, vid=0, pid=
     return p
 
 
-def run_tests(chip_tool):
+def test_code_generation(chip_tool):
     test_data_set = [
         get_payload_params(3840, 20202021),
         get_payload_params(3781, 12349876, flow=1, vid=1, pid=1),
@@ -113,23 +134,49 @@ def run_tests(chip_tool):
 
     for test_params in test_data_set:
         manualcode, qrcode = generate_payloads(test_params)
-        manualcode_params = parse_setup_payload(chip_tool, manualcode)
-        qrcode_params = parse_setup_payload(chip_tool, qrcode)
+        manualcode_params = chip_tool_parse_setup_payload(chip_tool, manualcode)
+        qrcode_params = chip_tool_parse_setup_payload(chip_tool, qrcode)
 
-        print("Input parameters:", test_params)
-        print("Manualcode:", manualcode)
-        print("QRCode:", qrcode)
-        print("Manualcode parsed by chip-tool:", manualcode_params)
-        print("QRCode parsed by chip-tool:", qrcode_params)
-        print("")
+        verify_generated_payloads(test_params, manualcode_params, qrcode_params)
 
-        verify_payloads(test_params, manualcode_params, qrcode_params)
+
+def test_manualcode_parsing(chip_tool):
+    test_data_set = [
+        '34970112332',
+        '745492075300001000013',
+        '619156140465523329207',
+        '702871264504387000187',
+        '402104334209029041311',
+        '403732495800069000166',
+    ]
+    for test_payload in test_data_set:
+        payload = SetupPayload.parse(test_payload)
+        code = chip_tool_generate_code(chip_tool, payload, 'generate-manualcode', 'Manual Code:', is_qrcode=False)
+        assert test_payload == code
+
+
+def test_qrcode_parsing(chip_tool):
+    test_data_set = [
+        'MT:U9VJ0OMV172PX813210',
+        'MT:00000CQM00KA0648G00',
+        'MT:A3L90ARR15G6N57Y900',
+        'MT:MZWA6G6026O2XP0II00',
+        'MT:KSNK4M5113-JPR4UY00',
+        'MT:0A.T0P--00Y0OJ0.510',
+        'MT:EPX0482F26DAVY09R10',
+    ]
+    for test_payload in test_data_set:
+        payload = SetupPayload.parse(test_payload)
+        code = chip_tool_generate_code(chip_tool, payload, 'generate-qrcode', 'QR Code:', is_qrcode=True)
+        assert test_payload == code
 
 
 def main():
     if len(sys.argv) == 2:
         chip_tool = sys.argv[1]
-        run_tests(chip_tool)
+        test_code_generation(chip_tool)
+        test_manualcode_parsing(chip_tool)
+        test_qrcode_parsing(chip_tool)
 
 
 if __name__ == '__main__':
