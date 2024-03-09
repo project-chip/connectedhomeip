@@ -21,7 +21,7 @@ import Base38
 import click
 from bitarray import bitarray
 from bitarray.util import int2ba, zeros
-from construct import BitStruct, BitsInteger, Enum
+from construct import BitsInteger, BitStruct, Enum
 from stdnum.verhoeff import calc_check_digit
 
 # Format for constructing manualcode
