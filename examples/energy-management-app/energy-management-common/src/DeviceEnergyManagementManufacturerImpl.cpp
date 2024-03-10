@@ -35,11 +35,24 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 
+// TODO: refactor, once the best approach is clear
+extern void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> & nullableForecast);
+
 static DataModel::Nullable<Structs::ForecastStruct::Type>  sForecast;
+static OptOutStateEnum sOptOutState = OptOutStateEnum::kNoOptOut;
 
 struct DeviceEnergyManagementTestEventSaveData
 {
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast;
+};
+
+static PowerAdjustmentCapability::TypeInfo::Type  sPowerAdjustmentCapability;
+
+struct DeviceEnergyManagementTestEventPowerAdjustRequest
+{
+    int64_t  power;
+    uint32_t duration;
+    AdjustmentCauseEnum cause;
 };
 
 static DeviceEnergyManagementTestEventSaveData    sDeviceEnergyManagementTestEventSaveData;
@@ -75,9 +88,6 @@ void SetTestEventTrigger_zzzzzzzzzz()
     ChipLogProgress(Support, "[zzzzzzzzzz-handle] L-%d", __LINE__ );
 }
 
-// TODO: inc. header ...
-extern void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> & nullableForecast);
-
 void SetTestEventTrigger_StartTimeAdjustment()
 {
     ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d", __LINE__ );
@@ -105,7 +115,7 @@ void SetTestEventTrigger_StartTimeAdjustment()
 #endif
     }
 #endif
-    ForecastTestSetup_TP3b(sForecast);
+    // ForecastTestSetup_TP3b(sForecast);
 
     Status s = dg->StartTimeAdjustRequest(1, AdjustmentCauseEnum::kLocalOptimization);
     if (s != Status::Success)
@@ -119,6 +129,32 @@ void SetTestEventTrigger_StartTimeAdjustment()
 
 
 }
+
+void SetTestEventTrigger_UserOptOutOptimization( OptOutStateEnum optOutState )
+{
+    ChipLogProgress(Support, "[UserOptOutOptimization-handle] L-%d", __LINE__ );
+
+    DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
+    sOptOutState = dg->GetOptOutState();
+
+    // ChipLogProgress(Support, "[UserOptOutOptimization-Test-Event] ");
+
+    
+// TODO:     
+}
+
+void SetTestEventTrigger_PowerAdjustRequest()
+{
+    ChipLogProgress(Support, "[PowerAdjustRequest-handle] L-%d", __LINE__ );
+
+    DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
+    sPowerAdjustmentCapability = dg->GetPowerAdjustmentCapability();
+
+
+    
+// TODO:     const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause
+}
+
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
 {
@@ -135,19 +171,19 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         break;
     case DeviceEnergyManagementTrigger::kPowerAdjustmentClear:
         ChipLogProgress(Support, "[PowerAdjustmentClear-Test-Event] => Clear PowerAdjustment struct");
-        // TODO call implementation
+	    SetTestEventTrigger_PowerAdjustRequest();
         break;
     case DeviceEnergyManagementTrigger::kUserOptOutLocalOptimization:
         ChipLogProgress(Support, "[UserOptOutLocalOptimization-Test-Event] => Set User opt-out Local Optimization");
-        // TODO call implementation
+                SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum::kLocalOptOut);
         break;
     case DeviceEnergyManagementTrigger::kUserOptOutGridOptimization:
         ChipLogProgress(Support, "[UserOptOutGrisOptimization-Test-Event] => Set User opt-out Grid Optimization");
-        // TODO call implementation
+        SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum::kGridOptOut);
         break;
     case DeviceEnergyManagementTrigger::kUserOptOutClearAll:
         ChipLogProgress(Support, "[UserOptOutClearAll-Test-Event] => Clear all User opt-outs");
-        // TODO call implementation
+        SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum::kNoOptOut);
         break;
     case DeviceEnergyManagementTrigger::kStartTimeAdjustment:
         ChipLogProgress(Support, "[StartTimeAdjustment-Test-Event] => Create simulated forecast to allow StartTimeAdjustment");

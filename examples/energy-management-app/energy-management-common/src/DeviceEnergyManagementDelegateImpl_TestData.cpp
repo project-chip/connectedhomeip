@@ -30,14 +30,40 @@ using namespace chip::app::DataModel;
 using chip::Protocols::InteractionModel::Status;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
+static DeviceEnergyManagementDelegate * sDeviceEnergyManagementDelegate = nullptr;
 
 #define DELEGATE_TEST_DATA        // TODO: comment out if not needed
 
-static Structs::CostStruct::Type  gCosts [2];
 
 
 #ifdef  DELEGATE_TEST_DATA
-static Structs::SlotStruct::Type gSlot[2] {
+//################## PowerAdjustmentCapability
+
+#if 0
+void FillPowerAdjustmentCapability(PowerAdjustmentCapability::TypeInfo::Type & nullablePowerAdjustmentCapability)
+{
+    nullablePowerAdjustmentCapability.SetNull();
+    if (!nullablePowerAdjustmentCapability.IsNull())
+    {
+        ChipLogProgress(Zcl, "DEM: %s Null but nullablePowerAdjustmentCapability.HasValue",  __FUNCTION__);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "DEM: %s Null & nullablePowerAdjustmentCapability.NullValue",  __FUNCTION__);
+    }
+
+// DataModel::Nullable< DataModel::List<Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>>;
+//    DataModel::List<DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>  pac;
+//    pac.forecastId        = static_cast<uint16_t>(1234);
+//    nullablePowerAdjustmentCapability = MakeNullable(pac);
+}
+#endif
+
+//################## Forecast
+
+static Structs::CostStruct::Type  gCosts [2];
+
+static Structs::SlotStruct::Type  gSlot[2] {
     static_cast<uint32_t>(120),   // minDuration
     static_cast<uint32_t>(230),   // maxDuration
     static_cast<uint32_t>(340),   // defaultDuration
@@ -176,6 +202,13 @@ void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> &
     forecast.latestEndTime     = Optional<uint32_t> (static_cast<uint32_t>(chipEpoch * 3));  // latest end time, in UTC, for the entire Forecast
 }
 
+#if 0
+static void PowerAdjustmentTestSetup_TP3b( PowerAdjustmentCapability::TypeInfo::Type  & powerAdjustmentCapability)
+{
+
+}
+#endif
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -184,6 +217,11 @@ namespace DeviceEnergyManagement {
 //DeviceEnergyManagementDelegateImpl::DeviceEnergyManagementDelegateImpl() 
 DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() 
 {
+    if (nullptr == sDeviceEnergyManagementDelegate)
+    {
+        sDeviceEnergyManagementDelegate = this;
+    }
+
     BitMask<DeviceEnergyManagement::Feature> FeatureMap;
     FeatureMap.Set(DeviceEnergyManagement::Feature::kForecastAdjustment);
     //Status status = DeviceEnergyManagement::Attributes::FeatureMap::Set(mEndpointId, FeatureMap.Raw());
@@ -202,6 +240,10 @@ DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate()
 
     FillForecast(mForecast);
     ForecastTestSetup_TP3b(mForecast);
+
+//    FillPowerAdjustmentCapability(mPowerAdjustmentCapability);
+//    PowerAdjustmentTestSetup_TP3b(mForecast);
+
     ChipLogProgress(Zcl, "DEM: %s Enabled Feature ForecastAdjustment",  __FUNCTION__);
 
     return;
