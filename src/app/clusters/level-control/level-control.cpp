@@ -952,6 +952,12 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
         goto send_default_response;
     }
 
+    if (rate == 0) {
+      status = Status::Success;
+      goto send_default_response;
+    }
+
+
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
         status = Status::Success;
