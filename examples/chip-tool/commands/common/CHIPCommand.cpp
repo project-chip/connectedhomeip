@@ -166,7 +166,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
             cdTrustStorePath = getenv(kCDTrustStorePathVariable);
         }
 
-        auto additionalCdCerts = chip::Credentials::LoadAllX509DerCerts(cdTrustStorePath);
+        auto additionalCdCerts =
+            chip::Credentials::LoadAllX509DerCerts(cdTrustStorePath, chip::Credentials::CertificateValidationMode::kPublicKeyOnly);
         if (cdTrustStorePath != nullptr && additionalCdCerts.size() == 0)
         {
             ChipLogError(chipTool, "Warning: no CD signing certs found in path: %s, only defaults will be used", cdTrustStorePath);
