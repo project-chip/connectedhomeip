@@ -2106,7 +2106,6 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
     }
     else
     {
-        mExchangeCtxt.SetValue(ExchangeHandle(*ec));
         mExchangeCtxt.Emplace(*ec);
     }
     mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
