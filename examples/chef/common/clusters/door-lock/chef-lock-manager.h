@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include "chef-lock-endpoint.h"
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <cstdint>
-#include "chef-lock-endpoint.h"
 
 #include <app/util/af.h>
 

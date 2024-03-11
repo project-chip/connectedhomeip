@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include "chef-lock-manager.h"
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
-#include "chef-lock-manager.h"
 
 using chip::to_underlying;
 
@@ -115,24 +115,26 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     chip::FabricIndex modifier(1);
     const chip::CharSpan userName = chip::CharSpan::fromCharString("user1"); // default
                                                                              // username
-    uint32_t uniqueId = 0xFFFFFFFF; // null
+    uint32_t uniqueId         = 0xFFFFFFFF;                                  // null
     UserStatusEnum userStatus = UserStatusEnum::kOccupiedEnabled;
     // Set to programming user instead of unrestrict user to perform
     // priviledged function
-    UserTypeEnum usertype = UserTypeEnum::kProgrammingUser;
+    UserTypeEnum usertype             = UserTypeEnum::kProgrammingUser;
     CredentialRuleEnum credentialRule = CredentialRuleEnum::kSingle;
 
     constexpr size_t totalCredentials(2);
     // According to spec (5.2.6.26.2. CredentialIndex Field), programming PIN credential should be always indexed as 0
     uint16_t credentialIndex0(0);
-     // 1st non ProgrammingPIN credential should be indexed as 1
+    // 1st non ProgrammingPIN credential should be indexed as 1
     uint16_t credentialIndex1(1);
 
     const CredentialStruct credentials[totalCredentials] = {
-            {credentialType: CredentialTypeEnum::kProgrammingPIN, credentialIndex: credentialIndex0},
-            {credentialType: CredentialTypeEnum::kPin, credentialIndex: credentialIndex1}};
+        { credentialType : CredentialTypeEnum::kProgrammingPIN, credentialIndex : credentialIndex0 },
+        { credentialType : CredentialTypeEnum::kPin, credentialIndex : credentialIndex1 }
+    };
 
-    if (!SetUser(endpointId, userIndex, creator, modifier, userName, uniqueId, userStatus, usertype, credentialRule, &credentials[0], totalCredentials))
+    if (!SetUser(endpointId, userIndex, creator, modifier, userName, uniqueId, userStatus, usertype, credentialRule,
+                 &credentials[0], totalCredentials))
     {
         ChipLogError(Zcl, "Unable to set the User [endpointId=%d]", endpointId);
         return false;
@@ -141,16 +143,18 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     DlCredentialStatus credentialStatus = DlCredentialStatus::kOccupied;
 
     // Set the default user's ProgrammingPIN credential
-    uint8_t defaultProgrammingPIN[6]  = { 0x39, 0x39, 0x39, 0x39, 0x39, 0x39 }; // 000000
-    if (!SetCredential(endpointId, credentialIndex0, creator, modifier, credentialStatus, CredentialTypeEnum::kProgrammingPIN, chip::ByteSpan(defaultProgrammingPIN)))
+    uint8_t defaultProgrammingPIN[6] = { 0x39, 0x39, 0x39, 0x39, 0x39, 0x39 }; // 000000
+    if (!SetCredential(endpointId, credentialIndex0, creator, modifier, credentialStatus, CredentialTypeEnum::kProgrammingPIN,
+                       chip::ByteSpan(defaultProgrammingPIN)))
     {
         ChipLogError(Zcl, "Unable to set the credential - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
 
     // Set the default user's non ProgrammingPIN credential
-    uint8_t defaultPin[6]  = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36 }; // 123456
-    if (!SetCredential(endpointId, credentialIndex1, creator, modifier, credentialStatus, CredentialTypeEnum::kPin, chip::ByteSpan(defaultPin)))
+    uint8_t defaultPin[6] = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36 }; // 123456
+    if (!SetCredential(endpointId, credentialIndex1, creator, modifier, credentialStatus, CredentialTypeEnum::kPin,
+                       chip::ByteSpan(defaultPin)))
     {
         ChipLogError(Zcl, "Unable to set the credential - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;

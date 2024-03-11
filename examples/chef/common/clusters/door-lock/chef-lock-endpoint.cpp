@@ -15,11 +15,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "chef-lock-endpoint.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include "chef-lock-endpoint.h"
 
 using chip::to_underlying;
 using chip::app::DataModel::MakeNullable;
@@ -605,8 +605,9 @@ bool LockEndpoint::weekDayScheduleForbidsAccess(uint16_t userIndex, bool * haveS
         [currentTime, calendarTime](const WeekDaysScheduleInfo & s) {
             auto startTime = s.schedule.startHour * chip::kSecondsPerHour + s.schedule.startMinute * chip::kSecondsPerMinute;
             auto endTime   = s.schedule.endHour * chip::kSecondsPerHour + s.schedule.endMinute * chip::kSecondsPerMinute;
-            bool ret = (s.status == DlScheduleStatus::kOccupied && (to_underlying(s.schedule.daysMask) & (1 << calendarTime.tm_wday)) &&
-                startTime <= currentTime && currentTime <= endTime);
+            bool ret =
+                (s.status == DlScheduleStatus::kOccupied && (to_underlying(s.schedule.daysMask) & (1 << calendarTime.tm_wday)) &&
+                 startTime <= currentTime && currentTime <= endTime);
             return s.status == DlScheduleStatus::kOccupied && (to_underlying(s.schedule.daysMask) & (1 << calendarTime.tm_wday)) &&
                 startTime <= currentTime && currentTime <= endTime;
         });
