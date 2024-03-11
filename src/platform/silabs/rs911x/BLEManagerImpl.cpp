@@ -249,8 +249,8 @@ namespace {
 #define BLE_CONFIG_MIN_INTERVAL (16) // Time = Value x 1.25 ms = 30ms
 #define BLE_CONFIG_MAX_INTERVAL (80) // Time = Value x 1.25 ms = 100ms
 #define BLE_CONFIG_LATENCY (0)
-#define BLE_CONFIG_TIMEOUT (100) // Time = Value x 10 ms = 1s
-#define BLE_CONFIG_MIN_CE_LENGTH (0) // Leave to min value
+#define BLE_CONFIG_TIMEOUT (100)          // Time = Value x 10 ms = 1s
+#define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
@@ -496,7 +496,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
         return false;
     }
 
-	// start timer for the indication Confirmation Event
+    // start timer for the indication Confirmation Event
     DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(BLE_SEND_INDICATION_TIMER_PERIOD_MS),
                                           OnSendIndicationTimeout, this);
     return true;
