@@ -965,6 +965,7 @@ private:
     void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
                                       app::AttributePathParams * readPaths, size_t readPathsSize);
     void CancelCommissioningInteractions();
+    void CancelCASECallbacks();
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     void ParseCommissioningInfo();

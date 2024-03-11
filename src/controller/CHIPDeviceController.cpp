@@ -953,6 +953,20 @@ void DeviceCommissioner::CancelCommissioningInteractions()
         mInvokeCancelFn();
         mInvokeCancelFn = nullptr;
     }
+    if (mOnDeviceConnectedCallback.IsRegistered())
+    {
+        ChipLogDetail(Controller, "Cancelling CASE setup for step '%s'", StageToString(mCommissioningStage));
+        CancelCASECallbacks();
+    }
+}
+
+void DeviceCommissioner::CancelCASECallbacks()
+{
+    mOnDeviceConnectedCallback.Cancel();
+    mOnDeviceConnectionFailureCallback.Cancel();
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    mOnDeviceConnectionRetryCallback.Cancel();
+#endif
 }
 
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
@@ -1809,56 +1823,43 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::Exchange
 {
     // CASE session established.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(commissioner->mDeviceBeingCommissioned->GetDeviceId() == sessionHandle->GetPeer().GetNodeId());
+    commissioner->CancelCASECallbacks(); // ensure all CASE callbacks are unregistered
 
-    if (commissioner->mCommissioningStage != CommissioningStage::kFindOperational)
-    {
-        // This call is definitely not us finding our commissionee device.
-        // This is presumably us trying to re-establish CASE on MRP failure.
-        return;
-    }
-
-    if (commissioner->mDeviceBeingCommissioned == nullptr ||
-        commissioner->mDeviceBeingCommissioned->GetDeviceId() != sessionHandle->GetPeer().GetNodeId())
-    {
-        // Not the device we are trying to commission.
-        return;
-    }
-
-    if (commissioner->mCommissioningDelegate != nullptr)
-    {
-        CommissioningDelegate::CommissioningReport report;
-        report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(OperationalDeviceProxy(&exchangeMgr, sessionHandle)));
-        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-    }
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(OperationalDeviceProxy(&exchangeMgr, sessionHandle)));
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
 void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(commissioner->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
+    commissioner->CancelCASECallbacks(); // ensure all CASE callbacks are unregistered
 
-    ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
-    VerifyOrReturn(commissioner != nullptr,
-                   ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
-
-    // Ensure that commissioning stage advancement is done based on seeing an error.
-    if (error == CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
-        error = CHIP_ERROR_INTERNAL;
+        ChipLogProgress(Controller, "Device connection failed. Error %" CHIP_ERROR_FORMAT, error.Format());
     }
-
-    if (commissioner->mDeviceBeingCommissioned == nullptr ||
-        commissioner->mDeviceBeingCommissioned->GetDeviceId() != peerId.GetNodeId())
+    else
     {
-        // Not the device we are trying to commission.
-        return;
-    }
+        // Ensure that commissioning stage advancement is done based on seeing an error.
+        // Ensure that commissioning stage advancement is done based on seeing an error.
+        if (error == CHIP_NO_ERROR)
+        {
+            // Ensure that commissioning stage advancement is done based on seeing an error.
+            if (error == CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
+                error = CHIP_ERROR_INTERNAL;
+            }
 
-    if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
-        commissioner->mCommissioningDelegate != nullptr)
-    {
+            commissioner->CommissioningStageComplete(error);
+            commissioner->CommissioningStageComplete(error);
+        }
         commissioner->CommissioningStageComplete(error);
     }
 }
@@ -1887,6 +1888,8 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
                  ChipLogValueScopedNodeId(peerId), error.Format(), retryTimeout.count());
 
     auto self = static_cast<DeviceCommissioner *>(context);
+    VerifyOrDie(self->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(self->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
 
     // We need to do the fail-safe arming over the PASE session.
     auto * commissioneeDevice = self->FindCommissioneeDevice(peerId.GetNodeId());
