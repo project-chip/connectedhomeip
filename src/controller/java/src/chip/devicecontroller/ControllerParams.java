@@ -369,7 +369,6 @@ public final class ControllerParams {
      * has to be enabled.
      *
      * @param enableServerInteractions indicates whether to enable server interactions.
-     *
      */
     public Builder setEnableServerInteractions(boolean enableServerInteractions) {
       this.enableServerInteractions = enableServerInteractions;
