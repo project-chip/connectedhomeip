@@ -29,7 +29,7 @@ namespace app {
  * Provides information about the associated exchange context.
  *
  * Design Rationale: This interface enhances unit testability and allows applications to
- * customize CommandResponder behavior with stubs.
+ * customize CommandResponder behavior. For example, it can stub out sending a response.
  */
 class CommandResponderInterface
 {

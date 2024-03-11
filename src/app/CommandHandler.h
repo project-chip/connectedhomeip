@@ -161,7 +161,7 @@ public:
     // add new parameters without there needing to be an ever increasing parameter list with defaults.
     struct InvokeResponseParameters
     {
-        InvokeResponseParameters(ConcreteCommandPath aRequestCommandPath) : mRequestCommandPath(aRequestCommandPath) {}
+        InvokeResponseParameters(const ConcreteCommandPath & aRequestCommandPath) : mRequestCommandPath(aRequestCommandPath) {}
 
         InvokeResponseParameters & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
         {
