@@ -90,8 +90,8 @@ void CommandResponder::StartSendingCommandResponses()
         // TODO(#30453): It should be our responsibility to send a Failure StatusResponse to the requestor
         // if there is a SessionHandle, but legacy unit tests explicitly check the behavior where
         // we do not send any message. Changing this behavior should be done in a standalone
-        // PR where only that specific change is made. Here is a possible solution that should
-        // be done that fulfills our responsibility to send a Failure StatusResponse, but this causes unit
+        // PR where only that specific change is made. Here is a possible solution that could 
+        // be used that fulfills our responsibility to send a Failure StatusResponse. This causes unit
         // tests to start failing.
         //   ```
         //   if (mExchangeCtx && mExchangeCtx->HasSessionHandle())
