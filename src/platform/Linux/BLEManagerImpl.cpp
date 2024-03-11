@@ -251,8 +251,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEvent)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    bool controlOpComplete = false;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
     switch (apEvent->Type)
     {
@@ -288,7 +287,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete:
         SuccessOrExit(err = apEvent->Platform.BLEPeripheralAdvStartComplete.mError);
-        sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
+        mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
         // Do not restart the timer if it is still active. This is to avoid the timer from being restarted
         // if the advertising is stopped due to a premature release.
         if (!DeviceLayer::SystemLayer().IsTimerActive(HandleAdvertisingTimer, this))
@@ -296,29 +295,29 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             // Start a timer to make sure that the fast advertising is stopped after specified timeout.
             SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this));
         }
-        sInstance.mFlags.Set(Flags::kAdvertising);
+        mFlags.Set(Flags::kAdvertising);
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete:
         SuccessOrExit(err = apEvent->Platform.BLEPeripheralAdvStopComplete.mError);
-        sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
+        mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
-
         // Transition to the not Advertising state...
-        if (sInstance.mFlags.Has(Flags::kAdvertising))
+        if (mFlags.Has(Flags::kAdvertising))
         {
-            sInstance.mFlags.Clear(Flags::kAdvertising);
+            mFlags.Clear(Flags::kAdvertising);
             ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
         }
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvReleased:
         // If the advertising was stopped due to a premature release, check if it needs to be restarted.
-        sInstance.mFlags.Clear(Flags::kAdvertising);
+        mFlags.Clear(Flags::kAdvertising);
         DriveBLEState();
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete:
         SuccessOrExit(err = apEvent->Platform.BLEPeripheralRegisterAppComplete.mError);
+        mFlags.Clear(Flags::kControlOpInProgress);
         mFlags.Set(Flags::kAppRegistered);
-        controlOpComplete = true;
+        DriveBLEState();
         break;
     default:
         break;
@@ -330,13 +329,7 @@ exit:
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
-        sInstance.mFlags.Clear(Flags::kControlOpInProgress);
-    }
-
-    if (controlOpComplete)
-    {
         mFlags.Clear(Flags::kControlOpInProgress);
-        DriveBLEState();
     }
 }
 
